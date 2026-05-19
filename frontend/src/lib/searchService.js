@@ -1,20 +1,7 @@
 import { MOCK_LEADS } from './mockLeads'
+import { PROVIDERS } from './providers'
 
-/**
- * Lead search providers — wire up real APIs later.
- * - claude: AI-powered search (phase 1)
- * - apollo: Apollo.io API (phase 2)
- * - hunter: Hunter.io API (phase 2)
- */
-export const PROVIDERS = {
-  claude: { id: 'claude', label: 'Claude AI', status: 'active', description: 'AI-powered lead discovery' },
-  apollo: { id: 'apollo', label: 'Apollo.io', status: 'coming_soon', description: '230M+ B2B contacts' },
-  hunter: { id: 'hunter', label: 'Hunter.io', status: 'coming_soon', description: 'Email finder & verification' },
-}
-
-function delay(ms) {
-  return new Promise((r) => setTimeout(r, ms))
-}
+export { PROVIDERS }
 
 function filterMockLeads(filters) {
   let results = [...MOCK_LEADS]
@@ -23,27 +10,37 @@ function filterMockLeads(filters) {
   if (q) {
     results = results.filter(
       (l) =>
-        l.firstName.toLowerCase().includes(q) ||
-        l.lastName.toLowerCase().includes(q) ||
-        l.company.toLowerCase().includes(q) ||
-        l.title.toLowerCase().includes(q)
+        l.firstName?.toLowerCase().includes(q) ||
+        l.lastName?.toLowerCase().includes(q) ||
+        l.company?.toLowerCase().includes(q) ||
+        l.title?.toLowerCase().includes(q) ||
+        l.city?.toLowerCase().includes(q) ||
+        l.state?.toLowerCase().includes(q) ||
+        l.location?.toLowerCase().includes(q) ||
+        l.industry?.toLowerCase().includes(q)
     )
   }
 
   if (filters.jobTitles?.length) {
     results = results.filter((l) =>
-      filters.jobTitles.some((t) => l.title.toLowerCase().includes(t.toLowerCase()))
+      filters.jobTitles.some((t) => l.title?.toLowerCase().includes(t.split('/')[0].trim().toLowerCase()))
+    )
+  }
+
+  if (filters.states?.length) {
+    results = results.filter((l) =>
+      filters.states.some((s) => l.state?.includes(s) || l.location?.includes(s))
+    )
+  }
+
+  if (filters.cities?.length) {
+    results = results.filter((l) =>
+      filters.cities.some((c) => l.city?.includes(c) || l.location?.includes(c))
     )
   }
 
   if (filters.industries?.length) {
     results = results.filter((l) => filters.industries.includes(l.industry))
-  }
-
-  if (filters.locations?.length) {
-    results = results.filter((l) =>
-      filters.locations.some((loc) => l.location.includes(loc))
-    )
   }
 
   if (filters.companySizes?.length) {
@@ -53,24 +50,46 @@ function filterMockLeads(filters) {
   return results
 }
 
+async function searchViaClaude(filters, count) {
+  const res = await fetch('/api/search-leads', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ filters, count }),
+  })
+
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error || data.hint || 'Claude search failed')
+  return data
+}
+
 /**
- * Search leads — currently uses mock data + simulated AI delay.
- * Replace body with Claude API call when backend is ready.
+ * Search leads — Claude via /api on Vercel; Indian demo data fallback locally.
  */
-export async function searchLeads(filters, provider = 'claude') {
+export async function searchLeads(filters, provider = 'claude', count = 8) {
   if (provider === 'apollo' || provider === 'hunter') {
     throw new Error(`${PROVIDERS[provider].label} integration coming soon`)
   }
 
-  await delay(1200 + Math.random() * 800)
+  try {
+    const data = await searchViaClaude(filters, count)
+    if (data.leads?.length) return data
+  } catch (e) {
+    console.warn('Claude API:', e.message)
+  }
 
-  const results = filterMockLeads(filters)
-  const totalEstimate = Math.max(results.length, Math.floor(Math.random() * 50000) + 1200)
+  // Fallback: Indian mock data (local dev or missing API key)
+  await new Promise((r) => setTimeout(r, 800))
+  const leads = filterMockLeads(filters)
+  const total = Math.max(leads.length * 150, 3200 + Math.floor(Math.random() * 12000))
 
   return {
-    leads: results,
-    total: totalEstimate,
-    netNew: Math.floor(totalEstimate * 0.85),
-    provider,
+    leads,
+    total,
+    netNew: Math.floor(total * 0.88),
+    provider: leads.length ? 'demo-india' : 'none',
+    notice:
+      leads.length === 0
+        ? 'No demo matches — add ANTHROPIC_API_KEY on Vercel for full Claude search.'
+        : 'Showing Indian sample leads. Add ANTHROPIC_API_KEY on Vercel for live Claude AI search.',
   }
 }

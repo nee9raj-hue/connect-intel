@@ -1,4 +1,4 @@
-import { PROVIDERS } from '../../lib/searchService'
+import { PROVIDERS } from '../../lib/providers'
 
 export default function IntegrationsPanel() {
   return (

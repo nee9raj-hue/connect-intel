@@ -1,55 +1,11 @@
 import { useState } from 'react'
+import { FILTER_SECTIONS } from '../../lib/filterOptions'
 
-const FILTER_SECTIONS = {
-  jobTitles: {
-    label: 'Job Titles',
-    options: [
-      'CEO',
-      'Founder',
-      'CMO',
-      'VP Marketing',
-      'Head of Growth',
-      'Marketing Manager',
-      'Director of Sales',
-      'Business Development',
-    ],
-  },
-  locations: {
-    label: 'Location',
-    options: [
-      'San Francisco',
-      'New York',
-      'Austin',
-      'Boston',
-      'Chicago',
-      'Seattle',
-      'Miami',
-      'Los Angeles',
-    ],
-  },
-  industries: {
-    label: 'Industry',
-    options: [
-      'Software',
-      'Marketing & Advertising',
-      'Information Technology',
-      'Healthcare',
-      'E-commerce',
-      'Financial Services',
-      'Retail',
-      'Data & Analytics',
-    ],
-  },
-  companySizes: {
-    label: 'Company Size',
-    options: ['1-10', '11-50', '51-200', '201-500', '501-1000'],
-  },
-}
-
-export default function FilterSidebar({ filters, onChange, onSearch, loading }) {
+export default function FilterSidebar({ filters, onChange, onSearch, loading, collapsed, onToggleCollapse }) {
   const [expanded, setExpanded] = useState({
     jobTitles: true,
-    locations: true,
+    states: true,
+    cities: false,
     industries: true,
     companySizes: false,
   })
@@ -62,37 +18,60 @@ export default function FilterSidebar({ filters, onChange, onSearch, loading }) 
     onChange({ ...filters, [key]: next })
   }
 
-  const activeCount = Object.values(filters).flat().length
+  const activeCount =
+    (filters.jobTitles?.length || 0) +
+    (filters.states?.length || 0) +
+    (filters.cities?.length || 0) +
+    (filters.industries?.length || 0) +
+    (filters.companySizes?.length || 0)
+
+  if (collapsed) {
+    return (
+      <button
+        type="button"
+        onClick={onToggleCollapse}
+        className="w-10 shrink-0 border-r border-gray-200 bg-white text-xs text-gray-500 hover:bg-gray-50 writing-mode-vertical"
+        title="Show filters"
+      >
+        Filters
+      </button>
+    )
+  }
 
   return (
-    <aside className="w-64 shrink-0 bg-white border-r border-gray-200 flex flex-col h-full overflow-hidden">
-      <div className="p-4 border-b border-gray-200">
-        <div className="flex items-center justify-between mb-1">
-          <h2 className="text-sm font-semibold text-gray-900">Filters</h2>
+    <aside className="w-[260px] shrink-0 bg-white border-r border-gray-200 flex flex-col h-full">
+      <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between shrink-0">
+        <span className="text-sm font-semibold text-gray-900">Filters</span>
+        <div className="flex items-center gap-2">
           {activeCount > 0 && (
             <button
+              type="button"
               onClick={() =>
                 onChange({
                   jobTitles: [],
-                  locations: [],
+                  states: [],
+                  cities: [],
                   industries: [],
                   companySizes: [],
                   keywords: filters.keywords || '',
                 })
               }
-              className="text-xs text-apollo-dark font-medium hover:underline"
+              className="text-xs text-blue-600 hover:underline"
             >
               Clear all
             </button>
           )}
+          <button type="button" onClick={onToggleCollapse} className="text-xs text-gray-400 hover:text-gray-600">
+            Hide
+          </button>
         </div>
-        <p className="text-xs text-gray-500">{activeCount} filters applied</p>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-3 space-y-1">
+      <div className="flex-1 overflow-y-auto">
         {Object.entries(FILTER_SECTIONS).map(([key, section]) => (
           <FilterSection
             key={key}
+            icon={section.icon}
             label={section.label}
             options={section.options}
             selected={filters[key] || []}
@@ -103,55 +82,59 @@ export default function FilterSidebar({ filters, onChange, onSearch, loading }) 
         ))}
       </div>
 
-      <div className="p-4 border-t border-gray-200">
+      <div className="p-3 border-t border-gray-100 shrink-0 space-y-2">
         <button
+          type="button"
           onClick={onSearch}
           disabled={loading}
-          className="w-full py-2.5 bg-apollo-yellow text-apollo-dark font-bold text-sm rounded-lg hover:bg-apollo-yellow-hover disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="w-full py-2.5 bg-[#ffcb2b] hover:bg-[#f0bc00] text-[#242424] font-semibold text-sm rounded-md disabled:opacity-60 flex items-center justify-center gap-2"
         >
           {loading ? (
             <>
-              <span className="w-4 h-4 border-2 border-apollo-dark/30 border-t-apollo-dark rounded-full animate-spin" />
-              Searching...
+              <span className="w-4 h-4 border-2 border-[#242424]/30 border-t-[#242424] rounded-full animate-spin" />
+              Claude searching…
             </>
           ) : (
-            <>Search leads</>
+            <>Search with Claude AI</>
           )}
         </button>
+        <p className="text-[10px] text-center text-gray-400">Apollo.io data — coming soon</p>
       </div>
     </aside>
   )
 }
 
-function FilterSection({ label, options, selected, expanded, onToggleExpand, onToggleOption }) {
+function FilterSection({ icon, label, options, selected, expanded, onToggleExpand, onToggleOption }) {
   return (
-    <div className="border border-gray-100 rounded-lg overflow-hidden mb-2">
+    <div className="border-b border-gray-100">
       <button
+        type="button"
         onClick={onToggleExpand}
-        className="w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium text-gray-800 hover:bg-gray-50"
+        className="w-full flex items-center gap-2 px-4 py-2.5 text-[13px] font-medium text-gray-800 hover:bg-gray-50"
       >
-        {label}
+        <span className="text-base opacity-70">{icon}</span>
+        <span className="flex-1 text-left">{label}</span>
         {selected.length > 0 && (
-          <span className="text-[10px] font-bold bg-apollo-yellow text-apollo-dark px-1.5 rounded-full mr-1">
+          <span className="text-[10px] font-bold bg-[#ffcb2b] text-[#242424] px-1.5 rounded-full">
             {selected.length}
           </span>
         )}
-        <span className="text-gray-400 text-xs">{expanded ? '▲' : '▼'}</span>
+        <span className="text-gray-400 text-[10px]">{expanded ? '▲' : '▼'}</span>
       </button>
       {expanded && (
-        <div className="px-2 pb-2 space-y-0.5 max-h-40 overflow-y-auto">
+        <div className="px-3 pb-3 max-h-44 overflow-y-auto">
           {options.map((opt) => (
             <label
               key={opt}
-              className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-gray-50 cursor-pointer text-sm text-gray-700"
+              className="flex items-start gap-2 py-1.5 px-1 rounded hover:bg-gray-50 cursor-pointer text-[13px] text-gray-700"
             >
               <input
                 type="checkbox"
                 checked={selected.includes(opt)}
                 onChange={() => onToggleOption(opt)}
-                className="rounded border-gray-300 text-apollo-dark focus:ring-apollo-yellow"
+                className="mt-0.5 rounded border-gray-300 text-gray-900 focus:ring-[#ffcb2b]"
               />
-              <span className="truncate">{opt}</span>
+              <span className="leading-snug">{opt}</span>
             </label>
           ))}
         </div>

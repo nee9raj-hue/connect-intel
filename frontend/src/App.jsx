@@ -4,7 +4,7 @@ import LandingPage from './pages/LandingPage'
 import AuthPage from './pages/AuthPage'
 import AppShell from './components/layout/AppShell'
 
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''
+const GOOGLE_CLIENT_ID = (import.meta.env.VITE_GOOGLE_CLIENT_ID || '').trim().replace(/^["']|["']$/g, '')
 
 function Router() {
   const { screen } = useApp()

@@ -4,7 +4,7 @@ export default function OverviewPanel({ onNavigate }) {
   const { user, savedLeads, searchHistory } = useApp()
 
   return (
-    <div className="p-6 overflow-y-auto h-[calc(100vh-3.5rem)]">
+    <div className="p-6 overflow-y-auto h-full bg-[#f6f7f9]">
       <div className="grid grid-cols-4 gap-4 mb-6">
         {[
           { label: 'Searches this month', value: searchHistory.length, change: '+2 this week' },

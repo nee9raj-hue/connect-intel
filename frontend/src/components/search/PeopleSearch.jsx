@@ -6,27 +6,31 @@ import ResultsTable from './ResultsTable'
 
 const EMPTY_FILTERS = {
   jobTitles: [],
-  locations: [],
+  states: [],
+  cities: [],
   industries: [],
   companySizes: [],
   keywords: '',
 }
 
 export default function PeopleSearch() {
-  const { addSearchHistory, toggleSaveLead } = useApp()
+  const { addSearchHistory, toggleSaveLead, savedLeads } = useApp()
   const [filters, setFilters] = useState(EMPTY_FILTERS)
-  const [tab, setTab] = useState('people')
+  const [countTab, setCountTab] = useState('total')
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState(null)
   const [selected, setSelected] = useState([])
   const [hasSearched, setHasSearched] = useState(false)
+  const [filtersOpen, setFiltersOpen] = useState(true)
+  const [searchError, setSearchError] = useState(null)
 
   const handleSearch = async () => {
     setLoading(true)
     setHasSearched(true)
     setSelected([])
+    setSearchError(null)
     try {
-      const data = await searchLeads(filters, 'claude')
+      const data = await searchLeads(filters, 'claude', 10)
       setResults(data)
       addSearchHistory({
         filters: { ...filters },
@@ -35,39 +39,29 @@ export default function PeopleSearch() {
         at: new Date().toISOString(),
       })
     } catch (e) {
-      alert(e.message)
+      setSearchError(e.message)
+      setResults(null)
     } finally {
       setLoading(false)
     }
   }
 
-  const handleSelectAll = () => {
-    if (!results) return
-    setSelected(
-      selected.length === results.leads.length ? [] : results.leads.map((l) => l.id)
-    )
-  }
+  const displayLeads =
+    countTab === 'saved'
+      ? savedLeads
+      : results?.leads || []
 
-  const handleSelect = (id) => {
-    setSelected((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    )
+  const handleSelectAll = () => {
+    const list = displayLeads
+    setSelected(selected.length === list.length ? [] : list.map((l) => l.id))
   }
 
   const exportCSV = () => {
-    const leads = results?.leads.filter((l) => selected.includes(l.id)) || results?.leads || []
+    const leads = displayLeads.filter((l) => (selected.length ? selected.includes(l.id) : true))
     if (!leads.length) return
-    const hdr = ['First Name', 'Last Name', 'Title', 'Company', 'Email', 'Phone', 'Location', 'Industry', 'Score']
+    const hdr = ['First Name', 'Last Name', 'Title', 'Company', 'Email', 'Phone', 'Location', 'Industry', 'Score', 'Source']
     const rows = leads.map((l) => [
-      l.firstName,
-      l.lastName,
-      l.title,
-      l.company,
-      l.email,
-      l.phone,
-      l.location,
-      l.industry,
-      l.score,
+      l.firstName, l.lastName, l.title, l.company, l.email, l.phone, l.location, l.industry, l.score, l.source || '',
     ])
     const csv = [hdr, ...rows].map((r) => r.map((v) => `"${v || ''}"`).join(',')).join('\n')
     const a = document.createElement('a')
@@ -77,168 +71,187 @@ export default function PeopleSearch() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-3.5rem)]">
-      <FilterSidebar
-        filters={filters}
-        onChange={setFilters}
-        onSearch={handleSearch}
-        loading={loading}
-      />
-
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Search toolbar */}
-        <div className="bg-white border-b border-gray-200 px-4 py-3 shrink-0">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="flex border border-gray-200 rounded-lg overflow-hidden text-sm font-medium">
-              {['people', 'companies'].map((t) => (
-                <button
-                  key={t}
-                  onClick={() => setTab(t)}
-                  className={`px-4 py-2 capitalize transition-colors ${
-                    tab === t
-                      ? 'bg-ci-nav text-white'
-                      : 'bg-white text-gray-600 hover:bg-gray-50'
-                  }`}
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
-            {tab === 'companies' && (
-              <span className="text-xs text-amber-700 bg-amber-50 px-2 py-1 rounded font-medium">
-                Company search coming soon
-              </span>
-            )}
-          </div>
-
-          <div className="flex gap-2">
-            <div className="flex-1 relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
-              <input
-                type="text"
-                placeholder="Search keywords — company, title, industry..."
-                value={filters.keywords}
-                onChange={(e) => setFilters({ ...filters, keywords: e.target.value })}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                className="w-full pl-9 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ci-yellow/40 focus:border-ci-yellow"
-              />
-            </div>
+    <div className="flex flex-col h-full min-h-0">
+      {/* Apollo-style top bar */}
+      <header className="shrink-0 bg-white border-b border-gray-200 px-5 py-3">
+        <div className="flex items-center justify-between gap-4 mb-3">
+          <h1 className="text-lg font-semibold text-gray-900">Find people</h1>
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600 bg-gray-100 px-2.5 py-1 rounded-full">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+              Claude AI
+            </span>
             <button
-              onClick={handleSearch}
-              disabled={loading}
-              className="px-5 py-2.5 bg-ci-yellow text-ci-dark font-bold text-sm rounded-md hover:bg-ci-yellow-hover disabled:opacity-60"
+              type="button"
+              onClick={exportCSV}
+              disabled={!displayLeads.length}
+              className="text-xs font-medium px-3 py-1.5 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-40"
             >
-              Search
+              Export
             </button>
           </div>
+        </div>
 
-          {results && (
-            <div className="flex items-center gap-4 mt-3">
-              <StatPill label="Total" value={results.total.toLocaleString()} active />
-              <StatPill label="Net New" value={results.netNew.toLocaleString()} />
-              <StatPill label="Showing" value={results.leads.length} />
-              <div className="ml-auto flex gap-2">
-                {selected.length > 0 && (
-                  <button
-                    onClick={exportCSV}
-                    className="px-3 py-1.5 text-xs font-semibold border border-gray-200 rounded-lg hover:bg-gray-50"
-                  >
-                    Export {selected.length} selected
-                  </button>
-                )}
-                <button
-                  onClick={exportCSV}
-                  className="px-3 py-1.5 text-xs font-semibold border border-gray-200 rounded-lg hover:bg-gray-50"
-                >
-                  Export all
-                </button>
-              </div>
-            </div>
+        <div className="flex flex-wrap items-center gap-2 mb-3">
+          <button
+            type="button"
+            onClick={() => setFiltersOpen((o) => !o)}
+            className="text-xs font-medium px-3 py-1.5 border border-gray-300 rounded-md hover:bg-gray-50"
+          >
+            {filtersOpen ? 'Hide filters' : 'Show filters'}
+          </button>
+          <div className="flex-1 min-w-[200px] relative max-w-xl">
+            <input
+              type="text"
+              placeholder="Search people — e.g. exporters in Jaipur, pharma Mumbai…"
+              value={filters.keywords}
+              onChange={(e) => setFilters({ ...filters, keywords: e.target.value })}
+              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+              className="w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#ffcb2b]/50 focus:border-[#ffcb2b]"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={handleSearch}
+            disabled={loading}
+            className="px-4 py-2 bg-[#ffcb2b] hover:bg-[#f0bc00] text-[#242424] text-sm font-semibold rounded-md disabled:opacity-60"
+          >
+            {loading ? 'Searching…' : 'Search'}
+          </button>
+          <button
+            type="button"
+            onClick={handleSearch}
+            disabled={loading}
+            className="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-800 disabled:opacity-60"
+          >
+            Research with AI
+          </button>
+        </div>
+
+        {/* Total | Net New | Saved — Apollo style */}
+        <div className="flex items-center gap-2">
+          {[
+            { id: 'total', label: 'Total', value: results?.total },
+            { id: 'netNew', label: 'Net new', value: results?.netNew },
+            { id: 'saved', label: 'Saved', value: savedLeads.length },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setCountTab(tab.id)}
+              className={`px-3 py-1.5 rounded-md text-xs font-semibold border transition-colors ${
+                countTab === tab.id
+                  ? 'bg-gray-900 text-white border-gray-900'
+                  : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+              }`}
+            >
+              {tab.label}
+              {tab.value != null && (
+                <span className="ml-1 opacity-80">
+                  ({typeof tab.value === 'number' ? tab.value.toLocaleString() : tab.value})
+                </span>
+              )}
+            </button>
+          ))}
+          {hasSearched && results && countTab !== 'saved' && (
+            <span className="ml-auto text-xs text-gray-500">
+              Showing <strong>{results.leads.length}</strong>
+              {results.provider === 'claude' && (
+                <span className="ml-1 text-green-600">· Claude AI</span>
+              )}
+              {results.provider === 'demo-india' && (
+                <span className="ml-1 text-amber-600">· Demo data (add API key for Claude)</span>
+              )}
+            </span>
           )}
         </div>
 
-        {/* Results area */}
-        {!hasSearched ? (
-          <EmptySearch />
-        ) : loading ? (
-          <LoadingState />
-        ) : results?.leads.length === 0 ? (
-          <NoResults onRetry={handleSearch} />
-        ) : (
-          <ResultsTable
-            leads={results.leads}
-            selected={selected}
-            onSelectAll={handleSelectAll}
-            onSelect={handleSelect}
-            onSave={toggleSaveLead}
-          />
+        {results?.notice && countTab !== 'saved' && (
+          <p className="mt-2 text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded px-2 py-1.5">
+            {results.notice}
+          </p>
         )}
+        {searchError && (
+          <p className="mt-2 text-xs text-red-700 bg-red-50 border border-red-100 rounded px-2 py-1.5">
+            {searchError}
+          </p>
+        )}
+      </header>
+
+      <div className="flex flex-1 min-h-0">
+        <FilterSidebar
+          filters={filters}
+          onChange={setFilters}
+          onSearch={handleSearch}
+          loading={loading}
+          collapsed={!filtersOpen}
+          onToggleCollapse={() => setFiltersOpen((o) => !o)}
+        />
+
+        <div className="flex-1 flex flex-col min-w-0 bg-white">
+          {countTab === 'saved' ? (
+            displayLeads.length ? (
+              <ResultsTable
+                leads={displayLeads}
+                selected={selected}
+                onSelectAll={handleSelectAll}
+                onSelect={(id) =>
+                  setSelected((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
+                }
+                onSave={toggleSaveLead}
+              />
+            ) : (
+              <EmptyState title="No saved leads" sub="Save prospects from search results" />
+            )
+          ) : !hasSearched ? (
+            <EmptyState
+              title="Use filters and search"
+              sub="Select Indian states, industries, or type keywords like “exporters from Jaipur”, then click Search with Claude AI."
+            />
+          ) : loading ? (
+            <LoadingState />
+          ) : displayLeads.length === 0 ? (
+            <EmptyState title="No leads match" sub="Try fewer filters or different keywords" action={handleSearch} />
+          ) : (
+            <ResultsTable
+              leads={displayLeads}
+              selected={selected}
+              onSelectAll={handleSelectAll}
+              onSelect={(id) =>
+                setSelected((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
+              }
+              onSave={toggleSaveLead}
+            />
+          )}
+        </div>
       </div>
     </div>
   )
 }
 
-function StatPill({ label, value, active }) {
+function EmptyState({ title, sub, action }) {
   return (
-    <div
-      className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm ${
-        active ? 'bg-ci-yellow/25 border border-ci-yellow/50' : 'bg-gray-100'
-      }`}
-    >
-      <span className="text-gray-500 text-xs font-medium">{label}</span>
-      <span className="font-bold text-gray-900">{value}</span>
-    </div>
-  )
-}
-
-function EmptySearch() {
-  return (
-    <div className="flex-1 flex flex-col items-center justify-center text-center p-8 bg-white">
-      <div className="text-5xl mb-4">👥</div>
-      <h3 className="text-lg font-semibold text-gray-900 mb-2">Search for your ideal prospects</h3>
-      <p className="text-sm text-gray-500 max-w-md leading-relaxed">
-        Use filters on the left to narrow by job title, location, industry, and company size —
-        then click Search. Results are powered by Claude AI (demo data until API is connected).
-      </p>
-      <div className="mt-8 grid grid-cols-3 gap-4 text-left max-w-lg w-full">
-        {[
-          { icon: '🎯', t: 'Filter', d: 'Job title, location, industry & more' },
-          { icon: '🤖', t: 'AI Search', d: 'Claude finds matching leads' },
-          { icon: '📋', t: 'Save & Export', d: 'Build lists, export CSV' },
-        ].map((item) => (
-          <div key={item.t} className="p-4 rounded-xl border border-gray-100 bg-gray-50">
-            <div className="text-xl mb-2">{item.icon}</div>
-            <div className="text-sm font-semibold text-gray-800">{item.t}</div>
-            <div className="text-xs text-gray-500 mt-0.5">{item.d}</div>
-          </div>
-        ))}
-      </div>
+    <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
+      <p className="font-medium text-gray-900">{title}</p>
+      <p className="text-sm text-gray-500 mt-1 max-w-sm">{sub}</p>
+      {action && (
+        <button
+          type="button"
+          onClick={action}
+          className="mt-4 px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md"
+        >
+          Search again
+        </button>
+      )}
     </div>
   )
 }
 
 function LoadingState() {
   return (
-    <div className="flex-1 flex flex-col items-center justify-center bg-white">
-      <div className="w-10 h-10 border-3 border-apollo-yellow/30 border-t-apollo-yellow rounded-full animate-spin mb-4" />
-      <p className="font-semibold text-gray-800">Claude AI is searching...</p>
-      <p className="text-sm text-gray-500 mt-1">Finding leads that match your filters</p>
-    </div>
-  )
-}
-
-function NoResults({ onRetry }) {
-  return (
-    <div className="flex-1 flex flex-col items-center justify-center bg-white">
-      <div className="text-4xl mb-3">🔍</div>
-      <h3 className="font-semibold text-gray-900 mb-1">No leads match your filters</h3>
-      <p className="text-sm text-gray-500 mb-4">Try broadening your search criteria</p>
-      <button
-        onClick={onRetry}
-        className="px-4 py-2 bg-apollo-dark text-white text-sm font-semibold rounded-lg"
-      >
-        Search again
-      </button>
+    <div className="flex-1 flex flex-col items-center justify-center">
+      <div className="w-10 h-10 border-2 border-[#ffcb2b]/30 border-t-[#ffcb2b] rounded-full animate-spin mb-3" />
+      <p className="text-sm font-medium text-gray-800">Claude is finding Indian B2B leads…</p>
     </div>
   )
 }

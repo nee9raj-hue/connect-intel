@@ -2,7 +2,7 @@ import { GoogleLogin } from '@react-oauth/google'
 import { jwtDecode } from 'jwt-decode'
 import { useApp } from '../../context/AppContext'
 
-const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''
+const CLIENT_ID = (import.meta.env.VITE_GOOGLE_CLIENT_ID || '').trim().replace(/^["']|["']$/g, '')
 
 /**
  * Google sign-in — instant access without signup form.
