@@ -64,41 +64,79 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="pt-[100px] pb-16 px-6 bg-gradient-to-b from-white to-ci-surface">
-        <div className="max-w-[720px] mx-auto text-center">
-          <h1 className="font-display text-[2.75rem] md:text-[3.25rem] font-bold text-ci-dark tracking-tight leading-[1.08] mb-5">
-            Find leads. Close deals.
-            <br />
-            <span className="text-ci-yellow" style={{ WebkitTextStroke: '1px #242424' }}>
-              One platform.
+      <section className="relative pt-[100px] pb-20 px-6 overflow-hidden">
+        <div className="absolute inset-0 -z-10 bg-[#fafafa]" aria-hidden />
+        <div
+          className="absolute inset-0 -z-10 opacity-[0.35]"
+          style={{
+            backgroundImage: 'radial-gradient(circle at 1px 1px, #d4d4d4 1px, transparent 0)',
+            backgroundSize: '28px 28px',
+          }}
+          aria-hidden
+        />
+        <div
+          className="absolute top-16 left-1/2 -translate-x-1/2 w-[min(100%,720px)] h-[380px] -z-10 rounded-full bg-[#ffcb2b]/12 blur-[90px]"
+          aria-hidden
+        />
+        <div className="max-w-[800px] mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-gray-200 shadow-sm mb-8">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
             </span>
-          </h1>
-          <p className="text-[17px] text-gray-600 leading-relaxed mb-8 max-w-[540px] mx-auto">
-            Connect Intel gives marketing and sales teams a single workspace to search prospects,
-            enrich contacts, and grow pipeline — without switching tools.
-          </p>
-
-          <div className="max-w-[380px] mx-auto mb-3">
-            <GoogleSignIn text="signup_with" theme="filled_blue" />
+            <span className="text-[12px] font-semibold text-gray-600">
+              AI prospecting · India & global B2B
+            </span>
           </div>
-          <p className="text-xs text-gray-500 mb-8">
-            Sign in with Google — no password, no lengthy signup
+
+          <h1 className="font-display text-[2.5rem] sm:text-[3rem] md:text-[3.5rem] font-bold text-[#0f0f0f] tracking-[-0.03em] leading-[1.1] mb-6">
+            Find the right leads.
+            <br />
+            Close deals <span className="text-[#b8860b]">faster</span>.
+          </h1>
+
+          <p className="text-lg md:text-xl text-gray-600 leading-relaxed mb-4 max-w-[580px] mx-auto">
+            Connect Intel is the workspace where marketing and sales teams search prospects,
+            score opportunities with AI, and grow pipeline—without juggling multiple tools.
+          </p>
+          <p className="text-sm text-gray-500 mb-10 max-w-[500px] mx-auto leading-relaxed">
+            Filter by role, industry, and state. Save lists and export in one click.
+            Plug in Apollo.io and Hunter.io when you scale.
           </p>
 
-          <button
-            onClick={() => setScreen('auth')}
-            className="text-sm font-semibold text-ci-blue hover:underline"
-          >
-            Or continue with email →
-          </button>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-5">
+            <button
+              type="button"
+              onClick={() => setScreen('auth')}
+              className="w-full sm:w-auto px-8 py-3.5 bg-[#0f0f0f] text-white text-[15px] font-semibold rounded-lg hover:bg-[#2a2a2a] transition-colors shadow-lg shadow-black/10"
+            >
+              Start free — 25 searches
+            </button>
+            <a
+              href="#product"
+              className="w-full sm:w-auto px-8 py-3.5 bg-white text-[#0f0f0f] text-[15px] font-semibold rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
+            >
+              See how it works
+            </a>
+          </div>
+
+          <div className="max-w-[400px] mx-auto">
+            <GoogleSignIn text="signup_with" theme="outline" />
+          </div>
+          <p className="text-xs text-gray-400 mt-3">
+            Sign in with Google · No credit card · Live in 2 minutes
+          </p>
         </div>
 
         {/* Stats */}
-        <div className="max-w-[800px] mx-auto mt-14 grid grid-cols-3 gap-6">
+        <div className="max-w-[900px] mx-auto mt-16 grid grid-cols-3 gap-4 md:gap-6">
           {STATS.map((s) => (
-            <div key={s.label} className="text-center">
-              <div className="text-2xl md:text-3xl font-bold text-ci-dark">{s.value}</div>
-              <div className="text-xs text-gray-500 mt-1 font-medium">{s.label}</div>
+            <div
+              key={s.label}
+              className="text-center py-5 px-4 rounded-xl bg-white/90 border border-gray-100 shadow-sm"
+            >
+              <div className="text-2xl md:text-3xl font-bold text-[#0f0f0f] tracking-tight">{s.value}</div>
+              <div className="text-xs text-gray-500 mt-1.5 font-medium">{s.label}</div>
             </div>
           ))}
         </div>
