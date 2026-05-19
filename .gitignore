@@ -1,0 +1,16 @@
+node_modules/
+frontend/node_modules/
+frontend/dist/
+.DS_Store
+.env
+.env.*
+!.env.example
+*.log
+
+# Built output (Vercel builds these on deploy)
+site/
+site-standalone/
+app.html
+assets/
+frontend/dist/
+Connect Import/

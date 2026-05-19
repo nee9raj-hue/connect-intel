@@ -1,0 +1,32 @@
+CONNECT INTEL — HOW TO OPEN THE APP
+====================================
+
+STEP 1 — Double-click:  index.html
+        (Opens a launcher page with instructions)
+
+STEP 2 — Best way on Mac:
+        Double-click:  OPEN CONNECT INTEL.command
+
+        → Browser opens the full app at http://localhost:4173
+        → Keep the terminal window open while using the app
+        → Press Ctrl+C in terminal to stop
+
+WHY NOT JUST index.html FOR THE FULL APP?
+Browsers block modern apps opened as plain files (security).
+The .command file starts a tiny local server — this always works.
+
+ALTERNATIVE (TERMINAL)
+----------------------
+cd "/Users/apple/Downloads/Connect intel"
+npx serve .
+Open the localhost link in your browser.
+
+FILES
+-----
+index.html  = launcher (small, always opens)
+app.html    = full app (may be blank if opened as file — use .command)
+OPEN CONNECT INTEL.command = recommended on Mac
+
+ONLINE (FOR OTHER PEOPLE)
+-------------------------
+Deploy folder "site/" to Vercel or Netlify — see DEPLOYMENT.md
