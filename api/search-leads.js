@@ -1,6 +1,5 @@
 /**
- * Vercel serverless — Claude lead search (keeps API key off the browser).
- * Set ANTHROPIC_API_KEY in Vercel → Environment Variables.
+ * Vercel serverless — lead search (import DB → Apollo → demo → Claude).
  */
 import { isApolloConfigured, searchApolloPeople } from '../lib/server/apollo.js'
 import { readStore } from '../lib/server/store.js'
@@ -24,102 +23,119 @@ export default async function handler(req, res) {
     return sendJson(res, 402, { error: error.message || 'Search quota exceeded' })
   }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY
+  const anthropicKey = process.env.ANTHROPIC_API_KEY
   const { filters = {}, count = DEFAULT_SEARCH_LIMIT, provider = 'auto' } = getBody(req)
   const store = await readStore()
   const viewer = quotaUser
+
   const databaseResults = searchStoredLeads(store, filters, count, viewer)
   if (databaseResults?.leads?.length) {
     return sendJson(res, 200, { ...databaseResults, user: quotaUser })
   }
 
+  let apolloError = null
   const useApollo = provider === 'apollo' || (provider === 'auto' && isApolloConfigured())
+
   if (useApollo) {
     try {
       const apolloResults = await searchApolloPeople(filters, count, store, viewer)
       if (apolloResults?.leads?.length) {
         return sendJson(res, 200, { ...apolloResults, user: quotaUser })
       }
-      if (provider === 'apollo') {
-        return sendJson(res, 200, {
-          leads: [],
-          total: 0,
-          netNew: 0,
-          provider: 'apollo',
-          notice: 'No Apollo matches for these filters. Try broader keywords or India city/state filters.',
-          user: quotaUser,
-        })
-      }
+      apolloError = 'Apollo returned no matches for these filters.'
     } catch (error) {
+      apolloError = error.message || 'Apollo search failed'
       if (provider === 'apollo') {
-        return sendJson(res, 502, { error: error.message || 'Apollo search failed' })
+        return sendJson(res, 502, { error: apolloError })
       }
-      console.warn('Apollo search fallback:', error.message)
     }
-  }
-
-  if (provider === 'apollo') {
+  } else if (provider === 'apollo') {
     return sendJson(res, 503, {
-      error: 'Apollo.io is not configured. Add APOLLO_API_KEY to your server environment.',
+      error: 'Apollo.io is not configured. Add APOLLO_API_KEY in Vercel and redeploy.',
     })
   }
 
-  if (!apiKey) {
-    const mockLeads = getMockLeadsForViewer(store, viewer, filters, count)
+  const mockLeads = getMockLeadsForViewer(store, viewer, filters, count)
+  if (mockLeads.length && provider !== 'claude') {
+    const notice = apolloError
+      ? `Apollo: ${apolloError} Showing sample India leads for this search.`
+      : 'Showing sample India leads. Import data in Admin or use Apollo.io for live B2B records.'
+
     return sendJson(res, 200, {
       leads: mockLeads,
-      total: mockLeads.length,
-      netNew: Math.max(mockLeads.length, Math.floor(mockLeads.length * 0.8)),
-      provider: mockLeads.length ? 'demo-india' : 'database',
-      notice: mockLeads.length
-        ? 'Showing demo India leads. Import records or add Apollo later for production data.'
-        : 'No imported records matched this search yet. Add datasets in Admin or enable Claude fallback.',
+      total: Math.max(mockLeads.length * 50, mockLeads.length),
+      netNew: Math.max(mockLeads.length, Math.floor(mockLeads.length * 0.85)),
+      provider: 'demo-india',
+      notice,
       user: quotaUser,
     })
   }
 
-  const prompt = buildPrompt(filters, count)
-
-  try {
-    const anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 4096,
-        messages: [{ role: 'user', content: prompt }],
-      }),
-    })
-
-    const data = await anthropicRes.json()
-    if (!anthropicRes.ok) {
-      return sendJson(res, anthropicRes.status, {
-        error: data.error?.message || 'Claude API error',
+  if (provider === 'claude' || (provider === 'auto' && anthropicKey)) {
+    if (!anthropicKey) {
+      return sendJson(res, 503, {
+        error: 'Claude is not configured. Add ANTHROPIC_API_KEY on Vercel.',
       })
     }
 
-    const text = (data.content || [])
-      .filter((b) => b.type === 'text')
-      .map((b) => b.text)
-      .join('\n')
+    try {
+      const prompt = buildPrompt(filters, count)
+      const anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': anthropicKey,
+          'anthropic-version': '2023-06-01',
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 4096,
+          messages: [{ role: 'user', content: prompt }],
+        }),
+      })
 
-    const leads = parseLeadsJson(text).map((lead, index) => shapeLeadForViewer(lead, store, viewer, index))
-    const total = Math.max(leads.length * 120, 2400 + Math.floor(Math.random() * 8000))
+      const data = await anthropicRes.json()
+      if (!anthropicRes.ok) {
+        return sendJson(res, anthropicRes.status, {
+          error: data.error?.message || 'Claude API error',
+        })
+      }
 
-    return sendJson(res, 200, {
-      leads,
-      total,
-      netNew: Math.floor(total * 0.88),
-      provider: 'claude',
-      user: quotaUser,
-    })
-  } catch (e) {
-    return sendJson(res, 500, { error: e.message || 'Search failed' })
+      const text = (data.content || [])
+        .filter((b) => b.type === 'text')
+        .map((b) => b.text)
+        .join('\n')
+
+      const leads = parseLeadsJson(text).map((lead, index) => shapeLeadForViewer(lead, store, viewer, index))
+      if (leads.length) {
+        const total = Math.max(leads.length * 120, 2400 + Math.floor(Math.random() * 8000))
+        return sendJson(res, 200, {
+          leads,
+          total,
+          netNew: Math.floor(total * 0.88),
+          provider: 'claude',
+          user: quotaUser,
+        })
+      }
+    } catch (e) {
+      return sendJson(res, 500, { error: e.message || 'Search failed' })
+    }
   }
+
+  const hints = []
+  if (isApolloConfigured() && apolloError) hints.push(`Apollo: ${apolloError}`)
+  if (!isApolloConfigured()) hints.push('Add APOLLO_API_KEY on Vercel')
+  if (!anthropicKey) hints.push('or ANTHROPIC_API_KEY for AI search')
+  hints.push('Admins can import Excel data under Admin')
+
+  return sendJson(res, 200, {
+    leads: [],
+    total: 0,
+    netNew: 0,
+    provider: 'none',
+    notice: `No leads found. ${hints.join('. ')}.`,
+    user: quotaUser,
+  })
 }
 
 function buildPrompt(filters, count) {

@@ -137,7 +137,13 @@ export async function searchLeads(filters, provider = 'auto', count = 8) {
 
   try {
     const data = await searchViaApi(filters, count, provider)
-    if (data.leads?.length || data.user || data.provider === 'apollo') return data
+    if (data.leads?.length) return data
+    if (data.error) {
+      const error = new Error(data.error)
+      error.status = data.status
+      throw error
+    }
+    if (data.notice && provider !== 'auto') return data
   } catch (e) {
     if (!shouldUseLocalFallback(e, provider)) throw e
     console.warn('Search API:', e.message)
