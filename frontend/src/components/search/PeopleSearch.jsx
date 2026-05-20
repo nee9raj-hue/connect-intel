@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useApp } from '../../context/AppContext'
+import { api } from '../../lib/api'
 import { searchLeads } from '../../lib/searchService'
 import FilterSidebar from './FilterSidebar'
 import ResultsTable from './ResultsTable'
@@ -14,7 +15,7 @@ const EMPTY_FILTERS = {
 }
 
 export default function PeopleSearch() {
-  const { addSearchHistory, toggleSaveLead, savedLeads } = useApp()
+  const { addSearchHistory, toggleSaveLead, savedLeads, user, updateUser, refreshSession } = useApp()
   const [filters, setFilters] = useState(EMPTY_FILTERS)
   const [countTab, setCountTab] = useState('total')
   const [loading, setLoading] = useState(false)
@@ -23,6 +24,7 @@ export default function PeopleSearch() {
   const [hasSearched, setHasSearched] = useState(false)
   const [filtersOpen, setFiltersOpen] = useState(true)
   const [searchError, setSearchError] = useState(null)
+  const [unlockingLeadId, setUnlockingLeadId] = useState(null)
 
   const handleSearch = async () => {
     setLoading(true)
@@ -32,11 +34,15 @@ export default function PeopleSearch() {
     try {
       const data = await searchLeads(filters, 'claude', 10)
       setResults(data)
+      if (data.user?.searchesLeft != null) {
+        updateUser({ searchesLeft: data.user.searchesLeft })
+      }
       addSearchHistory({
         filters: { ...filters },
         count: data.leads.length,
         total: data.total,
         at: new Date().toISOString(),
+        provider: data.provider,
       })
     } catch (e) {
       setSearchError(e.message)
@@ -46,10 +52,15 @@ export default function PeopleSearch() {
     }
   }
 
-  const displayLeads =
-    countTab === 'saved'
-      ? savedLeads
-      : results?.leads || []
+  const displayLeads = useMemo(() => {
+    if (countTab === 'saved') return savedLeads
+    const leads = results?.leads || []
+    if (countTab === 'netNew') {
+      const savedIds = new Set(savedLeads.map((entry) => entry.id))
+      return leads.filter((entry) => !savedIds.has(entry.id))
+    }
+    return leads
+  }, [countTab, savedLeads, results])
 
   const handleSelectAll = () => {
     const list = displayLeads
@@ -70,6 +81,34 @@ export default function PeopleSearch() {
     a.click()
   }
 
+  const handleUnlockLead = async (lead) => {
+    setUnlockingLeadId(lead.id)
+    setSearchError(null)
+
+    try {
+      const data = await api.unlockLead(lead)
+      setResults((prev) => {
+        if (!prev) return prev
+        return {
+          ...prev,
+          leads: prev.leads.map((entry) => (entry.id === lead.id ? data.lead : entry)),
+        }
+      })
+
+      updateUser((prev) => ({
+        ...prev,
+        creditsPaise: data.user.creditsPaise,
+        creditBalanceRupees: Number(((data.user.creditsPaise || 0) / 100).toFixed(2)),
+      }))
+
+      await refreshSession()
+    } catch (error) {
+      setSearchError(error.message)
+    } finally {
+      setUnlockingLeadId(null)
+    }
+  }
+
   return (
     <div className="flex flex-col h-full min-h-0">
       {/* Apollo-style top bar */}
@@ -77,6 +116,12 @@ export default function PeopleSearch() {
         <div className="flex items-center justify-between gap-4 mb-3">
           <h1 className="text-lg font-semibold text-gray-900">Find people</h1>
           <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-700 bg-gray-100 px-2.5 py-1 rounded-full border border-gray-200">
+              Searches left: {user?.searchesLeft ?? 0}
+            </span>
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#7a5f00] bg-[#fff6d6] px-2.5 py-1 rounded-full border border-[#ffe48a]">
+              Trial credits: Rs {((user?.creditsPaise ?? 0) / 100).toFixed(0)}
+            </span>
             <span className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600 bg-gray-100 px-2.5 py-1 rounded-full">
               <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
               Claude AI
@@ -113,18 +158,10 @@ export default function PeopleSearch() {
           <button
             type="button"
             onClick={handleSearch}
-            disabled={loading}
+            disabled={loading || (user?.searchesLeft ?? 0) <= 0}
             className="px-4 py-2 bg-[#ffcb2b] hover:bg-[#f0bc00] text-[#242424] text-sm font-semibold rounded-md disabled:opacity-60"
           >
             {loading ? 'Searching…' : 'Search'}
-          </button>
-          <button
-            type="button"
-            onClick={handleSearch}
-            disabled={loading}
-            className="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-800 disabled:opacity-60"
-          >
-            Research with AI
           </button>
         </div>
 
@@ -159,6 +196,9 @@ export default function PeopleSearch() {
               {results.provider === 'claude' && (
                 <span className="ml-1 text-green-600">· Claude AI</span>
               )}
+              {results.provider === 'database' && (
+                <span className="ml-1 text-blue-600">· Imported records</span>
+              )}
               {results.provider === 'demo-india' && (
                 <span className="ml-1 text-amber-600">· Demo data (add API key for Claude)</span>
               )}
@@ -169,6 +209,11 @@ export default function PeopleSearch() {
         {results?.notice && countTab !== 'saved' && (
           <p className="mt-2 text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded px-2 py-1.5">
             {results.notice}
+          </p>
+        )}
+        {countTab !== 'saved' && (
+          <p className="mt-2 text-xs text-gray-500">
+            First 5 matched leads show full details. Later rows unlock complete contact data for Rs 10 each.
           </p>
         )}
         {searchError && (
@@ -199,6 +244,8 @@ export default function PeopleSearch() {
                   setSelected((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
                 }
                 onSave={toggleSaveLead}
+                onUnlock={handleUnlockLead}
+                unlockingLeadId={unlockingLeadId}
               />
             ) : (
               <EmptyState title="No saved leads" sub="Save prospects from search results" />
@@ -221,6 +268,8 @@ export default function PeopleSearch() {
                 setSelected((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
               }
               onSave={toggleSaveLead}
+              onUnlock={handleUnlockLead}
+              unlockingLeadId={unlockingLeadId}
             />
           )}
         </div>

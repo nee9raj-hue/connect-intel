@@ -11,12 +11,14 @@ export default function AuthPage() {
     e.preventDefault()
     if (!form.email) return
     login({
-      name: form.email.split('@')[0],
-      email: form.email,
-      company: 'Your Company',
-      plan: 'free',
-      searchesLeft: 25,
-      authProvider: 'email',
+      demoProfile: {
+        name: form.email.split('@')[0],
+        email: form.email,
+        company: form.email.split('@')[1]?.split('.')[0] || 'Your Company',
+        plan: 'free',
+        searchesLeft: 25,
+        authProvider: 'email-demo',
+      },
     })
   }
 

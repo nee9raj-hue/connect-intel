@@ -14,3 +14,6 @@ app.html
 assets/
 frontend/dist/
 Connect Import/
+data/store.json
+data/connect-intel.sqlite
+.vercel

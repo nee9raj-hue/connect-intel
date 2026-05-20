@@ -2,6 +2,44 @@ import { MOCK_LEADS } from './mockLeads'
 import { PROVIDERS } from './providers'
 
 export { PROVIDERS }
+const FREE_FULL_LEAD_PREVIEW_COUNT = 5
+
+function maskEmail(email) {
+  if (!email) return ''
+  const [local, domain] = String(email).split('@')
+  if (!domain) return 'Locked'
+  return `${local.slice(0, 2)}•••@${domain}`
+}
+
+function maskPhone(phone) {
+  if (!phone) return ''
+  return `${String(phone).slice(0, 3)}••••${String(phone).slice(-2)}`
+}
+
+function maskLinkedin(linkedin) {
+  if (!linkedin) return ''
+  return 'linkedin.com/in/••••'
+}
+
+function shapeFallbackLead(lead, index) {
+  const previewUnlocked = index < FREE_FULL_LEAD_PREVIEW_COUNT
+  const unlockableFields = [lead.email && 'email', lead.phone && 'phone', lead.linkedin && 'linkedin'].filter(Boolean)
+
+  return {
+    ...lead,
+    email: previewUnlocked ? lead.email : maskEmail(lead.email),
+    phone: previewUnlocked ? lead.phone : maskPhone(lead.phone),
+    linkedin: previewUnlocked ? lead.linkedin : maskLinkedin(lead.linkedin),
+    access: {
+      isUnlocked: previewUnlocked || unlockableFields.length === 0,
+      previewUnlocked,
+      previouslyUnlocked: false,
+      unlockable: unlockableFields.length > 0,
+      unlockPricePaise: previewUnlocked ? 0 : 1000,
+      unlockableFields,
+    },
+  }
+}
 
 function filterMockLeads(filters) {
   let results = [...MOCK_LEADS]
@@ -53,13 +91,36 @@ function filterMockLeads(filters) {
 async function searchViaClaude(filters, count) {
   const res = await fetch('/api/search-leads', {
     method: 'POST',
+    credentials: 'same-origin',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ filters, count }),
   })
 
-  const data = await res.json()
-  if (!res.ok) throw new Error(data.error || data.hint || 'Claude search failed')
+  const text = await res.text()
+  let data = {}
+  if (text) {
+    try {
+      data = JSON.parse(text)
+    } catch {
+      throw new Error(res.ok ? 'Invalid search response' : 'Search failed')
+    }
+  }
+
+  if (!res.ok) {
+    const error = new Error(data.error || data.hint || 'Claude search failed')
+    error.status = res.status
+    throw error
+  }
+
   return data
+}
+
+function shouldUseLocalFallback(error) {
+  if (!error) return true
+  if (error.status === 401 || error.status === 402 || error.status === 403) return false
+  const message = String(error.message || '').toLowerCase()
+  if (message.includes('authentication') || message.includes('searches remaining')) return false
+  return true
 }
 
 /**
@@ -72,14 +133,15 @@ export async function searchLeads(filters, provider = 'claude', count = 8) {
 
   try {
     const data = await searchViaClaude(filters, count)
-    if (data.leads?.length) return data
+    if (data.leads?.length || data.user) return data
   } catch (e) {
+    if (!shouldUseLocalFallback(e)) throw e
     console.warn('Claude API:', e.message)
   }
 
   // Fallback: Indian mock data (local dev or missing API key)
   await new Promise((r) => setTimeout(r, 800))
-  const leads = filterMockLeads(filters)
+  const leads = filterMockLeads(filters).map(shapeFallbackLead)
   const total = Math.max(leads.length * 150, 3200 + Math.floor(Math.random() * 12000))
 
   return {

@@ -3,6 +3,9 @@
   "private": true,
   "type": "module",
   "description": "Connect Intel — B2B lead search platform",
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "dev": "npm run dev --prefix frontend",
     "build": "npm run build --prefix frontend",

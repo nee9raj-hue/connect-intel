@@ -47,6 +47,13 @@ export default function Sidebar({ active, onNavigate }) {
             onClick={() => onNavigate(item.id)}
           />
         ))}
+        {user?.role === 'admin' && (
+          <NavBtn
+            item={{ id: 'admin', label: 'Admin', icon: ShieldIcon }}
+            active={active === 'admin'}
+            onClick={() => onNavigate('admin')}
+          />
+        )}
 
         <div className="mx-2 mt-4 p-3 rounded-lg bg-[#fffbeb] border border-[#fde68a]">
           <p className="text-xs font-semibold text-gray-800">Claude AI search</p>
@@ -68,6 +75,9 @@ export default function Sidebar({ active, onNavigate }) {
           <div className="flex-1 min-w-0">
             <p className="text-xs font-semibold text-gray-900 truncate">{user?.name}</p>
             <p className="text-[10px] text-gray-500 truncate">{user?.email}</p>
+            <p className="text-[10px] text-[#8a6600] truncate mt-0.5">
+              Credits: Rs {((user?.creditsPaise ?? 0) / 100).toFixed(0)}
+            </p>
           </div>
         </div>
         <button
@@ -128,6 +138,17 @@ function BoltIcon({ className }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+    </svg>
+  )
+}
+function ShieldIcon({ className }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M12 3l7 4v5c0 5-3 8-7 9-4-1-7-4-7-9V7l7-4z"
+      />
     </svg>
   )
 }

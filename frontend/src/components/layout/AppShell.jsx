@@ -4,12 +4,14 @@ import PeopleSearch from '../search/PeopleSearch'
 import SavedLeadsPanel from '../saved/SavedLeadsPanel'
 import IntegrationsPanel from '../integrations/IntegrationsPanel'
 import OverviewPanel from '../overview/OverviewPanel'
+import AdminPanel from '../admin/AdminPanel'
 
 const PANELS = {
   overview: OverviewPanel,
   search: PeopleSearch,
   saved: SavedLeadsPanel,
   integrations: IntegrationsPanel,
+  admin: AdminPanel,
 }
 
 export default function AppShell() {

@@ -10,7 +10,7 @@ export default function OverviewPanel({ onNavigate }) {
           { label: 'Searches this month', value: searchHistory.length, change: '+2 this week' },
           { label: 'Leads found', value: searchHistory.reduce((s, h) => s + h.count, 0), change: 'Last 7 days' },
           { label: 'Saved leads', value: savedLeads.length, change: 'In your lists' },
-          { label: 'Searches left', value: user?.searchesLeft ?? 25, change: 'Free plan' },
+          { label: 'Credit balance', value: `Rs ${((user?.creditsPaise ?? 0) / 100).toFixed(0)}`, change: 'Unlock paid details' },
         ].map((kpi) => (
           <div key={kpi.label} className="bg-white rounded-xl border border-gray-200 p-5">
             <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">

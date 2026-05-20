@@ -2,23 +2,50 @@
  * Vercel serverless — Claude lead search (keeps API key off the browser).
  * Set ANTHROPIC_API_KEY in Vercel → Environment Variables.
  */
-export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*')
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+import { readStore } from '../lib/server/store.js'
+import { getMockLeadsForViewer, searchStoredLeads, shapeLeadForViewer } from '../lib/server/search.js'
+import { DEFAULT_SEARCH_LIMIT } from '../lib/server/config.js'
+import { applyCors, getBody, handleOptions, methodNotAllowed, sendJson } from '../lib/server/http.js'
+import { consumeSearchQuota, requireUser } from '../lib/server/auth.js'
 
-  if (req.method === 'OPTIONS') return res.status(200).end()
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+export default async function handler(req, res) {
+  if (handleOptions(req, res)) return
+  applyCors(req, res)
+  if (req.method !== 'POST') return methodNotAllowed(res, ['POST'])
+
+  const user = await requireUser(req, res)
+  if (!user) return
+
+  let quotaUser
+  try {
+    quotaUser = await consumeSearchQuota(user.id)
+  } catch (error) {
+    return sendJson(res, 402, { error: error.message || 'Search quota exceeded' })
+  }
 
   const apiKey = process.env.ANTHROPIC_API_KEY
+  const { filters = {}, count = DEFAULT_SEARCH_LIMIT } = getBody(req)
+  const store = await readStore()
+  const viewer = quotaUser
+  const databaseResults = searchStoredLeads(store, filters, count, viewer)
+  if (databaseResults?.leads?.length) {
+    return sendJson(res, 200, { ...databaseResults, user: quotaUser })
+  }
+
   if (!apiKey) {
-    return res.status(503).json({
-      error: 'Claude API not configured',
-      hint: 'Add ANTHROPIC_API_KEY in Vercel project settings, then redeploy.',
+    const mockLeads = getMockLeadsForViewer(store, viewer, filters, count)
+    return sendJson(res, 200, {
+      leads: mockLeads,
+      total: mockLeads.length,
+      netNew: Math.max(mockLeads.length, Math.floor(mockLeads.length * 0.8)),
+      provider: mockLeads.length ? 'demo-india' : 'database',
+      notice: mockLeads.length
+        ? 'Showing demo India leads. Import records or add Apollo later for production data.'
+        : 'No imported records matched this search yet. Add datasets in Admin or enable Claude fallback.',
+      user: quotaUser,
     })
   }
 
-  const { filters, count = 8 } = req.body || {}
   const prompt = buildPrompt(filters, count)
 
   try {
@@ -38,7 +65,7 @@ export default async function handler(req, res) {
 
     const data = await anthropicRes.json()
     if (!anthropicRes.ok) {
-      return res.status(anthropicRes.status).json({
+      return sendJson(res, anthropicRes.status, {
         error: data.error?.message || 'Claude API error',
       })
     }
@@ -48,17 +75,18 @@ export default async function handler(req, res) {
       .map((b) => b.text)
       .join('\n')
 
-    const leads = parseLeadsJson(text)
+    const leads = parseLeadsJson(text).map((lead, index) => shapeLeadForViewer(lead, store, viewer, index))
     const total = Math.max(leads.length * 120, 2400 + Math.floor(Math.random() * 8000))
 
-    return res.status(200).json({
+    return sendJson(res, 200, {
       leads,
       total,
       netNew: Math.floor(total * 0.88),
       provider: 'claude',
+      user: quotaUser,
     })
   } catch (e) {
-    return res.status(500).json({ error: e.message || 'Search failed' })
+    return sendJson(res, 500, { error: e.message || 'Search failed' })
   }
 }
 

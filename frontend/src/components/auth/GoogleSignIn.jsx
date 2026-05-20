@@ -1,5 +1,4 @@
 import { GoogleLogin } from '@react-oauth/google'
-import { jwtDecode } from 'jwt-decode'
 import { useApp } from '../../context/AppContext'
 
 const CLIENT_ID = (import.meta.env.VITE_GOOGLE_CLIENT_ID || '').trim().replace(/^["']|["']$/g, '')
@@ -11,20 +10,13 @@ const CLIENT_ID = (import.meta.env.VITE_GOOGLE_CLIENT_ID || '').trim().replace(/
 export default function GoogleSignIn({ size = 'large', theme = 'outline', text = 'continue_with' }) {
   const { login } = useApp()
 
-  const handleSuccess = (credentialResponse) => {
+  const handleSuccess = async (credentialResponse) => {
     try {
-      const payload = jwtDecode(credentialResponse.credential)
-      login({
-        name: payload.name || payload.email?.split('@')[0] || 'User',
-        email: payload.email,
-        company: payload.hd ? payload.hd.replace(/\./g, ' ') : 'Your Company',
-        picture: payload.picture,
-        plan: 'free',
-        searchesLeft: 25,
-        authProvider: 'google',
+      await login({
+        credential: credentialResponse.credential,
       })
-    } catch {
-      alert('Could not sign in with Google. Please try again.')
+    } catch (error) {
+      alert(error.message || 'Could not sign in with Google. Please try again.')
     }
   }
 
@@ -34,6 +26,7 @@ export default function GoogleSignIn({ size = 'large', theme = 'outline', text =
         type="button"
         onClick={() =>
           login({
+            demoProfile: {
             name: 'Demo User',
             email: 'demo@gmail.com',
             company: 'Demo Company',
@@ -41,6 +34,7 @@ export default function GoogleSignIn({ size = 'large', theme = 'outline', text =
             plan: 'free',
             searchesLeft: 25,
             authProvider: 'google-demo',
+            },
           })
         }
         className="w-full flex items-center justify-center gap-3 py-3 px-4 bg-white border border-gray-300 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors shadow-sm"
@@ -71,21 +65,14 @@ export default function GoogleSignIn({ size = 'large', theme = 'outline', text =
 export function GoogleSignInCompact({ onBeforeLogin }) {
   const { login } = useApp()
 
-  const handleSuccess = (credentialResponse) => {
+  const handleSuccess = async (credentialResponse) => {
     onBeforeLogin?.()
     try {
-      const payload = jwtDecode(credentialResponse.credential)
-      login({
-        name: payload.name || 'User',
-        email: payload.email,
-        company: payload.hd || 'Your Company',
-        picture: payload.picture,
-        plan: 'free',
-        searchesLeft: 25,
-        authProvider: 'google',
+      await login({
+        credential: credentialResponse.credential,
       })
-    } catch {
-      alert('Google sign-in failed.')
+    } catch (error) {
+      alert(error.message || 'Google sign-in failed.')
     }
   }
 
@@ -96,6 +83,7 @@ export function GoogleSignInCompact({ onBeforeLogin }) {
         onClick={() => {
           onBeforeLogin?.()
           login({
+            demoProfile: {
             name: 'Demo User',
             email: 'demo@gmail.com',
             company: 'Demo Co',
@@ -103,6 +91,7 @@ export function GoogleSignInCompact({ onBeforeLogin }) {
             plan: 'free',
             searchesLeft: 25,
             authProvider: 'google-demo',
+            },
           })
         }}
         className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-semibold text-gray-800 hover:bg-gray-50 shadow-sm"

@@ -1,6 +1,6 @@
 import { useApp } from '../../context/AppContext'
 
-export default function ResultsTable({ leads, selected, onSelectAll, onSelect, onSave }) {
+export default function ResultsTable({ leads, selected, onSelectAll, onSelect, onSave, onUnlock, unlockingLeadId }) {
   const { isSaved } = useApp()
   const allSelected = leads.length > 0 && selected.length === leads.length
 
@@ -15,10 +15,10 @@ export default function ResultsTable({ leads, selected, onSelectAll, onSelect, o
             <th className="py-2.5 pr-2 min-w-[180px]">Name</th>
             <th className="py-2.5 pr-2 min-w-[140px]">Job title</th>
             <th className="py-2.5 pr-2 min-w-[160px]">Company</th>
-            <th className="py-2.5 pr-2 w-24">Contact</th>
+            <th className="py-2.5 pr-2 min-w-[220px]">Contact access</th>
             <th className="py-2.5 pr-2">Location</th>
             <th className="py-2.5 pr-2 w-16 text-center">Score</th>
-            <th className="py-2.5 pr-4 w-20" />
+            <th className="py-2.5 pr-4 w-[170px]" />
           </tr>
         </thead>
         <tbody>
@@ -40,11 +40,15 @@ export default function ResultsTable({ leads, selected, onSelectAll, onSelect, o
                   <Avatar name={`${lead.firstName} ${lead.lastName}`} />
                   <div>
                     <div className="font-medium text-gray-900">
-                      {lead.firstName} {lead.lastName}
+                      {[lead.firstName, lead.lastName].filter(Boolean).join(' ') || 'Contact not named'}
                     </div>
-                    {lead.source && (
-                      <span className="text-[10px] text-gray-400 capitalize">{lead.source}</span>
-                    )}
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      {lead.source && <SourceBadge source={lead.source} />}
+                      {lead.access?.previewUnlocked && !lead.access?.previouslyUnlocked && (
+                        <MiniBadge tone="amber">Preview</MiniBadge>
+                      )}
+                      {lead.access?.previouslyUnlocked && <MiniBadge tone="green">Unlocked</MiniBadge>}
+                    </div>
                   </div>
                 </div>
               </td>
@@ -54,24 +58,38 @@ export default function ResultsTable({ leads, selected, onSelectAll, onSelect, o
                 <div className="text-[11px] text-gray-400">{lead.companyDomain}</div>
               </td>
               <td className="py-2.5 pr-2">
-                <ContactIcons email={lead.email} status={lead.emailStatus} phone={lead.phone} />
+                <ContactCell lead={lead} />
               </td>
               <td className="py-2.5 pr-2 text-gray-600 whitespace-nowrap">{lead.location}</td>
               <td className="py-2.5 pr-2 text-center">
                 <ScoreBadge score={lead.score} />
               </td>
               <td className="py-2.5 pr-4">
-                <button
-                  type="button"
-                  onClick={() => onSave(lead)}
-                  className={`text-[11px] font-semibold px-2 py-1 rounded border ${
-                    isSaved(lead.id)
-                      ? 'border-green-500 text-green-700 bg-green-50'
-                      : 'border-gray-200 text-gray-600 opacity-0 group-hover:opacity-100 hover:border-gray-400'
-                  } ${isSaved(lead.id) ? 'opacity-100' : ''}`}
-                >
-                  {isSaved(lead.id) ? 'Saved' : '+ Save'}
-                </button>
+                <div className="flex items-center justify-end gap-2">
+                  {lead.access?.unlockable && !lead.access?.isUnlocked && (
+                    <button
+                      type="button"
+                      onClick={() => onUnlock?.(lead)}
+                      disabled={unlockingLeadId === lead.id}
+                      className="text-[11px] font-semibold px-2.5 py-1.5 rounded border border-[#ffcb2b] bg-[#fffbdf] text-[#8a6600] hover:bg-[#fff4bf] disabled:opacity-60"
+                    >
+                      {unlockingLeadId === lead.id
+                        ? 'Unlocking…'
+                        : `Unlock Rs ${(lead.access.unlockPricePaise || 0) / 100}`}
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => onSave(lead)}
+                    className={`text-[11px] font-semibold px-2 py-1.5 rounded border ${
+                      isSaved(lead.id)
+                        ? 'border-green-500 text-green-700 bg-green-50'
+                        : 'border-gray-200 text-gray-600 opacity-0 group-hover:opacity-100 hover:border-gray-400'
+                    } ${isSaved(lead.id) ? 'opacity-100' : ''}`}
+                  >
+                    {isSaved(lead.id) ? 'Saved' : '+ Save'}
+                  </button>
+                </div>
               </td>
             </tr>
           ))}
@@ -94,28 +112,78 @@ function Avatar({ name }) {
   )
 }
 
-function ContactIcons({ email, status, phone }) {
-  const emailOk = status === 'verified'
+function ContactCell({ lead }) {
   return (
-    <div className="flex items-center gap-1.5">
-      <span
-        title={email}
-        className={`w-7 h-7 rounded flex items-center justify-center text-[10px] font-bold ${
-          emailOk ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-400'
-        }`}
-      >
-        ✉
-      </span>
-      <span
-        title={phone}
-        className={`w-7 h-7 rounded flex items-center justify-center text-[10px] ${
-          phone ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-300'
-        }`}
-      >
-        📞
-      </span>
+    <div className="space-y-1">
+      <div className="flex items-center gap-1.5">
+        <ContactIcon kind="email" active={Boolean(lead.email)} />
+        <span className={`text-[11px] ${lead.access?.isUnlocked ? 'text-gray-700' : 'text-gray-500'}`}>
+          {lead.email || 'No email'}
+        </span>
+      </div>
+      <div className="flex items-center gap-1.5">
+        <ContactIcon kind="phone" active={Boolean(lead.phone)} />
+        <span className={`text-[11px] ${lead.access?.isUnlocked ? 'text-gray-700' : 'text-gray-500'}`}>
+          {lead.phone || 'No phone'}
+        </span>
+      </div>
+      {lead.linkedin && (
+        <div className="flex items-center gap-1.5">
+          <ContactIcon kind="linkedin" active />
+          <span className={`text-[11px] ${lead.access?.isUnlocked ? 'text-gray-700' : 'text-gray-500'}`}>
+            {lead.linkedin}
+          </span>
+        </div>
+      )}
     </div>
   )
+}
+
+function ContactIcon({ kind, active }) {
+  const styles = active
+    ? {
+        email: 'bg-green-100 text-green-700',
+        phone: 'bg-blue-100 text-blue-700',
+        linkedin: 'bg-sky-100 text-sky-700',
+      }
+    : {
+        email: 'bg-gray-100 text-gray-300',
+        phone: 'bg-gray-100 text-gray-300',
+        linkedin: 'bg-gray-100 text-gray-300',
+      }
+
+  const icon = kind === 'email' ? '✉' : kind === 'phone' ? '📞' : 'in'
+
+  return (
+    <span className={`w-6 h-6 rounded flex items-center justify-center text-[10px] font-bold ${styles[kind]}`}>
+      {icon}
+    </span>
+  )
+}
+
+function SourceBadge({ source }) {
+  const tone =
+    source === 'database'
+      ? 'bg-blue-50 text-blue-700 border-blue-200'
+      : source === 'claude'
+        ? 'bg-violet-50 text-violet-700 border-violet-200'
+        : 'bg-gray-50 text-gray-600 border-gray-200'
+
+  return (
+    <span className={`text-[10px] px-1.5 py-0.5 rounded border capitalize ${tone}`}>
+      {source}
+    </span>
+  )
+}
+
+function MiniBadge({ children, tone = 'gray' }) {
+  const classes = {
+    amber: 'bg-amber-50 text-amber-700 border-amber-200',
+    green: 'bg-green-50 text-green-700 border-green-200',
+    gray: 'bg-gray-50 text-gray-600 border-gray-200',
+  }
+
+  return <span className={`text-[10px] px-1.5 py-0.5 rounded border ${classes[tone]}`}>{children}</span>
 }
 
 function ScoreBadge({ score }) {
