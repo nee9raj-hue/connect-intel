@@ -19,7 +19,7 @@ export default async function handler(req, res) {
 
   let quotaUser
   try {
-    quotaUser = await consumeSearchQuota(user.id)
+    quotaUser = await consumeSearchQuota(req, res)
   } catch (error) {
     return sendJson(res, 402, { error: error.message || 'Search quota exceeded' })
   }

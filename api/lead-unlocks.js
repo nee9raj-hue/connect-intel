@@ -1,9 +1,16 @@
-import { requireUser } from '../lib/server/auth.js'
+import { refreshSessionCookie, requireUser } from '../lib/server/auth.js'
 import { enrichApolloPerson } from '../lib/server/apollo.js'
 import { LEAD_UNLOCK_PRICE_PAISE } from '../lib/server/config.js'
 import { getUnlockableFields, shapeLeadForViewer } from '../lib/server/search.js'
 import { createId, readStore, updateStore } from '../lib/server/store.js'
 import { applyCors, getBody, handleOptions, methodNotAllowed, sendJson } from '../lib/server/http.js'
+
+function buildUserPayload(user) {
+  return {
+    ...user,
+    creditBalanceRupees: Number(((user.creditsPaise || 0) / 100).toFixed(2)),
+  }
+}
 
 export default async function handler(req, res) {
   if (handleOptions(req, res)) return
@@ -26,8 +33,6 @@ export default async function handler(req, res) {
     return sendJson(res, 400, { error: 'This result has no premium fields to unlock' })
   }
 
-  let responsePayload = null
-
   try {
     const store = await readStore()
     const alreadyUnlocked = store.leadUnlocks.find(
@@ -40,14 +45,15 @@ export default async function handler(req, res) {
         return sendJson(res, 400, { error: 'Stored unlock record is invalid' })
       }
 
-      const currentUser = store.users.find((entry) => entry.id === user.id)
       return sendJson(res, 200, {
-        lead: shapeLeadForViewer(snapshot, store, currentUser, Number.MAX_SAFE_INTEGER),
-        user: {
-          ...currentUser,
-          creditsPaise: currentUser?.creditsPaise ?? 0,
-        },
+        lead: shapeLeadForViewer(snapshot, store, user, Number.MAX_SAFE_INTEGER),
+        user: buildUserPayload(user),
       })
+    }
+
+    const creditsPaise = user.creditsPaise ?? 0
+    if (creditsPaise < LEAD_UNLOCK_PRICE_PAISE) {
+      return sendJson(res, 400, { error: 'Not enough credits to unlock this lead' })
     }
 
     let enrichedLead = lead
@@ -55,48 +61,46 @@ export default async function handler(req, res) {
       enrichedLead = await enrichApolloPerson(lead)
     }
 
-    await updateStore((freshStore) => {
-      const currentUser = freshStore.users.find((entry) => entry.id === user.id)
-      if (!currentUser) {
-        throw new Error('User not found')
-      }
+    const updatedUser = {
+      ...user,
+      creditsPaise: creditsPaise - LEAD_UNLOCK_PRICE_PAISE,
+    }
+    refreshSessionCookie(res, updatedUser)
 
-      const creditsPaise = currentUser.creditsPaise ?? 0
-      if (creditsPaise < LEAD_UNLOCK_PRICE_PAISE) {
-        throw new Error('Not enough credits to unlock this lead')
-      }
+    try {
+      await updateStore((freshStore) => {
+        const currentUser = freshStore.users.find((entry) => entry.id === user.id)
+        if (currentUser) {
+          currentUser.creditsPaise = updatedUser.creditsPaise
+        }
 
-      currentUser.creditsPaise = creditsPaise - LEAD_UNLOCK_PRICE_PAISE
-      freshStore.leadUnlocks.push({
-        id: createId('unlock'),
-        userId: user.id,
-        leadId: lead.id,
-        leadSnapshot: enrichedLead,
-        pricePaise: LEAD_UNLOCK_PRICE_PAISE,
-        unlockedAt: new Date().toISOString(),
+        freshStore.leadUnlocks.push({
+          id: createId('unlock'),
+          userId: user.id,
+          leadId: lead.id,
+          leadSnapshot: enrichedLead,
+          pricePaise: LEAD_UNLOCK_PRICE_PAISE,
+          unlockedAt: new Date().toISOString(),
+        })
+        freshStore.creditLedger.push({
+          id: createId('credit'),
+          userId: user.id,
+          kind: 'debit',
+          amountPaise: -LEAD_UNLOCK_PRICE_PAISE,
+          description: `Unlocked lead ${lead.id}`,
+          createdAt: new Date().toISOString(),
+        })
+        return freshStore
       })
-      freshStore.creditLedger.push({
-        id: createId('credit'),
-        userId: user.id,
-        kind: 'debit',
-        amountPaise: -LEAD_UNLOCK_PRICE_PAISE,
-        description: `Unlocked lead ${lead.id}`,
-        createdAt: new Date().toISOString(),
-      })
+    } catch {
+      // Ephemeral store on Vercel — unlock still succeeds via JWT + enriched lead.
+    }
 
-      responsePayload = {
-        lead: shapeLeadForViewer(enrichedLead, freshStore, currentUser, Number.MAX_SAFE_INTEGER),
-        user: {
-          ...currentUser,
-          creditsPaise: currentUser.creditsPaise,
-        },
-      }
-
-      return freshStore
+    return sendJson(res, 200, {
+      lead: shapeLeadForViewer(enrichedLead, store, updatedUser, Number.MAX_SAFE_INTEGER),
+      user: buildUserPayload(updatedUser),
     })
   } catch (error) {
     return sendJson(res, 400, { error: error.message || 'Unlock failed' })
   }
-
-  return sendJson(res, 200, responsePayload)
 }

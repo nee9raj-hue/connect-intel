@@ -15,7 +15,8 @@ const EMPTY_FILTERS = {
 }
 
 export default function PeopleSearch() {
-  const { addSearchHistory, toggleSaveLead, savedLeads, user, updateUser, refreshSession } = useApp()
+  const { addSearchHistory, toggleSaveLead, savedLeads, user, updateUser, refreshSession, setScreen, logout } =
+    useApp()
   const [filters, setFilters] = useState(EMPTY_FILTERS)
   const [countTab, setCountTab] = useState('total')
   const [loading, setLoading] = useState(false)
@@ -60,8 +61,13 @@ export default function PeopleSearch() {
         provider: data.provider,
       })
     } catch (e) {
-      setSearchError(e.message)
+      const message = e.message || 'Search failed'
+      setSearchError(message)
       setResults(null)
+      if (e.status === 401 || /authentication required/i.test(message)) {
+        await logout()
+        setScreen('auth')
+      }
     } finally {
       setLoading(false)
     }
