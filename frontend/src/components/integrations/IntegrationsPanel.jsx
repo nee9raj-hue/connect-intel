@@ -3,7 +3,7 @@ import { api } from '../../lib/api'
 import { PROVIDERS } from '../../lib/providers'
 
 export default function IntegrationsPanel() {
-  const [status, setStatus] = useState({ apollo: false, claude: false })
+  const [status, setStatus] = useState({ apollo: false, apolloConfigured: false, apolloError: null, claude: false })
 
   useEffect(() => {
     let cancelled = false
@@ -30,13 +30,9 @@ export default function IntegrationsPanel() {
           <IntegrationCard
             key={provider.id}
             provider={provider}
-            isLive={
-              provider.id === 'apollo'
-                ? status.apollo
-                : provider.id === 'claude'
-                  ? status.claude
-                  : false
-            }
+            isLive={provider.id === 'apollo' ? status.apollo : provider.id === 'claude' ? status.claude : false}
+            apolloError={provider.id === 'apollo' ? status.apolloError : null}
+            apolloConfigured={provider.id === 'apollo' ? status.apolloConfigured : false}
           />
         ))}
       </div>
@@ -44,9 +40,9 @@ export default function IntegrationsPanel() {
   )
 }
 
-function IntegrationCard({ provider, isLive }) {
+function IntegrationCard({ provider, isLive, apolloError, apolloConfigured }) {
   const isActive = provider.id === 'claude' ? isLive : provider.id === 'apollo' ? isLive : false
-  const badge = isLive ? 'Active' : 'Not configured'
+  const badge = isLive ? 'Active' : apolloConfigured && apolloError ? 'Key invalid' : 'Not configured'
 
   return (
     <div
@@ -78,10 +74,14 @@ function IntegrationCard({ provider, isLive }) {
             ✓ People API Search + enrichment on unlock
           </p>
         )}
-        {provider.id === 'apollo' && !isLive && (
+        {provider.id === 'apollo' && apolloError && (
+          <p className="text-xs text-red-700 mt-2 leading-relaxed bg-red-50 border border-red-100 rounded-lg p-2">
+            {apolloError}
+          </p>
+        )}
+        {provider.id === 'apollo' && !apolloConfigured && !apolloError && (
           <p className="text-xs text-gray-500 mt-2">
-            Add <code className="bg-gray-100 px-1 rounded">APOLLO_API_KEY</code> on Vercel — see
-            APOLLO-SETUP.md
+            Add <code className="bg-gray-100 px-1 rounded">APOLLO_API_KEY</code> on Vercel — see APOLLO-SETUP.md
           </p>
         )}
         {provider.id === 'claude' && isLive && (

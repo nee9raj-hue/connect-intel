@@ -46,17 +46,31 @@ function filterMockLeads(filters) {
   const q = (filters.keywords || '').toLowerCase()
 
   if (q) {
-    results = results.filter(
-      (l) =>
-        l.firstName?.toLowerCase().includes(q) ||
-        l.lastName?.toLowerCase().includes(q) ||
-        l.company?.toLowerCase().includes(q) ||
-        l.title?.toLowerCase().includes(q) ||
-        l.city?.toLowerCase().includes(q) ||
-        l.state?.toLowerCase().includes(q) ||
-        l.location?.toLowerCase().includes(q) ||
-        l.industry?.toLowerCase().includes(q)
-    )
+    const stopWords = new Set(['from', 'in', 'the', 'and', 'for', 'of', 'a', 'an', 'at', 'to'])
+    const tokens = q.split(/\s+/).filter((token) => token.length >= 3 && !stopWords.has(token))
+
+    results = results.filter((l) => {
+      const haystack = [
+        l.firstName,
+        l.lastName,
+        l.company,
+        l.title,
+        l.city,
+        l.state,
+        l.location,
+        l.industry,
+      ]
+        .join(' ')
+        .toLowerCase()
+
+      if (haystack.includes(q)) return true
+      if (!tokens.length) return true
+
+      return tokens.some((token) => {
+        const stem = token.replace(/ers$/, 'er').replace(/ies$/, 'y').replace(/s$/, '')
+        return haystack.includes(token) || (stem.length >= 3 && haystack.includes(stem))
+      })
+    })
   }
 
   if (filters.jobTitles?.length) {

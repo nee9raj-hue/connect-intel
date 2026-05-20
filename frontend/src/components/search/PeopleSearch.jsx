@@ -27,7 +27,12 @@ export default function PeopleSearch() {
   const [searchError, setSearchError] = useState(null)
   const [unlockingLeadId, setUnlockingLeadId] = useState(null)
   const [searchProvider, setSearchProvider] = useState('auto')
-  const [integrations, setIntegrations] = useState({ apollo: false, claude: false })
+  const [integrations, setIntegrations] = useState({
+    apollo: false,
+    apolloConfigured: false,
+    apolloError: null,
+    claude: false,
+  })
 
   useEffect(() => {
     let cancelled = false
@@ -151,7 +156,12 @@ export default function PeopleSearch() {
             >
               <option value="auto">Source: Auto</option>
               <option value="apollo" disabled={!integrations.apollo}>
-                Apollo.io{integrations.apollo ? '' : ' (add API key)'}
+                Apollo.io
+                {!integrations.apolloConfigured
+                  ? ' (add API key)'
+                  : !integrations.apollo
+                    ? ' (invalid key)'
+                    : ''}
               </option>
               <option value="claude" disabled={!integrations.claude}>
                 Claude AI{integrations.claude ? '' : ' (add API key)'}

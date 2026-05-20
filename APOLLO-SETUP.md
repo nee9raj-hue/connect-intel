@@ -2,12 +2,16 @@
 
 Connect Intel uses Apollo’s **People API Search** and **People Enrichment** on the server only.
 
-## 1. Get an API key
+## 1. Get an API key (must be **master**)
 
 1. Sign in at [apollo.io](https://www.apollo.io)
-2. Go to **Settings → Integrations → API** (or **Developer**)
-3. Create a **master API key** (required for People API Search)
-4. Copy the key — it is shown once
+2. Open **[Developer dashboard → API Keys](https://developer.apollo.io/)** (or Settings → Integrations → Apollo API)
+3. Click **Create new key**
+4. Turn on **Set as master key** (required for People API Search)
+5. Enable access to **People API Search** (and People Enrichment if listed)
+6. Copy the **full** key once — no spaces before/after
+
+If you see **401** in Connect Intel, your key is wrong, not master, or was regenerated. Create a new master key and update Vercel.
 
 ## 2. Add to Vercel
 
