@@ -98,7 +98,9 @@ export default function FilterSidebar({ filters, onChange, onSearch, loading, co
             <>Search with Claude AI</>
           )}
         </button>
-        <p className="text-[10px] text-center text-gray-400">Apollo.io data — coming soon</p>
+        <p className="text-[10px] text-center text-gray-400">
+          Apollo.io when APOLLO_API_KEY is set · Import for India lists
+        </p>
       </div>
     </aside>
   )

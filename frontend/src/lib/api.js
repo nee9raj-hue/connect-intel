@@ -33,6 +33,7 @@ async function request(path, options = {}) {
 }
 
 export const api = {
+  getIntegrationStatus: () => request('/api/integrations/status'),
   getSession: () => request('/api/auth/session'),
   createSession: (payload) => request('/api/auth/session', { method: 'POST', body: payload }),
   destroySession: () => request('/api/auth/session', { method: 'DELETE' }),

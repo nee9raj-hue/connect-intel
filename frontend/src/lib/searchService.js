@@ -88,12 +88,12 @@ function filterMockLeads(filters) {
   return results
 }
 
-async function searchViaClaude(filters, count) {
+async function searchViaApi(filters, count, provider) {
   const res = await fetch('/api/search-leads', {
     method: 'POST',
     credentials: 'same-origin',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ filters, count }),
+    body: JSON.stringify({ filters, count, provider }),
   })
 
   const text = await res.text()
@@ -107,7 +107,7 @@ async function searchViaClaude(filters, count) {
   }
 
   if (!res.ok) {
-    const error = new Error(data.error || data.hint || 'Claude search failed')
+    const error = new Error(data.error || data.hint || 'Search failed')
     error.status = res.status
     throw error
   }
@@ -115,7 +115,8 @@ async function searchViaClaude(filters, count) {
   return data
 }
 
-function shouldUseLocalFallback(error) {
+function shouldUseLocalFallback(error, provider) {
+  if (provider === 'apollo') return false
   if (!error) return true
   if (error.status === 401 || error.status === 402 || error.status === 403) return false
   const message = String(error.message || '').toLowerCase()
@@ -124,22 +125,28 @@ function shouldUseLocalFallback(error) {
 }
 
 /**
- * Search leads — Claude via /api on Vercel; Indian demo data fallback locally.
+ * Search leads — imported DB → Apollo → Claude → local demo fallback.
+ * @param {object} filters
+ * @param {'auto'|'apollo'|'claude'} provider
+ * @param {number} count
  */
-export async function searchLeads(filters, provider = 'claude', count = 8) {
-  if (provider === 'apollo' || provider === 'hunter') {
-    throw new Error(`${PROVIDERS[provider].label} integration coming soon`)
+export async function searchLeads(filters, provider = 'auto', count = 8) {
+  if (provider === 'hunter') {
+    throw new Error(`${PROVIDERS.hunter.label} integration coming soon`)
   }
 
   try {
-    const data = await searchViaClaude(filters, count)
-    if (data.leads?.length || data.user) return data
+    const data = await searchViaApi(filters, count, provider)
+    if (data.leads?.length || data.user || data.provider === 'apollo') return data
   } catch (e) {
-    if (!shouldUseLocalFallback(e)) throw e
-    console.warn('Claude API:', e.message)
+    if (!shouldUseLocalFallback(e, provider)) throw e
+    console.warn('Search API:', e.message)
   }
 
-  // Fallback: Indian mock data (local dev or missing API key)
+  if (provider === 'apollo') {
+    throw new Error('Apollo search failed. Check APOLLO_API_KEY on the server.')
+  }
+
   await new Promise((r) => setTimeout(r, 800))
   const leads = filterMockLeads(filters).map(shapeFallbackLead)
   const total = Math.max(leads.length * 150, 3200 + Math.floor(Math.random() * 12000))
@@ -151,7 +158,7 @@ export async function searchLeads(filters, provider = 'claude', count = 8) {
     provider: leads.length ? 'demo-india' : 'none',
     notice:
       leads.length === 0
-        ? 'No demo matches — add ANTHROPIC_API_KEY on Vercel for full Claude search.'
-        : 'Showing Indian sample leads. Add ANTHROPIC_API_KEY on Vercel for live Claude AI search.',
+        ? 'No demo matches. Add APOLLO_API_KEY or ANTHROPIC_API_KEY on Vercel, or import data in Admin.'
+        : 'Showing Indian sample leads. Add APOLLO_API_KEY for Apollo.io or ANTHROPIC_API_KEY for Claude.',
   }
 }

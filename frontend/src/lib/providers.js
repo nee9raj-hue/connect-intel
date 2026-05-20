@@ -8,8 +8,8 @@ export const PROVIDERS = {
   apollo: {
     id: 'apollo',
     label: 'Apollo.io',
-    status: 'coming_soon',
-    description: '230M+ B2B contacts — will replace AI-generated leads',
+    status: 'configured',
+    description: '230M+ B2B contacts — search via People API; unlock reveals email via enrichment',
   },
   hunter: {
     id: 'hunter',

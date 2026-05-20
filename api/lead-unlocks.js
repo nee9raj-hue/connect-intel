@@ -1,16 +1,9 @@
 import { requireUser } from '../lib/server/auth.js'
+import { enrichApolloPerson } from '../lib/server/apollo.js'
 import { LEAD_UNLOCK_PRICE_PAISE } from '../lib/server/config.js'
-import { shapeLeadForViewer } from '../lib/server/search.js'
-import { createId, updateStore } from '../lib/server/store.js'
+import { getUnlockableFields, shapeLeadForViewer } from '../lib/server/search.js'
+import { createId, readStore, updateStore } from '../lib/server/store.js'
 import { applyCors, getBody, handleOptions, methodNotAllowed, sendJson } from '../lib/server/http.js'
-
-function getUnlockableFields(lead) {
-  const fields = []
-  if (lead.email) fields.push('email')
-  if (lead.phone) fields.push('phone')
-  if (lead.linkedin) fields.push('linkedin')
-  return fields
-}
 
 export default async function handler(req, res) {
   if (handleOptions(req, res)) return
@@ -36,29 +29,36 @@ export default async function handler(req, res) {
   let responsePayload = null
 
   try {
-    await updateStore((store) => {
-      const currentUser = store.users.find((entry) => entry.id === user.id)
-      if (!currentUser) {
-        throw new Error('User not found')
+    const store = await readStore()
+    const alreadyUnlocked = store.leadUnlocks.find(
+      (entry) => entry.userId === user.id && entry.leadId === lead.id
+    )
+
+    if (alreadyUnlocked) {
+      const snapshot = alreadyUnlocked.leadSnapshot
+      if (!snapshot?.id) {
+        return sendJson(res, 400, { error: 'Stored unlock record is invalid' })
       }
 
-      const alreadyUnlocked = store.leadUnlocks.find(
-        (entry) => entry.userId === user.id && entry.leadId === lead.id
-      )
+      const currentUser = store.users.find((entry) => entry.id === user.id)
+      return sendJson(res, 200, {
+        lead: shapeLeadForViewer(snapshot, store, currentUser, Number.MAX_SAFE_INTEGER),
+        user: {
+          ...currentUser,
+          creditsPaise: currentUser?.creditsPaise ?? 0,
+        },
+      })
+    }
 
-      if (alreadyUnlocked) {
-        const snapshot = alreadyUnlocked.leadSnapshot
-        if (!snapshot?.id) {
-          throw new Error('Stored unlock record is invalid')
-        }
-        responsePayload = {
-          lead: shapeLeadForViewer(snapshot, store, currentUser, Number.MAX_SAFE_INTEGER),
-          user: {
-            ...currentUser,
-            creditsPaise: currentUser.creditsPaise ?? 0,
-          },
-        }
-        return store
+    let enrichedLead = lead
+    if (lead.source === 'apollo' && lead.apolloId) {
+      enrichedLead = await enrichApolloPerson(lead)
+    }
+
+    await updateStore((freshStore) => {
+      const currentUser = freshStore.users.find((entry) => entry.id === user.id)
+      if (!currentUser) {
+        throw new Error('User not found')
       }
 
       const creditsPaise = currentUser.creditsPaise ?? 0
@@ -67,15 +67,15 @@ export default async function handler(req, res) {
       }
 
       currentUser.creditsPaise = creditsPaise - LEAD_UNLOCK_PRICE_PAISE
-      store.leadUnlocks.push({
+      freshStore.leadUnlocks.push({
         id: createId('unlock'),
         userId: user.id,
         leadId: lead.id,
-        leadSnapshot: lead,
+        leadSnapshot: enrichedLead,
         pricePaise: LEAD_UNLOCK_PRICE_PAISE,
         unlockedAt: new Date().toISOString(),
       })
-      store.creditLedger.push({
+      freshStore.creditLedger.push({
         id: createId('credit'),
         userId: user.id,
         kind: 'debit',
@@ -85,14 +85,14 @@ export default async function handler(req, res) {
       })
 
       responsePayload = {
-        lead: shapeLeadForViewer(lead, store, currentUser, Number.MAX_SAFE_INTEGER),
+        lead: shapeLeadForViewer(enrichedLead, freshStore, currentUser, Number.MAX_SAFE_INTEGER),
         user: {
           ...currentUser,
           creditsPaise: currentUser.creditsPaise,
         },
       }
 
-      return store
+      return freshStore
     })
   } catch (error) {
     return sendJson(res, 400, { error: error.message || 'Unlock failed' })

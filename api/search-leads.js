@@ -2,6 +2,7 @@
  * Vercel serverless — Claude lead search (keeps API key off the browser).
  * Set ANTHROPIC_API_KEY in Vercel → Environment Variables.
  */
+import { isApolloConfigured, searchApolloPeople } from '../lib/server/apollo.js'
 import { readStore } from '../lib/server/store.js'
 import { getMockLeadsForViewer, searchStoredLeads, shapeLeadForViewer } from '../lib/server/search.js'
 import { DEFAULT_SEARCH_LIMIT } from '../lib/server/config.js'
@@ -24,12 +25,43 @@ export default async function handler(req, res) {
   }
 
   const apiKey = process.env.ANTHROPIC_API_KEY
-  const { filters = {}, count = DEFAULT_SEARCH_LIMIT } = getBody(req)
+  const { filters = {}, count = DEFAULT_SEARCH_LIMIT, provider = 'auto' } = getBody(req)
   const store = await readStore()
   const viewer = quotaUser
   const databaseResults = searchStoredLeads(store, filters, count, viewer)
   if (databaseResults?.leads?.length) {
     return sendJson(res, 200, { ...databaseResults, user: quotaUser })
+  }
+
+  const useApollo = provider === 'apollo' || (provider === 'auto' && isApolloConfigured())
+  if (useApollo) {
+    try {
+      const apolloResults = await searchApolloPeople(filters, count, store, viewer)
+      if (apolloResults?.leads?.length) {
+        return sendJson(res, 200, { ...apolloResults, user: quotaUser })
+      }
+      if (provider === 'apollo') {
+        return sendJson(res, 200, {
+          leads: [],
+          total: 0,
+          netNew: 0,
+          provider: 'apollo',
+          notice: 'No Apollo matches for these filters. Try broader keywords or India city/state filters.',
+          user: quotaUser,
+        })
+      }
+    } catch (error) {
+      if (provider === 'apollo') {
+        return sendJson(res, 502, { error: error.message || 'Apollo search failed' })
+      }
+      console.warn('Apollo search fallback:', error.message)
+    }
+  }
+
+  if (provider === 'apollo') {
+    return sendJson(res, 503, {
+      error: 'Apollo.io is not configured. Add APOLLO_API_KEY to your server environment.',
+    })
   }
 
   if (!apiKey) {

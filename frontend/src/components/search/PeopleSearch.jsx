@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { searchLeads } from '../../lib/searchService'
@@ -25,6 +25,21 @@ export default function PeopleSearch() {
   const [filtersOpen, setFiltersOpen] = useState(true)
   const [searchError, setSearchError] = useState(null)
   const [unlockingLeadId, setUnlockingLeadId] = useState(null)
+  const [searchProvider, setSearchProvider] = useState('auto')
+  const [integrations, setIntegrations] = useState({ apollo: false, claude: false })
+
+  useEffect(() => {
+    let cancelled = false
+    api
+      .getIntegrationStatus()
+      .then((data) => {
+        if (!cancelled) setIntegrations(data.providers || {})
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const handleSearch = async () => {
     setLoading(true)
@@ -32,7 +47,7 @@ export default function PeopleSearch() {
     setSelected([])
     setSearchError(null)
     try {
-      const data = await searchLeads(filters, 'claude', 10)
+      const data = await searchLeads(filters, searchProvider, 10)
       setResults(data)
       if (data.user?.searchesLeft != null) {
         updateUser({ searchesLeft: data.user.searchesLeft })
@@ -122,10 +137,20 @@ export default function PeopleSearch() {
             <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#7a5f00] bg-[#fff6d6] px-2.5 py-1 rounded-full border border-[#ffe48a]">
               Trial credits: Rs {((user?.creditsPaise ?? 0) / 100).toFixed(0)}
             </span>
-            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600 bg-gray-100 px-2.5 py-1 rounded-full">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-              Claude AI
-            </span>
+            <select
+              value={searchProvider}
+              onChange={(e) => setSearchProvider(e.target.value)}
+              className="text-xs font-medium border border-gray-300 rounded-md px-2 py-1.5 bg-white text-gray-800"
+              aria-label="Data source"
+            >
+              <option value="auto">Source: Auto</option>
+              <option value="apollo" disabled={!integrations.apollo}>
+                Apollo.io{integrations.apollo ? '' : ' (add API key)'}
+              </option>
+              <option value="claude" disabled={!integrations.claude}>
+                Claude AI{integrations.claude ? '' : ' (add API key)'}
+              </option>
+            </select>
             <button
               type="button"
               onClick={exportCSV}
@@ -193,6 +218,9 @@ export default function PeopleSearch() {
           {hasSearched && results && countTab !== 'saved' && (
             <span className="ml-auto text-xs text-gray-500">
               Showing <strong>{results.leads.length}</strong>
+              {results.provider === 'apollo' && (
+                <span className="ml-1 text-indigo-600">· Apollo.io</span>
+              )}
               {results.provider === 'claude' && (
                 <span className="ml-1 text-green-600">· Claude AI</span>
               )}
