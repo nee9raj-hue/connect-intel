@@ -25,6 +25,8 @@ export const IMPORT_TEMPLATE_COLUMNS = [
   'linkedin',
   'seniority',
   'source_confidence',
+  'pipeline_status',
+  'notes',
 ]
 
 /** Example rows — replace with your data; structure must stay the same. */
@@ -50,6 +52,8 @@ export const IMPORT_TEMPLATE_SAMPLE_ROWS = [
     linkedin: 'linkedin.com/in/priya-sharma-export',
     seniority: 'Manager',
     source_confidence: 'verified',
+    pipeline_status: 'contacted',
+    notes: 'Met at trade fair — follow up on samples',
   },
   {
     company: 'Ganesh Marble & Granite Exports',
@@ -194,6 +198,8 @@ const INSTRUCTIONS_ROWS = [
   ['linkedin', 'Profile URL or path.'],
   ['seniority', 'Optional: Owner, Director, Manager.'],
   ['source_confidence', 'verified | imported | likely'],
+  ['pipeline_status', 'Optional CRM stage: new, contacted, follow_up, replied, won, lost'],
+  ['notes', 'Optional free-text note shown in Pipeline'],
 ]
 
 function triggerDownload(blob, filename) {

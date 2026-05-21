@@ -59,6 +59,17 @@ export function AppProvider({ children }) {
     }
   }, [user?.organizationId, user?.accountType])
 
+  const refreshSavedLeads = useCallback(async () => {
+    try {
+      const saved = await api.getSavedLeads()
+      setSavedLeads(saved.leads || [])
+      return saved.leads || []
+    } catch {
+      setSavedLeads([])
+      return []
+    }
+  }, [])
+
   useEffect(() => {
     let cancelled = false
 
@@ -318,6 +329,7 @@ export function AppProvider({ children }) {
         completeOnboarding,
         teamMembers,
         refreshTeam,
+        refreshSavedLeads,
         inviteTeamMember,
         updateTeamBranding,
         updateMemberPermissions,

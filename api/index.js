@@ -16,6 +16,7 @@ const ROUTES = {
   'team/invite': () => import('../lib/server/handlers/team-invite.js'),
   'team/branding': () => import('../lib/server/handlers/team-branding.js'),
   'team/permissions': () => import('../lib/server/handlers/team-permissions.js'),
+  'org/imports': () => import('../lib/server/handlers/org-imports.js'),
   'invite/preview': () => import('../lib/server/handlers/invite-preview.js'),
   'invite/accept': () => import('../lib/server/handlers/invite-accept.js'),
   'auth/session': () => import('../lib/server/handlers/auth-session.js'),

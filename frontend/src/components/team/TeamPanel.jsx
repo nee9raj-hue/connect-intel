@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { TEAM_PIPELINE_ROLES } from '../../lib/crmConstants'
+import OrgPipelineImport from './OrgPipelineImport'
 
 export default function TeamPanel() {
   const {
     user,
     teamMembers,
     refreshTeam,
+    refreshSavedLeads,
     inviteTeamMember,
     updateTeamBranding,
     updateMemberPermissions,
@@ -238,6 +240,13 @@ export default function TeamPanel() {
             </ul>
           )}
         </section>
+
+        <OrgPipelineImport
+          onImported={async () => {
+            await refreshSavedLeads()
+            setNotice('Pipeline import complete — open Pipeline to follow up.')
+          }}
+        />
 
         {notice && <p className="text-xs text-green-800 bg-green-50 border border-green-100 rounded px-3 py-2">{notice}</p>}
         {error && <p className="text-xs text-red-700 bg-red-50 border border-red-100 rounded px-3 py-2">{error}</p>}
