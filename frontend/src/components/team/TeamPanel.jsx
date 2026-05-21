@@ -3,7 +3,7 @@ import { useApp } from '../../context/AppContext'
 import { TEAM_PIPELINE_ROLES } from '../../lib/crmConstants'
 import OrgPipelineImport from './OrgPipelineImport'
 
-export default function TeamPanel() {
+export default function TeamPanel({ onNavigate }) {
   const {
     user,
     teamMembers,
@@ -32,6 +32,25 @@ export default function TeamPanel() {
     setCompanyName(user?.organizationName || '')
     setLogoUrl(user?.organizationLogoUrl || '')
   }, [user?.organizationName, user?.organizationLogoUrl])
+
+  if (user?.isPlatformAdmin) {
+    return (
+      <div className="p-8 max-w-lg mx-auto text-center">
+        <h2 className="text-lg font-semibold text-gray-900">Company team area</h2>
+        <p className="mt-2 text-sm text-gray-500 leading-relaxed">
+          You are signed in as a <strong>Connect Intel platform operator</strong>. Use{' '}
+          <strong>Data & imports</strong> in the sidebar to upload master sheets for all customers.
+        </p>
+        <button
+          type="button"
+          onClick={() => onNavigate?.('admin')}
+          className="mt-4 px-4 py-2 bg-[#ffcb2b] text-[#242424] text-sm font-semibold rounded-lg"
+        >
+          Open Data & imports
+        </button>
+      </div>
+    )
+  }
 
   if (!user?.isOrgAdmin || user?.accountType !== 'company') {
     return (

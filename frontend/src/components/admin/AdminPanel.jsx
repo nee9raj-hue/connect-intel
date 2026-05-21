@@ -33,7 +33,7 @@ export default function AdminPanel() {
     let cancelled = false
 
     const load = async () => {
-      if (user?.role !== 'admin') return
+      if (!user?.isPlatformAdmin) return
       try {
         const data = await api.getAdminOverview()
         if (!cancelled) setOverview(data)
@@ -119,14 +119,19 @@ export default function AdminPanel() {
     }
   }
 
-  if (user?.role !== 'admin') {
+  if (!user?.isPlatformAdmin) {
     return (
       <div className="p-6">
         <div className="bg-white rounded-2xl border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-900">Admin access required</h2>
+          <h2 className="text-lg font-semibold text-gray-900">Platform operator access required</h2>
           <p className="mt-2 text-sm text-gray-500">
-            Sign in with a Google account listed in <code className="text-xs bg-gray-100 px-1 rounded">ADMIN_EMAILS</code>{' '}
-            on Vercel, then sign out and back in to refresh admin access.
+            This area is for Connect Intel backend staff only. Add your Google email to{' '}
+            <code className="text-xs bg-gray-100 px-1 rounded">ADMIN_EMAILS</code> on Vercel, then sign out and
+            sign in again.
+          </p>
+          <p className="mt-3 text-sm text-gray-600">
+            Company customers use <strong>Team → Import your pipeline</strong> for their own CRM data, not this
+            screen.
           </p>
         </div>
       </div>
@@ -135,6 +140,15 @@ export default function AdminPanel() {
 
   return (
     <div className="p-6 h-full overflow-y-auto bg-[#f6f7f9]">
+      <div className="mb-6 rounded-2xl border border-gray-900 bg-gray-900 text-white px-5 py-4">
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-[#ffcb2b]">Platform operator</p>
+        <h1 className="text-xl font-semibold mt-1">Master data & imports</h1>
+        <p className="text-sm text-gray-300 mt-2 max-w-2xl">
+          Upload exporter and contact sheets here. All customer searches use this shared database. Customer
+          company admins only manage their own team pipeline under Team — not this screen.
+        </p>
+      </div>
+
       <div className="grid grid-cols-3 gap-4 mb-6">
         <StatCard label="Companies" value={overview?.counts?.companies ?? 0} />
         <StatCard label="Contacts" value={overview?.counts?.contacts ?? 0} />

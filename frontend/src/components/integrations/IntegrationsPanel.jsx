@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { PRODUCT } from '../../lib/productCopy'
 
@@ -34,7 +35,9 @@ const PARTNERS = [
 ]
 
 export default function IntegrationsPanel() {
+  const { user } = useApp()
   const [status, setStatus] = useState(null)
+  const isOperator = user?.isPlatformAdmin
 
   useEffect(() => {
     let cancelled = false
@@ -55,9 +58,18 @@ export default function IntegrationsPanel() {
   return (
     <div className="p-6 h-[calc(100vh-3.5rem)] overflow-y-auto max-w-3xl">
       <p className="text-sm text-gray-600 mb-6 leading-relaxed">
-        {PRODUCT.tagline} — search runs on the Connect Intel database today. Your organization can
-        grow coverage by importing Excel lists in Admin. Additional data partners roll out with
-        enterprise plans.
+        {isOperator ? (
+          <>
+            <strong>Platform operator view.</strong> Check Supabase, Perplexity, and Gemini env wiring
+            on Vercel. Customer company admins import only their own pipeline under Team — master
+            sheets go through Data & imports.
+          </>
+        ) : (
+          <>
+            {PRODUCT.tagline} — search runs on the Connect Intel database today. Your company admin can
+            import your pipeline under Team. Additional data partners roll out with enterprise plans.
+          </>
+        )}
       </p>
 
       <div

@@ -20,7 +20,7 @@ export const TEAM_PIPELINE_ROLES = [
 
 export function getVisiblePipelineColumns(user) {
   if (!user || user.accountType !== 'company') return CRM_STATUSES
-  if (user.isOrgAdmin || user.orgRole === 'org_admin') return CRM_STATUSES
+  if (user.isOrgAdmin || user.orgRole === 'org_admin' || user.isPlatformAdmin) return CRM_STATUSES
   const role = user.pipelineRole || 'member'
   const allowed = PIPELINE_ROLE_COLUMNS[role] || PIPELINE_ROLE_COLUMNS.member
   return CRM_STATUSES.filter((col) => allowed.includes(col.id))

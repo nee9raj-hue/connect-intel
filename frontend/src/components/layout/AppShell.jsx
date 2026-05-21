@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import OnboardingModal from '../onboarding/OnboardingModal'
 import Sidebar from './Sidebar'
@@ -24,14 +24,20 @@ export default function AppShell() {
   const { user } = useApp()
   const [activePanel, setActivePanel] = useState('search')
   const Panel = PANELS[activePanel] || PeopleSearch
-  const needsOnboarding = user && !user.onboardingComplete
+  const needsOnboarding = user && !user.onboardingComplete && !user.isPlatformAdmin
+
+  useEffect(() => {
+    if (user?.isPlatformAdmin) {
+      setActivePanel('admin')
+    }
+  }, [user?.isPlatformAdmin, user?.id])
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-[#f6f7f9]">
       <Sidebar active={activePanel} onNavigate={setActivePanel} />
       <main className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden">
         <div className="flex-1 flex flex-col min-h-0 min-w-0 overflow-hidden">
-          <Panel onNavigate={setActivePanel} />
+          <Panel onNavigate={setActivePanel} activePanel={activePanel} />
         </div>
       </main>
       {needsOnboarding && <OnboardingModal />}

@@ -9,22 +9,36 @@ const CRM = [
   { id: 'pipeline', label: 'Pipeline', icon: PipelineIcon },
 ]
 
-const BOTTOM = [
+const CUSTOMER_PLATFORM = [
   { id: 'overview', label: 'Home', icon: HomeIcon },
   { id: 'integrations', label: 'Integrations', icon: BoltIcon },
 ]
 
+const OPERATOR_PLATFORM = [
+  { id: 'admin', label: 'Data & imports', icon: DatabaseIcon },
+  { id: 'integrations', label: 'System status', icon: BoltIcon },
+]
+
 export default function Sidebar({ active, onNavigate }) {
   const { user, logout, savedLeads } = useApp()
-  const showTeam = user?.isOrgAdmin && user?.accountType === 'company'
-  const orgName = user?.organizationName || 'Connect Intel'
-  const orgLogo = user?.organizationLogoUrl
+  const isOperator = Boolean(user?.isPlatformAdmin)
+  const showTeam = user?.isOrgAdmin && user?.accountType === 'company' && !isOperator
+  const orgName = isOperator ? 'Connect Intel' : user?.organizationName || 'Connect Intel'
+  const orgSubtitle = isOperator
+    ? 'Platform operator'
+    : user?.accountType === 'company'
+      ? 'Team workspace'
+      : null
 
   return (
     <aside className="w-[220px] shrink-0 h-full bg-white border-r border-gray-200 flex flex-col">
       <div className="h-14 flex items-center gap-2.5 px-4 border-b border-gray-100 shrink-0">
-        {orgLogo ? (
-          <img src={orgLogo} alt="" className="w-8 h-8 rounded-lg object-cover border border-gray-200" />
+        {isOperator ? (
+          <div className="w-8 h-8 rounded-lg bg-[#242424] flex items-center justify-center">
+            <span className="text-[#ffcb2b] font-bold text-xs">CI</span>
+          </div>
+        ) : user?.organizationLogoUrl ? (
+          <img src={user.organizationLogoUrl} alt="" className="w-8 h-8 rounded-lg object-cover border border-gray-200" />
         ) : (
           <div className="w-8 h-8 rounded-lg bg-[#242424] flex items-center justify-center">
             <span className="text-[#ffcb2b] font-bold text-xs">CI</span>
@@ -32,70 +46,110 @@ export default function Sidebar({ active, onNavigate }) {
         )}
         <div className="min-w-0">
           <span className="font-semibold text-[14px] text-gray-900 block truncate">{orgName}</span>
-          {user?.accountType === 'company' && (
-            <span className="text-[10px] text-gray-500 truncate block">Team workspace</span>
+          {orgSubtitle && (
+            <span className="text-[10px] text-gray-500 truncate block">{orgSubtitle}</span>
           )}
         </div>
       </div>
 
       <nav className="flex-1 overflow-y-auto py-3 px-2">
-        <p className="px-3 mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
-          Prospect & enrich
-        </p>
-        {PROSPECT.map((item) => (
-          <NavBtn
-            key={item.id}
-            item={item}
-            active={active === item.id}
-            onClick={() => onNavigate(item.id)}
-            badge={item.id === 'saved' && savedLeads.length > 0 ? savedLeads.length : null}
-          />
-        ))}
+        {isOperator ? (
+          <>
+            <p className="px-3 mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-[#8a6600]">
+              Platform backend
+            </p>
+            {OPERATOR_PLATFORM.map((item) => (
+              <NavBtn
+                key={item.id}
+                item={item}
+                active={active === item.id}
+                onClick={() => onNavigate(item.id)}
+              />
+            ))}
+            <p className="px-3 mt-5 mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
+              Preview as customer
+            </p>
+            {PROSPECT.map((item) => (
+              <NavBtn
+                key={item.id}
+                item={item}
+                active={active === item.id}
+                onClick={() => onNavigate(item.id)}
+                muted
+              />
+            ))}
+            {CRM.map((item) => (
+              <NavBtn
+                key={item.id}
+                item={item}
+                active={active === item.id}
+                onClick={() => onNavigate(item.id)}
+                muted
+              />
+            ))}
+          </>
+        ) : (
+          <>
+            <p className="px-3 mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
+              Prospect & enrich
+            </p>
+            {PROSPECT.map((item) => (
+              <NavBtn
+                key={item.id}
+                item={item}
+                active={active === item.id}
+                onClick={() => onNavigate(item.id)}
+                badge={item.id === 'saved' && savedLeads.length > 0 ? savedLeads.length : null}
+              />
+            ))}
 
-        <p className="px-3 mt-5 mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
-          Outreach & CRM
-        </p>
-        {CRM.map((item) => (
-          <NavBtn
-            key={item.id}
-            item={item}
-            active={active === item.id}
-            onClick={() => onNavigate(item.id)}
-            badge={item.id === 'pipeline' && savedLeads.length > 0 ? savedLeads.length : null}
-          />
-        ))}
+            <p className="px-3 mt-5 mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
+              Outreach & CRM
+            </p>
+            {CRM.map((item) => (
+              <NavBtn
+                key={item.id}
+                item={item}
+                active={active === item.id}
+                onClick={() => onNavigate(item.id)}
+                badge={item.id === 'pipeline' && savedLeads.length > 0 ? savedLeads.length : null}
+              />
+            ))}
 
-        {showTeam && (
-          <NavBtn
-            item={{ id: 'team', label: 'Team', icon: TeamIcon }}
-            active={active === 'team'}
-            onClick={() => onNavigate('team')}
-          />
+            {showTeam && (
+              <NavBtn
+                item={{ id: 'team', label: 'Team', icon: TeamIcon }}
+                active={active === 'team'}
+                onClick={() => onNavigate('team')}
+              />
+            )}
+
+            <p className="px-3 mt-5 mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
+              Platform
+            </p>
+            {CUSTOMER_PLATFORM.map((item) => (
+              <NavBtn
+                key={item.id}
+                item={item}
+                active={active === item.id}
+                onClick={() => onNavigate(item.id)}
+              />
+            ))}
+          </>
         )}
 
-        <p className="px-3 mt-5 mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
-          Platform
-        </p>
-        {BOTTOM.map((item) => (
-          <NavBtn
-            key={item.id}
-            item={item}
-            active={active === item.id}
-            onClick={() => onNavigate(item.id)}
-          />
-        ))}
-        {user?.role === 'admin' && (
-          <NavBtn
-            item={{ id: 'admin', label: 'Admin', icon: ShieldIcon }}
-            active={active === 'admin'}
-            onClick={() => onNavigate('admin')}
-          />
-        )}
-
-        <div className="mx-2 mt-4 p-3 rounded-lg bg-[#fffbeb] border border-[#fde68a]">
-          <p className="text-xs font-semibold text-gray-800">AI-powered search</p>
-          <p className="text-[10px] text-gray-600 mt-1 leading-snug">
-            Pipeline leads stay in CRM and won&apos;t appear in new searches.
+        <div
+          className={`mx-2 mt-4 p-3 rounded-lg border ${
+            isOperator ? 'bg-gray-900 border-gray-800 text-white' : 'bg-[#fffbeb] border-[#fde68a]'
+          }`}
+        >
+          <p className={`text-xs font-semibold ${isOperator ? 'text-[#ffcb2b]' : 'text-gray-800'}`}>
+            {isOperator ? 'Master database' : 'AI-powered search'}
+          </p>
+          <p className={`text-[10px] mt-1 leading-snug ${isOperator ? 'text-gray-300' : 'text-gray-600'}`}>
+            {isOperator
+              ? 'Upload sheets here. All customers search this shared data.'
+              : 'Pipeline leads stay in CRM and won\u2019t appear in new searches.'}
           </p>
         </div>
       </nav>
@@ -113,7 +167,9 @@ export default function Sidebar({ active, onNavigate }) {
             <p className="text-xs font-semibold text-gray-900 truncate">{user?.name}</p>
             <p className="text-[10px] text-gray-500 truncate">{user?.email}</p>
             <p className="text-[10px] text-[#8a6600] truncate mt-0.5">
-              {user?.accountType === 'company' ? 'Company' : 'Individual'} · Searches: {user?.searchesLeft ?? 0}
+              {isOperator
+                ? 'Platform admin'
+                : `${user?.accountType === 'company' ? 'Company' : 'Individual'} · Searches: ${user?.searchesLeft ?? 0}`}
             </p>
           </div>
         </div>
@@ -129,24 +185,44 @@ export default function Sidebar({ active, onNavigate }) {
   )
 }
 
-function NavBtn({ item, active, onClick, badge }) {
+function NavBtn({ item, active, onClick, badge, muted = false }) {
   const Icon = item.icon
   return (
     <button
       type="button"
       onClick={onClick}
       className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] font-medium mb-0.5 transition-colors ${
-        active ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-100'
+        active
+          ? 'bg-gray-900 text-white'
+          : muted
+            ? 'text-gray-500 hover:bg-gray-50'
+            : 'text-gray-600 hover:bg-gray-100'
       }`}
     >
       <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-white' : 'text-gray-500'}`} />
       <span className="flex-1 text-left">{item.label}</span>
       {badge != null && (
-        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${active ? 'bg-white/20 text-white' : 'bg-gray-200 text-gray-700'}`}>
+        <span
+          className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+            active ? 'bg-white/20 text-white' : 'bg-gray-200 text-gray-700'
+          }`}
+        >
           {badge}
         </span>
       )}
     </button>
+  )
+}
+
+function DatabaseIcon({ className }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"
+      />
+    </svg>
   )
 }
 
@@ -190,17 +266,6 @@ function BoltIcon({ className }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-    </svg>
-  )
-}
-function ShieldIcon({ className }) {
-  return (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M12 3l7 4v5c0 5-3 8-7 9-4-1-7-4-7-9V7l7-4z"
-      />
     </svg>
   )
 }

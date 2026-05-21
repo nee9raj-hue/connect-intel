@@ -150,7 +150,9 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
           </select>
         </section>
 
-        {user?.isOrgAdmin && user?.accountType === 'company' && teamMembers.length > 0 && (
+        {(user?.isOrgAdmin || user?.orgRole === 'org_admin') &&
+          user?.accountType === 'company' &&
+          teamMembers.length > 0 && (
           <section>
             <h3 className="text-[11px] font-semibold uppercase tracking-wide text-gray-400 mb-2">
               Assign to teammate
