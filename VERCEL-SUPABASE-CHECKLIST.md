@@ -1,95 +1,49 @@
-# Vercel + Supabase checklist (if status still shows `sqlite`)
+# Vercel + Supabase — resolved checklist
 
-## Your JSON means two problems
+## Root cause (May 2026)
+
+1. **Hobby plan limit:** Vercel allows **12 serverless functions** max. The app had **18** files under `api/`, so every deploy **failed** and production stayed on an old build (`sqlite`, no Supabase).
+2. **Fix:** One router at `api/index.js` + handlers in `lib/server/handlers/` (1 function total).
+3. **Env vars** were already set on Vercel; they only took effect after a **successful** deploy.
+
+## Verify production
+
+- App: https://connect-intel-mocha.vercel.app/
+- Health: https://connect-intel-mocha.vercel.app/api/health
+- Status: https://connect-intel-mocha.vercel.app/api/integrations/status
+
+Success:
 
 ```json
-"supabase": false
+"storage": "supabase",
+"supabaseConnected": true
 ```
 
-→ Server does **not** see `SUPABASE_URL` or the secret key at **runtime**.
-
-No `"apiVersion": "2026-05-21-supabase-diag"` in the response → Production is **not** running the latest code from GitHub.
-
----
-
-## Step 1 — Vercel project settings
-
-**Settings → General**
-
-| Setting | Must be |
-|---------|---------|
-| **Root Directory** | Empty (`.`) — **NOT** `frontend` |
-| **Production Branch** | `main` |
-
-If Root Directory is `frontend`, API routes in `/api` may never update.
-
----
-
-## Step 2 — Environment variables (exact names)
-
-**Settings → Environment Variables**
+## Required Vercel env vars (Production)
 
 | Key | Value |
 |-----|--------|
-| `SUPABASE_URL` | `https://hkdrannqcnszfukcqchj.supabase.co` (no `/rest/v1/`) |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase **Secret** key (`eyJ...`) |
-
-- Enable **Production** (and Preview if you use it).
-- Do **not** put the secret in the browser-exposed `VITE_` variables.
-
-Also add (optional):
-
-| Key | Value |
-|-----|--------|
+| `SUPABASE_URL` | `https://YOUR_PROJECT.supabase.co` (no `/rest/v1/`) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase **Secret** key |
+| `SESSION_SECRET` | Random string (auto-added via CLI) |
 | `APP_URL` | `https://connect-intel-mocha.vercel.app` |
-| `NODE_OPTIONS` | `--disable-warning=DEP0040` |
+| `VITE_GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_ID` | Google OAuth |
+| `PERPLEXITY_API_KEY` | Optional AI discovery |
 
-Click **Save**, then **Redeploy** (required).
+## Settings
 
----
+- **Root Directory:** empty (`.`) — not `frontend`
+- **Production branch:** `main`
 
-## Step 3 — Confirm latest deploy is Production
+## Deploy from your Mac (if Git deploy fails)
 
-**Deployments** tab:
-
-1. Top deployment should be commit `e67f5c5` or newer.
-2. Status **Ready**.
-3. Environment **Production**.
-4. If an older deployment is Production, click the latest → **⋯** → **Promote to Production**.
-
-Or: **⋯ → Redeploy** on the latest commit (uncheck “Use existing Build Cache” if shown).
-
----
-
-## Step 4 — Test endpoints
-
-After redeploy:
-
-**Health (new):**  
-https://connect-intel-mocha.vercel.app/api/health
-
-Should include:
-
-```json
-"apiVersion": "2026-05-21-supabase-diag",
-"supabase": { "configured": true, "connected": true }
+```bash
+cd "/Users/apple/Downloads/Connect intel"
+vercel pull --yes --environment=production
+vercel build --prod --yes
+vercel deploy --prebuilt --prod --yes
 ```
 
-**Status:**  
-https://connect-intel-mocha.vercel.app/api/integrations/status
+## Supabase SQL
 
-Should include `apiVersion`, `supabaseEnv`, `storage: "supabase"`.
-
----
-
-## Step 5 — Git connected?
-
-**Settings → Git** → Repository should be `nee9raj-hue/connect-intel`, branch `main`, auto-deploy **on**.
-
-If Git is disconnected, pushes to GitHub will not update the live site.
-
----
-
-## Still stuck?
-
-Open `/api/health` and paste the full JSON in chat — it shows which env vars the server sees (without exposing secrets).
+Run `supabase/schema.sql` once in SQL Editor → "Success. No rows returned" is correct.
