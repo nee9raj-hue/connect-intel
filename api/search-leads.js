@@ -56,7 +56,17 @@ export default async function handler(req, res) {
     })
   }
 
-  if (provider === 'free' || provider === 'auto' || provider === 'database') {
+  const hasStructuredFilters =
+    filters.jobTitles?.length ||
+    filters.states?.length ||
+    filters.cities?.length ||
+    filters.industries?.length ||
+    filters.companySizes?.length
+
+  if (
+    !hasStructuredFilters &&
+    (provider === 'free' || provider === 'auto' || provider === 'database')
+  ) {
     const broadMock = getMockLeadsForViewer(store, viewer, { ...filters, keywords: '' }, count)
     if (broadMock.length) {
       return sendJson(res, 200, {
@@ -64,7 +74,7 @@ export default async function handler(req, res) {
         total: broadMock.length,
         netNew: broadMock.length,
         provider: 'database',
-        notice: 'No exact match — showing related India prospects. Try keywords like Jaipur or exporter.',
+        notice: 'No exact keyword match — showing related India prospects. Add state or role filters to narrow further.',
         user: quotaUser,
       })
     }

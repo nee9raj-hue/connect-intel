@@ -3,7 +3,7 @@ import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { getResultsBadge, softenNotice, PRODUCT } from '../../lib/productCopy'
 import { searchLeads } from '../../lib/searchService'
-import FilterSidebar from './FilterSidebar'
+import SearchFiltersBar from './SearchFiltersBar'
 import ResultsTable from './ResultsTable'
 
 const EMPTY_FILTERS = {
@@ -33,7 +33,6 @@ export default function PeopleSearch({ onNavigate }) {
   const [results, setResults] = useState(null)
   const [selected, setSelected] = useState([])
   const [hasSearched, setHasSearched] = useState(false)
-  const [filtersOpen, setFiltersOpen] = useState(true)
   const [searchError, setSearchError] = useState(null)
   const [unlockingLeadId, setUnlockingLeadId] = useState(null)
 
@@ -43,7 +42,7 @@ export default function PeopleSearch({ onNavigate }) {
     setSelected([])
     setSearchError(null)
     try {
-      const data = await searchLeads(filters, 'free', 10)
+      const data = await searchLeads(filters, 'free', 25)
       setResults(data)
       if (data.user?.searchesLeft != null) {
         updateUser({ searchesLeft: data.user.searchesLeft })
@@ -133,10 +132,20 @@ export default function PeopleSearch({ onNavigate }) {
     onNavigate?.('pipeline')
   }
 
+  const filterSummary = useMemo(() => {
+    const parts = []
+    if (filters.keywords?.trim()) parts.push(`“${filters.keywords.trim()}”`)
+    if (filters.jobTitles?.length) parts.push(`${filters.jobTitles.length} role(s)`)
+    if (filters.states?.length) parts.push(filters.states.join(', '))
+    if (filters.cities?.length) parts.push(filters.cities.join(', '))
+    if (filters.industries?.length) parts.push(`${filters.industries.length} industry`)
+    return parts.length ? parts.join(' · ') : null
+  }, [filters])
+
   return (
-    <div className="flex flex-col h-full min-h-0">
+    <div className="flex flex-col h-full min-h-0 bg-[#f6f7f9]">
       <header className="shrink-0 bg-white border-b border-gray-200 px-5 py-3">
-        <div className="flex items-center justify-between gap-4 mb-3">
+        <div className="flex items-center justify-between gap-4">
           <div>
             <h1 className="text-lg font-semibold text-gray-900">Find people</h1>
             <p className="text-xs text-gray-500 mt-0.5">{PRODUCT.databaseLine}</p>
@@ -162,130 +171,69 @@ export default function PeopleSearch({ onNavigate }) {
             </button>
           </div>
         </div>
-
-        <div className="flex flex-wrap items-center gap-2 mb-3">
-          <button
-            type="button"
-            onClick={() => setFiltersOpen((o) => !o)}
-            className="text-xs font-medium px-3 py-1.5 border border-gray-300 rounded-md hover:bg-gray-50"
-          >
-            {filtersOpen ? 'Hide filters' : 'Show filters'}
-          </button>
-          <div className="flex-1 min-w-[200px] relative max-w-xl">
-            <input
-              type="text"
-              placeholder="Search exporters, industries, cities — e.g. Jaipur, pharma, textiles…"
-              value={filters.keywords}
-              onChange={(e) => setFilters({ ...filters, keywords: e.target.value })}
-              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              className="w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#ffcb2b]/50 focus:border-[#ffcb2b]"
-            />
-          </div>
-          <button
-            type="button"
-            onClick={handleSearch}
-            disabled={loading || (user?.searchesLeft ?? 0) <= 0}
-            className="px-4 py-2 bg-[#ffcb2b] hover:bg-[#f0bc00] text-[#242424] text-sm font-semibold rounded-md disabled:opacity-60"
-          >
-            {loading ? 'Searching…' : 'Search'}
-          </button>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {[
-            { id: 'total', label: 'Total', value: results?.total },
-            { id: 'netNew', label: 'Net new', value: results?.netNew },
-            { id: 'saved', label: 'Saved', value: savedLeads.length },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setCountTab(tab.id)}
-              className={`px-3 py-1.5 rounded-md text-xs font-semibold border transition-colors ${
-                countTab === tab.id
-                  ? 'bg-gray-900 text-white border-gray-900'
-                  : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
-              }`}
-            >
-              {tab.label}
-              {tab.value != null && (
-                <span className="ml-1 opacity-80">
-                  ({typeof tab.value === 'number' ? tab.value.toLocaleString() : tab.value})
-                </span>
-              )}
-            </button>
-          ))}
-          {hasSearched && results && countTab !== 'saved' && resultBadge && (
-            <span className={`ml-auto text-xs font-medium ${resultBadge.className}`}>
-              Showing <strong>{results.leads.length}</strong> · {resultBadge.text}
-            </span>
-          )}
-        </div>
-
-        {friendlyNotice && countTab !== 'saved' && (
-          <p className="mt-2 text-xs text-gray-600 bg-gray-50 border border-gray-100 rounded-lg px-3 py-2">
-            {friendlyNotice}
-          </p>
-        )}
-        {countTab !== 'saved' && (
-          <p className="mt-2 text-xs text-gray-500">
-            {PRODUCT.searchHint}. First 5 results include full contact details; unlock more for Rs 10 each.
-          </p>
-        )}
-        {searchError && (
-          <p className="mt-2 text-xs text-red-700 bg-red-50 border border-red-100 rounded px-2 py-1.5">
-            {searchError}
-          </p>
-        )}
       </header>
 
-      <div className="flex flex-1 min-h-0">
-        <FilterSidebar
-          filters={filters}
-          onChange={setFilters}
-          onSearch={handleSearch}
-          loading={loading}
-          collapsed={!filtersOpen}
-          onToggleCollapse={() => setFiltersOpen((o) => !o)}
-        />
+      <SearchFiltersBar
+        filters={filters}
+        onChange={setFilters}
+        onSearch={handleSearch}
+        loading={loading}
+      />
 
-        <div className="flex-1 flex flex-col min-w-0 bg-white">
-          {countTab === 'saved' ? (
-            displayLeads.length ? (
-              <ResultsTable
-                leads={displayLeads}
-                selected={selected}
-                onSelectAll={handleSelectAll}
-                onSelect={(id) =>
-                  setSelected((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
-                }
-                onSave={toggleSaveLead}
-                onWorkOnLead={workOnLead}
-                onUnlock={handleUnlockLead}
-                unlockingLeadId={unlockingLeadId}
-              />
-            ) : (
-              <EmptyState
-                title="No saved leads"
-                sub="Save prospects from search, then open Pipeline to email and track status."
-                action={() => onNavigate?.('pipeline')}
-                actionLabel="Open pipeline"
-              />
-            )
-          ) : !hasSearched ? (
-            <EmptyState
-              title="Search your B2B database"
-              sub="Filter by state, city, or industry — then search for exporters, buyers, and decision-makers across India."
-            />
-          ) : loading ? (
-            <LoadingState />
-          ) : displayLeads.length === 0 ? (
-            <EmptyState
-              title="No matches yet"
-              sub="Try broader keywords (e.g. exporter, textile) or another city. Your team can add more companies in Admin."
-              action={handleSearch}
-            />
-          ) : (
+      <div className="shrink-0 bg-white border-b border-gray-200 px-5 py-2 flex flex-wrap items-center gap-2">
+        {[
+          { id: 'total', label: 'Total', value: results?.total },
+          { id: 'netNew', label: 'Net new', value: results?.netNew },
+          { id: 'saved', label: 'Saved', value: savedLeads.length },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            onClick={() => setCountTab(tab.id)}
+            className={`px-3 py-1.5 rounded-md text-xs font-semibold border transition-colors ${
+              countTab === tab.id
+                ? 'bg-gray-900 text-white border-gray-900'
+                : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+            }`}
+          >
+            {tab.label}
+            {tab.value != null && (
+              <span className="ml-1 opacity-80">
+                ({typeof tab.value === 'number' ? tab.value.toLocaleString() : tab.value})
+              </span>
+            )}
+          </button>
+        ))}
+        {hasSearched && results && countTab !== 'saved' && resultBadge && (
+          <span className={`ml-auto text-xs font-medium ${resultBadge.className}`}>
+            Showing <strong>{results.leads.length}</strong> · {resultBadge.text}
+          </span>
+        )}
+      </div>
+
+      {(friendlyNotice || filterSummary || searchError) && (
+        <div className="shrink-0 px-5 py-2 space-y-1.5 bg-white border-b border-gray-100">
+          {filterSummary && hasSearched && countTab !== 'saved' && (
+            <p className="text-xs text-gray-600">
+              Active filters: <span className="font-medium">{filterSummary}</span>
+            </p>
+          )}
+          {friendlyNotice && countTab !== 'saved' && (
+            <p className="text-xs text-gray-600 bg-gray-50 border border-gray-100 rounded-lg px-3 py-2">
+              {friendlyNotice}
+            </p>
+          )}
+          {searchError && (
+            <p className="text-xs text-red-700 bg-red-50 border border-red-100 rounded px-2 py-1.5">
+              {searchError}
+            </p>
+          )}
+        </div>
+      )}
+
+      <div className="flex-1 flex flex-col min-w-0 min-h-0 bg-white mx-0">
+        {countTab === 'saved' ? (
+          displayLeads.length ? (
             <ResultsTable
               leads={displayLeads}
               selected={selected}
@@ -298,8 +246,41 @@ export default function PeopleSearch({ onNavigate }) {
               onUnlock={handleUnlockLead}
               unlockingLeadId={unlockingLeadId}
             />
-          )}
-        </div>
+          ) : (
+            <EmptyState
+              title="No saved leads"
+              sub="Save prospects from search, then open Pipeline to email and track status."
+              action={() => onNavigate?.('pipeline')}
+              actionLabel="Open pipeline"
+            />
+          )
+        ) : !hasSearched ? (
+          <EmptyState
+            title="Search your B2B database"
+            sub="Enter keywords, then narrow by designation, state, and city. City options update when you pick a state."
+          />
+        ) : loading ? (
+          <LoadingState />
+        ) : displayLeads.length === 0 ? (
+          <EmptyState
+            title="No matches for these filters"
+            sub="Try fewer filters, broader keywords, or a nearby city in the same state."
+            action={handleSearch}
+          />
+        ) : (
+          <ResultsTable
+            leads={displayLeads}
+            selected={selected}
+            onSelectAll={handleSelectAll}
+            onSelect={(id) =>
+              setSelected((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
+            }
+            onSave={toggleSaveLead}
+            onWorkOnLead={workOnLead}
+            onUnlock={handleUnlockLead}
+            unlockingLeadId={unlockingLeadId}
+          />
+        )}
       </div>
     </div>
   )
@@ -328,7 +309,7 @@ function LoadingState() {
     <div className="flex-1 flex flex-col items-center justify-center px-6">
       <div className="w-10 h-10 border-2 border-[#ffcb2b]/30 border-t-[#ffcb2b] rounded-full animate-spin mb-3" />
       <p className="text-sm font-medium text-gray-800">Searching our B2B database…</p>
-      <p className="text-xs text-gray-500 mt-1">AI-powered matching across companies & contacts</p>
+      <p className="text-xs text-gray-500 mt-1">Matching keywords, designation, and location</p>
     </div>
   )
 }

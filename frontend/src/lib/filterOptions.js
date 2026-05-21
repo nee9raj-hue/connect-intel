@@ -1,4 +1,4 @@
-/** B2B filters tuned for India — states, industries, titles */
+/** B2B filters tuned for India — states linked to cities */
 
 export const INDIAN_STATES = [
   'Maharashtra',
@@ -23,23 +23,29 @@ export const INDIAN_STATES = [
   'Goa',
 ]
 
-export const INDIAN_CITIES = [
-  'Mumbai',
-  'Bengaluru',
-  'Delhi',
-  'Chennai',
-  'Hyderabad',
-  'Ahmedabad',
-  'Pune',
-  'Jaipur',
-  'Kolkata',
-  'Surat',
-  'Lucknow',
-  'Kochi',
-  'Indore',
-  'Nagpur',
-  'Coimbatore',
-]
+/** Cities available per state — drives linked city filter */
+export const CITIES_BY_STATE = {
+  Maharashtra: ['Mumbai', 'Pune', 'Nagpur', 'Nashik', 'Thane', 'Aurangabad'],
+  Karnataka: ['Bengaluru', 'Mysuru', 'Mangaluru', 'Hubballi'],
+  'Delhi NCR': ['Delhi', 'New Delhi', 'Noida', 'Gurugram', 'Faridabad', 'Ghaziabad'],
+  'Tamil Nadu': ['Chennai', 'Coimbatore', 'Madurai', 'Tiruchirappalli'],
+  Gujarat: ['Ahmedabad', 'Surat', 'Vadodara', 'Rajkot', 'Gandhinagar'],
+  Rajasthan: ['Jaipur', 'Jodhpur', 'Udaipur', 'Kota', 'Ajmer'],
+  'West Bengal': ['Kolkata', 'Howrah', 'Durgapur', 'Siliguri'],
+  Telangana: ['Hyderabad', 'Warangal', 'Nizamabad'],
+  'Uttar Pradesh': ['Lucknow', 'Noida', 'Kanpur', 'Varanasi', 'Agra'],
+  Kerala: ['Kochi', 'Thiruvananthapuram', 'Kozhikode'],
+  Punjab: ['Ludhiana', 'Amritsar', 'Chandigarh', 'Jalandhar'],
+  Haryana: ['Gurugram', 'Faridabad', 'Panipat', 'Ambala'],
+  'Madhya Pradesh': ['Indore', 'Bhopal', 'Jabalpur', 'Gwalior'],
+  Bihar: ['Patna', 'Gaya', 'Muzaffarpur'],
+  Odisha: ['Bhubaneswar', 'Cuttack', 'Rourkela'],
+  'Andhra Pradesh': ['Visakhapatnam', 'Vijayawada', 'Guntur'],
+  Assam: ['Guwahati', 'Dibrugarh', 'Silchar'],
+  Chhattisgarh: ['Raipur', 'Bhilai', 'Bilaspur'],
+  Jharkhand: ['Ranchi', 'Jamshedpur', 'Dhanbad'],
+  Goa: ['Panaji', 'Margao', 'Vasco da Gama'],
+}
 
 export const JOB_TITLES = [
   'CEO / Founder',
@@ -78,10 +84,18 @@ export const COMPANY_SIZES = [
   '1000+',
 ]
 
-export const FILTER_SECTIONS = {
-  jobTitles: { label: 'Job titles', options: JOB_TITLES, icon: '👤' },
-  states: { label: 'State', options: INDIAN_STATES, icon: '📍' },
-  cities: { label: 'City', options: INDIAN_CITIES, icon: '🏙' },
-  industries: { label: 'Industry & keywords', options: INDUSTRIES, icon: '🏭' },
-  companySizes: { label: 'Company size', options: COMPANY_SIZES, icon: '🏢' },
+export function getCitiesForStates(states = []) {
+  if (!states.length) return []
+  const cities = new Set()
+  for (const state of states) {
+    for (const city of CITIES_BY_STATE[state] || []) {
+      cities.add(city)
+    }
+  }
+  return [...cities].sort((a, b) => a.localeCompare(b))
+}
+
+export function pruneCitiesForStates(states, cities) {
+  const allowed = new Set(getCitiesForStates(states))
+  return (cities || []).filter((city) => allowed.has(city))
 }

@@ -1,3 +1,4 @@
+import { recordMatches } from '../../../lib/filterMatch.js'
 import { MOCK_LEADS } from './mockLeads'
 import { PROVIDERS } from './providers'
 
@@ -42,64 +43,7 @@ function shapeFallbackLead(lead, index) {
 }
 
 function filterMockLeads(filters) {
-  let results = [...MOCK_LEADS]
-  const q = (filters.keywords || '').toLowerCase()
-
-  if (q) {
-    const stopWords = new Set(['from', 'in', 'the', 'and', 'for', 'of', 'a', 'an', 'at', 'to'])
-    const tokens = q.split(/\s+/).filter((token) => token.length >= 3 && !stopWords.has(token))
-
-    results = results.filter((l) => {
-      const haystack = [
-        l.firstName,
-        l.lastName,
-        l.company,
-        l.title,
-        l.city,
-        l.state,
-        l.location,
-        l.industry,
-      ]
-        .join(' ')
-        .toLowerCase()
-
-      if (haystack.includes(q)) return true
-      if (!tokens.length) return true
-
-      return tokens.some((token) => {
-        const stem = token.replace(/ers$/, 'er').replace(/ies$/, 'y').replace(/s$/, '')
-        return haystack.includes(token) || (stem.length >= 3 && haystack.includes(stem))
-      })
-    })
-  }
-
-  if (filters.jobTitles?.length) {
-    results = results.filter((l) =>
-      filters.jobTitles.some((t) => l.title?.toLowerCase().includes(t.split('/')[0].trim().toLowerCase()))
-    )
-  }
-
-  if (filters.states?.length) {
-    results = results.filter((l) =>
-      filters.states.some((s) => l.state?.includes(s) || l.location?.includes(s))
-    )
-  }
-
-  if (filters.cities?.length) {
-    results = results.filter((l) =>
-      filters.cities.some((c) => l.city?.includes(c) || l.location?.includes(c))
-    )
-  }
-
-  if (filters.industries?.length) {
-    results = results.filter((l) => filters.industries.includes(l.industry))
-  }
-
-  if (filters.companySizes?.length) {
-    results = results.filter((l) => filters.companySizes.includes(l.employees))
-  }
-
-  return results
+  return MOCK_LEADS.filter((lead) => recordMatches(lead, filters))
 }
 
 async function searchViaApi(filters, count, provider) {
