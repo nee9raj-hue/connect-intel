@@ -1,4 +1,5 @@
 import { useApp } from '../../context/AppContext'
+import { getSourceLabel } from '../../lib/productCopy'
 
 export default function ResultsTable({ leads, selected, onSelectAll, onSelect, onSave, onUnlock, unlockingLeadId }) {
   const { isSaved } = useApp()
@@ -162,16 +163,17 @@ function ContactIcon({ kind, active }) {
 }
 
 function SourceBadge({ source }) {
+  const label = getSourceLabel(source)
   const tone =
-    source === 'database'
+    source === 'database' || source === 'demo' || source === 'demo-india'
       ? 'bg-blue-50 text-blue-700 border-blue-200'
       : source === 'claude'
         ? 'bg-violet-50 text-violet-700 border-violet-200'
         : 'bg-gray-50 text-gray-600 border-gray-200'
 
   return (
-    <span className={`text-[10px] px-1.5 py-0.5 rounded border capitalize ${tone}`}>
-      {source}
+    <span className={`text-[10px] px-1.5 py-0.5 rounded border ${tone}`}>
+      {label}
     </span>
   )
 }

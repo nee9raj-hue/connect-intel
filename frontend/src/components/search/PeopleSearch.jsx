@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
+import { getResultsBadge, softenNotice, PRODUCT } from '../../lib/productCopy'
 import { searchLeads } from '../../lib/searchService'
 import FilterSidebar from './FilterSidebar'
 import ResultsTable from './ResultsTable'
@@ -26,28 +27,6 @@ export default function PeopleSearch() {
   const [filtersOpen, setFiltersOpen] = useState(true)
   const [searchError, setSearchError] = useState(null)
   const [unlockingLeadId, setUnlockingLeadId] = useState(null)
-  const [searchProvider, setSearchProvider] = useState('free')
-  const [integrations, setIntegrations] = useState({
-    freeMode: true,
-    builtInRecords: 0,
-    apollo: false,
-    apolloConfigured: false,
-    apolloError: null,
-    claude: false,
-  })
-
-  useEffect(() => {
-    let cancelled = false
-    api
-      .getIntegrationStatus()
-      .then((data) => {
-        if (!cancelled) setIntegrations(data.providers || {})
-      })
-      .catch(() => {})
-    return () => {
-      cancelled = true
-    }
-  }, [])
 
   const handleSearch = async () => {
     setLoading(true)
@@ -55,7 +34,7 @@ export default function PeopleSearch() {
     setSelected([])
     setSearchError(null)
     try {
-      const data = await searchLeads(filters, searchProvider, 10)
+      const data = await searchLeads(filters, 'free', 10)
       setResults(data)
       if (data.user?.searchesLeft != null) {
         updateUser({ searchesLeft: data.user.searchesLeft })
@@ -137,33 +116,28 @@ export default function PeopleSearch() {
     }
   }
 
+  const friendlyNotice = softenNotice(results?.notice)
+  const resultBadge = results ? getResultsBadge(results.provider) : null
+
   return (
     <div className="flex flex-col h-full min-h-0">
-      {/* Apollo-style top bar */}
       <header className="shrink-0 bg-white border-b border-gray-200 px-5 py-3">
         <div className="flex items-center justify-between gap-4 mb-3">
-          <h1 className="text-lg font-semibold text-gray-900">Find people</h1>
-          <div className="flex items-center gap-2">
+          <div>
+            <h1 className="text-lg font-semibold text-gray-900">Find people</h1>
+            <p className="text-xs text-gray-500 mt-0.5">{PRODUCT.databaseLine}</p>
+          </div>
+          <div className="flex items-center gap-2 flex-wrap justify-end">
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#5b4a00] bg-[#fff6d6] px-2.5 py-1 rounded-full border border-[#ffe48a]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#ffcb2b]" />
+              {PRODUCT.poweredBy}
+            </span>
             <span className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-700 bg-gray-100 px-2.5 py-1 rounded-full border border-gray-200">
               Searches left: {user?.searchesLeft ?? 0}
             </span>
-            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#7a5f00] bg-[#fff6d6] px-2.5 py-1 rounded-full border border-[#ffe48a]">
-              Trial credits: Rs {((user?.creditsPaise ?? 0) / 100).toFixed(0)}
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#7a5f00] bg-[#fffbeb] px-2.5 py-1 rounded-full border border-[#fde68a]">
+              Credits: Rs {((user?.creditsPaise ?? 0) / 100).toFixed(0)}
             </span>
-            <select
-              value={searchProvider}
-              onChange={(e) => setSearchProvider(e.target.value)}
-              className="text-xs font-medium border border-gray-300 rounded-md px-2 py-1.5 bg-white text-gray-800"
-              aria-label="Data source"
-            >
-              <option value="free">Free database ({integrations.builtInRecords || '12+'} leads)</option>
-              <option value="apollo" disabled={integrations.freeMode}>
-                Apollo.io (paid){integrations.freeMode ? ' — off' : ''}
-              </option>
-              <option value="claude" disabled={integrations.freeMode}>
-                Claude AI (paid){integrations.freeMode ? ' — off' : ''}
-              </option>
-            </select>
             <button
               type="button"
               onClick={exportCSV}
@@ -186,7 +160,7 @@ export default function PeopleSearch() {
           <div className="flex-1 min-w-[200px] relative max-w-xl">
             <input
               type="text"
-              placeholder="Search people — e.g. exporters in Jaipur, pharma Mumbai…"
+              placeholder="Search exporters, industries, cities — e.g. Jaipur, pharma, textiles…"
               value={filters.keywords}
               onChange={(e) => setFilters({ ...filters, keywords: e.target.value })}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -203,7 +177,6 @@ export default function PeopleSearch() {
           </button>
         </div>
 
-        {/* Total | Net New | Saved — Apollo style */}
         <div className="flex items-center gap-2">
           {[
             { id: 'total', label: 'Total', value: results?.total },
@@ -228,33 +201,21 @@ export default function PeopleSearch() {
               )}
             </button>
           ))}
-          {hasSearched && results && countTab !== 'saved' && (
-            <span className="ml-auto text-xs text-gray-500">
-              Showing <strong>{results.leads.length}</strong>
-              {results.provider === 'apollo' && (
-                <span className="ml-1 text-indigo-600">· Apollo.io</span>
-              )}
-              {results.provider === 'claude' && (
-                <span className="ml-1 text-green-600">· Claude AI</span>
-              )}
-              {results.provider === 'database' && (
-                <span className="ml-1 text-blue-600">· Connect Intel database</span>
-              )}
-              {results.provider === 'demo-india' && (
-                <span className="ml-1 text-amber-600">· Demo data (add API key for Claude)</span>
-              )}
+          {hasSearched && results && countTab !== 'saved' && resultBadge && (
+            <span className={`ml-auto text-xs font-medium ${resultBadge.className}`}>
+              Showing <strong>{results.leads.length}</strong> · {resultBadge.text}
             </span>
           )}
         </div>
 
-        {results?.notice && countTab !== 'saved' && (
-          <p className="mt-2 text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded px-2 py-1.5">
-            {results.notice}
+        {friendlyNotice && countTab !== 'saved' && (
+          <p className="mt-2 text-xs text-gray-600 bg-gray-50 border border-gray-100 rounded-lg px-3 py-2">
+            {friendlyNotice}
           </p>
         )}
         {countTab !== 'saved' && (
           <p className="mt-2 text-xs text-gray-500">
-            First 5 matched leads show full details. Later rows unlock complete contact data for Rs 10 each.
+            {PRODUCT.searchHint}. First 5 results include full contact details; unlock more for Rs 10 each.
           </p>
         )}
         {searchError && (
@@ -289,17 +250,21 @@ export default function PeopleSearch() {
                 unlockingLeadId={unlockingLeadId}
               />
             ) : (
-              <EmptyState title="No saved leads" sub="Save prospects from search results" />
+              <EmptyState title="No saved leads" sub="Save prospects from your search results to build lists." />
             )
           ) : !hasSearched ? (
             <EmptyState
-              title="Use filters and search"
-              sub="Select Indian states, industries, or type keywords like “exporters from Jaipur”, then click Search with Claude AI."
+              title="Search your B2B database"
+              sub="Filter by state, city, or industry — then search for exporters, buyers, and decision-makers across India."
             />
           ) : loading ? (
             <LoadingState />
           ) : displayLeads.length === 0 ? (
-            <EmptyState title="No leads match" sub="Try fewer filters or different keywords" action={handleSearch} />
+            <EmptyState
+              title="No matches yet"
+              sub="Try broader keywords (e.g. exporter, textile) or another city. Your team can add more companies in Admin."
+              action={handleSearch}
+            />
           ) : (
             <ResultsTable
               leads={displayLeads}
@@ -323,7 +288,7 @@ function EmptyState({ title, sub, action }) {
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
       <p className="font-medium text-gray-900">{title}</p>
-      <p className="text-sm text-gray-500 mt-1 max-w-sm">{sub}</p>
+      <p className="text-sm text-gray-500 mt-1 max-w-md leading-relaxed">{sub}</p>
       {action && (
         <button
           type="button"
@@ -339,9 +304,10 @@ function EmptyState({ title, sub, action }) {
 
 function LoadingState() {
   return (
-    <div className="flex-1 flex flex-col items-center justify-center">
+    <div className="flex-1 flex flex-col items-center justify-center px-6">
       <div className="w-10 h-10 border-2 border-[#ffcb2b]/30 border-t-[#ffcb2b] rounded-full animate-spin mb-3" />
-      <p className="text-sm font-medium text-gray-800">Claude is finding Indian B2B leads…</p>
+      <p className="text-sm font-medium text-gray-800">Searching our B2B database…</p>
+      <p className="text-xs text-gray-500 mt-1">AI-powered matching across companies & contacts</p>
     </div>
   )
 }

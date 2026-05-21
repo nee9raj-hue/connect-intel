@@ -56,9 +56,9 @@ export default function Sidebar({ active, onNavigate }) {
         )}
 
         <div className="mx-2 mt-4 p-3 rounded-lg bg-[#fffbeb] border border-[#fde68a]">
-          <p className="text-xs font-semibold text-gray-800">Claude AI search</p>
+          <p className="text-xs font-semibold text-gray-800">AI-powered search</p>
           <p className="text-[10px] text-gray-600 mt-1 leading-snug">
-            Apollo.io search when API key is set · Hunter.io coming soon.
+            Growing B2B database · Smart filters · Built for India exports
           </p>
         </div>
       </nav>

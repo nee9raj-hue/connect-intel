@@ -14,7 +14,7 @@ const FEATURES = [
   },
   {
     title: 'AI lead scoring',
-    desc: 'Claude ranks prospects so your team focuses on the highest-intent leads first.',
+    desc: 'AI ranks prospects so your team focuses on the highest-intent leads first.',
   },
   {
     title: 'Contact enrichment',
@@ -101,7 +101,7 @@ export default function LandingPage() {
           </p>
           <p className="text-sm text-gray-500 mb-10 max-w-[500px] mx-auto leading-relaxed">
             Filter by role, industry, and state. Save lists and export in one click.
-            Plug in Apollo.io and Hunter.io when you scale.
+            Enterprise data partners and CRM sync when you scale.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-5">

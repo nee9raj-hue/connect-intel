@@ -92,14 +92,14 @@ export default function FilterSidebar({ filters, onChange, onSearch, loading, co
           {loading ? (
             <>
               <span className="w-4 h-4 border-2 border-[#242424]/30 border-t-[#242424] rounded-full animate-spin" />
-              Claude searching…
+              Searching…
             </>
           ) : (
-            <>Search with Claude AI</>
+            <>Search leads</>
           )}
         </button>
-        <p className="text-[10px] text-center text-gray-400">
-          Apollo.io when APOLLO_API_KEY is set · Import for India lists
+        <p className="text-[10px] text-center text-gray-400 leading-snug">
+          Powered by AI · India & global B2B data
         </p>
       </div>
     </aside>

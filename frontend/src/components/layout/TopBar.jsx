@@ -17,7 +17,7 @@ export default function TopBar({ activePanel }) {
       <div className="flex items-center gap-3">
         <span className="flex items-center gap-1.5 text-xs font-medium text-gray-600 bg-gray-100 px-3 py-1.5 rounded-lg">
           <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-          Claude AI active
+          Powered by AI
         </span>
         <button className="w-9 h-9 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50">
           🔔

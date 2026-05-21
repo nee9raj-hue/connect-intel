@@ -139,9 +139,9 @@ function shouldUseLocalFallback(error, provider) {
 }
 
 /**
- * Search leads — imported DB → Apollo → Claude → local demo fallback.
+ * Search leads — Connect Intel database (imported + built-in), with local fallback when offline.
  * @param {object} filters
- * @param {'auto'|'apollo'|'claude'} provider
+ * @param {string} provider — use 'free' for customer search
  * @param {number} count
  */
 export async function searchLeads(filters, provider = 'free', count = 8) {
@@ -164,11 +164,7 @@ export async function searchLeads(filters, provider = 'free', count = 8) {
   }
 
   if (provider === 'apollo' || provider === 'claude') {
-    throw new Error(
-      provider === 'apollo'
-        ? 'Apollo is disabled in free mode. Use Free database, or set ENABLE_PAID_APIS=true on Vercel.'
-        : 'Claude is disabled in free mode. Use Free database, or set ENABLE_PAID_APIS=true on Vercel.'
-    )
+    throw new Error('This search mode is not available on your plan. Use the main search.')
   }
 
   await new Promise((r) => setTimeout(r, 800))
@@ -179,10 +175,10 @@ export async function searchLeads(filters, provider = 'free', count = 8) {
     leads,
     total,
     netNew: Math.floor(total * 0.88),
-    provider: leads.length ? 'demo-india' : 'none',
+    provider: leads.length ? 'database' : 'none',
     notice:
       leads.length === 0
-        ? 'No demo matches. Add APOLLO_API_KEY or ANTHROPIC_API_KEY on Vercel, or import data in Admin.'
-        : 'Showing Indian sample leads. Add APOLLO_API_KEY for Apollo.io or ANTHROPIC_API_KEY for Claude.',
+        ? 'No matches for these filters. Try broader keywords or ask your admin to import more companies.'
+        : 'Sample prospects from the Connect Intel database while you refine filters.',
   }
 }

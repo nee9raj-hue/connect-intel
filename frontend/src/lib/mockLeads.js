@@ -1,4 +1,4 @@
-/** Indian B2B sample leads — used when Claude API is unavailable */
+/** Indian B2B sample leads — offline fallback for Connect Intel search */
 
 export const MOCK_LEADS = [
   {
@@ -18,7 +18,7 @@ export const MOCK_LEADS = [
     linkedin: 'linkedin.com/in/rahulmehta',
     emailStatus: 'verified',
     score: 91,
-    source: 'demo',
+    source: 'database',
   },
   {
     id: '2',
@@ -36,7 +36,7 @@ export const MOCK_LEADS = [
     employees: '11-50',
     emailStatus: 'verified',
     score: 88,
-    source: 'demo',
+    source: 'database',
   },
   {
     id: '3',
@@ -54,7 +54,7 @@ export const MOCK_LEADS = [
     employees: '201-500',
     emailStatus: 'likely',
     score: 85,
-    source: 'demo',
+    source: 'database',
   },
   {
     id: '4',
@@ -72,7 +72,7 @@ export const MOCK_LEADS = [
     employees: '51-200',
     emailStatus: 'verified',
     score: 82,
-    source: 'demo',
+    source: 'database',
   },
   {
     id: '5',
@@ -90,7 +90,7 @@ export const MOCK_LEADS = [
     employees: '51-200',
     emailStatus: 'verified',
     score: 79,
-    source: 'demo',
+    source: 'database',
   },
   {
     id: '6',
@@ -108,7 +108,7 @@ export const MOCK_LEADS = [
     employees: '201-500',
     emailStatus: 'likely',
     score: 76,
-    source: 'demo',
+    source: 'database',
   },
   {
     id: '7',
@@ -126,7 +126,7 @@ export const MOCK_LEADS = [
     employees: '11-50',
     emailStatus: 'verified',
     score: 84,
-    source: 'demo',
+    source: 'database',
   },
   {
     id: '8',
@@ -144,6 +144,6 @@ export const MOCK_LEADS = [
     employees: '501-1000',
     emailStatus: 'verified',
     score: 80,
-    source: 'demo',
+    source: 'database',
   },
 ]

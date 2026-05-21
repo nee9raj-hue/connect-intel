@@ -11,7 +11,7 @@ import { applyCors, getBody, handleOptions, methodNotAllowed, sendJson } from '.
 import { consumeSearchQuota, requireUser } from '../lib/server/auth.js'
 
 const FREE_NOTICE =
-  'Connect Intel free database — no Apollo or Claude API needed. Admins can add more rows via Excel import.'
+  'Results from the Connect Intel database — built-in India B2B records plus data your team imports.'
 
 export default async function handler(req, res) {
   if (handleOptions(req, res)) return
@@ -50,8 +50,8 @@ export default async function handler(req, res) {
       leads: mockLeads,
       total: Math.max(mockLeads.length * 40, mockLeads.length),
       netNew: mockLeads.length,
-      provider: 'demo-india',
-      notice: `${FREE_NOTICE} Showing extra sample leads.`,
+      provider: 'database',
+      notice: 'Additional sample prospects shown to help you explore filters.',
       user: quotaUser,
     })
   }
@@ -63,8 +63,8 @@ export default async function handler(req, res) {
         leads: broadMock,
         total: broadMock.length,
         netNew: broadMock.length,
-        provider: 'demo-india',
-        notice: 'No exact match — showing available India sample leads. Try keywords like Jaipur or exporter.',
+        provider: 'database',
+        notice: 'No exact match — showing related India prospects. Try keywords like Jaipur or exporter.',
         user: quotaUser,
       })
     }
@@ -86,7 +86,7 @@ export default async function handler(req, res) {
           total: 0,
           netNew: 0,
           provider: 'apollo',
-          notice: 'No Apollo matches. Switch source to Free database or add Admin import data.',
+          notice: 'No matches in partner data. Try different filters or ask your admin to import more companies.',
           user: quotaUser,
         })
       }
@@ -101,8 +101,7 @@ export default async function handler(req, res) {
       total: 0,
       netNew: 0,
       provider: 'database',
-      notice:
-        'Apollo is off in free mode. Use source “Free database”, or set ENABLE_PAID_APIS=true on Vercel with a valid master API key.',
+      notice: 'Extended partner search is not enabled for your account. Results use the Connect Intel database.',
       user: quotaUser,
     })
   }
@@ -131,7 +130,7 @@ export default async function handler(req, res) {
       total: 0,
       netNew: 0,
       provider: 'database',
-      notice: 'Claude is off in free mode. Use Free database source, or add ENABLE_PAID_APIS=true and ANTHROPIC_API_KEY.',
+      notice: 'AI expansion search is not enabled. Results use the Connect Intel database.',
       user: quotaUser,
     })
   }

@@ -1,16 +1,49 @@
 import { useEffect, useState } from 'react'
 import { api } from '../../lib/api'
-import { PROVIDERS } from '../../lib/providers'
+import { PRODUCT } from '../../lib/productCopy'
+
+const PARTNERS = [
+  {
+    id: 'connect-intel',
+    label: 'Connect Intel database',
+    icon: '📊',
+    description: 'Built-in India B2B records plus companies your team imports via Admin.',
+    status: 'active',
+  },
+  {
+    id: 'ai',
+    label: 'AI ranking & search',
+    icon: '✨',
+    description: 'Smart matching and lead scoring across your workspace.',
+    status: 'active',
+  },
+  {
+    id: 'crm',
+    label: 'CRM sync',
+    icon: '🔗',
+    description: 'Salesforce, HubSpot, and pipeline tools — enterprise rollout.',
+    status: 'soon',
+  },
+  {
+    id: 'enrichment',
+    label: 'Global enrichment',
+    icon: '🌐',
+    description: 'Expanded contact verification and international data partners.',
+    status: 'soon',
+  },
+]
 
 export default function IntegrationsPanel() {
-  const [status, setStatus] = useState({ apollo: false, apolloConfigured: false, apolloError: null, claude: false })
+  const [recordCount, setRecordCount] = useState(null)
 
   useEffect(() => {
     let cancelled = false
     api
       .getIntegrationStatus()
       .then((data) => {
-        if (!cancelled) setStatus(data.providers || {})
+        if (!cancelled && data.builtInRecords != null) {
+          setRecordCount(data.builtInRecords)
+        }
       })
       .catch(() => {})
     return () => {
@@ -20,81 +53,58 @@ export default function IntegrationsPanel() {
 
   return (
     <div className="p-6 h-[calc(100vh-3.5rem)] overflow-y-auto max-w-3xl">
-      <p className="text-sm text-gray-600 mb-8 leading-relaxed">
-        <strong>Free mode (default):</strong> search uses a built-in India exporter database and sample
-        leads — no Apollo or Claude subscription required. Admins can upload more rows via Excel.
-        Paid APIs only run when you set <code className="bg-gray-100 px-1 rounded">ENABLE_PAID_APIS=true</code> on
-        Vercel.
+      <p className="text-sm text-gray-600 mb-6 leading-relaxed">
+        {PRODUCT.tagline} — search runs on the Connect Intel database today. Your organization can
+        grow coverage by importing Excel lists in Admin. Additional data partners roll out with
+        enterprise plans.
       </p>
-      {status.freeMode && (
-        <p className="text-sm text-green-800 bg-green-50 border border-green-200 rounded-lg px-4 py-3 mb-6">
-          Free database active — {status.builtInRecords} contacts loaded. Use source “Free database” in Find
-          people.
-        </p>
-      )}
+
+      <div className="text-sm text-green-800 bg-green-50 border border-green-200 rounded-lg px-4 py-3 mb-8">
+        <strong>Database active.</strong>{' '}
+        {recordCount != null
+          ? `${recordCount.toLocaleString()} built-in contacts loaded.`
+          : 'Built-in India & global B2B records are available.'}{' '}
+        Use <strong>Find people</strong> to search and save lists.
+      </div>
 
       <div className="space-y-4">
-        {Object.values(PROVIDERS).map((provider) => (
-          <IntegrationCard
-            key={provider.id}
-            provider={provider}
-            isLive={provider.id === 'apollo' ? status.apollo : provider.id === 'claude' ? status.claude : false}
-            apolloError={provider.id === 'apollo' ? status.apolloError : null}
-            apolloConfigured={provider.id === 'apollo' ? status.apolloConfigured : false}
-          />
+        {PARTNERS.map((partner) => (
+          <PartnerCard key={partner.id} partner={partner} />
         ))}
       </div>
     </div>
   )
 }
 
-function IntegrationCard({ provider, isLive, apolloError, apolloConfigured }) {
-  const isActive = provider.id === 'claude' ? isLive : provider.id === 'apollo' ? isLive : false
-  const badge = isLive ? 'Active' : apolloConfigured && apolloError ? 'Key invalid' : 'Not configured'
+function PartnerCard({ partner }) {
+  const isActive = partner.status === 'active'
+  const badge = isActive ? 'Included' : 'Coming soon'
 
   return (
     <div
       className={`flex items-start gap-4 p-5 rounded-xl border ${
-        isLive ? 'border-apollo-yellow bg-apollo-yellow/5' : 'border-gray-200 bg-white'
+        isActive ? 'border-[#ffcb2b]/40 bg-[#fffbeb]' : 'border-gray-200 bg-white'
       }`}
     >
       <div
         className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl shrink-0 ${
-          isLive ? 'bg-apollo-yellow' : 'bg-gray-100'
+          isActive ? 'bg-[#ffcb2b]' : 'bg-gray-100'
         }`}
       >
-        {provider.id === 'claude' ? '🤖' : provider.id === 'apollo' ? '🚀' : '✉️'}
+        {partner.icon}
       </div>
       <div className="flex-1">
         <div className="flex items-center gap-2 mb-1">
-          <h3 className="font-semibold text-gray-900">{provider.label}</h3>
+          <h3 className="font-semibold text-gray-900">{partner.label}</h3>
           <span
             className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
-              isLive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+              isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
             }`}
           >
             {badge}
           </span>
         </div>
-        <p className="text-sm text-gray-600">{provider.description}</p>
-        {provider.id === 'apollo' && isLive && (
-          <p className="text-xs text-green-700 mt-2 font-medium">
-            ✓ People API Search + enrichment on unlock
-          </p>
-        )}
-        {provider.id === 'apollo' && apolloError && (
-          <p className="text-xs text-red-700 mt-2 leading-relaxed bg-red-50 border border-red-100 rounded-lg p-2">
-            {apolloError}
-          </p>
-        )}
-        {provider.id === 'apollo' && !apolloConfigured && !apolloError && (
-          <p className="text-xs text-gray-500 mt-2">
-            Add <code className="bg-gray-100 px-1 rounded">APOLLO_API_KEY</code> on Vercel — see APOLLO-SETUP.md
-          </p>
-        )}
-        {provider.id === 'claude' && isLive && (
-          <p className="text-xs text-green-700 mt-2 font-medium">✓ Fallback AI search enabled</p>
-        )}
+        <p className="text-sm text-gray-600">{partner.description}</p>
       </div>
     </div>
   )
