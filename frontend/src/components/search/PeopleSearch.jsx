@@ -211,7 +211,7 @@ export default function PeopleSearch({ onNavigate }) {
         )}
       </div>
 
-      {(friendlyNotice || filterSummary || searchError) && (
+      {(friendlyNotice || filterSummary || searchError || results?.discoveryError) && (
         <div className="shrink-0 px-5 py-2 space-y-1.5 bg-white border-b border-gray-100">
           {filterSummary && hasSearched && countTab !== 'saved' && (
             <p className="text-xs text-gray-600">
@@ -221,6 +221,11 @@ export default function PeopleSearch({ onNavigate }) {
           {friendlyNotice && countTab !== 'saved' && (
             <p className="text-xs text-gray-600 bg-gray-50 border border-gray-100 rounded-lg px-3 py-2">
               {friendlyNotice}
+            </p>
+          )}
+          {results?.discoveryError && countTab !== 'saved' && (
+            <p className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+              Perplexity: {results.discoveryError}
             </p>
           )}
           {searchError && (
@@ -261,12 +266,16 @@ export default function PeopleSearch({ onNavigate }) {
           />
         ) : loading ? (
           <LoadingState />
-        ) : displayLeads.length === 0 ? (
-          <EmptyState
-            title="No matches for these filters"
-            sub="Try fewer filters, broader keywords, or a nearby city in the same state."
-            action={handleSearch}
-          />
+          ) : displayLeads.length === 0 ? (
+            <EmptyState
+              title="No matches for these filters"
+              sub={
+                results?.discoveryError
+                  ? `Database had no matches. Perplexity: ${results.discoveryError}. Try keyword "exporter" only, clear Designation, or fewer cities.`
+                  : 'Try keyword "exporter", state Rajasthan, and clear Designation if selected. Your database has limited rows until you import via Admin.'
+              }
+              action={handleSearch}
+            />
         ) : (
           <ResultsTable
             leads={displayLeads}

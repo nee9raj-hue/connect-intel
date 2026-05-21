@@ -101,7 +101,7 @@ export async function searchLeads(filters, provider = 'free', count = 8) {
       error.status = data.status
       throw error
     }
-    if (data.notice && provider !== 'auto') return data
+    if (data.notice || data.discoveryError) return data
   } catch (e) {
     if (!shouldUseLocalFallback(e, provider)) throw e
     console.warn('Search API:', e.message)

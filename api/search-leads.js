@@ -25,7 +25,7 @@ function hasStructuredFilters(filters) {
   )
 }
 
-function runLocalSearch(store, filters, count, viewer) {
+function tryLocalSearch(store, filters, count, viewer) {
   const databaseResults = searchStoredLeads(store, filters, count, viewer)
   if (databaseResults?.leads?.length) {
     return { ...databaseResults, notice: FREE_NOTICE }
@@ -57,6 +57,23 @@ function runLocalSearch(store, filters, count, viewer) {
   }
 
   return null
+}
+
+function runLocalSearch(store, filters, count, viewer) {
+  let result = tryLocalSearch(store, filters, count, viewer)
+
+  if (!result?.leads?.length && filters.jobTitles?.length) {
+    const relaxed = tryLocalSearch(store, { ...filters, jobTitles: [] }, count, viewer)
+    if (relaxed?.leads?.length) {
+      return {
+        ...relaxed,
+        notice: `${relaxed.notice || FREE_NOTICE} Designation filter had no matches — results shown without role filter.`,
+        relaxedRoleFilter: true,
+      }
+    }
+  }
+
+  return result
 }
 
 export default async function handler(req, res) {
@@ -102,6 +119,8 @@ export default async function handler(req, res) {
     }
   }
 
+  let discoveryError = null
+
   if (!result?.leads?.length && isPerplexityConfigured()) {
     const discovery = await discoverLeadsWithPerplexity(filters, Math.min(count, 8))
     if (discovery.leads?.length) {
@@ -112,7 +131,10 @@ export default async function handler(req, res) {
         netNew: leads.length,
         provider: 'ai-discovery',
         notice: discovery.notice,
+        discoveryMethod: discovery.method,
       }
+    } else if (discovery.error) {
+      discoveryError = discovery.error
     }
   }
 
@@ -194,7 +216,8 @@ export default async function handler(req, res) {
     total: 0,
     netNew: 0,
     provider: 'none',
-    notice: `No leads matched your filters. Try broader keywords or import data in Admin.${hints.length ? ` ${hints.join('. ')}.` : ''}`,
+    notice: `No leads matched your filters. Try clearing Designation, use keyword "exporter", or import data in Admin.${hints.length ? ` ${hints.join('. ')}.` : ''}`,
+    discoveryError,
     user: quotaUser,
   })
 }
