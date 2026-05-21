@@ -34,22 +34,23 @@ const PARTNERS = [
 ]
 
 export default function IntegrationsPanel() {
-  const [recordCount, setRecordCount] = useState(null)
+  const [status, setStatus] = useState(null)
 
   useEffect(() => {
     let cancelled = false
     api
       .getIntegrationStatus()
       .then((data) => {
-        if (!cancelled && data.builtInRecords != null) {
-          setRecordCount(data.builtInRecords)
-        }
+        if (!cancelled) setStatus(data.providers || data)
       })
       .catch(() => {})
     return () => {
       cancelled = true
     }
   }, [])
+
+  const storageOk = status?.supabaseConnected
+  const storageLabel = status?.storage === 'supabase' ? 'Supabase (persistent)' : 'Temporary (sqlite)'
 
   return (
     <div className="p-6 h-[calc(100vh-3.5rem)] overflow-y-auto max-w-3xl">
@@ -59,12 +60,36 @@ export default function IntegrationsPanel() {
         enterprise plans.
       </p>
 
-      <div className="text-sm text-green-800 bg-green-50 border border-green-200 rounded-lg px-4 py-3 mb-8">
-        <strong>Database active.</strong>{' '}
-        {recordCount != null
-          ? `${recordCount.toLocaleString()} built-in contacts loaded.`
-          : 'Built-in India & global B2B records are available.'}{' '}
-        Use <strong>Find people</strong> to search and save lists.
+      <div
+        className={`text-sm rounded-lg px-4 py-3 mb-6 border ${
+          storageOk
+            ? 'text-green-800 bg-green-50 border-green-200'
+            : 'text-amber-900 bg-amber-50 border-amber-200'
+        }`}
+      >
+        <strong>Storage: {storageLabel}</strong>
+        {status?.builtInRecords != null && (
+          <span className="block mt-1">
+            {status.builtInRecords.toLocaleString()} contacts in database.
+          </span>
+        )}
+        {!storageOk && status?.supabaseError && (
+          <span className="block mt-2 text-xs leading-relaxed">{status.supabaseError}</span>
+        )}
+        {!storageOk && status?.supabaseEnv && (
+          <span className="block mt-1 text-xs font-mono text-amber-800/90">
+            SUPABASE_URL set: {status.supabaseEnv.urlSet ? 'yes' : 'no'} · KEY set:{' '}
+            {status.supabaseEnv.keySet ? 'yes' : 'no'}
+            {status.supabaseEnv.urlHost ? ` · host: ${status.supabaseEnv.urlHost}` : ''}
+          </span>
+        )}
+      </div>
+
+      <div className="grid grid-cols-2 gap-2 mb-8 text-xs">
+        <StatusPill label="Perplexity" on={status?.perplexity} />
+        <StatusPill label="Gemini" on={status?.gemini} />
+        <StatusPill label="Supabase env" on={status?.supabase} />
+        <StatusPill label="Supabase live" on={status?.supabaseConnected} />
       </div>
 
       <div className="space-y-4">
@@ -76,35 +101,41 @@ export default function IntegrationsPanel() {
   )
 }
 
-function PartnerCard({ partner }) {
-  const isActive = partner.status === 'active'
-  const badge = isActive ? 'Included' : 'Coming soon'
-
+function StatusPill({ label, on }) {
   return (
-    <div
-      className={`flex items-start gap-4 p-5 rounded-xl border ${
-        isActive ? 'border-[#ffcb2b]/40 bg-[#fffbeb]' : 'border-gray-200 bg-white'
+    <span
+      className={`inline-flex px-2.5 py-1 rounded-full border font-medium ${
+        on ? 'bg-green-50 text-green-800 border-green-200' : 'bg-gray-50 text-gray-500 border-gray-200'
       }`}
     >
-      <div
-        className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl shrink-0 ${
-          isActive ? 'bg-[#ffcb2b]' : 'bg-gray-100'
-        }`}
-      >
-        {partner.icon}
-      </div>
-      <div className="flex-1">
-        <div className="flex items-center gap-2 mb-1">
-          <h3 className="font-semibold text-gray-900">{partner.label}</h3>
-          <span
-            className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
-              isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
-            }`}
-          >
-            {badge}
-          </span>
+      {label}: {on ? 'On' : 'Off'}
+    </span>
+  )
+}
+
+function PartnerCard({ partner }) {
+  const isActive = partner.status === 'active'
+  return (
+    <div
+      className={`rounded-xl border p-4 ${
+        isActive ? 'border-gray-200 bg-white' : 'border-dashed border-gray-200 bg-gray-50/50'
+      }`}
+    >
+      <div className="flex items-start gap-3">
+        <span className="text-2xl">{partner.icon}</span>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <h3 className="font-semibold text-gray-900">{partner.label}</h3>
+            <span
+              className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${
+                isActive ? 'bg-green-100 text-green-800' : 'bg-gray-200 text-gray-600'
+              }`}
+            >
+              {isActive ? 'Active' : 'Coming soon'}
+            </span>
+          </div>
+          <p className="text-sm text-gray-500 mt-1">{partner.description}</p>
         </div>
-        <p className="text-sm text-gray-600">{partner.description}</p>
       </div>
     </div>
   )

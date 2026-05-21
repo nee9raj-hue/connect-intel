@@ -3,8 +3,12 @@ import { paidApisEnabled } from '../../lib/server/config.js'
 import { isGeminiConfigured } from '../../lib/server/gemini.js'
 import { isPerplexityConfigured } from '../../lib/server/perplexity.js'
 import { ensureBuiltInDatabase } from '../../lib/server/seed.js'
-import { getStoreMetadata, readStore } from '../../lib/server/store.js'
-import { isSupabaseEnabled } from '../../lib/server/supabaseClient.js'
+import { readStore } from '../../lib/server/store.js'
+import {
+  getSupabaseEnvStatus,
+  isSupabaseEnabled,
+  testSupabaseConnection,
+} from '../../lib/server/supabaseClient.js'
 import { applyCors, handleOptions, methodNotAllowed, sendJson } from '../../lib/server/http.js'
 
 export default async function handler(req, res) {
@@ -13,10 +17,13 @@ export default async function handler(req, res) {
 
   if (req.method !== 'GET') return methodNotAllowed(res, ['GET'])
 
+  const supabaseEnv = getSupabaseEnvStatus()
+  const supabaseTest = await testSupabaseConnection()
+  const storageEngine = supabaseTest.ok ? 'supabase' : 'sqlite'
+
   await ensureBuiltInDatabase()
   const store = await readStore()
   const freeMode = !paidApisEnabled()
-  const storage = getStoreMetadata()
 
   let apollo = false
   let apolloError = null
@@ -33,8 +40,11 @@ export default async function handler(req, res) {
   return sendJson(res, 200, {
     providers: {
       freeMode,
-      storage: storage.engine,
+      storage: storageEngine,
       supabase: isSupabaseEnabled(),
+      supabaseConnected: supabaseTest.ok,
+      supabaseEnv,
+      supabaseError: supabaseTest.ok ? null : supabaseTest.error,
       builtInRecords: store.contacts?.length ?? 0,
       companies: store.companies?.length ?? 0,
       gemini: isGeminiConfigured(),
