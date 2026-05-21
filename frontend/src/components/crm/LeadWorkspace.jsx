@@ -8,8 +8,8 @@ import {
   getStatusMeta,
 } from '../../lib/crmConstants'
 
-export default function LeadWorkspace({ lead, onClose }) {
-  const { updateSavedLeadCrm, generateEmailDraft, logCrmEmailSend } = useApp()
+export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATUSES }) {
+  const { user, teamMembers, assignLead, updateSavedLeadCrm, generateEmailDraft, logCrmEmailSend } = useApp()
   const [notes, setNotes] = useState(lead.crm?.notes || '')
   const [status, setStatus] = useState(lead.crm?.status || 'new')
   const [subject, setSubject] = useState('')
@@ -142,13 +142,41 @@ export default function LeadWorkspace({ lead, onClose }) {
             onChange={(e) => changeStatus(e.target.value)}
             className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
           >
-            {CRM_STATUSES.map((s) => (
+            {statusOptions.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.label}
               </option>
             ))}
           </select>
         </section>
+
+        {user?.isOrgAdmin && user?.accountType === 'company' && teamMembers.length > 0 && (
+          <section>
+            <h3 className="text-[11px] font-semibold uppercase tracking-wide text-gray-400 mb-2">
+              Assign to teammate
+            </h3>
+            <select
+              value={lead.assignedToUserId || ''}
+              onChange={async (e) => {
+                try {
+                  await assignLead(lead.id, e.target.value || null)
+                } catch (err) {
+                  setError(err.message)
+                }
+              }}
+              className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
+            >
+              <option value="">Unassigned (all admins)</option>
+              {teamMembers
+                .filter((m) => m.role !== 'org_admin')
+                .map((m) => (
+                  <option key={m.userId} value={m.userId}>
+                    {m.name} ({m.email})
+                  </option>
+                ))}
+            </select>
+          </section>
+        )}
 
         <section className="grid grid-cols-2 gap-2 text-xs">
           <Stat label="Last email sent" value={formatCrmDate(crm.lastEmailSentAt)} />

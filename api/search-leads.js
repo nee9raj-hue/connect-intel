@@ -1,37 +1,44 @@
 /**
- * Lead search — database → mock → Gemini keyword expand → Perplexity discovery.
+ * Lead search — database → mock → Gemini → Perplexity → paid APIs.
+ * AI results are persisted to the database so repeat searches avoid paid calls.
  */
 import { isApolloConfigured, searchApolloPeople, verifyApolloApiKey } from '../lib/server/apollo.js'
 import { paidApisEnabled } from '../lib/server/config.js'
 import { expandSearchKeywords, isGeminiConfigured } from '../lib/server/gemini.js'
 import { discoverLeadsWithPerplexity, isPerplexityConfigured } from '../lib/server/perplexity.js'
+import { persistDiscoveredLeads } from '../lib/server/leadPersistence.js'
 import { ensureBuiltInDatabase } from '../lib/server/seed.js'
-import { readStore } from '../lib/server/store.js'
+import { readStore, updateStore } from '../lib/server/store.js'
 import { getMockLeadsForViewer, searchStoredLeads, shapeLeadForViewer } from '../lib/server/search.js'
 import { DEFAULT_SEARCH_LIMIT } from '../lib/server/config.js'
 import { applyCors, getBody, handleOptions, methodNotAllowed, sendJson } from '../lib/server/http.js'
 import { consumeSearchQuota, requireUser } from '../lib/server/auth.js'
+import { getExcludedPipelineLeadIds } from '../lib/server/organizations.js'
 
 const FREE_NOTICE =
-  'Results from the Connect Intel database — built-in India B2B records plus data your team imports.'
+  'Results from the Connect Intel database — saved AI discoveries and imports are reused automatically. Pipeline leads are excluded.'
 
 function hasStructuredFilters(filters) {
   return Boolean(
-    filters.jobTitles?.length ||
-      filters.states?.length ||
+    filters.states?.length ||
       filters.cities?.length ||
       filters.industries?.length ||
       filters.companySizes?.length
   )
 }
 
-function tryLocalSearch(store, filters, count, viewer) {
-  const databaseResults = searchStoredLeads(store, filters, count, viewer)
+function filterDiscoveryLeads(leads, excludeIds) {
+  if (!excludeIds?.size) return leads
+  return leads.filter((lead) => !excludeIds.has(lead.id))
+}
+
+function tryLocalSearch(store, filters, count, viewer, excludeIds) {
+  const databaseResults = searchStoredLeads(store, filters, count, viewer, excludeIds)
   if (databaseResults?.leads?.length) {
-    return { ...databaseResults, notice: FREE_NOTICE }
+    return { ...databaseResults, notice: FREE_NOTICE, fromDatabase: true }
   }
 
-  const mockLeads = getMockLeadsForViewer(store, viewer, filters, count)
+  const mockLeads = getMockLeadsForViewer(store, viewer, filters, count, excludeIds)
   if (mockLeads.length) {
     return {
       leads: mockLeads,
@@ -43,7 +50,7 @@ function tryLocalSearch(store, filters, count, viewer) {
   }
 
   if (!hasStructuredFilters(filters)) {
-    const broadMock = getMockLeadsForViewer(store, viewer, { ...filters, keywords: '' }, count)
+    const broadMock = getMockLeadsForViewer(store, viewer, { ...filters, keywords: '' }, count, excludeIds)
     if (broadMock.length) {
       return {
         leads: broadMock,
@@ -51,7 +58,7 @@ function tryLocalSearch(store, filters, count, viewer) {
         netNew: broadMock.length,
         provider: 'database',
         notice:
-          'No exact keyword match — showing related India prospects. Add state or role filters to narrow further.',
+          'No exact keyword match — showing related India prospects. Add state or city filters to narrow further.',
       }
     }
   }
@@ -59,21 +66,49 @@ function tryLocalSearch(store, filters, count, viewer) {
   return null
 }
 
-function runLocalSearch(store, filters, count, viewer) {
-  let result = tryLocalSearch(store, filters, count, viewer)
+function runLocalSearch(store, filters, count, viewer, excludeIds) {
+  return tryLocalSearch(store, filters, count, viewer, excludeIds)
+}
 
-  if (!result?.leads?.length && filters.jobTitles?.length) {
-    const relaxed = tryLocalSearch(store, { ...filters, jobTitles: [] }, count, viewer)
-    if (relaxed?.leads?.length) {
-      return {
-        ...relaxed,
-        notice: `${relaxed.notice || FREE_NOTICE} Designation filter had no matches — results shown without role filter.`,
-        relaxedRoleFilter: true,
-      }
+async function persistAiLeadsAndSearch(store, rawLeads, filters, count, viewer, excludeIds, source, discoveryMeta = {}) {
+  if (!rawLeads?.length) return null
+
+  const updatedStore = await updateStore((draft) => {
+    const { store: next } = persistDiscoveredLeads(draft, rawLeads, {
+      source,
+      actor: viewer,
+      filters,
+    })
+    return next
+  })
+
+  const local = runLocalSearch(updatedStore, filters, count, viewer, excludeIds)
+  if (local?.leads?.length) {
+    return {
+      ...local,
+      ...discoveryMeta,
+      provider: 'database',
+      notice: `${FREE_NOTICE} ${discoveryMeta.cachedNotice || 'Previously discovered leads served from your database.'}`,
+      aiPersisted: true,
     }
   }
 
-  return result
+  const leads = filterDiscoveryLeads(
+    rawLeads.map((lead, index) => shapeLeadForViewer(lead, updatedStore, viewer, index)),
+    excludeIds
+  )
+
+  if (!leads.length) return null
+
+  return {
+    leads,
+    total: leads.length,
+    netNew: leads.length,
+    provider: source,
+    notice: `${discoveryMeta.notice || 'AI discovery'} Saved to database for next time.`,
+    ...discoveryMeta,
+    aiPersisted: true,
+  }
 }
 
 export default async function handler(req, res) {
@@ -93,21 +128,24 @@ export default async function handler(req, res) {
 
   const anthropicKey = process.env.ANTHROPIC_API_KEY
   const { filters = {}, count = DEFAULT_SEARCH_LIMIT, provider = 'free' } = getBody(req)
+  const searchFilters = { ...filters, jobTitles: [] }
 
   await ensureBuiltInDatabase()
-  const store = await readStore()
+  let store = await readStore()
   const viewer = quotaUser
+  const excludeIds = getExcludedPipelineLeadIds(store, viewer)
 
-  let result = runLocalSearch(store, filters, count, viewer)
+  let result = runLocalSearch(store, searchFilters, count, viewer, excludeIds)
 
   if (!result?.leads?.length && isGeminiConfigured()) {
-    const expanded = await expandSearchKeywords(filters)
-    if (expanded.keywords && expanded.keywords !== filters.keywords) {
+    const expanded = await expandSearchKeywords(searchFilters)
+    if (expanded.keywords && expanded.keywords !== searchFilters.keywords) {
       const retry = runLocalSearch(
         store,
-        { ...filters, keywords: expanded.keywords },
+        { ...searchFilters, keywords: expanded.keywords },
         count,
-        viewer
+        viewer,
+        excludeIds
       )
       if (retry?.leads?.length) {
         result = {
@@ -122,24 +160,30 @@ export default async function handler(req, res) {
   let discoveryError = null
 
   if (!result?.leads?.length && isPerplexityConfigured()) {
-    const discovery = await discoverLeadsWithPerplexity(filters, Math.min(count, 8))
+    const discovery = await discoverLeadsWithPerplexity(searchFilters, Math.min(count, 8))
     if (discovery.leads?.length) {
-      const leads = discovery.leads.map((lead, index) => shapeLeadForViewer(lead, store, viewer, index))
-      result = {
-        leads,
-        total: leads.length,
-        netNew: leads.length,
-        provider: 'ai-discovery',
-        notice: discovery.notice,
-        discoveryMethod: discovery.method,
-      }
+      result = await persistAiLeadsAndSearch(
+        store,
+        discovery.leads,
+        searchFilters,
+        count,
+        viewer,
+        excludeIds,
+        'perplexity',
+        {
+          notice: discovery.notice,
+          discoveryMethod: discovery.method,
+          cachedNotice: 'Perplexity results were saved and loaded from your database.',
+        }
+      )
+      store = await readStore()
     } else if (discovery.error) {
       discoveryError = discovery.error
     }
   }
 
   if (result?.leads?.length) {
-    return sendJson(res, 200, { ...result, user: quotaUser })
+    return sendJson(res, 200, { ...result, user: quotaUser, excludedPipelineCount: excludeIds.size })
   }
 
   const usePaid = paidApisEnabled()
@@ -148,9 +192,21 @@ export default async function handler(req, res) {
 
   if (useApollo) {
     try {
-      const apolloResults = await searchApolloPeople(filters, count, store, viewer)
+      const apolloResults = await searchApolloPeople(searchFilters, count, store, viewer)
       if (apolloResults?.leads?.length) {
-        return sendJson(res, 200, { ...apolloResults, user: quotaUser })
+        const persisted = await persistAiLeadsAndSearch(
+          store,
+          apolloResults.leads,
+          searchFilters,
+          count,
+          viewer,
+          excludeIds,
+          'apollo',
+          { notice: apolloResults.notice }
+        )
+        if (persisted?.leads?.length) {
+          return sendJson(res, 200, { ...persisted, user: quotaUser })
+        }
       }
       if (provider === 'apollo') {
         return sendJson(res, 200, {
@@ -180,16 +236,19 @@ export default async function handler(req, res) {
 
   if (usePaid && (provider === 'claude' || provider === 'auto') && anthropicKey) {
     try {
-      const leads = await searchViaClaude(filters, count, store, viewer, anthropicKey)
-      if (leads.length) {
-        const total = Math.max(leads.length * 120, 2400)
-        return sendJson(res, 200, {
-          leads,
-          total,
-          netNew: Math.floor(total * 0.88),
-          provider: 'claude',
-          user: quotaUser,
-        })
+      const rawLeads = await searchViaClaude(searchFilters, count, store, viewer, anthropicKey)
+      const persisted = await persistAiLeadsAndSearch(
+        store,
+        rawLeads,
+        searchFilters,
+        count,
+        viewer,
+        excludeIds,
+        'claude',
+        { notice: 'Claude discovery saved to your database.' }
+      )
+      if (persisted?.leads?.length) {
+        return sendJson(res, 200, { ...persisted, user: quotaUser })
       }
     } catch (e) {
       return sendJson(res, 500, { error: e.message || 'Claude search failed' })
@@ -211,12 +270,15 @@ export default async function handler(req, res) {
   if (!isGeminiConfigured()) hints.push('Set GEMINI_API_KEY for smarter keyword expansion')
   if (!isPerplexityConfigured()) hints.push('Set PERPLEXITY_API_KEY for AI discovery when the database is empty')
 
+  const pipelineHint =
+    excludeIds.size > 0 ? ` ${excludeIds.size} lead(s) already in your pipeline were hidden.` : ''
+
   return sendJson(res, 200, {
     leads: [],
     total: 0,
     netNew: 0,
     provider: 'none',
-    notice: `No leads matched your filters. Try clearing Designation, use keyword "exporter", or import data in Admin.${hints.length ? ` ${hints.join('. ')}.` : ''}`,
+    notice: `No leads matched your filters. Try keyword "exporter", fewer cities, or import data in Admin.${pipelineHint}${hints.length ? ` ${hints.join('. ')}.` : ''}`,
     discoveryError,
     user: quotaUser,
   })
@@ -248,13 +310,12 @@ async function searchViaClaude(filters, count, store, viewer, apiKey) {
     .map((b) => b.text)
     .join('\n')
 
-  return parseLeadsJson(text).map((lead, index) => shapeLeadForViewer(lead, store, viewer, index))
+  return parseLeadsJson(text)
 }
 
 function buildPrompt(filters, count) {
   const parts = []
   if (filters.keywords) parts.push(`Keywords: ${filters.keywords}`)
-  if (filters.jobTitles?.length) parts.push(`Job titles: ${filters.jobTitles.join(', ')}`)
   if (filters.states?.length) parts.push(`Indian states: ${filters.states.join(', ')}`)
   if (filters.cities?.length) parts.push(`Cities: ${filters.cities.join(', ')}`)
   if (filters.industries?.length) parts.push(`Industries: ${filters.industries.join(', ')}`)

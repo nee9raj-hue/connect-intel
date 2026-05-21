@@ -1,13 +1,39 @@
+import { useEffect, useState } from 'react'
 import { GoogleOAuthProvider } from '@react-oauth/google'
-import { AppProvider, useApp } from './context/AppContext'
+import { AppProvider, useApp, storeInviteToken } from './context/AppContext'
 import LandingPage from './pages/LandingPage'
 import AuthPage from './pages/AuthPage'
 import AppShell from './components/layout/AppShell'
 
 const GOOGLE_CLIENT_ID = (import.meta.env.VITE_GOOGLE_CLIENT_ID || '').trim().replace(/^["']|["']$/g, '')
 
+function useInviteToken() {
+  const [token, setToken] = useState(null)
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const invite = params.get('invite')
+    if (invite) {
+      setToken(invite)
+      storeInviteToken(invite)
+      const url = new URL(window.location.href)
+      url.searchParams.delete('invite')
+      window.history.replaceState({}, '', url.pathname + url.search)
+    }
+  }, [])
+
+  return token
+}
+
 function Router() {
-  const { ready, screen } = useApp()
+  const { ready, screen, setScreen } = useApp()
+  const inviteToken = useInviteToken()
+
+  useEffect(() => {
+    if (inviteToken && screen === 'landing') {
+      setScreen('auth')
+    }
+  }, [inviteToken, screen, setScreen])
 
   if (!ready) {
     return (
@@ -21,7 +47,7 @@ function Router() {
   }
 
   if (screen === 'landing') return <LandingPage />
-  if (screen === 'auth') return <AuthPage />
+  if (screen === 'auth') return <AuthPage inviteToken={inviteToken} />
   return <AppShell />
 }
 

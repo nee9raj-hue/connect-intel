@@ -37,11 +37,22 @@ export const api = {
   getSession: () => request('/api/auth/session'),
   createSession: (payload) => request('/api/auth/session', { method: 'POST', body: payload }),
   destroySession: () => request('/api/auth/session', { method: 'DELETE' }),
+  completeOnboarding: (payload) =>
+    request('/api/onboarding/complete', { method: 'POST', body: payload }),
+  getTeamMembers: () => request('/api/team/members'),
+  inviteTeamMember: (payload) => request('/api/team/invite', { method: 'POST', body: payload }),
+  previewInvite: (token) => request(`/api/invite/preview?token=${encodeURIComponent(token)}`),
+  acceptInvite: (token) => request('/api/invite/accept', { method: 'POST', body: { token } }),
+  updateTeamBranding: (payload) => request('/api/team/branding', { method: 'PATCH', body: payload }),
+  updateMemberPermissions: (payload) =>
+    request('/api/team/permissions', { method: 'PATCH', body: payload }),
   getSavedLeads: () => request('/api/saved-leads'),
   saveLead: (lead) => request('/api/saved-leads', { method: 'POST', body: { lead } }),
   removeLead: (leadId) => request('/api/saved-leads', { method: 'DELETE', body: { leadId } }),
-  updateSavedLead: (leadId, crm) =>
-    request('/api/saved-leads', { method: 'PATCH', body: { leadId, crm } }),
+  updateSavedLead: (leadId, patch) =>
+    request('/api/saved-leads', { method: 'PATCH', body: { leadId, ...patch } }),
+  assignLead: (leadId, assignToUserId) =>
+    request('/api/saved-leads', { method: 'PATCH', body: { leadId, assignToUserId } }),
   generateCrmEmail: (leadId, options = {}) =>
     request('/api/crm-generate-email', { method: 'POST', body: { leadId, ...options } }),
   sendCrmEmail: (leadId, payload) =>

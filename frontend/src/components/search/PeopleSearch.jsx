@@ -1,13 +1,13 @@
 import { useMemo, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
+import { isAllCitiesSelected, isAllStatesSelected } from '../../lib/filterOptions'
 import { getResultsBadge, softenNotice, PRODUCT } from '../../lib/productCopy'
 import { searchLeads } from '../../lib/searchService'
 import SearchFiltersBar from './SearchFiltersBar'
 import ResultsTable from './ResultsTable'
 
 const EMPTY_FILTERS = {
-  jobTitles: [],
   states: [],
   cities: [],
   industries: [],
@@ -135,12 +135,38 @@ export default function PeopleSearch({ onNavigate }) {
   const filterSummary = useMemo(() => {
     const parts = []
     if (filters.keywords?.trim()) parts.push(`“${filters.keywords.trim()}”`)
-    if (filters.jobTitles?.length) parts.push(`${filters.jobTitles.length} role(s)`)
-    if (filters.states?.length) parts.push(filters.states.join(', '))
-    if (filters.cities?.length) parts.push(filters.cities.join(', '))
+    if (filters.states?.length && !isAllStatesSelected(filters.states)) {
+      parts.push(filters.states.length > 3 ? `${filters.states.length} states` : filters.states.join(', '))
+    } else if (!filters.states?.length) {
+      parts.push('All India')
+    }
+    if (filters.cities?.length && !isAllCitiesSelected(filters.states, filters.cities)) {
+      parts.push(filters.cities.length > 3 ? `${filters.cities.length} cities` : filters.cities.join(', '))
+    }
     if (filters.industries?.length) parts.push(`${filters.industries.length} industry`)
     return parts.length ? parts.join(' · ') : null
   }, [filters])
+
+  const canSearch = user?.canSearch !== false
+
+  if (!canSearch) {
+    return (
+      <div className="flex flex-col h-full items-center justify-center p-8 text-center bg-[#f6f7f9]">
+        <h1 className="text-lg font-semibold text-gray-900">Search not enabled</h1>
+        <p className="text-sm text-gray-500 mt-2 max-w-md">
+          Your company admin can enable lead search for your account from Team settings. You can still work on
+          pipeline leads assigned to you.
+        </p>
+        <button
+          type="button"
+          onClick={() => onNavigate?.('pipeline')}
+          className="mt-4 px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md"
+        >
+          Open pipeline
+        </button>
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col h-full min-h-0 bg-[#f6f7f9]">
@@ -262,7 +288,7 @@ export default function PeopleSearch({ onNavigate }) {
         ) : !hasSearched ? (
           <EmptyState
             title="Search your B2B database"
-            sub="Enter keywords, then narrow by designation, state, and city. City options update when you pick a state."
+            sub="Enter keywords, then narrow by state and city (or leave location empty for all India). Job title stays in results only."
           />
         ) : loading ? (
           <LoadingState />
@@ -271,8 +297,8 @@ export default function PeopleSearch({ onNavigate }) {
               title="No matches for these filters"
               sub={
                 results?.discoveryError
-                  ? `Database had no matches. Perplexity: ${results.discoveryError}. Try keyword "exporter" only, clear Designation, or fewer cities.`
-                  : 'Try keyword "exporter", state Rajasthan, and clear Designation if selected. Your database has limited rows until you import via Admin.'
+                  ? `Database had no matches. Perplexity: ${results.discoveryError}. Try keyword "exporter" only or fewer cities.`
+                  : 'Try keyword "exporter", state Rajasthan, or leave filters empty for all India. Saved pipeline leads are excluded from search.'
               }
               action={handleSearch}
             />
@@ -318,7 +344,7 @@ function LoadingState() {
     <div className="flex-1 flex flex-col items-center justify-center px-6">
       <div className="w-10 h-10 border-2 border-[#ffcb2b]/30 border-t-[#ffcb2b] rounded-full animate-spin mb-3" />
       <p className="text-sm font-medium text-gray-800">Searching our B2B database…</p>
-      <p className="text-xs text-gray-500 mt-1">Matching keywords, designation, and location</p>
+      <p className="text-xs text-gray-500 mt-1">Matching keywords and location</p>
     </div>
   )
 }

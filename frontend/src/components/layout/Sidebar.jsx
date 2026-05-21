@@ -16,14 +16,26 @@ const BOTTOM = [
 
 export default function Sidebar({ active, onNavigate }) {
   const { user, logout, savedLeads } = useApp()
+  const showTeam = user?.isOrgAdmin && user?.accountType === 'company'
+  const orgName = user?.organizationName || 'Connect Intel'
+  const orgLogo = user?.organizationLogoUrl
 
   return (
     <aside className="w-[220px] shrink-0 h-full bg-white border-r border-gray-200 flex flex-col">
       <div className="h-14 flex items-center gap-2.5 px-4 border-b border-gray-100 shrink-0">
-        <div className="w-8 h-8 rounded-lg bg-[#242424] flex items-center justify-center">
-          <span className="text-[#ffcb2b] font-bold text-xs">CI</span>
+        {orgLogo ? (
+          <img src={orgLogo} alt="" className="w-8 h-8 rounded-lg object-cover border border-gray-200" />
+        ) : (
+          <div className="w-8 h-8 rounded-lg bg-[#242424] flex items-center justify-center">
+            <span className="text-[#ffcb2b] font-bold text-xs">CI</span>
+          </div>
+        )}
+        <div className="min-w-0">
+          <span className="font-semibold text-[14px] text-gray-900 block truncate">{orgName}</span>
+          {user?.accountType === 'company' && (
+            <span className="text-[10px] text-gray-500 truncate block">Team workspace</span>
+          )}
         </div>
-        <span className="font-semibold text-[15px] text-gray-900">Connect Intel</span>
       </div>
 
       <nav className="flex-1 overflow-y-auto py-3 px-2">
@@ -53,6 +65,14 @@ export default function Sidebar({ active, onNavigate }) {
           />
         ))}
 
+        {showTeam && (
+          <NavBtn
+            item={{ id: 'team', label: 'Team', icon: TeamIcon }}
+            active={active === 'team'}
+            onClick={() => onNavigate('team')}
+          />
+        )}
+
         <p className="px-3 mt-5 mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
           Platform
         </p>
@@ -75,7 +95,7 @@ export default function Sidebar({ active, onNavigate }) {
         <div className="mx-2 mt-4 p-3 rounded-lg bg-[#fffbeb] border border-[#fde68a]">
           <p className="text-xs font-semibold text-gray-800">AI-powered search</p>
           <p className="text-[10px] text-gray-600 mt-1 leading-snug">
-            Growing B2B database · Smart filters · Built for India exports
+            Pipeline leads stay in CRM and won&apos;t appear in new searches.
           </p>
         </div>
       </nav>
@@ -93,7 +113,7 @@ export default function Sidebar({ active, onNavigate }) {
             <p className="text-xs font-semibold text-gray-900 truncate">{user?.name}</p>
             <p className="text-[10px] text-gray-500 truncate">{user?.email}</p>
             <p className="text-[10px] text-[#8a6600] truncate mt-0.5">
-              Credits: Rs {((user?.creditsPaise ?? 0) / 100).toFixed(0)}
+              {user?.accountType === 'company' ? 'Company' : 'Individual'} · Searches: {user?.searchesLeft ?? 0}
             </p>
           </div>
         </div>
@@ -127,6 +147,14 @@ function NavBtn({ item, active, onClick, badge }) {
         </span>
       )}
     </button>
+  )
+}
+
+function TeamIcon({ className }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+    </svg>
   )
 }
 

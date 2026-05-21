@@ -3,18 +3,20 @@ import {
   getCitiesForStates,
   INDUSTRIES,
   INDIAN_STATES,
-  JOB_TITLES,
+  isAllCitiesSelected,
+  isAllStatesSelected,
   pruneCitiesForStates,
 } from '../../lib/filterOptions'
 
 export default function SearchFiltersBar({ filters, onChange, onSearch, loading }) {
+  const stateOptions = INDIAN_STATES
   const cityOptions = useMemo(() => getCitiesForStates(filters.states), [filters.states])
-  const hasStates = filters.states?.length > 0
+  const allStates = isAllStatesSelected(filters.states)
+  const allCities = isAllCitiesSelected(filters.states, filters.cities)
 
   const activeCount =
-    (filters.jobTitles?.length || 0) +
-    (filters.states?.length || 0) +
-    (filters.cities?.length || 0) +
+    (filters.states?.length && !allStates ? 1 : 0) +
+    (filters.cities?.length && !allCities ? 1 : 0) +
     (filters.industries?.length || 0)
 
   const toggle = (key, value) => {
@@ -23,6 +25,22 @@ export default function SearchFiltersBar({ filters, onChange, onSearch, loading 
       ? current.filter((v) => v !== value)
       : [...current, value]
     onChange({ ...filters, [key]: next })
+  }
+
+  const selectAllStates = () => {
+    onChange({ ...filters, states: [], cities: [] })
+  }
+
+  const selectAllCities = () => {
+    onChange({ ...filters, cities: [] })
+  }
+
+  const selectEveryState = () => {
+    onChange({ ...filters, states: [...INDIAN_STATES], cities: [] })
+  }
+
+  const selectEveryCity = () => {
+    onChange({ ...filters, cities: [...getCitiesForStates(filters.states)] })
   }
 
   const changeStates = (nextStates) => {
@@ -36,7 +54,6 @@ export default function SearchFiltersBar({ filters, onChange, onSearch, loading 
   const clearFilters = () => {
     onChange({
       ...filters,
-      jobTitles: [],
       states: [],
       cities: [],
       industries: [],
@@ -82,22 +99,17 @@ export default function SearchFiltersBar({ filters, onChange, onSearch, loading 
       </div>
 
       <p className="text-[11px] text-gray-500 -mt-1">
-        Add designation and location below to narrow results. All selected filters must match.
+        Leave state and city empty for all India. Saved pipeline leads are hidden from new searches.
       </p>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
-        <MultiSelectField
-          label="Designation / role"
-          hint="Multi-select"
-          options={JOB_TITLES}
-          selected={filters.jobTitles || []}
-          onToggle={(val) => toggle('jobTitles', val)}
-        />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
         <MultiSelectField
           label="State"
-          hint="Multi-select"
-          options={INDIAN_STATES}
+          hint={allStates ? 'All India' : `${filters.states?.length || 0} selected`}
+          options={stateOptions}
           selected={filters.states || []}
+          allSelected={allStates}
+          onSelectAll={allStates ? selectAllStates : selectEveryState}
           onToggle={(val) => {
             const current = filters.states || []
             const next = current.includes(val)
@@ -108,33 +120,34 @@ export default function SearchFiltersBar({ filters, onChange, onSearch, loading 
         />
         <MultiSelectField
           label="City"
-          hint={hasStates ? 'Filtered by state' : 'Select state first'}
+          hint={allCities ? 'All cities' : `${filters.cities?.length || 0} selected`}
           options={cityOptions}
           selected={filters.cities || []}
+          allSelected={allCities}
+          onSelectAll={allCities ? selectAllCities : selectEveryCity}
           onToggle={(val) => toggle('cities', val)}
-          disabled={!hasStates}
-          emptyMessage={hasStates ? 'No cities for selected states' : 'Select one or more states'}
         />
         <MultiSelectField
           label="Industry"
           hint="Optional"
           options={INDUSTRIES}
           selected={filters.industries || []}
+          onSelectAll={() => onChange({ ...filters, industries: [] })}
+          allSelected={!filters.industries?.length}
           onToggle={(val) => toggle('industries', val)}
         />
       </div>
 
-      {activeCount > 0 && (
+      {(filters.states?.length || filters.cities?.length || filters.industries?.length) > 0 && (
         <div className="flex flex-wrap gap-1.5 pt-1">
-          {(filters.jobTitles || []).map((v) => (
-            <Chip key={`t-${v}`} label={v} onRemove={() => toggle('jobTitles', v)} />
-          ))}
-          {(filters.states || []).map((v) => (
-            <Chip key={`s-${v}`} label={v} onRemove={() => changeStates(filters.states.filter((s) => s !== v))} />
-          ))}
-          {(filters.cities || []).map((v) => (
-            <Chip key={`c-${v}`} label={v} onRemove={() => toggle('cities', v)} />
-          ))}
+          {!allStates &&
+            (filters.states || []).map((v) => (
+              <Chip key={`s-${v}`} label={v} onRemove={() => changeStates(filters.states.filter((s) => s !== v))} />
+            ))}
+          {!allCities &&
+            (filters.cities || []).map((v) => (
+              <Chip key={`c-${v}`} label={v} onRemove={() => toggle('cities', v)} />
+            ))}
           {(filters.industries || []).map((v) => (
             <Chip key={`i-${v}`} label={v} onRemove={() => toggle('industries', v)} />
           ))}
@@ -144,41 +157,46 @@ export default function SearchFiltersBar({ filters, onChange, onSearch, loading 
   )
 }
 
-function MultiSelectField({ label, hint, options, selected, onToggle, disabled, emptyMessage }) {
+function MultiSelectField({
+  label,
+  hint,
+  options,
+  selected,
+  onToggle,
+  onSelectAll,
+  allSelected,
+}) {
   return (
-    <div className={disabled ? 'opacity-60' : ''}>
+    <div>
       <div className="flex items-baseline justify-between gap-2 mb-1">
         <label className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">{label}</label>
         <span className="text-[10px] text-gray-400">{hint}</span>
       </div>
-      <div
-        className={`border border-gray-200 rounded-lg bg-gray-50/80 max-h-[120px] overflow-y-auto p-1.5 ${
-          disabled ? 'pointer-events-none' : ''
-        }`}
-      >
-        {!options.length ? (
-          <p className="text-xs text-gray-400 px-2 py-3 text-center">{emptyMessage || 'No options'}</p>
-        ) : (
-          options.map((opt) => (
-            <label
-              key={opt}
-              className="flex items-center gap-2 px-2 py-1 rounded hover:bg-white cursor-pointer text-[13px] text-gray-700"
-            >
-              <input
-                type="checkbox"
-                checked={selected.includes(opt)}
-                onChange={() => onToggle(opt)}
-                disabled={disabled}
-                className="rounded border-gray-300 text-gray-900 focus:ring-[#ffcb2b]"
-              />
-              <span className="truncate">{opt}</span>
-            </label>
-          ))
-        )}
+      <div className="border border-gray-200 rounded-lg bg-gray-50/80 max-h-[140px] overflow-y-auto p-1.5">
+        <label className="flex items-center gap-2 px-2 py-1.5 rounded bg-white border border-[#ffe48a] cursor-pointer text-[13px] font-semibold text-[#5b4a00] sticky top-0 z-10">
+          <input
+            type="checkbox"
+            checked={allSelected}
+            onChange={onSelectAll}
+            className="rounded border-gray-300 text-gray-900 focus:ring-[#ffcb2b]"
+          />
+          <span>Select all</span>
+        </label>
+        {options.map((opt) => (
+          <label
+            key={opt}
+            className="flex items-center gap-2 px-2 py-1 rounded hover:bg-white cursor-pointer text-[13px] text-gray-700"
+          >
+            <input
+              type="checkbox"
+              checked={!allSelected && selected.includes(opt)}
+              onChange={() => onToggle(opt)}
+              className="rounded border-gray-300 text-gray-900 focus:ring-[#ffcb2b]"
+            />
+            <span className="truncate">{opt}</span>
+          </label>
+        ))}
       </div>
-      {selected.length > 0 && (
-        <p className="text-[10px] text-[#8a6600] mt-1 font-medium">{selected.length} selected</p>
-      )}
     </div>
   )
 }

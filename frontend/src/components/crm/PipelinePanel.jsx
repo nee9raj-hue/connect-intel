@@ -1,16 +1,19 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useApp } from '../../context/AppContext'
-import { CRM_STATUSES, formatCrmDate, getStatusMeta } from '../../lib/crmConstants'
+import { formatCrmDate, getStatusMeta, getVisiblePipelineColumns } from '../../lib/crmConstants'
 import LeadWorkspace from './LeadWorkspace'
 
 export default function PipelinePanel({ onNavigate }) {
   const {
+    user,
     savedLeads,
     toggleSaveLead,
     pipelineLeadId,
     setPipelineLeadId,
     openPipelineLead,
   } = useApp()
+
+  const columns = useMemo(() => getVisiblePipelineColumns(user), [user])
   const [view, setView] = useState('board')
   const [filter, setFilter] = useState('all')
 
@@ -31,13 +34,18 @@ export default function PipelinePanel({ onNavigate }) {
   }, [savedLeads, filter])
 
   const byStatus = useMemo(() => {
-    const map = Object.fromEntries(CRM_STATUSES.map((s) => [s.id, []]))
+    const map = Object.fromEntries(columns.map((s) => [s.id, []]))
+    const hidden = []
     for (const lead of savedLeads) {
       const st = lead.crm?.status || 'new'
       if (map[st]) map[st].push(lead)
+      else hidden.push(lead)
+    }
+    if (hidden.length && map[columns[0]?.id]) {
+      map[columns[0].id].push(...hidden)
     }
     return map
-  }, [savedLeads])
+  }, [savedLeads, columns])
 
   const stats = useMemo(
     () => ({
@@ -56,7 +64,7 @@ export default function PipelinePanel({ onNavigate }) {
             <div>
               <h1 className="text-lg font-semibold text-gray-900">Pipeline</h1>
               <p className="text-xs text-gray-500 mt-0.5">
-                Mini CRM — work saved leads, track status, and send AI-assisted email
+                Mini CRM — columns match your team role ({columns.map((c) => c.label).join(', ')})
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -98,7 +106,7 @@ export default function PipelinePanel({ onNavigate }) {
           {view === 'list' && (
             <div className="flex flex-wrap gap-1.5 mt-3">
               <FilterChip active={filter === 'all'} onClick={() => setFilter('all')} label="All" />
-              {CRM_STATUSES.map((s) => (
+              {columns.map((s) => (
                 <FilterChip
                   key={s.id}
                   active={filter === s.id}
@@ -115,7 +123,7 @@ export default function PipelinePanel({ onNavigate }) {
             <EmptyPipeline onNavigate={onNavigate} />
           ) : view === 'board' ? (
             <div className="flex gap-3 min-h-[320px] overflow-x-auto pb-2">
-              {CRM_STATUSES.map((col) => (
+              {columns.map((col) => (
                 <KanbanColumn
                   key={col.id}
                   column={col}
@@ -193,7 +201,11 @@ export default function PipelinePanel({ onNavigate }) {
       </div>
 
       {selectedLead && (
-        <LeadWorkspace lead={selectedLead} onClose={() => setPipelineLeadId(null)} />
+        <LeadWorkspace
+          lead={selectedLead}
+          statusOptions={columns}
+          onClose={() => setPipelineLeadId(null)}
+        />
       )}
     </div>
   )

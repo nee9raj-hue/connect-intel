@@ -4,11 +4,31 @@ import { defaultCrm } from '../lib/crmConstants'
 
 const AppContext = createContext(null)
 
+const INVITE_TOKEN_KEY = 'connect_intel_invite_token'
+
+export function getStoredInviteToken() {
+  try {
+    return sessionStorage.getItem(INVITE_TOKEN_KEY)
+  } catch {
+    return null
+  }
+}
+
+export function storeInviteToken(token) {
+  try {
+    if (token) sessionStorage.setItem(INVITE_TOKEN_KEY, token)
+    else sessionStorage.removeItem(INVITE_TOKEN_KEY)
+  } catch {
+    // ignore
+  }
+}
+
 export function AppProvider({ children }) {
   const [user, setUser] = useState(null)
   const [screen, setScreen] = useState('landing') // landing | auth | app
   const [savedLeads, setSavedLeads] = useState([])
   const [searchHistory, setSearchHistory] = useState([])
+  const [teamMembers, setTeamMembers] = useState([])
   const [ready, setReady] = useState(false)
   const [pipelineLeadId, setPipelineLeadId] = useState(null)
 
@@ -24,6 +44,21 @@ export function AppProvider({ children }) {
     return session.user
   }, [])
 
+  const refreshTeam = useCallback(async () => {
+    if (!user?.organizationId || user?.accountType !== 'company') {
+      setTeamMembers([])
+      return []
+    }
+    try {
+      const data = await api.getTeamMembers()
+      setTeamMembers(data.members || [])
+      return data.members || []
+    } catch {
+      setTeamMembers([])
+      return []
+    }
+  }, [user?.organizationId, user?.accountType])
+
   useEffect(() => {
     let cancelled = false
 
@@ -35,6 +70,16 @@ export function AppProvider({ children }) {
         if (session.user) {
           setUser(session.user)
           setScreen('app')
+          const token = getStoredInviteToken()
+          if (token) {
+            try {
+              const data = await api.acceptInvite(token)
+              storeInviteToken(null)
+              setUser(data.user)
+            } catch {
+              // invite may be for different email
+            }
+          }
         }
       } catch {
         if (!cancelled) {
@@ -59,6 +104,7 @@ export function AppProvider({ children }) {
       if (!user) {
         setSavedLeads([])
         setSearchHistory([])
+        setTeamMembers([])
         return
       }
 
@@ -71,6 +117,11 @@ export function AppProvider({ children }) {
         if (cancelled) return
         setSavedLeads(saved.leads || [])
         setSearchHistory(history.history || [])
+
+        if (user.organizationId && user.accountType === 'company') {
+          const data = await api.getTeamMembers()
+          if (!cancelled) setTeamMembers(data.members || [])
+        }
       } catch {
         if (!cancelled) {
           setSavedLeads([])
@@ -85,12 +136,26 @@ export function AppProvider({ children }) {
     }
   }, [user])
 
+  const acceptPendingInvite = useCallback(async () => {
+    const token = getStoredInviteToken()
+    if (!token) return null
+    try {
+      const data = await api.acceptInvite(token)
+      storeInviteToken(null)
+      setUser(data.user)
+      return data.user
+    } catch {
+      return null
+    }
+  }, [])
+
   const login = useCallback(async (payload) => {
     const session = await api.createSession(payload)
     setUser(session.user)
     setScreen('app')
+    await acceptPendingInvite()
     return session.user
-  }, [])
+  }, [acceptPendingInvite])
 
   const logout = useCallback(async () => {
     try {
@@ -101,9 +166,39 @@ export function AppProvider({ children }) {
     setUser(null)
     setSavedLeads([])
     setSearchHistory([])
+    setTeamMembers([])
     setPipelineLeadId(null)
     setScreen('landing')
   }, [])
+
+  const completeOnboarding = useCallback(async (payload) => {
+    const data = await api.completeOnboarding(payload)
+    setUser(data.user)
+    return data.user
+  }, [])
+
+  const inviteTeamMember = useCallback(
+    async (payload) => {
+      const data = await api.inviteTeamMember(payload)
+      if (data.user) setUser(data.user)
+      await refreshTeam()
+      return data
+    },
+    [refreshTeam]
+  )
+
+  const updateTeamBranding = useCallback(async (payload) => {
+    return api.updateTeamBranding(payload)
+  }, [])
+
+  const updateMemberPermissions = useCallback(
+    async (payload) => {
+      const data = await api.updateMemberPermissions(payload)
+      setTeamMembers(data.members || [])
+      return data
+    },
+    []
+  )
 
   const replaceSavedLeads = useCallback((leads) => {
     setSavedLeads(leads || [])
@@ -141,13 +236,19 @@ export function AppProvider({ children }) {
     })
 
     try {
-      const data = await api.updateSavedLead(leadId, crmPatch)
+      const data = await api.updateSavedLead(leadId, { crm: crmPatch })
       setSavedLeads(data.leads || [])
       return data.lead
     } catch (error) {
       setSavedLeads(previous)
       throw error
     }
+  }, [])
+
+  const assignLead = useCallback(async (leadId, assignToUserId) => {
+    const data = await api.assignLead(leadId, assignToUserId)
+    setSavedLeads(data.leads || [])
+    return data.lead
   }, [])
 
   const generateEmailDraft = useCallback(async (leadId, options) => {
@@ -205,6 +306,7 @@ export function AppProvider({ children }) {
         savedLeads,
         toggleSaveLead,
         updateSavedLeadCrm,
+        assignLead,
         generateEmailDraft,
         logCrmEmailSend,
         openPipelineLead,
@@ -213,6 +315,13 @@ export function AppProvider({ children }) {
         isSaved,
         searchHistory,
         addSearchHistory,
+        completeOnboarding,
+        teamMembers,
+        refreshTeam,
+        inviteTeamMember,
+        updateTeamBranding,
+        updateMemberPermissions,
+        acceptPendingInvite,
       }}
     >
       {children}

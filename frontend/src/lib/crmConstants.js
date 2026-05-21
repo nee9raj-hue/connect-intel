@@ -7,6 +7,25 @@ export const CRM_STATUSES = [
   { id: 'lost', label: 'Lost', color: 'bg-gray-100 text-gray-500 border-gray-200' },
 ]
 
+const PIPELINE_ROLE_COLUMNS = {
+  org_admin: ['new', 'contacted', 'follow_up', 'replied', 'won', 'lost'],
+  member: ['new', 'contacted', 'follow_up', 'replied', 'lost'],
+  sales: ['new', 'contacted', 'follow_up'],
+}
+
+export const TEAM_PIPELINE_ROLES = [
+  { id: 'member', label: 'Full pipeline', description: 'New through Replied and Lost' },
+  { id: 'sales', label: 'Sales rep', description: 'Early funnel only' },
+]
+
+export function getVisiblePipelineColumns(user) {
+  if (!user || user.accountType !== 'company') return CRM_STATUSES
+  if (user.isOrgAdmin || user.orgRole === 'org_admin') return CRM_STATUSES
+  const role = user.pipelineRole || 'member'
+  const allowed = PIPELINE_ROLE_COLUMNS[role] || PIPELINE_ROLE_COLUMNS.member
+  return CRM_STATUSES.filter((col) => allowed.includes(col.id))
+}
+
 export const EMAIL_PURPOSES = [
   { id: 'introduction', label: 'Introduction' },
   { id: 'follow_up', label: 'Follow up' },

@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useApp } from '../context/AppContext'
 import GoogleSignIn from '../components/auth/GoogleSignIn'
+import InviteBanner from '../components/auth/InviteBanner'
 
-export default function AuthPage() {
+export default function AuthPage({ inviteToken = null }) {
   const { login, setScreen } = useApp()
   const [showEmail, setShowEmail] = useState(false)
   const [form, setForm] = useState({ email: '', password: '' })
@@ -66,6 +67,8 @@ export default function AuthPage() {
 
           <h1 className="text-2xl font-bold text-ci-dark mb-1">Welcome</h1>
           <p className="text-sm text-gray-500 mb-8">Sign in to access your workspace</p>
+
+          {inviteToken && <InviteBanner token={inviteToken} />}
 
           <GoogleSignIn text="continue_with" />
 

@@ -2,16 +2,18 @@ import { requireUser } from '../lib/server/auth.js'
 import { createId, readStore, updateStore } from '../lib/server/store.js'
 import { applyCors, getBody, handleOptions, methodNotAllowed, sendJson } from '../lib/server/http.js'
 import { defaultCrm, mergeLeadForClient, normalizeCrm } from '../lib/server/crm.js'
+import {
+  getMembership,
+  listPipelineEntries,
+  resolveOrgRole,
+} from '../lib/server/organizations.js'
 
-function listSavedLeads(store, userId) {
-  return store.savedLeads
-    .filter((entry) => entry.userId === userId)
-    .sort((left, right) => new Date(right.savedAt).getTime() - new Date(left.savedAt).getTime())
-    .map((entry) => mergeLeadForClient(entry))
-}
-
-function findEntry(store, userId, leadId) {
-  return store.savedLeads.find((entry) => entry.userId === userId && entry.lead.id === leadId)
+function findEntry(store, user, leadId) {
+  const entries = listPipelineEntries(store, user)
+  const match = store.savedLeads.find(
+    (e) => e.lead.id === leadId && entries.some((p) => p.id === leadId)
+  )
+  return match
 }
 
 export default async function handler(req, res) {
@@ -21,9 +23,13 @@ export default async function handler(req, res) {
   const user = await requireUser(req, res)
   if (!user) return
 
+  const store = await readStore()
+  const { accountType } = resolveOrgRole(user, store)
+  const organizationId =
+    accountType === 'company' && user.organizationId ? user.organizationId : null
+
   if (req.method === 'GET') {
-    const store = await readStore()
-    return sendJson(res, 200, { leads: listSavedLeads(store, user.id) })
+    return sendJson(res, 200, { leads: listPipelineEntries(store, user) })
   }
 
   if (req.method === 'POST') {
@@ -34,63 +40,93 @@ export default async function handler(req, res) {
       return sendJson(res, 400, { error: 'Lead payload is required' })
     }
 
-    const store = await updateStore((draft) => {
-      const existing = findEntry(draft, user.id, lead.id)
+    const updated = await updateStore((draft) => {
+      const exists = draft.savedLeads.find(
+        (e) =>
+          e.lead.id === lead.id &&
+          (organizationId ? e.organizationId === organizationId : e.userId === user.id)
+      )
 
-      if (!existing) {
+      if (!exists) {
         draft.savedLeads.push({
           id: createId('saved'),
           userId: user.id,
+          organizationId,
+          savedByUserId: user.id,
+          assignedToUserId: user.isOrgAdmin ? null : user.id,
           savedAt: new Date().toISOString(),
           crm: defaultCrm(),
           lead: {
             ...lead,
             savedAt: new Date().toISOString(),
+            inPipeline: true,
           },
         })
       }
       return draft
     })
 
-    return sendJson(res, 200, { leads: listSavedLeads(store, user.id) })
+    return sendJson(res, 200, { leads: listPipelineEntries(updated, user) })
   }
 
   if (req.method === 'PATCH') {
     const body = getBody(req)
     const leadId = body.leadId
     const crmPatch = body.crm
+    const assignToUserId = body.assignToUserId
 
     if (!leadId) {
       return sendJson(res, 400, { error: 'leadId is required' })
     }
 
-    const store = await updateStore((draft) => {
-      const entry = findEntry(draft, user.id, leadId)
+    if (assignToUserId && user.isOrgAdmin && organizationId) {
+      const member = getMembership(store, assignToUserId, organizationId)
+      if (!member) {
+        return sendJson(res, 400, { error: 'Assignee is not in your team' })
+      }
+    }
+
+    const updated = await updateStore((draft) => {
+      const entry = draft.savedLeads.find(
+        (e) =>
+          e.lead.id === leadId &&
+          (organizationId ? e.organizationId === organizationId : e.userId === user.id)
+      )
       if (!entry) return draft
 
-      const current = normalizeCrm(entry.crm)
-      entry.crm = normalizeCrm({
-        ...current,
-        ...crmPatch,
-        emails: crmPatch?.emails ?? current.emails,
-      })
+      if (assignToUserId !== undefined && user.isOrgAdmin && organizationId) {
+        entry.assignedToUserId = assignToUserId || null
+        entry.assignedAt = new Date().toISOString()
+        entry.assignedByUserId = user.id
+      }
 
-      if (crmPatch?.responseReceived === true && !entry.crm.lastResponseAt) {
-        entry.crm.lastResponseAt = new Date().toISOString()
-        if (entry.crm.status === 'new' || entry.crm.status === 'contacted' || entry.crm.status === 'follow_up') {
-          entry.crm.status = 'replied'
+      if (crmPatch) {
+        const current = normalizeCrm(entry.crm)
+        entry.crm = normalizeCrm({
+          ...current,
+          ...crmPatch,
+          emails: crmPatch?.emails ?? current.emails,
+        })
+        if (crmPatch?.responseReceived === true && !entry.crm.lastResponseAt) {
+          entry.crm.lastResponseAt = new Date().toISOString()
+          if (['new', 'contacted', 'follow_up'].includes(entry.crm.status)) {
+            entry.crm.status = 'replied'
+          }
         }
       }
 
       return draft
     })
 
-    const entry = findEntry(store, user.id, leadId)
+    const entry = updated.savedLeads.find((e) => e.lead.id === leadId)
     if (!entry) {
-      return sendJson(res, 404, { error: 'Saved lead not found' })
+      return sendJson(res, 404, { error: 'Lead not in pipeline' })
     }
 
-    return sendJson(res, 200, { leads: listSavedLeads(store, user.id), lead: mergeLeadForClient(entry) })
+    return sendJson(res, 200, {
+      leads: listPipelineEntries(updated, user),
+      lead: mergeLeadForClient(entry),
+    })
   }
 
   if (req.method === 'DELETE') {
@@ -101,14 +137,18 @@ export default async function handler(req, res) {
       return sendJson(res, 400, { error: 'leadId is required' })
     }
 
-    const store = await updateStore((draft) => {
+    const updated = await updateStore((draft) => {
       draft.savedLeads = draft.savedLeads.filter(
-        (entry) => !(entry.userId === user.id && entry.lead.id === leadId)
+        (e) =>
+          !(
+            e.lead.id === leadId &&
+            (organizationId ? e.organizationId === organizationId : e.userId === user.id)
+          )
       )
       return draft
     })
 
-    return sendJson(res, 200, { leads: listSavedLeads(store, user.id) })
+    return sendJson(res, 200, { leads: listPipelineEntries(updated, user) })
   }
 
   return methodNotAllowed(res, ['GET', 'POST', 'PATCH', 'DELETE'])
