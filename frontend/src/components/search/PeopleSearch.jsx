@@ -290,7 +290,7 @@ export default function PeopleSearch({ onNavigate }) {
         ) : !hasSearched ? (
           <EmptyState
             title="Search your B2B database"
-            sub='Enter keywords plus state or city for best matches. Every result includes email and phone — scroll the table below to review.'
+            sub='Enter keywords plus state or city for best matches. Each result has email or phone (or both) — scroll the table below.'
           />
         ) : loading ? (
           <LoadingState />
@@ -300,7 +300,7 @@ export default function PeopleSearch({ onNavigate }) {
               sub={
                 results?.discoveryError
                   ? `Database had no matches. Perplexity: ${results.discoveryError}. Try keyword "exporter" only or fewer cities.`
-                  : 'Try keyword "exporter" with one state (e.g. Rajasthan). Only contacts with email and phone are shown.'
+                  : 'Try keyword "exporter" with one state (e.g. Rajasthan). Contacts need at least email or phone.'
               }
               action={handleSearch}
             />

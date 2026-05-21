@@ -81,7 +81,7 @@ export default function OrgPipelineImport({ onImported }) {
         <h2 className="text-sm font-semibold text-gray-900">Import your pipeline</h2>
         <p className="text-xs text-gray-500 mt-1 leading-relaxed">
           Upload your existing leads (CSV or Excel). Contacts are saved to Connect Intel master data and
-          added to your team Pipeline for follow-up and closures. Rows with email and phone appear in
+          added to your team Pipeline for follow-up and closures. Rows with email or phone appear in
           People search for your org.
         </p>
       </div>
