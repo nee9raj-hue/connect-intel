@@ -38,6 +38,7 @@ export default async function handler(req, res) {
   }
 
   return sendJson(res, 200, {
+    apiVersion: '2026-05-21-supabase-diag',
     providers: {
       freeMode,
       storage: storageEngine,
