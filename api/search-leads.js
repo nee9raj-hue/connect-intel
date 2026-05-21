@@ -1,8 +1,10 @@
 /**
- * Lead search — free built-in database first; paid Apollo/Claude only if ENABLE_PAID_APIS=true.
+ * Lead search — database → mock → Gemini keyword expand → Perplexity discovery.
  */
 import { isApolloConfigured, searchApolloPeople, verifyApolloApiKey } from '../lib/server/apollo.js'
 import { paidApisEnabled } from '../lib/server/config.js'
+import { expandSearchKeywords, isGeminiConfigured } from '../lib/server/gemini.js'
+import { discoverLeadsWithPerplexity, isPerplexityConfigured } from '../lib/server/perplexity.js'
 import { ensureBuiltInDatabase } from '../lib/server/seed.js'
 import { readStore } from '../lib/server/store.js'
 import { getMockLeadsForViewer, searchStoredLeads, shapeLeadForViewer } from '../lib/server/search.js'
@@ -12,6 +14,50 @@ import { consumeSearchQuota, requireUser } from '../lib/server/auth.js'
 
 const FREE_NOTICE =
   'Results from the Connect Intel database — built-in India B2B records plus data your team imports.'
+
+function hasStructuredFilters(filters) {
+  return Boolean(
+    filters.jobTitles?.length ||
+      filters.states?.length ||
+      filters.cities?.length ||
+      filters.industries?.length ||
+      filters.companySizes?.length
+  )
+}
+
+function runLocalSearch(store, filters, count, viewer) {
+  const databaseResults = searchStoredLeads(store, filters, count, viewer)
+  if (databaseResults?.leads?.length) {
+    return { ...databaseResults, notice: FREE_NOTICE }
+  }
+
+  const mockLeads = getMockLeadsForViewer(store, viewer, filters, count)
+  if (mockLeads.length) {
+    return {
+      leads: mockLeads,
+      total: Math.max(mockLeads.length * 40, mockLeads.length),
+      netNew: mockLeads.length,
+      provider: 'database',
+      notice: 'Sample prospects matching your filters.',
+    }
+  }
+
+  if (!hasStructuredFilters(filters)) {
+    const broadMock = getMockLeadsForViewer(store, viewer, { ...filters, keywords: '' }, count)
+    if (broadMock.length) {
+      return {
+        leads: broadMock,
+        total: broadMock.length,
+        netNew: broadMock.length,
+        provider: 'database',
+        notice:
+          'No exact keyword match — showing related India prospects. Add state or role filters to narrow further.',
+      }
+    }
+  }
+
+  return null
+}
 
 export default async function handler(req, res) {
   if (handleOptions(req, res)) return
@@ -35,49 +81,43 @@ export default async function handler(req, res) {
   const store = await readStore()
   const viewer = quotaUser
 
-  const databaseResults = searchStoredLeads(store, filters, count, viewer)
-  if (databaseResults?.leads?.length) {
-    return sendJson(res, 200, {
-      ...databaseResults,
-      notice: FREE_NOTICE,
-      user: quotaUser,
-    })
-  }
+  let result = runLocalSearch(store, filters, count, viewer)
 
-  const mockLeads = getMockLeadsForViewer(store, viewer, filters, count)
-  if (mockLeads.length) {
-    return sendJson(res, 200, {
-      leads: mockLeads,
-      total: Math.max(mockLeads.length * 40, mockLeads.length),
-      netNew: mockLeads.length,
-      provider: 'database',
-      notice: 'Additional sample prospects shown to help you explore filters.',
-      user: quotaUser,
-    })
-  }
-
-  const hasStructuredFilters =
-    filters.jobTitles?.length ||
-    filters.states?.length ||
-    filters.cities?.length ||
-    filters.industries?.length ||
-    filters.companySizes?.length
-
-  if (
-    !hasStructuredFilters &&
-    (provider === 'free' || provider === 'auto' || provider === 'database')
-  ) {
-    const broadMock = getMockLeadsForViewer(store, viewer, { ...filters, keywords: '' }, count)
-    if (broadMock.length) {
-      return sendJson(res, 200, {
-        leads: broadMock,
-        total: broadMock.length,
-        netNew: broadMock.length,
-        provider: 'database',
-        notice: 'No exact keyword match — showing related India prospects. Add state or role filters to narrow further.',
-        user: quotaUser,
-      })
+  if (!result?.leads?.length && isGeminiConfigured()) {
+    const expanded = await expandSearchKeywords(filters)
+    if (expanded.keywords && expanded.keywords !== filters.keywords) {
+      const retry = runLocalSearch(
+        store,
+        { ...filters, keywords: expanded.keywords },
+        count,
+        viewer
+      )
+      if (retry?.leads?.length) {
+        result = {
+          ...retry,
+          notice: `${retry.notice} Gemini expanded your search terms.`,
+          expandedKeywords: expanded.keywords,
+        }
+      }
     }
+  }
+
+  if (!result?.leads?.length && isPerplexityConfigured()) {
+    const discovery = await discoverLeadsWithPerplexity(filters, Math.min(count, 8))
+    if (discovery.leads?.length) {
+      const leads = discovery.leads.map((lead, index) => shapeLeadForViewer(lead, store, viewer, index))
+      result = {
+        leads,
+        total: leads.length,
+        netNew: leads.length,
+        provider: 'ai-discovery',
+        notice: discovery.notice,
+      }
+    }
+  }
+
+  if (result?.leads?.length) {
+    return sendJson(res, 200, { ...result, user: quotaUser })
   }
 
   const usePaid = paidApisEnabled()
@@ -145,12 +185,16 @@ export default async function handler(req, res) {
     })
   }
 
+  const hints = []
+  if (!isGeminiConfigured()) hints.push('Set GEMINI_API_KEY for smarter keyword expansion')
+  if (!isPerplexityConfigured()) hints.push('Set PERPLEXITY_API_KEY for AI discovery when the database is empty')
+
   return sendJson(res, 200, {
     leads: [],
     total: 0,
     netNew: 0,
     provider: 'none',
-    notice: 'No leads matched. Try: keywords “exporter”, city Jaipur, state Rajasthan.',
+    notice: `No leads matched your filters. Try broader keywords or import data in Admin.${hints.length ? ` ${hints.join('. ')}.` : ''}`,
     user: quotaUser,
   })
 }

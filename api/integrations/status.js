@@ -1,7 +1,10 @@
 import { isApolloConfigured, verifyApolloApiKey } from '../../lib/server/apollo.js'
 import { paidApisEnabled } from '../../lib/server/config.js'
+import { isGeminiConfigured } from '../../lib/server/gemini.js'
+import { isPerplexityConfigured } from '../../lib/server/perplexity.js'
 import { ensureBuiltInDatabase } from '../../lib/server/seed.js'
-import { readStore } from '../../lib/server/store.js'
+import { getStoreMetadata, readStore } from '../../lib/server/store.js'
+import { isSupabaseEnabled } from '../../lib/server/supabaseClient.js'
 import { applyCors, handleOptions, methodNotAllowed, sendJson } from '../../lib/server/http.js'
 
 export default async function handler(req, res) {
@@ -13,6 +16,7 @@ export default async function handler(req, res) {
   await ensureBuiltInDatabase()
   const store = await readStore()
   const freeMode = !paidApisEnabled()
+  const storage = getStoreMetadata()
 
   let apollo = false
   let apolloError = null
@@ -29,7 +33,12 @@ export default async function handler(req, res) {
   return sendJson(res, 200, {
     providers: {
       freeMode,
+      storage: storage.engine,
+      supabase: isSupabaseEnabled(),
       builtInRecords: store.contacts?.length ?? 0,
+      companies: store.companies?.length ?? 0,
+      gemini: isGeminiConfigured(),
+      perplexity: isPerplexityConfigured(),
       apollo,
       apolloConfigured,
       apolloError,

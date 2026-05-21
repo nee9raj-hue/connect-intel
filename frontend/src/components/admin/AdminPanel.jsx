@@ -23,6 +23,11 @@ export default function AdminPanel() {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
+  const [researchKeywords, setResearchKeywords] = useState('exporter')
+  const [researchState, setResearchState] = useState('Rajasthan')
+  const [researchCities, setResearchCities] = useState('Jaipur, Jodhpur, Udaipur')
+  const [researchResults, setResearchResults] = useState([])
+  const [researchLoading, setResearchLoading] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -59,6 +64,38 @@ export default function AdminPanel() {
       setRows([])
       setFileName('')
       setError(err.message || 'Could not parse file')
+    }
+  }
+
+  const handlePerplexityResearch = async () => {
+    setResearchLoading(true)
+    setError('')
+    setMessage('')
+
+    try {
+      const cities = researchCities
+        .split(',')
+        .map((c) => c.trim())
+        .filter(Boolean)
+      const data = await api.researchLeads(
+        {
+          keywords: researchKeywords,
+          states: researchState ? [researchState] : [],
+          cities,
+          jobTitles: [],
+          industries: [],
+          companySizes: [],
+        },
+        12
+      )
+      setResearchResults(data.leads || [])
+      setMessage(data.notice || `Found ${data.leads?.length || 0} AI-suggested companies`)
+      if (data.error) setError(data.error)
+    } catch (err) {
+      setResearchResults([])
+      setError(err.message)
+    } finally {
+      setResearchLoading(false)
     }
   }
 
@@ -217,6 +254,73 @@ export default function AdminPanel() {
           </div>
         </section>
       </div>
+
+      <section className="mt-4 bg-white rounded-2xl border border-gray-200 p-5">
+        <h2 className="text-lg font-semibold text-gray-900">AI research (Perplexity)</h2>
+        <p className="mt-1 text-sm text-gray-500">
+          Discover companies on the web when your database is thin. Verify contacts, then import via Excel.
+          Customer search also uses Perplexity automatically when no database matches.
+        </p>
+        <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+          <input
+            type="text"
+            value={researchKeywords}
+            onChange={(e) => setResearchKeywords(e.target.value)}
+            placeholder="Keywords e.g. exporter"
+            className="px-3 py-2 border border-gray-200 rounded-lg text-sm"
+          />
+          <input
+            type="text"
+            value={researchState}
+            onChange={(e) => setResearchState(e.target.value)}
+            placeholder="State e.g. Rajasthan"
+            className="px-3 py-2 border border-gray-200 rounded-lg text-sm"
+          />
+          <input
+            type="text"
+            value={researchCities}
+            onChange={(e) => setResearchCities(e.target.value)}
+            placeholder="Cities comma-separated"
+            className="px-3 py-2 border border-gray-200 rounded-lg text-sm"
+          />
+        </div>
+        <button
+          type="button"
+          onClick={handlePerplexityResearch}
+          disabled={researchLoading}
+          className="mt-4 px-4 py-2 bg-gray-900 text-white text-sm font-semibold rounded-lg disabled:opacity-50"
+        >
+          {researchLoading ? 'Researching…' : 'Run Perplexity research'}
+        </button>
+        {researchResults.length > 0 && (
+          <div className="mt-4 rounded-xl border border-violet-200 bg-violet-50/50 overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-violet-100/80 text-left text-xs uppercase text-violet-900">
+                <tr>
+                  <th className="px-3 py-2">Name</th>
+                  <th className="px-3 py-2">Company</th>
+                  <th className="px-3 py-2">Location</th>
+                  <th className="px-3 py-2">Title</th>
+                </tr>
+              </thead>
+              <tbody>
+                {researchResults.map((lead) => (
+                  <tr key={lead.id} className="border-t border-violet-100">
+                    <td className="px-3 py-2">
+                      {lead.firstName} {lead.lastName}
+                    </td>
+                    <td className="px-3 py-2">{lead.company}</td>
+                    <td className="px-3 py-2 text-gray-600">
+                      {[lead.city, lead.state].filter(Boolean).join(', ')}
+                    </td>
+                    <td className="px-3 py-2 text-gray-600">{lead.title}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
 
       <section className="mt-4 bg-white rounded-2xl border border-gray-200 p-5">
         <h2 className="text-lg font-semibold text-gray-900">Latest records</h2>

@@ -185,7 +185,7 @@ function SourceBadge({ source }) {
   const tone =
     source === 'database' || source === 'demo' || source === 'demo-india'
       ? 'bg-blue-50 text-blue-700 border-blue-200'
-      : source === 'claude'
+      : source === 'claude' || source === 'ai-discovery'
         ? 'bg-violet-50 text-violet-700 border-violet-200'
         : 'bg-gray-50 text-gray-600 border-gray-200'
 

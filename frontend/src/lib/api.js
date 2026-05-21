@@ -52,4 +52,6 @@ export const api = {
   getAdminOverview: () => request('/api/admin/imports'),
   createImport: ({ datasetType, rows }) =>
     request('/api/admin/imports', { method: 'POST', body: { datasetType, rows } }),
+  researchLeads: (filters, count = 10) =>
+    request('/api/admin/research-leads', { method: 'POST', body: { filters, count } }),
 }
