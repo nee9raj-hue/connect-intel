@@ -15,20 +15,21 @@ export default function ResultsTable({
   const allSelected = leads.length > 0 && selected.length === leads.length
 
   return (
-    <div className="flex-1 overflow-auto">
+    <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
       <table className="w-full text-[13px]">
-        <thead className="sticky top-0 bg-gray-50 border-b border-gray-200 z-10">
+        <thead className="sticky top-0 bg-gray-50 border-b border-gray-200 z-10 shadow-sm">
           <tr className="text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wide">
             <th className="w-10 py-2.5 pl-4">
               <input type="checkbox" checked={allSelected} onChange={onSelectAll} className="rounded" />
             </th>
-            <th className="py-2.5 pr-2 min-w-[180px]">Name</th>
-            <th className="py-2.5 pr-2 min-w-[140px]">Job title</th>
-            <th className="py-2.5 pr-2 min-w-[160px]">Company</th>
-            <th className="py-2.5 pr-2 min-w-[220px]">Contact access</th>
+            <th className="py-2.5 pr-2 min-w-[160px]">Name</th>
+            <th className="py-2.5 pr-2 min-w-[120px]">Job title</th>
+            <th className="py-2.5 pr-2 min-w-[140px]">Company</th>
+            <th className="py-2.5 pr-2 min-w-[200px]">Email</th>
+            <th className="py-2.5 pr-2 min-w-[130px]">Phone</th>
             <th className="py-2.5 pr-2">Location</th>
-            <th className="py-2.5 pr-2 w-16 text-center">Score</th>
-            <th className="py-2.5 pr-4 w-[170px]" />
+            <th className="py-2.5 pr-2 w-14 text-center">Score</th>
+            <th className="py-2.5 pr-4 w-[160px]" />
           </tr>
         </thead>
         <tbody>
@@ -37,7 +38,7 @@ export default function ResultsTable({
               key={lead.id}
               className="border-b border-gray-100 hover:bg-[#fffbeb]/40 group"
             >
-              <td className="py-2.5 pl-4">
+              <td className="py-2.5 pl-4 align-top">
                 <input
                   type="checkbox"
                   checked={selected.includes(lead.id)}
@@ -45,37 +46,50 @@ export default function ResultsTable({
                   className="rounded"
                 />
               </td>
-              <td className="py-2.5 pr-2">
+              <td className="py-2.5 pr-2 align-top">
                 <div className="flex items-center gap-2">
                   <Avatar name={`${lead.firstName} ${lead.lastName}`} />
                   <div>
                     <div className="font-medium text-gray-900">
                       {[lead.firstName, lead.lastName].filter(Boolean).join(' ') || 'Contact not named'}
                     </div>
-                    <div className="flex items-center gap-1.5 mt-0.5">
+                    <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                       {lead.source && <SourceBadge source={lead.source} />}
                       {lead.access?.previewUnlocked && !lead.access?.previouslyUnlocked && (
                         <MiniBadge tone="amber">Preview</MiniBadge>
                       )}
-                      {lead.access?.previouslyUnlocked && <MiniBadge tone="green">Unlocked</MiniBadge>}
                     </div>
                   </div>
                 </div>
               </td>
-              <td className="py-2.5 pr-2 text-gray-700">{lead.title}</td>
-              <td className="py-2.5 pr-2">
+              <td className="py-2.5 pr-2 text-gray-700 align-top">{lead.title}</td>
+              <td className="py-2.5 pr-2 align-top">
                 <div className="font-medium text-gray-900">{lead.company}</div>
-                <div className="text-[11px] text-gray-400">{lead.companyDomain}</div>
+                {lead.companyDomain && (
+                  <div className="text-[11px] text-gray-400">{lead.companyDomain}</div>
+                )}
               </td>
-              <td className="py-2.5 pr-2">
-                <ContactCell lead={lead} />
+              <td className="py-2.5 pr-2 align-top">
+                <ContactValue
+                  value={lead.email}
+                  href={lead.email && lead.access?.isUnlocked !== false ? `mailto:${lead.email}` : undefined}
+                  missingLabel="Missing email"
+                  mono
+                />
               </td>
-              <td className="py-2.5 pr-2 text-gray-600 whitespace-nowrap">{lead.location}</td>
-              <td className="py-2.5 pr-2 text-center">
+              <td className="py-2.5 pr-2 align-top">
+                <ContactValue
+                  value={lead.phone}
+                  href={lead.phone && lead.access?.isUnlocked !== false ? `tel:${lead.phone}` : undefined}
+                  missingLabel="Missing phone"
+                />
+              </td>
+              <td className="py-2.5 pr-2 text-gray-600 whitespace-nowrap align-top">{lead.location}</td>
+              <td className="py-2.5 pr-2 text-center align-top">
                 <ScoreBadge score={lead.score} />
               </td>
-              <td className="py-2.5 pr-4">
-                <div className="flex items-center justify-end gap-2">
+              <td className="py-2.5 pr-4 align-top">
+                <div className="flex items-center justify-end gap-2 flex-wrap">
                   {lead.access?.unlockable && !lead.access?.isUnlocked && (
                     <button
                       type="button"
@@ -118,6 +132,24 @@ export default function ResultsTable({
   )
 }
 
+function ContactValue({ value, href, missingLabel, mono = false }) {
+  if (!value) {
+    return <span className="text-[11px] text-red-600 font-medium">{missingLabel}</span>
+  }
+
+  const className = `text-[12px] text-gray-800 break-all ${mono ? 'font-mono' : ''}`
+
+  if (href && !value.includes('•')) {
+    return (
+      <a href={href} className={`${className} hover:text-[#8a6600] hover:underline`}>
+        {value}
+      </a>
+    )
+  }
+
+  return <span className={className}>{value}</span>
+}
+
 function Avatar({ name }) {
   const initials = name
     .split(' ')
@@ -128,55 +160,6 @@ function Avatar({ name }) {
     <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-[11px] font-bold text-gray-600 shrink-0">
       {initials}
     </div>
-  )
-}
-
-function ContactCell({ lead }) {
-  return (
-    <div className="space-y-1">
-      <div className="flex items-center gap-1.5">
-        <ContactIcon kind="email" active={Boolean(lead.email)} />
-        <span className={`text-[11px] ${lead.access?.isUnlocked ? 'text-gray-700' : 'text-gray-500'}`}>
-          {lead.email || 'No email'}
-        </span>
-      </div>
-      <div className="flex items-center gap-1.5">
-        <ContactIcon kind="phone" active={Boolean(lead.phone)} />
-        <span className={`text-[11px] ${lead.access?.isUnlocked ? 'text-gray-700' : 'text-gray-500'}`}>
-          {lead.phone || 'No phone'}
-        </span>
-      </div>
-      {lead.linkedin && (
-        <div className="flex items-center gap-1.5">
-          <ContactIcon kind="linkedin" active />
-          <span className={`text-[11px] ${lead.access?.isUnlocked ? 'text-gray-700' : 'text-gray-500'}`}>
-            {lead.linkedin}
-          </span>
-        </div>
-      )}
-    </div>
-  )
-}
-
-function ContactIcon({ kind, active }) {
-  const styles = active
-    ? {
-        email: 'bg-green-100 text-green-700',
-        phone: 'bg-blue-100 text-blue-700',
-        linkedin: 'bg-sky-100 text-sky-700',
-      }
-    : {
-        email: 'bg-gray-100 text-gray-300',
-        phone: 'bg-gray-100 text-gray-300',
-        linkedin: 'bg-gray-100 text-gray-300',
-      }
-
-  const icon = kind === 'email' ? '✉' : kind === 'phone' ? '📞' : 'in'
-
-  return (
-    <span className={`w-6 h-6 rounded flex items-center justify-center text-[10px] font-bold ${styles[kind]}`}>
-      {icon}
-    </span>
   )
 }
 

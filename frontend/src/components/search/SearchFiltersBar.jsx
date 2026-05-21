@@ -112,7 +112,7 @@ export default function SearchFiltersBar({ filters, onChange, onSearch, loading 
       </div>
 
       <p className="text-[11px] text-gray-500 -mt-1">
-        Leave state and city unchecked for all India. Use search inside each list to find a name quickly.
+        Results only show contacts with email and phone. Add keywords or location for sharper AI discovery (saves API usage).
       </p>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">

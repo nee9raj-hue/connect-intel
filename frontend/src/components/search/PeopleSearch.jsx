@@ -199,12 +199,14 @@ export default function PeopleSearch({ onNavigate }) {
         </div>
       </header>
 
-      <SearchFiltersBar
-        filters={filters}
-        onChange={setFilters}
-        onSearch={handleSearch}
-        loading={loading}
-      />
+      <div className="shrink-0 max-h-[42vh] overflow-y-auto border-b border-gray-100">
+        <SearchFiltersBar
+          filters={filters}
+          onChange={setFilters}
+          onSearch={handleSearch}
+          loading={loading}
+        />
+      </div>
 
       <div className="shrink-0 bg-white border-b border-gray-200 px-5 py-2 flex flex-wrap items-center gap-2">
         {[
@@ -262,7 +264,7 @@ export default function PeopleSearch({ onNavigate }) {
         </div>
       )}
 
-      <div className="flex-1 flex flex-col min-w-0 min-h-0 bg-white mx-0">
+      <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden bg-white">
         {countTab === 'saved' ? (
           displayLeads.length ? (
             <ResultsTable
@@ -288,7 +290,7 @@ export default function PeopleSearch({ onNavigate }) {
         ) : !hasSearched ? (
           <EmptyState
             title="Search your B2B database"
-            sub="Enter keywords, then narrow by state and city (or leave location empty for all India). Job title stays in results only."
+            sub='Enter keywords plus state or city for best matches. Every result includes email and phone — scroll the table below to review.'
           />
         ) : loading ? (
           <LoadingState />
@@ -298,7 +300,7 @@ export default function PeopleSearch({ onNavigate }) {
               sub={
                 results?.discoveryError
                   ? `Database had no matches. Perplexity: ${results.discoveryError}. Try keyword "exporter" only or fewer cities.`
-                  : 'Try keyword "exporter", state Rajasthan, or leave filters empty for all India. Saved pipeline leads are excluded from search.'
+                  : 'Try keyword "exporter" with one state (e.g. Rajasthan). Only contacts with email and phone are shown.'
               }
               action={handleSearch}
             />

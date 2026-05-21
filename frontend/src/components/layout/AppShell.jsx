@@ -29,8 +29,10 @@ export default function AppShell() {
   return (
     <div className="flex h-screen w-full overflow-hidden bg-[#f6f7f9]">
       <Sidebar active={activePanel} onNavigate={setActivePanel} />
-      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <Panel onNavigate={setActivePanel} />
+      <main className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden">
+        <div className="flex-1 flex flex-col min-h-0 min-w-0 overflow-hidden">
+          <Panel onNavigate={setActivePanel} />
+        </div>
       </main>
       {needsOnboarding && <OnboardingModal />}
     </div>
