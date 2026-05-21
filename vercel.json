@@ -4,5 +4,13 @@
   "outputDirectory": "site",
   "installCommand": "cd frontend && npm ci",
   "framework": null,
+  "env": {
+    "NODE_OPTIONS": "--disable-warning=DEP0040"
+  },
+  "build": {
+    "env": {
+      "NODE_OPTIONS": "--disable-warning=DEP0040"
+    }
+  },
   "rewrites": [{ "source": "/((?!assets/).*)", "destination": "/index.html" }]
 }
