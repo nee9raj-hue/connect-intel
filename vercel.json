@@ -1,8 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "cd frontend && npm ci && npm run build",
+  "installCommand": "cd frontend && NODE_OPTIONS=--disable-warning=DEP0040 npm ci",
+  "buildCommand": "cd frontend && NODE_OPTIONS=--disable-warning=DEP0040 npm run build",
   "outputDirectory": "site",
-  "installCommand": "cd frontend && npm ci",
   "framework": null,
   "env": {
     "NODE_OPTIONS": "--disable-warning=DEP0040"
