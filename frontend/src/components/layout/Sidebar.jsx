@@ -2,7 +2,11 @@ import { useApp } from '../../context/AppContext'
 
 const PROSPECT = [
   { id: 'search', label: 'People', icon: PeopleIcon },
-  { id: 'saved', label: 'Lists', icon: ListIcon },
+  { id: 'saved', label: 'Saved leads', icon: ListIcon },
+]
+
+const CRM = [
+  { id: 'pipeline', label: 'Pipeline', icon: PipelineIcon },
 ]
 
 const BOTTOM = [
@@ -33,6 +37,19 @@ export default function Sidebar({ active, onNavigate }) {
             active={active === item.id}
             onClick={() => onNavigate(item.id)}
             badge={item.id === 'saved' && savedLeads.length > 0 ? savedLeads.length : null}
+          />
+        ))}
+
+        <p className="px-3 mt-5 mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
+          Outreach & CRM
+        </p>
+        {CRM.map((item) => (
+          <NavBtn
+            key={item.id}
+            item={item}
+            active={active === item.id}
+            onClick={() => onNavigate(item.id)}
+            badge={item.id === 'pipeline' && savedLeads.length > 0 ? savedLeads.length : null}
           />
         ))}
 
@@ -131,6 +148,13 @@ function ListIcon({ className }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+    </svg>
+  )
+}
+function PipelineIcon({ className }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7" />
     </svg>
   )
 }

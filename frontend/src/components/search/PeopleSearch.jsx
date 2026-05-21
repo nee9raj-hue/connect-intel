@@ -15,9 +15,18 @@ const EMPTY_FILTERS = {
   keywords: '',
 }
 
-export default function PeopleSearch() {
-  const { addSearchHistory, toggleSaveLead, savedLeads, user, updateUser, refreshSession, setScreen, logout } =
-    useApp()
+export default function PeopleSearch({ onNavigate }) {
+  const {
+    addSearchHistory,
+    toggleSaveLead,
+    savedLeads,
+    user,
+    updateUser,
+    refreshSession,
+    setScreen,
+    logout,
+    openPipelineLead,
+  } = useApp()
   const [filters, setFilters] = useState(EMPTY_FILTERS)
   const [countTab, setCountTab] = useState('total')
   const [loading, setLoading] = useState(false)
@@ -118,6 +127,11 @@ export default function PeopleSearch() {
 
   const friendlyNotice = softenNotice(results?.notice)
   const resultBadge = results ? getResultsBadge(results.provider) : null
+
+  const workOnLead = (lead) => {
+    openPipelineLead(lead.id)
+    onNavigate?.('pipeline')
+  }
 
   return (
     <div className="flex flex-col h-full min-h-0">
@@ -246,11 +260,17 @@ export default function PeopleSearch() {
                   setSelected((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
                 }
                 onSave={toggleSaveLead}
+                onWorkOnLead={workOnLead}
                 onUnlock={handleUnlockLead}
                 unlockingLeadId={unlockingLeadId}
               />
             ) : (
-              <EmptyState title="No saved leads" sub="Save prospects from your search results to build lists." />
+              <EmptyState
+                title="No saved leads"
+                sub="Save prospects from search, then open Pipeline to email and track status."
+                action={() => onNavigate?.('pipeline')}
+                actionLabel="Open pipeline"
+              />
             )
           ) : !hasSearched ? (
             <EmptyState
@@ -274,6 +294,7 @@ export default function PeopleSearch() {
                 setSelected((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
               }
               onSave={toggleSaveLead}
+              onWorkOnLead={workOnLead}
               onUnlock={handleUnlockLead}
               unlockingLeadId={unlockingLeadId}
             />
@@ -284,7 +305,7 @@ export default function PeopleSearch() {
   )
 }
 
-function EmptyState({ title, sub, action }) {
+function EmptyState({ title, sub, action, actionLabel = 'Search again' }) {
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
       <p className="font-medium text-gray-900">{title}</p>
@@ -295,7 +316,7 @@ function EmptyState({ title, sub, action }) {
           onClick={action}
           className="mt-4 px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md"
         >
-          Search again
+          {actionLabel}
         </button>
       )}
     </div>

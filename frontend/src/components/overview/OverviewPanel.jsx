@@ -9,7 +9,11 @@ export default function OverviewPanel({ onNavigate }) {
         {[
           { label: 'Searches this month', value: searchHistory.length, change: '+2 this week' },
           { label: 'Leads found', value: searchHistory.reduce((s, h) => s + h.count, 0), change: 'Last 7 days' },
-          { label: 'Saved leads', value: savedLeads.length, change: 'In your lists' },
+          {
+            label: 'Pipeline leads',
+            value: savedLeads.length,
+            change: `${savedLeads.filter((l) => l.crm?.responseReceived).length} replied`,
+          },
           { label: 'Credit balance', value: `Rs ${((user?.creditsPaise ?? 0) / 100).toFixed(0)}`, change: 'Unlock paid details' },
         ].map((kpi) => (
           <div key={kpi.label} className="bg-white rounded-xl border border-gray-200 p-5">
@@ -53,6 +57,7 @@ export default function OverviewPanel({ onNavigate }) {
           <div className="space-y-2">
             {[
               { label: '🔍 New people search', panel: 'search' },
+              { label: '◎ Open pipeline CRM', panel: 'pipeline' },
               { label: '★ View saved leads', panel: 'saved' },
               { label: '⚡ Manage integrations', panel: 'integrations' },
             ].map((action) => (

@@ -1,7 +1,16 @@
 import { useApp } from '../../context/AppContext'
 import { getSourceLabel } from '../../lib/productCopy'
 
-export default function ResultsTable({ leads, selected, onSelectAll, onSelect, onSave, onUnlock, unlockingLeadId }) {
+export default function ResultsTable({
+  leads,
+  selected,
+  onSelectAll,
+  onSelect,
+  onSave,
+  onWorkOnLead,
+  onUnlock,
+  unlockingLeadId,
+}) {
   const { isSaved } = useApp()
   const allSelected = leads.length > 0 && selected.length === leads.length
 
@@ -77,6 +86,15 @@ export default function ResultsTable({ leads, selected, onSelectAll, onSelect, o
                       {unlockingLeadId === lead.id
                         ? 'Unlocking…'
                         : `Unlock Rs ${(lead.access.unlockPricePaise || 0) / 100}`}
+                    </button>
+                  )}
+                  {isSaved(lead.id) && onWorkOnLead && (
+                    <button
+                      type="button"
+                      onClick={() => onWorkOnLead(lead)}
+                      className="text-[11px] font-semibold px-2 py-1.5 rounded border border-[#8a6600]/30 text-[#8a6600] bg-[#fffbeb] hover:bg-[#fff4bf]"
+                    >
+                      Pipeline
                     </button>
                   )}
                   <button

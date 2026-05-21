@@ -40,6 +40,12 @@ export const api = {
   getSavedLeads: () => request('/api/saved-leads'),
   saveLead: (lead) => request('/api/saved-leads', { method: 'POST', body: { lead } }),
   removeLead: (leadId) => request('/api/saved-leads', { method: 'DELETE', body: { leadId } }),
+  updateSavedLead: (leadId, crm) =>
+    request('/api/saved-leads', { method: 'PATCH', body: { leadId, crm } }),
+  generateCrmEmail: (leadId, options = {}) =>
+    request('/api/crm-generate-email', { method: 'POST', body: { leadId, ...options } }),
+  sendCrmEmail: (leadId, payload) =>
+    request('/api/crm-send-email', { method: 'POST', body: { leadId, ...payload } }),
   getSearchHistory: () => request('/api/search-history'),
   addSearchHistory: (entry) => request('/api/search-history', { method: 'POST', body: { entry } }),
   unlockLead: (lead) => request('/api/lead-unlocks', { method: 'POST', body: { lead } }),

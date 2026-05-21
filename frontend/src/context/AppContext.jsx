@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { api } from '../lib/api'
+import { defaultCrm } from '../lib/crmConstants'
 
 const AppContext = createContext(null)
 
@@ -9,6 +10,7 @@ export function AppProvider({ children }) {
   const [savedLeads, setSavedLeads] = useState([])
   const [searchHistory, setSearchHistory] = useState([])
   const [ready, setReady] = useState(false)
+  const [pipelineLeadId, setPipelineLeadId] = useState(null)
 
   const refreshSession = useCallback(async () => {
     const session = await api.getSession()
@@ -99,7 +101,12 @@ export function AppProvider({ children }) {
     setUser(null)
     setSavedLeads([])
     setSearchHistory([])
+    setPipelineLeadId(null)
     setScreen('landing')
+  }, [])
+
+  const replaceSavedLeads = useCallback((leads) => {
+    setSavedLeads(leads || [])
   }, [])
 
   const toggleSaveLead = useCallback(async (lead) => {
@@ -110,7 +117,7 @@ export function AppProvider({ children }) {
       const exists = current.some((entry) => entry.id === lead.id)
       return exists
         ? current.filter((entry) => entry.id !== lead.id)
-        : [...current, { ...lead, savedAt: new Date().toISOString() }]
+        : [...current, { ...lead, savedAt: new Date().toISOString(), crm: defaultCrm() }]
     })
 
     try {
@@ -120,6 +127,45 @@ export function AppProvider({ children }) {
     } catch {
       setSavedLeads(previous)
     }
+  }, [])
+
+  const updateSavedLeadCrm = useCallback(async (leadId, crmPatch) => {
+    let previous = []
+    setSavedLeads((current) => {
+      previous = current
+      return current.map((entry) =>
+        entry.id === leadId
+          ? { ...entry, crm: { ...(entry.crm || defaultCrm()), ...crmPatch } }
+          : entry
+      )
+    })
+
+    try {
+      const data = await api.updateSavedLead(leadId, crmPatch)
+      setSavedLeads(data.leads || [])
+      return data.lead
+    } catch (error) {
+      setSavedLeads(previous)
+      throw error
+    }
+  }, [])
+
+  const generateEmailDraft = useCallback(async (leadId, options) => {
+    return api.generateCrmEmail(leadId, options)
+  }, [])
+
+  const logCrmEmailSend = useCallback(async (leadId, payload) => {
+    const data = await api.sendCrmEmail(leadId, payload)
+    setSavedLeads((current) => {
+      const list = current.map((entry) => (entry.id === leadId ? data.lead : entry))
+      if (list.some((e) => e.id === leadId)) return list
+      return [...current, data.lead]
+    })
+    return data
+  }, [])
+
+  const openPipelineLead = useCallback((leadId) => {
+    setPipelineLeadId(leadId)
   }, [])
 
   const isSaved = useCallback(
@@ -158,6 +204,12 @@ export function AppProvider({ children }) {
         updateUser,
         savedLeads,
         toggleSaveLead,
+        updateSavedLeadCrm,
+        generateEmailDraft,
+        logCrmEmailSend,
+        openPipelineLead,
+        pipelineLeadId,
+        setPipelineLeadId,
         isSaved,
         searchHistory,
         addSearchHistory,
