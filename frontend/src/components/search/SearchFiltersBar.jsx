@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import {
   getCitiesForStates,
   INDUSTRIES,
@@ -11,12 +11,12 @@ import {
 export default function SearchFiltersBar({ filters, onChange, onSearch, loading }) {
   const stateOptions = INDIAN_STATES
   const cityOptions = useMemo(() => getCitiesForStates(filters.states), [filters.states])
-  const allStates = isAllStatesSelected(filters.states)
-  const allCities = isAllCitiesSelected(filters.states, filters.cities)
+  const allStatesExplicit = isAllStatesSelected(filters.states)
+  const allCitiesExplicit = isAllCitiesSelected(filters.states, filters.cities)
 
   const activeCount =
-    (filters.states?.length && !allStates ? 1 : 0) +
-    (filters.cities?.length && !allCities ? 1 : 0) +
+    (filters.states?.length && !allStatesExplicit ? 1 : 0) +
+    (filters.cities?.length && !allCitiesExplicit ? 1 : 0) +
     (filters.industries?.length || 0)
 
   const toggle = (key, value) => {
@@ -27,20 +27,21 @@ export default function SearchFiltersBar({ filters, onChange, onSearch, loading 
     onChange({ ...filters, [key]: next })
   }
 
-  const selectAllStates = () => {
-    onChange({ ...filters, states: [], cities: [] })
+  const toggleAllStates = () => {
+    if (allStatesExplicit) {
+      changeStates([])
+      return
+    }
+    changeStates([...INDIAN_STATES])
   }
 
-  const selectAllCities = () => {
-    onChange({ ...filters, cities: [] })
-  }
-
-  const selectEveryState = () => {
-    onChange({ ...filters, states: [...INDIAN_STATES], cities: [] })
-  }
-
-  const selectEveryCity = () => {
-    onChange({ ...filters, cities: [...getCitiesForStates(filters.states)] })
+  const toggleAllCities = () => {
+    const all = getCitiesForStates(filters.states)
+    if (allCitiesExplicit) {
+      onChange({ ...filters, cities: [] })
+      return
+    }
+    onChange({ ...filters, cities: [...all] })
   }
 
   const changeStates = (nextStates) => {
@@ -60,6 +61,18 @@ export default function SearchFiltersBar({ filters, onChange, onSearch, loading 
       companySizes: [],
     })
   }
+
+  const stateHint = !filters.states?.length
+    ? 'All India'
+    : allStatesExplicit
+      ? `All ${stateOptions.length} states`
+      : `${filters.states.length} selected`
+
+  const cityHint = !filters.cities?.length
+    ? 'All cities'
+    : allCitiesExplicit
+      ? `All ${cityOptions.length} cities`
+      : `${filters.cities.length} selected`
 
   return (
     <div className="shrink-0 bg-white border-b border-gray-200 px-5 py-4 space-y-3">
@@ -99,17 +112,17 @@ export default function SearchFiltersBar({ filters, onChange, onSearch, loading 
       </div>
 
       <p className="text-[11px] text-gray-500 -mt-1">
-        Leave state and city empty for all India. Saved pipeline leads are hidden from new searches.
+        Leave state and city unchecked for all India. Use search inside each list to find a name quickly.
       </p>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
         <MultiSelectField
           label="State"
-          hint={allStates ? 'All India' : `${filters.states?.length || 0} selected`}
+          hint={stateHint}
+          searchPlaceholder="Search states…"
           options={stateOptions}
           selected={filters.states || []}
-          allSelected={allStates}
-          onSelectAll={allStates ? selectAllStates : selectEveryState}
+          onSelectAll={toggleAllStates}
           onToggle={(val) => {
             const current = filters.states || []
             const next = current.includes(val)
@@ -120,34 +133,46 @@ export default function SearchFiltersBar({ filters, onChange, onSearch, loading 
         />
         <MultiSelectField
           label="City"
-          hint={allCities ? 'All cities' : `${filters.cities?.length || 0} selected`}
+          hint={cityHint}
+          searchPlaceholder="Search cities…"
           options={cityOptions}
           selected={filters.cities || []}
-          allSelected={allCities}
-          onSelectAll={allCities ? selectAllCities : selectEveryCity}
+          onSelectAll={toggleAllCities}
           onToggle={(val) => toggle('cities', val)}
         />
         <MultiSelectField
           label="Industry"
           hint="Optional"
+          searchPlaceholder="Search industries…"
           options={INDUSTRIES}
           selected={filters.industries || []}
-          onSelectAll={() => onChange({ ...filters, industries: [] })}
-          allSelected={!filters.industries?.length}
+          onSelectAll={() => {
+            if ((filters.industries || []).length === INDUSTRIES.length) {
+              onChange({ ...filters, industries: [] })
+            } else {
+              onChange({ ...filters, industries: [...INDUSTRIES] })
+            }
+          }}
           onToggle={(val) => toggle('industries', val)}
         />
       </div>
 
       {(filters.states?.length || filters.cities?.length || filters.industries?.length) > 0 && (
         <div className="flex flex-wrap gap-1.5 pt-1">
-          {!allStates &&
+          {!allStatesExplicit &&
             (filters.states || []).map((v) => (
               <Chip key={`s-${v}`} label={v} onRemove={() => changeStates(filters.states.filter((s) => s !== v))} />
             ))}
-          {!allCities &&
+          {allStatesExplicit && filters.states?.length > 0 && (
+            <Chip label="All states" onRemove={() => changeStates([])} />
+          )}
+          {!allCitiesExplicit &&
             (filters.cities || []).map((v) => (
               <Chip key={`c-${v}`} label={v} onRemove={() => toggle('cities', v)} />
             ))}
+          {allCitiesExplicit && filters.cities?.length > 0 && (
+            <Chip label="All cities" onRemove={() => onChange({ ...filters, cities: [] })} />
+          )}
           {(filters.industries || []).map((v) => (
             <Chip key={`i-${v}`} label={v} onRemove={() => toggle('industries', v)} />
           ))}
@@ -160,42 +185,74 @@ export default function SearchFiltersBar({ filters, onChange, onSearch, loading 
 function MultiSelectField({
   label,
   hint,
+  searchPlaceholder,
   options,
   selected,
   onToggle,
   onSelectAll,
-  allSelected,
 }) {
+  const [query, setQuery] = useState('')
+  const filteredOptions = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    if (!q) return options
+    return options.filter((opt) => opt.toLowerCase().includes(q))
+  }, [options, query])
+
+  const allSelected =
+    options.length > 0 && selected.length === options.length && options.every((o) => selected.includes(o))
+
+  const someSelected = selected.length > 0 && !allSelected
+
   return (
     <div>
       <div className="flex items-baseline justify-between gap-2 mb-1">
         <label className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">{label}</label>
         <span className="text-[10px] text-gray-400">{hint}</span>
       </div>
-      <div className="border border-gray-200 rounded-lg bg-gray-50/80 max-h-[140px] overflow-y-auto p-1.5">
-        <label className="flex items-center gap-2 px-2 py-1.5 rounded bg-white border border-[#ffe48a] cursor-pointer text-[13px] font-semibold text-[#5b4a00] sticky top-0 z-10">
+      <div className="border border-gray-200 rounded-lg bg-gray-50/80 overflow-hidden">
+        <div className="p-1.5 border-b border-gray-200 bg-white sticky top-0 z-20 space-y-1.5">
           <input
-            type="checkbox"
-            checked={allSelected}
-            onChange={onSelectAll}
-            className="rounded border-gray-300 text-gray-900 focus:ring-[#ffcb2b]"
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={searchPlaceholder}
+            className="w-full px-2 py-1.5 text-[13px] border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-[#ffcb2b]/50 focus:border-[#ffcb2b]"
           />
-          <span>Select all</span>
-        </label>
-        {options.map((opt) => (
-          <label
-            key={opt}
-            className="flex items-center gap-2 px-2 py-1 rounded hover:bg-white cursor-pointer text-[13px] text-gray-700"
-          >
+          <label className="flex items-center gap-2 px-2 py-1 rounded bg-[#fffbeb] border border-[#ffe48a] cursor-pointer text-[13px] font-semibold text-[#5b4a00]">
             <input
               type="checkbox"
-              checked={!allSelected && selected.includes(opt)}
-              onChange={() => onToggle(opt)}
+              checked={allSelected}
+              ref={(el) => {
+                if (el) el.indeterminate = someSelected
+              }}
+              onChange={onSelectAll}
               className="rounded border-gray-300 text-gray-900 focus:ring-[#ffcb2b]"
             />
-            <span className="truncate">{opt}</span>
+            <span>Select all{query.trim() ? ` (${filteredOptions.length} shown)` : ` (${options.length})`}</span>
           </label>
-        ))}
+        </div>
+        <div className="max-h-[200px] overflow-y-auto p-1.5">
+          {filteredOptions.length === 0 ? (
+            <p className="px-2 py-3 text-[12px] text-gray-500 text-center">No matches</p>
+          ) : (
+            filteredOptions.map((opt) => (
+              <label
+                key={opt}
+                className="flex items-center gap-2 px-2 py-1 rounded hover:bg-white cursor-pointer text-[13px] text-gray-700"
+              >
+                <input
+                  type="checkbox"
+                  checked={selected.includes(opt)}
+                  onChange={() => onToggle(opt)}
+                  className="rounded border-gray-300 text-gray-900 focus:ring-[#ffcb2b]"
+                />
+                <span className="truncate" title={opt}>
+                  {opt}
+                </span>
+              </label>
+            ))
+          )}
+        </div>
       </div>
     </div>
   )

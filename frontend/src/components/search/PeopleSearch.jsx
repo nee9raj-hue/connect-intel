@@ -135,10 +135,10 @@ export default function PeopleSearch({ onNavigate }) {
   const filterSummary = useMemo(() => {
     const parts = []
     if (filters.keywords?.trim()) parts.push(`“${filters.keywords.trim()}”`)
-    if (filters.states?.length && !isAllStatesSelected(filters.states)) {
-      parts.push(filters.states.length > 3 ? `${filters.states.length} states` : filters.states.join(', '))
-    } else if (!filters.states?.length) {
+    if (!filters.states?.length || isAllStatesSelected(filters.states)) {
       parts.push('All India')
+    } else if (filters.states?.length) {
+      parts.push(filters.states.length > 3 ? `${filters.states.length} states` : filters.states.join(', '))
     }
     if (filters.cities?.length && !isAllCitiesSelected(filters.states, filters.cities)) {
       parts.push(filters.cities.length > 3 ? `${filters.cities.length} cities` : filters.cities.join(', '))
