@@ -144,7 +144,7 @@ function shouldUseLocalFallback(error, provider) {
  * @param {'auto'|'apollo'|'claude'} provider
  * @param {number} count
  */
-export async function searchLeads(filters, provider = 'auto', count = 8) {
+export async function searchLeads(filters, provider = 'free', count = 8) {
   if (provider === 'hunter') {
     throw new Error(`${PROVIDERS.hunter.label} integration coming soon`)
   }
@@ -163,8 +163,12 @@ export async function searchLeads(filters, provider = 'auto', count = 8) {
     console.warn('Search API:', e.message)
   }
 
-  if (provider === 'apollo') {
-    throw new Error('Apollo search failed. Check APOLLO_API_KEY on the server.')
+  if (provider === 'apollo' || provider === 'claude') {
+    throw new Error(
+      provider === 'apollo'
+        ? 'Apollo is disabled in free mode. Use Free database, or set ENABLE_PAID_APIS=true on Vercel.'
+        : 'Claude is disabled in free mode. Use Free database, or set ENABLE_PAID_APIS=true on Vercel.'
+    )
   }
 
   await new Promise((r) => setTimeout(r, 800))

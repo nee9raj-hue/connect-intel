@@ -21,9 +21,17 @@ export default function IntegrationsPanel() {
   return (
     <div className="p-6 h-[calc(100vh-3.5rem)] overflow-y-auto max-w-3xl">
       <p className="text-sm text-gray-600 mb-8 leading-relaxed">
-        Connect Intel searches imported data first, then Apollo.io (when configured), then Claude AI.
-        Unlock uses trial credits; Apollo leads call Apollo People Enrichment for email.
+        <strong>Free mode (default):</strong> search uses a built-in India exporter database and sample
+        leads — no Apollo or Claude subscription required. Admins can upload more rows via Excel.
+        Paid APIs only run when you set <code className="bg-gray-100 px-1 rounded">ENABLE_PAID_APIS=true</code> on
+        Vercel.
       </p>
+      {status.freeMode && (
+        <p className="text-sm text-green-800 bg-green-50 border border-green-200 rounded-lg px-4 py-3 mb-6">
+          Free database active — {status.builtInRecords} contacts loaded. Use source “Free database” in Find
+          people.
+        </p>
+      )}
 
       <div className="space-y-4">
         {Object.values(PROVIDERS).map((provider) => (

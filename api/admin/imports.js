@@ -1,5 +1,6 @@
 import { requireAdmin } from '../../lib/server/auth.js'
 import { listAdminOverview, importRowsIntoStore } from '../../lib/server/imports.js'
+import { ensureBuiltInDatabase } from '../../lib/server/seed.js'
 import { readStore, updateStore } from '../../lib/server/store.js'
 import { applyCors, getBody, handleOptions, methodNotAllowed, sendJson } from '../../lib/server/http.js'
 
@@ -11,6 +12,7 @@ export default async function handler(req, res) {
   if (!user) return
 
   if (req.method === 'GET') {
+    await ensureBuiltInDatabase()
     const store = await readStore()
     return sendJson(res, 200, listAdminOverview(store))
   }

@@ -26,8 +26,10 @@ export default function PeopleSearch() {
   const [filtersOpen, setFiltersOpen] = useState(true)
   const [searchError, setSearchError] = useState(null)
   const [unlockingLeadId, setUnlockingLeadId] = useState(null)
-  const [searchProvider, setSearchProvider] = useState('auto')
+  const [searchProvider, setSearchProvider] = useState('free')
   const [integrations, setIntegrations] = useState({
+    freeMode: true,
+    builtInRecords: 0,
     apollo: false,
     apolloConfigured: false,
     apolloError: null,
@@ -154,17 +156,12 @@ export default function PeopleSearch() {
               className="text-xs font-medium border border-gray-300 rounded-md px-2 py-1.5 bg-white text-gray-800"
               aria-label="Data source"
             >
-              <option value="auto">Source: Auto</option>
-              <option value="apollo" disabled={!integrations.apollo}>
-                Apollo.io
-                {!integrations.apolloConfigured
-                  ? ' (add API key)'
-                  : !integrations.apollo
-                    ? ' (invalid key)'
-                    : ''}
+              <option value="free">Free database ({integrations.builtInRecords || '12+'} leads)</option>
+              <option value="apollo" disabled={integrations.freeMode}>
+                Apollo.io (paid){integrations.freeMode ? ' — off' : ''}
               </option>
-              <option value="claude" disabled={!integrations.claude}>
-                Claude AI{integrations.claude ? '' : ' (add API key)'}
+              <option value="claude" disabled={integrations.freeMode}>
+                Claude AI (paid){integrations.freeMode ? ' — off' : ''}
               </option>
             </select>
             <button
@@ -241,7 +238,7 @@ export default function PeopleSearch() {
                 <span className="ml-1 text-green-600">· Claude AI</span>
               )}
               {results.provider === 'database' && (
-                <span className="ml-1 text-blue-600">· Imported records</span>
+                <span className="ml-1 text-blue-600">· Connect Intel database</span>
               )}
               {results.provider === 'demo-india' && (
                 <span className="ml-1 text-amber-600">· Demo data (add API key for Claude)</span>

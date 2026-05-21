@@ -1,12 +1,17 @@
 /**
- * Vercel serverless — lead search (import DB → Apollo → demo → Claude).
+ * Lead search — free built-in database first; paid Apollo/Claude only if ENABLE_PAID_APIS=true.
  */
-import { isApolloConfigured, searchApolloPeople } from '../lib/server/apollo.js'
+import { isApolloConfigured, searchApolloPeople, verifyApolloApiKey } from '../lib/server/apollo.js'
+import { paidApisEnabled } from '../lib/server/config.js'
+import { ensureBuiltInDatabase } from '../lib/server/seed.js'
 import { readStore } from '../lib/server/store.js'
 import { getMockLeadsForViewer, searchStoredLeads, shapeLeadForViewer } from '../lib/server/search.js'
 import { DEFAULT_SEARCH_LIMIT } from '../lib/server/config.js'
 import { applyCors, getBody, handleOptions, methodNotAllowed, sendJson } from '../lib/server/http.js'
 import { consumeSearchQuota, requireUser } from '../lib/server/auth.js'
+
+const FREE_NOTICE =
+  'Connect Intel free database — no Apollo or Claude API needed. Admins can add more rows via Excel import.'
 
 export default async function handler(req, res) {
   if (handleOptions(req, res)) return
@@ -24,17 +29,50 @@ export default async function handler(req, res) {
   }
 
   const anthropicKey = process.env.ANTHROPIC_API_KEY
-  const { filters = {}, count = DEFAULT_SEARCH_LIMIT, provider = 'auto' } = getBody(req)
+  const { filters = {}, count = DEFAULT_SEARCH_LIMIT, provider = 'free' } = getBody(req)
+
+  await ensureBuiltInDatabase()
   const store = await readStore()
   const viewer = quotaUser
 
   const databaseResults = searchStoredLeads(store, filters, count, viewer)
   if (databaseResults?.leads?.length) {
-    return sendJson(res, 200, { ...databaseResults, user: quotaUser })
+    return sendJson(res, 200, {
+      ...databaseResults,
+      notice: FREE_NOTICE,
+      user: quotaUser,
+    })
   }
 
-  let apolloError = null
-  const useApollo = provider === 'apollo' || (provider === 'auto' && isApolloConfigured())
+  const mockLeads = getMockLeadsForViewer(store, viewer, filters, count)
+  if (mockLeads.length) {
+    return sendJson(res, 200, {
+      leads: mockLeads,
+      total: Math.max(mockLeads.length * 40, mockLeads.length),
+      netNew: mockLeads.length,
+      provider: 'demo-india',
+      notice: `${FREE_NOTICE} Showing extra sample leads.`,
+      user: quotaUser,
+    })
+  }
+
+  if (provider === 'free' || provider === 'auto' || provider === 'database') {
+    const broadMock = getMockLeadsForViewer(store, viewer, { ...filters, keywords: '' }, count)
+    if (broadMock.length) {
+      return sendJson(res, 200, {
+        leads: broadMock,
+        total: broadMock.length,
+        netNew: broadMock.length,
+        provider: 'demo-india',
+        notice: 'No exact match — showing available India sample leads. Try keywords like Jaipur or exporter.',
+        user: quotaUser,
+      })
+    }
+  }
+
+  const usePaid = paidApisEnabled()
+  const apolloOk = usePaid && isApolloConfigured() && (await verifyApolloApiKey()).ok
+  const useApollo = apolloOk && (provider === 'apollo' || provider === 'auto')
 
   if (useApollo) {
     try {
@@ -42,73 +80,38 @@ export default async function handler(req, res) {
       if (apolloResults?.leads?.length) {
         return sendJson(res, 200, { ...apolloResults, user: quotaUser })
       }
-      apolloError = 'Apollo returned no matches for these filters.'
-    } catch (error) {
-      apolloError = error.message || 'Apollo search failed'
       if (provider === 'apollo') {
-        return sendJson(res, 502, { error: apolloError })
+        return sendJson(res, 200, {
+          leads: [],
+          total: 0,
+          netNew: 0,
+          provider: 'apollo',
+          notice: 'No Apollo matches. Switch source to Free database or add Admin import data.',
+          user: quotaUser,
+        })
+      }
+    } catch (error) {
+      if (provider === 'apollo') {
+        return sendJson(res, 502, { error: error.message })
       }
     }
   } else if (provider === 'apollo') {
-    return sendJson(res, 503, {
-      error: 'Apollo.io is not configured. Add APOLLO_API_KEY in Vercel and redeploy.',
-    })
-  }
-
-  const mockLeads = getMockLeadsForViewer(store, viewer, filters, count)
-  if (mockLeads.length && provider !== 'claude') {
-    const notice = apolloError
-      ? `Apollo: ${apolloError} Showing sample India leads for this search.`
-      : 'Showing sample India leads. Import data in Admin or use Apollo.io for live B2B records.'
-
     return sendJson(res, 200, {
-      leads: mockLeads,
-      total: Math.max(mockLeads.length * 50, mockLeads.length),
-      netNew: Math.max(mockLeads.length, Math.floor(mockLeads.length * 0.85)),
-      provider: 'demo-india',
-      notice,
+      leads: [],
+      total: 0,
+      netNew: 0,
+      provider: 'database',
+      notice:
+        'Apollo is off in free mode. Use source “Free database”, or set ENABLE_PAID_APIS=true on Vercel with a valid master API key.',
       user: quotaUser,
     })
   }
 
-  if (provider === 'claude' || (provider === 'auto' && anthropicKey)) {
-    if (!anthropicKey) {
-      return sendJson(res, 503, {
-        error: 'Claude is not configured. Add ANTHROPIC_API_KEY on Vercel.',
-      })
-    }
-
+  if (usePaid && (provider === 'claude' || provider === 'auto') && anthropicKey) {
     try {
-      const prompt = buildPrompt(filters, count)
-      const anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': anthropicKey,
-          'anthropic-version': '2023-06-01',
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 4096,
-          messages: [{ role: 'user', content: prompt }],
-        }),
-      })
-
-      const data = await anthropicRes.json()
-      if (!anthropicRes.ok) {
-        return sendJson(res, anthropicRes.status, {
-          error: data.error?.message || 'Claude API error',
-        })
-      }
-
-      const text = (data.content || [])
-        .filter((b) => b.type === 'text')
-        .map((b) => b.text)
-        .join('\n')
-
-      const leads = parseLeadsJson(text).map((lead, index) => shapeLeadForViewer(lead, store, viewer, index))
+      const leads = await searchViaClaude(filters, count, store, viewer, anthropicKey)
       if (leads.length) {
-        const total = Math.max(leads.length * 120, 2400 + Math.floor(Math.random() * 8000))
+        const total = Math.max(leads.length * 120, 2400)
         return sendJson(res, 200, {
           leads,
           total,
@@ -118,24 +121,58 @@ export default async function handler(req, res) {
         })
       }
     } catch (e) {
-      return sendJson(res, 500, { error: e.message || 'Search failed' })
+      return sendJson(res, 500, { error: e.message || 'Claude search failed' })
     }
   }
 
-  const hints = []
-  if (isApolloConfigured() && apolloError) hints.push(`Apollo: ${apolloError}`)
-  if (!isApolloConfigured()) hints.push('Add APOLLO_API_KEY on Vercel')
-  if (!anthropicKey) hints.push('or ANTHROPIC_API_KEY for AI search')
-  hints.push('Admins can import Excel data under Admin')
+  if (provider === 'claude') {
+    return sendJson(res, 200, {
+      leads: [],
+      total: 0,
+      netNew: 0,
+      provider: 'database',
+      notice: 'Claude is off in free mode. Use Free database source, or add ENABLE_PAID_APIS=true and ANTHROPIC_API_KEY.',
+      user: quotaUser,
+    })
+  }
 
   return sendJson(res, 200, {
     leads: [],
     total: 0,
     netNew: 0,
     provider: 'none',
-    notice: `No leads found. ${hints.join('. ')}.`,
+    notice: 'No leads matched. Try: keywords “exporter”, city Jaipur, state Rajasthan.',
     user: quotaUser,
   })
+}
+
+async function searchViaClaude(filters, count, store, viewer, apiKey) {
+  const prompt = buildPrompt(filters, count)
+  const anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 4096,
+      messages: [{ role: 'user', content: prompt }],
+    }),
+  })
+
+  const data = await anthropicRes.json()
+  if (!anthropicRes.ok) {
+    throw new Error(data.error?.message || 'Claude API error')
+  }
+
+  const text = (data.content || [])
+    .filter((b) => b.type === 'text')
+    .map((b) => b.text)
+    .join('\n')
+
+  return parseLeadsJson(text).map((lead, index) => shapeLeadForViewer(lead, store, viewer, index))
 }
 
 function buildPrompt(filters, count) {
@@ -145,36 +182,10 @@ function buildPrompt(filters, count) {
   if (filters.states?.length) parts.push(`Indian states: ${filters.states.join(', ')}`)
   if (filters.cities?.length) parts.push(`Cities: ${filters.cities.join(', ')}`)
   if (filters.industries?.length) parts.push(`Industries: ${filters.industries.join(', ')}`)
-  if (filters.companySizes?.length) parts.push(`Company size: ${filters.companySizes.join(', ')}`)
 
   const criteria = parts.length ? parts.join('\n') : 'General B2B prospects in India'
 
-  return `You are a B2B lead intelligence expert focused on the Indian market.
-
-Find ${count} realistic Indian business contacts matching:
-${criteria}
-
-Return ONLY a valid JSON array (no markdown). Each object:
-{
-  "id": "unique-string",
-  "firstName": "",
-  "lastName": "",
-  "title": "",
-  "company": "",
-  "companyDomain": "",
-  "email": "",
-  "phone": "+91-...",
-  "location": "City, State",
-  "state": "Indian state",
-  "city": "",
-  "industry": "",
-  "employees": "11-50",
-  "emailStatus": "verified|likely|unverified",
-  "score": 60-97,
-  "linkedin": ""
-}
-
-Use real-sounding Indian companies. Match cities/states when specified.`
+  return `Find ${count} realistic Indian B2B contacts matching:\n${criteria}\n\nReturn ONLY a JSON array of lead objects with firstName, lastName, title, company, email, phone, city, state, industry.`
 }
 
 function parseLeadsJson(text) {
