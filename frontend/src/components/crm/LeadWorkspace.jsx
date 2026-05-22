@@ -57,7 +57,11 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
       setSubject(data.draft.subject || '')
       setBody(data.draft.body || '')
       setDraftAi(Boolean(data.draft.aiGenerated))
-      if (data.draft.notice) setNotice(data.draft.notice)
+      if (data.draft.provider === 'perplexity') {
+        setNotice('Draft written with Perplexity — review before sending.')
+      } else if (data.draft.notice) {
+        setNotice(data.draft.notice)
+      }
     } catch (e) {
       setError(e.message)
     } finally {
@@ -234,7 +238,7 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
               disabled={generating}
               className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-[#fff6d6] border border-[#ffe48a] text-[#5b4a00] hover:bg-[#ffefb0] disabled:opacity-60"
             >
-              {generating ? '…' : '✨ AI draft'}
+              {generating ? 'Writing…' : '✨ Perplexity draft'}
             </button>
           </div>
           <input

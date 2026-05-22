@@ -112,7 +112,7 @@ export default function SearchFiltersBar({ filters, onChange, onSearch, loading 
       </div>
 
       <p className="text-[11px] text-gray-500 -mt-1">
-        Results need at least email or phone (not both). Add keywords or location for sharper AI discovery.
+        Email and phone are shown when available. Add keywords or location for sharper AI discovery.
       </p>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
