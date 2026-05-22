@@ -20,7 +20,9 @@ export default function TeamPanel({ onNavigate }) {
   const [invitePipelineRole, setInvitePipelineRole] = useState('member')
   const [companyName, setCompanyName] = useState(user?.organizationName || '')
   const [logoUrl, setLogoUrl] = useState(user?.organizationLogoUrl || '')
-  const [loading, setLoading] = useState(false)
+  const [brandingLoading, setBrandingLoading] = useState(false)
+  const [inviteLoading, setInviteLoading] = useState(false)
+  const [inviteStatus, setInviteStatus] = useState(null)
   const [error, setError] = useState(null)
   const [notice, setNotice] = useState(null)
   const [lastInviteUrl, setLastInviteUrl] = useState(null)
@@ -79,17 +81,21 @@ export default function TeamPanel({ onNavigate }) {
 
   const handleInvite = async (e) => {
     e.preventDefault()
-    setLoading(true)
+    const invited = inviteEmail.trim()
+    if (!invited) return
+
+    setInviteLoading(true)
+    setInviteStatus(`Sending invite to ${invited}…`)
     setError(null)
     setNotice(null)
     setLastInviteUrl(null)
     try {
+      setInviteStatus(`Sending email from ${user?.name || 'you'} to ${invited}…`)
       const data = await inviteTeamMember({
-        email: inviteEmail.trim(),
+        email: invited,
         canSearch: inviteCanSearch,
         pipelineRole: invitePipelineRole,
       })
-      const invited = inviteEmail.trim()
       setInviteEmail('')
       if (data.inviteUrl) setLastInviteUrl(data.inviteUrl)
 
@@ -109,17 +115,19 @@ export default function TeamPanel({ onNavigate }) {
       } else if (data.inviteUrl) {
         setNotice('Invite link created. Email not sent — add RESEND_API_KEY and EMAIL_FROM on Vercel.')
       }
+      setInviteStatus(null)
       await refreshTeam()
     } catch (err) {
+      setInviteStatus(null)
       setError(err.message)
     } finally {
-      setLoading(false)
+      setInviteLoading(false)
     }
   }
 
   const handleBranding = async (e) => {
     e.preventDefault()
-    setLoading(true)
+    setBrandingLoading(true)
     setError(null)
     try {
       const data = await updateTeamBranding({ name: companyName.trim(), logoUrl: logoUrl.trim() || null })
@@ -128,7 +136,7 @@ export default function TeamPanel({ onNavigate }) {
     } catch (err) {
       setError(err.message)
     } finally {
-      setLoading(false)
+      setBrandingLoading(false)
     }
   }
 
@@ -178,10 +186,10 @@ export default function TeamPanel({ onNavigate }) {
             />
             <button
               type="submit"
-              disabled={loading}
-              className="text-xs font-semibold px-3 py-1.5 bg-gray-900 text-white rounded-md"
+              disabled={brandingLoading}
+              className="text-xs font-semibold px-3 py-1.5 bg-gray-900 text-white rounded-md disabled:opacity-60"
             >
-              Save branding
+              {brandingLoading ? 'Saving…' : 'Save branding'}
             </button>
           </form>
         </section>
@@ -210,14 +218,16 @@ export default function TeamPanel({ onNavigate }) {
               value={inviteEmail}
               onChange={(e) => setInviteEmail(e.target.value)}
               placeholder="colleague@company.com"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+              disabled={inviteLoading}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm disabled:bg-gray-50 disabled:text-gray-500"
             />
             <div>
               <label className="block text-xs font-semibold text-gray-600 mb-1">Pipeline role</label>
               <select
                 value={invitePipelineRole}
                 onChange={(e) => setInvitePipelineRole(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                disabled={inviteLoading}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm disabled:bg-gray-50"
               >
                 {TEAM_PIPELINE_ROLES.map((r) => (
                   <option key={r.id} value={r.id}>
@@ -231,15 +241,38 @@ export default function TeamPanel({ onNavigate }) {
                 type="checkbox"
                 checked={inviteCanSearch}
                 onChange={(e) => setInviteCanSearch(e.target.checked)}
+                disabled={inviteLoading}
               />
               Can search leads (uses company search credits)
             </label>
+
+            {inviteLoading && inviteStatus && (
+              <div
+                className="flex items-center gap-3 rounded-lg border border-[#ffe48a] bg-[#fffbeb] px-3 py-3"
+                role="status"
+                aria-live="polite"
+              >
+                <span className="w-5 h-5 border-2 border-[#ffcb2b]/40 border-t-[#ffcb2b] rounded-full animate-spin shrink-0" />
+                <div>
+                  <p className="text-sm font-semibold text-[#5b4a00]">Sending invite…</p>
+                  <p className="text-xs text-[#8a6600] mt-0.5">{inviteStatus}</p>
+                </div>
+              </div>
+            )}
+
             <button
               type="submit"
-              disabled={loading}
-              className="text-xs font-semibold px-3 py-2 bg-[#ffcb2b] text-[#242424] rounded-md"
+              disabled={inviteLoading || !inviteEmail.trim()}
+              className="inline-flex items-center justify-center gap-2 text-sm font-semibold px-4 py-2.5 bg-[#ffcb2b] hover:bg-[#f0bc00] text-[#242424] rounded-lg disabled:opacity-60 min-w-[140px]"
             >
-              Send invite
+              {inviteLoading ? (
+                <>
+                  <span className="w-4 h-4 border-2 border-[#242424]/30 border-t-[#242424] rounded-full animate-spin" />
+                  Sending invite…
+                </>
+              ) : (
+                'Send invite'
+              )}
             </button>
           </form>
           {lastInviteUrl && (
