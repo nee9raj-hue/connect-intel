@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useApp } from '../../context/AppContext'
+import { api } from '../../lib/api'
 import { TEAM_PIPELINE_ROLES } from '../../lib/crmConstants'
 import OrgPipelineImport from './OrgPipelineImport'
 
@@ -23,10 +24,26 @@ export default function TeamPanel({ onNavigate }) {
   const [error, setError] = useState(null)
   const [notice, setNotice] = useState(null)
   const [lastInviteUrl, setLastInviteUrl] = useState(null)
+  const [emailReady, setEmailReady] = useState(null)
 
   useEffect(() => {
     refreshTeam()
   }, [refreshTeam])
+
+  useEffect(() => {
+    let cancelled = false
+    api
+      .getIntegrationStatus()
+      .then((data) => {
+        if (!cancelled) setEmailReady(Boolean(data.providers?.resend))
+      })
+      .catch(() => {
+        if (!cancelled) setEmailReady(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   useEffect(() => {
     setCompanyName(user?.organizationName || '')
@@ -72,16 +89,25 @@ export default function TeamPanel({ onNavigate }) {
         canSearch: inviteCanSearch,
         pipelineRole: invitePipelineRole,
       })
+      const invited = inviteEmail.trim()
       setInviteEmail('')
-      if (data.inviteUrl) {
-        setLastInviteUrl(data.inviteUrl)
+      if (data.inviteUrl) setLastInviteUrl(data.inviteUrl)
+
+      if (data.emailSent) {
         setNotice(
-          data.emailSent
-            ? `Invite email sent to ${inviteEmail.trim()}. They can also use the link below.`
-            : `Invite created. Copy the link below (email not sent — add RESEND_API_KEY on Vercel).`
+          data.joinedImmediately
+            ? `Email sent to ${invited} from your name (${user?.email}). They were added to the team — sign in with ${invited}.`
+            : `Invite email sent to ${invited}. It shows your name and uses ${user?.email} for replies. They can also use the link below.`
         )
+      } else if (data.emailError) {
+        setError(`Invite saved but email failed: ${data.emailError}`)
+        if (data.inviteUrl) {
+          setNotice('Copy the invite link below and send it manually from your email.')
+        }
       } else if (data.joinedImmediately) {
-        setNotice('User already has an account — they were added to your team immediately.')
+        setNotice('User added to your team. Email was not sent — configure RESEND_API_KEY on Vercel.')
+      } else if (data.inviteUrl) {
+        setNotice('Invite link created. Email not sent — add RESEND_API_KEY and EMAIL_FROM on Vercel.')
       }
       await refreshTeam()
     } catch (err) {
@@ -162,6 +188,21 @@ export default function TeamPanel({ onNavigate }) {
 
         <section className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
           <h2 className="text-sm font-semibold text-gray-900">Invite team member</h2>
+          <p className="text-xs text-gray-500 leading-relaxed">
+            Invites are emailed to your teammate with your name (
+            <span className="font-medium text-gray-700">{user?.name}</span>) and{' '}
+            <span className="font-medium text-gray-700">{user?.email}</span> as reply-to so they can
+            respond to you directly.
+            {emailReady === false && (
+              <span className="block mt-2 text-amber-800 bg-amber-50 border border-amber-200 rounded px-2 py-1">
+                Email sending is off — set <strong>RESEND_API_KEY</strong> (and verify{' '}
+                <strong>EMAIL_FROM</strong> domain) in Vercel.
+              </span>
+            )}
+            {emailReady === true && (
+              <span className="block mt-2 text-green-800">Email delivery is configured.</span>
+            )}
+          </p>
           <form onSubmit={handleInvite} className="space-y-3">
             <input
               type="email"
