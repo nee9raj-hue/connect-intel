@@ -121,7 +121,7 @@ export const api = {
     request('/api/search-leads', { method: 'POST', body: { filters, count, provider } }),
   getSearchHistory: () => request('/api/search-history'),
   addSearchHistory: (entry) => request('/api/search-history', { method: 'POST', body: { entry } }),
-  unlockLead: (lead) => request('/api/lead-unlocks', { method: 'POST', body: { lead } }),
+  unlockLead: (lead, field) => request('/api/lead-unlocks', { method: 'POST', body: { lead, field } }),
   getAdminOverview: () => request('/api/admin/imports'),
   createImport: ({ datasetType, rows }) =>
     request('/api/admin/imports', { method: 'POST', body: { datasetType, rows } }),

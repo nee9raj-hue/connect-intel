@@ -37,7 +37,7 @@ export default function PeopleSearch({ onNavigate }) {
   const [selected, setSelected] = useState([])
   const [hasSearched, setHasSearched] = useState(false)
   const [searchError, setSearchError] = useState(null)
-  const [unlockingLeadId, setUnlockingLeadId] = useState(null)
+  const [revealingKey, setRevealingKey] = useState(null)
   const [filtersExpanded, setFiltersExpanded] = useState(false)
 
   const handleSearch = async () => {
@@ -49,8 +49,16 @@ export default function PeopleSearch({ onNavigate }) {
     try {
       const data = await searchLeads(filters, 'free', SEARCH_FETCH_COUNT)
       setResults(data)
-      if (data.user?.searchesLeft != null) {
-        updateUser({ searchesLeft: data.user.searchesLeft })
+      if (data.user) {
+        updateUser({
+          searchesLeft: data.user.searchesLeft,
+          creditsPaise: data.user.creditsPaise,
+          creditBalanceRupees: data.user.creditBalanceRupees,
+          aiDiscoverySearchesLeft: data.aiDiscoverySearchesLeft ?? data.user.aiDiscoverySearchesLeft,
+        })
+      }
+      if (data.aiDiscoverySearchesLeft != null) {
+        updateUser({ aiDiscoverySearchesLeft: data.aiDiscoverySearchesLeft })
       }
       addSearchHistory({
         filters: { ...filters },
@@ -118,12 +126,13 @@ export default function PeopleSearch({ onNavigate }) {
     a.click()
   }
 
-  const handleUnlockLead = async (lead) => {
-    setUnlockingLeadId(lead.id)
+  const handleRevealField = async (lead, field) => {
+    const key = `${lead.id}:${field}`
+    setRevealingKey(key)
     setSearchError(null)
 
     try {
-      const data = await api.unlockLead(lead)
+      const data = await api.unlockLead(lead, field)
       setResults((prev) => {
         if (!prev) return prev
         return {
@@ -135,14 +144,14 @@ export default function PeopleSearch({ onNavigate }) {
       updateUser((prev) => ({
         ...prev,
         creditsPaise: data.user.creditsPaise,
-        creditBalanceRupees: Number(((data.user.creditsPaise || 0) / 100).toFixed(2)),
+        creditBalanceRupees: data.user.creditBalanceRupees ?? Number(((data.user.creditsPaise || 0) / 100).toFixed(2)),
       }))
 
       await refreshSession()
     } catch (error) {
-      setSearchError(error.message)
+      setSearchError(error.message || 'Could not reveal contact')
     } finally {
-      setUnlockingLeadId(null)
+      setRevealingKey(null)
     }
   }
 
@@ -182,8 +191,8 @@ export default function PeopleSearch({ onNavigate }) {
       setSelected((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id])),
     onSave: toggleSaveLead,
     onWorkOnLead: workOnLead,
-    onUnlock: handleUnlockLead,
-    unlockingLeadId,
+    onRevealField: handleRevealField,
+    revealingKey,
     fullPreviewCount,
   }
 
@@ -215,8 +224,11 @@ export default function PeopleSearch({ onNavigate }) {
             <p className="text-[11px] text-gray-500 truncate">{PRODUCT.databaseLine}</p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <span className="hidden sm:inline text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
-              {user?.searchesLeft ?? 0} searches left
+            <span className="hidden sm:inline text-xs font-medium text-[#5b4a00] bg-[#fff6d6] px-2 py-1 rounded-full border border-[#ffe48a]">
+              ₹{user?.creditBalanceRupees ?? ((user?.creditsPaise || 0) / 100).toFixed(0)} wallet
+            </span>
+            <span className="hidden md:inline text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
+              {user?.aiDiscoverySearchesLeft ?? 3} live AI searches
             </span>
             <button
               type="button"
@@ -287,13 +299,18 @@ export default function PeopleSearch({ onNavigate }) {
           {hasSearched && results?.leads?.length > 0 && countTab !== 'saved' && (
             <div className="flex flex-wrap items-center gap-2 text-xs bg-[#fffbeb] border border-[#fde68a] rounded-lg px-3 py-2">
               <span className="font-semibold text-[#5b4a00]">
-                {displayLeads.length} prospects in this view
-                {results.total >= 50 ? ' · 50+ matched in database' : ''}
+                {results.usedLiveAi ? 'Live Perplexity AI results' : `${displayLeads.length} prospects`}
+                {results.total >= 50 ? ' · 50+ matched' : ''}
               </span>
               <span className="text-gray-600">
-                · <strong>{Math.min(fullPreviewCount, displayLeads.length)}</strong> with full email & phone ·{' '}
-                <strong>{maskedCount}</strong> summarized below
+                · Top <strong>{Math.min(fullPreviewCount, displayLeads.length)}</strong> show full email & phone on
+                live AI search · Reveal others at <strong>₹1</strong> per email or phone
               </span>
+              {(user?.aiDiscoverySearchesLeft ?? results?.aiDiscoverySearchesLeft ?? 0) <= 0 && (
+                <span className="text-amber-800 font-medium">
+                  · No free live AI searches left — recharge wallet for more
+                </span>
+              )}
             </div>
           )}
           {results?.parsedSearch?.summary && hasSearched && countTab !== 'saved' && (

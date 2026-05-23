@@ -10,8 +10,8 @@ export default function SearchResultsView({
   onSelect,
   onSave,
   onWorkOnLead,
-  onUnlock,
-  unlockingLeadId,
+  onRevealField,
+  revealingKey,
   fullPreviewCount = FULL_DETAIL_PREVIEW_COUNT,
   allSelected,
 }) {
@@ -41,8 +41,8 @@ export default function SearchResultsView({
             onSelect={onSelect}
             onSave={onSave}
             onWorkOnLead={onWorkOnLead}
-            onUnlock={onUnlock}
-            unlockingLeadId={unlockingLeadId}
+            onRevealField={onRevealField}
+            revealingKey={revealingKey}
             embedded
           />
         </section>
@@ -67,8 +67,8 @@ export default function SearchResultsView({
             onSelect={onSelect}
             onSave={onSave}
             onWorkOnLead={onWorkOnLead}
-            onUnlock={onUnlock}
-            unlockingLeadId={unlockingLeadId}
+            onRevealField={onRevealField}
+            revealingKey={revealingKey}
           />
         </section>
       )}
@@ -82,8 +82,8 @@ function CompactResultsList({
   onSelect,
   onSave,
   onWorkOnLead,
-  onUnlock,
-  unlockingLeadId,
+  onRevealField,
+  revealingKey,
 }) {
   const { isSaved } = useApp()
 
@@ -91,7 +91,7 @@ function CompactResultsList({
     <ul className="divide-y divide-gray-100 bg-white">
       {leads.map((lead) => {
         const name = [lead.firstName, lead.lastName].filter(Boolean).join(' ') || 'Contact'
-        const masked = lead.access?.isUnlocked === false && lead.access?.unlockable
+        const masked = lead.access?.emailLocked || lead.access?.phoneLocked
         return (
           <li
             key={lead.id}
@@ -119,26 +119,14 @@ function CompactResultsList({
               <div className="min-w-0 text-[12px] text-gray-500">
                 <p className="truncate">{lead.location || [lead.city, lead.state].filter(Boolean).join(', ') || '—'}</p>
                 {lead.industry && <p className="truncate text-gray-400">{lead.industry}</p>}
-                {masked && (
+                {(lead.access?.emailLocked || lead.access?.phoneLocked) && (
                   <p className="text-[11px] text-amber-700/90 mt-1 font-medium">
-                    {lead.email ? 'Email hidden' : ''}
-                    {lead.email && lead.phone ? ' · ' : ''}
-                    {lead.phone ? 'Phone hidden' : 'Contact hidden'}
+                    Tap email or phone in full-detail rows · ₹1 each
                   </p>
                 )}
               </div>
               <div className="flex items-center gap-2 md:justify-end flex-wrap">
                 <ScorePill score={lead.score} />
-                {lead.access?.unlockable && !lead.access?.isUnlocked && (
-                  <button
-                    type="button"
-                    onClick={() => onUnlock?.(lead)}
-                    disabled={unlockingLeadId === lead.id}
-                    className="text-[11px] font-semibold px-2 py-1 rounded border border-[#ffcb2b] bg-[#fffbdf] text-[#8a6600] hover:bg-[#fff4bf] disabled:opacity-60"
-                  >
-                    {unlockingLeadId === lead.id ? '…' : 'Unlock'}
-                  </button>
-                )}
                 {isSaved(lead.id) && onWorkOnLead && (
                   <button
                     type="button"

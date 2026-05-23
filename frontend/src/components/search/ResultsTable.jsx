@@ -1,5 +1,6 @@
 import { useApp } from '../../context/AppContext'
 import { getSourceLabel } from '../../lib/productCopy'
+import ContactField from './ContactField'
 
 export default function ResultsTable({
   leads,
@@ -8,8 +9,8 @@ export default function ResultsTable({
   onSelect,
   onSave,
   onWorkOnLead,
-  onUnlock,
-  unlockingLeadId,
+  onRevealField,
+  revealingKey,
   embedded = false,
   allSelected: allSelectedProp,
 }) {
@@ -36,15 +37,12 @@ export default function ResultsTable({
             <th className="py-2.5 pr-2 min-w-[130px]">Phone</th>
             <th className="py-2.5 pr-2">Location</th>
             <th className="py-2.5 pr-2 w-14 text-center">Score</th>
-            <th className="py-2.5 pr-4 w-[160px]" />
+            <th className="py-2.5 pr-4 w-[100px]" />
           </tr>
         </thead>
         <tbody>
           {leads.map((lead) => (
-            <tr
-              key={lead.id}
-              className="border-b border-gray-100 hover:bg-[#fffbeb]/40 group"
-            >
+            <tr key={lead.id} className="border-b border-gray-100 hover:bg-[#fffbeb]/40 group">
               <td className="py-2.5 pl-4 align-top">
                 <input
                   type="checkbox"
@@ -62,8 +60,8 @@ export default function ResultsTable({
                     </div>
                     <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                       {lead.source && <SourceBadge source={lead.source} />}
-                      {lead.access?.previewUnlocked && !lead.access?.previouslyUnlocked && (
-                        <MiniBadge tone="amber">Preview</MiniBadge>
+                      {lead.access?.previewUnlocked && (
+                        <MiniBadge tone="amber">AI preview</MiniBadge>
                       )}
                     </div>
                   </div>
@@ -77,18 +75,24 @@ export default function ResultsTable({
                 )}
               </td>
               <td className="py-2.5 pr-2 align-top">
-                <ContactValue
+                <ContactField
+                  lead={lead}
+                  field="email"
                   value={lead.email}
-                  href={lead.email && lead.access?.isUnlocked !== false ? `mailto:${lead.email}` : undefined}
-                  missingLabel="Missing email"
+                  missingLabel="No email"
                   mono
+                  onReveal={onRevealField}
+                  revealing={revealingKey === `${lead.id}:email`}
                 />
               </td>
               <td className="py-2.5 pr-2 align-top">
-                <ContactValue
+                <ContactField
+                  lead={lead}
+                  field="phone"
                   value={lead.phone}
-                  href={lead.phone && lead.access?.isUnlocked !== false ? `tel:${lead.phone}` : undefined}
-                  missingLabel="Missing phone"
+                  missingLabel="No phone"
+                  onReveal={onRevealField}
+                  revealing={revealingKey === `${lead.id}:phone`}
                 />
               </td>
               <td className="py-2.5 pr-2 text-gray-600 whitespace-nowrap align-top">{lead.location}</td>
@@ -97,18 +101,6 @@ export default function ResultsTable({
               </td>
               <td className="py-2.5 pr-4 align-top">
                 <div className="flex items-center justify-end gap-2 flex-wrap">
-                  {lead.access?.unlockable && !lead.access?.isUnlocked && (
-                    <button
-                      type="button"
-                      onClick={() => onUnlock?.(lead)}
-                      disabled={unlockingLeadId === lead.id}
-                      className="text-[11px] font-semibold px-2.5 py-1.5 rounded border border-[#ffcb2b] bg-[#fffbdf] text-[#8a6600] hover:bg-[#fff4bf] disabled:opacity-60"
-                    >
-                      {unlockingLeadId === lead.id
-                        ? 'Unlocking…'
-                        : `Unlock Rs ${(lead.access.unlockPricePaise || 0) / 100}`}
-                    </button>
-                  )}
                   {isSaved(lead.id) && onWorkOnLead && (
                     <button
                       type="button"
@@ -139,24 +131,6 @@ export default function ResultsTable({
   )
 }
 
-function ContactValue({ value, href, missingLabel, mono = false }) {
-  if (!value) {
-    return <span className="text-[11px] text-red-600 font-medium">{missingLabel}</span>
-  }
-
-  const className = `text-[12px] text-gray-800 break-all ${mono ? 'font-mono' : ''}`
-
-  if (href && !value.includes('•')) {
-    return (
-      <a href={href} className={`${className} hover:text-[#8a6600] hover:underline`}>
-        {value}
-      </a>
-    )
-  }
-
-  return <span className={className}>{value}</span>
-}
-
 function Avatar({ name }) {
   const initials = name
     .split(' ')
@@ -175,14 +149,12 @@ function SourceBadge({ source }) {
   const tone =
     source === 'database' || source === 'demo' || source === 'demo-india'
       ? 'bg-blue-50 text-blue-700 border-blue-200'
-      : source === 'claude' || source === 'ai-discovery'
+      : source === 'perplexity' || source === 'claude' || source === 'ai-discovery'
         ? 'bg-violet-50 text-violet-700 border-violet-200'
         : 'bg-gray-50 text-gray-600 border-gray-200'
 
   return (
-    <span className={`text-[10px] px-1.5 py-0.5 rounded border ${tone}`}>
-      {label}
-    </span>
+    <span className={`text-[10px] px-1.5 py-0.5 rounded border ${tone}`}>{label}</span>
   )
 }
 

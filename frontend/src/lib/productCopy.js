@@ -18,7 +18,8 @@ export function getSourceLabel(source) {
     case 'apollo':
       return 'Verified data'
     case 'ai-discovery':
-      return 'AI discovery'
+    case 'perplexity':
+      return 'Live AI'
     default:
       return 'Connect Intel'
   }
@@ -35,7 +36,8 @@ export function getResultsBadge(provider) {
     case 'apollo':
       return { text: 'Partner data', className: 'text-indigo-700' }
     case 'ai-discovery':
-      return { text: 'AI discovery (verify contacts)', className: 'text-violet-700' }
+    case 'perplexity':
+      return { text: 'Live Perplexity AI', className: 'text-violet-700' }
     default:
       return { text: PRODUCT.poweredBy, className: 'text-gray-600' }
   }
