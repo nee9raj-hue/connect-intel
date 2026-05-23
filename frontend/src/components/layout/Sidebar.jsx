@@ -7,6 +7,8 @@ const PROSPECT = [
 
 const CRM = [
   { id: 'pipeline', label: 'Pipeline', icon: PipelineIcon },
+  { id: 'crm-log', label: 'Activity log', icon: LogIcon },
+  { id: 'crm-calendar', label: 'Calendar', icon: CalendarIcon },
 ]
 
 const CUSTOMER_PLATFORM = [
@@ -19,7 +21,7 @@ const OPERATOR_PLATFORM = [
   { id: 'integrations', label: 'System status', icon: BoltIcon },
 ]
 
-export default function Sidebar({ active, onNavigate }) {
+export default function Sidebar({ active, onNavigate, mobileOpen, onMobileClose }) {
   const { user, logout, savedLeads } = useApp()
   const isOperator = Boolean(user?.isPlatformAdmin)
   const showTeam = user?.isOrgAdmin && user?.accountType === 'company' && !isOperator
@@ -31,7 +33,20 @@ export default function Sidebar({ active, onNavigate }) {
       : null
 
   return (
-    <aside className="w-[220px] shrink-0 h-full bg-white border-r border-gray-200 flex flex-col">
+    <>
+      {mobileOpen && (
+        <button
+          type="button"
+          aria-label="Close menu"
+          className="md:hidden fixed inset-0 z-40 bg-black/40"
+          onClick={onMobileClose}
+        />
+      )}
+      <aside
+        className={`fixed md:static z-50 md:z-auto w-[260px] md:w-[220px] shrink-0 h-full bg-white border-r border-gray-200 flex flex-col transition-transform duration-200 ${
+          mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+        }`}
+      >
       <div className="h-14 flex items-center gap-2.5 px-4 border-b border-gray-100 shrink-0">
         {isOperator ? (
           <div className="w-8 h-8 rounded-lg bg-[#242424] flex items-center justify-center">
@@ -182,6 +197,7 @@ export default function Sidebar({ active, onNavigate }) {
         </button>
       </div>
     </aside>
+    </>
   )
 }
 
@@ -259,6 +275,20 @@ function PipelineIcon({ className }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7" />
+    </svg>
+  )
+}
+function LogIcon({ className }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+    </svg>
+  )
+}
+function CalendarIcon({ className }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
     </svg>
   )
 }

@@ -28,7 +28,7 @@ npx serve .
 See **[DEPLOYMENT.md](./DEPLOYMENT.md)** for:
 
 - Vercel / Netlify / Cloudflare / GitHub Pages
-- Custom domain (`connectintel.com`)
+- Custom domain — **[DOMAIN-SETUP.md](./DOMAIN-SETUP.md)** (`https://connectintel.net`)
 - GitHub setup
 - Backend & API keys before public launch
 - Enterprise integrations roadmap (Salesforce, HubSpot, Apollo.io, etc.)

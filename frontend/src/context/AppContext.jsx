@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { api } from '../lib/api'
+import { storeSessionToken } from '../lib/sessionAuth'
 import { defaultCrm } from '../lib/crmConstants'
 
 const AppContext = createContext(null)
@@ -79,6 +80,7 @@ export function AppProvider({ children }) {
         if (cancelled) return
 
         if (session.user) {
+          if (session.token) storeSessionToken(session.token)
           setUser(session.user)
           setScreen('app')
           const token = getStoredInviteToken()
@@ -162,6 +164,7 @@ export function AppProvider({ children }) {
 
   const login = useCallback(async (payload) => {
     const session = await api.createSession(payload)
+    if (session.token) storeSessionToken(session.token)
     setUser(session.user)
     setScreen('app')
     await acceptPendingInvite()
@@ -174,6 +177,7 @@ export function AppProvider({ children }) {
     } catch {
       // Keep the client state moving even if the network call fails.
     }
+    storeSessionToken(null)
     setUser(null)
     setSavedLeads([])
     setSearchHistory([])
@@ -184,6 +188,7 @@ export function AppProvider({ children }) {
 
   const completeOnboarding = useCallback(async (payload) => {
     const data = await api.completeOnboarding(payload)
+    if (data.token) storeSessionToken(data.token)
     setUser(data.user)
     return data.user
   }, [])
@@ -235,19 +240,15 @@ export function AppProvider({ children }) {
     }
   }, [])
 
-  const updateSavedLeadCrm = useCallback(async (leadId, crmPatch) => {
+  const patchLead = useCallback(async (leadId, body) => {
     let previous = []
     setSavedLeads((current) => {
       previous = current
-      return current.map((entry) =>
-        entry.id === leadId
-          ? { ...entry, crm: { ...(entry.crm || defaultCrm()), ...crmPatch } }
-          : entry
-      )
+      return current
     })
 
     try {
-      const data = await api.updateSavedLead(leadId, { crm: crmPatch })
+      const data = await api.updateSavedLead(leadId, body)
       setSavedLeads(data.leads || [])
       return data.lead
     } catch (error) {
@@ -255,6 +256,11 @@ export function AppProvider({ children }) {
       throw error
     }
   }, [])
+
+  const updateSavedLeadCrm = useCallback(
+    async (leadId, crmPatch) => patchLead(leadId, { crm: crmPatch }),
+    [patchLead]
+  )
 
   const assignLead = useCallback(async (leadId, assignToUserId) => {
     const data = await api.assignLead(leadId, assignToUserId)
@@ -268,11 +274,7 @@ export function AppProvider({ children }) {
 
   const logCrmEmailSend = useCallback(async (leadId, payload) => {
     const data = await api.sendCrmEmail(leadId, payload)
-    setSavedLeads((current) => {
-      const list = current.map((entry) => (entry.id === leadId ? data.lead : entry))
-      if (list.some((e) => e.id === leadId)) return list
-      return [...current, data.lead]
-    })
+    if (data.leads) setSavedLeads(data.leads)
     return data
   }, [])
 
@@ -317,6 +319,7 @@ export function AppProvider({ children }) {
         savedLeads,
         toggleSaveLead,
         updateSavedLeadCrm,
+        patchLead,
         assignLead,
         generateEmailDraft,
         logCrmEmailSend,

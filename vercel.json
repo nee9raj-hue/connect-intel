@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "installCommand": "cd frontend && NODE_OPTIONS=--disable-warning=DEP0040 npm ci",
+  "installCommand": "npm ci && cd frontend && NODE_OPTIONS=--disable-warning=DEP0040 npm ci",
   "buildCommand": "cd frontend && NODE_OPTIONS=--disable-warning=DEP0040 npm run build",
   "outputDirectory": "site",
   "framework": null,
@@ -12,8 +12,24 @@
       "NODE_OPTIONS": "--disable-warning=DEP0040"
     }
   },
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "connect-intel-mocha.vercel.app" }],
+      "destination": "https://connectintel.net/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.connectintel.net" }],
+      "destination": "https://connectintel.net/:path*",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api?path=$1" },
-    { "source": "/((?!api/|assets/).*)", "destination": "/index.html" }
+    { "source": "/setup-dns", "destination": "/setup-dns.html" },
+    { "source": "/privacy", "destination": "/privacy.html" },
+    { "source": "/((?!api/|assets/|setup-dns|privacy).*)", "destination": "/index.html" }
   ]
 }

@@ -57,8 +57,8 @@ export default function PipelinePanel({ onNavigate }) {
   )
 
   return (
-    <div className="flex h-full min-h-0">
-      <div className="flex-1 flex flex-col min-w-0">
+    <div className="flex h-full min-h-0 relative">
+      <div className={`flex-1 flex flex-col min-w-0 ${selectedLead ? 'hidden md:flex' : 'flex'}`}>
         <header className="shrink-0 bg-white border-b border-gray-200 px-5 py-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>

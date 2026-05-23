@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Connect Intel — Email DNS Setup</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, sans-serif; max-width: 720px; margin: 0 auto; padding: 24px; background: #f6f7f9; color: #242424; line-height: 1.5; }
+    h1 { font-size: 1.35rem; margin: 0 0 8px; }
+    .card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; margin: 16px 0; }
+    .warn { background: #fffbeb; border-color: #ffe48a; color: #5b4a00; }
+    .ok { background: #ecfdf5; border-color: #a7f3d0; color: #065f46; }
+    .err { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+    button, .btn { cursor: pointer; background: #ffcb2b; color: #242424; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 14px; margin: 4px 4px 4px 0; text-decoration: none; display: inline-block; }
+    button.secondary { background: #fff; border: 1px solid #d1d5db; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { text-align: left; padding: 8px; border-bottom: 1px solid #eee; vertical-align: top; }
+    code, .mono { font-family: ui-monospace, monospace; font-size: 11px; word-break: break-all; }
+    ol { padding-left: 1.25rem; }
+    li { margin: 8px 0; }
+    #status { font-size: 14px; }
+  </style>
+</head>
+<body>
+  <h1>Team invite email — setup</h1>
+  <div class="card ok" style="margin-bottom:12px">
+    <strong>Fastest (no DNS):</strong> Add <code>GMAIL_SMTP_APP_PASSWORD</code> on Vercel — see <code>EMAIL-INVITES-SETUP.md</code> in the repo.
+  </div>
+  <h2 style="font-size:1rem;margin:0 0 8px">Resend DNS setup (optional)</h2>
+  <p>Domain: <strong>connectintel.net</strong> · Sender: <strong>invite@connectintel.net</strong></p>
+  <p>
+    <strong>Google Workspace</strong> = your email inbox (<code>invite@connectintel.net</code>).<br />
+    <strong>Domain DNS</strong> = where you bought <code>connectintel.net</code> (registrar shows
+    <strong>Squarespace Domains</strong> — often from an old <em>Google Domains</em> purchase; not the Squarespace website builder).
+  </p>
+
+  <div id="status" class="card">Checking status…</div>
+
+  <div class="card">
+    <h2 style="margin:0 0 12px;font-size:1rem">Step 1 — Open your dashboards</h2>
+    <a class="btn" href="https://account.squarespace.com/domains" target="_blank" rel="noopener">Open Squarespace Domains</a>
+    <a class="btn secondary" href="https://resend.com/domains" target="_blank" rel="noopener">Open Resend Domains</a>
+    <p style="font-size:13px;color:#666;margin:12px 0 0">In Squarespace: Domains → <strong>connectintel.net</strong> → <strong>DNS Settings</strong></p>
+  </div>
+
+  <div class="card">
+    <h2 style="margin:0 0 12px;font-size:1rem">Step 2 — Edit root SPF (one TXT at @)</h2>
+    <p style="font-size:13px">Replace the existing Google SPF value with this (copy):</p>
+    <code id="spf-root">v=spf1 include:_spf.google.com include:amazonses.com ~all</code>
+    <button type="button" onclick="copy('spf-root')">Copy SPF</button>
+  </div>
+
+  <div class="card">
+    <h2 style="margin:0 0 12px;font-size:1rem">Step 3 — Add 3 custom records</h2>
+    <table>
+      <thead><tr><th>Type</th><th>Host</th><th>Value</th><th></th></tr></thead>
+      <tbody id="records"></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2 style="margin:0 0 12px;font-size:1rem">Step 4 — Verify in Resend</h2>
+    <ol>
+      <li>In Resend, open <strong>connectintel.net</strong></li>
+      <li>Click <strong>Verify DNS records</strong></li>
+      <li>Wait until status is <strong>Verified</strong></li>
+    </ol>
+    <button type="button" id="recheck">Re-check status</button>
+    <button type="button" class="secondary" id="triggerVerify">Ask server to trigger Resend verify</button>
+  </div>
+
+  <script>
+    function copy(id) {
+      const el = document.getElementById(id)
+      const text = el.tagName === 'CODE' ? el.textContent : el.value
+      navigator.clipboard.writeText(text).then(() => alert('Copied!'))
+    }
+    function copyText(text) {
+      navigator.clipboard.writeText(text).then(() => alert('Copied!'))
+    }
+    function renderRecords(records) {
+      const tbody = document.getElementById('records')
+      tbody.innerHTML = ''
+      ;(records || []).forEach((r, i) => {
+        const tr = document.createElement('tr')
+        const val = r.type === 'MX' ? `${r.value} (priority ${r.priority})` : r.value
+        tr.innerHTML = `<td>${r.type}</td><td><strong>${r.host}</strong></td><td class="mono">${val}</td><td><button type="button">Copy</button></td>`
+        tr.querySelector('button').onclick = () => copyText(r.type === 'MX' ? r.value : r.value)
+        tbody.appendChild(tr)
+      })
+    }
+    async function loadStatus() {
+      const el = document.getElementById('status')
+      el.className = 'card'
+      el.textContent = 'Checking…'
+      try {
+        const res = await fetch('/api/setup/resend-dns')
+        const data = await res.json()
+        renderRecords(data.records)
+        if (data.inviteEmailReady) {
+          el.className = 'card ok'
+          el.innerHTML = '<strong>Ready!</strong> Invites can send. Go to Team → Send test invite.'
+        } else {
+          el.className = 'card warn'
+          el.innerHTML = `<strong>Not ready yet</strong> (${data.resendDomainStatus || 'unknown'})<br>${data.hint || ''}`
+        }
+      } catch (e) {
+        el.className = 'card err'
+        el.textContent = 'Could not load status: ' + e.message
+      }
+    }
+    document.getElementById('recheck').onclick = loadStatus
+    document.getElementById('triggerVerify').onclick = async () => {
+      await fetch('/api/setup/resend-dns', { method: 'POST' })
+      await loadStatus()
+      alert('Verify triggered. Wait 10–30 min after DNS saves, then Re-check.')
+    }
+    loadStatus()
+  </script>
+</body>
+</html>

@@ -8,9 +8,9 @@
 
 ## Verify production
 
-- App: https://connect-intel-mocha.vercel.app/
-- Health: https://connect-intel-mocha.vercel.app/api/health
-- Status: https://connect-intel-mocha.vercel.app/api/integrations/status
+- App: https://connectintel.net/
+- Health: https://connectintel.net/api/health
+- Status: https://connectintel.net/api/integrations/status
 
 Success:
 
@@ -26,7 +26,7 @@ Success:
 | `SUPABASE_URL` | `https://YOUR_PROJECT.supabase.co` (no `/rest/v1/`) |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase **Secret** key |
 | `SESSION_SECRET` | Random string (auto-added via CLI) |
-| `APP_URL` | `https://connect-intel-mocha.vercel.app` |
+| `APP_URL` | `https://connectintel.net` |
 | `VITE_GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_ID` | Google OAuth |
 | `PERPLEXITY_API_KEY` | Optional AI discovery |
 

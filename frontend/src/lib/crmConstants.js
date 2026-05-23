@@ -40,6 +40,13 @@ export function defaultCrm() {
     lastResponseAt: null,
     responseReceived: false,
     emails: [],
+    activities: [],
+    tasks: [],
+    meetings: [],
+    nextFollowUpAt: null,
+    lastCommunicationAt: null,
+    lastCommunicationType: null,
+    lastCommunicationSummary: '',
   }
 }
 

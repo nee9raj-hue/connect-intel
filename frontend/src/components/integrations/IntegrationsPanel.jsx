@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { PRODUCT } from '../../lib/productCopy'
+import InviteEmailSetup from '../team/InviteEmailSetup'
 
 const PARTNERS = [
   {
@@ -97,12 +98,28 @@ export default function IntegrationsPanel() {
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-2 mb-8 text-xs">
+      <div className="grid grid-cols-2 gap-2 mb-6 text-xs">
         <StatusPill label="Perplexity" on={status?.perplexity} />
         <StatusPill label="Gemini" on={status?.gemini} />
         <StatusPill label="Supabase env" on={status?.supabase} />
         <StatusPill label="Supabase live" on={status?.supabaseConnected} />
+        <StatusPill label="Team invite email" on={status?.inviteEmailReady} />
       </div>
+
+      {isOperator && (
+        <section className="mb-8 rounded-xl border-2 border-[#ffe48a] bg-[#fffbeb] p-4 space-y-3">
+          <h2 className="text-sm font-semibold text-[#242424]">Team invite email (required for Team invites)</h2>
+          <p className="text-xs text-[#5b4a00] leading-relaxed">
+            Production status:{' '}
+            <strong>{status?.inviteEmailReady ? 'Connected' : 'Not connected'}</strong>
+            {status?.inviteFromAddress ? ` · From ${status.inviteFromAddress}` : ''}
+          </p>
+          {!status?.inviteEmailReady && status?.inviteEmailHint && (
+            <p className="text-xs text-amber-900">{status.inviteEmailHint}</p>
+          )}
+          <InviteEmailSetup />
+        </section>
+      )}
 
       <div className="space-y-4">
         {PARTNERS.map((partner) => (

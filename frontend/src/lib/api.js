@@ -1,8 +1,12 @@
+import { getSessionToken } from './sessionAuth'
+
 async function request(path, options = {}) {
+  const token = getSessionToken()
   const response = await fetch(path, {
     credentials: 'same-origin',
     headers: {
       'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(options.headers || {}),
     },
     ...options,
@@ -41,6 +45,9 @@ export const api = {
     request('/api/onboarding/complete', { method: 'POST', body: payload }),
   getTeamMembers: () => request('/api/team/members'),
   inviteTeamMember: (payload) => request('/api/team/invite', { method: 'POST', body: payload }),
+  getInviteEmailDiagnostics: () => request('/api/team/invite-email'),
+  sendInviteTestEmail: () => request('/api/team/invite-email', { method: 'POST' }),
+  startInviteEmailOAuth: () => request('/api/team/email-oauth/start'),
   previewInvite: (token) => request(`/api/invite/preview?token=${encodeURIComponent(token)}`),
   acceptInvite: (token) => request('/api/invite/accept', { method: 'POST', body: { token } }),
   updateTeamBranding: (payload) => request('/api/team/branding', { method: 'PATCH', body: payload }),
@@ -49,10 +56,16 @@ export const api = {
   getSavedLeads: () => request('/api/saved-leads'),
   saveLead: (lead) => request('/api/saved-leads', { method: 'POST', body: { lead } }),
   removeLead: (leadId) => request('/api/saved-leads', { method: 'DELETE', body: { leadId } }),
-  updateSavedLead: (leadId, patch) =>
-    request('/api/saved-leads', { method: 'PATCH', body: { leadId, ...patch } }),
+  updateSavedLead: (leadId, body) =>
+    request('/api/saved-leads', { method: 'PATCH', body: { leadId, ...body } }),
   assignLead: (leadId, assignToUserId) =>
     request('/api/saved-leads', { method: 'PATCH', body: { leadId, assignToUserId } }),
+  getCrmCalendar: () => request('/api/crm/calendar'),
+  getCrmActivityLog: () => request('/api/crm/activity-log'),
+  ackMeetingReminder: (leadId, meetingId) =>
+    request('/api/crm/reminders-ack', { method: 'POST', body: { leadId, meetingId } }),
+  getCrmGmailStatus: () => request('/api/crm/email-gmail-status'),
+  startCrmGmailOAuth: () => request('/api/crm/email-oauth/start'),
   generateCrmEmail: (leadId, options = {}) =>
     request('/api/crm-generate-email', { method: 'POST', body: { leadId, ...options } }),
   sendCrmEmail: (leadId, payload) =>

@@ -15,7 +15,7 @@ Without Supabase, Vercel uses `/tmp` and **all data is lost on cold starts**.
 ```
 SUPABASE_URL=https://xxxx.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=eyJ...
-APP_URL=https://connect-intel-mocha.vercel.app
+APP_URL=https://connectintel.net
 ```
 
 Redeploy. Check **Integrations** in the app: `storage: supabase` should be true.

@@ -3,6 +3,7 @@ import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { TEAM_PIPELINE_ROLES } from '../../lib/crmConstants'
 import OrgPipelineImport from './OrgPipelineImport'
+import InviteEmailSetup from './InviteEmailSetup'
 
 export default function TeamPanel({ onNavigate }) {
   const {
@@ -27,25 +28,11 @@ export default function TeamPanel({ onNavigate }) {
   const [notice, setNotice] = useState(null)
   const [lastInviteUrl, setLastInviteUrl] = useState(null)
   const [emailReady, setEmailReady] = useState(null)
+  const [testEmailLoading, setTestEmailLoading] = useState(false)
 
   useEffect(() => {
     refreshTeam()
   }, [refreshTeam])
-
-  useEffect(() => {
-    let cancelled = false
-    api
-      .getIntegrationStatus()
-      .then((data) => {
-        if (!cancelled) setEmailReady(Boolean(data.providers?.resend))
-      })
-      .catch(() => {
-        if (!cancelled) setEmailReady(false)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [])
 
   useEffect(() => {
     setCompanyName(user?.organizationName || '')
@@ -84,6 +71,13 @@ export default function TeamPanel({ onNavigate }) {
     const invited = inviteEmail.trim()
     if (!invited) return
 
+    if (emailReady === false) {
+      setError(
+        'Invite email is not connected yet. Click “Connect invite@connectintel.net” below and sign in with that Google account (one time).'
+      )
+      return
+    }
+
     setInviteLoading(true)
     setInviteStatus(`Sending invite to ${invited}…`)
     setError(null)
@@ -100,20 +94,20 @@ export default function TeamPanel({ onNavigate }) {
       if (data.inviteUrl) setLastInviteUrl(data.inviteUrl)
 
       if (data.emailSent) {
+        const via = data.emailProvider ? ` via ${data.emailProvider}` : ''
         setNotice(
           data.joinedImmediately
-            ? `Email sent to ${invited} from your name (${user?.email}). They were added to the team — sign in with ${invited}.`
-            : `Invite email sent to ${invited}. It shows your name and uses ${user?.email} for replies. They can also use the link below.`
+            ? `Email sent to ${invited}${via}. They were added to the team — sign in with ${invited}.`
+            : `Invite email sent to ${invited}${via}. Replies go to ${user?.email}. They can also use the link below.`
         )
-      } else if (data.emailError) {
-        setError(`Invite saved but email failed: ${data.emailError}`)
+      } else {
+        const detail = [data.emailError, data.emailHint].filter(Boolean).join(' ')
+        setError(detail || 'Invite saved but email was not sent.')
         if (data.inviteUrl) {
           setNotice('Copy the invite link below and send it manually from your email.')
+        } else if (data.joinedImmediately) {
+          setNotice('User added to your team, but the notification email failed.')
         }
-      } else if (data.joinedImmediately) {
-        setNotice('User added to your team. Email was not sent — configure RESEND_API_KEY on Vercel.')
-      } else if (data.inviteUrl) {
-        setNotice('Invite link created. Email not sent — add RESEND_API_KEY and EMAIL_FROM on Vercel.')
       }
       setInviteStatus(null)
       await refreshTeam()
@@ -146,6 +140,27 @@ export default function TeamPanel({ onNavigate }) {
       setNotice(`Updated search access for ${member.name}`)
     } catch (err) {
       setError(err.message)
+    }
+  }
+
+  const handleTestInviteEmail = async () => {
+    setTestEmailLoading(true)
+    setError(null)
+    setNotice(null)
+    try {
+      const data = await api.sendInviteTestEmail()
+      if (data.emailSent) {
+        setNotice(
+          data.message ||
+            `Test queued to ${user?.email}${data.resendId ? ` (Resend: ${data.resendId})` : ''}. Check inbox and spam in 1–2 min.`
+        )
+      } else {
+        setError([data.emailError, data.emailHint, data.message].filter(Boolean).join(' ') || 'Test email failed.')
+      }
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setTestEmailLoading(false)
     }
   }
 
@@ -197,20 +212,29 @@ export default function TeamPanel({ onNavigate }) {
         <section className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
           <h2 className="text-sm font-semibold text-gray-900">Invite team member</h2>
           <p className="text-xs text-gray-500 leading-relaxed">
-            Invites are emailed to your teammate with your name (
-            <span className="font-medium text-gray-700">{user?.name}</span>) and{' '}
-            <span className="font-medium text-gray-700">{user?.email}</span> as reply-to so they can
-            respond to you directly.
-            {emailReady === false && (
-              <span className="block mt-2 text-amber-800 bg-amber-50 border border-amber-200 rounded px-2 py-1">
-                Email sending is off — set <strong>RESEND_API_KEY</strong> (and verify{' '}
-                <strong>EMAIL_FROM</strong> domain) in Vercel.
-              </span>
-            )}
-            {emailReady === true && (
-              <span className="block mt-2 text-green-800">Email delivery is configured.</span>
+            {emailReady ? (
+              <>
+                Invites send from <strong>invite@connectintel.net</strong>. Recipients see{' '}
+                <span className="font-medium text-gray-700">{user?.name}</span>; replies go to{' '}
+                <span className="font-medium text-gray-700">{user?.email}</span>.
+              </>
+            ) : (
+              <>
+                Invites email your teammate from <strong>invite@connectintel.net</strong> with your name (
+                <span className="font-medium text-gray-700">{user?.name}</span>) and{' '}
+                <span className="font-medium text-gray-700">{user?.email}</span> as reply-to.
+              </>
             )}
           </p>
+          <InviteEmailSetup onStatusChange={(ready) => setEmailReady(ready)} />
+          <button
+            type="button"
+            onClick={handleTestInviteEmail}
+            disabled={testEmailLoading || inviteLoading || emailReady === false}
+            className="text-xs font-semibold px-3 py-1.5 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 disabled:opacity-60"
+          >
+            {testEmailLoading ? 'Sending test…' : `Send test invite to ${user?.email}`}
+          </button>
           <form onSubmit={handleInvite} className="space-y-3">
             <input
               type="email"
@@ -262,8 +286,13 @@ export default function TeamPanel({ onNavigate }) {
 
             <button
               type="submit"
-              disabled={inviteLoading || !inviteEmail.trim()}
+              disabled={inviteLoading || !inviteEmail.trim() || emailReady === false}
               className="inline-flex items-center justify-center gap-2 text-sm font-semibold px-4 py-2.5 bg-[#ffcb2b] hover:bg-[#f0bc00] text-[#242424] rounded-lg disabled:opacity-60 min-w-[140px]"
+              title={
+                emailReady === false
+                  ? 'Connect invite@connectintel.net first (yellow box above)'
+                  : undefined
+              }
             >
               {inviteLoading ? (
                 <>

@@ -7,6 +7,7 @@ import {
   downloadImportTemplateXlsx,
 } from '../../lib/importTemplate'
 import { useApp } from '../../context/AppContext'
+import InviteEmailSetup from '../team/InviteEmailSetup'
 
 const DATASET_OPTIONS = [
   { id: 'exporters', label: 'Exporters' },
@@ -148,6 +149,15 @@ export default function AdminPanel() {
           company admins only manage their own team pipeline under Team — not this screen.
         </p>
       </div>
+
+      <section className="mb-6 bg-white rounded-2xl border border-[#ffe48a] p-5 max-w-xl">
+        <h2 className="text-sm font-semibold text-gray-900">Team invite email (all customers)</h2>
+        <p className="text-xs text-gray-500 mt-1 mb-3 leading-relaxed">
+          Connect once as <strong>invite@connectintel.net</strong>. Every company admin can then send team invites
+          without DNS.
+        </p>
+        <InviteEmailSetup />
+      </section>
 
       <div className="grid grid-cols-3 gap-4 mb-6">
         <StatCard label="Companies" value={overview?.counts?.companies ?? 0} />
