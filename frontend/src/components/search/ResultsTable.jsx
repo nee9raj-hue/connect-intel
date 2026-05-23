@@ -10,12 +10,19 @@ export default function ResultsTable({
   onWorkOnLead,
   onUnlock,
   unlockingLeadId,
+  embedded = false,
+  allSelected: allSelectedProp,
 }) {
   const { isSaved } = useApp()
-  const allSelected = leads.length > 0 && selected.length === leads.length
+  const allSelected =
+    allSelectedProp ?? (leads.length > 0 && selected.filter((id) => leads.some((l) => l.id === id)).length === leads.length)
+
+  const wrapperClass = embedded
+    ? 'w-full overflow-x-auto'
+    : 'flex-1 min-h-0 overflow-y-auto overscroll-contain'
 
   return (
-    <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
+    <div className={wrapperClass}>
       <table className="w-full text-[13px]">
         <thead className="sticky top-0 bg-gray-50 border-b border-gray-200 z-10 shadow-sm">
           <tr className="text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wide">

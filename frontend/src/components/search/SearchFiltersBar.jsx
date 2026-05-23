@@ -8,7 +8,14 @@ import {
   pruneCitiesForStates,
 } from '../../lib/filterOptions'
 
-export default function SearchFiltersBar({ filters, onChange, onSearch, loading }) {
+export default function SearchFiltersBar({
+  filters,
+  onChange,
+  onSearch,
+  loading,
+  filtersExpanded = false,
+  onToggleFilters,
+}) {
   const stateOptions = INDIAN_STATES
   const cityOptions = useMemo(() => getCitiesForStates(filters.states), [filters.states])
   const allStatesExplicit = isAllStatesSelected(filters.states)
@@ -75,12 +82,10 @@ export default function SearchFiltersBar({ filters, onChange, onSearch, loading 
       : `${filters.cities.length} selected`
 
   return (
-    <div className="shrink-0 bg-white border-b border-gray-200 px-5 py-4 space-y-3">
+    <div className="shrink-0 bg-white border-b border-gray-200 px-4 sm:px-5 py-3 space-y-2">
       <div className="flex flex-col sm:flex-row gap-2">
         <div className="flex-1">
-          <label className="block text-[11px] font-semibold uppercase tracking-wide text-gray-500 mb-1">
-            What are you looking for?
-          </label>
+          <label className="sr-only">What are you looking for?</label>
           <input
             type="text"
             placeholder="e.g. ghee manufacturers in Alwar, Rajasthan · CEO email at Xindus Network Trade"
@@ -90,32 +95,41 @@ export default function SearchFiltersBar({ filters, onChange, onSearch, loading 
             className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#ffcb2b]/50 focus:border-[#ffcb2b]"
           />
         </div>
-        <div className="flex items-end gap-2 shrink-0">
+        <div className="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap">
           <button
             type="button"
             onClick={onSearch}
             disabled={loading}
-            className="px-5 py-2.5 bg-[#ffcb2b] hover:bg-[#f0bc00] text-[#242424] text-sm font-semibold rounded-lg disabled:opacity-60 min-w-[100px]"
+            className="flex-1 sm:flex-none px-5 py-2.5 bg-[#ffcb2b] hover:bg-[#f0bc00] text-[#242424] text-sm font-semibold rounded-lg disabled:opacity-60 min-w-[100px]"
           >
             {loading ? 'Searching…' : 'Search'}
           </button>
-          {activeCount > 0 && (
+          {onToggleFilters && (
+            <button
+              type="button"
+              onClick={onToggleFilters}
+              className="px-3 py-2.5 text-sm font-medium text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50"
+            >
+              {filtersExpanded ? 'Hide filters' : 'Location & industry'}
+              {activeCount > 0 && !filtersExpanded ? (
+                <span className="ml-1 text-[#8a6600]">({activeCount})</span>
+              ) : null}
+            </button>
+          )}
+          {activeCount > 0 && filtersExpanded && (
             <button
               type="button"
               onClick={clearFilters}
               className="px-3 py-2.5 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50"
             >
-              Clear filters
+              Clear
             </button>
           )}
         </div>
       </div>
 
-      <p className="text-[11px] text-gray-500 -mt-1">
-        Type a plain-English request — any industry or role. Optional state/city/industry filters narrow results.
-      </p>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+      {filtersExpanded && (
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 pt-1">
         <MultiSelectField
           label="State"
           hint={stateHint}
@@ -157,7 +171,10 @@ export default function SearchFiltersBar({ filters, onChange, onSearch, loading 
         />
       </div>
 
-      {(filters.states?.length || filters.cities?.length || filters.industries?.length) > 0 && (
+      )}
+
+      {filtersExpanded &&
+      (filters.states?.length || filters.cities?.length || filters.industries?.length) > 0 && (
         <div className="flex flex-wrap gap-1.5 pt-1">
           {!allStatesExplicit &&
             (filters.states || []).map((v) => (
@@ -177,6 +194,13 @@ export default function SearchFiltersBar({ filters, onChange, onSearch, loading 
             <Chip key={`i-${v}`} label={v} onRemove={() => toggle('industries', v)} />
           ))}
         </div>
+      )}
+
+      {!filtersExpanded && activeCount > 0 && (
+        <p className="text-[11px] text-gray-500">
+          {stateHint} · {cityHint}
+          {filters.industries?.length ? ` · ${filters.industries.length} industries` : ''}
+        </p>
       )}
     </div>
   )

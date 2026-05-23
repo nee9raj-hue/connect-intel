@@ -534,7 +534,7 @@ function EmptyPipeline({ onNavigate, onImport, onAdd }) {
           >
             Search prospects with AI
           </button>
-          <p className="text-[11px] text-gray-400 mt-2">50+ matches · 5 full previews · unlock with credits</p>
+          <p className="text-[11px] text-gray-400 mt-2">50+ matches · 10 full previews · unlock with credits</p>
         </div>
       </div>
     </div>

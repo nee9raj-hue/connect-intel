@@ -5,6 +5,7 @@ import { isAllCitiesSelected, isAllStatesSelected } from '../../lib/filterOption
 import { getResultsBadge, softenNotice, PRODUCT } from '../../lib/productCopy'
 import { searchLeads } from '../../lib/searchService'
 import SearchFiltersBar from './SearchFiltersBar'
+import SearchResultsView, { FULL_DETAIL_PREVIEW_COUNT } from './SearchResultsView'
 import ResultsTable from './ResultsTable'
 
 const EMPTY_FILTERS = {
@@ -14,6 +15,8 @@ const EMPTY_FILTERS = {
   companySizes: [],
   keywords: '',
 }
+
+const SEARCH_FETCH_COUNT = 50
 
 export default function PeopleSearch({ onNavigate }) {
   const {
@@ -35,14 +38,16 @@ export default function PeopleSearch({ onNavigate }) {
   const [hasSearched, setHasSearched] = useState(false)
   const [searchError, setSearchError] = useState(null)
   const [unlockingLeadId, setUnlockingLeadId] = useState(null)
+  const [filtersExpanded, setFiltersExpanded] = useState(false)
 
   const handleSearch = async () => {
     setLoading(true)
     setHasSearched(true)
     setSelected([])
     setSearchError(null)
+    setFiltersExpanded(false)
     try {
-      const data = await searchLeads(filters, 'free', 50)
+      const data = await searchLeads(filters, 'free', SEARCH_FETCH_COUNT)
       setResults(data)
       if (data.user?.searchesLeft != null) {
         updateUser({ searchesLeft: data.user.searchesLeft })
@@ -90,6 +95,9 @@ export default function PeopleSearch({ onNavigate }) {
     }
     return leads
   }, [countTab, savedLeads, results])
+
+  const fullPreviewCount = results?.fullPreviewCount ?? FULL_DETAIL_PREVIEW_COUNT
+  const maskedCount = results?.maskedCount ?? Math.max(0, displayLeads.length - fullPreviewCount)
 
   const handleSelectAll = () => {
     const list = displayLeads
@@ -163,6 +171,22 @@ export default function PeopleSearch({ onNavigate }) {
 
   const canSearch = user?.canSearch !== false
 
+  const allLeadsSelected =
+    displayLeads.length > 0 && selected.length === displayLeads.length
+
+  const resultsHandlers = {
+    selected,
+    allSelected: allLeadsSelected,
+    onSelectAll: handleSelectAll,
+    onSelect: (id) =>
+      setSelected((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id])),
+    onSave: toggleSaveLead,
+    onWorkOnLead: workOnLead,
+    onUnlock: handleUnlockLead,
+    unlockingLeadId,
+    fullPreviewCount,
+  }
+
   if (!canSearch) {
     return (
       <div className="flex flex-col h-full items-center justify-center p-8 text-center bg-[#f6f7f9]">
@@ -184,21 +208,15 @@ export default function PeopleSearch({ onNavigate }) {
 
   return (
     <div className="flex flex-col h-full min-h-0 bg-[#f6f7f9]">
-      <header className="shrink-0 bg-white border-b border-gray-200 px-5 py-3">
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <h1 className="text-lg font-semibold text-gray-900">AI prospect search</h1>
-            <p className="text-xs text-gray-500 mt-0.5">
-              Find new leads after your pipeline is set up · {PRODUCT.databaseLine}
-            </p>
+      <header className="shrink-0 bg-white border-b border-gray-200 px-4 sm:px-5 py-2.5">
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="text-base sm:text-lg font-semibold text-gray-900 truncate">AI prospect search</h1>
+            <p className="text-[11px] text-gray-500 truncate">{PRODUCT.databaseLine}</p>
           </div>
-          <div className="flex items-center gap-2 flex-wrap justify-end">
-            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#5b4a00] bg-[#fff6d6] px-2.5 py-1 rounded-full border border-[#ffe48a]">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#ffcb2b]" />
-              {PRODUCT.poweredBy}
-            </span>
-            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-700 bg-gray-100 px-2.5 py-1 rounded-full border border-gray-200">
-              Searches left: {user?.searchesLeft ?? 0}
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="hidden sm:inline text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
+              {user?.searchesLeft ?? 0} searches left
             </span>
             <button
               type="button"
@@ -212,16 +230,16 @@ export default function PeopleSearch({ onNavigate }) {
         </div>
       </header>
 
-      <div className="shrink-0 max-h-[42vh] overflow-y-auto border-b border-gray-100">
-        <SearchFiltersBar
-          filters={filters}
-          onChange={setFilters}
-          onSearch={handleSearch}
-          loading={loading}
-        />
-      </div>
+      <SearchFiltersBar
+        filters={filters}
+        onChange={setFilters}
+        onSearch={handleSearch}
+        loading={loading}
+        filtersExpanded={filtersExpanded}
+        onToggleFilters={() => setFiltersExpanded((v) => !v)}
+      />
 
-      <div className="shrink-0 bg-white border-b border-gray-200 px-5 py-2 flex flex-wrap items-center gap-2">
+      <div className="shrink-0 bg-white border-b border-gray-200 px-4 sm:px-5 py-2 flex flex-wrap items-center gap-2">
         {[
           { id: 'total', label: 'Total', value: results?.total },
           { id: 'netNew', label: 'Net new', value: results?.netNew },
@@ -247,11 +265,11 @@ export default function PeopleSearch({ onNavigate }) {
         ))}
         {hasSearched && results && countTab !== 'saved' && resultBadge && (
           <span className={`ml-auto text-xs font-medium ${resultBadge.className}`}>
-            Showing <strong>{results.leads.length}</strong>
-            {results.total > results.leads.length ? (
+            <strong>{displayLeads.length}</strong> shown
+            {results.total > displayLeads.length ? (
               <>
                 {' '}
-                of <strong>{results.total}+</strong>
+                · <strong>{results.total}+</strong> matched
               </>
             ) : null}{' '}
             · {resultBadge.text}
@@ -259,27 +277,25 @@ export default function PeopleSearch({ onNavigate }) {
         )}
       </div>
 
-      {hasSearched && results?.leads?.length > 0 && countTab !== 'saved' && (
-        <div className="shrink-0 mx-5 mt-0 mb-0">
-          <div className="flex flex-wrap items-center gap-2 text-xs bg-[#fffbeb] border border-[#fde68a] rounded-lg px-3 py-2">
-            <span className="font-semibold text-[#5b4a00]">
-              {results.total >= 50 ? '50+' : results.total} prospects matched
-            </span>
-            <span className="text-gray-600">
-              · <strong>5</strong> full contact previews ·{' '}
-              <strong>{Math.max(0, (results.maskedCount ?? results.leads.length - 5))}</strong> details hidden
-            </span>
-            {!user?.subscriptionActive && (
-              <span className="text-gray-500 ml-auto">
-                Unlock with AI credits · Subscribe for full access (coming soon)
+      {(hasSearched && results?.leads?.length > 0 && countTab !== 'saved') ||
+      friendlyNotice ||
+      filterSummary ||
+      searchError ||
+      results?.discoveryError ||
+      results?.parsedSearch?.summary ? (
+        <div className="shrink-0 px-4 sm:px-5 py-2 space-y-1.5 bg-white border-b border-gray-100 max-h-[28vh] overflow-y-auto">
+          {hasSearched && results?.leads?.length > 0 && countTab !== 'saved' && (
+            <div className="flex flex-wrap items-center gap-2 text-xs bg-[#fffbeb] border border-[#fde68a] rounded-lg px-3 py-2">
+              <span className="font-semibold text-[#5b4a00]">
+                {displayLeads.length} prospects in this view
+                {results.total >= 50 ? ' · 50+ matched in database' : ''}
               </span>
-            )}
-          </div>
-        </div>
-      )}
-
-      {(friendlyNotice || filterSummary || searchError || results?.discoveryError) && (
-        <div className="shrink-0 px-5 py-2 space-y-1.5 bg-white border-b border-gray-100">
+              <span className="text-gray-600">
+                · <strong>{Math.min(fullPreviewCount, displayLeads.length)}</strong> with full email & phone ·{' '}
+                <strong>{maskedCount}</strong> summarized below
+              </span>
+            </div>
+          )}
           {results?.parsedSearch?.summary && hasSearched && countTab !== 'saved' && (
             <p className="text-xs text-emerald-900 bg-emerald-50 border border-emerald-100 rounded-lg px-3 py-2">
               Understood as: <span className="font-medium">{results.parsedSearch.summary}</span>
@@ -291,38 +307,23 @@ export default function PeopleSearch({ onNavigate }) {
             </p>
           )}
           {friendlyNotice && countTab !== 'saved' && (
-            <p className="text-xs text-gray-600 bg-gray-50 border border-gray-100 rounded-lg px-3 py-2">
-              {friendlyNotice}
-            </p>
+            <p className="text-xs text-gray-600">{friendlyNotice}</p>
           )}
           {results?.discoveryError && countTab !== 'saved' && (
             <p className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-              Perplexity: {results.discoveryError}
+              AI: {results.discoveryError}
             </p>
           )}
           {searchError && (
-            <p className="text-xs text-red-700 bg-red-50 border border-red-100 rounded px-2 py-1.5">
-              {searchError}
-            </p>
+            <p className="text-xs text-red-700 bg-red-50 border border-red-100 rounded px-2 py-1.5">{searchError}</p>
           )}
         </div>
-      )}
+      ) : null}
 
-      <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden bg-white">
+      <div className="flex-1 flex flex-col min-h-0 min-w-0 overflow-hidden">
         {countTab === 'saved' ? (
           displayLeads.length ? (
-            <ResultsTable
-              leads={displayLeads}
-              selected={selected}
-              onSelectAll={handleSelectAll}
-              onSelect={(id) =>
-                setSelected((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
-              }
-              onSave={toggleSaveLead}
-              onWorkOnLead={workOnLead}
-              onUnlock={handleUnlockLead}
-              unlockingLeadId={unlockingLeadId}
-            />
+            <ResultsTable {...resultsHandlers} leads={displayLeads} allSelected={allLeadsSelected} />
           ) : (
             <EmptyState
               title="No saved leads"
@@ -334,33 +335,22 @@ export default function PeopleSearch({ onNavigate }) {
         ) : !hasSearched ? (
           <EmptyState
             title="Search your B2B database"
-            sub='Describe who you need in one sentence — e.g. "spice exporters in Surat" or "marketing head at Acme Foods". Results appear in the table below.'
+            sub='Type who you need above and press Search. Results fill this page — full contacts for the top 10, more matches listed below.'
           />
         ) : loading ? (
           <LoadingState />
-          ) : displayLeads.length === 0 ? (
-            <EmptyState
-              title="No matches for these filters"
-              sub={
-                results?.discoveryError
-                  ? `Database had no matches. AI: ${results.discoveryError}. Try a clearer sentence with product + location.`
-                  : 'Try a specific product or company type with a state or city, or import more companies in Admin / Team.'
-              }
-              action={handleSearch}
-            />
-        ) : (
-          <ResultsTable
-            leads={displayLeads}
-            selected={selected}
-            onSelectAll={handleSelectAll}
-            onSelect={(id) =>
-              setSelected((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
+        ) : displayLeads.length === 0 ? (
+          <EmptyState
+            title="No matches for these filters"
+            sub={
+              results?.discoveryError
+                ? `Database had no matches. AI: ${results.discoveryError}. Try a clearer sentence with product + location.`
+                : 'Try a specific product or company type with a state or city, or import more companies in Admin / Team.'
             }
-            onSave={toggleSaveLead}
-            onWorkOnLead={workOnLead}
-            onUnlock={handleUnlockLead}
-            unlockingLeadId={unlockingLeadId}
+            action={handleSearch}
           />
+        ) : (
+          <SearchResultsView leads={displayLeads} {...resultsHandlers} />
         )}
       </div>
     </div>
@@ -369,7 +359,7 @@ export default function PeopleSearch({ onNavigate }) {
 
 function EmptyState({ title, sub, action, actionLabel = 'Search again' }) {
   return (
-    <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
+    <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-white">
       <p className="font-medium text-gray-900">{title}</p>
       <p className="text-sm text-gray-500 mt-1 max-w-md leading-relaxed">{sub}</p>
       {action && (
@@ -387,10 +377,10 @@ function EmptyState({ title, sub, action, actionLabel = 'Search again' }) {
 
 function LoadingState() {
   return (
-    <div className="flex-1 flex flex-col items-center justify-center px-6">
+    <div className="flex-1 flex flex-col items-center justify-center px-6 bg-white">
       <div className="w-10 h-10 border-2 border-[#ffcb2b]/30 border-t-[#ffcb2b] rounded-full animate-spin mb-3" />
       <p className="text-sm font-medium text-gray-800">Searching our B2B database…</p>
-      <p className="text-xs text-gray-500 mt-1">Understanding your request and matching prospects</p>
+      <p className="text-xs text-gray-500 mt-1">Up to 50 matches · full details on the top 10</p>
     </div>
   )
 }
