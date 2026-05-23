@@ -15,6 +15,9 @@ export default function PipelinePanel({ onNavigate }) {
     setPipelineLeadId,
     openPipelineLead,
     refreshSavedLeads,
+    pipelineAssigneeFilter,
+    setPipelineAssigneeFilter,
+    teamMembers,
   } = useApp()
 
   const columns = useMemo(() => getVisiblePipelineColumns(user), [user])
@@ -36,15 +39,27 @@ export default function PipelinePanel({ onNavigate }) {
     }
   }, [pipelineLeadId, selectedLead, setPipelineLeadId])
 
+  const assigneeName = useMemo(() => {
+    if (!pipelineAssigneeFilter) return null
+    const m = teamMembers.find((t) => t.userId === pipelineAssigneeFilter)
+    return m?.name || 'Team member'
+  }, [pipelineAssigneeFilter, teamMembers])
+
+  const scopedLeads = useMemo(() => {
+    if (!pipelineAssigneeFilter) return savedLeads
+    return savedLeads.filter((l) => (l.assignedToUserId || l.savedByUserId) === pipelineAssigneeFilter)
+  }, [savedLeads, pipelineAssigneeFilter])
+
   const filtered = useMemo(() => {
-    if (filter === 'all') return savedLeads
-    return savedLeads.filter((l) => (l.crm?.status || 'new') === filter)
-  }, [savedLeads, filter])
+    const base = scopedLeads
+    if (filter === 'all') return base
+    return base.filter((l) => (l.crm?.status || 'new') === filter)
+  }, [scopedLeads, filter])
 
   const byStatus = useMemo(() => {
     const map = Object.fromEntries(columns.map((s) => [s.id, []]))
     const hidden = []
-    for (const lead of savedLeads) {
+    for (const lead of scopedLeads) {
       const st = lead.crm?.status || 'new'
       if (map[st]) map[st].push(lead)
       else hidden.push(lead)
@@ -53,15 +68,15 @@ export default function PipelinePanel({ onNavigate }) {
       map[columns[0].id].push(...hidden)
     }
     return map
-  }, [savedLeads, columns])
+  }, [scopedLeads, columns])
 
   const stats = useMemo(
     () => ({
-      total: savedLeads.length,
-      contacted: savedLeads.filter((l) => l.crm?.lastEmailSentAt).length,
-      replied: savedLeads.filter((l) => l.crm?.responseReceived).length,
+      total: scopedLeads.length,
+      contacted: scopedLeads.filter((l) => l.crm?.lastEmailSentAt).length,
+      replied: scopedLeads.filter((l) => l.crm?.responseReceived).length,
     }),
-    [savedLeads]
+    [scopedLeads]
   )
 
   return (
@@ -72,8 +87,22 @@ export default function PipelinePanel({ onNavigate }) {
             <div>
               <h1 className="text-lg font-semibold text-gray-900">Pipeline</h1>
               <p className="text-xs text-gray-500 mt-0.5">
-                Mini CRM — columns match your team role ({columns.map((c) => c.label).join(', ')})
+                {savedLeads.length === 0
+                  ? 'Start building your pipeline — then use AI prospect search for new leads'
+                  : `Mini CRM — ${columns.map((c) => c.label).join(', ')}`}
               </p>
+              {assigneeName && (
+                <p className="text-xs text-[#8a6600] mt-1 flex items-center gap-2">
+                  Showing: <strong>{assigneeName}</strong>
+                  <button
+                    type="button"
+                    className="underline"
+                    onClick={() => setPipelineAssigneeFilter?.(null)}
+                  >
+                    Clear
+                  </button>
+                </p>
+              )}
             </div>
             <div className="flex items-center gap-2 flex-wrap">
               <button
@@ -104,7 +133,7 @@ export default function PipelinePanel({ onNavigate }) {
                 onClick={() => onNavigate?.('search')}
                 className="text-xs font-medium px-3 py-1.5 border border-gray-200 rounded-md hover:bg-gray-50"
               >
-                + Find people
+                AI prospect search
               </button>
             </div>
           </div>
@@ -339,34 +368,41 @@ function KanbanColumn({ column, leads, selectedId, onSelect }) {
 
 function EmptyPipeline({ onNavigate, onImport, onAdd }) {
   return (
-    <div className="flex flex-col items-center justify-center py-20 text-center max-w-md mx-auto">
-      <p className="text-4xl mb-3">◎</p>
-      <h3 className="font-semibold text-gray-900 mb-1">Your pipeline is empty</h3>
-      <p className="text-sm text-gray-500 leading-relaxed">
-        Import your existing Excel pipeline, or save leads from People Search.
-      </p>
-      <div className="flex flex-col gap-2 mt-5 w-full max-w-xs">
-        <button
-          type="button"
-          onClick={() => onAdd?.()}
-          className="px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg"
-        >
-          Add lead manually
-        </button>
-        <button
-          type="button"
-          onClick={onImport}
-          className="px-5 py-2.5 border-2 border-[#ffcb2b] text-[#242424] text-sm font-semibold rounded-lg"
-        >
-          Import CSV / Excel
-        </button>
-        <button
-          type="button"
-          onClick={() => onNavigate?.('search')}
-          className="px-5 py-2.5 bg-[#ffcb2b] text-[#242424] text-sm font-semibold rounded-lg hover:bg-[#f0bc00]"
-        >
-          Go to People Search
-        </button>
+    <div className="flex flex-col items-center justify-center py-16 text-center max-w-lg mx-auto px-4">
+      <div className="w-full rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
+        <p className="text-xs font-semibold uppercase tracking-wider text-[#8a6600] mb-2">Step 1 — CRM</p>
+        <h3 className="text-xl font-semibold text-gray-900 mb-2">Build your pipeline first</h3>
+        <p className="text-sm text-gray-500 leading-relaxed">
+          Connect Intel is your team CRM. Add or import the leads you are already working, assign owners, and
+          track follow-ups. When your pipeline is ready, use AI prospect search to find new opportunities.
+        </p>
+        <div className="flex flex-col gap-2 mt-6">
+          <button
+            type="button"
+            onClick={() => onAdd?.()}
+            className="px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg"
+          >
+            Add lead manually
+          </button>
+          <button
+            type="button"
+            onClick={onImport}
+            className="px-5 py-2.5 border-2 border-[#ffcb2b] text-[#242424] text-sm font-semibold rounded-lg"
+          >
+            Import CSV / Excel
+          </button>
+        </div>
+        <div className="mt-8 pt-6 border-t border-gray-100">
+          <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Step 2 — AI</p>
+          <button
+            type="button"
+            onClick={() => onNavigate?.('search')}
+            className="w-full px-5 py-2.5 border border-gray-200 text-gray-800 text-sm font-medium rounded-lg hover:bg-gray-50"
+          >
+            Search prospects with AI
+          </button>
+          <p className="text-[11px] text-gray-400 mt-2">50+ matches · 5 full previews · unlock with credits</p>
+        </div>
       </div>
     </div>
   )

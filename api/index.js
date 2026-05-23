@@ -20,6 +20,7 @@ const ROUTES = {
   'crm/generate-whatsapp': () => import('../lib/server/handlers/crm-generate-whatsapp.js'),
   'crm/calendar': () => import('../lib/server/handlers/crm-calendar.js'),
   'crm/activity-log': () => import('../lib/server/handlers/crm-activity-log.js'),
+  'crm/team-dashboard': () => import('../lib/server/handlers/crm-team-dashboard.js'),
   'crm/reminders-ack': () => import('../lib/server/handlers/crm-reminders-ack.js'),
   'onboarding/complete': () => import('../lib/server/handlers/onboarding-complete.js'),
   'team/members': () => import('../lib/server/handlers/team-members.js'),

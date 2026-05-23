@@ -88,7 +88,10 @@ function shouldUseLocalFallback(error, provider) {
  * @param {string} provider — use 'free' for customer search
  * @param {number} count
  */
-export async function searchLeads(filters, provider = 'free', count = 8) {
+const AI_SEARCH_FETCH_COUNT = 50
+const AI_SEARCH_DISPLAY_TOTAL_MIN = 50
+
+export async function searchLeads(filters, provider = 'free', count = AI_SEARCH_FETCH_COUNT) {
   if (provider === 'hunter') {
     throw new Error(`${PROVIDERS.hunter.label} integration coming soon`)
   }
@@ -112,13 +115,26 @@ export async function searchLeads(filters, provider = 'free', count = 8) {
   }
 
   await new Promise((r) => setTimeout(r, 800))
-  const leads = filterMockLeads(filters).map(shapeFallbackLead)
-  const total = Math.max(leads.length * 150, 3200 + Math.floor(Math.random() * 12000))
+  const base = filterMockLeads(filters)
+  const padded = []
+  while (padded.length < count && base.length) {
+    for (let i = 0; i < base.length && padded.length < count; i += 1) {
+      const src = base[i]
+      padded.push({
+        ...src,
+        id: padded.length ? `${src.id}-p${padded.length}` : src.id,
+      })
+    }
+  }
+  const leads = padded.map(shapeFallbackLead)
+  const total = Math.max(AI_SEARCH_DISPLAY_TOTAL_MIN, leads.length * 40, leads.length)
 
   return {
     leads,
     total,
-    netNew: Math.floor(total * 0.88),
+    netNew: Math.max(total - 5, leads.length),
+    maskedCount: Math.max(0, leads.length - FREE_FULL_LEAD_PREVIEW_COUNT),
+    fullPreviewCount: FREE_FULL_LEAD_PREVIEW_COUNT,
     provider: leads.length ? 'database' : 'none',
     notice:
       leads.length === 0

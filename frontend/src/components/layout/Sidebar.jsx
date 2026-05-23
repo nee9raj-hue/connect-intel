@@ -1,12 +1,13 @@
 import { useApp } from '../../context/AppContext'
 
 const PROSPECT = [
-  { id: 'search', label: 'People', icon: PeopleIcon },
+  { id: 'search', label: 'AI prospect search', icon: SparkIcon },
   { id: 'saved', label: 'Saved leads', icon: ListIcon },
 ]
 
 const CRM = [
   { id: 'pipeline', label: 'Pipeline', icon: PipelineIcon },
+  { id: 'crm-dashboard', label: 'Team dashboard', icon: ChartIcon },
   { id: 'crm-log', label: 'Activity log', icon: LogIcon },
   { id: 'crm-calendar', label: 'Calendar', icon: CalendarIcon },
 ]
@@ -106,7 +107,21 @@ export default function Sidebar({ active, onNavigate, mobileOpen, onMobileClose 
         ) : (
           <>
             <p className="px-3 mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
-              Prospect & enrich
+              CRM
+            </p>
+            {(user?.accountType === 'company' ? CRM : CRM.filter((i) => i.id !== 'crm-dashboard')).map(
+              (item) => (
+              <NavBtn
+                key={item.id}
+                item={item}
+                active={active === item.id}
+                onClick={() => onNavigate(item.id)}
+                badge={item.id === 'pipeline' && savedLeads.length > 0 ? savedLeads.length : null}
+              />
+            ))}
+
+            <p className="px-3 mt-5 mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
+              AI prospecting
             </p>
             {PROSPECT.map((item) => (
               <NavBtn
@@ -115,19 +130,6 @@ export default function Sidebar({ active, onNavigate, mobileOpen, onMobileClose 
                 active={active === item.id}
                 onClick={() => onNavigate(item.id)}
                 badge={item.id === 'saved' && savedLeads.length > 0 ? savedLeads.length : null}
-              />
-            ))}
-
-            <p className="px-3 mt-5 mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
-              Outreach & CRM
-            </p>
-            {CRM.map((item) => (
-              <NavBtn
-                key={item.id}
-                item={item}
-                active={active === item.id}
-                onClick={() => onNavigate(item.id)}
-                badge={item.id === 'pipeline' && savedLeads.length > 0 ? savedLeads.length : null}
               />
             ))}
 
@@ -159,12 +161,12 @@ export default function Sidebar({ active, onNavigate, mobileOpen, onMobileClose 
           }`}
         >
           <p className={`text-xs font-semibold ${isOperator ? 'text-[#ffcb2b]' : 'text-gray-800'}`}>
-            {isOperator ? 'Master database' : 'AI-powered search'}
+            {isOperator ? 'Master database' : 'CRM first, then AI'}
           </p>
           <p className={`text-[10px] mt-1 leading-snug ${isOperator ? 'text-gray-300' : 'text-gray-600'}`}>
             {isOperator
               ? 'Upload sheets here. All customers search this shared data.'
-              : 'Pipeline leads stay in CRM and won\u2019t appear in new searches.'}
+              : 'Build your pipeline first. Use AI prospect search when you need new leads.'}
           </p>
         </div>
       </nav>
@@ -296,6 +298,22 @@ function BoltIcon({ className }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+    </svg>
+  )
+}
+
+function ChartIcon({ className }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+    </svg>
+  )
+}
+
+function SparkIcon({ className }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
     </svg>
   )
 }

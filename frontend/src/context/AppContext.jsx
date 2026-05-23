@@ -32,6 +32,7 @@ export function AppProvider({ children }) {
   const [teamMembers, setTeamMembers] = useState([])
   const [ready, setReady] = useState(false)
   const [pipelineLeadId, setPipelineLeadId] = useState(null)
+  const [pipelineAssigneeFilter, setPipelineAssigneeFilter] = useState(null)
 
   const refreshSession = useCallback(async () => {
     const session = await api.getSession()
@@ -353,6 +354,8 @@ export function AppProvider({ children }) {
         openPipelineLead,
         pipelineLeadId,
         setPipelineLeadId,
+        pipelineAssigneeFilter,
+        setPipelineAssigneeFilter,
         isSaved,
         searchHistory,
         addSearchHistory,

@@ -63,6 +63,8 @@ export const api = {
     request('/api/saved-leads', { method: 'PATCH', body: { leadId, assignToUserId } }),
   getCrmCalendar: () => request('/api/crm/calendar'),
   getCrmActivityLog: () => request('/api/crm/activity-log'),
+  getCrmTeamDashboard: (query = '') =>
+    request(`/api/crm/team-dashboard${query ? `?${query}` : ''}`),
   ackMeetingReminder: (leadId, meetingId) =>
     request('/api/crm/reminders-ack', { method: 'POST', body: { leadId, meetingId } }),
   getCrmGmailStatus: () => request('/api/crm/email-gmail-status'),

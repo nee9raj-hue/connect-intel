@@ -42,7 +42,7 @@ export default function PeopleSearch({ onNavigate }) {
     setSelected([])
     setSearchError(null)
     try {
-      const data = await searchLeads(filters, 'free', 25)
+      const data = await searchLeads(filters, 'free', 50)
       setResults(data)
       if (data.user?.searchesLeft != null) {
         updateUser({ searchesLeft: data.user.searchesLeft })
@@ -173,8 +173,10 @@ export default function PeopleSearch({ onNavigate }) {
       <header className="shrink-0 bg-white border-b border-gray-200 px-5 py-3">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <h1 className="text-lg font-semibold text-gray-900">Find people</h1>
-            <p className="text-xs text-gray-500 mt-0.5">{PRODUCT.databaseLine}</p>
+            <h1 className="text-lg font-semibold text-gray-900">AI prospect search</h1>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Find new leads after your pipeline is set up · {PRODUCT.databaseLine}
+            </p>
           </div>
           <div className="flex items-center gap-2 flex-wrap justify-end">
             <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#5b4a00] bg-[#fff6d6] px-2.5 py-1 rounded-full border border-[#ffe48a]">
@@ -183,9 +185,6 @@ export default function PeopleSearch({ onNavigate }) {
             </span>
             <span className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-700 bg-gray-100 px-2.5 py-1 rounded-full border border-gray-200">
               Searches left: {user?.searchesLeft ?? 0}
-            </span>
-            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#7a5f00] bg-[#fffbeb] px-2.5 py-1 rounded-full border border-[#fde68a]">
-              Credits: Rs {((user?.creditsPaise ?? 0) / 100).toFixed(0)}
             </span>
             <button
               type="button"
@@ -234,10 +233,36 @@ export default function PeopleSearch({ onNavigate }) {
         ))}
         {hasSearched && results && countTab !== 'saved' && resultBadge && (
           <span className={`ml-auto text-xs font-medium ${resultBadge.className}`}>
-            Showing <strong>{results.leads.length}</strong> · {resultBadge.text}
+            Showing <strong>{results.leads.length}</strong>
+            {results.total > results.leads.length ? (
+              <>
+                {' '}
+                of <strong>{results.total}+</strong>
+              </>
+            ) : null}{' '}
+            · {resultBadge.text}
           </span>
         )}
       </div>
+
+      {hasSearched && results?.leads?.length > 0 && countTab !== 'saved' && (
+        <div className="shrink-0 mx-5 mt-0 mb-0">
+          <div className="flex flex-wrap items-center gap-2 text-xs bg-[#fffbeb] border border-[#fde68a] rounded-lg px-3 py-2">
+            <span className="font-semibold text-[#5b4a00]">
+              {results.total >= 50 ? '50+' : results.total} prospects matched
+            </span>
+            <span className="text-gray-600">
+              · <strong>5</strong> full contact previews ·{' '}
+              <strong>{Math.max(0, (results.maskedCount ?? results.leads.length - 5))}</strong> details hidden
+            </span>
+            {!user?.subscriptionActive && (
+              <span className="text-gray-500 ml-auto">
+                Unlock with AI credits · Subscribe for full access (coming soon)
+              </span>
+            )}
+          </div>
+        </div>
+      )}
 
       {(friendlyNotice || filterSummary || searchError || results?.discoveryError) && (
         <div className="shrink-0 px-5 py-2 space-y-1.5 bg-white border-b border-gray-100">

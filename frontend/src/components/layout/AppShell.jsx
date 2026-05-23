@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import OnboardingModal from '../onboarding/OnboardingModal'
 import Sidebar from './Sidebar'
+import AppHeader from './AppHeader'
+import TeamDashboardPanel from '../crm/TeamDashboardPanel'
 import PeopleSearch from '../search/PeopleSearch'
 import SavedLeadsPanel from '../saved/SavedLeadsPanel'
 import PipelinePanel from '../crm/PipelinePanel'
@@ -20,6 +22,7 @@ const PANELS = {
   search: PeopleSearch,
   saved: SavedLeadsPanel,
   pipeline: PipelinePanel,
+  'crm-dashboard': TeamDashboardPanel,
   'crm-log': CrmActivityLogPanel,
   'crm-calendar': CrmCalendarPanel,
   team: TeamPanel,
@@ -29,7 +32,7 @@ const PANELS = {
 
 export default function AppShell() {
   const { user } = useApp()
-  const [activePanel, setActivePanel] = useState('search')
+  const [activePanel, setActivePanel] = useState('pipeline')
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const Panel = PANELS[activePanel] || PeopleSearch
   const needsOnboarding = user && !user.onboardingComplete && !user.isPlatformAdmin
@@ -78,6 +81,7 @@ export default function AppShell() {
         </div>
         <EmailOAuthNotice onOpenSystemStatus={() => navigate('integrations')} />
         <MobileRequiredModal />
+        {!user?.isPlatformAdmin && <AppHeader onNavigate={navigate} />}
         <div className="flex-1 flex flex-col min-h-0 min-w-0 overflow-hidden">
           <Panel onNavigate={navigate} activePanel={activePanel} />
         </div>
