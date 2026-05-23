@@ -273,7 +273,7 @@ export function AppProvider({ children }) {
   const assignLead = useCallback(async (leadId, assignToUserId) => {
     const data = await api.assignLead(leadId, assignToUserId)
     setSavedLeads(data.leads || [])
-    return data.lead
+    return data
   }, [])
 
   const generateEmailDraft = useCallback(async (leadId, options) => {
@@ -288,6 +288,24 @@ export function AppProvider({ children }) {
 
   const sendBulkEmail = useCallback(async (payload) => {
     const data = await api.sendBulkCrmEmail(payload)
+    if (data.leads) setSavedLeads(data.leads)
+    return data
+  }, [])
+
+  const bulkUpdatePipeline = useCallback(async (leadIds, actions) => {
+    const data = await api.bulkUpdatePipeline({ leadIds, ...actions })
+    if (data.leads) setSavedLeads(data.leads)
+    return data
+  }, [])
+
+  const syncEmailThread = useCallback(async (leadId) => {
+    const data = await api.syncCrmEmailThread(leadId)
+    if (data.leads) setSavedLeads(data.leads)
+    return data
+  }, [])
+
+  const logEmailReply = useCallback(async (leadId, payload) => {
+    const data = await api.logCrmEmailReply(leadId, payload)
     if (data.leads) setSavedLeads(data.leads)
     return data
   }, [])
@@ -350,6 +368,9 @@ export function AppProvider({ children }) {
         generateEmailDraft,
         logCrmEmailSend,
         sendBulkEmail,
+        bulkUpdatePipeline,
+        syncEmailThread,
+        logEmailReply,
         generateWhatsAppDraft,
         updateMobile,
         openPipelineLead,

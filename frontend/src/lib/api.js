@@ -94,6 +94,11 @@ export const api = {
     request('/api/my/imports', { method: 'POST', body: { datasetType, rows, addToPipeline } }),
   updateUserProfile: (payload) => request('/api/user/profile', { method: 'PATCH', body: payload }),
   sendBulkCrmEmail: (payload) => request('/api/crm/bulk-email', { method: 'POST', body: payload }),
+  bulkUpdatePipeline: (payload) => request('/api/crm/bulk-update', { method: 'POST', body: payload }),
+  syncCrmEmailThread: (leadId) =>
+    request('/api/crm/sync-email-thread', { method: 'POST', body: { leadId } }),
+  logCrmEmailReply: (leadId, payload) =>
+    request('/api/crm/log-email-reply', { method: 'POST', body: { leadId, ...payload } }),
   generateCrmWhatsApp: (leadId, options = {}) =>
     request('/api/crm/generate-whatsapp', { method: 'POST', body: { leadId, ...options } }),
 }

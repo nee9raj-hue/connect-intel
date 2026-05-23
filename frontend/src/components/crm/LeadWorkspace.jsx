@@ -16,6 +16,7 @@ import {
   toDatetimeLocalValue,
 } from '../../lib/crmUiConstants'
 import TeamParticipantPicker from './TeamParticipantPicker'
+import CrmEmailThread from './CrmEmailThread'
 
 const TABS = [
   { id: 'overview', label: 'Overview' },
@@ -34,6 +35,8 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
     patchLead,
     generateEmailDraft,
     logCrmEmailSend,
+    syncEmailThread,
+    logEmailReply,
     generateWhatsAppDraft,
     refreshTeam,
   } = useApp()
@@ -50,7 +53,12 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
   const [error, setError] = useState(null)
   const [notice, setNotice] = useState(null)
   const [orgEmail, setOrgEmail] = useState(null)
-  const [gmailStatus, setGmailStatus] = useState({ connected: false, mailbox: null })
+  const [gmailStatus, setGmailStatus] = useState({
+    connected: false,
+    mailbox: null,
+    replySyncEnabled: false,
+  })
+  const [threadSyncing, setThreadSyncing] = useState(false)
   const [connectingGmail, setConnectingGmail] = useState(false)
   const [emailAgenda, setEmailAgenda] = useState('')
   const [emailKeyPoints, setEmailKeyPoints] = useState('')
@@ -111,8 +119,14 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
       .catch(() => setOrgEmail(null))
     api
       .getCrmGmailStatus()
-      .then((data) => setGmailStatus({ connected: data.connected, mailbox: data.mailbox }))
-      .catch(() => setGmailStatus({ connected: false, mailbox: null }))
+      .then((data) =>
+        setGmailStatus({
+          connected: data.connected,
+          mailbox: data.mailbox,
+          replySyncEnabled: Boolean(data.replySyncEnabled),
+        })
+      )
+      .catch(() => setGmailStatus({ connected: false, mailbox: null, replySyncEnabled: false }))
   }, [tab, lead.id, user?.orgOutboundEmailReady])
 
   useEffect(() => {
@@ -126,7 +140,13 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
     window.history.replaceState({}, '', qs ? `${window.location.pathname}?${qs}` : window.location.pathname)
     api
       .getCrmGmailStatus()
-      .then((data) => setGmailStatus({ connected: data.connected, mailbox: data.mailbox }))
+      .then((data) =>
+        setGmailStatus({
+          connected: data.connected,
+          mailbox: data.mailbox,
+          replySyncEnabled: Boolean(data.replySyncEnabled),
+        })
+      )
       .catch(() => {})
     setTab('email')
   }, [])
@@ -340,8 +360,38 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
     }
   }
 
+  const handleSyncEmailThread = async () => {
+    setThreadSyncing(true)
+    setError(null)
+    try {
+      const data = await syncEmailThread(lead.id)
+      setNotice(
+        data.importedCount > 0
+          ? `Synced ${data.importedCount} message(s) from Gmail`
+          : 'No new messages found in the last 90 days'
+      )
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setThreadSyncing(false)
+    }
+  }
+
+  const handleLogReply = async ({ subject: replySubj, body: replyBody }) => {
+    setThreadSyncing(true)
+    setError(null)
+    try {
+      await logEmailReply(lead.id, { subject: replySubj, body: replyBody })
+      setNotice('Reply logged — lead marked as replied')
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setThreadSyncing(false)
+    }
+  }
+
   const canSendEmail = Boolean(gmailStatus.connected || orgEmail?.userCanSend || user?.orgOutboundEmailReady)
-  const busy = saving || sending || generating || connectingGmail || waGenerating
+  const busy = saving || sending || generating || connectingGmail || waGenerating || threadSyncing
   const hasLeadPhone = leadHasCallablePhone(lead)
 
   const handleGenerateWhatsApp = async () => {
@@ -459,8 +509,15 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
                   value={lead.assignedToUserId || ''}
                   onChange={async (e) => {
                     try {
-                      await assignLead(lead.id, e.target.value || null)
-                      setNotice('Lead assigned')
+                      const data = await assignLead(lead.id, e.target.value || null)
+                      const mail = data?.assignmentEmail
+                      if (e.target.value && mail?.sent) {
+                        setNotice('Lead assigned — notification email sent to teammate')
+                      } else if (e.target.value && mail?.error) {
+                        setNotice(`Lead assigned. Email not sent: ${mail.error}`)
+                      } else {
+                        setNotice(e.target.value ? 'Lead assigned' : 'Lead unassigned')
+                      }
                     } catch (err) {
                       setError(err.message)
                     }
@@ -777,16 +834,16 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
             >
               {sending ? 'Sending…' : 'Send email & log in CRM'}
             </button>
-            {crm.emails?.length > 0 && (
-              <ul className="space-y-2 pt-2">
-                {crm.emails.slice(0, 6).map((email) => (
-                  <li key={email.id} className="text-xs border rounded-lg p-2 bg-gray-50">
-                    <div className="font-medium truncate">{email.subject}</div>
-                    <div className="text-gray-500">{formatCrmDate(email.sentAt)}</div>
-                  </li>
-                ))}
-              </ul>
-            )}
+
+            <CrmEmailThread
+              lead={lead}
+              emails={crm.emails || []}
+              gmailConnected={gmailStatus.connected}
+              replySyncEnabled={gmailStatus.replySyncEnabled}
+              busy={threadSyncing || sending}
+              onSync={handleSyncEmailThread}
+              onLogReply={handleLogReply}
+            />
           </>
         )}
 

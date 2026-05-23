@@ -116,7 +116,8 @@ export default function CrmGmailConnectCard({ compact = false }) {
           Sends from <strong>{status.mailbox}</strong> via Google — no DNS changes. Activity is logged in CRM.
         </p>
         <p className="text-[10px] text-green-700 mt-1">
-          Inbox sync (auto-import replies) is not enabled yet — outbound send only, like early HubSpot connect.
+          After connecting, open a lead → Email → <strong>Sync from Gmail</strong> to pull replies into the thread.
+          Reconnect once if sync asks for read access.
         </p>
       </div>
     )

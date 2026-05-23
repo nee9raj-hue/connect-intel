@@ -138,8 +138,13 @@ export default function TeamDashboardPanel({ onNavigate }) {
                   ))}
                 </div>
                 <p className="text-[10px] text-gray-400 mt-2">
-                  Email, call, and WhatsApp touchpoints logged in CRM
+                  Emails sent, calls, WhatsApp, notes, and new leads added to pipeline
                 </p>
+                {summary.activitiesInPeriod === 0 && summary.totalLeads > 0 && (
+                  <p className="text-[10px] text-amber-800 bg-amber-50 border border-amber-100 rounded-lg px-2 py-1.5 mt-2">
+                    No touchpoints in this period yet — send email or log activity from a lead in Pipeline.
+                  </p>
+                )}
               </section>
 
               <section className="bg-white rounded-xl border border-gray-200 p-4">

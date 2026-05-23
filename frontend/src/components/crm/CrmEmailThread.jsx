@@ -1,0 +1,171 @@
+import { useState } from 'react'
+import { formatCrmDate } from '../../lib/crmConstants'
+import { formatDateTime } from '../../lib/crmUiConstants'
+
+export default function CrmEmailThread({
+  lead,
+  emails = [],
+  gmailConnected,
+  replySyncEnabled,
+  busy,
+  onSync,
+  onLogReply,
+}) {
+  const [showReplyForm, setShowReplyForm] = useState(false)
+  const [replySubject, setReplySubject] = useState('')
+  const [replyBody, setReplyBody] = useState('')
+  const [expandedId, setExpandedId] = useState(null)
+
+  const sorted = [...emails].sort(
+    (a, b) => new Date(a.sentAt || 0) - new Date(b.sentAt || 0)
+  )
+
+  const submitReply = async () => {
+    if (!replyBody.trim()) return
+    await onLogReply?.({
+      subject: replySubject.trim(),
+      body: replyBody.trim(),
+    })
+    setReplyBody('')
+    setReplySubject('')
+    setShowReplyForm(false)
+  }
+
+  return (
+    <section className="rounded-xl border border-gray-200 bg-white overflow-hidden">
+      <div className="px-3 py-2.5 border-b border-gray-100 flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h3 className="text-[11px] font-semibold uppercase text-gray-500">Email thread</h3>
+          <p className="text-[10px] text-gray-400 mt-0.5">
+            HubSpot-style trail — outbound sends and replies in one place
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-1.5">
+          {gmailConnected && (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => onSync?.()}
+              className="text-[10px] font-semibold px-2 py-1 rounded-md border border-gray-200 hover:bg-gray-50 disabled:opacity-50"
+              title={
+                replySyncEnabled
+                  ? 'Pull recent messages from Gmail'
+                  : 'Reconnect Gmail to enable automatic reply sync'
+              }
+            >
+              {busy ? 'Syncing…' : '↻ Sync from Gmail'}
+            </button>
+          )}
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => setShowReplyForm((v) => !v)}
+            className="text-[10px] font-semibold px-2 py-1 rounded-md bg-violet-50 text-violet-800 border border-violet-200"
+          >
+            + Log reply
+          </button>
+        </div>
+      </div>
+
+      {gmailConnected && !replySyncEnabled && (
+        <p className="text-[10px] text-amber-900 bg-amber-50 border-b border-amber-100 px-3 py-2">
+          Reconnect work Gmail once to import replies automatically (Team or Email tab). You can still log
+          replies manually below.
+        </p>
+      )}
+
+      {showReplyForm && (
+        <div className="p-3 border-b border-gray-100 bg-violet-50/40 space-y-2">
+          <input
+            value={replySubject}
+            onChange={(e) => setReplySubject(e.target.value)}
+            placeholder="Subject (optional)"
+            className="w-full text-xs border border-gray-200 rounded-lg px-2 py-1.5"
+          />
+          <textarea
+            value={replyBody}
+            onChange={(e) => setReplyBody(e.target.value)}
+            rows={4}
+            placeholder="Paste the lead's reply here…"
+            className="w-full text-xs border border-gray-200 rounded-lg px-2 py-1.5"
+          />
+          <div className="flex gap-2">
+            <button
+              type="button"
+              disabled={busy || !replyBody.trim()}
+              onClick={submitReply}
+              className="text-xs font-semibold px-3 py-1.5 bg-violet-700 text-white rounded-lg disabled:opacity-50"
+            >
+              Save reply to CRM
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowReplyForm(false)}
+              className="text-xs text-gray-500 underline"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="max-h-64 overflow-y-auto p-3 space-y-2">
+        {sorted.length === 0 ? (
+          <p className="text-xs text-gray-500 text-center py-4">
+            No emails logged yet. Send from below or sync from Gmail.
+          </p>
+        ) : (
+          sorted.map((msg) => {
+            const inbound = msg.direction === 'inbound'
+            const open = expandedId === msg.id
+            return (
+              <div
+                key={msg.id}
+                className={`rounded-lg border text-xs ${
+                  inbound
+                    ? 'border-violet-200 bg-violet-50/60 ml-2'
+                    : 'border-gray-200 bg-gray-50 mr-2'
+                }`}
+              >
+                <button
+                  type="button"
+                  onClick={() => setExpandedId(open ? null : msg.id)}
+                  className="w-full text-left px-3 py-2"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <span
+                      className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${
+                        inbound ? 'bg-violet-200 text-violet-900' : 'bg-gray-200 text-gray-700'
+                      }`}
+                    >
+                      {inbound ? 'Reply' : 'Sent'}
+                    </span>
+                    <span className="text-[10px] text-gray-500 shrink-0">
+                      {formatDateTime(msg.sentAt) || formatCrmDate(msg.sentAt)}
+                    </span>
+                  </div>
+                  <p className="font-semibold text-gray-900 mt-1 truncate">{msg.subject || '(No subject)'}</p>
+                  {msg.fromMailbox && (
+                    <p className="text-[10px] text-gray-500 mt-0.5 truncate">{msg.fromMailbox}</p>
+                  )}
+                  {!open && (
+                    <p className="text-gray-600 mt-1 line-clamp-2 whitespace-pre-wrap">
+                      {msg.bodyPreview || msg.body || ''}
+                    </p>
+                  )}
+                </button>
+                {open && (
+                  <div className="px-3 pb-3 border-t border-gray-200/60">
+                    <pre className="text-[11px] text-gray-700 whitespace-pre-wrap font-sans leading-relaxed mt-2">
+                      {msg.body || msg.bodyPreview || ''}
+                    </pre>
+                  </div>
+                )}
+              </div>
+            )
+          })
+        )}
+      </div>
+    </section>
+  )
+}

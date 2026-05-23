@@ -5,6 +5,7 @@ import LeadWorkspace from './LeadWorkspace'
 import PipelineImportModal from './PipelineImportModal'
 import BulkEmailModal from './BulkEmailModal'
 import AddLeadModal from './AddLeadModal'
+import PipelineBulkActionsBar from './PipelineBulkActionsBar'
 
 export default function PipelinePanel({ onNavigate }) {
   const {
@@ -18,6 +19,8 @@ export default function PipelinePanel({ onNavigate }) {
     pipelineAssigneeFilter,
     setPipelineAssigneeFilter,
     teamMembers,
+    refreshTeam,
+    bulkUpdatePipeline,
   } = useApp()
 
   const columns = useMemo(() => getVisiblePipelineColumns(user), [user])
@@ -27,6 +30,13 @@ export default function PipelinePanel({ onNavigate }) {
   const [importOpen, setImportOpen] = useState(false)
   const [addOpen, setAddOpen] = useState(false)
   const [bulkOpen, setBulkOpen] = useState(false)
+  const [bulkBusy, setBulkBusy] = useState(false)
+
+  const canAssign = Boolean(user?.isOrgAdmin && user?.accountType === 'company')
+
+  useEffect(() => {
+    if (canAssign) refreshTeam?.()
+  }, [canAssign, refreshTeam])
 
   const selectedLead = useMemo(
     () => savedLeads.find((l) => l.id === pipelineLeadId) || null,
@@ -79,6 +89,45 @@ export default function PipelinePanel({ onNavigate }) {
     [scopedLeads]
   )
 
+  const toggleSelect = (id, checked) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (checked) next.add(id)
+      else next.delete(id)
+      return next
+    })
+  }
+
+  const selectAllInList = (checked) => {
+    if (checked) setSelectedIds(new Set(filtered.map((l) => l.id)))
+    else setSelectedIds(new Set())
+  }
+
+  const selectAllInColumn = (columnId, checked) => {
+    const ids = (byStatus[columnId] || []).map((l) => l.id)
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      for (const id of ids) {
+        if (checked) next.add(id)
+        else next.delete(id)
+      }
+      return next
+    })
+  }
+
+  const runBulk = async (actions) => {
+    if (!selectedIds.size) return
+    setBulkBusy(true)
+    try {
+      await bulkUpdatePipeline([...selectedIds], actions)
+      await refreshSavedLeads()
+    } catch (e) {
+      window.alert(e.message || 'Bulk update failed')
+    } finally {
+      setBulkBusy(false)
+    }
+  }
+
   return (
     <div className="flex h-full min-h-0 relative">
       <div className={`flex-1 flex flex-col min-w-0 ${selectedLead ? 'hidden md:flex' : 'flex'}`}>
@@ -119,15 +168,6 @@ export default function PipelinePanel({ onNavigate }) {
               >
                 Import CSV
               </button>
-              {selectedIds.size > 0 && (
-                <button
-                  type="button"
-                  onClick={() => setBulkOpen(true)}
-                  className="text-xs font-semibold px-3 py-1.5 bg-gray-900 text-white rounded-md"
-                >
-                  Email selected ({selectedIds.size})
-                </button>
-              )}
               <button
                 type="button"
                 onClick={() => onNavigate?.('bulk-email')}
@@ -185,6 +225,19 @@ export default function PipelinePanel({ onNavigate }) {
           )}
         </header>
 
+        <PipelineBulkActionsBar
+          count={selectedIds.size}
+          statusOptions={columns}
+          teamMembers={teamMembers}
+          canAssign={canAssign}
+          busy={bulkBusy}
+          onApplyStatus={(status) => runBulk({ status })}
+          onAssign={(assignToUserId) => runBulk({ assignToUserId })}
+          onMarkReplied={() => runBulk({ markReplied: true })}
+          onEmail={() => setBulkOpen(true)}
+          onClear={() => setSelectedIds(new Set())}
+        />
+
         <div className="flex-1 overflow-auto p-4">
           {savedLeads.length === 0 ? (
             <EmptyPipeline
@@ -200,7 +253,10 @@ export default function PipelinePanel({ onNavigate }) {
                   column={col}
                   leads={byStatus[col.id] || []}
                   selectedId={pipelineLeadId}
+                  selectedIds={selectedIds}
                   onSelect={openPipelineLead}
+                  onToggleSelect={toggleSelect}
+                  onSelectAllInColumn={(checked) => selectAllInColumn(col.id, checked)}
                 />
               ))}
             </div>
@@ -213,14 +269,8 @@ export default function PipelinePanel({ onNavigate }) {
                       <input
                         type="checkbox"
                         checked={filtered.length > 0 && filtered.every((l) => selectedIds.has(l.id))}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedIds(new Set(filtered.map((l) => l.id)))
-                          } else {
-                            setSelectedIds(new Set())
-                          }
-                        }}
-                        aria-label="Select all"
+                        onChange={(e) => selectAllInList(e.target.checked)}
+                        aria-label="Select all in list"
                       />
                     </th>
                     {['Name', 'Company', 'Status', 'Last email', 'Response', ''].map((h) => (
@@ -248,14 +298,7 @@ export default function PipelinePanel({ onNavigate }) {
                           <input
                             type="checkbox"
                             checked={selectedIds.has(lead.id)}
-                            onChange={(e) => {
-                              setSelectedIds((prev) => {
-                                const next = new Set(prev)
-                                if (e.target.checked) next.add(lead.id)
-                                else next.delete(lead.id)
-                                return next
-                              })
-                            }}
+                            onChange={(e) => toggleSelect(lead.id, e.target.checked)}
                             aria-label="Select lead"
                           />
                         </td>
@@ -336,36 +379,75 @@ export default function PipelinePanel({ onNavigate }) {
   )
 }
 
-function KanbanColumn({ column, leads, selectedId, onSelect }) {
+function KanbanColumn({
+  column,
+  leads,
+  selectedId,
+  selectedIds,
+  onSelect,
+  onToggleSelect,
+  onSelectAllInColumn,
+}) {
+  const allSelected = leads.length > 0 && leads.every((l) => selectedIds.has(l.id))
+
   return (
     <div className="w-[220px] shrink-0 flex flex-col bg-gray-100/80 rounded-xl border border-gray-200/80">
-      <div className="px-3 py-2.5 border-b border-gray-200/60 flex items-center justify-between">
+      <div className="px-3 py-2.5 border-b border-gray-200/60 flex items-center justify-between gap-1">
         <span className="text-xs font-semibold text-gray-700">{column.label}</span>
-        <span className="text-[10px] font-bold text-gray-500 bg-white px-1.5 py-0.5 rounded">{leads.length}</span>
+        <div className="flex items-center gap-1">
+          <input
+            type="checkbox"
+            checked={allSelected}
+            onChange={(e) => onSelectAllInColumn(e.target.checked)}
+            title={`Select all in ${column.label}`}
+            aria-label={`Select all in ${column.label}`}
+            className="w-3.5 h-3.5"
+          />
+          <span className="text-[10px] font-bold text-gray-500 bg-white px-1.5 py-0.5 rounded">
+            {leads.length}
+          </span>
+        </div>
       </div>
       <div className="flex-1 p-2 space-y-2 overflow-y-auto max-h-[calc(100vh-220px)]">
         {leads.length === 0 ? (
           <p className="text-[10px] text-gray-400 text-center py-4">No leads</p>
         ) : (
           leads.map((lead) => (
-            <button
+            <div
               key={lead.id}
-              type="button"
-              onClick={() => onSelect(lead.id)}
-              className={`w-full text-left p-2.5 rounded-lg border bg-white hover:border-[#ffcb2b]/60 transition-colors ${
+              className={`rounded-lg border bg-white transition-colors ${
                 selectedId === lead.id ? 'border-[#ffcb2b] ring-1 ring-[#ffcb2b]/30' : 'border-gray-200'
-              }`}
+              } ${selectedIds.has(lead.id) ? 'ring-1 ring-gray-400' : ''}`}
             >
-              <div className="text-xs font-semibold text-gray-900 truncate">
-                {lead.firstName} {lead.lastName}
+              <div className="flex items-start gap-1 p-2">
+                <input
+                  type="checkbox"
+                  className="mt-0.5 shrink-0"
+                  checked={selectedIds.has(lead.id)}
+                  onChange={(e) => onToggleSelect(lead.id, e.target.checked)}
+                  onClick={(e) => e.stopPropagation()}
+                  aria-label="Select lead"
+                />
+                <button
+                  type="button"
+                  onClick={() => onSelect(lead.id)}
+                  className="flex-1 min-w-0 text-left"
+                >
+                  <div className="text-xs font-semibold text-gray-900 truncate">
+                    {lead.firstName} {lead.lastName}
+                  </div>
+                  <div className="text-[10px] text-gray-500 truncate mt-0.5">{lead.company}</div>
+                  {lead.crm?.lastEmailSentAt && (
+                    <div className="text-[10px] text-gray-400 mt-1">
+                      Emailed {formatCrmDate(lead.crm.lastEmailSentAt)}
+                    </div>
+                  )}
+                  {lead.crm?.responseReceived && (
+                    <div className="text-[10px] text-violet-700 mt-0.5 font-medium">Replied</div>
+                  )}
+                </button>
               </div>
-              <div className="text-[10px] text-gray-500 truncate mt-0.5">{lead.company}</div>
-              {lead.crm?.lastEmailSentAt && (
-                <div className="text-[10px] text-gray-400 mt-1">
-                  Emailed {formatCrmDate(lead.crm.lastEmailSentAt)}
-                </div>
-              )}
-            </button>
+            </div>
           ))
         )}
       </div>
