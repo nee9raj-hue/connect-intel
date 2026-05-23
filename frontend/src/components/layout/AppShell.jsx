@@ -18,6 +18,7 @@ import CrmCalendarPanel from '../crm/CrmCalendarPanel'
 import BulkEmailPanel from '../crm/BulkEmailPanel'
 import { useWorkspaceSync } from '../../hooks/useWorkspaceSync'
 import SessionReconnectBanner from './SessionReconnectBanner'
+import GmailSetupModal, { markGmailSetupDone, useGmailSetupNeeded } from '../onboarding/GmailSetupModal'
 
 const PANELS = {
   overview: OverviewPanel,
@@ -40,6 +41,7 @@ export default function AppShell() {
   const [liveToast, setLiveToast] = useState(null)
   const Panel = PANELS[activePanel] || PeopleSearch
   const needsOnboarding = user && !user.onboardingComplete && !user.isPlatformAdmin
+  const { needed: needsGmailSetup, setNeeded: setNeedsGmailSetup } = useGmailSetupNeeded(user)
 
   useWorkspaceSync({
     enabled: Boolean(user?.onboardingComplete || user?.isPlatformAdmin),
@@ -71,6 +73,14 @@ export default function AppShell() {
       setActivePanel(user?.isPlatformAdmin ? 'integrations' : 'team')
     }
   }, [user?.isPlatformAdmin])
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('crm_gmail') === 'connected') {
+      markGmailSetupDone()
+      setNeedsGmailSetup(false)
+    }
+  }, [setNeedsGmailSetup])
 
   const navigate = (id) => {
     setActivePanel(id)
@@ -116,6 +126,9 @@ export default function AppShell() {
         </div>
       </main>
       {needsOnboarding && <OnboardingModal />}
+      {!needsOnboarding && needsGmailSetup && (
+        <GmailSetupModal onDone={() => setNeedsGmailSetup(false)} />
+      )}
     </div>
   )
 }

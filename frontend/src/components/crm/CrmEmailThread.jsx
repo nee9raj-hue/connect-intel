@@ -69,21 +69,20 @@ export default function CrmEmailThread({
         </div>
       </div>
 
-      {gmailConnected && !replySyncEnabled && (
+      {gmailConnected && !replySyncEnabled && onEnableReplySync && (
         <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] text-amber-950 bg-amber-50 border-b border-amber-100 px-3 py-2">
           <p className="leading-relaxed">
-            Reply import needs one extra Google permission. Use the button to allow it, or log replies manually.
+            Allow Gmail to import replies (one-time). Your company admin may need to add your work email as a
+            Google test user first — then click below and approve all permissions.
           </p>
-          {onEnableReplySync && (
-            <button
-              type="button"
-              disabled={busy || enableReplySyncBusy}
-              onClick={() => onEnableReplySync()}
-              className="shrink-0 text-[10px] font-semibold px-2.5 py-1 rounded-md bg-[#ffcb2b] text-[#242424] border border-[#e6b800] disabled:opacity-50"
-            >
-              {enableReplySyncBusy ? 'Opening Google…' : 'Enable reply sync'}
-            </button>
-          )}
+          <button
+            type="button"
+            disabled={busy || enableReplySyncBusy}
+            onClick={() => onEnableReplySync()}
+            className="shrink-0 text-[10px] font-semibold px-2.5 py-1 rounded-md bg-[#ffcb2b] text-[#242424] border border-[#e6b800] disabled:opacity-50"
+          >
+            {enableReplySyncBusy ? 'Opening Google…' : 'Allow reply import'}
+          </button>
         </div>
       )}
 

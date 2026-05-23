@@ -148,6 +148,12 @@ export default function CrmGmailConnectCard({ compact = false }) {
         HubSpot-style: each rep connects their <strong>@company.com</strong> Google account once. CRM sends through
         that inbox — <strong>no DNS</strong> at your domain host.
       </p>
+      {user?.isOrgAdmin && (
+        <p className="text-[10px] text-gray-600 leading-relaxed border-t border-gray-100 pt-2">
+          <strong>Admin:</strong> In Google Cloud → OAuth consent → <strong>Test users</strong>, add each
+          teammate&apos;s work email before they connect. They must approve send + read access on first login.
+        </p>
+      )}
       {error && (
         <p className="text-xs text-red-800 bg-red-50 border border-red-100 rounded px-2 py-1">{error}</p>
       )}

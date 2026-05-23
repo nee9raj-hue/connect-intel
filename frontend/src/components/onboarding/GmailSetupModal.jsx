@@ -1,0 +1,163 @@
+import { useCallback, useEffect, useState } from 'react'
+import { useApp } from '../../context/AppContext'
+import { api } from '../../lib/api'
+
+const STORAGE_KEY = 'ci_gmail_setup_done'
+
+export function markGmailSetupDone() {
+  try {
+    sessionStorage.setItem(STORAGE_KEY, '1')
+  } catch {
+    // ignore
+  }
+}
+
+export function useGmailSetupNeeded(user) {
+  const [needed, setNeeded] = useState(false)
+  const [status, setStatus] = useState(null)
+
+  useEffect(() => {
+    if (!user?.onboardingComplete || user?.isPlatformAdmin) {
+      setNeeded(false)
+      return
+    }
+
+    let cancelled = false
+    try {
+      if (sessionStorage.getItem(STORAGE_KEY) === '1') {
+        setNeeded(false)
+        return
+      }
+    } catch {
+      // continue
+    }
+
+    api
+      .getCrmGmailStatus()
+      .then((data) => {
+        if (cancelled) return
+        setStatus(data)
+        const ready = data.connected && data.replySyncEnabled
+        if (ready) {
+          markGmailSetupDone()
+          setNeeded(false)
+        } else {
+          setNeeded(true)
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setNeeded(false)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [user?.id, user?.onboardingComplete, user?.isPlatformAdmin])
+
+  return { needed, status, setNeeded }
+}
+
+export default function GmailSetupModal({ onDone }) {
+  const { user } = useApp()
+  const [connecting, setConnecting] = useState(false)
+  const [error, setError] = useState(null)
+  const [status, setStatus] = useState(null)
+
+  const loadStatus = useCallback(() => {
+    api
+      .getCrmGmailStatus()
+      .then((data) => {
+        setStatus(data)
+        if (data.connected && data.replySyncEnabled) {
+          markGmailSetupDone()
+          onDone?.()
+        }
+      })
+      .catch(() => {})
+  }, [onDone])
+
+  useEffect(() => {
+    loadStatus()
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('crm_gmail') === 'connected') {
+      loadStatus()
+    }
+  }, [loadStatus])
+
+  const connect = async () => {
+    setConnecting(true)
+    setError(null)
+    try {
+      await api.touchSession()
+      const data = await api.startCrmGmailOAuth()
+      if (data.url) window.location.href = data.url
+      else setError('Could not start Google authorization')
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setConnecting(false)
+    }
+  }
+
+  const skip = () => {
+    markGmailSetupDone()
+    onDone?.()
+  }
+
+  const isAdmin = Boolean(user?.isOrgAdmin)
+  const needsUpgrade = status?.connected && !status?.replySyncEnabled
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/45 p-4">
+      <div className="w-full max-w-md bg-white rounded-xl shadow-xl border border-gray-200 p-6 space-y-4">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900">
+            {needsUpgrade ? 'Allow reply import from Gmail' : 'Connect your work Gmail'}
+          </h2>
+          <p className="text-sm text-gray-600 mt-1 leading-relaxed">
+            {needsUpgrade
+              ? 'Sending works already. Approve read access once so replies sync into the CRM automatically.'
+              : 'Connect once to send emails and sync replies from your work inbox — no DNS setup required.'}
+          </p>
+        </div>
+
+        {!isAdmin && (
+          <div className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-950 leading-relaxed">
+            <p className="font-semibold">Before you connect</p>
+            <p className="mt-1">
+              Ask your company admin to add <strong>{user?.email}</strong> as a Google OAuth test user in Google
+              Cloud (Audience → Test users). Until then, Google may block the permission screen.
+            </p>
+          </div>
+        )}
+
+        {isAdmin && (
+          <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-950 leading-relaxed">
+            <p className="font-semibold">For your team (company admin)</p>
+            <p className="mt-1">
+              Add each teammate&apos;s <strong>work email</strong> under Google Cloud → OAuth consent → Test users
+              before they connect. You can connect your own Gmail now.
+            </p>
+          </div>
+        )}
+
+        {error && (
+          <p className="text-xs text-red-800 bg-red-50 border border-red-100 rounded px-2 py-1.5">{error}</p>
+        )}
+
+        <button
+          type="button"
+          onClick={connect}
+          disabled={connecting}
+          className="w-full py-2.5 text-sm font-semibold bg-[#ffcb2b] text-[#242424] rounded-lg disabled:opacity-50"
+        >
+          {connecting ? 'Opening Google…' : needsUpgrade ? 'Allow reply import' : 'Connect work Gmail'}
+        </button>
+
+        <button type="button" onClick={skip} className="w-full text-xs text-gray-500 underline">
+          Skip for now — you can connect later from Team
+        </button>
+      </div>
+    </div>
+  )
+}
