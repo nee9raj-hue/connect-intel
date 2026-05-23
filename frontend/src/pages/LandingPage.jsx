@@ -1,5 +1,7 @@
 import { useApp } from '../context/AppContext'
-import GoogleSignIn, { GoogleSignInCompact } from '../components/auth/GoogleSignIn'
+import { GoogleSignInCompact } from '../components/auth/GoogleSignIn'
+import HeroAuthCta from '../components/landing/HeroAuthCta'
+import GoogleSignIn from '../components/auth/GoogleSignIn'
 import {
   CrmPipelineMini,
   EmailCrmFlow,
@@ -95,9 +97,9 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="relative pt-[100px] pb-16 px-6 overflow-hidden">
+      <section className="relative pt-[100px] pb-16 px-6 overflow-x-hidden">
         <HeroBackground />
-        <div className="max-w-[880px] mx-auto text-center relative">
+        <div className="max-w-[880px] mx-auto text-center relative z-10">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-gray-200 shadow-sm mb-8">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
@@ -124,26 +126,7 @@ export default function LandingPage() {
             follow-ups in one click · Reminders 30 minutes before every meeting.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-5">
-            <button
-              type="button"
-              onClick={() => setScreen('auth')}
-              className="w-full sm:w-auto px-8 py-3.5 bg-[#0f0f0f] text-white text-[15px] font-semibold rounded-lg hover:bg-[#2a2a2a] transition-colors shadow-lg shadow-black/10"
-            >
-              Start free workspace
-            </button>
-            <a
-              href="#product"
-              className="w-full sm:w-auto px-8 py-3.5 bg-white text-[#0f0f0f] text-[15px] font-semibold rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
-            >
-              See the CRM
-            </a>
-          </div>
-
-          <div className="max-w-[400px] mx-auto">
-            <GoogleSignIn text="signup_with" theme="outline" />
-          </div>
-          <p className="text-xs text-gray-400 mt-3">Google sign-in · No credit card · Live in minutes</p>
+          <HeroAuthCta />
         </div>
 
         <div className="max-w-[1000px] mx-auto mt-14 grid md:grid-cols-3 gap-4">
@@ -339,15 +322,15 @@ export default function LandingPage() {
           <p className="text-gray-600 mb-8">
             Join teams using Connect Intel to search India B2B leads, run CRM, and close with AI-powered outreach.
           </p>
-          <div className="max-w-[320px] mx-auto space-y-3">
+          <div className="max-w-[420px] mx-auto">
             <button
               type="button"
               onClick={() => setScreen('auth')}
-              className="w-full py-3.5 bg-[#0f0f0f] text-white font-semibold rounded-lg hover:bg-[#2a2a2a]"
+              className="w-full min-h-[48px] py-3.5 mb-4 bg-[#0f0f0f] text-white font-semibold rounded-lg hover:bg-[#2a2a2a]"
             >
               Create free account
             </button>
-            <GoogleSignIn text="signup_with" theme="outline" />
+            <GoogleSignIn text="signup_with" theme="outline" layout="block" />
           </div>
         </div>
       </section>
@@ -368,9 +351,9 @@ export default function LandingPage() {
 function HeroBackground() {
   return (
     <>
-      <div className="absolute inset-0 -z-10 bg-[#fafafa]" aria-hidden />
+      <div className="absolute inset-0 -z-10 bg-[#fafafa] overflow-hidden pointer-events-none" aria-hidden />
       <div
-        className="absolute inset-0 -z-10 opacity-[0.35]"
+        className="absolute inset-0 -z-10 opacity-[0.35] overflow-hidden pointer-events-none"
         style={{
           backgroundImage: 'radial-gradient(circle at 1px 1px, #d4d4d4 1px, transparent 0)',
           backgroundSize: '28px 28px',

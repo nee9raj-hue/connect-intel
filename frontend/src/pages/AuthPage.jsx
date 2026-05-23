@@ -70,7 +70,7 @@ export default function AuthPage({ inviteToken = null }) {
 
           {inviteToken && <InviteBanner token={inviteToken} />}
 
-          <GoogleSignIn text="continue_with" />
+          <GoogleSignIn text="continue_with" layout="block" />
 
           <div className="flex items-center gap-3 my-6">
             <div className="flex-1 h-px bg-gray-200" />

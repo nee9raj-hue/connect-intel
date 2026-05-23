@@ -1,53 +1,112 @@
+import { useEffect, useRef, useState } from 'react'
 import { GoogleLogin } from '@react-oauth/google'
 import { useApp } from '../../context/AppContext'
 
 const CLIENT_ID = (import.meta.env.VITE_GOOGLE_CLIENT_ID || '').trim().replace(/^["']|["']$/g, '')
 
+function useButtonWidth() {
+  const ref = useRef(null)
+  const [width, setWidth] = useState(320)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+
+    const measure = () => {
+      const w = el.getBoundingClientRect().width
+      setWidth(Math.min(400, Math.max(240, Math.floor(w))))
+    }
+
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(el)
+    window.addEventListener('resize', measure)
+    return () => {
+      ro.disconnect()
+      window.removeEventListener('resize', measure)
+    }
+  }, [])
+
+  return [ref, width]
+}
+
 /**
- * Google sign-in — instant access without signup form.
- * Set VITE_GOOGLE_CLIENT_ID in .env for production (Google Cloud Console).
+ * Google sign-in — full-width on landing/auth when layout="block".
  */
-export default function GoogleSignIn({ size = 'large', theme = 'outline', text = 'continue_with' }) {
+export default function GoogleSignIn({
+  size = 'large',
+  theme = 'outline',
+  text = 'continue_with',
+  layout = 'block',
+  label,
+}) {
   const { login } = useApp()
+  const [containerRef, btnWidth] = useButtonWidth()
 
   const handleSuccess = async (credentialResponse) => {
     try {
-      await login({
-        credential: credentialResponse.credential,
-      })
+      await login({ credential: credentialResponse.credential })
     } catch (error) {
       alert(error.message || 'Could not sign in with Google. Please try again.')
     }
   }
 
+  const displayLabel =
+    label ||
+    (text === 'signup_with' ? 'Sign up with Google' : text === 'signin_with' ? 'Sign in with Google' : 'Continue with Google')
+
   if (!CLIENT_ID) {
     return (
-      <button
-        type="button"
-        onClick={() =>
-          login({
-            demoProfile: {
-            name: 'Demo User',
-            email: 'demo@gmail.com',
-            company: 'Demo Company',
-            picture: null,
-            plan: 'free',
-            searchesLeft: 25,
-            authProvider: 'google-demo',
-            },
-          })
-        }
-        className="w-full flex items-center justify-center gap-3 py-3 px-4 bg-white border border-gray-300 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors shadow-sm"
-      >
-        <GoogleIcon />
-        Continue with Google
-        <span className="text-[10px] font-normal text-gray-400 ml-1">(demo)</span>
-      </button>
+      <div ref={containerRef} className="w-full">
+        <button
+          type="button"
+          onClick={() =>
+            login({
+              demoProfile: {
+                name: 'Demo User',
+                email: 'demo@gmail.com',
+                company: 'Demo Company',
+                picture: null,
+                plan: 'free',
+                searchesLeft: 25,
+                authProvider: 'google-demo',
+              },
+            })
+          }
+          className="w-full flex items-center justify-center gap-3 min-h-[44px] py-3 px-4 bg-white border border-gray-300 rounded-lg text-sm font-semibold text-gray-800 hover:bg-gray-50 hover:border-gray-400 transition-colors shadow-sm"
+        >
+          <GoogleIcon />
+          {displayLabel}
+          <span className="text-[10px] font-normal text-gray-500">(demo)</span>
+        </button>
+      </div>
+    )
+  }
+
+  if (layout === 'block') {
+    return (
+      <div ref={containerRef} className="w-full">
+        <div
+          className="w-full flex justify-center overflow-visible"
+          style={{ minHeight: size === 'large' ? 44 : 40 }}
+        >
+          <GoogleLogin
+            onSuccess={handleSuccess}
+            onError={() => alert('Google sign-in failed. Check your connection and try again.')}
+            useOneTap={false}
+            theme={theme}
+            size={size}
+            text={text}
+            shape="rectangular"
+            width={btnWidth}
+          />
+        </div>
+      </div>
     )
   }
 
   return (
-    <div className="w-full flex justify-center [&>div]:w-full [&_iframe]:!w-full">
+    <div ref={containerRef} className="inline-flex justify-center overflow-visible">
       <GoogleLogin
         onSuccess={handleSuccess}
         onError={() => alert('Google sign-in failed. Check your connection and try again.')}
@@ -56,7 +115,7 @@ export default function GoogleSignIn({ size = 'large', theme = 'outline', text =
         size={size}
         text={text}
         shape="rectangular"
-        width={360}
+        width={btnWidth}
       />
     </div>
   )
@@ -68,9 +127,7 @@ export function GoogleSignInCompact({ onBeforeLogin }) {
   const handleSuccess = async (credentialResponse) => {
     onBeforeLogin?.()
     try {
-      await login({
-        credential: credentialResponse.credential,
-      })
+      await login({ credential: credentialResponse.credential })
     } catch (error) {
       alert(error.message || 'Google sign-in failed.')
     }
@@ -84,13 +141,13 @@ export function GoogleSignInCompact({ onBeforeLogin }) {
           onBeforeLogin?.()
           login({
             demoProfile: {
-            name: 'Demo User',
-            email: 'demo@gmail.com',
-            company: 'Demo Co',
-            picture: null,
-            plan: 'free',
-            searchesLeft: 25,
-            authProvider: 'google-demo',
+              name: 'Demo User',
+              email: 'demo@gmail.com',
+              company: 'Demo Co',
+              picture: null,
+              plan: 'free',
+              searchesLeft: 25,
+              authProvider: 'google-demo',
             },
           })
         }}
@@ -103,20 +160,22 @@ export function GoogleSignInCompact({ onBeforeLogin }) {
   }
 
   return (
-    <GoogleLogin
-      onSuccess={handleSuccess}
-      onError={() => {}}
-      theme="outline"
-      size="medium"
-      text="signin_with"
-      shape="rectangular"
-    />
+    <div className="inline-flex overflow-visible">
+      <GoogleLogin
+        onSuccess={handleSuccess}
+        onError={() => {}}
+        theme="outline"
+        size="medium"
+        text="signin_with"
+        shape="rectangular"
+      />
+    </div>
   )
 }
 
 function GoogleIcon({ size = 20 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden>
+    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden className="shrink-0">
       <path
         fill="#4285F4"
         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
