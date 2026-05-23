@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react'
-import { formatDateTime } from '../lib/crmUiConstants'
+import { api } from '../lib/api'
 
-const POLL_MS = 20 * 1000
+const POLL_MS = 45 * 1000
+const AUTH_FAIL_PAUSE_MS = 2 * 60 * 1000
 
 function showBrowserNotification(item) {
   if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return
@@ -23,6 +24,7 @@ export function useWorkspaceSync({
 }) {
   const sinceRef = useRef(null)
   const seenRef = useRef(new Set())
+  const pausedUntilRef = useRef(0)
 
   useEffect(() => {
     if (!enabled || !userId) return undefined
@@ -32,7 +34,10 @@ export function useWorkspaceSync({
     }
 
     const run = async () => {
+      if (Date.now() < pausedUntilRef.current) return
+
       try {
+        await api.touchSession()
         const since = sinceRef.current
         const result = await syncWorkspace(since)
         if (result?.serverTime) {
@@ -58,8 +63,10 @@ export function useWorkspaceSync({
             }
           }
         }
-      } catch {
-        // ignore transient poll errors
+      } catch (error) {
+        if (error?.status === 401) {
+          pausedUntilRef.current = Date.now() + AUTH_FAIL_PAUSE_MS
+        }
       }
     }
 
@@ -69,7 +76,10 @@ export function useWorkspaceSync({
     const intervalId = setInterval(run, POLL_MS)
 
     const onVisible = () => {
-      if (document.visibilityState === 'visible') run()
+      if (document.visibilityState === 'visible') {
+        pausedUntilRef.current = 0
+        run()
+      }
     }
     document.addEventListener('visibilitychange', onVisible)
     window.addEventListener('focus', onVisible)
@@ -81,5 +91,3 @@ export function useWorkspaceSync({
     }
   }, [enabled, userId, syncWorkspace, onNewNotifications])
 }
-
-export { formatDateTime }

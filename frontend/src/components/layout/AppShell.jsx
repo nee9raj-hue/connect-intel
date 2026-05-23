@@ -17,6 +17,7 @@ import CrmActivityLogPanel from '../crm/CrmActivityLogPanel'
 import CrmCalendarPanel from '../crm/CrmCalendarPanel'
 import BulkEmailPanel from '../crm/BulkEmailPanel'
 import { useWorkspaceSync } from '../../hooks/useWorkspaceSync'
+import SessionReconnectBanner from './SessionReconnectBanner'
 
 const PANELS = {
   overview: OverviewPanel,
@@ -101,6 +102,7 @@ export default function AppShell() {
         )}
         <MobileRequiredModal />
         {!user?.isPlatformAdmin && <AppHeader onNavigate={navigate} />}
+        <SessionReconnectBanner />
         {liveToast && (
           <div
             className="shrink-0 mx-3 mt-2 text-xs font-medium text-[#5b4a00] bg-[#fffbeb] border border-[#ffe48a] rounded-lg px-3 py-2"

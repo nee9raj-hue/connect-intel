@@ -37,18 +37,25 @@ export function AppProvider({ children }) {
   const [notifications, setNotifications] = useState([])
   const readNotificationIdsRef = useRef(loadReadNotificationIds())
   const [notificationTick, setNotificationTick] = useState(0)
+  const [sessionError, setSessionError] = useState(null)
 
   const refreshSession = useCallback(async () => {
-    const session = await api.getSession()
-    if (session.user) {
-      if (session.token) storeSessionToken(session.token)
-      setUser(session.user)
-      setScreen('app')
-    } else {
-      setUser(null)
-      setScreen('landing')
+    try {
+      const session = await api.getSession()
+      if (session.user) {
+        if (session.token) storeSessionToken(session.token)
+        setUser(session.user)
+        setScreen('app')
+        setSessionError(null)
+      } else {
+        setUser(null)
+        setScreen('landing')
+      }
+      return session.user
+    } catch (error) {
+      setSessionError(error.message || 'Could not refresh your session')
+      return null
     }
-    return session.user
   }, [])
 
   const refreshTeam = useCallback(async () => {
@@ -70,10 +77,13 @@ export function AppProvider({ children }) {
     try {
       const saved = await api.getSavedLeads()
       setSavedLeads(saved.leads || [])
+      setSessionError(null)
       return saved.leads || []
-    } catch {
-      setSavedLeads([])
-      return []
+    } catch (error) {
+      if (error.status === 401) {
+        setSessionError(error.message || 'Session expired. Please sign in again.')
+      }
+      return null
     }
   }, [])
 
@@ -97,17 +107,32 @@ export function AppProvider({ children }) {
 
   const syncWorkspace = useCallback(
     async (since) => {
-      const [saved, notif] = await Promise.all([
+      const [savedResult, notifResult] = await Promise.allSettled([
         api.getSavedLeads(),
         api.getCrmNotifications(since || undefined),
       ])
-      setSavedLeads(saved.leads || [])
-      const newItems = mergeNotificationItems(notif.items || [])
-      return {
-        leads: saved.leads || [],
-        serverTime: notif.serverTime,
-        newItems,
+
+      let leads = []
+      let serverTime = new Date().toISOString()
+      let newItems = []
+
+      if (savedResult.status === 'fulfilled') {
+        leads = savedResult.value.leads || []
+        setSavedLeads(leads)
+        setSessionError(null)
+      } else if (savedResult.reason?.status === 401) {
+        setSessionError(
+          savedResult.reason.message || 'Session expired. Please sign in again.'
+        )
+        throw savedResult.reason
       }
+
+      if (notifResult.status === 'fulfilled') {
+        serverTime = notifResult.value.serverTime || serverTime
+        newItems = mergeNotificationItems(notifResult.value.items || [])
+      }
+
+      return { leads, serverTime, newItems }
     },
     [mergeNotificationItems]
   )
@@ -200,10 +225,9 @@ export function AppProvider({ children }) {
           const data = await api.getTeamMembers()
           if (!cancelled) setTeamMembers(data.members || [])
         }
-      } catch {
-        if (!cancelled) {
-          setSavedLeads([])
-          setSearchHistory([])
+      } catch (error) {
+        if (!cancelled && error?.status === 401) {
+          setSessionError(error.message || 'Session expired. Please sign in again.')
         }
       }
     }
@@ -212,7 +236,7 @@ export function AppProvider({ children }) {
     return () => {
       cancelled = true
     }
-  }, [user])
+  }, [user?.id, user?.organizationId, user?.accountType])
 
   const acceptPendingInvite = useCallback(async () => {
     const token = getStoredInviteToken()
@@ -230,6 +254,7 @@ export function AppProvider({ children }) {
   const login = useCallback(async (payload) => {
     const session = await api.createSession(payload)
     if (session.token) storeSessionToken(session.token)
+    setSessionError(null)
     setUser(session.user)
     setScreen('app')
     await acceptPendingInvite()
@@ -244,6 +269,7 @@ export function AppProvider({ children }) {
     }
     storeSessionToken(null)
     setUser(null)
+    setSessionError(null)
     setSavedLeads([])
     setSearchHistory([])
     setTeamMembers([])
@@ -421,6 +447,8 @@ export function AppProvider({ children }) {
         login,
         logout,
         refreshSession,
+        sessionError,
+        setSessionError,
         updateUser,
         savedLeads,
         toggleSaveLead,

@@ -3,7 +3,7 @@ import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 
 export default function CrmGmailConnectCard({ compact = false }) {
-  const { user } = useApp()
+  const { user, refreshSession } = useApp()
   const [status, setStatus] = useState(null)
   const [loading, setLoading] = useState(true)
   const [connecting, setConnecting] = useState(false)
@@ -13,10 +13,16 @@ export default function CrmGmailConnectCard({ compact = false }) {
     setLoading(true)
     setError(null)
     try {
+      await api.touchSession()
       const data = await api.getCrmGmailStatus()
       setStatus(data)
     } catch (e) {
-      setError(e.message)
+      const msg = e.message || 'Could not check Gmail status'
+      setError(
+        e.status === 401
+          ? `${msg} Try Reconnect below, or sign out and sign in again.`
+          : msg
+      )
     } finally {
       setLoading(false)
     }
@@ -53,9 +59,21 @@ export default function CrmGmailConnectCard({ compact = false }) {
       <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-900">
         <p className="font-semibold">Could not check Gmail status</p>
         <p className="mt-1">{error}</p>
-        <button type="button" onClick={load} className="mt-2 underline font-semibold">
-          Retry
-        </button>
+        <div className="mt-2 flex gap-3">
+          <button type="button" onClick={load} className="underline font-semibold">
+            Retry
+          </button>
+          <button
+            type="button"
+            onClick={async () => {
+              await refreshSession?.()
+              load()
+            }}
+            className="underline font-semibold"
+          >
+            Reconnect session
+          </button>
+        </div>
       </div>
     )
   }

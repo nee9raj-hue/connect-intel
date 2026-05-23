@@ -1,6 +1,36 @@
-import { getSessionToken } from './sessionAuth'
+import { getSessionToken, storeSessionToken } from './sessionAuth'
 
-async function request(path, options = {}) {
+let refreshInFlight = null
+
+async function touchSession() {
+  if (refreshInFlight) return refreshInFlight
+
+  refreshInFlight = (async () => {
+    const response = await fetch('/api/auth/session', {
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+    })
+    const text = await response.text()
+    let data = {}
+    if (text) {
+      try {
+        data = JSON.parse(text)
+      } catch {
+        return { user: null, token: null, ok: false }
+      }
+    }
+    if (data.token) storeSessionToken(data.token)
+    return { user: data.user || null, token: data.token || null, ok: Boolean(data.user) }
+  })()
+
+  try {
+    return await refreshInFlight
+  } finally {
+    refreshInFlight = null
+  }
+}
+
+async function request(path, options = {}, { retried = false } = {}) {
   const token = getSessionToken()
   const response = await fetch(path, {
     credentials: 'same-origin',
@@ -30,6 +60,14 @@ async function request(path, options = {}) {
     const message = data.error || data.hint || 'Request failed'
     const error = new Error(message)
     error.status = response.status
+
+    if (response.status === 401 && !retried && !path.includes('/api/auth/session')) {
+      const session = await touchSession()
+      if (session.ok) {
+        return request(path, options, { retried: true })
+      }
+    }
+
     throw error
   }
 
@@ -37,6 +75,7 @@ async function request(path, options = {}) {
 }
 
 export const api = {
+  touchSession,
   getIntegrationStatus: () => request('/api/integrations/status'),
   getSession: () => request('/api/auth/session'),
   createSession: (payload) => request('/api/auth/session', { method: 'POST', body: payload }),
