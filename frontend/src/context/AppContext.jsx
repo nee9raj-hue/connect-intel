@@ -278,6 +278,23 @@ export function AppProvider({ children }) {
     return data
   }, [])
 
+  const sendBulkEmail = useCallback(async (payload) => {
+    const data = await api.sendBulkCrmEmail(payload)
+    if (data.leads) setSavedLeads(data.leads)
+    return data
+  }, [])
+
+  const generateWhatsAppDraft = useCallback(async (leadId, options) => {
+    return api.generateCrmWhatsApp(leadId, options)
+  }, [])
+
+  const updateMobile = useCallback(async (mobile) => {
+    const data = await api.updateUserProfile({ mobile })
+    if (data.token) storeSessionToken(data.token)
+    setUser(data.user)
+    return data.user
+  }, [])
+
   const openPipelineLead = useCallback((leadId) => {
     setPipelineLeadId(leadId)
   }, [])
@@ -323,6 +340,9 @@ export function AppProvider({ children }) {
         assignLead,
         generateEmailDraft,
         logCrmEmailSend,
+        sendBulkEmail,
+        generateWhatsAppDraft,
+        updateMobile,
         openPipelineLead,
         pipelineLeadId,
         setPipelineLeadId,

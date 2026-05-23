@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { formatCrmDate, getStatusMeta, getVisiblePipelineColumns } from '../../lib/crmConstants'
 import LeadWorkspace from './LeadWorkspace'
+import PipelineImportModal from './PipelineImportModal'
+import BulkEmailModal from './BulkEmailModal'
 
 export default function PipelinePanel({ onNavigate }) {
   const {
@@ -11,11 +13,15 @@ export default function PipelinePanel({ onNavigate }) {
     pipelineLeadId,
     setPipelineLeadId,
     openPipelineLead,
+    refreshSavedLeads,
   } = useApp()
 
   const columns = useMemo(() => getVisiblePipelineColumns(user), [user])
   const [view, setView] = useState('board')
   const [filter, setFilter] = useState('all')
+  const [selectedIds, setSelectedIds] = useState(new Set())
+  const [importOpen, setImportOpen] = useState(false)
+  const [bulkOpen, setBulkOpen] = useState(false)
 
   const selectedLead = useMemo(
     () => savedLeads.find((l) => l.id === pipelineLeadId) || null,
@@ -67,7 +73,23 @@ export default function PipelinePanel({ onNavigate }) {
                 Mini CRM — columns match your team role ({columns.map((c) => c.label).join(', ')})
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              <button
+                type="button"
+                onClick={() => setImportOpen(true)}
+                className="text-xs font-medium px-3 py-1.5 border border-[#ffcb2b] bg-[#fffbeb] rounded-md hover:bg-[#fff6d6]"
+              >
+                Import pipeline
+              </button>
+              {selectedIds.size > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setBulkOpen(true)}
+                  className="text-xs font-semibold px-3 py-1.5 bg-gray-900 text-white rounded-md"
+                >
+                  Email selected ({selectedIds.size})
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => onNavigate?.('search')}
@@ -120,7 +142,7 @@ export default function PipelinePanel({ onNavigate }) {
 
         <div className="flex-1 overflow-auto p-4">
           {savedLeads.length === 0 ? (
-            <EmptyPipeline onNavigate={onNavigate} />
+            <EmptyPipeline onNavigate={onNavigate} onImport={() => setImportOpen(true)} />
           ) : view === 'board' ? (
             <div className="flex gap-3 min-h-[320px] overflow-x-auto pb-2">
               {columns.map((col) => (
@@ -138,6 +160,20 @@ export default function PipelinePanel({ onNavigate }) {
               <table className="w-full text-sm">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
+                    <th className="w-10 px-2 py-3">
+                      <input
+                        type="checkbox"
+                        checked={filtered.length > 0 && filtered.every((l) => selectedIds.has(l.id))}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedIds(new Set(filtered.map((l) => l.id)))
+                          } else {
+                            setSelectedIds(new Set())
+                          }
+                        }}
+                        aria-label="Select all"
+                      />
+                    </th>
                     {['Name', 'Company', 'Status', 'Last email', 'Response', ''].map((h) => (
                       <th
                         key={h}
@@ -159,6 +195,21 @@ export default function PipelinePanel({ onNavigate }) {
                         }`}
                         onClick={() => openPipelineLead(lead.id)}
                       >
+                        <td className="px-2 py-3" onClick={(e) => e.stopPropagation()}>
+                          <input
+                            type="checkbox"
+                            checked={selectedIds.has(lead.id)}
+                            onChange={(e) => {
+                              setSelectedIds((prev) => {
+                                const next = new Set(prev)
+                                if (e.target.checked) next.add(lead.id)
+                                else next.delete(lead.id)
+                                return next
+                              })
+                            }}
+                            aria-label="Select lead"
+                          />
+                        </td>
                         <td className="px-4 py-3 font-medium">
                           {lead.firstName} {lead.lastName}
                         </td>
@@ -207,6 +258,26 @@ export default function PipelinePanel({ onNavigate }) {
           onClose={() => setPipelineLeadId(null)}
         />
       )}
+
+      <PipelineImportModal
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+        onImported={() => {
+          refreshSavedLeads()
+          setImportOpen(false)
+        }}
+      />
+      <BulkEmailModal
+        open={bulkOpen}
+        leadIds={[...selectedIds]}
+        leads={savedLeads.filter((l) => selectedIds.has(l.id))}
+        onClose={() => setBulkOpen(false)}
+        onDone={() => {
+          setBulkOpen(false)
+          setSelectedIds(new Set())
+          refreshSavedLeads()
+        }}
+      />
     </div>
   )
 }
@@ -248,21 +319,30 @@ function KanbanColumn({ column, leads, selectedId, onSelect }) {
   )
 }
 
-function EmptyPipeline({ onNavigate }) {
+function EmptyPipeline({ onNavigate, onImport }) {
   return (
     <div className="flex flex-col items-center justify-center py-20 text-center max-w-md mx-auto">
       <p className="text-4xl mb-3">◎</p>
       <h3 className="font-semibold text-gray-900 mb-1">Your pipeline is empty</h3>
       <p className="text-sm text-gray-500 leading-relaxed">
-        Save leads from People Search, then manage status, notes, and email outreach here.
+        Import your existing Excel pipeline, or save leads from People Search.
       </p>
-      <button
-        type="button"
-        onClick={() => onNavigate?.('search')}
-        className="mt-5 px-5 py-2.5 bg-[#ffcb2b] text-[#242424] text-sm font-semibold rounded-lg hover:bg-[#f0bc00]"
-      >
-        Go to People Search
-      </button>
+      <div className="flex flex-col gap-2 mt-5 w-full max-w-xs">
+        <button
+          type="button"
+          onClick={onImport}
+          className="px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg"
+        >
+          Import pipeline (CSV/Excel)
+        </button>
+        <button
+          type="button"
+          onClick={() => onNavigate?.('search')}
+          className="px-5 py-2.5 bg-[#ffcb2b] text-[#242424] text-sm font-semibold rounded-lg hover:bg-[#f0bc00]"
+        >
+          Go to People Search
+        </button>
+      </div>
     </div>
   )
 }

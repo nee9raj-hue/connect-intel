@@ -83,4 +83,11 @@ export const api = {
   getOrgImportOverview: () => request('/api/org/imports'),
   importOrgPipeline: ({ datasetType, rows, addToPipeline = true }) =>
     request('/api/org/imports', { method: 'POST', body: { datasetType, rows, addToPipeline } }),
+  getMyImportOverview: () => request('/api/my/imports'),
+  importMyPipeline: ({ datasetType, rows, addToPipeline = true }) =>
+    request('/api/my/imports', { method: 'POST', body: { datasetType, rows, addToPipeline } }),
+  updateUserProfile: (payload) => request('/api/user/profile', { method: 'PATCH', body: payload }),
+  sendBulkCrmEmail: (payload) => request('/api/crm/bulk-email', { method: 'POST', body: payload }),
+  generateCrmWhatsApp: (leadId, options = {}) =>
+    request('/api/crm/generate-whatsapp', { method: 'POST', body: { leadId, ...options } }),
 }

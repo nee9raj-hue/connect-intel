@@ -6,6 +6,7 @@ export default function OnboardingModal() {
   const [accountType, setAccountType] = useState('company')
   const [companyName, setCompanyName] = useState('')
   const [logoUrl, setLogoUrl] = useState('')
+  const [mobile, setMobile] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
@@ -18,6 +19,7 @@ export default function OnboardingModal() {
         accountType,
         companyName: accountType === 'company' ? companyName.trim() : undefined,
         logoUrl: accountType === 'company' ? logoUrl.trim() || null : null,
+        mobile: mobile.trim(),
       })
     } catch (err) {
       setError(err.message)
@@ -58,6 +60,18 @@ export default function OnboardingModal() {
               <p className="text-xs text-gray-500 mt-0.5">{opt.sub}</p>
             </button>
           ))}
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-gray-600 mb-1">Your mobile (WhatsApp)</label>
+          <input
+            required
+            value={mobile}
+            onChange={(e) => setMobile(e.target.value)}
+            placeholder="+91 98765 43210"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+          />
+          <p className="text-[11px] text-gray-500 mt-1">Same number you use on WhatsApp — for customer outreach from CRM.</p>
         </div>
 
         {accountType === 'company' && (

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
+import { buildWhatsAppUrl, leadHasCallablePhone } from '../../lib/phoneUtils'
 import {
   CRM_STATUSES,
   EMAIL_PURPOSES,
@@ -20,11 +21,20 @@ const TABS = [
   { id: 'notes', label: 'Notes & log' },
   { id: 'schedule', label: 'Tasks & meetings' },
   { id: 'email', label: 'Email' },
+  { id: 'whatsapp', label: 'WhatsApp' },
 ]
 
 export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATUSES }) {
-  const { user, teamMembers, assignLead, updateSavedLeadCrm, patchLead, generateEmailDraft, logCrmEmailSend } =
-    useApp()
+  const {
+    user,
+    teamMembers,
+    assignLead,
+    updateSavedLeadCrm,
+    patchLead,
+    generateEmailDraft,
+    logCrmEmailSend,
+    generateWhatsAppDraft,
+  } = useApp()
   const [tab, setTab] = useState('overview')
   const [notes, setNotes] = useState(lead.crm?.notes || '')
   const [status, setStatus] = useState(lead.crm?.status || 'new')
@@ -45,6 +55,10 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
   const [emailKeyPoints, setEmailKeyPoints] = useState('')
   const [senderCompany, setSenderCompany] = useState(user?.organizationName || user?.company || '')
   const [draftAi, setDraftAi] = useState(false)
+  const [waMessage, setWaMessage] = useState('')
+  const [waAgenda, setWaAgenda] = useState('')
+  const [waKeyPoints, setWaKeyPoints] = useState('')
+  const [waGenerating, setWaGenerating] = useState(false)
   const [taskTitle, setTaskTitle] = useState('')
   const [taskDue, setTaskDue] = useState('')
   const [taskAssignee, setTaskAssignee] = useState(user?.id || '')
@@ -309,7 +323,55 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
   }
 
   const canSendEmail = Boolean(orgEmail?.userCanSend || user?.orgOutboundEmailReady || gmailStatus.connected)
-  const busy = saving || sending || generating || connectingGmail
+  const busy = saving || sending || generating || connectingGmail || waGenerating
+  const hasLeadPhone = leadHasCallablePhone(lead)
+
+  const handleGenerateWhatsApp = async () => {
+    if (waAgenda.trim().length < 8) {
+      setError('Describe your WhatsApp goal (agenda) in a few words')
+      return
+    }
+    setWaGenerating(true)
+    setError(null)
+    try {
+      const data = await generateWhatsAppDraft(lead.id, {
+        agenda: waAgenda.trim(),
+        keyPoints: waKeyPoints.trim(),
+        senderCompany: senderCompany.trim(),
+        senderName: user?.name,
+        purpose,
+        tone: 'professional',
+      })
+      setWaMessage(data.draft?.message || '')
+      setTab('whatsapp')
+      setNotice('WhatsApp draft ready')
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setWaGenerating(false)
+    }
+  }
+
+  const openWhatsApp = async () => {
+    if (!waMessage.trim()) {
+      setError('Write or generate a message first')
+      return
+    }
+    const url = buildWhatsAppUrl(lead.phone, waMessage.trim())
+    if (!url) {
+      setError('Lead has no valid phone number for WhatsApp')
+      return
+    }
+    try {
+      await patchLead(lead.id, {
+        activity: { type: 'whatsapp', summary: `WhatsApp: ${waMessage.trim().slice(0, 120)}` },
+      })
+      setNotice('WhatsApp opened — send from your app')
+    } catch {
+      // still open wa
+    }
+    window.open(url, '_blank', 'noopener,noreferrer')
+  }
 
   return (
     <aside className="fixed inset-0 z-40 md:static md:inset-auto md:w-full md:max-w-[420px] shrink-0 bg-white flex flex-col h-full shadow-xl md:shadow-none border-l border-gray-200">
@@ -687,6 +749,57 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
                 ))}
               </ul>
             )}
+          </>
+        )}
+
+        {tab === 'whatsapp' && (
+          <>
+            <p className="text-xs text-gray-600">
+              Sends from <strong>your WhatsApp</strong> ({user?.mobile || 'add mobile in profile'}) to{' '}
+              <strong>{lead.phone || 'no phone on lead'}</strong>.
+            </p>
+            {!hasLeadPhone && (
+              <p className="text-xs text-amber-900 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1.5">
+                This lead needs a valid phone number on the record.
+              </p>
+            )}
+            <textarea
+              value={waAgenda}
+              onChange={(e) => setWaAgenda(e.target.value)}
+              rows={2}
+              placeholder="Agenda (required for AI): e.g. follow up on export quote"
+              className="w-full text-sm border rounded-lg px-3 py-2"
+            />
+            <textarea
+              value={waKeyPoints}
+              onChange={(e) => setWaKeyPoints(e.target.value)}
+              rows={2}
+              placeholder="Key points (optional)"
+              className="w-full text-sm border rounded-lg px-3 py-2"
+            />
+            <button
+              type="button"
+              onClick={handleGenerateWhatsApp}
+              disabled={busy || waAgenda.trim().length < 8}
+              className="w-full py-2 text-xs font-semibold bg-[#fff6d6] border border-[#ffe48a] rounded-lg disabled:opacity-50"
+            >
+              {waGenerating ? 'Drafting…' : '✨ AI WhatsApp draft'}
+            </button>
+            <textarea
+              value={waMessage}
+              onChange={(e) => setWaMessage(e.target.value)}
+              rows={8}
+              placeholder="Message to send on WhatsApp"
+              className="w-full text-sm border rounded-lg px-3 py-2"
+            />
+            <button
+              type="button"
+              onClick={openWhatsApp}
+              disabled={busy || !hasLeadPhone || !waMessage.trim()}
+              className="w-full py-2.5 text-sm font-semibold bg-[#25D366] text-white rounded-lg disabled:opacity-50"
+            >
+              Open in WhatsApp & log
+            </button>
           </>
         )}
 

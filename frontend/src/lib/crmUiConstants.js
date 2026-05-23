@@ -1,6 +1,7 @@
 export const ACTIVITY_LABELS = {
   note: 'Note',
   email: 'Email',
+  whatsapp: 'WhatsApp',
   call: 'Call',
   meeting: 'Meeting',
   field_visit: 'Field visit',

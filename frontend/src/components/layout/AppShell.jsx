@@ -10,6 +10,7 @@ import IntegrationsPanel from '../integrations/IntegrationsPanel'
 import OverviewPanel from '../overview/OverviewPanel'
 import AdminPanel from '../admin/AdminPanel'
 import EmailOAuthNotice from './EmailOAuthNotice'
+import MobileRequiredModal from '../profile/MobileRequiredModal'
 import CrmActivityLogPanel from '../crm/CrmActivityLogPanel'
 import CrmCalendarPanel from '../crm/CrmCalendarPanel'
 import { useCrmReminders } from '../../hooks/useCrmReminders'
@@ -76,6 +77,7 @@ export default function AppShell() {
           <span className="text-sm font-semibold text-gray-900 truncate">Connect Intel</span>
         </div>
         <EmailOAuthNotice onOpenSystemStatus={() => navigate('integrations')} />
+        <MobileRequiredModal />
         <div className="flex-1 flex flex-col min-h-0 min-w-0 overflow-hidden">
           <Panel onNavigate={navigate} activePanel={activePanel} />
         </div>

@@ -40,8 +40,23 @@ Each rep: **Email tab → Connect work Gmail** (one-time). OAuth uses the same G
 
 Tasks, meetings, calls, and notes show **Saving…** / success banners and block double-clicks.
 
-## Coming next (tell us priorities)
+## Pipeline import
+
+- **Pipeline → Import pipeline** (CSV/Excel) — company team and individuals  
+- Company **members** can import (leads assign to them); **admins** assign from sheet or self  
+
+## Bulk email
+
+- **Pipeline → List** view: select leads → **Email selected**  
+- AI draft per lead (agenda) or same subject/body for all (max 50)  
+
+## WhatsApp
+
+- **WhatsApp** tab on each lead: AI draft → **Open in WhatsApp** (your mobile on profile)  
+- Mobile collected at onboarding or prompted on first login  
+
+## Coming next
 
 - Google Calendar sync  
-- Push/email reminders via Resend  
-- Manager task dashboard  
+- Slack / Teams notifications  
+- WhatsApp Business API (server send)  
