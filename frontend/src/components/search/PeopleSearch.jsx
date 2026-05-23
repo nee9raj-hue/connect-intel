@@ -7,6 +7,9 @@ import { searchLeads } from '../../lib/searchService'
 import SearchFiltersBar from './SearchFiltersBar'
 import SearchResultsView, { FULL_DETAIL_PREVIEW_COUNT } from './SearchResultsView'
 import ResultsTable from './ResultsTable'
+import RechargeWalletModal from './RechargeWalletModal'
+
+const CREDIT_COST_PAISE = 100
 
 const EMPTY_FILTERS = {
   states: [],
@@ -39,6 +42,10 @@ export default function PeopleSearch({ onNavigate }) {
   const [searchError, setSearchError] = useState(null)
   const [revealingKey, setRevealingKey] = useState(null)
   const [filtersExpanded, setFiltersExpanded] = useState(false)
+  const [rechargeOpen, setRechargeOpen] = useState(false)
+
+  const walletPaise = user?.creditsPaise ?? 0
+  const walletRupees = user?.creditBalanceRupees ?? Number((walletPaise / 100).toFixed(2))
 
   const handleSearch = async () => {
     setLoading(true)
@@ -127,6 +134,12 @@ export default function PeopleSearch({ onNavigate }) {
   }
 
   const handleRevealField = async (lead, field) => {
+    if (walletPaise < CREDIT_COST_PAISE) {
+      setRechargeOpen(true)
+      setSearchError('Recharge your credit wallet first — each reveal costs 1 credit (₹1).')
+      return
+    }
+
     const key = `${lead.id}:${field}`
     setRevealingKey(key)
     setSearchError(null)
@@ -149,6 +162,9 @@ export default function PeopleSearch({ onNavigate }) {
 
       await refreshSession()
     } catch (error) {
+      if (error.status === 402 || error.message?.toLowerCase().includes('recharge')) {
+        setRechargeOpen(true)
+      }
       setSearchError(error.message || 'Could not reveal contact')
     } finally {
       setRevealingKey(null)
@@ -217,6 +233,11 @@ export default function PeopleSearch({ onNavigate }) {
 
   return (
     <div className="flex flex-col h-full min-h-0 bg-[#f6f7f9]">
+      <RechargeWalletModal
+        open={rechargeOpen}
+        onClose={() => setRechargeOpen(false)}
+        balanceRupees={walletRupees}
+      />
       <header className="shrink-0 bg-white border-b border-gray-200 px-4 sm:px-5 py-2.5">
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
@@ -224,9 +245,17 @@ export default function PeopleSearch({ onNavigate }) {
             <p className="text-[11px] text-gray-500 truncate">{PRODUCT.databaseLine}</p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <span className="hidden sm:inline text-xs font-medium text-[#5b4a00] bg-[#fff6d6] px-2 py-1 rounded-full border border-[#ffe48a]">
-              ₹{user?.creditBalanceRupees ?? ((user?.creditsPaise || 0) / 100).toFixed(0)} wallet
-            </span>
+            <button
+              type="button"
+              onClick={() => walletPaise < CREDIT_COST_PAISE && setRechargeOpen(true)}
+              className={`hidden sm:inline text-xs font-medium px-2 py-1 rounded-full border ${
+                walletPaise < CREDIT_COST_PAISE
+                  ? 'text-red-800 bg-red-50 border-red-200'
+                  : 'text-[#5b4a00] bg-[#fff6d6] border-[#ffe48a]'
+              }`}
+            >
+              {walletPaise < CREDIT_COST_PAISE ? 'Recharge wallet' : `${walletRupees} credits`}
+            </button>
             <span className="hidden md:inline text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
               {user?.aiDiscoverySearchesLeft ?? 3} live AI searches
             </span>
@@ -303,13 +332,10 @@ export default function PeopleSearch({ onNavigate }) {
                 {results.total >= 50 ? ' · 50+ matched' : ''}
               </span>
               <span className="text-gray-600">
-                · Top <strong>{Math.min(fullPreviewCount, displayLeads.length)}</strong> show full email & phone on
-                live AI search · Reveal others at <strong>₹1</strong> per email or phone
+                · Reveal email or phone with <strong>1 credit</strong> each (₹1 from your wallet)
               </span>
-              {(user?.aiDiscoverySearchesLeft ?? results?.aiDiscoverySearchesLeft ?? 0) <= 0 && (
-                <span className="text-amber-800 font-medium">
-                  · No free live AI searches left — recharge wallet for more
-                </span>
+              {walletPaise < CREDIT_COST_PAISE && (
+                <span className="text-red-800 font-medium"> · Wallet empty — recharge first to reveal contacts</span>
               )}
             </div>
           )}

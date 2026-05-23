@@ -24,13 +24,13 @@ export default function SearchResultsView({
         <section className="bg-white border-b border-gray-200">
           <div className="sticky top-0 z-20 flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 bg-white/95 backdrop-blur border-b border-gray-100">
             <div>
-              <h2 className="text-sm font-semibold text-gray-900">Full contact details</h2>
+              <h2 className="text-sm font-semibold text-gray-900">Top matches</h2>
               <p className="text-[11px] text-gray-500 mt-0.5">
-                Email and phone shown for the top {detailed.length} matches
+                Tap Reveal — 1 credit per email or phone
               </p>
             </div>
-            <span className="text-[11px] font-semibold text-[#5b4a00] bg-[#fff6d6] px-2.5 py-1 rounded-full border border-[#ffe48a]">
-              {detailed.length} unlocked preview{detailed.length === 1 ? '' : 's'}
+            <span className="text-[11px] font-semibold text-gray-600 bg-gray-100 px-2.5 py-1 rounded-full border border-gray-200">
+              {detailed.length} leads
             </span>
           </div>
           <ResultsTable
@@ -54,7 +54,7 @@ export default function SearchResultsView({
             <div>
               <h2 className="text-sm font-semibold text-gray-900">More matches</h2>
               <p className="text-[11px] text-gray-500 mt-0.5">
-                Company and role visible · contact details hidden until unlock
+                Company and role visible · reveal email/phone with 1 credit each
               </p>
             </div>
             <span className="text-[11px] font-medium text-gray-600 bg-white px-2.5 py-1 rounded-full border border-gray-200">

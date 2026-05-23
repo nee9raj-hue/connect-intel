@@ -23,22 +23,30 @@ function maskLinkedin(linkedin) {
   return 'linkedin.com/in/••••'
 }
 
-function shapeFallbackLead(lead, index) {
-  const previewUnlocked = index < FREE_FULL_LEAD_PREVIEW_COUNT
-  const unlockableFields = [lead.email && 'email', lead.phone && 'phone', lead.linkedin && 'linkedin'].filter(Boolean)
+function shapeFallbackLead(lead) {
+  const hasEmail = Boolean(lead.email)
+  const hasPhone = Boolean(lead.phone)
 
   return {
     ...lead,
-    email: previewUnlocked ? lead.email : maskEmail(lead.email),
-    phone: previewUnlocked ? lead.phone : maskPhone(lead.phone),
-    linkedin: previewUnlocked ? lead.linkedin : maskLinkedin(lead.linkedin),
+    email: hasEmail ? maskEmail(lead.email) : '',
+    phone: hasPhone ? maskPhone(lead.phone) : '',
+    linkedin: lead.linkedin ? maskLinkedin(lead.linkedin) : '',
     access: {
-      isUnlocked: previewUnlocked || unlockableFields.length === 0,
-      previewUnlocked,
+      hasEmail,
+      hasPhone,
+      emailUnlocked: false,
+      phoneUnlocked: false,
+      emailLocked: hasEmail,
+      phoneLocked: hasPhone,
+      emailUnlockPricePaise: hasEmail ? 100 : 0,
+      phoneUnlockPricePaise: hasPhone ? 100 : 0,
+      creditCost: 1,
       previouslyUnlocked: false,
-      unlockable: unlockableFields.length > 0,
-      unlockPricePaise: previewUnlocked ? 0 : 1000,
-      unlockableFields,
+      isUnlocked: false,
+      unlockable: hasEmail || hasPhone,
+      unlockPricePaise: 100,
+      unlockableFields: [hasEmail && 'email', hasPhone && 'phone'].filter(Boolean),
     },
   }
 }

@@ -10,9 +10,9 @@ export default function ContactField({
   const access = lead.access || {}
   const locked = field === 'email' ? access.emailLocked : access.phoneLocked
   const unlocked = field === 'email' ? access.emailUnlocked : access.phoneUnlocked
-  const pricePaise = field === 'email' ? access.emailUnlockPricePaise : access.phoneUnlockPricePaise
+  const hasHidden = field === 'email' ? access.hasEmail && !unlocked : access.hasPhone && !unlocked
 
-  if (!value && !locked) {
+  if (!hasHidden && !value && !locked) {
     return <span className="text-[11px] text-red-600 font-medium">{missingLabel}</span>
   }
 
@@ -26,7 +26,7 @@ export default function ContactField({
     )
   }
 
-  if (locked) {
+  if (locked || hasHidden) {
     return (
       <button
         type="button"
@@ -34,7 +34,7 @@ export default function ContactField({
         disabled={revealing}
         className="text-[11px] font-semibold text-left text-[#8a6600] bg-[#fffbeb] border border-[#ffe48a] rounded px-2 py-1 hover:bg-[#fff4bf] disabled:opacity-60"
       >
-        {revealing ? 'Revealing…' : `Reveal ${field} · ₹${(pricePaise || 100) / 100}`}
+        {revealing ? 'Revealing…' : `Reveal ${field} · 1 credit`}
       </button>
     )
   }
