@@ -31,6 +31,7 @@ export default function PipelinePanel({ onNavigate }) {
   const [addOpen, setAddOpen] = useState(false)
   const [bulkOpen, setBulkOpen] = useState(false)
   const [bulkBusy, setBulkBusy] = useState(false)
+  const [bulkNotice, setBulkNotice] = useState(null)
 
   const canAssign = Boolean(user?.isOrgAdmin && user?.accountType === 'company')
 
@@ -48,6 +49,12 @@ export default function PipelinePanel({ onNavigate }) {
       setPipelineLeadId(null)
     }
   }, [pipelineLeadId, selectedLead, setPipelineLeadId])
+
+  useEffect(() => {
+    if (!bulkNotice) return
+    const timer = setTimeout(() => setBulkNotice(null), 5000)
+    return () => clearTimeout(timer)
+  }, [bulkNotice])
 
   const assigneeName = useMemo(() => {
     if (!pipelineAssigneeFilter) return null
@@ -117,11 +124,38 @@ export default function PipelinePanel({ onNavigate }) {
 
   const runBulk = async (actions) => {
     if (!selectedIds.size) return
+    const count = selectedIds.size
     setBulkBusy(true)
+    setBulkNotice(null)
     try {
       await bulkUpdatePipeline([...selectedIds], actions)
       await refreshSavedLeads()
+      if (actions.status) {
+        setBulkNotice(
+          count === 1
+            ? 'Contact updated successfully.'
+            : `${count} contacts updated successfully.`
+        )
+      } else if (actions.assignToUserId !== undefined) {
+        setBulkNotice(
+          actions.assignToUserId
+            ? count === 1
+              ? 'Contact assigned successfully.'
+              : `${count} contacts assigned successfully.`
+            : count === 1
+              ? 'Contact unassigned.'
+              : `${count} contacts unassigned.`
+        )
+      } else if (actions.markReplied) {
+        setBulkNotice(
+          count === 1
+            ? 'Contact marked as replied.'
+            : `${count} contacts marked as replied.`
+        )
+      }
+      setSelectedIds(new Set())
     } catch (e) {
+      setBulkNotice(null)
       window.alert(e.message || 'Bulk update failed')
     } finally {
       setBulkBusy(false)
@@ -237,6 +271,15 @@ export default function PipelinePanel({ onNavigate }) {
           onEmail={() => setBulkOpen(true)}
           onClear={() => setSelectedIds(new Set())}
         />
+
+        {bulkNotice && (
+          <div
+            className="mx-4 mb-2 text-sm font-medium text-green-900 bg-green-50 border border-green-200 rounded-lg px-3 py-2"
+            role="status"
+          >
+            {bulkNotice}
+          </div>
+        )}
 
         <div className="flex-1 overflow-auto p-4">
           {savedLeads.length === 0 ? (

@@ -180,8 +180,10 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
 
   const changeStatus = async (next) => {
     setStatus(next)
+    setError(null)
     try {
       await updateSavedLeadCrm(lead.id, { status: next })
+      setNotice('Contact updated successfully.')
     } catch (e) {
       setError(e.message)
       setStatus(lead.crm?.status || 'new')
@@ -508,16 +510,12 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
                 <select
                   value={lead.assignedToUserId || ''}
                   onChange={async (e) => {
+                    setError(null)
                     try {
-                      const data = await assignLead(lead.id, e.target.value || null)
-                      const mail = data?.assignmentEmail
-                      if (e.target.value && mail?.sent) {
-                        setNotice('Lead assigned — notification email sent to teammate')
-                      } else if (e.target.value && mail?.error) {
-                        setNotice(`Lead assigned. Email not sent: ${mail.error}`)
-                      } else {
-                        setNotice(e.target.value ? 'Lead assigned' : 'Lead unassigned')
-                      }
+                      await assignLead(lead.id, e.target.value || null)
+                      setNotice(
+                        e.target.value ? 'Contact assigned successfully.' : 'Contact unassigned.'
+                      )
                     } catch (err) {
                       setError(err.message)
                     }
