@@ -39,6 +39,7 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
     logEmailReply,
     generateWhatsAppDraft,
     refreshTeam,
+    consumePendingLeadTab,
   } = useApp()
   const [tab, setTab] = useState('overview')
   const [notes, setNotes] = useState(lead.crm?.notes || '')
@@ -97,9 +98,10 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
     setNextFollowUp(toDatetimeLocalValue(lead.crm?.nextFollowUpAt))
     setError(null)
     setNotice(null)
-    setTab('overview')
+    const pendingTab = consumePendingLeadTab(lead.id)
+    setTab(pendingTab || 'overview')
     setSenderCompany(user?.organizationName || user?.company || '')
-  }, [lead.id, user?.organizationName, user?.company])
+  }, [lead.id, user?.organizationName, user?.company, consumePendingLeadTab])
 
   useEffect(() => {
     if (!notice) return

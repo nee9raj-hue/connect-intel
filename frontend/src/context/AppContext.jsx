@@ -3,6 +3,7 @@ import { api } from '../lib/api'
 import { storeSessionToken } from '../lib/sessionAuth'
 import { defaultCrm } from '../lib/crmConstants'
 import { loadReadNotificationIds, saveReadNotificationIds } from '../lib/notificationStorage'
+import { getNotificationTarget } from '../lib/notificationNavigation'
 
 const AppContext = createContext(null)
 
@@ -38,6 +39,9 @@ export function AppProvider({ children }) {
   const readNotificationIdsRef = useRef(loadReadNotificationIds())
   const [notificationTick, setNotificationTick] = useState(0)
   const [sessionError, setSessionError] = useState(null)
+  const panelNavigateRef = useRef(null)
+  const pendingLeadOpenRef = useRef({ leadId: null, tab: null })
+  const [calendarFocus, setCalendarFocus] = useState(null)
 
   const refreshSession = useCallback(async () => {
     try {
@@ -410,9 +414,62 @@ export function AppProvider({ children }) {
     return data.user
   }, [])
 
-  const openPipelineLead = useCallback((leadId) => {
+  const setPanelNavigate = useCallback((fn) => {
+    panelNavigateRef.current = fn
+  }, [])
+
+  const openPipelineLead = useCallback((leadId, tab = null) => {
+    if (tab) pendingLeadOpenRef.current = { leadId, tab }
     setPipelineLeadId(leadId)
   }, [])
+
+  const consumePendingLeadTab = useCallback((leadId) => {
+    const pending = pendingLeadOpenRef.current
+    if (pending.leadId === leadId && pending.tab) {
+      pendingLeadOpenRef.current = { leadId: null, tab: null }
+      return pending.tab
+    }
+    return null
+  }, [])
+
+  const clearCalendarFocus = useCallback(() => {
+    setCalendarFocus(null)
+  }, [])
+
+  const navigateToNotification = useCallback(
+    (item) => {
+      if (!item) return
+      markNotificationRead(item.id)
+
+      if (item.meetingId && item.leadId) {
+        api.ackMeetingReminder(item.leadId, item.meetingId).catch(() => {})
+      }
+
+      const target = getNotificationTarget(item)
+      panelNavigateRef.current?.(target.panel)
+
+      if (target.panel === 'crm-calendar') {
+        setCalendarFocus({
+          eventId: target.calendarEventId,
+          leadId: target.leadId,
+          scheduledAt: target.scheduledAt,
+        })
+        if (target.leadId) {
+          openPipelineLead(target.leadId, target.leadTab)
+        }
+        return
+      }
+
+      if (target.leadId) {
+        openPipelineLead(target.leadId, target.leadTab)
+      }
+    },
+    [markNotificationRead, openPipelineLead]
+  )
+
+  const markNotificationsPanelOpened = useCallback(() => {
+    markAllNotificationsRead()
+  }, [markAllNotificationsRead])
 
   const isSaved = useCallback(
     (id) => savedLeads.some((l) => l.id === id),
@@ -465,8 +522,14 @@ export function AppProvider({ children }) {
         generateWhatsAppDraft,
         updateMobile,
         openPipelineLead,
+        consumePendingLeadTab,
         pipelineLeadId,
         setPipelineLeadId,
+        setPanelNavigate,
+        navigateToNotification,
+        markNotificationsPanelOpened,
+        calendarFocus,
+        clearCalendarFocus,
         pipelineAssigneeFilter,
         setPipelineAssigneeFilter,
         isSaved,

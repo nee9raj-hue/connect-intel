@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import OnboardingModal from '../onboarding/OnboardingModal'
 import Sidebar from './Sidebar'
@@ -35,7 +35,7 @@ const PANELS = {
 }
 
 export default function AppShell() {
-  const { user, syncWorkspace } = useApp()
+  const { user, syncWorkspace, setPanelNavigate } = useApp()
   const [activePanel, setActivePanel] = useState('pipeline')
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [liveToast, setLiveToast] = useState(null)
@@ -79,10 +79,15 @@ export default function AppShell() {
     }
   }, [])
 
-  const navigate = (id) => {
+  const navigate = useCallback((id) => {
     setActivePanel(id)
     setMobileNavOpen(false)
-  }
+  }, [])
+
+  useEffect(() => {
+    setPanelNavigate(navigate)
+    return () => setPanelNavigate(null)
+  }, [navigate, setPanelNavigate])
 
   return (
     <div className="flex h-[100dvh] w-full overflow-hidden bg-[#f6f7f9]">

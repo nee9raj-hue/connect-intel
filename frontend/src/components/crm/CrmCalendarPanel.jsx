@@ -14,6 +14,12 @@ import {
   startOfDay,
 } from '../../lib/calendarUtils'
 
+function parseFocusDate(iso) {
+  if (!iso) return null
+  const d = new Date(iso)
+  return Number.isNaN(d.getTime()) ? null : startOfDay(d)
+}
+
 const VIEWS = [
   { id: 'list', label: 'List' },
   { id: 'week', label: 'Week' },
@@ -21,13 +27,43 @@ const VIEWS = [
 ]
 
 export default function CrmCalendarPanel({ onNavigate }) {
-  const { openPipelineLead } = useApp()
+  const { openPipelineLead, calendarFocus, clearCalendarFocus } = useApp()
   const [view, setView] = useState('list')
   const [anchor, setAnchor] = useState(() => startOfDay(new Date()))
   const [events, setEvents] = useState([])
   const [members, setMembers] = useState([])
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState(null)
+
+  useEffect(() => {
+    if (!calendarFocus?.scheduledAt) return
+    const day = parseFocusDate(calendarFocus.scheduledAt)
+    if (day) setAnchor(day)
+  }, [calendarFocus?.scheduledAt, calendarFocus?.eventId])
+
+  useEffect(() => {
+    if (!calendarFocus || loading) return
+
+    let match = null
+    if (calendarFocus.eventId) {
+      match = events.find((e) => e.id === calendarFocus.eventId)
+    }
+    if (!match && calendarFocus.leadId) {
+      match = events.find(
+        (e) =>
+          e.leadId === calendarFocus.leadId &&
+          (calendarFocus.eventId
+            ? e.id === calendarFocus.eventId
+            : e.meetingId === calendarFocus.meetingId || e.taskId === calendarFocus.taskId)
+      )
+    }
+
+    if (match) {
+      setView('list')
+      setSelected(match)
+      clearCalendarFocus()
+    }
+  }, [calendarFocus, events, loading, clearCalendarFocus])
 
   const memberName = useMemo(() => {
     const map = Object.fromEntries(members.map((m) => [m.userId, m.name]))
