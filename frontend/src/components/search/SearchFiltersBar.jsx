@@ -79,11 +79,11 @@ export default function SearchFiltersBar({ filters, onChange, onSearch, loading 
       <div className="flex flex-col sm:flex-row gap-2">
         <div className="flex-1">
           <label className="block text-[11px] font-semibold uppercase tracking-wide text-gray-500 mb-1">
-            Search
+            What are you looking for?
           </label>
           <input
             type="text"
-            placeholder="e.g. exporter, textile, pharma, company name…"
+            placeholder="e.g. ghee manufacturers in Alwar, Rajasthan · CEO email at Xindus Network Trade"
             value={filters.keywords}
             onChange={(e) => onChange({ ...filters, keywords: e.target.value })}
             onKeyDown={(e) => e.key === 'Enter' && onSearch()}
@@ -112,7 +112,7 @@ export default function SearchFiltersBar({ filters, onChange, onSearch, loading 
       </div>
 
       <p className="text-[11px] text-gray-500 -mt-1">
-        Email and phone are shown when available. Add keywords or location for sharper AI discovery.
+        Type a plain-English request — any industry or role. Optional state/city/industry filters narrow results.
       </p>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">

@@ -280,6 +280,11 @@ export default function PeopleSearch({ onNavigate }) {
 
       {(friendlyNotice || filterSummary || searchError || results?.discoveryError) && (
         <div className="shrink-0 px-5 py-2 space-y-1.5 bg-white border-b border-gray-100">
+          {results?.parsedSearch?.summary && hasSearched && countTab !== 'saved' && (
+            <p className="text-xs text-emerald-900 bg-emerald-50 border border-emerald-100 rounded-lg px-3 py-2">
+              Understood as: <span className="font-medium">{results.parsedSearch.summary}</span>
+            </p>
+          )}
           {filterSummary && hasSearched && countTab !== 'saved' && (
             <p className="text-xs text-gray-600">
               Active filters: <span className="font-medium">{filterSummary}</span>
@@ -329,7 +334,7 @@ export default function PeopleSearch({ onNavigate }) {
         ) : !hasSearched ? (
           <EmptyState
             title="Search your B2B database"
-            sub='Enter keywords plus state or city for best matches. Scroll the results table below — contact details appear when we have them.'
+            sub='Describe who you need in one sentence — e.g. "spice exporters in Surat" or "marketing head at Acme Foods". Results appear in the table below.'
           />
         ) : loading ? (
           <LoadingState />
@@ -338,8 +343,8 @@ export default function PeopleSearch({ onNavigate }) {
               title="No matches for these filters"
               sub={
                 results?.discoveryError
-                  ? `Database had no matches. Perplexity: ${results.discoveryError}. Try keyword "exporter" only or fewer cities.`
-                  : 'Try keyword "exporter" with one state (e.g. Rajasthan), or import more companies in Admin.'
+                  ? `Database had no matches. AI: ${results.discoveryError}. Try a clearer sentence with product + location.`
+                  : 'Try a specific product or company type with a state or city, or import more companies in Admin / Team.'
               }
               action={handleSearch}
             />
@@ -385,7 +390,7 @@ function LoadingState() {
     <div className="flex-1 flex flex-col items-center justify-center px-6">
       <div className="w-10 h-10 border-2 border-[#ffcb2b]/30 border-t-[#ffcb2b] rounded-full animate-spin mb-3" />
       <p className="text-sm font-medium text-gray-800">Searching our B2B database…</p>
-      <p className="text-xs text-gray-500 mt-1">Matching keywords and location</p>
+      <p className="text-xs text-gray-500 mt-1">Understanding your request and matching prospects</p>
     </div>
   )
 }
