@@ -10,6 +10,8 @@ export default function CrmEmailThread({
   busy,
   onSync,
   onLogReply,
+  onEnableReplySync,
+  enableReplySyncBusy = false,
 }) {
   const [showReplyForm, setShowReplyForm] = useState(false)
   const [replySubject, setReplySubject] = useState('')
@@ -68,10 +70,21 @@ export default function CrmEmailThread({
       </div>
 
       {gmailConnected && !replySyncEnabled && (
-        <p className="text-[10px] text-amber-900 bg-amber-50 border-b border-amber-100 px-3 py-2">
-          Reconnect work Gmail once to import replies automatically (Team or Email tab). You can still log
-          replies manually below.
-        </p>
+        <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] text-amber-950 bg-amber-50 border-b border-amber-100 px-3 py-2">
+          <p className="leading-relaxed">
+            Reply import needs one extra Google permission. Use the button to allow it, or log replies manually.
+          </p>
+          {onEnableReplySync && (
+            <button
+              type="button"
+              disabled={busy || enableReplySyncBusy}
+              onClick={() => onEnableReplySync()}
+              className="shrink-0 text-[10px] font-semibold px-2.5 py-1 rounded-md bg-[#ffcb2b] text-[#242424] border border-[#e6b800] disabled:opacity-50"
+            >
+              {enableReplySyncBusy ? 'Opening Google…' : 'Enable reply sync'}
+            </button>
+          )}
+        </div>
       )}
 
       {showReplyForm && (

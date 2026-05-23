@@ -372,6 +372,12 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
           ? `Synced ${data.importedCount} message(s) from Gmail`
           : 'No new messages found in the last 90 days'
       )
+      const status = await api.getCrmGmailStatus()
+      setGmailStatus({
+        connected: status.connected,
+        mailbox: status.mailbox,
+        replySyncEnabled: Boolean(status.replySyncEnabled),
+      })
     } catch (e) {
       setError(e.message)
     } finally {
@@ -839,6 +845,8 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
               gmailConnected={gmailStatus.connected}
               replySyncEnabled={gmailStatus.replySyncEnabled}
               busy={threadSyncing || sending}
+              enableReplySyncBusy={connectingGmail}
+              onEnableReplySync={connectWorkGmail}
               onSync={handleSyncEmailThread}
               onLogReply={handleLogReply}
             />
