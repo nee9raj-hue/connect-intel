@@ -700,23 +700,12 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
 
         {tab === 'email' && (
           <>
-            <section className="rounded-lg border border-gray-200 bg-gray-50 p-3 space-y-2">
-              <h3 className="text-[11px] font-semibold uppercase text-gray-500">Sending from your company</h3>
-              {gmailStatus.connected ? (
-                <p className="text-xs text-green-800">
-                  Gmail connected — sends from <span className="font-semibold">{gmailStatus.mailbox}</span> (no DNS).
-                  Logged in CRM activity.
+            {!canSendEmail && (
+              <section className="rounded-lg border border-amber-200 bg-amber-50 p-3 space-y-2">
+                <h3 className="text-[11px] font-semibold uppercase text-amber-900">Connect email to send</h3>
+                <p className="text-xs text-amber-900 leading-relaxed">
+                  Connect work Gmail (recommended, no DNS), or ask your admin for Team → DNS setup.
                 </p>
-              ) : canSendEmail && user?.orgOutboundEmailReady ? (
-                <p className="text-xs text-green-800">
-                  Company DNS sending active — emails send as <span className="font-semibold">{user?.email}</span>.
-                </p>
-              ) : (
-                <p className="text-xs text-amber-900 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1.5 leading-relaxed">
-                  Connect work Gmail below (recommended, no DNS), or ask admin for optional Team → DNS setup.
-                </p>
-              )}
-              {!gmailStatus.connected && (
                 <button
                   type="button"
                   onClick={connectWorkGmail}
@@ -725,14 +714,11 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
                 >
                   {connectingGmail ? 'Opening Google…' : 'Connect work Gmail'}
                 </button>
-              )}
-              {!gmailStatus.connected && (orgEmail?.userCanSend || user?.orgOutboundEmailReady) && (
-                <p className="text-[10px] text-gray-500">DNS domain sending is also available for your company.</p>
-              )}
-              <p className="text-[10px] text-gray-400">
-                Inbox sync (auto-import replies into CRM) is not live yet — outbound send + CRM log only.
-              </p>
-            </section>
+                {(orgEmail?.userCanSend || user?.orgOutboundEmailReady) && (
+                  <p className="text-[10px] text-gray-600">DNS domain sending is also available for your company.</p>
+                )}
+              </section>
+            )}
 
             <section className="space-y-2">
               <h3 className="text-[11px] font-semibold uppercase text-gray-400">What should this email say?</h3>
