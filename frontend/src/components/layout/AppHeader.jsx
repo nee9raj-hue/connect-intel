@@ -1,4 +1,5 @@
 import { useApp } from '../../context/AppContext'
+import NotificationBell from './NotificationBell'
 
 export default function AppHeader({ onNavigate }) {
   const { user } = useApp()
@@ -10,6 +11,7 @@ export default function AppHeader({ onNavigate }) {
 
   return (
     <header className="shrink-0 flex items-center justify-end gap-2 px-4 py-2 bg-white border-b border-gray-200">
+      <NotificationBell onNavigate={onNavigate} />
       <button
         type="button"
         onClick={() => onNavigate?.('search')}

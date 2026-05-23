@@ -64,6 +64,8 @@ export const api = {
   getCrmCalendar: (query = '') =>
     request(`/api/crm/calendar${query ? `?${query}` : ''}`),
   getCrmActivityLog: () => request('/api/crm/activity-log'),
+  getCrmNotifications: (since) =>
+    request(`/api/crm/notifications${since ? `?since=${encodeURIComponent(since)}` : ''}`),
   getCrmTeamDashboard: (query = '') =>
     request(`/api/crm/team-dashboard${query ? `?${query}` : ''}`),
   ackMeetingReminder: (leadId, meetingId) =>

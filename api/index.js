@@ -20,6 +20,7 @@ const ROUTES = {
   'crm/bulk-update': () => import('../lib/server/handlers/crm-bulk-update.js'),
   'crm/sync-email-thread': () => import('../lib/server/handlers/crm-sync-email-thread.js'),
   'crm/log-email-reply': () => import('../lib/server/handlers/crm-log-email-reply.js'),
+  'crm/notifications': () => import('../lib/server/handlers/crm-notifications.js'),
   'crm/generate-whatsapp': () => import('../lib/server/handlers/crm-generate-whatsapp.js'),
   'crm/calendar': () => import('../lib/server/handlers/crm-calendar.js'),
   'crm/activity-log': () => import('../lib/server/handlers/crm-activity-log.js'),

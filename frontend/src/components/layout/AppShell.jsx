@@ -16,7 +16,7 @@ import MobileRequiredModal from '../profile/MobileRequiredModal'
 import CrmActivityLogPanel from '../crm/CrmActivityLogPanel'
 import CrmCalendarPanel from '../crm/CrmCalendarPanel'
 import BulkEmailPanel from '../crm/BulkEmailPanel'
-import { useCrmReminders } from '../../hooks/useCrmReminders'
+import { useWorkspaceSync } from '../../hooks/useWorkspaceSync'
 
 const PANELS = {
   overview: OverviewPanel,
@@ -33,13 +33,28 @@ const PANELS = {
 }
 
 export default function AppShell() {
-  const { user } = useApp()
+  const { user, syncWorkspace } = useApp()
   const [activePanel, setActivePanel] = useState('pipeline')
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
+  const [liveToast, setLiveToast] = useState(null)
   const Panel = PANELS[activePanel] || PeopleSearch
   const needsOnboarding = user && !user.onboardingComplete && !user.isPlatformAdmin
 
-  useCrmReminders(Boolean(user?.onboardingComplete || user?.isPlatformAdmin))
+  useWorkspaceSync({
+    enabled: Boolean(user?.onboardingComplete || user?.isPlatformAdmin),
+    userId: user?.id,
+    syncWorkspace,
+    onNewNotifications: (items) => {
+      const assign = items.find((i) => i.type === 'assignment')
+      if (assign) setLiveToast(assign.title)
+    },
+  })
+
+  useEffect(() => {
+    if (!liveToast) return undefined
+    const t = setTimeout(() => setLiveToast(null), 5000)
+    return () => clearTimeout(t)
+  }, [liveToast])
 
   useEffect(() => {
     if (user?.isPlatformAdmin) {
@@ -86,6 +101,14 @@ export default function AppShell() {
         )}
         <MobileRequiredModal />
         {!user?.isPlatformAdmin && <AppHeader onNavigate={navigate} />}
+        {liveToast && (
+          <div
+            className="shrink-0 mx-3 mt-2 text-xs font-medium text-[#5b4a00] bg-[#fffbeb] border border-[#ffe48a] rounded-lg px-3 py-2"
+            role="status"
+          >
+            {liveToast} — pipeline updated automatically
+          </div>
+        )}
         <div className="flex-1 flex flex-col min-h-0 min-w-0 overflow-hidden">
           <Panel onNavigate={navigate} activePanel={activePanel} />
         </div>

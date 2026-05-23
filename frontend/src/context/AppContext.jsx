@@ -1,7 +1,8 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { api } from '../lib/api'
 import { storeSessionToken } from '../lib/sessionAuth'
 import { defaultCrm } from '../lib/crmConstants'
+import { loadReadNotificationIds, saveReadNotificationIds } from '../lib/notificationStorage'
 
 const AppContext = createContext(null)
 
@@ -33,6 +34,9 @@ export function AppProvider({ children }) {
   const [ready, setReady] = useState(false)
   const [pipelineLeadId, setPipelineLeadId] = useState(null)
   const [pipelineAssigneeFilter, setPipelineAssigneeFilter] = useState(null)
+  const [notifications, setNotifications] = useState([])
+  const readNotificationIdsRef = useRef(loadReadNotificationIds())
+  const [notificationTick, setNotificationTick] = useState(0)
 
   const refreshSession = useCallback(async () => {
     const session = await api.getSession()
@@ -72,6 +76,65 @@ export function AppProvider({ children }) {
       return []
     }
   }, [])
+
+  const mergeNotificationItems = useCallback((newItems) => {
+    if (!newItems?.length) return []
+    setNotifications((prev) => {
+      const map = new Map(prev.map((n) => [n.id, n]))
+      for (const item of newItems) {
+        map.set(item.id, { ...item, unread: !readNotificationIdsRef.current.has(item.id) })
+      }
+      return [...map.values()]
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, 50)
+        .map((n) => ({
+          ...n,
+          unread: !readNotificationIdsRef.current.has(n.id),
+        }))
+    })
+    return newItems
+  }, [])
+
+  const syncWorkspace = useCallback(
+    async (since) => {
+      const [saved, notif] = await Promise.all([
+        api.getSavedLeads(),
+        api.getCrmNotifications(since || undefined),
+      ])
+      setSavedLeads(saved.leads || [])
+      const newItems = mergeNotificationItems(notif.items || [])
+      return {
+        leads: saved.leads || [],
+        serverTime: notif.serverTime,
+        newItems,
+      }
+    },
+    [mergeNotificationItems]
+  )
+
+  const markNotificationRead = useCallback((id) => {
+    if (!id) return
+    readNotificationIdsRef.current.add(id)
+    saveReadNotificationIds(readNotificationIdsRef.current)
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, unread: false } : n))
+    )
+    setNotificationTick((t) => t + 1)
+  }, [])
+
+  const markAllNotificationsRead = useCallback(() => {
+    setNotifications((prev) => {
+      for (const n of prev) readNotificationIdsRef.current.add(n.id)
+      saveReadNotificationIds(readNotificationIdsRef.current)
+      return prev.map((n) => ({ ...n, unread: false }))
+    })
+    setNotificationTick((t) => t + 1)
+  }, [])
+
+  const unreadNotificationCount = useMemo(() => {
+    void notificationTick
+    return notifications.filter((n) => n.unread).length
+  }, [notifications, notificationTick])
 
   useEffect(() => {
     let cancelled = false
@@ -385,6 +448,12 @@ export function AppProvider({ children }) {
         teamMembers,
         refreshTeam,
         refreshSavedLeads,
+        syncWorkspace,
+        notifications,
+        unreadNotificationCount,
+        markNotificationRead,
+        markAllNotificationsRead,
+        mergeNotificationItems,
         inviteTeamMember,
         updateTeamBranding,
         updateMemberPermissions,
