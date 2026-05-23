@@ -56,6 +56,7 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
   const [emailKeyPoints, setEmailKeyPoints] = useState('')
   const [senderCompany, setSenderCompany] = useState(user?.organizationName || user?.company || '')
   const [draftAi, setDraftAi] = useState(false)
+  const [emailCc, setEmailCc] = useState('')
   const [waMessage, setWaMessage] = useState('')
   const [waAgenda, setWaAgenda] = useState('')
   const [waKeyPoints, setWaKeyPoints] = useState('')
@@ -322,6 +323,7 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
       const data = await logCrmEmailSend(lead.id, {
         subject: subject.trim(),
         body: body.trim(),
+        cc: emailCc.trim(),
         aiGenerated: draftAi,
       })
       setSubject('')
@@ -774,6 +776,12 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
               </button>
             </div>
             <input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Subject" className="w-full text-sm border rounded-lg px-3 py-2" />
+            <input
+              value={emailCc}
+              onChange={(e) => setEmailCc(e.target.value)}
+              placeholder="Cc (optional): name@company.com, teammate@company.com"
+              className="w-full text-sm border rounded-lg px-3 py-2"
+            />
             <textarea value={body} onChange={(e) => setBody(e.target.value)} rows={10} className="w-full text-sm border rounded-lg px-3 py-2 font-mono text-[12px]" />
             <button
               type="button"

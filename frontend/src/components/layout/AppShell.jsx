@@ -15,6 +15,7 @@ import EmailOAuthNotice from './EmailOAuthNotice'
 import MobileRequiredModal from '../profile/MobileRequiredModal'
 import CrmActivityLogPanel from '../crm/CrmActivityLogPanel'
 import CrmCalendarPanel from '../crm/CrmCalendarPanel'
+import BulkEmailPanel from '../crm/BulkEmailPanel'
 import { useCrmReminders } from '../../hooks/useCrmReminders'
 
 const PANELS = {
@@ -25,6 +26,7 @@ const PANELS = {
   'crm-dashboard': TeamDashboardPanel,
   'crm-log': CrmActivityLogPanel,
   'crm-calendar': CrmCalendarPanel,
+  'bulk-email': BulkEmailPanel,
   team: TeamPanel,
   integrations: IntegrationsPanel,
   admin: AdminPanel,

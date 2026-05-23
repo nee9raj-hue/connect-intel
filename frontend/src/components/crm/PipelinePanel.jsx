@@ -130,6 +130,13 @@ export default function PipelinePanel({ onNavigate }) {
               )}
               <button
                 type="button"
+                onClick={() => onNavigate?.('bulk-email')}
+                className="text-xs font-medium px-3 py-1.5 border border-gray-200 rounded-md hover:bg-gray-50"
+              >
+                Bulk email
+              </button>
+              <button
+                type="button"
                 onClick={() => onNavigate?.('search')}
                 className="text-xs font-medium px-3 py-1.5 border border-gray-200 rounded-md hover:bg-gray-50"
               >
