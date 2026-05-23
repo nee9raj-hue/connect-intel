@@ -37,6 +37,7 @@ export function AppProvider({ children }) {
   const refreshSession = useCallback(async () => {
     const session = await api.getSession()
     if (session.user) {
+      if (session.token) storeSessionToken(session.token)
       setUser(session.user)
       setScreen('app')
     } else {

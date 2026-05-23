@@ -76,6 +76,8 @@ export const api = {
     request('/api/crm-generate-email', { method: 'POST', body: { leadId, ...options } }),
   sendCrmEmail: (leadId, payload) =>
     request('/api/crm-send-email', { method: 'POST', body: { leadId, ...payload } }),
+  searchLeads: (filters, count = 50, provider = 'free') =>
+    request('/api/search-leads', { method: 'POST', body: { filters, count, provider } }),
   getSearchHistory: () => request('/api/search-history'),
   addSearchHistory: (entry) => request('/api/search-history', { method: 'POST', body: { entry } }),
   unlockLead: (lead) => request('/api/lead-unlocks', { method: 'POST', body: { lead } }),

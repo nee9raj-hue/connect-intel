@@ -58,7 +58,21 @@ export default function PeopleSearch({ onNavigate }) {
       const message = e.message || 'Search failed'
       setSearchError(message)
       setResults(null)
-      if (e.status === 401 || /authentication required/i.test(message)) {
+      const authProblem =
+        e.status === 401 ||
+        /authentication required/i.test(message) ||
+        /session out of date/i.test(message) ||
+        /sign in again/i.test(message)
+      if (authProblem) {
+        try {
+          const session = await refreshSession()
+          if (session) {
+            setSearchError('Session refreshed — please run your search again.')
+            return
+          }
+        } catch {
+          // fall through to sign-in
+        }
         await logout()
         setScreen('auth')
       }

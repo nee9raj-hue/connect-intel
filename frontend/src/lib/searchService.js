@@ -1,4 +1,5 @@
 import { recordMatches } from '../../../lib/filterMatch.js'
+import { api } from './api'
 import { MOCK_LEADS } from './mockLeads'
 import { PROVIDERS } from './providers'
 
@@ -47,30 +48,7 @@ function filterMockLeads(filters) {
 }
 
 async function searchViaApi(filters, count, provider) {
-  const res = await fetch('/api/search-leads', {
-    method: 'POST',
-    credentials: 'same-origin',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ filters, count, provider }),
-  })
-
-  const text = await res.text()
-  let data = {}
-  if (text) {
-    try {
-      data = JSON.parse(text)
-    } catch {
-      throw new Error(res.ok ? 'Invalid search response' : 'Search failed')
-    }
-  }
-
-  if (!res.ok) {
-    const error = new Error(data.error || data.hint || 'Search failed')
-    error.status = res.status
-    throw error
-  }
-
-  return data
+  return api.searchLeads(filters, count, provider)
 }
 
 function shouldUseLocalFallback(error, provider) {
