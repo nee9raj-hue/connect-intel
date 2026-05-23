@@ -66,6 +66,8 @@ export const api = {
     request('/api/crm/reminders-ack', { method: 'POST', body: { leadId, meetingId } }),
   getCrmGmailStatus: () => request('/api/crm/email-gmail-status'),
   startCrmGmailOAuth: () => request('/api/crm/email-oauth/start'),
+  getOrgEmailDomain: () => request('/api/org/email-domain'),
+  setupOrgEmailDomain: (body) => request('/api/org/email-domain', { method: 'POST', body }),
   generateCrmEmail: (leadId, options = {}) =>
     request('/api/crm-generate-email', { method: 'POST', body: { leadId, ...options } }),
   sendCrmEmail: (leadId, payload) =>

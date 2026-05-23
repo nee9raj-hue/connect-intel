@@ -13,6 +13,7 @@ const ROUTES = {
   'crm-send-email': () => import('../lib/server/handlers/crm-send-email.js'),
   'crm/email-oauth/start': () => import('../lib/server/handlers/crm-email-oauth-start.js'),
   'crm/email-gmail-status': () => import('../lib/server/handlers/crm-email-gmail-status.js'),
+  'org/email-domain': () => import('../lib/server/handlers/org-email-domain.js'),
   'crm/calendar': () => import('../lib/server/handlers/crm-calendar.js'),
   'crm/activity-log': () => import('../lib/server/handlers/crm-activity-log.js'),
   'crm/reminders-ack': () => import('../lib/server/handlers/crm-reminders-ack.js'),

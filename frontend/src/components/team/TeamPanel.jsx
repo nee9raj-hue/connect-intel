@@ -4,6 +4,7 @@ import { api } from '../../lib/api'
 import { TEAM_PIPELINE_ROLES } from '../../lib/crmConstants'
 import OrgPipelineImport from './OrgPipelineImport'
 import InviteEmailSetup from './InviteEmailSetup'
+import OrgCrmEmailSetup from './OrgCrmEmailSetup'
 
 export default function TeamPanel({ onNavigate }) {
   const {
@@ -207,6 +208,16 @@ export default function TeamPanel({ onNavigate }) {
               {brandingLoading ? 'Saving…' : 'Save branding'}
             </button>
           </form>
+        </section>
+
+        <section className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
+          <h2 className="text-sm font-semibold text-gray-900">Outbound email (CRM)</h2>
+          <p className="text-xs text-gray-500 leading-relaxed">
+            One-time DNS setup for your company domain. After verification, every rep signs in with{' '}
+            <strong>@{user?.email?.split('@')[1] || 'yourcompany.com'}</strong> and sends from CRM — no Google test-user
+            list, unlimited teammates.
+          </p>
+          <OrgCrmEmailSetup />
         </section>
 
         <section className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
