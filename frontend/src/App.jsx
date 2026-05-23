@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react'
-import { GoogleOAuthProvider } from '@react-oauth/google'
 import { AppProvider, useApp, storeInviteToken } from './context/AppContext'
+import GoogleAuthRoot from './components/auth/GoogleAuthRoot'
 import LandingPage from './pages/LandingPage'
 import AuthPage from './pages/AuthPage'
 import AppShell from './components/layout/AppShell'
-
-const GOOGLE_CLIENT_ID = (import.meta.env.VITE_GOOGLE_CLIENT_ID || '').trim().replace(/^["']|["']$/g, '')
 
 function useInviteToken() {
   const [token, setToken] = useState(null)
@@ -52,13 +50,11 @@ function Router() {
 }
 
 export default function App() {
-  const content = (
-    <AppProvider>
-      <Router />
-    </AppProvider>
+  return (
+    <GoogleAuthRoot>
+      <AppProvider>
+        <Router />
+      </AppProvider>
+    </GoogleAuthRoot>
   )
-
-  if (!GOOGLE_CLIENT_ID) return content
-
-  return <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>{content}</GoogleOAuthProvider>
 }

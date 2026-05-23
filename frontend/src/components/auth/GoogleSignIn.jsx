@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { GoogleLogin } from '@react-oauth/google'
 import { useApp } from '../../context/AppContext'
+import { getBuiltInGoogleClientId, resolveGoogleClientId } from '../../lib/googleAuthConfig'
 
-const CLIENT_ID = (import.meta.env.VITE_GOOGLE_CLIENT_ID || '').trim().replace(/^["']|["']$/g, '')
+const IS_PROD = import.meta.env.PROD
 
 function useButtonWidth() {
   const ref = useRef(null)
@@ -30,6 +31,41 @@ function useButtonWidth() {
   return [ref, width]
 }
 
+function useGoogleClientId() {
+  const builtIn = getBuiltInGoogleClientId()
+  const [clientId, setClientId] = useState(builtIn)
+  const [ready, setReady] = useState(Boolean(builtIn))
+
+  useEffect(() => {
+    if (builtIn) return
+    resolveGoogleClientId().then((id) => {
+      setClientId(id)
+      setReady(true)
+    })
+  }, [builtIn])
+
+  return { clientId, ready, configured: Boolean(clientId) }
+}
+
+function MissingGoogleConfig({ label, compact = false }) {
+  return (
+    <div
+      className={
+        compact
+          ? 'text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2'
+          : 'w-full text-sm text-amber-900 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-left'
+      }
+    >
+      <p className="font-semibold">{label || 'Google sign-in unavailable'}</p>
+      <p className="text-[12px] mt-1 text-amber-800/90 leading-relaxed">
+        {IS_PROD
+          ? 'Add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET on Vercel, then redeploy. In Google Cloud Console, authorize https://connectintel.net as a JavaScript origin.'
+          : 'Set VITE_GOOGLE_CLIENT_ID in frontend/.env.local for local Google login.'}
+      </p>
+    </div>
+  )
+}
+
 /**
  * Google sign-in — full-width on landing/auth when layout="block".
  */
@@ -42,8 +78,13 @@ export default function GoogleSignIn({
 }) {
   const { login } = useApp()
   const [containerRef, btnWidth] = useButtonWidth()
+  const { clientId, ready, configured } = useGoogleClientId()
 
   const handleSuccess = async (credentialResponse) => {
+    if (!credentialResponse?.credential) {
+      alert('Google did not return a sign-in token. Please try again.')
+      return
+    }
     try {
       await login({ credential: credentialResponse.credential })
     } catch (error) {
@@ -51,11 +92,32 @@ export default function GoogleSignIn({
     }
   }
 
+  const handleError = () => {
+    alert(
+      'Google sign-in could not start. Check that https://connectintel.net is listed under Authorized JavaScript origins in Google Cloud Console.'
+    )
+  }
+
   const displayLabel =
     label ||
-    (text === 'signup_with' ? 'Sign up with Google' : text === 'signin_with' ? 'Sign in with Google' : 'Continue with Google')
+    (text === 'signup_with'
+      ? 'Sign up with Google'
+      : text === 'signin_with'
+        ? 'Sign in with Google'
+        : 'Continue with Google')
 
-  if (!CLIENT_ID) {
+  if (!ready) {
+    return (
+      <div ref={containerRef} className="w-full min-h-[44px] flex items-center justify-center text-sm text-gray-500">
+        Loading Google sign-in…
+      </div>
+    )
+  }
+
+  if (!configured) {
+    if (IS_PROD) {
+      return <MissingGoogleConfig label={displayLabel} />
+    }
     return (
       <div ref={containerRef} className="w-full">
         <button
@@ -83,6 +145,10 @@ export default function GoogleSignIn({
     )
   }
 
+  if (!clientId) {
+    return <MissingGoogleConfig label={displayLabel} />
+  }
+
   if (layout === 'block') {
     return (
       <div ref={containerRef} className="w-full">
@@ -92,7 +158,7 @@ export default function GoogleSignIn({
         >
           <GoogleLogin
             onSuccess={handleSuccess}
-            onError={() => alert('Google sign-in failed. Check your connection and try again.')}
+            onError={handleError}
             useOneTap={false}
             theme={theme}
             size={size}
@@ -109,7 +175,7 @@ export default function GoogleSignIn({
     <div ref={containerRef} className="inline-flex justify-center overflow-visible">
       <GoogleLogin
         onSuccess={handleSuccess}
-        onError={() => alert('Google sign-in failed. Check your connection and try again.')}
+        onError={handleError}
         useOneTap={false}
         theme={theme}
         size={size}
@@ -122,10 +188,12 @@ export default function GoogleSignIn({
 }
 
 export function GoogleSignInCompact({ onBeforeLogin }) {
-  const { login } = useApp()
+  const { login, setScreen } = useApp()
+  const { clientId, ready, configured } = useGoogleClientId()
 
   const handleSuccess = async (credentialResponse) => {
     onBeforeLogin?.()
+    if (!credentialResponse?.credential) return
     try {
       await login({ credential: credentialResponse.credential })
     } catch (error) {
@@ -133,7 +201,22 @@ export function GoogleSignInCompact({ onBeforeLogin }) {
     }
   }
 
-  if (!CLIENT_ID) {
+  if (!ready) {
+    return <span className="text-xs text-gray-500 px-2">…</span>
+  }
+
+  if (!configured) {
+    if (IS_PROD) {
+      return (
+        <button
+          type="button"
+          onClick={() => setScreen('auth')}
+          className="px-4 py-2 text-[13px] font-semibold text-amber-800 bg-amber-50 border border-amber-200 rounded-md"
+        >
+          Log in
+        </button>
+      )
+    }
     return (
       <button
         type="button"
@@ -154,20 +237,23 @@ export function GoogleSignInCompact({ onBeforeLogin }) {
         className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-semibold text-gray-800 hover:bg-gray-50 shadow-sm"
       >
         <GoogleIcon size={18} />
-        Google
+        Google (demo)
       </button>
     )
   }
 
   return (
-    <div className="inline-flex overflow-visible">
+    <div className="inline-flex overflow-visible min-w-[180px]">
       <GoogleLogin
         onSuccess={handleSuccess}
-        onError={() => {}}
+        onError={() =>
+          alert('Google sign-in failed. Add connectintel.net to Authorized JavaScript origins in Google Cloud.')
+        }
         theme="outline"
         size="medium"
         text="signin_with"
         shape="rectangular"
+        width={200}
       />
     </div>
   )

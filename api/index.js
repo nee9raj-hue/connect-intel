@@ -39,6 +39,7 @@ const ROUTES = {
   'invite/preview': () => import('../lib/server/handlers/invite-preview.js'),
   'invite/accept': () => import('../lib/server/handlers/invite-accept.js'),
   'auth/session': () => import('../lib/server/handlers/auth-session.js'),
+  'public-config': () => import('../lib/server/handlers/public-config.js'),
 }
 
 function resolvePath(req) {
