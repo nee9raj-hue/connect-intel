@@ -4,6 +4,7 @@ import { formatCrmDate, getStatusMeta, getVisiblePipelineColumns } from '../../l
 import LeadWorkspace from './LeadWorkspace'
 import PipelineImportModal from './PipelineImportModal'
 import BulkEmailModal from './BulkEmailModal'
+import AddLeadModal from './AddLeadModal'
 
 export default function PipelinePanel({ onNavigate }) {
   const {
@@ -21,6 +22,7 @@ export default function PipelinePanel({ onNavigate }) {
   const [filter, setFilter] = useState('all')
   const [selectedIds, setSelectedIds] = useState(new Set())
   const [importOpen, setImportOpen] = useState(false)
+  const [addOpen, setAddOpen] = useState(false)
   const [bulkOpen, setBulkOpen] = useState(false)
 
   const selectedLead = useMemo(
@@ -76,10 +78,17 @@ export default function PipelinePanel({ onNavigate }) {
             <div className="flex items-center gap-2 flex-wrap">
               <button
                 type="button"
+                onClick={() => setAddOpen(true)}
+                className="text-xs font-semibold px-3 py-1.5 bg-gray-900 text-white rounded-md"
+              >
+                + Add lead
+              </button>
+              <button
+                type="button"
                 onClick={() => setImportOpen(true)}
                 className="text-xs font-medium px-3 py-1.5 border border-[#ffcb2b] bg-[#fffbeb] rounded-md hover:bg-[#fff6d6]"
               >
-                Import pipeline
+                Import CSV
               </button>
               {selectedIds.size > 0 && (
                 <button
@@ -142,7 +151,11 @@ export default function PipelinePanel({ onNavigate }) {
 
         <div className="flex-1 overflow-auto p-4">
           {savedLeads.length === 0 ? (
-            <EmptyPipeline onNavigate={onNavigate} onImport={() => setImportOpen(true)} />
+            <EmptyPipeline
+              onNavigate={onNavigate}
+              onImport={() => setImportOpen(true)}
+              onAdd={() => setAddOpen(true)}
+            />
           ) : view === 'board' ? (
             <div className="flex gap-3 min-h-[320px] overflow-x-auto pb-2">
               {columns.map((col) => (
@@ -259,6 +272,11 @@ export default function PipelinePanel({ onNavigate }) {
         />
       )}
 
+      <AddLeadModal
+        open={addOpen}
+        onClose={() => setAddOpen(false)}
+        onAdded={() => refreshSavedLeads()}
+      />
       <PipelineImportModal
         open={importOpen}
         onClose={() => setImportOpen(false)}
@@ -319,7 +337,7 @@ function KanbanColumn({ column, leads, selectedId, onSelect }) {
   )
 }
 
-function EmptyPipeline({ onNavigate, onImport }) {
+function EmptyPipeline({ onNavigate, onImport, onAdd }) {
   return (
     <div className="flex flex-col items-center justify-center py-20 text-center max-w-md mx-auto">
       <p className="text-4xl mb-3">◎</p>
@@ -330,10 +348,17 @@ function EmptyPipeline({ onNavigate, onImport }) {
       <div className="flex flex-col gap-2 mt-5 w-full max-w-xs">
         <button
           type="button"
-          onClick={onImport}
+          onClick={() => onAdd?.()}
           className="px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg"
         >
-          Import pipeline (CSV/Excel)
+          Add lead manually
+        </button>
+        <button
+          type="button"
+          onClick={onImport}
+          className="px-5 py-2.5 border-2 border-[#ffcb2b] text-[#242424] text-sm font-semibold rounded-lg"
+        >
+          Import CSV / Excel
         </button>
         <button
           type="button"

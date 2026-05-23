@@ -55,6 +55,7 @@ export const api = {
     request('/api/team/permissions', { method: 'PATCH', body: payload }),
   getSavedLeads: () => request('/api/saved-leads'),
   saveLead: (lead) => request('/api/saved-leads', { method: 'POST', body: { lead } }),
+  addManualLead: (manual) => request('/api/saved-leads', { method: 'POST', body: { manual } }),
   removeLead: (leadId) => request('/api/saved-leads', { method: 'DELETE', body: { leadId } }),
   updateSavedLead: (leadId, body) =>
     request('/api/saved-leads', { method: 'PATCH', body: { leadId, ...body } }),

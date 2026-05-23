@@ -240,6 +240,12 @@ export function AppProvider({ children }) {
     }
   }, [])
 
+  const addManualLead = useCallback(async (fields) => {
+    const data = await api.addManualLead(fields)
+    setSavedLeads(data.leads || [])
+    return data
+  }, [])
+
   const patchLead = useCallback(async (leadId, body) => {
     let previous = []
     setSavedLeads((current) => {
@@ -336,6 +342,7 @@ export function AppProvider({ children }) {
         savedLeads,
         toggleSaveLead,
         updateSavedLeadCrm,
+        addManualLead,
         patchLead,
         assignLead,
         generateEmailDraft,

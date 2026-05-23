@@ -40,10 +40,11 @@ Each rep: **Email tab → Connect work Gmail** (one-time). OAuth uses the same G
 
 Tasks, meetings, calls, and notes show **Saving…** / success banners and block double-clicks.
 
-## Pipeline import
+## Pipeline import & manual add
 
-- **Pipeline → Import pipeline** (CSV/Excel) — company team and individuals  
-- Company **members** can import (leads assign to them); **admins** assign from sheet or self  
+- **Pipeline → + Add lead** — one contact at a time (admin can assign to teammate)  
+- **Pipeline → Import CSV** — bulk Excel/CSV upload  
+- Company **members** can import or add (leads assign to them); **admins** can assign to anyone  
 
 ## Bulk email
 
