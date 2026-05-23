@@ -69,14 +69,13 @@ Wait until status is **Ready** (~1 minute).
 
 ---
 
-## 5. Then connect Gmail (test users / verification)
+## 5. Customer email (no Google warning)
 
-After `configured: true`, reps still may see **“Google hasn’t verified this app”** until:
+Until Google verifies the app, customers use **Team → Outbound CRM email → Company domain (DNS)** — not per-user Gmail.
 
-- Their email is on **Test users** in Google Cloud **Audience**, or  
-- You complete **OAuth verification** for `gmail.send`.
+Do **not** set `GOOGLE_OAUTH_VERIFIED=true` until Google approves `gmail.send` / `gmail.readonly`.
 
-See [GOOGLE-CRM-GMAIL-ACCESS.md](./GOOGLE-CRM-GMAIL-ACCESS.md).
+See [GOOGLE-OAUTH-VERIFICATION-SUBMIT.md](./GOOGLE-OAUTH-VERIFICATION-SUBMIT.md).
 
 ---
 

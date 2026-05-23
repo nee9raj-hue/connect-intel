@@ -391,6 +391,7 @@ export default function PipelinePanel({ onNavigate }) {
           lead={selectedLead}
           statusOptions={columns}
           onClose={() => setPipelineLeadId(null)}
+          onNavigate={onNavigate}
         />
       )}
 

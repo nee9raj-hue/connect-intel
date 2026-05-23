@@ -212,21 +212,14 @@ export default function TeamPanel({ onNavigate }) {
         </section>
 
         <section className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
-          <h2 className="text-sm font-semibold text-gray-900">CRM email (HubSpot-style)</h2>
+          <h2 className="text-sm font-semibold text-gray-900">Outbound CRM email</h2>
           <p className="text-xs text-gray-500 leading-relaxed">
-            <strong>Recommended:</strong> each rep connects work Gmail below — sends from{' '}
-            <strong>@{user?.email?.split('@')[1] || 'yourcompany.com'}</strong>, no DNS changes. Optional DNS domain
-            sending is for teams that prefer centralized mail without per-user Google connect.
+            <strong>Recommended for your team:</strong> verify your company domain once below. Every rep with @
+            {user?.email?.split('@')[1] || 'yourcompany.com'} can send from CRM with no Google &quot;unverified
+            app&quot; screen.
           </p>
+          <OrgCrmEmailSetup />
           <CrmGmailConnectCard />
-          <details className="rounded-lg border border-gray-200 bg-gray-50">
-            <summary className="px-3 py-2 text-xs font-semibold text-gray-700 cursor-pointer">
-              Optional: company domain DNS (Resend)
-            </summary>
-            <div className="px-3 pb-3 pt-1 border-t border-gray-200">
-              <OrgCrmEmailSetup />
-            </div>
-          </details>
         </section>
 
         <section className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">

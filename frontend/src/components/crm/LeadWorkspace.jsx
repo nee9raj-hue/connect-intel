@@ -26,7 +26,7 @@ const TABS = [
   { id: 'whatsapp', label: 'WhatsApp' },
 ]
 
-export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATUSES }) {
+export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions = CRM_STATUSES }) {
   const {
     user,
     teamMembers,
@@ -57,6 +57,8 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
     connected: false,
     mailbox: null,
     replySyncEnabled: false,
+    gmailConnectAvailable: false,
+    googleVerificationPending: true,
   })
   const [threadSyncing, setThreadSyncing] = useState(false)
   const [connectingGmail, setConnectingGmail] = useState(false)
@@ -124,9 +126,19 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
           connected: data.connected,
           mailbox: data.mailbox,
           replySyncEnabled: Boolean(data.replySyncEnabled),
+          gmailConnectAvailable: Boolean(data.gmailConnectAvailable),
+          googleVerificationPending: Boolean(data.googleVerificationPending),
         })
       )
-      .catch(() => setGmailStatus({ connected: false, mailbox: null, replySyncEnabled: false }))
+      .catch(() =>
+        setGmailStatus({
+          connected: false,
+          mailbox: null,
+          replySyncEnabled: false,
+          gmailConnectAvailable: false,
+          googleVerificationPending: true,
+        })
+      )
   }, [tab, lead.id, user?.orgOutboundEmailReady])
 
   useEffect(() => {
@@ -145,6 +157,8 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
           connected: data.connected,
           mailbox: data.mailbox,
           replySyncEnabled: Boolean(data.replySyncEnabled),
+          gmailConnectAvailable: Boolean(data.gmailConnectAvailable),
+          googleVerificationPending: Boolean(data.googleVerificationPending),
         })
       )
       .catch(() => {})
@@ -377,6 +391,8 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
         connected: status.connected,
         mailbox: status.mailbox,
         replySyncEnabled: Boolean(status.replySyncEnabled),
+        gmailConnectAvailable: Boolean(status.gmailConnectAvailable),
+        googleVerificationPending: Boolean(status.googleVerificationPending),
       })
     } catch (e) {
       setError(e.message)
@@ -763,22 +779,38 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
           <>
             {!canSendEmail && (
               <section className="rounded-lg border border-amber-200 bg-amber-50 p-3 space-y-2">
-                <h3 className="text-[11px] font-semibold uppercase text-amber-900">Connect email to send</h3>
+                <h3 className="text-[11px] font-semibold uppercase text-amber-900">Set up email to send</h3>
                 <p className="text-xs text-amber-900 leading-relaxed">
-                  Connect work Gmail (recommended, no DNS), or ask your admin for Team → DNS setup.
+                  {user?.isOrgAdmin
+                    ? 'Open Team → Outbound CRM email and complete company domain (DNS) verification. Your whole team can send without any Google permission pop-ups.'
+                    : 'Ask your company admin to set up outbound email under Team → Company domain (DNS).'}
                 </p>
-                <button
-                  type="button"
-                  onClick={connectWorkGmail}
-                  disabled={busy}
-                  className="w-full py-2 text-xs font-semibold bg-[#ffcb2b] text-[#242424] rounded-lg disabled:opacity-50"
-                >
-                  {connectingGmail ? 'Opening Google…' : 'Connect work Gmail'}
-                </button>
-                {(orgEmail?.userCanSend || user?.orgOutboundEmailReady) && (
-                  <p className="text-[10px] text-gray-600">DNS domain sending is also available for your company.</p>
+                {user?.isOrgAdmin && onNavigate && (
+                  <button
+                    type="button"
+                    onClick={() => onNavigate('team')}
+                    className="w-full py-2 text-xs font-semibold bg-[#ffcb2b] text-[#242424] rounded-lg"
+                  >
+                    Open Team email setup
+                  </button>
+                )}
+                {gmailStatus.gmailConnectAvailable && (
+                  <button
+                    type="button"
+                    onClick={connectWorkGmail}
+                    disabled={busy}
+                    className="w-full py-2 text-xs font-medium text-gray-700 border border-gray-300 rounded-lg disabled:opacity-50"
+                  >
+                    {connectingGmail ? 'Opening Google…' : 'Or connect work Gmail (advanced)'}
+                  </button>
                 )}
               </section>
+            )}
+
+            {canSendEmail && (orgEmail?.userCanSend || user?.orgOutboundEmailReady) && (
+              <p className="text-[10px] text-emerald-800 bg-emerald-50 border border-emerald-100 rounded-lg px-2 py-1.5">
+                Sending via your company domain — professional delivery, no Google verification screen for reps.
+              </p>
             )}
 
             <section className="space-y-2">
@@ -846,7 +878,10 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
               replySyncEnabled={gmailStatus.replySyncEnabled}
               busy={threadSyncing || sending}
               enableReplySyncBusy={connectingGmail}
-              onEnableReplySync={connectWorkGmail}
+              onEnableReplySync={
+                gmailStatus.gmailConnectAvailable ? connectWorkGmail : undefined
+              }
+              showReplySyncUpgrade={gmailStatus.gmailConnectAvailable}
               onSync={handleSyncEmailThread}
               onLogReply={handleLogReply}
             />

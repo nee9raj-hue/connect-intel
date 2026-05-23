@@ -12,6 +12,7 @@ export default function CrmEmailThread({
   onLogReply,
   onEnableReplySync,
   enableReplySyncBusy = false,
+  showReplySyncUpgrade = false,
 }) {
   const [showReplyForm, setShowReplyForm] = useState(false)
   const [replySubject, setReplySubject] = useState('')
@@ -69,7 +70,7 @@ export default function CrmEmailThread({
         </div>
       </div>
 
-      {gmailConnected && !replySyncEnabled && onEnableReplySync && (
+      {showReplySyncUpgrade && gmailConnected && !replySyncEnabled && onEnableReplySync && (
         <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] text-amber-950 bg-amber-50 border-b border-amber-100 px-3 py-2">
           <p className="leading-relaxed">
             Allow Gmail to import replies (one-time). Your company admin may need to add your work email as a
