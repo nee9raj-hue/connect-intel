@@ -52,7 +52,6 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
   const [orgEmail, setOrgEmail] = useState(null)
   const [gmailStatus, setGmailStatus] = useState({ connected: false, mailbox: null })
   const [connectingGmail, setConnectingGmail] = useState(false)
-  const [showGmailOptional, setShowGmailOptional] = useState(false)
   const [emailAgenda, setEmailAgenda] = useState('')
   const [emailKeyPoints, setEmailKeyPoints] = useState('')
   const [senderCompany, setSenderCompany] = useState(user?.organizationName || user?.company || '')
@@ -311,12 +310,9 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
       setError('Add subject and message')
       return
     }
-    const canSend = orgEmail?.userCanSend || user?.orgOutboundEmailReady || gmailStatus.connected
+    const canSend = gmailStatus.connected || orgEmail?.userCanSend || user?.orgOutboundEmailReady
     if (!canSend) {
-      setError(
-        orgEmail?.hint ||
-          'Company email is not ready. Ask your admin to open Team → Outbound email (DNS setup is automatic).'
-      )
+      setError('Connect work Gmail above, or ask admin to complete optional DNS sending in Team.')
       return
     }
     if (sending) return
@@ -342,7 +338,7 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
     }
   }
 
-  const canSendEmail = Boolean(orgEmail?.userCanSend || user?.orgOutboundEmailReady || gmailStatus.connected)
+  const canSendEmail = Boolean(gmailStatus.connected || orgEmail?.userCanSend || user?.orgOutboundEmailReady)
   const busy = saving || sending || generating || connectingGmail || waGenerating
   const hasLeadPhone = leadHasCallablePhone(lead)
 
@@ -704,46 +700,36 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
           <>
             <section className="rounded-lg border border-gray-200 bg-gray-50 p-3 space-y-2">
               <h3 className="text-[11px] font-semibold uppercase text-gray-500">Sending from your company</h3>
-              {canSendEmail ? (
+              {gmailStatus.connected ? (
                 <p className="text-xs text-green-800">
-                  Ready — emails send as <span className="font-semibold">{user?.email}</span> from your company domain (unlimited teammates, no Google test-user list).
+                  Gmail connected — sends from <span className="font-semibold">{gmailStatus.mailbox}</span> (no DNS).
+                  Logged in CRM activity.
+                </p>
+              ) : canSendEmail && user?.orgOutboundEmailReady ? (
+                <p className="text-xs text-green-800">
+                  Company DNS sending active — emails send as <span className="font-semibold">{user?.email}</span>.
                 </p>
               ) : (
                 <p className="text-xs text-amber-900 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1.5 leading-relaxed">
-                  {orgEmail?.hint ||
-                    (isManager
-                      ? 'Open Team → Outbound email — we register your domain and show DNS records automatically.'
-                      : 'Ask your company admin to complete Team → Outbound email (one-time DNS).')}
+                  Connect work Gmail below (recommended, no DNS), or ask admin for optional Team → DNS setup.
                 </p>
               )}
-              <button
-                type="button"
-                onClick={() => setShowGmailOptional((v) => !v)}
-                className="text-[11px] text-gray-500 underline"
-              >
-                {showGmailOptional ? 'Hide' : 'Optional: also use personal Gmail OAuth'}
-              </button>
-              {showGmailOptional && (
-                <div className="pt-1 space-y-2 border-t border-gray-200">
-                  {gmailStatus.connected ? (
-                    <p className="text-xs text-gray-600">Gmail connected ({gmailStatus.mailbox}) — used if domain sending is unavailable.</p>
-                  ) : (
-                    <>
-                      <p className="text-[11px] text-gray-500">
-                        Requires Google to verify Connect Intel for all users (platform one-time). Prefer company domain sending above.
-                      </p>
-                      <button
-                        type="button"
-                        onClick={connectWorkGmail}
-                        disabled={busy}
-                        className="w-full py-2 text-xs font-semibold bg-white border border-gray-300 rounded-lg disabled:opacity-50"
-                      >
-                        {connectingGmail ? 'Opening Google…' : 'Connect Gmail (optional)'}
-                      </button>
-                    </>
-                  )}
-                </div>
+              {!gmailStatus.connected && (
+                <button
+                  type="button"
+                  onClick={connectWorkGmail}
+                  disabled={busy}
+                  className="w-full py-2 text-xs font-semibold bg-[#ffcb2b] text-[#242424] rounded-lg disabled:opacity-50"
+                >
+                  {connectingGmail ? 'Opening Google…' : 'Connect work Gmail'}
+                </button>
               )}
+              {!gmailStatus.connected && (orgEmail?.userCanSend || user?.orgOutboundEmailReady) && (
+                <p className="text-[10px] text-gray-500">DNS domain sending is also available for your company.</p>
+              )}
+              <p className="text-[10px] text-gray-400">
+                Inbox sync (auto-import replies into CRM) is not live yet — outbound send + CRM log only.
+              </p>
             </section>
 
             <section className="space-y-2">

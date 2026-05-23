@@ -92,10 +92,11 @@ export default function OrgCrmEmailSetup() {
   return (
     <div className="rounded-lg border-2 border-[#ffcb2b] bg-[#fffbeb] px-4 py-4 text-sm space-y-3">
       <div>
-        <p className="font-semibold text-[#242424]">Outbound email (automatic)</p>
+        <p className="font-semibold text-[#242424]">Optional DNS sending</p>
         <p className="text-xs text-[#5b4a00] mt-1 leading-relaxed">
-          We register <strong>{status?.domain || status?.inferredDomain || 'your company domain'}</strong> for sending.
-          Add DNS once — every teammate with <strong>@{status?.domain || 'yourcompany.com'}</strong> can send from CRM with no manual Google steps.
+          Only if you cannot use Gmail connect above. We register{' '}
+          <strong>{status?.domain || status?.inferredDomain || 'your company domain'}</strong> — add DNS once for all
+          reps on <strong>@{status?.domain || 'yourcompany.com'}</strong>.
         </p>
       </div>
 
@@ -142,7 +143,7 @@ export default function OrgCrmEmailSetup() {
       )}
 
       <p className="text-[10px] text-gray-500 leading-relaxed">
-        Google &quot;unverified app&quot; only applies to optional Gmail OAuth. Production CRM email uses verified domain sending instead.
+        Most teams should use <strong>Connect work Gmail</strong> above instead of DNS.
       </p>
     </div>
   )

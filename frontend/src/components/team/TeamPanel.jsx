@@ -5,6 +5,7 @@ import { TEAM_PIPELINE_ROLES } from '../../lib/crmConstants'
 import OrgPipelineImport from './OrgPipelineImport'
 import InviteEmailSetup from './InviteEmailSetup'
 import OrgCrmEmailSetup from './OrgCrmEmailSetup'
+import CrmGmailConnectCard from './CrmGmailConnectCard'
 
 export default function TeamPanel({ onNavigate }) {
   const {
@@ -211,13 +212,21 @@ export default function TeamPanel({ onNavigate }) {
         </section>
 
         <section className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
-          <h2 className="text-sm font-semibold text-gray-900">Outbound email (CRM)</h2>
+          <h2 className="text-sm font-semibold text-gray-900">CRM email (HubSpot-style)</h2>
           <p className="text-xs text-gray-500 leading-relaxed">
-            One-time DNS setup for your company domain. After verification, every rep signs in with{' '}
-            <strong>@{user?.email?.split('@')[1] || 'yourcompany.com'}</strong> and sends from CRM — no Google test-user
-            list, unlimited teammates.
+            <strong>Recommended:</strong> each rep connects work Gmail below — sends from{' '}
+            <strong>@{user?.email?.split('@')[1] || 'yourcompany.com'}</strong>, no DNS changes. Optional DNS domain
+            sending is for teams that prefer centralized mail without per-user Google connect.
           </p>
-          <OrgCrmEmailSetup />
+          <CrmGmailConnectCard />
+          <details className="rounded-lg border border-gray-200 bg-gray-50">
+            <summary className="px-3 py-2 text-xs font-semibold text-gray-700 cursor-pointer">
+              Optional: company domain DNS (Resend)
+            </summary>
+            <div className="px-3 pb-3 pt-1 border-t border-gray-200">
+              <OrgCrmEmailSetup />
+            </div>
+          </details>
         </section>
 
         <section className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
