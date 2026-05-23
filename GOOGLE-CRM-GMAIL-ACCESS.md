@@ -1,9 +1,14 @@
 # Fix “Google hasn’t verified this app” (CRM work Gmail)
 
-> **For production / unlimited users:** use **Team → Outbound email (CRM)** (Resend domain setup).  
-> Do **not** rely on per-user Gmail OAuth or Google test users. See [PRODUCTION-EMAIL.md](./PRODUCTION-EMAIL.md).
+Connect Intel uses scope **`gmail.send`** so CRM can send from the rep’s work mailbox. Google treats that as **sensitive** until the app is verified.
 
-# Fix “Google hasn’t verified this app” (optional Gmail OAuth only)
+**Sign-in with Google** works for everyone; **Connect work Gmail** does not until one of the fixes below.
+
+See also [PRODUCTION-EMAIL.md](./PRODUCTION-EMAIL.md) and [CRM-EMAIL-INTEGRATION-OPTIONS.md](./CRM-EMAIL-INTEGRATION-OPTIONS.md).
+
+---
+
+# Fix “Google hasn’t verified this app”
 
 When a rep clicks **Connect work Gmail**, Google shows this because Connect Intel requests **`gmail.send`** (send email on the user’s behalf). That scope is **sensitive** until Google verifies your OAuth app.
 

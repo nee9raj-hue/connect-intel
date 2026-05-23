@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
+import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 
 export default function CrmGmailConnectCard({ compact = false }) {
+  const { user } = useApp()
   const [status, setStatus] = useState(null)
   const [loading, setLoading] = useState(true)
   const [connecting, setConnecting] = useState(false)
@@ -47,9 +49,49 @@ export default function CrmGmailConnectCard({ compact = false }) {
   }
 
   if (!status?.configured) {
+    const missing = status?.diagnostics?.missingEnv || []
+    const needsSecret = missing.includes('GOOGLE_CLIENT_SECRET')
+    const isOperator = Boolean(user?.isPlatformAdmin)
+
     return (
-      <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
-        Gmail connect is not configured on the server (Google OAuth env vars). Contact Connect Intel support.
+      <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-3 text-xs text-amber-950 space-y-2">
+        <p className="font-semibold">Gmail connect is not enabled on the server yet</p>
+        <p className="leading-relaxed">
+          Google sign-in works with the public Client ID only. <strong>Connect work Gmail</strong> also needs{' '}
+          <code className="bg-amber-100 px-1 rounded">GOOGLE_CLIENT_SECRET</code> on Vercel — this is separate from
+          the “unverified app” screen.
+        </p>
+        {status?.hint && <p className="text-amber-900">{status.hint}</p>}
+        {isOperator ? (
+          <ol className="list-decimal list-inside space-y-1 leading-relaxed">
+            <li>
+              Google Cloud → Credentials → your <strong>Web</strong> OAuth client → copy <strong>Client secret</strong>
+            </li>
+            <li>
+              Add redirect URI:{' '}
+              <code className="bg-amber-100 px-1 rounded text-[10px]">
+                https://connectintel.net/api/team/email-oauth/callback
+              </code>
+            </li>
+            <li>
+              Vercel → connect-intel → Environment Variables → set{' '}
+              <code className="bg-amber-100 px-1 rounded">GOOGLE_CLIENT_SECRET</code>,{' '}
+              <code className="bg-amber-100 px-1 rounded">GOOGLE_CLIENT_ID</code>,{' '}
+              <code className="bg-amber-100 px-1 rounded">APP_URL=https://connectintel.net</code>
+            </li>
+            <li>
+              <strong>Redeploy</strong> production (<code className="bg-amber-100 px-1 rounded">vercel --prod</code>)
+            </li>
+          </ol>
+        ) : (
+          <p>
+            Ask whoever runs Connect Intel hosting (Vercel) to add the Google OAuth client secret and redeploy. Until
+            then, use <strong>Optional: company domain DNS</strong> below for CRM sending.
+          </p>
+        )}
+        {needsSecret && isOperator && (
+          <p className="text-[10px] font-medium">Missing on server: {missing.join(', ')}</p>
+        )}
       </div>
     )
   }
@@ -86,10 +128,47 @@ export default function CrmGmailConnectCard({ compact = false }) {
       >
         {connecting ? 'Opening Google…' : 'Connect work Gmail'}
       </button>
-      <p className="text-[10px] text-gray-500">
-        Google may show &quot;unverified app&quot; until Connect Intel completes one-time verification — use Advanced →
-        Continue, or ask your admin to add you as a test user.
-      </p>
+
+      <details className="rounded-lg border border-amber-200 bg-amber-50 text-xs text-amber-950">
+        <summary className="px-3 py-2 font-semibold cursor-pointer">
+          Seeing &quot;Google hasn&apos;t verified this app&quot;?
+        </summary>
+        <div className="px-3 pb-3 space-y-2 border-t border-amber-200/80 pt-2 leading-relaxed">
+          <p className="font-medium">For you (the person connecting):</p>
+          <ol className="list-decimal list-inside space-y-1">
+            <li>On the Google warning page, click <strong>Advanced</strong> (bottom left).</li>
+            <li>Click <strong>Go to Connect Intel (unsafe)</strong>.</li>
+            <li>Pick your <strong>work</strong> email (e.g. sales@yourcompany.com), not personal Gmail.</li>
+            <li>Click <strong>Allow</strong>.</li>
+          </ol>
+          <p className="text-amber-900">
+            No <strong>Advanced</strong> link? Your email must be added by the Connect Intel platform admin (see
+            below), or the app must finish Google verification.
+          </p>
+          <p className="font-medium pt-1">For platform admin (invite@connectintel.net / Google Cloud):</p>
+          <ol className="list-decimal list-inside space-y-1">
+            <li>
+              <a
+                className="underline"
+                href="https://console.cloud.google.com/auth/audience"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Google Cloud → Audience
+              </a>{' '}
+              — app must be <strong>External</strong>, status <strong>Testing</strong> (or verified in Production).
+            </li>
+            <li>
+              <strong>Test users</strong> → Add users → add each rep&apos;s exact work email (max 100).
+            </li>
+            <li>Wait 5 minutes, then retry in an incognito window.</li>
+          </ol>
+          <p className="text-[10px] text-amber-800">
+            Long-term: submit <strong>gmail.send</strong> for Google OAuth verification (Verification center). Until
+            then, only test users can connect reliably.
+          </p>
+        </div>
+      </details>
     </div>
   )
 }
