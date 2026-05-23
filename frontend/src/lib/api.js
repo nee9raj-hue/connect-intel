@@ -61,7 +61,8 @@ export const api = {
     request('/api/saved-leads', { method: 'PATCH', body: { leadId, ...body } }),
   assignLead: (leadId, assignToUserId) =>
     request('/api/saved-leads', { method: 'PATCH', body: { leadId, assignToUserId } }),
-  getCrmCalendar: () => request('/api/crm/calendar'),
+  getCrmCalendar: (query = '') =>
+    request(`/api/crm/calendar${query ? `?${query}` : ''}`),
   getCrmActivityLog: () => request('/api/crm/activity-log'),
   getCrmTeamDashboard: (query = '') =>
     request(`/api/crm/team-dashboard${query ? `?${query}` : ''}`),

@@ -23,7 +23,7 @@ export function useCrmReminders(enabled) {
         for (const item of data.reminders || []) {
           const at = new Date(item.scheduledAt).getTime()
           const remindAt = at - REMINDER_MS
-          const key = `${item.leadId}:${item.meetingId || 'follow'}:${item.scheduledAt}`
+          const key = `${item.leadId}:${item.meetingId || item.taskId || 'follow'}:${item.scheduledAt}`
 
           if (now < remindAt || now > at + 5 * 60 * 1000) continue
           if (item.reminderSentAt || notifiedRef.current.has(key)) continue
@@ -32,7 +32,9 @@ export function useCrmReminders(enabled) {
           const title =
             item.kind === 'meeting'
               ? `Upcoming: ${item.title}`
-              : `Follow up: ${item.leadName}`
+              : item.kind === 'task'
+                ? `Task due: ${item.title}`
+                : `Follow up: ${item.leadName}`
           const body = `${item.leadName} · ${formatDateTime(item.scheduledAt)}`
 
           if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {

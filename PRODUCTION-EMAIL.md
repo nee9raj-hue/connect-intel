@@ -10,9 +10,15 @@ Connect Intel **cannot** programmatically:
 
 That is why manual test users are a dead end for a product you promote to the masses.
 
-## What we do instead (automatic from the panel)
+## What we do instead
 
-### Company domain sending (recommended)
+### Gmail / Outlook connect (recommended for most customers — no DNS)
+
+Like HubSpot: each rep connects **work Gmail** once (**Team / lead → Email → Connect work Gmail**).  
+No DNS. Requires Connect Intel to complete **Google OAuth verification** once (see [GOOGLE-CRM-GMAIL-ACCESS.md](./GOOGLE-CRM-GMAIL-ACCESS.md)).  
+Outlook/Microsoft 365 is on the roadmap ([CRM-EMAIL-INTEGRATION-OPTIONS.md](./CRM-EMAIL-INTEGRATION-OPTIONS.md)).
+
+### Company domain sending (optional — one DNS setup)
 
 1. Company admin signs in with **work email** (e.g. `sales@alvarfresh.com`).
 2. **Team → Outbound email (CRM)** runs **automatic setup**:

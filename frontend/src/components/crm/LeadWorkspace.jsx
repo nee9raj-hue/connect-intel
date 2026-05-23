@@ -15,6 +15,7 @@ import {
   fromDatetimeLocalValue,
   toDatetimeLocalValue,
 } from '../../lib/crmUiConstants'
+import TeamParticipantPicker from './TeamParticipantPicker'
 
 const TABS = [
   { id: 'overview', label: 'Overview' },
@@ -34,6 +35,7 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
     generateEmailDraft,
     logCrmEmailSend,
     generateWhatsAppDraft,
+    refreshTeam,
   } = useApp()
   const [tab, setTab] = useState('overview')
   const [notes, setNotes] = useState(lead.crm?.notes || '')
@@ -68,6 +70,8 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
   const [meetingLocation, setMeetingLocation] = useState('')
   const [meetingNotes, setMeetingNotes] = useState('')
   const [meetingAssignee, setMeetingAssignee] = useState(user?.id || '')
+  const [taskParticipants, setTaskParticipants] = useState([])
+  const [meetingParticipants, setMeetingParticipants] = useState([])
   const [logCallNote, setLogCallNote] = useState('')
   const [visitMeetingId, setVisitMeetingId] = useState('')
   const [visitNotes, setVisitNotes] = useState('')
@@ -92,6 +96,12 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
     const timer = setTimeout(() => setNotice(null), 5000)
     return () => clearTimeout(timer)
   }, [notice])
+
+  useEffect(() => {
+    if (tab === 'schedule' && user?.accountType === 'company') {
+      refreshTeam()
+    }
+  }, [tab, user?.accountType, refreshTeam])
 
   useEffect(() => {
     if (tab !== 'email') return
@@ -170,6 +180,10 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
   const addTask = async (e) => {
     e.preventDefault()
     if (!taskTitle.trim() || saving) return
+    if (!taskDue) {
+      setError('Pick a due date so the task appears on the calendar')
+      return
+    }
     const ok = await runPatch(
       {
         task: {
@@ -177,6 +191,7 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
           title: taskTitle.trim(),
           dueAt: fromDatetimeLocalValue(taskDue),
           assignedToUserId: isManager ? taskAssignee : user.id,
+          participantUserIds: taskParticipants.filter((id) => id !== (isManager ? taskAssignee : user.id)),
         },
       },
       'Task saved'
@@ -184,6 +199,7 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
     if (ok) {
       setTaskTitle('')
       setTaskDue('')
+      setTaskParticipants([])
     }
   }
 
@@ -204,6 +220,9 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
           location: meetingLocation,
           notes: meetingNotes,
           assignedToUserId: isManager ? meetingAssignee : user.id,
+          participantUserIds: meetingParticipants.filter(
+            (id) => id !== (isManager ? meetingAssignee : user.id)
+          ),
         },
       },
       'Meeting scheduled — reminder 30 min before'
@@ -213,6 +232,7 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
       setMeetingWhen('')
       setMeetingLocation('')
       setMeetingNotes('')
+      setMeetingParticipants([])
     }
   }
 
@@ -545,9 +565,11 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
                   type="datetime-local"
                   value={taskDue}
                   onChange={(e) => setTaskDue(e.target.value)}
+                  required
                   className="w-full text-sm border rounded-lg px-3 py-2"
                 />
-                {isManager && (
+                <p className="text-[10px] text-gray-400">Due date appears on team calendar</p>
+                {isManager && teamMembers.length > 0 && (
                   <select value={taskAssignee} onChange={(e) => setTaskAssignee(e.target.value)} className="w-full text-sm border rounded-lg px-3 py-2">
                     {teamMembers.map((m) => (
                       <option key={m.userId} value={m.userId}>
@@ -555,6 +577,14 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
                       </option>
                     ))}
                   </select>
+                )}
+                {teamMembers.length > 0 && (
+                  <TeamParticipantPicker
+                    members={teamMembers}
+                    primaryUserId={isManager ? taskAssignee : user.id}
+                    value={taskParticipants}
+                    onChange={setTaskParticipants}
+                  />
                 )}
                 <button type="submit" disabled={busy} className="w-full py-2 text-xs font-semibold bg-[#ffcb2b] rounded-lg disabled:opacity-50">
                   {saving ? 'Saving…' : 'Add task'}
@@ -565,6 +595,15 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
                   <li key={t.id} className={`text-xs border rounded-lg p-2 ${t.completedAt ? 'opacity-60' : ''}`}>
                     <p className="font-medium">{t.title}</p>
                     <p className="text-gray-500">Due {formatDateTime(t.dueAt)}</p>
+                    {(t.participantUserIds?.length > 1 || (t.participantUserIds?.length === 1 && t.participantUserIds[0] !== t.assignedToUserId)) && (
+                      <p className="text-gray-400 mt-0.5">
+                        With{' '}
+                        {t.participantUserIds
+                          .filter((id) => id !== t.assignedToUserId)
+                          .map((id) => teamMembers.find((m) => m.userId === id)?.name || 'teammate')
+                          .join(', ') || 'team'}
+                      </p>
+                    )}
                     {!t.completedAt && (
                       <button type="button" onClick={() => completeTask(t.id)} className="mt-1 text-[#5b4a00] font-semibold underline">
                         Mark done
@@ -589,7 +628,7 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
                 <input type="datetime-local" value={meetingWhen} onChange={(e) => setMeetingWhen(e.target.value)} className="w-full text-sm border rounded-lg px-3 py-2" />
                 <input value={meetingLocation} onChange={(e) => setMeetingLocation(e.target.value)} placeholder="Location" className="w-full text-sm border rounded-lg px-3 py-2" />
                 <textarea value={meetingNotes} onChange={(e) => setMeetingNotes(e.target.value)} rows={2} placeholder="Agenda" className="w-full text-sm border rounded-lg px-3 py-2" />
-                {isManager && (
+                {isManager && teamMembers.length > 0 && (
                   <select value={meetingAssignee} onChange={(e) => setMeetingAssignee(e.target.value)} className="w-full text-sm border rounded-lg px-3 py-2">
                     {teamMembers.map((m) => (
                       <option key={m.userId} value={m.userId}>
@@ -597,6 +636,15 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
                       </option>
                     ))}
                   </select>
+                )}
+                {teamMembers.length > 0 && (
+                  <TeamParticipantPicker
+                    members={teamMembers}
+                    primaryUserId={isManager ? meetingAssignee : user.id}
+                    value={meetingParticipants}
+                    onChange={setMeetingParticipants}
+                    label="Also attending (team)"
+                  />
                 )}
                 <button type="submit" disabled={busy} className="w-full py-2 text-xs font-semibold bg-gray-900 text-white rounded-lg disabled:opacity-50">
                   {saving ? 'Scheduling…' : 'Schedule'}
@@ -635,6 +683,16 @@ export default function LeadWorkspace({ lead, onClose, statusOptions = CRM_STATU
                 <li key={m.id} className="text-xs border rounded-lg p-2 bg-[#fffbeb]">
                   <p className="font-medium">{m.title}</p>
                   <p>{formatDateTime(m.scheduledAt)} · {m.type}</p>
+                  {(m.participantUserIds?.length > 1 ||
+                    (m.participantUserIds?.length === 1 && m.participantUserIds[0] !== m.assignedToUserId)) && (
+                    <p className="text-gray-500 mt-0.5">
+                      With{' '}
+                      {m.participantUserIds
+                        .filter((id) => id !== m.assignedToUserId)
+                        .map((id) => teamMembers.find((tm) => tm.userId === id)?.name || 'teammate')
+                        .join(', ')}
+                    </p>
+                  )}
                   {m.visitRecordedAt && <p className="text-green-700">Visit logged</p>}
                 </li>
               ))}
