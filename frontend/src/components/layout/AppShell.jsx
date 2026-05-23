@@ -81,7 +81,9 @@ export default function AppShell() {
           </button>
           <span className="text-sm font-semibold text-gray-900 truncate">Connect Intel</span>
         </div>
-        <EmailOAuthNotice onOpenSystemStatus={() => navigate('integrations')} />
+        {user?.isPlatformAdmin && (
+          <EmailOAuthNotice onOpenSystemStatus={() => navigate('integrations')} />
+        )}
         <MobileRequiredModal />
         {!user?.isPlatformAdmin && <AppHeader onNavigate={navigate} />}
         <div className="flex-1 flex flex-col min-h-0 min-w-0 overflow-hidden">

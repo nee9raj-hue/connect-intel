@@ -9,14 +9,21 @@ const PARTNERS = [
     id: 'connect-intel',
     label: 'Connect Intel database',
     icon: '📊',
-    description: 'Built-in India B2B records plus companies your team imports via Admin.',
+    description: 'India B2B records plus leads your team adds to the pipeline.',
     status: 'active',
   },
   {
     id: 'ai',
-    label: 'AI ranking & search',
+    label: 'AI prospect search',
     icon: '✨',
-    description: 'Smart matching and lead scoring across your workspace.',
+    description: 'Smart matching and lead discovery from your search filters.',
+    status: 'active',
+  },
+  {
+    id: 'gmail',
+    label: 'Work Gmail',
+    icon: '✉️',
+    description: 'Send outreach from your inbox — connect under Team or on any lead’s Email tab.',
     status: 'active',
   },
   {
@@ -37,10 +44,11 @@ const PARTNERS = [
 
 export default function IntegrationsPanel() {
   const { user } = useApp()
+  const isOperator = Boolean(user?.isPlatformAdmin)
   const [status, setStatus] = useState(null)
-  const isOperator = user?.isPlatformAdmin
 
   useEffect(() => {
+    if (!isOperator) return
     let cancelled = false
     api
       .getIntegrationStatus()
@@ -51,7 +59,27 @@ export default function IntegrationsPanel() {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [isOperator])
+
+  if (!isOperator) {
+    return (
+      <div className="p-6 h-[calc(100vh-3.5rem)] overflow-y-auto max-w-3xl">
+        <h1 className="text-lg font-semibold text-gray-900 mb-2">Connected services</h1>
+        <p className="text-sm text-gray-600 mb-6 leading-relaxed">
+          {PRODUCT.tagline} Your workspace includes AI prospect search, pipeline CRM, and optional work
+          Gmail for sending. Company admins manage team access and imports under <strong>Team</strong>.
+        </p>
+        <div className="space-y-4">
+          {PARTNERS.filter((p) => p.status === 'active').map((partner) => (
+            <PartnerCard key={partner.id} partner={partner} />
+          ))}
+        </div>
+        <p className="text-xs text-gray-400 mt-8">
+          More data partners and CRM sync are on the roadmap for enterprise plans.
+        </p>
+      </div>
+    )
+  }
 
   const storageOk = status?.supabaseConnected
   const storageLabel = status?.storage === 'supabase' ? 'Supabase (persistent)' : 'Temporary (sqlite)'
@@ -59,18 +87,9 @@ export default function IntegrationsPanel() {
   return (
     <div className="p-6 h-[calc(100vh-3.5rem)] overflow-y-auto max-w-3xl">
       <p className="text-sm text-gray-600 mb-6 leading-relaxed">
-        {isOperator ? (
-          <>
-            <strong>Platform operator view.</strong> Check Supabase, Perplexity, and Gemini env wiring
-            on Vercel. Customer company admins import only their own pipeline under Team — master
-            sheets go through Data & imports.
-          </>
-        ) : (
-          <>
-            {PRODUCT.tagline} — search runs on the Connect Intel database today. Your company admin can
-            import your pipeline under Team. Additional data partners roll out with enterprise plans.
-          </>
-        )}
+        <strong>Platform operator view.</strong> Check Supabase, Perplexity, and Gemini env wiring on
+        Vercel. Customer company admins import only their own pipeline under Team — master sheets go
+        through Data & imports.
       </p>
 
       <div
@@ -82,9 +101,7 @@ export default function IntegrationsPanel() {
       >
         <strong>Storage: {storageLabel}</strong>
         {status?.builtInRecords != null && (
-          <span className="block mt-1">
-            {status.builtInRecords.toLocaleString()} contacts in database.
-          </span>
+          <span className="block mt-1">{status.builtInRecords.toLocaleString()} contacts in database.</span>
         )}
         {!storageOk && status?.supabaseError && (
           <span className="block mt-2 text-xs leading-relaxed">{status.supabaseError}</span>
@@ -106,21 +123,20 @@ export default function IntegrationsPanel() {
         <StatusPill label="Team invite email" on={status?.inviteEmailReady} />
       </div>
 
-      {isOperator && (
-        <section className="mb-8 rounded-xl border-2 border-[#ffe48a] bg-[#fffbeb] p-4 space-y-3">
-          <h2 className="text-sm font-semibold text-[#242424]">Team invite email (required for Team invites)</h2>
-          <p className="text-xs text-[#5b4a00] leading-relaxed">
-            Production status:{' '}
-            <strong>{status?.inviteEmailReady ? 'Connected' : 'Not connected'}</strong>
-            {status?.inviteFromAddress ? ` · From ${status.inviteFromAddress}` : ''}
-          </p>
-          {!status?.inviteEmailReady && status?.inviteEmailHint && (
-            <p className="text-xs text-amber-900">{status.inviteEmailHint}</p>
-          )}
-          <InviteEmailSetup />
-        </section>
-      )}
+      <section className="mb-8 rounded-xl border-2 border-[#ffe48a] bg-[#fffbeb] p-4 space-y-3">
+        <h2 className="text-sm font-semibold text-[#242424]">Team invite email (required for Team invites)</h2>
+        <p className="text-xs text-[#5b4a00] leading-relaxed">
+          Production status:{' '}
+          <strong>{status?.inviteEmailReady ? 'Connected' : 'Not connected'}</strong>
+          {status?.inviteFromAddress ? ` · From ${status.inviteFromAddress}` : ''}
+        </p>
+        {!status?.inviteEmailReady && status?.inviteEmailHint && (
+          <p className="text-xs text-amber-900">{status.inviteEmailHint}</p>
+        )}
+        <InviteEmailSetup />
+      </section>
 
+      <h2 className="text-sm font-semibold text-gray-700 mb-3">Customer-facing catalog</h2>
       <div className="space-y-4">
         {PARTNERS.map((partner) => (
           <PartnerCard key={partner.id} partner={partner} />

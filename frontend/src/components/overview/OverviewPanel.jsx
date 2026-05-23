@@ -59,7 +59,9 @@ export default function OverviewPanel({ onNavigate }) {
               { label: '🔍 New people search', panel: 'search' },
               { label: '◎ Open pipeline CRM', panel: 'pipeline' },
               { label: '★ View saved leads', panel: 'saved' },
-              { label: '⚡ Manage integrations', panel: 'integrations' },
+              ...(user?.isOrgAdmin && user?.accountType === 'company'
+                ? [{ label: '👥 Team & Gmail setup', panel: 'team' }]
+                : []),
             ].map((action) => (
               <button
                 key={action.panel}

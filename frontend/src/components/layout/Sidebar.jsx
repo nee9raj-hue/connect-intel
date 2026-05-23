@@ -13,10 +13,7 @@ const CRM = [
   { id: 'crm-calendar', label: 'Calendar', icon: CalendarIcon },
 ]
 
-const CUSTOMER_PLATFORM = [
-  { id: 'overview', label: 'Home', icon: HomeIcon },
-  { id: 'integrations', label: 'Integrations', icon: BoltIcon },
-]
+const CUSTOMER_PLATFORM = [{ id: 'overview', label: 'Home', icon: HomeIcon }]
 
 const OPERATOR_PLATFORM = [
   { id: 'admin', label: 'Data & imports', icon: DatabaseIcon },
