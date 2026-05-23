@@ -1,28 +1,51 @@
 import { useApp } from '../context/AppContext'
 import GoogleSignIn, { GoogleSignInCompact } from '../components/auth/GoogleSignIn'
+import {
+  CrmPipelineMini,
+  EmailCrmFlow,
+  FollowUpTimeline,
+  IndiaLeadMapVisual,
+  ManagerDashboardPreview,
+  RevenueLeakInfographic,
+  WhatsAppOneClick,
+} from '../components/landing/LandingVisuals'
 
-const STATS = [
-  { value: '2.4M+', label: 'Searchable contacts' },
-  { value: '94%', label: 'Email accuracy' },
-  { value: '25', label: 'Free searches / mo' },
-]
-
-const FEATURES = [
+const PILLARS = [
   {
-    title: 'People search',
-    desc: 'Filter by title, location, industry, and company size. Build lists in seconds.',
+    id: 'leads',
+    title: 'AI lead search across India',
+    desc: 'Discover verified exporters, manufacturers, and B2B buyers by state, industry, and role. Our AI models surface high-intent prospects—not random lists.',
+    tag: 'Discovery',
   },
   {
-    title: 'AI lead scoring',
-    desc: 'AI ranks prospects so your team focuses on the highest-intent leads first.',
+    id: 'email',
+    title: 'AI email that sounds like you',
+    desc: 'Tell Connect Intel your agenda; AI drafts convincing outreach in your company voice. Connect your official email so every send is logged in CRM automatically.',
+    tag: 'Outreach',
   },
   {
-    title: 'Contact enrichment',
-    desc: 'Verified emails, direct dials, and company data — export to CSV anytime.',
+    id: 'followup',
+    title: 'Never miss a follow-up',
+    desc: 'Reminders 30 minutes before every meeting or call. Browser alerts keep reps on time—managers see the full activity trail.',
+    tag: 'Reminders',
   },
   {
-    title: 'Pipeline & lists',
-    desc: 'Save prospects, track outreach, and sync to your CRM when integrations go live.',
+    id: 'whatsapp',
+    title: 'WhatsApp in one click',
+    desc: 'AI drafts follow-ups; open WhatsApp from desktop or phone with pre-filled text. Log every touch so nothing falls through the cracks.',
+    tag: 'WhatsApp',
+  },
+  {
+    id: 'team',
+    title: 'Team & customer records',
+    desc: 'Import your pipeline, add leads manually, assign owners, and run productive sales calls with full context on screen.',
+    tag: 'CRM',
+  },
+  {
+    id: 'managers',
+    title: 'Dashboards for managers',
+    desc: 'See how each rep is performing, who needs coaching, and where deals stall—so leadership helps the team win customers.',
+    tag: 'Admin',
   },
 ]
 
@@ -31,77 +54,74 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <nav className="fixed top-0 inset-x-0 z-50 h-[60px] border-b border-gray-200/80 bg-white">
+      <nav className="fixed top-0 inset-x-0 z-50 h-[60px] border-b border-gray-200/80 bg-white/95 backdrop-blur-sm">
         <div className="max-w-[1200px] mx-auto h-full px-6 flex items-center justify-between">
           <Logo />
-          <div className="hidden md:flex items-center gap-7 text-[13px] font-medium text-gray-600">
+          <div className="hidden lg:flex items-center gap-6 text-[13px] font-medium text-gray-600">
+            <a href="#problem" className="hover:text-gray-900 transition-colors">
+              Why CRM
+            </a>
             <a href="#product" className="hover:text-gray-900 transition-colors">
               Product
             </a>
             <a href="#features" className="hover:text-gray-900 transition-colors">
               Features
             </a>
-            <a href="#pricing" className="hover:text-gray-900 transition-colors">
-              Pricing
+            <a href="#managers" className="hover:text-gray-900 transition-colors">
+              For managers
+            </a>
+            <a href="#start" className="hover:text-gray-900 transition-colors">
+              Get started
             </a>
           </div>
           <div className="flex items-center gap-2">
             <GoogleSignInCompact />
             <button
+              type="button"
               onClick={() => setScreen('auth')}
               className="hidden sm:inline-flex px-4 py-2 text-[13px] font-semibold text-gray-700 hover:text-gray-900"
             >
               Log in
             </button>
             <button
+              type="button"
               onClick={() => setScreen('auth')}
               className="px-4 py-2 text-[13px] font-bold bg-ci-yellow text-ci-dark rounded-md hover:bg-ci-yellow-hover transition-colors"
             >
-              Get started
+              Start free
             </button>
           </div>
         </div>
       </nav>
 
       {/* Hero */}
-      <section className="relative pt-[100px] pb-20 px-6 overflow-hidden">
-        <div className="absolute inset-0 -z-10 bg-[#fafafa]" aria-hidden />
-        <div
-          className="absolute inset-0 -z-10 opacity-[0.35]"
-          style={{
-            backgroundImage: 'radial-gradient(circle at 1px 1px, #d4d4d4 1px, transparent 0)',
-            backgroundSize: '28px 28px',
-          }}
-          aria-hidden
-        />
-        <div
-          className="absolute top-16 left-1/2 -translate-x-1/2 w-[min(100%,720px)] h-[380px] -z-10 rounded-full bg-[#ffcb2b]/12 blur-[90px]"
-          aria-hidden
-        />
-        <div className="max-w-[800px] mx-auto text-center">
+      <section className="relative pt-[100px] pb-16 px-6 overflow-hidden">
+        <HeroBackground />
+        <div className="max-w-[880px] mx-auto text-center relative">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-gray-200 shadow-sm mb-8">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
             </span>
             <span className="text-[12px] font-semibold text-gray-600">
-              AI prospecting · India & global B2B
+              CRM + AI prospecting built for Indian B2B teams
             </span>
           </div>
 
-          <h1 className="font-display text-[2.5rem] sm:text-[3rem] md:text-[3.5rem] font-bold text-[#0f0f0f] tracking-[-0.03em] leading-[1.1] mb-6">
-            Find the right leads.
+          <h1 className="font-display text-[2.25rem] sm:text-[3rem] md:text-[3.35rem] font-bold text-[#0f0f0f] tracking-[-0.03em] leading-[1.08] mb-6">
+            Never lose a prospect
             <br />
-            Close deals <span className="text-[#b8860b]">faster</span>.
+            in the <span className="text-[#b8860b]">follow-up gap</span>
           </h1>
 
-          <p className="text-lg md:text-xl text-gray-600 leading-relaxed mb-4 max-w-[580px] mx-auto">
-            Connect Intel is the workspace where marketing and sales teams search prospects,
-            score opportunities with AI, and grow pipeline—without juggling multiple tools.
+          <p className="text-lg md:text-xl text-gray-600 leading-relaxed mb-4 max-w-[640px] mx-auto">
+            Companies lose revenue when potential buyers go quiet—not because the product failed, but because
+            nobody followed up on time. Connect Intel keeps your team, customers, and pipeline in one place so
+            every call and message moves deals forward.
           </p>
-          <p className="text-sm text-gray-500 mb-10 max-w-[500px] mx-auto leading-relaxed">
-            Filter by role, industry, and state. Save lists and export in one click.
-            Enterprise data partners and CRM sync when you scale.
+          <p className="text-sm text-gray-500 mb-10 max-w-[560px] mx-auto leading-relaxed">
+            Search high-quality leads across India with AI · Write emails from your official inbox · WhatsApp
+            follow-ups in one click · Reminders 30 minutes before every meeting.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-5">
@@ -110,77 +130,200 @@ export default function LandingPage() {
               onClick={() => setScreen('auth')}
               className="w-full sm:w-auto px-8 py-3.5 bg-[#0f0f0f] text-white text-[15px] font-semibold rounded-lg hover:bg-[#2a2a2a] transition-colors shadow-lg shadow-black/10"
             >
-              Start free — 25 searches
+              Start free workspace
             </button>
             <a
               href="#product"
               className="w-full sm:w-auto px-8 py-3.5 bg-white text-[#0f0f0f] text-[15px] font-semibold rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
             >
-              See how it works
+              See the CRM
             </a>
           </div>
 
           <div className="max-w-[400px] mx-auto">
             <GoogleSignIn text="signup_with" theme="outline" />
           </div>
-          <p className="text-xs text-gray-400 mt-3">
-            Sign in with Google · No credit card · Live in 2 minutes
+          <p className="text-xs text-gray-400 mt-3">Google sign-in · No credit card · Live in minutes</p>
+        </div>
+
+        <div className="max-w-[1000px] mx-auto mt-14 grid md:grid-cols-3 gap-4">
+          <StatCard value="30 min" label="Reminder before every meeting & call" />
+          <StatCard value="1-click" label="WhatsApp with AI-drafted follow-ups" />
+          <StatCard value="100%" label="Outreach logged when email is connected" />
+        </div>
+      </section>
+
+      {/* Problem */}
+      <section id="problem" className="py-16 px-6 bg-gray-50 border-y border-gray-100">
+        <div className="max-w-[1100px] mx-auto grid lg:grid-cols-2 gap-10 items-center">
+          <div>
+            <h2 className="font-display text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+              Revenue walks out when follow-ups slip
+            </h2>
+            <p className="text-gray-600 leading-relaxed mb-4">
+              Your team finds great prospects—but spreadsheets, personal inboxes, and scattered WhatsApp chats
+              mean managers cannot see who was contacted, who replied, or who needs help today.
+            </p>
+            <ul className="space-y-3 text-sm text-gray-700">
+              {[
+                'Missed callbacks and forgotten meeting prep',
+                'No single record of team ↔ customer conversations',
+                'Reps rewriting the same emails from scratch',
+                'Leadership blind to pipeline health until month-end',
+              ].map((item) => (
+                <li key={item} className="flex gap-2">
+                  <span className="text-red-500 shrink-0">✕</span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <RevenueLeakInfographic />
+        </div>
+      </section>
+
+      {/* Product preview */}
+      <section id="product" className="py-20 px-6">
+        <div className="max-w-[1100px] mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="font-display text-2xl md:text-3xl font-bold text-gray-900 mb-3">
+              One workspace: search, CRM, outreach
+            </h2>
+            <p className="text-gray-600 max-w-xl mx-auto">
+              From AI lead discovery to closed-won—your official email and WhatsApp stay connected to every deal.
+            </p>
+          </div>
+          <div className="grid lg:grid-cols-5 gap-6 items-start">
+            <div className="lg:col-span-3">
+              <ProductPreview />
+            </div>
+            <div className="lg:col-span-2 space-y-4">
+              <CrmPipelineMini />
+              <FollowUpTimeline />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* India leads */}
+      <section className="py-16 px-6 bg-[#fafafa]">
+        <div className="max-w-[1100px] mx-auto grid lg:grid-cols-2 gap-8 items-center">
+          <IndiaLeadMapVisual />
+          <div>
+            <h2 className="font-display text-2xl font-bold text-gray-900 mb-3">
+              Use our AI to find high-quality leads across India
+            </h2>
+            <p className="text-gray-600 leading-relaxed mb-4">
+              Connect Intel combines your imported data with AI discovery (Perplexity, Gemini) to surface
+              exporters, buyers, and decision-makers with email and phone when available.
+            </p>
+            <p className="text-sm text-gray-500">
+              Filter by keywords, state, city, and industry—then save to pipeline, assign to reps, and start
+              outreach without exporting to five different tools.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Email + CRM */}
+      <section className="py-16 px-6">
+        <div className="max-w-[1100px] mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="font-display text-2xl md:text-3xl font-bold text-gray-900 mb-3">
+              Convincing emails, written by AI—sent from you
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Your team describes the agenda; Connect Intel drafts professional outreach in your company name.
+              Connect official email domains to CRM and enjoy a complete record of every message.
+            </p>
+          </div>
+          <EmailCrmFlow />
+        </div>
+      </section>
+
+      {/* WhatsApp */}
+      <section className="py-16 px-6 bg-gray-50">
+        <div className="max-w-[1100px] mx-auto">
+          <WhatsAppOneClick />
+          <p className="text-[10px] text-gray-400 text-center mt-4 max-w-lg mx-auto">
+            *Results vary by team discipline; structured follow-ups and timed reminders improve reply and meeting
+            rates for most B2B sales teams.
           </p>
         </div>
-
-        {/* Stats */}
-        <div className="max-w-[900px] mx-auto mt-16 grid grid-cols-3 gap-4 md:gap-6">
-          {STATS.map((s) => (
-            <div
-              key={s.label}
-              className="text-center py-5 px-4 rounded-xl bg-white/90 border border-gray-100 shadow-sm"
-            >
-              <div className="text-2xl md:text-3xl font-bold text-[#0f0f0f] tracking-tight">{s.value}</div>
-              <div className="text-xs text-gray-500 mt-1.5 font-medium">{s.label}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* Product preview */}
-        <div id="product" className="max-w-[1100px] mx-auto mt-16">
-          <ProductPreview />
-        </div>
       </section>
 
-      {/* Logos strip */}
-      <section className="py-10 border-y border-gray-100 bg-white">
-        <p className="text-center text-[11px] font-semibold text-gray-400 uppercase tracking-[0.2em] mb-6">
-          Integrates with your go-to-market stack
-        </p>
-        <div className="flex flex-wrap justify-center items-center gap-x-10 gap-y-4 px-6 max-w-4xl mx-auto opacity-70">
-          {['Salesforce', 'HubSpot', 'Google', 'Microsoft', 'LinkedIn', 'Slack'].map((name) => (
-            <span key={name} className="text-sm font-bold text-gray-400 tracking-tight">
-              {name}
-            </span>
-          ))}
-        </div>
-      </section>
-
-      {/* Features */}
+      {/* Features grid */}
       <section id="features" className="py-20 px-6">
         <div className="max-w-[1100px] mx-auto">
-          <h2 className="text-2xl md:text-3xl font-bold text-center text-ci-dark mb-3">
-            Everything to prospect and connect
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-center text-ci-dark mb-3">
+            Everything your revenue team needs
           </h2>
-          <p className="text-center text-gray-600 mb-12 max-w-lg mx-auto text-[15px]">
-            Professional search, filters, and list tools built for teams who live in their pipeline.
+          <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+            Built for exporters, manufacturers, and B2B sellers who live on follow-ups—not just lead lists.
           </p>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
-            {FEATURES.map((f, i) => (
-              <div
-                key={f.title}
-                className="p-6 rounded-lg border border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm transition-all"
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {PILLARS.map((f) => (
+              <article
+                key={f.id}
+                id={f.id}
+                className="p-6 rounded-xl border border-gray-200 bg-white hover:border-[#ffcb2b]/50 hover:shadow-md transition-all"
               >
-                <div className="w-8 h-8 rounded-md bg-ci-yellow/30 flex items-center justify-center text-sm font-bold text-ci-dark mb-4">
-                  {i + 1}
-                </div>
-                <h3 className="font-semibold text-ci-dark mb-2 text-[15px]">{f.title}</h3>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#b8860b]">{f.tag}</span>
+                <h3 className="font-semibold text-gray-900 mt-2 mb-2 text-[15px]">{f.title}</h3>
                 <p className="text-[13px] text-gray-600 leading-relaxed">{f.desc}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Managers */}
+      <section id="managers" className="py-20 px-6 bg-[#0f0f0f] text-white">
+        <div className="max-w-[1100px] mx-auto grid lg:grid-cols-2 gap-10 items-center">
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-amber-300 mb-3">For managers & admins</p>
+            <h2 className="font-display text-2xl md:text-3xl font-bold mb-4">
+              See how your team is working—and where to help them win
+            </h2>
+            <p className="text-gray-400 leading-relaxed mb-6">
+              Complete visibility: pipeline by stage, activity log across leads, calendar of upcoming calls, and
+              who has not followed up. Transfer leads, assign tasks, and coach with data—not guesswork.
+            </p>
+            <ul className="space-y-2 text-sm text-gray-300">
+              {[
+                'Company-wide pipeline & role-based columns',
+                'Bulk email with AI per lead',
+                'Import CSV or add leads one-by-one',
+                'Outbound email DNS setup from the panel',
+              ].map((item) => (
+                <li key={item} className="flex gap-2">
+                  <span className="text-ci-yellow">✓</span>
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <ManagerDashboardPreview />
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section className="py-16 px-6">
+        <div className="max-w-[900px] mx-auto">
+          <h2 className="font-display text-2xl font-bold text-center mb-10">How teams get started</h2>
+          <div className="grid sm:grid-cols-4 gap-4">
+            {[
+              { step: '1', title: 'Sign up', sub: 'Company or solo workspace' },
+              { step: '2', title: 'Import pipeline', sub: 'CSV or manual add' },
+              { step: '3', title: 'Connect email', sub: 'Official domain sending' },
+              { step: '4', title: 'Follow up', sub: 'Email, WhatsApp, reminders' },
+            ].map((s) => (
+              <div key={s.step} className="text-center p-4 rounded-xl bg-gray-50 border border-gray-100">
+                <div className="w-10 h-10 mx-auto rounded-full bg-ci-yellow text-ci-dark font-bold flex items-center justify-center mb-2">
+                  {s.step}
+                </div>
+                <p className="font-semibold text-sm">{s.title}</p>
+                <p className="text-[11px] text-gray-500 mt-1">{s.sub}</p>
               </div>
             ))}
           </div>
@@ -188,19 +331,65 @@ export default function LandingPage() {
       </section>
 
       {/* CTA */}
-      <section id="pricing" className="py-20 px-6 bg-ci-nav text-white">
+      <section id="start" className="py-20 px-6 bg-gradient-to-b from-amber-50 to-white border-t border-amber-100">
         <div className="max-w-xl mx-auto text-center">
-          <h2 className="text-2xl md:text-3xl font-bold mb-3">Start free today</h2>
-          <p className="text-gray-400 mb-8 text-[15px]">25 searches per month on the free plan. Upgrade when you scale.</p>
-          <div className="max-w-[320px] mx-auto">
-            <GoogleSignIn text="signup_with" theme="filled_blue" />
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-gray-900 mb-3">
+            Stop losing prospects. Start following up on time.
+          </h2>
+          <p className="text-gray-600 mb-8">
+            Join teams using Connect Intel to search India B2B leads, run CRM, and close with AI-powered outreach.
+          </p>
+          <div className="max-w-[320px] mx-auto space-y-3">
+            <button
+              type="button"
+              onClick={() => setScreen('auth')}
+              className="w-full py-3.5 bg-[#0f0f0f] text-white font-semibold rounded-lg hover:bg-[#2a2a2a]"
+            >
+              Create free account
+            </button>
+            <GoogleSignIn text="signup_with" theme="outline" />
           </div>
         </div>
       </section>
 
-      <footer className="py-8 px-6 border-t border-gray-200 text-center text-[13px] text-gray-500">
-        © {new Date().getFullYear()} Connect Intel
+      <footer className="py-10 px-6 border-t border-gray-200 bg-white">
+        <div className="max-w-[1100px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-[13px] text-gray-500">
+          <Logo />
+          <p>© {new Date().getFullYear()} Connect Intel · B2B CRM & AI prospecting for India</p>
+          <a href="https://connectintel.net/privacy.html" className="hover:text-gray-800">
+            Privacy
+          </a>
+        </div>
       </footer>
+    </div>
+  )
+}
+
+function HeroBackground() {
+  return (
+    <>
+      <div className="absolute inset-0 -z-10 bg-[#fafafa]" aria-hidden />
+      <div
+        className="absolute inset-0 -z-10 opacity-[0.35]"
+        style={{
+          backgroundImage: 'radial-gradient(circle at 1px 1px, #d4d4d4 1px, transparent 0)',
+          backgroundSize: '28px 28px',
+        }}
+        aria-hidden
+      />
+      <div
+        className="absolute top-16 left-1/2 -translate-x-1/2 w-[min(100%,720px)] h-[380px] -z-10 rounded-full bg-[#ffcb2b]/12 blur-[90px]"
+        aria-hidden
+      />
+    </>
+  )
+}
+
+function StatCard({ value, label }) {
+  return (
+    <div className="text-center py-5 px-4 rounded-xl bg-white border border-gray-100 shadow-sm">
+      <div className="text-2xl md:text-3xl font-bold text-[#0f0f0f] tracking-tight">{value}</div>
+      <div className="text-xs text-gray-500 mt-1.5 font-medium leading-snug">{label}</div>
     </div>
   )
 }
@@ -218,18 +407,16 @@ function Logo() {
 
 function ProductPreview() {
   const rows = [
-    { name: 'Sarah Chen', title: 'VP Marketing', company: 'TechFlow', email: 'verified', score: 92 },
-    { name: 'Marcus Webb', title: 'Head of Growth', company: 'ScaleUp Labs', email: 'verified', score: 88 },
-    { name: 'Priya Sharma', title: 'Director of Sales', company: 'CloudNine', email: 'likely', score: 85 },
-    { name: 'James Okonkwo', title: 'CMO', company: 'BrightPath', email: 'verified', score: 79 },
+    { name: 'Priya Sharma', title: 'Export Director', company: 'Rajasthan Handicrafts', score: 94 },
+    { name: 'Amit Patel', title: 'VP Sales', company: 'Gujarat Textiles', score: 91 },
+    { name: 'Lakshmi Iyer', title: 'Procurement', company: 'Chennai Spices Co', score: 88 },
+    { name: 'Rahul Mehta', title: 'Founder', company: 'Mumbai Organics', score: 85 },
   ]
 
   return (
-    <div className="rounded-lg border border-gray-200 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] overflow-hidden bg-white">
-      {/* App chrome */}
-      <div className="flex h-[420px]">
-        {/* Sidebar */}
-        <div className="w-[52px] md:w-[200px] bg-ci-sidebar shrink-0 flex flex-col">
+    <div className="rounded-xl border border-gray-200 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.12)] overflow-hidden bg-white">
+      <div className="flex h-[380px]">
+        <div className="w-[52px] md:w-[168px] bg-ci-sidebar shrink-0 flex flex-col">
           <div className="p-3 border-b border-white/10 hidden md:block">
             <div className="flex items-center gap-2">
               <div className="w-7 h-7 rounded bg-ci-yellow flex items-center justify-center text-[10px] font-bold text-ci-dark">
@@ -238,12 +425,12 @@ function ProductPreview() {
               <span className="text-white text-xs font-bold">Connect Intel</span>
             </div>
           </div>
-          <div className="p-2 space-y-0.5 flex-1">
-            {['Overview', 'People', 'Saved', 'Integrations'].map((item, i) => (
+          <div className="p-2 space-y-0.5 flex-1 hidden md:block">
+            {['Pipeline', 'People search', 'Activity log', 'Calendar', 'Team'].map((item, i) => (
               <div
                 key={item}
-                className={`px-2 py-1.5 rounded text-[11px] font-medium hidden md:block ${
-                  i === 1 ? 'bg-white/15 text-white' : 'text-gray-500'
+                className={`px-2 py-1.5 rounded text-[11px] font-medium ${
+                  i === 0 ? 'bg-white/15 text-white' : 'text-gray-500'
                 }`}
               >
                 {item}
@@ -252,66 +439,36 @@ function ProductPreview() {
           </div>
         </div>
 
-        {/* Main */}
         <div className="flex-1 flex flex-col min-w-0 bg-ci-surface">
-          <div className="h-11 bg-white border-b border-gray-200 flex items-center px-4 gap-3">
-            <span className="text-sm font-semibold text-ci-dark">People</span>
-            <span className="text-xs text-gray-400">· 2,847 total</span>
-            <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded bg-ci-yellow/40 text-ci-dark">
-              Net new 2,410
+          <div className="h-11 bg-white border-b border-gray-200 flex items-center px-4 gap-2">
+            <span className="text-sm font-semibold text-ci-dark">Pipeline</span>
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold">
+              Follow-up in 28 min
             </span>
           </div>
-
-          <div className="flex flex-1 min-h-0">
-            {/* Filters */}
-            <div className="w-[140px] md:w-[180px] bg-white border-r border-gray-200 p-3 hidden sm:block shrink-0">
-              <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">
-                Filters
-              </div>
-              {['VP Marketing', 'San Francisco', 'Software', '51-200'].map((f) => (
-                <div
-                  key={f}
-                  className="text-[10px] px-2 py-1 mb-1 rounded bg-gray-100 text-gray-700 font-medium truncate"
-                >
-                  {f}
-                </div>
-              ))}
-              <div className="mt-3 py-1.5 bg-ci-yellow rounded text-[10px] font-bold text-center text-ci-dark">
-                Search
-              </div>
-            </div>
-
-            {/* Table */}
-            <div className="flex-1 bg-white overflow-hidden">
-              <table className="w-full text-left text-[11px]">
-                <thead>
-                  <tr className="border-b border-gray-100 bg-gray-50/80 text-gray-500 font-semibold uppercase tracking-wide">
-                    <th className="py-2 pl-3 w-6" />
-                    <th className="py-2 pr-2">Name</th>
-                    <th className="py-2 pr-2 hidden md:table-cell">Title</th>
-                    <th className="py-2 pr-2">Company</th>
-                    <th className="py-2 pr-3 text-right">Score</th>
+          <div className="flex-1 bg-white overflow-hidden p-2">
+            <table className="w-full text-left text-[11px]">
+              <thead>
+                <tr className="text-gray-500 font-semibold uppercase text-[9px]">
+                  <th className="py-1 pl-1">Lead</th>
+                  <th className="py-1 hidden sm:table-cell">Company</th>
+                  <th className="py-1 text-right">Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((r) => (
+                  <tr key={r.name} className="border-t border-gray-50">
+                    <td className="py-2 pl-1 font-medium text-gray-900">{r.name}</td>
+                    <td className="py-2 text-gray-600 hidden sm:table-cell">{r.company}</td>
+                    <td className="py-2 text-right">
+                      <span className="inline-flex w-7 h-7 items-center justify-center rounded-full bg-green-100 text-green-800 font-bold text-[10px]">
+                        {r.score}
+                      </span>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {rows.map((r) => (
-                    <tr key={r.name} className="border-b border-gray-50 hover:bg-amber-50/30">
-                      <td className="py-2.5 pl-3">
-                        <div className="w-3.5 h-3.5 border border-gray-300 rounded" />
-                      </td>
-                      <td className="py-2.5 pr-2 font-medium text-gray-900">{r.name}</td>
-                      <td className="py-2.5 pr-2 text-gray-600 hidden md:table-cell">{r.title}</td>
-                      <td className="py-2.5 pr-2 text-gray-600">{r.company}</td>
-                      <td className="py-2.5 pr-3 text-right">
-                        <span className="inline-flex w-7 h-7 items-center justify-center rounded-full bg-green-100 text-green-800 font-bold text-[10px]">
-                          {r.score}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
