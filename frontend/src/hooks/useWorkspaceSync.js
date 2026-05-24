@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
-import { api } from '../lib/api'
 
-const POLL_MS = 45 * 1000
+const POLL_MS = 60 * 1000
+const INITIAL_DELAY_MS = 12 * 1000
 const AUTH_FAIL_PAUSE_MS = 2 * 60 * 1000
 
 function showBrowserNotification(item) {
@@ -25,6 +25,11 @@ export function useWorkspaceSync({
   const sinceRef = useRef(null)
   const seenRef = useRef(new Set())
   const pausedUntilRef = useRef(0)
+  const syncRef = useRef(syncWorkspace)
+  const notifyRef = useRef(onNewNotifications)
+
+  syncRef.current = syncWorkspace
+  notifyRef.current = onNewNotifications
 
   useEffect(() => {
     if (!enabled || !userId) return undefined
@@ -37,9 +42,8 @@ export function useWorkspaceSync({
       if (Date.now() < pausedUntilRef.current) return
 
       try {
-        await api.touchSession()
         const since = sinceRef.current
-        const result = await syncWorkspace(since)
+        const result = await syncRef.current(since)
         if (result?.serverTime) {
           sinceRef.current = result.serverTime
         }
@@ -50,7 +54,7 @@ export function useWorkspaceSync({
         }
 
         if (fresh.length) {
-          onNewNotifications?.(fresh)
+          notifyRef.current?.(fresh)
           for (const item of fresh) {
             if (
               item.type === 'assignment' ||
@@ -71,8 +75,7 @@ export function useWorkspaceSync({
     }
 
     sinceRef.current = new Date(Date.now() - 30 * 1000).toISOString()
-    run()
-
+    const initialTimer = setTimeout(run, INITIAL_DELAY_MS)
     const intervalId = setInterval(run, POLL_MS)
 
     const onVisible = () => {
@@ -85,9 +88,10 @@ export function useWorkspaceSync({
     window.addEventListener('focus', onVisible)
 
     return () => {
+      clearTimeout(initialTimer)
       clearInterval(intervalId)
       document.removeEventListener('visibilitychange', onVisible)
       window.removeEventListener('focus', onVisible)
     }
-  }, [enabled, userId, syncWorkspace, onNewNotifications])
+  }, [enabled, userId])
 }

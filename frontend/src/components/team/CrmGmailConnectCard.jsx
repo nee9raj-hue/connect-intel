@@ -3,7 +3,7 @@ import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 
 export default function CrmGmailConnectCard({ compact = false }) {
-  const { user, refreshSession } = useApp()
+  const { refreshSession } = useApp()
   const [status, setStatus] = useState(null)
   const [loading, setLoading] = useState(true)
   const [connecting, setConnecting] = useState(false)
@@ -17,7 +17,7 @@ export default function CrmGmailConnectCard({ compact = false }) {
       const data = await api.getCrmGmailStatus()
       setStatus(data)
     } catch (e) {
-      const msg = e.message || 'Could not check Gmail status'
+      const msg = e.message || 'Could not check email connection'
       setError(
         e.status === 401
           ? `${msg} Try Reconnect below, or sign out and sign in again.`
@@ -42,7 +42,7 @@ export default function CrmGmailConnectCard({ compact = false }) {
     try {
       const data = await api.startCrmGmailOAuth()
       if (data.url) window.location.href = data.url
-      else setError('Could not start Google authorization')
+      else setError('Could not start email authorization')
     } catch (e) {
       setError(e.message)
     } finally {
@@ -50,98 +50,83 @@ export default function CrmGmailConnectCard({ compact = false }) {
     }
   }
 
+  const pad = compact ? 'px-3 py-3' : 'px-4 py-4'
+
   if (loading) {
-    return <p className="text-xs text-gray-500">Checking email options…</p>
+    return <p className="text-xs text-gray-500">Checking email connection…</p>
   }
 
   if (error && !status) {
     return (
-      <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-900">
-        <p className="font-semibold">Could not check email status</p>
-        <p className="mt-1">{error}</p>
-        <div className="mt-2 flex gap-3">
-          <button type="button" onClick={load} className="underline font-semibold">
-            Retry
-          </button>
-          <button
-            type="button"
-            onClick={async () => {
-              await refreshSession?.()
-              load()
-            }}
-            className="underline font-semibold"
-          >
-            Reconnect session
-          </button>
-        </div>
+      <div className={`rounded-lg border border-red-200 bg-red-50 text-red-900 ${pad}`}>
+        <p className="font-semibold text-xs">Could not check email status</p>
+        <p className="mt-1 text-xs">{error}</p>
+        <RetryActions onRetry={load} onReconnect={refreshSession} />
       </div>
     )
   }
 
   if (!status?.configured) {
-    const missing = status?.diagnostics?.missingEnv || []
-    const needsSecret = missing.includes('GOOGLE_CLIENT_SECRET')
-    const isOperator = Boolean(user?.isPlatformAdmin)
-
     return (
-      <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-3 text-xs text-amber-950 space-y-2">
-        <p className="font-semibold">Gmail connect is not enabled on the server yet</p>
-        <p className="leading-relaxed">
-          Use <strong>Company domain (DNS)</strong> below for customer sending until Google OAuth is configured on
-          Vercel.
-        </p>
-        {status?.hint && <p className="text-amber-900">{status.hint}</p>}
-        {isOperator && (
-          <ol className="list-decimal list-inside space-y-1 leading-relaxed">
-            <li>Add <code className="bg-amber-100 px-1 rounded">GOOGLE_CLIENT_SECRET</code> on Vercel and redeploy</li>
-            <li>Complete Google app verification (see GOOGLE-OAUTH-VERIFICATION-SUBMIT.md)</li>
-          </ol>
-        )}
-        {needsSecret && isOperator && (
-          <p className="text-[10px] font-medium">Missing on server: {missing.join(', ')}</p>
-        )}
-      </div>
-    )
-  }
-
-  if (status.googleVerificationPending && !status.gmailConnectAvailable) {
-    return (
-      <div
-        className={`rounded-lg border border-gray-200 bg-gray-50 ${compact ? 'px-3 py-2' : 'px-4 py-3'} text-xs text-gray-700`}
-      >
-        <p className="font-semibold text-gray-900">Per-user Gmail connect — coming soon</p>
-        <p className="mt-1 leading-relaxed">
-          Your team sends through <strong>Company domain (DNS)</strong> below — the professional path with no Google
-          warning screens. Individual Gmail connect will appear after Connect Intel completes Google&apos;s app review.
-        </p>
-      </div>
-    )
-  }
-
-  if (status.connected) {
-    return (
-      <div className={`rounded-lg border border-green-200 bg-green-50 ${compact ? 'px-3 py-2' : 'px-4 py-3'} text-sm`}>
-        <p className="font-semibold text-green-900">Work Gmail connected</p>
-        <p className="text-xs text-green-800 mt-0.5">
-          Sends from <strong>{status.mailbox}</strong>. Activity is logged in CRM.
+      <div className={`rounded-lg border border-amber-200 bg-amber-50 text-amber-950 ${pad}`}>
+        <p className="font-semibold text-xs">Work email is not configured yet</p>
+        <p className="mt-1 text-xs leading-relaxed">
+          Contact Connect Intel support to enable work email sending for your organization.
         </p>
       </div>
     )
   }
 
   if (!status.gmailConnectAvailable) {
-    return null
+    return (
+      <div className={`rounded-lg border border-gray-200 bg-gray-50 text-gray-700 ${pad}`}>
+        <p className="font-semibold text-xs text-gray-900">Work email connect is unavailable</p>
+        <p className="mt-1 text-xs leading-relaxed">Try again later or contact Connect Intel support.</p>
+      </div>
+    )
+  }
+
+  if (status.connected) {
+    return (
+      <div className={`rounded-lg border border-green-200 bg-green-50 ${pad}`}>
+        <p className="font-semibold text-sm text-green-900">Work email connected</p>
+        <p className="text-xs text-green-800 mt-0.5">
+          Sends from <strong>{status.mailbox}</strong> · replies sync to CRM
+        </p>
+        {status.needsReplySyncReconnect && (
+          <button
+            type="button"
+            onClick={connect}
+            disabled={connecting}
+            className="mt-2 text-xs font-semibold text-green-900 underline disabled:opacity-60"
+          >
+            {connecting ? 'Connecting…' : 'Enable reply sync'}
+          </button>
+        )}
+      </div>
+    )
   }
 
   return (
-    <div
-      className={`rounded-lg border border-gray-200 bg-white ${compact ? 'px-3 py-3' : 'px-4 py-4'} text-sm space-y-2`}
-    >
-      <p className="font-semibold text-gray-900">Connect work Gmail (optional)</p>
+    <div className={`rounded-lg border border-gray-200 bg-white text-sm ${pad} space-y-2`}>
+      <p className="font-semibold text-gray-900">Connect work email</p>
       <p className="text-xs text-gray-600 leading-relaxed">
-        For platform testing only until Google verification is complete. Customers should use company domain DNS
-        above.
+        Sign in once with your <strong>work</strong> email account. Send CRM email from your real mailbox.
       </p>
+
+      {status.googleVerificationPending && (
+        <div className="text-[11px] text-amber-950 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-2 space-y-1.5 leading-relaxed">
+          <p className="font-semibold">Sign-in may show a security notice</p>
+          <p>
+            {status.googleSetup?.whyUnverifiedWarning ||
+              'This is normal while Connect Intel completes email provider verification.'}
+          </p>
+          <p className="text-[10px] text-amber-800">
+            If connection fails, choose Advanced → Continue to Connect Intel, or contact your administrator.
+          </p>
+        </div>
+      )}
+
       {error && (
         <p className="text-xs text-red-800 bg-red-50 border border-red-100 rounded px-2 py-1">{error}</p>
       )}
@@ -149,16 +134,35 @@ export default function CrmGmailConnectCard({ compact = false }) {
         type="button"
         onClick={connect}
         disabled={connecting}
-        className="w-full py-2 text-xs font-semibold bg-gray-100 text-gray-800 border border-gray-200 rounded-lg disabled:opacity-50"
+        className="w-full py-2.5 text-sm font-semibold bg-[#ffcb2b] text-[#242424] rounded-lg disabled:opacity-50"
       >
-        {connecting ? 'Opening Google…' : 'Connect work Gmail (operator)'}
+        {connecting ? 'Connecting…' : 'Connect work email'}
       </button>
-      {user?.isPlatformAdmin && status.googleVerificationPending && (
-        <p className="text-[10px] text-gray-500 leading-relaxed">
-          After Google approves the app, set <code className="bg-gray-100 px-1 rounded">GOOGLE_OAUTH_VERIFIED=true</code>{' '}
-          on Vercel. See GOOGLE-OAUTH-VERIFICATION-SUBMIT.md in the repo.
-        </p>
-      )}
+      <p className="text-[10px] text-gray-500">
+        <a href="https://connectintel.net/privacy.html" className="underline" target="_blank" rel="noreferrer">
+          Privacy policy
+        </a>
+      </p>
+    </div>
+  )
+}
+
+function RetryActions({ onRetry, onReconnect }) {
+  return (
+    <div className="mt-2 flex gap-3 text-xs">
+      <button type="button" onClick={onRetry} className="underline font-semibold">
+        Retry
+      </button>
+      <button
+        type="button"
+        onClick={async () => {
+          await onReconnect?.()
+          onRetry()
+        }}
+        className="underline font-semibold"
+      >
+        Reconnect session
+      </button>
     </div>
   )
 }

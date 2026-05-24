@@ -18,9 +18,7 @@ export default function ResultsTable({
   const allSelected =
     allSelectedProp ?? (leads.length > 0 && selected.filter((id) => leads.some((l) => l.id === id)).length === leads.length)
 
-  const wrapperClass = embedded
-    ? 'w-full overflow-x-auto'
-    : 'flex-1 min-h-0 overflow-y-auto overscroll-contain'
+  const wrapperClass = embedded ? 'w-full overflow-x-auto' : 'w-full overflow-x-auto'
 
   return (
     <div className={wrapperClass}>

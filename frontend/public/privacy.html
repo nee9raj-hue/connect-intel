@@ -8,24 +8,45 @@
     body { font-family: system-ui, sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; line-height: 1.6; color: #242424; }
     h1 { font-size: 1.5rem; }
     h2 { font-size: 1.1rem; margin-top: 1.5rem; }
+    ul { padding-left: 1.25rem; }
   </style>
 </head>
 <body>
   <h1>Privacy Policy</h1>
-  <p><strong>Connect Intel</strong> — B2B lead search and team collaboration.</p>
+  <p><strong>Connect Intel</strong> — B2B CRM and AI prospect search for sales teams.</p>
   <p>Last updated: May 2026</p>
+  <p>Contact: <a href="mailto:invite@connectintel.net">invite@connectintel.net</a></p>
 
   <h2>What we collect</h2>
-  <p>When you sign in with Google, we receive your name, email address, and profile picture to create your account. We store leads, search history, and CRM data you save in the product.</p>
+  <ul>
+    <li><strong>Account data</strong> — When you sign in with Google, we receive your name, email address, and profile picture to create and secure your account.</li>
+    <li><strong>CRM data</strong> — Leads, contacts, companies, pipeline stages, notes, tasks, meetings, and email activity you save in the product.</li>
+    <li><strong>Search data</strong> — Search queries and filters you run in AI prospect search.</li>
+  </ul>
+
+  <h2>How we use Google user data</h2>
+  <p>Connect Intel requests Google OAuth scopes only when you explicitly connect your work Gmail:</p>
+  <ul>
+    <li><strong>gmail.send</strong> — To send CRM emails you compose in Connect Intel from your own work mailbox (e.g. sales@yourcompany.com). We do not send email without your action.</li>
+    <li><strong>gmail.readonly</strong> (optional) — To sync replies between your mailbox and leads already in your CRM pipeline. We query Gmail only for threads involving lead email addresses you are working on.</li>
+    <li><strong>email / profile</strong> — To identify which Google account you connected and display your connected mailbox in settings.</li>
+  </ul>
+  <p>We do <strong>not</strong> sell Google user data. We do <strong>not</strong> use Gmail data for advertising. We do <strong>not</strong> read unrelated personal email.</p>
+
+  <h2>Data storage and retention</h2>
+  <p>CRM and account data are stored on secure cloud infrastructure (Vercel, Supabase). Gmail OAuth refresh tokens are stored encrypted at rest and used only to send mail or sync threads you request. You may disconnect Gmail at any time by revoking access at <a href="https://myaccount.google.com/permissions">Google Account permissions</a>.</p>
 
   <h2>How we use data</h2>
-  <p>To provide the service, manage your team and organization, and send team invitation emails when your admin requests it.</p>
+  <p>To provide B2B CRM features, team collaboration, AI prospect search, and optional email sending from your connected work Gmail.</p>
 
   <h2>Third parties</h2>
-  <p>We use hosting (Vercel), database (Supabase), and email providers (Google Gmail API / Resend) as configured by your organization.</p>
+  <p>We use hosting (Vercel), database (Supabase), Google Gmail API (when you connect work Gmail), and optional email delivery providers as configured.</p>
 
-  <h2>Contact</h2>
-  <p>invite@connectintel.net</p>
+  <h2>Your choices</h2>
+  <ul>
+    <li>Disconnect work Gmail in Google Account settings or contact support to remove tokens.</li>
+    <li>Request account deletion by emailing invite@connectintel.net.</li>
+  </ul>
 
   <p>Website: <a href="https://connectintel.net">connectintel.net</a></p>
   <p><a href="/">Back to Connect Intel</a></p>

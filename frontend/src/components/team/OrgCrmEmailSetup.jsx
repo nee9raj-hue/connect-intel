@@ -83,7 +83,7 @@ export default function OrgCrmEmailSetup() {
       <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm space-y-1">
         <p className="font-semibold text-green-900">Outbound email ready</p>
         <p className="text-xs text-green-800">
-          CRM sends from each rep&apos;s address <strong>@{(status.domain)}</strong> — no Google test-user list, unlimited users.
+          CRM sends from each rep&apos;s address <strong>@{(status.domain)}</strong> for your whole team.
         </p>
       </div>
     )
@@ -94,7 +94,7 @@ export default function OrgCrmEmailSetup() {
       <div>
         <p className="font-semibold text-[#242424]">Optional DNS sending</p>
         <p className="text-xs text-[#5b4a00] mt-1 leading-relaxed">
-          Only if you cannot use Gmail connect above. We register{' '}
+          Only if you cannot use work email connect above. We register{' '}
           <strong>{status?.domain || status?.inferredDomain || 'your company domain'}</strong> — add DNS once for all
           reps on <strong>@{status?.domain || 'yourcompany.com'}</strong>.
         </p>
@@ -143,7 +143,7 @@ export default function OrgCrmEmailSetup() {
       )}
 
       <p className="text-[10px] text-gray-500 leading-relaxed">
-        Most teams should use <strong>Connect work Gmail</strong> above instead of DNS.
+        Most teams should use <strong>Connect work email</strong> above instead of DNS.
       </p>
     </div>
   )

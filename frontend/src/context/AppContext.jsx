@@ -4,6 +4,7 @@ import { storeSessionToken } from '../lib/sessionAuth'
 import { defaultCrm } from '../lib/crmConstants'
 import { loadReadNotificationIds, saveReadNotificationIds } from '../lib/notificationStorage'
 import { getNotificationTarget } from '../lib/notificationNavigation'
+import { navTargetToOptions } from '../lib/navConfig'
 
 const AppContext = createContext(null)
 
@@ -41,6 +42,9 @@ export function AppProvider({ children }) {
   const [sessionError, setSessionError] = useState(null)
   const panelNavigateRef = useRef(null)
   const pendingLeadOpenRef = useRef({ leadId: null, tab: null })
+  const workspaceLoadedAtRef = useRef(0)
+  const workspaceLoadInFlightRef = useRef(null)
+  const [contactsFocusId, setContactsFocusId] = useState(null)
   const [calendarFocus, setCalendarFocus] = useState(null)
 
   const refreshSession = useCallback(async () => {
@@ -111,20 +115,31 @@ export function AppProvider({ children }) {
 
   const syncWorkspace = useCallback(
     async (since) => {
+      const skipLeadsFetch = Date.now() - workspaceLoadedAtRef.current < 20_000
       const [savedResult, notifResult] = await Promise.allSettled([
-        api.getSavedLeads(),
-        api.getCrmNotifications(since || undefined),
+        skipLeadsFetch
+          ? Promise.resolve({ leads: null })
+          : api.getSavedLeads({ silent: true, light: true }),
+        api.getCrmNotifications(since || undefined, { silent: true }),
       ])
 
       let leads = []
       let serverTime = new Date().toISOString()
       let newItems = []
 
-      if (savedResult.status === 'fulfilled') {
+      if (savedResult.status === 'fulfilled' && savedResult.value?.leads) {
         leads = savedResult.value.leads || []
-        setSavedLeads(leads)
+        setSavedLeads((prev) => {
+          if (
+            prev.length === leads.length &&
+            prev.every((p, i) => p.id === leads[i]?.id && p.updatedAt === leads[i]?.updatedAt)
+          ) {
+            return prev
+          }
+          return leads
+        })
         setSessionError(null)
-      } else if (savedResult.reason?.status === 401) {
+      } else if (savedResult.status === 'rejected' && savedResult.reason?.status === 401) {
         setSessionError(
           savedResult.reason.message || 'Session expired. Please sign in again.'
         )
@@ -212,27 +227,43 @@ export function AppProvider({ children }) {
         setSavedLeads([])
         setSearchHistory([])
         setTeamMembers([])
+        workspaceLoadedAtRef.current = 0
         return
       }
 
+      if (workspaceLoadInFlightRef.current) {
+        await workspaceLoadInFlightRef.current
+        return
+      }
+
+      const run = (async () => {
+        try {
+          const [saved, history] = await Promise.all([
+            api.getSavedLeads({ silent: true }),
+            api.getSearchHistory({ silent: true }),
+          ])
+
+          if (cancelled) return
+          setSavedLeads(saved.leads || [])
+          setSearchHistory(history.history || [])
+          workspaceLoadedAtRef.current = Date.now()
+
+          if (user.organizationId && user.accountType === 'company') {
+            const data = await api.getTeamMembers()
+            if (!cancelled) setTeamMembers(data.members || [])
+          }
+        } catch (error) {
+          if (!cancelled && error?.status === 401) {
+            setSessionError(error.message || 'Session expired. Please sign in again.')
+          }
+        }
+      })()
+
+      workspaceLoadInFlightRef.current = run
       try {
-        const [saved, history] = await Promise.all([
-          api.getSavedLeads(),
-          api.getSearchHistory(),
-        ])
-
-        if (cancelled) return
-        setSavedLeads(saved.leads || [])
-        setSearchHistory(history.history || [])
-
-        if (user.organizationId && user.accountType === 'company') {
-          const data = await api.getTeamMembers()
-          if (!cancelled) setTeamMembers(data.members || [])
-        }
-      } catch (error) {
-        if (!cancelled && error?.status === 401) {
-          setSessionError(error.message || 'Session expired. Please sign in again.')
-        }
+        await run
+      } finally {
+        workspaceLoadInFlightRef.current = null
       }
     }
 
@@ -414,6 +445,13 @@ export function AppProvider({ children }) {
     return data.user
   }, [])
 
+  const saveEmailSignature = useCallback(async ({ emailSignature, includeEmailSignature }) => {
+    const data = await api.updateUserProfile({ emailSignature, includeEmailSignature })
+    if (data.token) storeSessionToken(data.token)
+    setUser(data.user)
+    return data.user
+  }, [])
+
   const setPanelNavigate = useCallback((fn) => {
     panelNavigateRef.current = fn
   }, [])
@@ -432,6 +470,16 @@ export function AppProvider({ children }) {
     return null
   }, [])
 
+  const openContact = useCallback((contactId) => {
+    if (!contactId) return
+    setContactsFocusId(contactId)
+    panelNavigateRef.current?.('contacts')
+  }, [])
+
+  const clearContactsFocus = useCallback(() => {
+    setContactsFocusId(null)
+  }, [])
+
   const clearCalendarFocus = useCallback(() => {
     setCalendarFocus(null)
   }, [])
@@ -446,7 +494,7 @@ export function AppProvider({ children }) {
       }
 
       const target = getNotificationTarget(item)
-      panelNavigateRef.current?.(target.panel)
+      panelNavigateRef.current?.(target.panel, navTargetToOptions(target))
 
       if (target.panel === 'crm-calendar') {
         setCalendarFocus({
@@ -456,6 +504,14 @@ export function AppProvider({ children }) {
         })
         if (target.leadId) {
           openPipelineLead(target.leadId, target.leadTab)
+        }
+        return
+      }
+
+      if (target.panel === 'team-notes' || target.panel === 'team-tasks') {
+        if (target.leadId) {
+          openPipelineLead(target.leadId, 'overview')
+          panelNavigateRef.current?.('pipeline')
         }
         return
       }
@@ -521,8 +577,12 @@ export function AppProvider({ children }) {
         logEmailReply,
         generateWhatsAppDraft,
         updateMobile,
+        saveEmailSignature,
         openPipelineLead,
         consumePendingLeadTab,
+        openContact,
+        contactsFocusId,
+        clearContactsFocus,
         pipelineLeadId,
         setPipelineLeadId,
         setPanelNavigate,

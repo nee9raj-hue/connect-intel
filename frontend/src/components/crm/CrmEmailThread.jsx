@@ -2,6 +2,12 @@ import { useState } from 'react'
 import { formatCrmDate } from '../../lib/crmConstants'
 import { formatDateTime } from '../../lib/crmUiConstants'
 
+function formatAttachmentSize(bytes) {
+  if (!bytes || bytes < 1024) return `${bytes || 0} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
+
 export default function CrmEmailThread({
   lead,
   emails = [],
@@ -40,7 +46,7 @@ export default function CrmEmailThread({
         <div>
           <h3 className="text-[11px] font-semibold uppercase text-gray-500">Email thread</h3>
           <p className="text-[10px] text-gray-400 mt-0.5">
-            HubSpot-style trail — outbound sends and replies in one place
+            Email thread — outbound sends and replies in one place
           </p>
         </div>
         <div className="flex flex-wrap gap-1.5">
@@ -52,11 +58,11 @@ export default function CrmEmailThread({
               className="text-[10px] font-semibold px-2 py-1 rounded-md border border-gray-200 hover:bg-gray-50 disabled:opacity-50"
               title={
                 replySyncEnabled
-                  ? 'Pull recent messages from Gmail'
-                  : 'Reconnect Gmail to enable automatic reply sync'
+                  ? 'Pull recent messages from your inbox'
+                  : 'Reconnect work email to enable automatic reply sync'
               }
             >
-              {busy ? 'Syncing…' : '↻ Sync from Gmail'}
+              {busy ? 'Syncing…' : '↻ Sync inbox'}
             </button>
           )}
           <button
@@ -73,8 +79,7 @@ export default function CrmEmailThread({
       {showReplySyncUpgrade && gmailConnected && !replySyncEnabled && onEnableReplySync && (
         <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] text-amber-950 bg-amber-50 border-b border-amber-100 px-3 py-2">
           <p className="leading-relaxed">
-            Allow Gmail to import replies (one-time). Your company admin may need to add your work email as a
-            Google test user first — then click below and approve all permissions.
+            Allow email import (one-time). If sign-in is blocked, contact your Connect Intel administrator.
           </p>
           <button
             type="button"
@@ -82,7 +87,7 @@ export default function CrmEmailThread({
             onClick={() => onEnableReplySync()}
             className="shrink-0 text-[10px] font-semibold px-2.5 py-1 rounded-md bg-[#ffcb2b] text-[#242424] border border-[#e6b800] disabled:opacity-50"
           >
-            {enableReplySyncBusy ? 'Opening Google…' : 'Allow reply import'}
+            {enableReplySyncBusy ? 'Connecting…' : 'Allow reply import'}
           </button>
         </div>
       )}
@@ -125,7 +130,7 @@ export default function CrmEmailThread({
       <div className="max-h-64 overflow-y-auto p-3 space-y-2">
         {sorted.length === 0 ? (
           <p className="text-xs text-gray-500 text-center py-4">
-            No emails logged yet. Send from below or sync from Gmail.
+            No emails logged yet. Send from below or sync from your inbox.
           </p>
         ) : (
           sorted.map((msg) => {
@@ -166,12 +171,30 @@ export default function CrmEmailThread({
                       {msg.bodyPreview || msg.body || ''}
                     </p>
                   )}
+                  {!open && msg.attachments?.length > 0 && (
+                    <p className="text-[10px] text-gray-500 mt-1">
+                      📎 {msg.attachments.length} attachment{msg.attachments.length === 1 ? '' : 's'}
+                    </p>
+                  )}
                 </button>
                 {open && (
                   <div className="px-3 pb-3 border-t border-gray-200/60">
                     <pre className="text-[11px] text-gray-700 whitespace-pre-wrap font-sans leading-relaxed mt-2">
                       {msg.body || msg.bodyPreview || ''}
                     </pre>
+                    {msg.attachments?.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {msg.attachments.map((file, index) => (
+                          <span
+                            key={`${file.filename}-${index}`}
+                            className="text-[10px] px-2 py-0.5 rounded-md bg-gray-200 text-gray-800"
+                          >
+                            📎 {file.filename}
+                            {file.sizeBytes ? ` (${formatAttachmentSize(file.sizeBytes)})` : ''}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

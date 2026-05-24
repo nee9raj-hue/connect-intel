@@ -237,7 +237,7 @@ export default function BulkEmailCompose({ leadIds, leads, onDone, compact = fal
         ) : (
           <>
             <p className="text-xs text-gray-500">
-              Same subject and body for every selected lead. Sends via your connected Gmail or company email.
+              Same subject and body for every selected lead. Sends via your connected work or company email.
             </p>
             <input
               value={subject}

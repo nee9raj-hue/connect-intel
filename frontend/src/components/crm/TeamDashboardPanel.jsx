@@ -2,14 +2,22 @@ import { useCallback, useEffect, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { getStatusMeta } from '../../lib/crmConstants'
+import LoadingExperience from '../ui/LoadingExperience'
+import { LOADING_MESSAGES } from '../../lib/loadingQuotes'
+import { formatDealValue } from '../../lib/crmTimeline'
 
 const KPI = [
   { key: 'totalLeads', label: 'Pipeline leads', nav: 'pipeline' },
+  { key: 'pipelineValue', label: 'Pipeline value', nav: 'pipeline', format: 'currency' },
+  { key: 'weightedPipelineValue', label: 'Weighted forecast', nav: 'pipeline', format: 'currency' },
+  { key: 'wonValue', label: 'Won value', nav: 'pipeline', filter: 'won', format: 'currency' },
+  { key: 'avgLeadScore', label: 'Avg lead score', nav: 'pipeline' },
+  { key: 'staleLeads', label: 'Stale 7d+', nav: 'pipeline' },
   { key: 'activitiesInPeriod', label: 'Activities', nav: 'crm-log' },
   { key: 'emailsSent', label: 'Emails sent', nav: 'crm-log' },
   { key: 'meetingsUpcoming', label: 'Upcoming meetings', nav: 'crm-calendar' },
   { key: 'needsFollowUp', label: 'Follow-up due', nav: 'pipeline', filter: 'follow_up' },
-  { key: 'won', label: 'Won', nav: 'pipeline', filter: 'won' },
+  { key: 'won', label: 'Won deals', nav: 'pipeline', filter: 'won' },
 ]
 
 export default function TeamDashboardPanel({ onNavigate }) {
@@ -41,6 +49,14 @@ export default function TeamDashboardPanel({ onNavigate }) {
 
   const onKpiClick = (item) => {
     if (memberUserId) setPipelineAssigneeFilter?.(memberUserId)
+    if (item.nav === 'crm-calendar') {
+      onNavigate?.('crm-calendar', { upcomingOnly: true })
+      return
+    }
+    if (item.filter) {
+      onNavigate?.(item.nav, { status: item.filter })
+      return
+    }
     onNavigate?.(item.nav)
   }
 
@@ -54,7 +70,7 @@ export default function TeamDashboardPanel({ onNavigate }) {
   const maxActivity = Math.max(1, ...(data?.activityByDay || []).map((d) => d.count))
 
   return (
-    <div className="flex flex-col h-full min-h-0 bg-[#f6f7f9]">
+    <div className="panel-shell bg-[#f6f7f9]">
       <header className="shrink-0 bg-white border-b border-gray-200 px-5 py-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -97,13 +113,13 @@ export default function TeamDashboardPanel({ onNavigate }) {
         </div>
       </header>
 
-      <div className="flex-1 overflow-y-auto p-5 space-y-5">
+      <div className="panel-body-scroll p-5 space-y-5">
         {error && (
           <p className="text-sm text-red-700 bg-red-50 border border-red-100 rounded-lg px-3 py-2">{error}</p>
         )}
 
         {loading && !data ? (
-          <p className="text-sm text-gray-500">Loading team metrics…</p>
+          <LoadingExperience message={LOADING_MESSAGES.team} fill={false} className="rounded-xl border border-gray-200 min-h-[240px]" />
         ) : (
           <>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
@@ -116,7 +132,9 @@ export default function TeamDashboardPanel({ onNavigate }) {
                 >
                   <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-500">{item.label}</p>
                   <p className="text-2xl font-bold text-gray-900 mt-1 tabular-nums">
-                    {summary[item.key] ?? 0}
+                    {item.format === 'currency'
+                      ? formatDealValue(summary[item.key])
+                      : summary[item.key] ?? 0}
                   </p>
                 </button>
               ))}

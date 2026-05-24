@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { formatDateTime } from '../../lib/crmUiConstants'
+import LoadingExperience from '../ui/LoadingExperience'
+import { LOADING_MESSAGES } from '../../lib/loadingQuotes'
 import {
   KIND_STYLES,
   addDays,
@@ -26,14 +28,22 @@ const VIEWS = [
   { id: 'month', label: 'Month' },
 ]
 
-export default function CrmCalendarPanel({ onNavigate }) {
+export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
   const { openPipelineLead, calendarFocus, clearCalendarFocus } = useApp()
+  const upcomingOnly = Boolean(panelOptions?.upcomingOnly)
   const [view, setView] = useState('list')
   const [anchor, setAnchor] = useState(() => startOfDay(new Date()))
   const [events, setEvents] = useState([])
   const [members, setMembers] = useState([])
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState(null)
+
+  useEffect(() => {
+    if (panelOptions?.upcomingOnly) {
+      setView('list')
+      setAnchor(startOfDay(new Date()))
+    }
+  }, [panelOptions?.upcomingOnly])
 
   useEffect(() => {
     if (!calendarFocus?.scheduledAt) return
@@ -73,8 +83,15 @@ export default function CrmCalendarPanel({ onNavigate }) {
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const range = calendarRangeForView(view, anchor)
-      const q = new URLSearchParams({ from: range.from, to: range.to }).toString()
+      let q
+      if (upcomingOnly) {
+        const from = startOfDay(new Date())
+        const to = addDays(from, 90)
+        q = new URLSearchParams({ from: from.toISOString(), to: to.toISOString() }).toString()
+      } else {
+        const range = calendarRangeForView(view, anchor)
+        q = new URLSearchParams({ from: range.from, to: range.to }).toString()
+      }
       const data = await api.getCrmCalendar(q)
       setEvents(data.events || [])
       setMembers(data.members || [])
@@ -83,7 +100,13 @@ export default function CrmCalendarPanel({ onNavigate }) {
     } finally {
       setLoading(false)
     }
-  }, [view, anchor])
+  }, [view, anchor, upcomingOnly])
+
+  const visibleEvents = useMemo(() => {
+    if (!upcomingOnly) return events
+    const now = Date.now()
+    return events.filter((e) => new Date(e.scheduledAt).getTime() >= now)
+  }, [events, upcomingOnly])
 
   useEffect(() => {
     load()
@@ -109,17 +132,22 @@ export default function CrmCalendarPanel({ onNavigate }) {
       const b = days[6]
       return `${a.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} – ${b.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}`
     }
+    if (upcomingOnly) return 'Upcoming only'
     return 'All tasks & meetings'
-  }, [view, anchor])
+  }, [view, anchor, upcomingOnly])
 
   return (
-    <div className="flex flex-col h-full min-h-0 bg-[#f6f7f9] relative">
+    <div className="panel-shell bg-[#f6f7f9] relative">
       <header className="shrink-0 bg-white border-b border-gray-200 px-4 md:px-5 py-4 space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="text-lg font-semibold text-gray-900">Calendar</h1>
+            <h1 className="text-lg font-semibold text-gray-900">
+              {upcomingOnly ? 'Upcoming meetings' : 'Calendar'}
+            </h1>
             <p className="text-xs text-gray-500 mt-0.5">
-              Tasks, meetings, and follow-ups · past items kept for history
+              {upcomingOnly
+                ? 'Tasks and meetings from now — next 90 days'
+                : 'Tasks, meetings, and follow-ups · past items kept for history'}
             </p>
           </div>
           <button
@@ -135,19 +163,21 @@ export default function CrmCalendarPanel({ onNavigate }) {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <div className="flex rounded-lg border border-gray-200 overflow-hidden text-xs font-semibold">
-            {VIEWS.map((v) => (
-              <button
-                key={v.id}
-                type="button"
-                onClick={() => setView(v.id)}
-                className={`px-3 py-1.5 ${view === v.id ? 'bg-gray-900 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
-              >
-                {v.label}
-              </button>
-            ))}
-          </div>
-          {view !== 'list' && (
+          {!upcomingOnly && (
+            <div className="flex rounded-lg border border-gray-200 overflow-hidden text-xs font-semibold">
+              {VIEWS.map((v) => (
+                <button
+                  key={v.id}
+                  type="button"
+                  onClick={() => setView(v.id)}
+                  className={`px-3 py-1.5 ${view === v.id ? 'bg-gray-900 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                >
+                  {v.label}
+                </button>
+              ))}
+            </div>
+          )}
+          {!upcomingOnly && view !== 'list' && (
             <div className="flex items-center gap-1 ml-auto">
               <button type="button" onClick={() => shiftAnchor(-1)} className="px-2 py-1 text-sm border rounded-lg">
                 ‹
@@ -161,9 +191,11 @@ export default function CrmCalendarPanel({ onNavigate }) {
         </div>
       </header>
 
-      <div className="flex-1 overflow-auto p-4 md:p-5">
-        {loading && <p className="text-sm text-gray-500">Loading calendar…</p>}
-        {!loading && events.length === 0 && (
+      <div className="panel-body-scroll p-4 md:p-5">
+        {loading ? (
+          <LoadingExperience message={LOADING_MESSAGES.calendar} fill={false} className="rounded-xl border border-gray-200 min-h-[200px]" />
+        ) : null}
+        {!loading && visibleEvents.length === 0 && (
           <div className="bg-white border border-gray-200 rounded-xl p-8 text-center max-w-md mx-auto">
             <p className="text-sm text-gray-600">No tasks or meetings in this range.</p>
             <p className="text-xs text-gray-400 mt-2">
@@ -179,8 +211,8 @@ export default function CrmCalendarPanel({ onNavigate }) {
           </div>
         )}
 
-        {!loading && view === 'list' && events.length > 0 && (
-          <ListView events={events} onSelect={setSelected} />
+        {!loading && view === 'list' && visibleEvents.length > 0 && (
+          <ListView events={visibleEvents} onSelect={setSelected} />
         )}
 
         {!loading && view === 'week' && (

@@ -1,20 +1,20 @@
 export const PROVIDERS = {
   claude: {
     id: 'claude',
-    label: 'Claude AI',
+    label: 'Connect Intel AI',
     status: 'active',
-    description: 'AI-powered lead discovery for India & global markets',
+    description: 'AI-powered lead discovery for India and global markets',
   },
   apollo: {
     id: 'apollo',
-    label: 'Apollo.io',
+    label: 'Partner data',
     status: 'configured',
-    description: '230M+ B2B contacts — search via People API; unlock reveals email via enrichment',
+    description: 'Expanded B2B contacts — unlock to reveal email and phone',
   },
   hunter: {
     id: 'hunter',
-    label: 'Hunter.io',
+    label: 'Email verification',
     status: 'coming_soon',
-    description: 'Email verification & enrichment on saved leads',
+    description: 'Email verification and enrichment on saved leads',
   },
 }

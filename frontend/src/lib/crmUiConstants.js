@@ -10,6 +10,7 @@ export const ACTIVITY_LABELS = {
   status: 'Status',
   assignment: 'Assignment',
   transfer: 'Transfer',
+  form_response: 'Form response',
 }
 
 export const MEETING_TYPES = [

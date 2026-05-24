@@ -17,7 +17,7 @@ export function useCrmReminders(enabled) {
 
     const tick = async () => {
       try {
-        const data = await api.getCrmCalendar()
+        const data = await api.getCrmCalendar('', { silent: true })
         const now = Date.now()
 
         for (const item of data.reminders || []) {
@@ -42,7 +42,7 @@ export function useCrmReminders(enabled) {
           }
 
           if (item.meetingId) {
-            api.ackMeetingReminder(item.leadId, item.meetingId).catch(() => {})
+            api.ackMeetingReminder(item.leadId, item.meetingId, { silent: true }).catch(() => {})
           }
         }
       } catch {

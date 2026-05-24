@@ -70,7 +70,7 @@ export default function BulkEmailPanel() {
           <div>
             <h1 className="text-lg font-semibold text-gray-900">Bulk email</h1>
             <p className="text-xs text-gray-500 mt-0.5">
-              Filter pipeline leads, select recipients, compose on the right — sends via your connected Gmail or
+              Filter pipeline leads, select recipients, compose on the right — sends via your connected work or
               company email
             </p>
           </div>

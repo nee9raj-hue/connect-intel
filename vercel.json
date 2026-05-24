@@ -41,5 +41,11 @@
     { "source": "/setup-dns", "destination": "/setup-dns.html" },
     { "source": "/privacy", "destination": "/privacy.html" },
     { "source": "/((?!api/|assets/|setup-dns|privacy).*)", "destination": "/index.html" }
+  ],
+  "crons": [
+    {
+      "path": "/api/marketing/cron",
+      "schedule": "0 9 * * *"
+    }
   ]
 }

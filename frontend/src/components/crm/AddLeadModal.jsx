@@ -65,7 +65,7 @@ export default function AddLeadModal({ open, onClose, onAdded }) {
         </div>
 
         <div className="p-5 space-y-3 text-sm">
-          <p className="text-xs text-gray-500">Add one contact to your pipeline. Use Import for CSV/Excel bulk upload.</p>
+          <p className="text-xs text-gray-500">Creates a pipeline lead and a linked contact record. You can fill in email, phone, and company details later.</p>
 
           <div className="grid grid-cols-2 gap-2">
             <input
@@ -164,7 +164,7 @@ export default function AddLeadModal({ open, onClose, onAdded }) {
 
           <button
             type="submit"
-            disabled={loading || !form.company.trim()}
+            disabled={loading || (!form.company.trim() && !form.firstName.trim() && !form.lastName.trim())}
             className="w-full py-2.5 bg-gray-900 text-white font-semibold rounded-lg disabled:opacity-50"
           >
             {loading ? 'Adding…' : 'Add to pipeline'}

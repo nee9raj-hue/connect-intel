@@ -1,4 +1,5 @@
 import { getSessionToken, storeSessionToken } from './sessionAuth'
+import { trackApiLoading } from './apiLoading'
 
 let refreshInFlight = null
 
@@ -30,7 +31,13 @@ async function touchSession() {
   }
 }
 
-async function request(path, options = {}, { retried = false } = {}) {
+async function request(path, options = {}, meta = { retried: false, silent: false }) {
+  const run = () => requestInner(path, options, meta)
+  if (meta.silent) return run()
+  return trackApiLoading(run())
+}
+
+async function requestInner(path, options = {}, { retried = false, silent = false } = {}) {
   const token = getSessionToken()
   const response = await fetch(path, {
     credentials: 'same-origin',
@@ -64,7 +71,7 @@ async function request(path, options = {}, { retried = false } = {}) {
     if (response.status === 401 && !retried && !path.includes('/api/auth/session')) {
       const session = await touchSession()
       if (session.ok) {
-        return request(path, options, { retried: true })
+        return requestInner(path, options, { retried: true, silent })
       }
     }
 
@@ -92,7 +99,9 @@ export const api = {
   updateTeamBranding: (payload) => request('/api/team/branding', { method: 'PATCH', body: payload }),
   updateMemberPermissions: (payload) =>
     request('/api/team/permissions', { method: 'PATCH', body: payload }),
-  getSavedLeads: () => request('/api/saved-leads'),
+  getSavedLeads: ({ silent = false, light = false } = {}) =>
+    request(`/api/saved-leads${light ? '?light=1' : ''}`, {}, { silent }),
+  getSearchHistory: ({ silent = false } = {}) => request('/api/search-history', {}, { silent }),
   saveLead: (lead) => request('/api/saved-leads', { method: 'POST', body: { lead } }),
   addManualLead: (manual) => request('/api/saved-leads', { method: 'POST', body: { manual } }),
   removeLead: (leadId) => request('/api/saved-leads', { method: 'DELETE', body: { leadId } }),
@@ -100,29 +109,63 @@ export const api = {
     request('/api/saved-leads', { method: 'PATCH', body: { leadId, ...body } }),
   assignLead: (leadId, assignToUserId) =>
     request('/api/saved-leads', { method: 'PATCH', body: { leadId, assignToUserId } }),
-  getCrmCalendar: (query = '') =>
-    request(`/api/crm/calendar${query ? `?${query}` : ''}`),
+  getCrmCalendar: (query = '', { silent = false } = {}) =>
+    request(`/api/crm/calendar${query ? `?${query}` : ''}`, {}, { silent }),
   getCrmActivityLog: () => request('/api/crm/activity-log'),
-  getCrmNotifications: (since) =>
-    request(`/api/crm/notifications${since ? `?since=${encodeURIComponent(since)}` : ''}`),
+  getCrmNotifications: (since, { silent = false } = {}) =>
+    request(
+      `/api/crm/notifications${since ? `?since=${encodeURIComponent(since)}` : ''}`,
+      {},
+      { silent }
+    ),
   getCrmTeamDashboard: (query = '') =>
     request(`/api/crm/team-dashboard${query ? `?${query}` : ''}`),
-  ackMeetingReminder: (leadId, meetingId) =>
-    request('/api/crm/reminders-ack', { method: 'POST', body: { leadId, meetingId } }),
+  ackMeetingReminder: (leadId, meetingId, { silent = false } = {}) =>
+    request('/api/crm/reminders-ack', { method: 'POST', body: { leadId, meetingId } }, { silent }),
   getCrmGmailStatus: () => request('/api/crm/email-gmail-status'),
   startCrmGmailOAuth: () => request('/api/crm/email-oauth/start'),
   getOrgEmailDomain: () => request('/api/org/email-domain'),
   setupOrgEmailDomain: (body) => request('/api/org/email-domain', { method: 'POST', body }),
+  getOrgWhatsAppCloud: () => request('/api/org/whatsapp-cloud'),
+  connectOrgWhatsAppCloud: (body) =>
+    request('/api/org/whatsapp-cloud', { method: 'POST', body: { action: 'connect', ...body } }),
+  disconnectOrgWhatsAppCloud: () =>
+    request('/api/org/whatsapp-cloud', { method: 'POST', body: { action: 'disconnect' } }),
+  getAdminWhatsAppCloud: () => request('/api/admin/whatsapp-cloud'),
+  connectAdminWhatsAppCloud: (body) =>
+    request('/api/admin/whatsapp-cloud', { method: 'POST', body: { action: 'connect', ...body } }),
+  disconnectAdminWhatsAppCloud: () =>
+    request('/api/admin/whatsapp-cloud', { method: 'POST', body: { action: 'disconnect' } }),
+  bulkSendWhatsApp: (payload) =>
+    request('/api/crm/bulk-whatsapp', { method: 'POST', body: payload }),
   generateCrmEmail: (leadId, options = {}) =>
     request('/api/crm-generate-email', { method: 'POST', body: { leadId, ...options } }),
   sendCrmEmail: (leadId, payload) =>
     request('/api/crm-send-email', { method: 'POST', body: { leadId, ...payload } }),
   searchLeads: (filters, count = 50, provider = 'free') =>
     request('/api/search-leads', { method: 'POST', body: { filters, count, provider } }),
-  getSearchHistory: () => request('/api/search-history'),
   addSearchHistory: (entry) => request('/api/search-history', { method: 'POST', body: { entry } }),
   unlockLead: (lead, field) => request('/api/lead-unlocks', { method: 'POST', body: { lead, field } }),
   getAdminOverview: () => request('/api/admin/imports'),
+  getAdminSupportOverview: () => request('/api/admin/support-overview'),
+  listAdminSupportTickets: ({ status = 'active', q = '' } = {}) =>
+    request(
+      `/api/admin/support-tickets?status=${encodeURIComponent(status)}&q=${encodeURIComponent(q)}`
+    ),
+  getAdminSupportTicket: (ticketId) =>
+    request(`/api/admin/support-tickets?ticketId=${encodeURIComponent(ticketId)}`),
+  adminSupportTicketAction: (payload) =>
+    request('/api/admin/support-tickets', { method: 'PATCH', body: payload }),
+  getMySupportTickets: () => request('/api/support/tickets'),
+  createSupportTicket: (payload) => request('/api/support/tickets', { method: 'POST', body: payload }),
+  listAdminCustomers: (q = '') =>
+    request(`/api/admin/customers?view=users&q=${encodeURIComponent(q)}&limit=60`),
+  listAdminOrganizations: (q = '') =>
+    request(`/api/admin/customers?view=organizations&q=${encodeURIComponent(q)}&limit=40`),
+  getAdminCustomer: (userId) => request(`/api/admin/customers?userId=${encodeURIComponent(userId)}`),
+  getAdminOrganization: (organizationId) =>
+    request(`/api/admin/customers?organizationId=${encodeURIComponent(organizationId)}`),
+  adminCustomerAction: (payload) => request('/api/admin/customers', { method: 'PATCH', body: payload }),
   createImport: ({ datasetType, rows }) =>
     request('/api/admin/imports', { method: 'POST', body: { datasetType, rows } }),
   researchLeads: (filters, count = 10) =>
@@ -135,6 +178,48 @@ export const api = {
     request('/api/my/imports', { method: 'POST', body: { datasetType, rows, addToPipeline } }),
   updateUserProfile: (payload) => request('/api/user/profile', { method: 'PATCH', body: payload }),
   sendBulkCrmEmail: (payload) => request('/api/crm/bulk-email', { method: 'POST', body: payload }),
+  getMarketingOverview: () => request('/api/marketing/campaigns?overview=1'),
+  getMarketingCampaignReport: (campaignId) =>
+    request(`/api/marketing/campaigns?campaignId=${encodeURIComponent(campaignId)}`),
+  duplicateMarketingCampaign: (id) =>
+    request('/api/marketing/campaigns', { method: 'POST', body: { action: 'duplicate', id } }),
+  listMarketingLists: () => request('/api/marketing/lists'),
+  createMarketingList: (payload) => request('/api/marketing/lists', { method: 'POST', body: payload }),
+  updateMarketingList: (payload) => request('/api/marketing/lists', { method: 'PATCH', body: payload }),
+  deleteMarketingList: (id) => request('/api/marketing/lists', { method: 'DELETE', body: { id } }),
+  listMarketingTemplates: () => request('/api/marketing/templates'),
+  createMarketingTemplate: (payload) =>
+    request('/api/marketing/templates', { method: 'POST', body: payload }),
+  updateMarketingTemplate: (payload) =>
+    request('/api/marketing/templates', { method: 'PATCH', body: payload }),
+  deleteMarketingTemplate: (id) =>
+    request('/api/marketing/templates', { method: 'DELETE', body: { id } }),
+  createMarketingCampaign: (payload) =>
+    request('/api/marketing/campaigns', { method: 'POST', body: payload }),
+  updateMarketingCampaign: (payload) =>
+    request('/api/marketing/campaigns', { method: 'PATCH', body: payload }),
+  startMarketingCampaign: (id) =>
+    request('/api/marketing/campaigns', { method: 'POST', body: { action: 'start', id } }),
+  logMarketingWhatsAppSent: (enrollmentId) =>
+    request('/api/marketing/campaigns', {
+      method: 'POST',
+      body: { action: 'log_whatsapp_sent', enrollmentId },
+    }),
+  pauseMarketingCampaign: (id) =>
+    request('/api/marketing/campaigns', { method: 'PATCH', body: { action: 'pause', id } }),
+  deleteMarketingCampaign: (id) =>
+    request('/api/marketing/campaigns', { method: 'DELETE', body: { id } }),
+  listMarketingForms: () => request('/api/marketing/forms'),
+  createMarketingForm: (payload) => request('/api/marketing/forms', { method: 'POST', body: payload }),
+  updateMarketingForm: (payload) => request('/api/marketing/forms', { method: 'PATCH', body: payload }),
+  deleteMarketingForm: (id) => request('/api/marketing/forms', { method: 'DELETE', body: { id } }),
+  listTeamNotes: () => request('/api/team/notes'),
+  createTeamNote: (payload) => request('/api/team/notes', { method: 'POST', body: payload }),
+  listTeamTasks: () => request('/api/team/tasks'),
+  createTeamTask: (payload) => request('/api/team/tasks', { method: 'POST', body: payload }),
+  completeTeamTask: (id) => request('/api/team/tasks', { method: 'PATCH', body: { id, action: 'complete' } }),
+  searchTeamMentionLeads: (q = '') =>
+    request(`/api/team/mention-leads?q=${encodeURIComponent(q)}&limit=12`),
   bulkUpdatePipeline: (payload) => request('/api/crm/bulk-update', { method: 'POST', body: payload }),
   syncCrmEmailThread: (leadId) =>
     request('/api/crm/sync-email-thread', { method: 'POST', body: { leadId } }),
@@ -142,4 +227,31 @@ export const api = {
     request('/api/crm/log-email-reply', { method: 'POST', body: { leadId, ...payload } }),
   generateCrmWhatsApp: (leadId, options = {}) =>
     request('/api/crm/generate-whatsapp', { method: 'POST', body: { leadId, ...options } }),
+  listContacts: ({ search = '', limit = 100, offset = 0 } = {}) => {
+    const params = new URLSearchParams()
+    if (search) params.set('search', search)
+    if (limit) params.set('limit', String(limit))
+    if (offset) params.set('offset', String(offset))
+    const qs = params.toString()
+    return request(`/api/contacts${qs ? `?${qs}` : ''}`)
+  },
+  getContact: (contactId) => request(`/api/contacts?contactId=${encodeURIComponent(contactId)}`),
+  updateContact: (contactId, contact) =>
+    request('/api/contacts', { method: 'PATCH', body: { contactId, contact } }),
+  searchContactLinkedin: (contactId, contact) =>
+    request('/api/contacts/linkedin-search', { method: 'POST', body: { contactId, contact } }),
+  getAssistantChat: () => request('/api/assistant/chat'),
+  sendAssistantMessage: (message) =>
+    request('/api/assistant/chat', { method: 'POST', body: { message } }),
+  escalateAssistantSupport: (payload) =>
+    request('/api/assistant/chat', { method: 'POST', body: { action: 'escalate', ...payload } }),
+  getPipelineSavedViews: () => request('/api/crm/saved-views'),
+  savePipelineView: (payload) => request('/api/crm/saved-views', { method: 'POST', body: payload }),
+  listCrmSequences: () => request('/api/crm/sequences'),
+  createCrmSequence: (payload) => request('/api/crm/sequences', { method: 'POST', body: payload }),
+  enrollCrmSequence: (payload) =>
+    request('/api/crm/sequences', { method: 'POST', body: { action: 'enroll', ...payload } }),
+  processCrmSequences: () => request('/api/crm/sequences?process=1'),
+  getCrmSettings: () => request('/api/crm/settings'),
+  updateCrmSettings: (payload) => request('/api/crm/settings', { method: 'PATCH', body: payload }),
 }

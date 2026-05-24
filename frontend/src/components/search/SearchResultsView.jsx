@@ -1,7 +1,8 @@
 import { useApp } from '../../context/AppContext'
+import ContactField from './ContactField'
 import ResultsTable from './ResultsTable'
 
-export const FULL_DETAIL_PREVIEW_COUNT = 10
+export const FULL_DETAIL_PREVIEW_COUNT = 5
 
 export default function SearchResultsView({
   leads,
@@ -19,14 +20,14 @@ export default function SearchResultsView({
   const compact = leads.slice(fullPreviewCount)
 
   return (
-    <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain bg-[#fafafa]">
+    <div className="bg-[#fafafa] min-h-full">
       {detailed.length > 0 && (
         <section className="bg-white border-b border-gray-200">
           <div className="sticky top-0 z-20 flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 bg-white/95 backdrop-blur border-b border-gray-100">
             <div>
               <h2 className="text-sm font-semibold text-gray-900">Top matches</h2>
               <p className="text-[11px] text-gray-500 mt-0.5">
-                Tap Reveal — 1 credit per email or phone
+                Full email &amp; phone on these rows (no credit)
               </p>
             </div>
             <span className="text-[11px] font-semibold text-gray-600 bg-gray-100 px-2.5 py-1 rounded-full border border-gray-200">
@@ -116,14 +117,29 @@ function CompactResultsList({
                 <p className="text-[12px] text-gray-600 truncate">{lead.title || '—'}</p>
                 <p className="text-[12px] font-medium text-gray-800 truncate mt-0.5">{lead.company}</p>
               </div>
-              <div className="min-w-0 text-[12px] text-gray-500">
+              <div className="min-w-0 text-[12px] text-gray-500 space-y-1">
                 <p className="truncate">{lead.location || [lead.city, lead.state].filter(Boolean).join(', ') || '—'}</p>
                 {lead.industry && <p className="truncate text-gray-400">{lead.industry}</p>}
-                {(lead.access?.emailLocked || lead.access?.phoneLocked) && (
-                  <p className="text-[11px] text-amber-700/90 mt-1 font-medium">
-                    Tap email or phone in full-detail rows · ₹1 each
-                  </p>
-                )}
+                <div className="flex flex-wrap gap-2">
+                  <ContactField
+                    lead={lead}
+                    field="email"
+                    value={lead.email}
+                    missingLabel="No email"
+                    mono
+                    onReveal={onRevealField}
+                    revealing={revealingKey === `${lead.id}:email`}
+                  />
+                  <ContactField
+                    lead={lead}
+                    field="phone"
+                    value={lead.phone}
+                    missingLabel="No phone"
+                    mono
+                    onReveal={onRevealField}
+                    revealing={revealingKey === `${lead.id}:phone`}
+                  />
+                </div>
               </div>
               <div className="flex items-center gap-2 md:justify-end flex-wrap">
                 <ScorePill score={lead.score} />

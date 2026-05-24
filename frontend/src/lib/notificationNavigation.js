@@ -27,6 +27,10 @@ export function getNotificationTarget(item) {
       }
     case 'follow_up':
       return { panel: 'pipeline', leadId, leadTab: 'schedule' }
+    case 'team_note':
+      return { panel: 'team-notes', leadId, noteId: item.noteId || null }
+    case 'team_task':
+      return { panel: 'team-tasks', leadId, taskId: item.taskId || null }
     default:
       if (leadId) return { panel: 'pipeline', leadId, leadTab: 'overview' }
       return { panel: 'overview' }

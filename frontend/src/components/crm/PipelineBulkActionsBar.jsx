@@ -11,7 +11,11 @@ export default function PipelineBulkActionsBar({
   onAssign,
   onMarkReplied,
   onEmail,
+  onWhatsApp,
+  emailCount = null,
+  phoneCount = null,
   onClear,
+  compact = false,
 }) {
   const [status, setStatus] = useState('')
   const [assignee, setAssignee] = useState('')
@@ -19,8 +23,14 @@ export default function PipelineBulkActionsBar({
   if (count < 1) return null
 
   return (
-    <div className="sticky top-0 z-10 mx-4 mb-3 flex flex-wrap items-center gap-2 rounded-xl border border-[#ffe48a] bg-[#fffbeb] px-3 py-2.5 shadow-sm">
-      <span className="text-xs font-semibold text-[#5b4a00] tabular-nums">{count} selected</span>
+    <div
+      className={`shrink-0 flex flex-wrap items-center gap-1.5 md:gap-2 rounded-xl border border-[#ffe48a] bg-[#fffbeb] shadow-sm ${
+        compact ? 'mx-2 mt-1 mb-1 px-2 py-1.5' : 'mx-4 mb-2 mt-0 px-3 py-2.5'
+      }`}
+    >
+      <span className={`font-semibold text-[#5b4a00] tabular-nums ${compact ? 'text-[10px]' : 'text-xs'}`}>
+        {count} selected
+      </span>
 
       <div className="flex flex-wrap items-center gap-2 flex-1">
         <select
@@ -89,11 +99,22 @@ export default function PipelineBulkActionsBar({
 
         <button
           type="button"
-          disabled={busy}
+          disabled={busy || (emailCount !== null && emailCount < 1)}
           onClick={() => onEmail?.()}
           className="text-xs font-semibold px-2.5 py-1.5 bg-[#ffcb2b] text-[#242424] rounded-lg disabled:opacity-50"
+          title={emailCount === 0 ? 'No selected leads have email' : undefined}
         >
-          Email selected
+          Email{emailCount != null ? ` (${emailCount})` : ''}
+        </button>
+
+        <button
+          type="button"
+          disabled={busy || (phoneCount !== null && phoneCount < 1)}
+          onClick={() => onWhatsApp?.()}
+          className="text-xs font-semibold px-2.5 py-1.5 bg-[#25D366] text-white rounded-lg disabled:opacity-50"
+          title={phoneCount === 0 ? 'No selected leads have phone' : undefined}
+        >
+          WhatsApp{phoneCount != null ? ` (${phoneCount})` : ''}
         </button>
       </div>
 

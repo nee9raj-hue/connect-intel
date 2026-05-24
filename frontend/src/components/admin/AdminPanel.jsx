@@ -8,6 +8,7 @@ import {
 } from '../../lib/importTemplate'
 import { useApp } from '../../context/AppContext'
 import InviteEmailSetup from '../team/InviteEmailSetup'
+import OrgWhatsAppCloudSetup from '../team/OrgWhatsAppCloudSetup'
 
 const DATASET_OPTIONS = [
   { id: 'exporters', label: 'Exporters' },
@@ -140,7 +141,8 @@ export default function AdminPanel() {
   }
 
   return (
-    <div className="p-6 h-full overflow-y-auto bg-[#f6f7f9]">
+    <div className="panel-shell bg-[#f6f7f9]">
+      <div className="panel-body-scroll p-6">
       <div className="mb-6 rounded-2xl border border-gray-900 bg-gray-900 text-white px-5 py-4">
         <p className="text-[11px] font-semibold uppercase tracking-wide text-[#ffcb2b]">Platform operator</p>
         <h1 className="text-xl font-semibold mt-1">Master data & imports</h1>
@@ -157,6 +159,15 @@ export default function AdminPanel() {
           without DNS.
         </p>
         <InviteEmailSetup />
+      </section>
+
+      <section className="mb-6 bg-white rounded-2xl border border-[#25D366]/40 p-5 max-w-xl">
+        <h2 className="text-sm font-semibold text-gray-900">WhatsApp Business API (automatic bulk send)</h2>
+        <p className="text-xs text-gray-500 mt-1 mb-3 leading-relaxed">
+          Platform-wide default for marketing campaigns and pipeline bulk WhatsApp. Customers can override with
+          their own number under <strong>Team</strong>.
+        </p>
+        <OrgWhatsAppCloudSetup scope="platform" />
       </section>
 
       <div className="grid grid-cols-3 gap-4 mb-6">
@@ -280,10 +291,10 @@ export default function AdminPanel() {
       </div>
 
       <section className="mt-4 bg-white rounded-2xl border border-gray-200 p-5">
-        <h2 className="text-lg font-semibold text-gray-900">AI research (Perplexity)</h2>
+        <h2 className="text-lg font-semibold text-gray-900">AI research</h2>
         <p className="mt-1 text-sm text-gray-500">
           Discover companies on the web when your database is thin. Verify contacts, then import via Excel.
-          Customer search also uses Perplexity automatically when no database matches.
+          Customer search also uses live AI automatically when no database matches.
         </p>
         <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
           <input
@@ -314,7 +325,7 @@ export default function AdminPanel() {
           disabled={researchLoading}
           className="mt-4 px-4 py-2 bg-gray-900 text-white text-sm font-semibold rounded-lg disabled:opacity-50"
         >
-          {researchLoading ? 'Researching…' : 'Run Perplexity research'}
+          {researchLoading ? 'Researching…' : 'Run AI research'}
         </button>
         {researchResults.length > 0 && (
           <div className="mt-4 rounded-xl border border-violet-200 bg-violet-50/50 overflow-hidden">
@@ -377,6 +388,7 @@ export default function AdminPanel() {
           />
         </div>
       </section>
+      </div>
     </div>
   )
 }

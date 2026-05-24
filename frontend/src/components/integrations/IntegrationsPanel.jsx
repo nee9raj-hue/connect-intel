@@ -3,6 +3,7 @@ import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { PRODUCT } from '../../lib/productCopy'
 import InviteEmailSetup from '../team/InviteEmailSetup'
+import OrgWhatsAppCloudSetup from '../team/OrgWhatsAppCloudSetup'
 
 const PARTNERS = [
   {
@@ -21,7 +22,7 @@ const PARTNERS = [
   },
   {
     id: 'gmail',
-    label: 'Work Gmail',
+    label: 'Work email',
     icon: '✉️',
     description: 'Send outreach from your inbox — connect under Team or on any lead’s Email tab.',
     status: 'active',
@@ -30,7 +31,7 @@ const PARTNERS = [
     id: 'crm',
     label: 'CRM sync',
     icon: '🔗',
-    description: 'Salesforce, HubSpot, and pipeline tools — enterprise rollout.',
+    description: 'Sync with external CRM and pipeline tools — enterprise rollout.',
     status: 'soon',
   },
   {
@@ -62,13 +63,25 @@ export default function IntegrationsPanel() {
   }, [isOperator])
 
   if (!isOperator) {
+    const isCompanyAdmin = user?.isOrgAdmin && user?.accountType === 'company'
     return (
-      <div className="p-6 h-[calc(100vh-3.5rem)] overflow-y-auto max-w-3xl">
+      <div className="panel-shell bg-[#f6f7f9]">
+        <div className="panel-body-scroll p-6 max-w-3xl">
         <h1 className="text-lg font-semibold text-gray-900 mb-2">Connected services</h1>
         <p className="text-sm text-gray-600 mb-6 leading-relaxed">
           {PRODUCT.tagline} Your workspace includes AI prospect search, pipeline CRM, and optional work
-          Gmail for sending. Company admins manage team access and imports under <strong>Team</strong>.
+          email for sending. Company admins manage team access and imports under <strong>Team</strong>.
         </p>
+        {isCompanyAdmin && (
+          <section className="mb-6 rounded-xl border border-[#25D366]/40 bg-white p-4 space-y-2">
+            <h2 className="text-sm font-semibold text-gray-900">WhatsApp Business API</h2>
+            <p className="text-xs text-gray-500 leading-relaxed">
+              Enable automatic bulk WhatsApp from Marketing and Pipeline. Also available under{' '}
+              <strong>Team</strong>.
+            </p>
+            <OrgWhatsAppCloudSetup scope="org" />
+          </section>
+        )}
         <div className="space-y-4">
           {PARTNERS.filter((p) => p.status === 'active').map((partner) => (
             <PartnerCard key={partner.id} partner={partner} />
@@ -77,19 +90,19 @@ export default function IntegrationsPanel() {
         <p className="text-xs text-gray-400 mt-8">
           More data partners and CRM sync are on the roadmap for enterprise plans.
         </p>
+        </div>
       </div>
     )
   }
 
   const storageOk = status?.supabaseConnected
-  const storageLabel = status?.storage === 'supabase' ? 'Supabase (persistent)' : 'Temporary (sqlite)'
+  const storageLabel = status?.storage === 'supabase' ? 'Cloud database' : 'Local database'
 
   return (
-    <div className="p-6 h-[calc(100vh-3.5rem)] overflow-y-auto max-w-3xl">
+    <div className="panel-shell bg-[#f6f7f9]">
+      <div className="panel-body-scroll p-6 max-w-3xl">
       <p className="text-sm text-gray-600 mb-6 leading-relaxed">
-        <strong>Platform operator view.</strong> Check Supabase, Perplexity, and Gemini env wiring on
-        Vercel. Customer company admins import only their own pipeline under Team — master sheets go
-        through Data & imports.
+        <strong>Platform operator view.</strong> Internal service status for Connect Intel operations.
       </p>
 
       <div
@@ -116,11 +129,12 @@ export default function IntegrationsPanel() {
       </div>
 
       <div className="grid grid-cols-2 gap-2 mb-6 text-xs">
-        <StatusPill label="Perplexity" on={status?.perplexity} />
-        <StatusPill label="Gemini" on={status?.gemini} />
-        <StatusPill label="Supabase env" on={status?.supabase} />
-        <StatusPill label="Supabase live" on={status?.supabaseConnected} />
+        <StatusPill label="Live AI search" on={status?.perplexity} />
+        <StatusPill label="Keyword AI" on={status?.gemini} />
+        <StatusPill label="Database env" on={status?.supabase} />
+        <StatusPill label="Database live" on={status?.supabaseConnected} />
         <StatusPill label="Team invite email" on={status?.inviteEmailReady} />
+        <StatusPill label="WhatsApp auto-send" on={status?.whatsappAutoSendReady} />
       </div>
 
       <section className="mb-8 rounded-xl border-2 border-[#ffe48a] bg-[#fffbeb] p-4 space-y-3">
@@ -136,11 +150,21 @@ export default function IntegrationsPanel() {
         <InviteEmailSetup />
       </section>
 
+      <section className="mb-8 rounded-xl border-2 border-[#25D366]/50 bg-emerald-50/50 p-4 space-y-3">
+        <h2 className="text-sm font-semibold text-[#242424]">WhatsApp Business API (bulk auto-send)</h2>
+        <p className="text-xs text-[#14532d] leading-relaxed">
+          Same setup as <strong>Data &amp; imports</strong>. Enables automatic marketing WhatsApp and pipeline bulk
+          send for all customers.
+        </p>
+        <OrgWhatsAppCloudSetup scope="platform" />
+      </section>
+
       <h2 className="text-sm font-semibold text-gray-700 mb-3">Customer-facing catalog</h2>
       <div className="space-y-4">
         {PARTNERS.map((partner) => (
           <PartnerCard key={partner.id} partner={partner} />
         ))}
+      </div>
       </div>
     </div>
   )

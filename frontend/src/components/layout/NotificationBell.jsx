@@ -9,12 +9,16 @@ const TYPE_LABELS = {
   meeting: 'Calendar',
   task: 'Task',
   follow_up: 'Follow-up',
+  team_note: 'Team note',
+  team_task: 'Team task',
 }
 
 const PANEL_LABELS = {
   pipeline: 'Pipeline',
   'crm-calendar': 'Calendar',
   overview: 'Overview',
+  'team-notes': 'Notes',
+  'team-tasks': 'Tasks',
 }
 
 export default function NotificationBell() {

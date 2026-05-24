@@ -72,7 +72,7 @@ export function IndiaLeadMapVisual() {
         <p className="text-[11px] font-bold uppercase tracking-wider text-amber-300">AI lead discovery</p>
         <h3 className="text-xl font-bold mt-1">High-quality B2B leads across India</h3>
         <p className="text-sm text-gray-300 mt-2 max-w-xs">
-          Filter by state, industry, role, and exporter profile. Perplexity & Gemini rank the best fits.
+          Filter by state, industry, role, and exporter profile. Connect Intel AI ranks the best fits.
         </p>
         <div className="flex flex-wrap gap-2 mt-4">
           {['Rajasthan', 'Gujarat', 'Tamil Nadu', 'Maharashtra'].map((s) => (

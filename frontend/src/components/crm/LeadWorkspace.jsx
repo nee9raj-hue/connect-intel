@@ -17,10 +17,32 @@ import {
 } from '../../lib/crmUiConstants'
 import TeamParticipantPicker from './TeamParticipantPicker'
 import CrmEmailThread from './CrmEmailThread'
+import { buildUnifiedTimeline, formatDealValue, timelineTypeLabel } from '../../lib/crmTimeline'
+
+const MAX_EMAIL_ATTACHMENTS = 5
+const MAX_ATTACHMENT_BYTES = 5 * 1024 * 1024
+
+function readFileAsBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => {
+      const result = String(reader.result || '')
+      resolve(result.includes(',') ? result.split(',')[1] : result)
+    }
+    reader.onerror = () => reject(new Error(`Could not read ${file.name}`))
+    reader.readAsDataURL(file)
+  })
+}
+
+function formatAttachmentSize(bytes) {
+  if (!bytes || bytes < 1024) return `${bytes || 0} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
 
 const TABS = [
   { id: 'overview', label: 'Overview' },
-  { id: 'notes', label: 'Notes & log' },
+  { id: 'notes', label: 'Timeline' },
   { id: 'schedule', label: 'Tasks & meetings' },
   { id: 'email', label: 'Email' },
   { id: 'whatsapp', label: 'WhatsApp' },
@@ -40,6 +62,8 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
     generateWhatsAppDraft,
     refreshTeam,
     consumePendingLeadTab,
+    openContact,
+    saveEmailSignature,
   } = useApp()
   const [tab, setTab] = useState('overview')
   const [notes, setNotes] = useState(lead.crm?.notes || '')
@@ -68,6 +92,11 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
   const [senderCompany, setSenderCompany] = useState(user?.organizationName || user?.company || '')
   const [draftAi, setDraftAi] = useState(false)
   const [emailCc, setEmailCc] = useState('')
+  const [emailSignature, setEmailSignature] = useState(user?.emailSignature || '')
+  const [includeSignature, setIncludeSignature] = useState(user?.includeEmailSignature !== false)
+  const [showSignatureEditor, setShowSignatureEditor] = useState(false)
+  const [savingSignature, setSavingSignature] = useState(false)
+  const [emailAttachments, setEmailAttachments] = useState([])
   const [waMessage, setWaMessage] = useState('')
   const [waAgenda, setWaAgenda] = useState('')
   const [waKeyPoints, setWaKeyPoints] = useState('')
@@ -87,9 +116,16 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
   const [visitMeetingId, setVisitMeetingId] = useState('')
   const [visitNotes, setVisitNotes] = useState('')
   const [visitOutcome, setVisitOutcome] = useState('completed')
+  const [dealValue, setDealValue] = useState(lead.crm?.dealValue ?? '')
+  const [expectedCloseDate, setExpectedCloseDate] = useState(
+    lead.crm?.expectedCloseDate ? lead.crm.expectedCloseDate.slice(0, 10) : ''
+  )
+  const [sequences, setSequences] = useState([])
+  const [enrollSequenceId, setEnrollSequenceId] = useState('')
 
   const isManager = user?.isOrgAdmin || user?.orgRole === 'org_admin'
   const crm = lead.crm || {}
+  const timeline = buildUnifiedTimeline(crm)
   const statusMeta = getStatusMeta(status)
 
   useEffect(() => {
@@ -108,6 +144,11 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
     const timer = setTimeout(() => setNotice(null), 5000)
     return () => clearTimeout(timer)
   }, [notice])
+
+  useEffect(() => {
+    setEmailSignature(user?.emailSignature || '')
+    setIncludeSignature(user?.includeEmailSignature !== false)
+  }, [user?.emailSignature, user?.includeEmailSignature])
 
   useEffect(() => {
     if (tab === 'schedule' && user?.accountType === 'company') {
@@ -147,7 +188,7 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
     const params = new URLSearchParams(window.location.search)
     if (params.get('crm_gmail') !== 'connected') return
     const mailbox = params.get('mailbox')
-    setNotice(mailbox ? `Work Gmail connected (${mailbox})` : 'Work Gmail connected')
+    setNotice(mailbox ? `Work email connected (${mailbox})` : 'Work email connected')
     params.delete('crm_gmail')
     params.delete('mailbox')
     const qs = params.toString()
@@ -307,7 +348,7 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
     try {
       const data = await api.startCrmGmailOAuth()
       if (data.url) window.location.href = data.url
-      else setError('Could not start Gmail connection')
+      else setError('Could not start email connection')
     } catch (e) {
       setError(e.message)
     } finally {
@@ -344,6 +385,60 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
     }
   }
 
+  const handleSaveSignature = async () => {
+    if (savingSignature) return
+    setSavingSignature(true)
+    setError(null)
+    try {
+      await saveEmailSignature({
+        emailSignature: emailSignature.trim(),
+        includeEmailSignature: includeSignature,
+      })
+      setNotice('Email signature saved for all future emails')
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setSavingSignature(false)
+    }
+  }
+
+  const handleAttachmentPick = async (event) => {
+    const files = Array.from(event.target.files || [])
+    event.target.value = ''
+    if (!files.length) return
+
+    setError(null)
+    const next = [...emailAttachments]
+
+    for (const file of files) {
+      if (next.length >= MAX_EMAIL_ATTACHMENTS) {
+        setError(`Maximum ${MAX_EMAIL_ATTACHMENTS} attachments per email`)
+        break
+      }
+      if (file.size > MAX_ATTACHMENT_BYTES) {
+        setError(`${file.name} exceeds 5MB limit`)
+        continue
+      }
+      try {
+        const contentBase64 = await readFileAsBase64(file)
+        next.push({
+          filename: file.name,
+          mimeType: file.type || 'application/octet-stream',
+          contentBase64,
+          sizeBytes: file.size,
+        })
+      } catch (e) {
+        setError(e.message)
+      }
+    }
+
+    setEmailAttachments(next)
+  }
+
+  const removeAttachment = (index) => {
+    setEmailAttachments((prev) => prev.filter((_, i) => i !== index))
+  }
+
   const handleSend = async () => {
     if (!subject.trim() || !body.trim()) {
       setError('Add subject and message')
@@ -351,7 +446,7 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
     }
     const canSend = gmailStatus.connected || orgEmail?.userCanSend || user?.orgOutboundEmailReady
     if (!canSend) {
-      setError('Connect work Gmail above, or ask admin to complete optional DNS sending in Team.')
+      setError('Connect work email above (Team → CRM email) to send from CRM.')
       return
     }
     if (sending) return
@@ -363,13 +458,26 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
         body: body.trim(),
         cc: emailCc.trim(),
         aiGenerated: draftAi,
+        includeSignature,
+        attachments: emailAttachments.map(({ filename, mimeType, contentBase64 }) => ({
+          filename,
+          mimeType,
+          contentBase64,
+        })),
       })
       setSubject('')
       setBody('')
       setDraftAi(false)
+      setEmailAttachments([])
       const from = data.mailbox || user?.email
-      const via = data.provider === 'org_resend' ? 'company email' : 'Gmail'
-      setNotice(from ? `Email sent from ${from} (${via}) and logged in CRM` : 'Email sent and logged in CRM')
+      const via = data.provider === 'org_resend' ? 'company email' : 'work email'
+      const attachmentNote =
+        data.attachmentCount > 0 ? ` with ${data.attachmentCount} attachment(s)` : ''
+      setNotice(
+        from
+          ? `Email sent from ${from} (${via})${attachmentNote} and logged in CRM`
+          : `Email sent${attachmentNote} and logged in CRM`
+      )
       api.getOrgEmailDomain().then((d) => setOrgEmail(d)).catch(() => {})
     } catch (e) {
       setError(e.message)
@@ -385,7 +493,7 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
       const data = await syncEmailThread(lead.id)
       setNotice(
         data.importedCount > 0
-          ? `Synced ${data.importedCount} message(s) from Gmail`
+          ? `Synced ${data.importedCount} message(s) from your inbox`
           : 'No new messages found in the last 90 days'
       )
       const status = await api.getCrmGmailStatus()
@@ -415,6 +523,8 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
       setThreadSyncing(false)
     }
   }
+
+  const contactId = lead.contactId || lead.id
 
   const canSendEmail = Boolean(gmailStatus.connected || orgEmail?.userCanSend || user?.orgOutboundEmailReady)
   const busy = saving || sending || generating || connectingGmail || waGenerating || threadSyncing
@@ -468,14 +578,14 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
   }
 
   return (
-    <aside className="fixed inset-0 z-40 md:static md:inset-auto md:w-full md:max-w-[420px] shrink-0 bg-white flex flex-col h-full shadow-xl md:shadow-none border-l border-gray-200">
-      <div className="shrink-0 px-4 py-3 border-b border-gray-100">
+    <aside className="fixed inset-0 z-[75] md:static md:inset-auto md:w-full md:max-w-[420px] shrink-0 bg-white flex flex-col h-[100dvh] md:h-full shadow-xl md:shadow-none border-l border-gray-200">
+      <div className="shrink-0 px-2.5 py-2 md:px-4 md:py-3 border-b border-gray-100">
         <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0">
-            <h2 className="font-semibold text-gray-900 truncate">
+          <div className="min-w-0 flex-1">
+            <h2 className="text-sm md:text-base font-semibold text-gray-900 truncate">
               {[lead.firstName, lead.lastName].filter(Boolean).join(' ')}
             </h2>
-            <p className="text-xs text-gray-500 truncate">
+            <p className="text-[10px] md:text-xs text-gray-500 truncate">
               {lead.title} · {lead.company}
             </p>
             <span className={`inline-block mt-1 text-[10px] font-semibold px-2 py-0.5 rounded border ${statusMeta.color}`}>
@@ -486,13 +596,13 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
             ×
           </button>
         </div>
-        <div className="flex gap-1 mt-3 overflow-x-auto">
+        <div className="flex gap-0.5 mt-2 md:mt-3 overflow-x-auto no-scrollbar pb-0.5">
           {TABS.map((t) => (
             <button
               key={t.id}
               type="button"
               onClick={() => setTab(t.id)}
-              className={`shrink-0 text-[11px] font-semibold px-2.5 py-1 rounded-md ${
+              className={`shrink-0 text-[10px] md:text-[11px] font-semibold px-2 py-0.5 md:px-2.5 md:py-1 rounded-md ${
                 tab === t.id ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600'
               }`}
             >
@@ -514,7 +624,7 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
         )}
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
+      <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden pipeline-scroll-area px-2.5 py-2 md:px-4 md:py-3 space-y-3 md:space-y-4 pb-6">
         {tab === 'overview' && (
           <>
             <section>
@@ -526,7 +636,104 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
                   </option>
                 ))}
               </select>
+              {crm.leadScore != null && (
+                <p className="text-xs text-gray-500 mt-2">
+                  Lead score: <strong className="text-gray-900">{crm.leadScore}</strong>/100
+                </p>
+              )}
             </section>
+
+            <section className="grid grid-cols-2 gap-2">
+              <label className="block">
+                <span className="text-[11px] font-semibold uppercase text-gray-400 mb-1 block">Deal value (₹)</span>
+                <input
+                  type="number"
+                  min={0}
+                  value={dealValue}
+                  onChange={(e) => setDealValue(e.target.value)}
+                  onBlur={async () => {
+                    try {
+                      await patchLead(lead.id, {
+                        crm: { dealValue: dealValue === '' ? null : Number(dealValue) },
+                      })
+                      setNotice('Deal value saved')
+                    } catch (err) {
+                      setError(err.message)
+                    }
+                  }}
+                  className="w-full text-sm border rounded-lg px-3 py-2"
+                  placeholder="0"
+                />
+              </label>
+              <label className="block">
+                <span className="text-[11px] font-semibold uppercase text-gray-400 mb-1 block">Expected close</span>
+                <input
+                  type="date"
+                  value={expectedCloseDate}
+                  onChange={(e) => setExpectedCloseDate(e.target.value)}
+                  onBlur={async () => {
+                    try {
+                      await patchLead(lead.id, {
+                        crm: { expectedCloseDate: expectedCloseDate || null },
+                      })
+                      setNotice('Close date saved')
+                    } catch (err) {
+                      setError(err.message)
+                    }
+                  }}
+                  className="w-full text-sm border rounded-lg px-3 py-2"
+                />
+              </label>
+            </section>
+            {(dealValue || crm.dealValue) && (
+              <p className="text-xs text-gray-600 -mt-2">
+                Pipeline value: {formatDealValue(dealValue || crm.dealValue)}
+              </p>
+            )}
+
+            {user?.accountType === 'company' && (
+              <section>
+                <h3 className="text-[11px] font-semibold uppercase text-gray-400 mb-2">Sales sequence</h3>
+                <div className="flex gap-2">
+                  <select
+                    value={enrollSequenceId}
+                    onChange={(e) => setEnrollSequenceId(e.target.value)}
+                    className="flex-1 text-sm border rounded-lg px-2 py-2"
+                    onFocus={async () => {
+                      try {
+                        const data = await api.listCrmSequences()
+                        setSequences(data.sequences || [])
+                      } catch {
+                        setSequences([])
+                      }
+                    }}
+                  >
+                    <option value="">Select sequence…</option>
+                    {sequences.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.name}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    disabled={!enrollSequenceId}
+                    onClick={async () => {
+                      try {
+                        await api.enrollCrmSequence({ sequenceId: enrollSequenceId, leadId: lead.id })
+                        setNotice('Enrolled in sequence')
+                        setEnrollSequenceId('')
+                      } catch (err) {
+                        setError(err.message)
+                      }
+                    }}
+                    className="text-xs font-semibold px-3 py-2 rounded-lg bg-[#ffcb2b] text-[#242424] disabled:opacity-40"
+                  >
+                    Enroll
+                  </button>
+                </div>
+              </section>
+            )}
 
             {isManager && user?.accountType === 'company' && teamMembers.length > 0 && (
               <section>
@@ -555,6 +762,42 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
                 </select>
               </section>
             )}
+
+            <section>
+              <h3 className="text-[11px] font-semibold uppercase text-gray-400 mb-2">Contact record</h3>
+              <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 space-y-1.5 text-xs text-gray-700">
+                <p>
+                  <span className="text-gray-500">Name · </span>
+                  {[lead.firstName, lead.lastName].filter(Boolean).join(' ') || '—'}
+                </p>
+                <p>
+                  <span className="text-gray-500">Company · </span>
+                  {lead.company || '—'}
+                </p>
+                <p>
+                  <span className="text-gray-500">Email · </span>
+                  {lead.email || '—'}
+                </p>
+                <p>
+                  <span className="text-gray-500">Phone · </span>
+                  {lead.phone || '—'}
+                </p>
+                <p>
+                  <span className="text-gray-500">Location · </span>
+                  {lead.location || [lead.city, lead.state].filter(Boolean).join(', ') || '—'}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => openContact(contactId)}
+                className="mt-2 w-full py-2 text-xs font-semibold border border-gray-300 rounded-lg text-gray-800 hover:bg-white"
+              >
+                Edit contact details →
+              </button>
+              <p className="text-[10px] text-gray-400 mt-1.5 leading-relaxed">
+                Pipeline tracks deal activity. Contact info is edited on the Contacts page.
+              </p>
+            </section>
 
             <section className="grid grid-cols-1 gap-2 text-xs">
               <Info label="Last communication" value={formatDateTime(crm.lastCommunicationAt)} />
@@ -610,18 +853,28 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
               />
             </section>
             <section>
-              <h3 className="text-[11px] font-semibold uppercase text-gray-400 mb-2">Activity log</h3>
+              <h3 className="text-[11px] font-semibold uppercase text-gray-400 mb-2">Unified timeline</h3>
+              <p className="text-[10px] text-gray-400 mb-2">Emails, calls, tasks, meetings, and notes in one place.</p>
               <ul className="space-y-2 max-h-[50vh] overflow-y-auto">
-                {(crm.activities || []).map((act) => (
-                  <li key={act.id} className="text-xs border rounded-lg p-2.5 bg-gray-50">
-                    <span className="font-bold text-[#8a6600]">{ACTIVITY_LABELS[act.type] || act.type}</span>
-                    <p className="text-gray-800 mt-1">{act.summary}</p>
-                    <p className="text-gray-400 mt-1">
-                      {act.createdByName} · {formatDateTime(act.createdAt)}
-                    </p>
+                {timeline.map((item) => (
+                  <li key={item.id} className="text-xs border rounded-lg p-2.5 bg-gray-50">
+                    <span className="font-bold text-[#8a6600]">{timelineTypeLabel(item.type)}</span>
+                    <p className="text-gray-800 mt-1">{item.title}</p>
+                    {item.subtitle && <p className="text-gray-500">{item.subtitle}</p>}
+                    {item.meta?.answers?.length > 0 && (
+                      <ul className="mt-2 space-y-1 text-gray-700 border-t border-gray-200 pt-2">
+                        {item.meta.answers.map((row) => (
+                          <li key={row.fieldId || row.label}>
+                            <span className="font-medium text-gray-600">{row.label}: </span>
+                            {row.value}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    <p className="text-gray-400 mt-1">{formatDateTime(item.at)}</p>
                   </li>
                 ))}
-                {!crm.activities?.length && <p className="text-xs text-gray-400">No activity yet</p>}
+                {!timeline.length && <p className="text-xs text-gray-400">No activity yet</p>}
               </ul>
             </section>
           </>
@@ -781,39 +1034,80 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
           <>
             {!canSendEmail && (
               <section className="rounded-lg border border-amber-200 bg-amber-50 p-3 space-y-2">
-                <h3 className="text-[11px] font-semibold uppercase text-amber-900">Set up email to send</h3>
+                <h3 className="text-[11px] font-semibold uppercase text-amber-900">Connect email to send</h3>
                 <p className="text-xs text-amber-900 leading-relaxed">
-                  {user?.isOrgAdmin
-                    ? 'Open Team → Outbound CRM email and complete company domain (DNS) verification. Your whole team can send without any Google permission pop-ups.'
-                    : 'Ask your company admin to set up outbound email under Team → Company domain (DNS).'}
+                  Sign in once with your work email account. No DNS or domain setup needed.
                 </p>
+                <button
+                  type="button"
+                  onClick={connectWorkGmail}
+                  disabled={busy || !gmailStatus.gmailConnectAvailable}
+                  className="w-full py-2.5 text-xs font-semibold bg-[#ffcb2b] text-[#242424] rounded-lg disabled:opacity-50"
+                >
+                  {connectingGmail ? 'Connecting…' : 'Connect work email'}
+                </button>
                 {user?.isOrgAdmin && onNavigate && (
                   <button
                     type="button"
                     onClick={() => onNavigate('team')}
-                    className="w-full py-2 text-xs font-semibold bg-[#ffcb2b] text-[#242424] rounded-lg"
+                    className="w-full py-2 text-xs font-medium text-gray-700 border border-gray-300 rounded-lg"
                   >
-                    Open Team email setup
-                  </button>
-                )}
-                {gmailStatus.gmailConnectAvailable && (
-                  <button
-                    type="button"
-                    onClick={connectWorkGmail}
-                    disabled={busy}
-                    className="w-full py-2 text-xs font-medium text-gray-700 border border-gray-300 rounded-lg disabled:opacity-50"
-                  >
-                    {connectingGmail ? 'Opening Google…' : 'Or connect work Gmail (advanced)'}
+                    Open Team email settings
                   </button>
                 )}
               </section>
             )}
 
-            {canSendEmail && (orgEmail?.userCanSend || user?.orgOutboundEmailReady) && (
+            {canSendEmail && gmailStatus.connected && (
               <p className="text-[10px] text-emerald-800 bg-emerald-50 border border-emerald-100 rounded-lg px-2 py-1.5">
-                Sending via your company domain — professional delivery, no Google verification screen for reps.
+                Sending via <strong>{gmailStatus.mailbox}</strong> · use Sync replies below to pull inbound mail
               </p>
             )}
+
+            <section className="rounded-lg border border-gray-200 bg-gray-50 p-3 space-y-2">
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="text-[11px] font-semibold uppercase text-gray-500">Email signature</h3>
+                <button
+                  type="button"
+                  onClick={() => setShowSignatureEditor((v) => !v)}
+                  className="text-[10px] font-semibold text-gray-600 underline"
+                >
+                  {showSignatureEditor ? 'Hide' : emailSignature ? 'Edit signature' : 'Add signature'}
+                </button>
+              </div>
+              {!showSignatureEditor && emailSignature && (
+                <p className="text-xs text-gray-600 whitespace-pre-wrap border border-gray-200 rounded-lg px-2 py-1.5 bg-white">
+                  {emailSignature}
+                </p>
+              )}
+              {showSignatureEditor && (
+                <>
+                  <textarea
+                    value={emailSignature}
+                    onChange={(e) => setEmailSignature(e.target.value)}
+                    rows={4}
+                    placeholder={'Best regards,\nYour Name\nCompany · Phone · Website'}
+                    className="w-full text-xs border border-gray-200 rounded-lg px-2 py-1.5 font-mono bg-white"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleSaveSignature}
+                    disabled={savingSignature}
+                    className="text-xs font-semibold px-3 py-1.5 bg-white border border-gray-300 rounded-lg disabled:opacity-50"
+                  >
+                    {savingSignature ? 'Saving…' : 'Save signature for all emails'}
+                  </button>
+                </>
+              )}
+              <label className="flex items-center gap-2 text-xs text-gray-700">
+                <input
+                  type="checkbox"
+                  checked={includeSignature}
+                  onChange={(e) => setIncludeSignature(e.target.checked)}
+                />
+                Include signature when sending
+              </label>
+            </section>
 
             <section className="space-y-2">
               <h3 className="text-[11px] font-semibold uppercase text-gray-400">What should this email say?</h3>
@@ -864,6 +1158,49 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
               className="w-full text-sm border rounded-lg px-3 py-2"
             />
             <textarea value={body} onChange={(e) => setBody(e.target.value)} rows={10} className="w-full text-sm border rounded-lg px-3 py-2 font-mono text-[12px]" />
+            {includeSignature && emailSignature.trim() && (
+              <p className="text-[10px] text-gray-500">
+                Your saved signature will be appended automatically when you send.
+              </p>
+            )}
+            <div className="space-y-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <label className="text-xs font-semibold px-3 py-1.5 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                  📎 Attach files
+                  <input
+                    type="file"
+                    multiple
+                    className="hidden"
+                    onChange={handleAttachmentPick}
+                    disabled={busy || emailAttachments.length >= MAX_EMAIL_ATTACHMENTS}
+                  />
+                </label>
+                <span className="text-[10px] text-gray-500">
+                  Up to {MAX_EMAIL_ATTACHMENTS} files, 5MB each
+                </span>
+              </div>
+              {emailAttachments.length > 0 && (
+                <ul className="space-y-1">
+                  {emailAttachments.map((file, index) => (
+                    <li
+                      key={`${file.filename}-${index}`}
+                      className="flex items-center justify-between gap-2 text-xs bg-gray-50 border border-gray-200 rounded-lg px-2 py-1"
+                    >
+                      <span className="truncate">
+                        📎 {file.filename} ({formatAttachmentSize(file.sizeBytes)})
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => removeAttachment(index)}
+                        className="shrink-0 text-red-600 text-[10px] font-semibold"
+                      >
+                        Remove
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
             <button
               type="button"
               onClick={handleSend}

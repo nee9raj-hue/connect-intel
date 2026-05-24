@@ -20,6 +20,7 @@
   --color-apollo-border: #e8e8e8;
   --color-apollo-muted: #6b7280;
   --color-apollo-surface: #f7f7f7;
+  --animate-loading-bar: loading-bar 1.2s ease-in-out infinite;
 }
 
 html {
@@ -44,4 +45,99 @@ body {
 ::-webkit-scrollbar-thumb {
   background: #d1d5db;
   border-radius: 3px;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.pipeline-scroll-area {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+.mobile-nav-pill {
+  bottom: max(0.65rem, env(safe-area-inset-bottom, 0px));
+  pointer-events: none;
+}
+.mobile-nav-pill > div {
+  pointer-events: auto;
+}
+
+.mobile-main-pad {
+  padding-bottom: max(4.5rem, calc(env(safe-area-inset-bottom, 0px) + 4rem));
+}
+
+/* Full-height app panels: chrome on top, scrollable body fills remaining space */
+.panel-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.panel-body-scroll {
+  flex: 1 1 0%;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+.panel-chrome-scroll {
+  flex-shrink: 0;
+  max-height: min(36vh, 320px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Desktop dashboard: single-page scroll, full width (mobile keeps split chrome/body) */
+@media (min-width: 768px) {
+  .panel-shell.panel-scroll-page {
+    display: block;
+    height: 100%;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .panel-scroll-page .panel-body-scroll {
+    display: block;
+    flex: none;
+    min-height: auto;
+    overflow: visible;
+  }
+
+  .panel-scroll-page > header {
+    display: block;
+  }
+}
+
+@keyframes loading-bar {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(400%);
+  }
+}
+
+
+.rich-text-editor p {
+  margin: 0 0 0.75rem;
+}
+
+.rich-text-editor p:last-child {
+  margin-bottom: 0;
+}
+
+.rich-text-editor:focus {
+  border-color: #111827;
 }

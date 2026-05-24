@@ -4,7 +4,7 @@ import { MOCK_LEADS } from './mockLeads'
 import { PROVIDERS } from './providers'
 
 export { PROVIDERS }
-const FREE_FULL_LEAD_PREVIEW_COUNT = 10
+const FREE_FULL_LEAD_PREVIEW_COUNT = 5
 
 function maskEmail(email) {
   if (!email) return ''

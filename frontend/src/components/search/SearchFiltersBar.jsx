@@ -129,7 +129,8 @@ export default function SearchFiltersBar({
       </div>
 
       {filtersExpanded && (
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 pt-1">
+      <div className="panel-chrome-scroll">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 pt-1 pb-1">
         <MultiSelectField
           label="State"
           hint={stateHint}
@@ -169,6 +170,7 @@ export default function SearchFiltersBar({
           }}
           onToggle={(val) => toggle('industries', val)}
         />
+      </div>
       </div>
 
       )}

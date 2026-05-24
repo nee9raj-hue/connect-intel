@@ -197,7 +197,7 @@ export default function LandingPage() {
               Use our AI to find high-quality leads across India
             </h2>
             <p className="text-gray-600 leading-relaxed mb-4">
-              Connect Intel combines your imported data with AI discovery (Perplexity, Gemini) to surface
+              Connect Intel combines your imported data with AI discovery to surface
               exporters, buyers, and decision-makers with email and phone when available.
             </p>
             <p className="text-sm text-gray-500">

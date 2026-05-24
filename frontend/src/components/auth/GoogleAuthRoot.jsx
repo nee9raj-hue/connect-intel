@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import { resolveGoogleClientId } from '../../lib/googleAuthConfig'
+import LoadingExperience from '../ui/LoadingExperience'
 
 export default function GoogleAuthRoot({ children }) {
   const [clientId, setClientId] = useState(null)
@@ -20,11 +21,8 @@ export default function GoogleAuthRoot({ children }) {
 
   if (!ready) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#f6f7f9]">
-        <div className="text-center">
-          <div className="w-10 h-10 mx-auto border-2 border-[#ffcb2b]/30 border-t-[#ffcb2b] rounded-full animate-spin mb-3" />
-          <p className="text-sm text-gray-600">Loading…</p>
-        </div>
+      <div className="min-h-screen flex flex-col bg-[#f6f7f9]">
+        <LoadingExperience message="Preparing sign-in…" fill className="min-h-screen" />
       </div>
     )
   }

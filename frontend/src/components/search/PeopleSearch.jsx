@@ -2,12 +2,15 @@ import { useMemo, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { isAllCitiesSelected, isAllStatesSelected } from '../../lib/filterOptions'
-import { getResultsBadge, softenNotice, PRODUCT } from '../../lib/productCopy'
+import { getResultsBadge, softenNotice, PRODUCT, sanitizeCustomerText } from '../../lib/productCopy'
 import { searchLeads } from '../../lib/searchService'
 import SearchFiltersBar from './SearchFiltersBar'
 import SearchResultsView, { FULL_DETAIL_PREVIEW_COUNT } from './SearchResultsView'
 import ResultsTable from './ResultsTable'
 import RechargeWalletModal from './RechargeWalletModal'
+import LoadingExperience from '../ui/LoadingExperience'
+import { LOADING_MESSAGES } from '../../lib/loadingQuotes'
+import useIsMobile from '../../hooks/useIsMobile'
 
 const CREDIT_COST_PAISE = 100
 
@@ -42,7 +45,10 @@ export default function PeopleSearch({ onNavigate }) {
   const [searchError, setSearchError] = useState(null)
   const [revealingKey, setRevealingKey] = useState(null)
   const [filtersExpanded, setFiltersExpanded] = useState(false)
+  const [searchMetaOpen, setSearchMetaOpen] = useState(false)
   const [rechargeOpen, setRechargeOpen] = useState(false)
+  const [listSaving, setListSaving] = useState(false)
+  const isMobile = useIsMobile()
 
   const walletPaise = user?.creditsPaise ?? 0
   const walletRupees = user?.creditBalanceRupees ?? Number((walletPaise / 100).toFixed(2))
@@ -133,6 +139,49 @@ export default function PeopleSearch({ onNavigate }) {
     a.click()
   }
 
+  const saveToMarketingList = async () => {
+    const leads = displayLeads
+      .filter((l) => (selected.length ? selected.includes(l.id) : true))
+      .filter((l) => String(l.email || '').includes('@'))
+    if (!leads.length) {
+      setSearchError('Select at least one lead with an email address.')
+      return
+    }
+    const defaultName = `Search ${new Date().toLocaleDateString()}`
+    const name = window.prompt('Marketing list name', defaultName)
+    if (!name?.trim()) return
+
+    setListSaving(true)
+    setSearchError(null)
+    try {
+      await api.createMarketingList({
+        name: name.trim(),
+        searchLeads: leads.map((l) => ({
+          id: l.id,
+          firstName: l.firstName,
+          lastName: l.lastName,
+          title: l.title,
+          company: l.company,
+          email: l.email,
+          phone: l.phone,
+          city: l.city,
+          state: l.state,
+          industry: l.industry,
+          companyDomain: l.companyDomain,
+          website: l.website,
+          linkedin: l.linkedin,
+          score: l.score,
+          source: l.source || 'search',
+        })),
+      })
+      onNavigate?.('marketing')
+    } catch (error) {
+      setSearchError(error.message || 'Could not create marketing list')
+    } finally {
+      setListSaving(false)
+    }
+  }
+
   const handleRevealField = async (lead, field) => {
     if (walletPaise < CREDIT_COST_PAISE) {
       setRechargeOpen(true)
@@ -172,6 +221,7 @@ export default function PeopleSearch({ onNavigate }) {
   }
 
   const friendlyNotice = softenNotice(results?.notice)
+  const friendlyDiscoveryError = sanitizeCustomerText(results?.discoveryError)
   const resultBadge = results ? getResultsBadge(results.provider) : null
 
   const workOnLead = (lead) => {
@@ -231,20 +281,32 @@ export default function PeopleSearch({ onNavigate }) {
     )
   }
 
+  const showMetaBlock =
+    (hasSearched && results?.leads?.length > 0 && countTab !== 'saved') ||
+    friendlyNotice ||
+    filterSummary ||
+    searchError ||
+    results?.discoveryError ||
+    results?.parsedSearch?.summary
+
+  const metaCollapsedOnMobile = isMobile && hasSearched && displayLeads.length > 0 && countTab !== 'saved'
+
   return (
-    <div className="flex flex-col h-full min-h-0 bg-[#f6f7f9]">
+    <div className="panel-shell bg-[#f6f7f9]">
       <RechargeWalletModal
         open={rechargeOpen}
         onClose={() => setRechargeOpen(false)}
         balanceRupees={walletRupees}
       />
-      <header className="shrink-0 bg-white border-b border-gray-200 px-4 sm:px-5 py-2.5">
-        <div className="flex items-center justify-between gap-3">
+      <header className="shrink-0 bg-white border-b border-gray-200 px-3 sm:px-5 py-2 md:py-2.5">
+        <div className="flex items-center justify-between gap-2 md:gap-3">
           <div className="min-w-0">
-            <h1 className="text-base sm:text-lg font-semibold text-gray-900 truncate">AI prospect search</h1>
-            <p className="text-[11px] text-gray-500 truncate">{PRODUCT.databaseLine}</p>
+            <h1 className="text-sm sm:text-lg font-semibold text-gray-900 truncate">AI prospect search</h1>
+            <p className="text-[10px] sm:text-[11px] text-gray-500 truncate hidden sm:block">
+              {PRODUCT.databaseLine}
+            </p>
           </div>
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
             <button
               type="button"
               onClick={() => walletPaise < CREDIT_COST_PAISE && setRechargeOpen(true)}
@@ -261,9 +323,17 @@ export default function PeopleSearch({ onNavigate }) {
             </span>
             <button
               type="button"
+              onClick={saveToMarketingList}
+              disabled={!displayLeads.length || listSaving}
+              className="text-[10px] sm:text-xs font-medium px-2 sm:px-3 py-1 sm:py-1.5 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-40"
+            >
+              {listSaving ? '…' : 'List'}
+            </button>
+            <button
+              type="button"
               onClick={exportCSV}
               disabled={!displayLeads.length}
-              className="text-xs font-medium px-3 py-1.5 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-40"
+              className="text-[10px] sm:text-xs font-medium px-2 sm:px-3 py-1 sm:py-1.5 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-40"
             >
               Export
             </button>
@@ -271,16 +341,17 @@ export default function PeopleSearch({ onNavigate }) {
         </div>
       </header>
 
-      <SearchFiltersBar
-        filters={filters}
-        onChange={setFilters}
-        onSearch={handleSearch}
-        loading={loading}
-        filtersExpanded={filtersExpanded}
-        onToggleFilters={() => setFiltersExpanded((v) => !v)}
-      />
+      <div className="shrink-0 bg-white border-b border-gray-200">
+        <SearchFiltersBar
+          filters={filters}
+          onChange={setFilters}
+          onSearch={handleSearch}
+          loading={loading}
+          filtersExpanded={filtersExpanded}
+          onToggleFilters={() => setFiltersExpanded((v) => !v)}
+        />
 
-      <div className="shrink-0 bg-white border-b border-gray-200 px-4 sm:px-5 py-2 flex flex-wrap items-center gap-2">
+        <div className="px-3 sm:px-5 pb-2 flex flex-wrap items-center gap-1.5 border-t border-gray-100">
         {[
           { id: 'total', label: 'Total', value: results?.total },
           { id: 'netNew', label: 'Net new', value: results?.netNew },
@@ -305,65 +376,72 @@ export default function PeopleSearch({ onNavigate }) {
           </button>
         ))}
         {hasSearched && results && countTab !== 'saved' && resultBadge && (
-          <span className={`ml-auto text-xs font-medium ${resultBadge.className}`}>
+          <span className={`ml-auto text-[10px] sm:text-xs font-medium ${resultBadge.className}`}>
             <strong>{displayLeads.length}</strong> shown
             {results.total > displayLeads.length ? (
               <>
                 {' '}
                 · <strong>{results.total}+</strong> matched
               </>
-            ) : null}{' '}
-            · {resultBadge.text}
+            ) : null}
           </span>
+        )}
+        </div>
+
+        {showMetaBlock && metaCollapsedOnMobile && (
+          <button
+            type="button"
+            onClick={() => setSearchMetaOpen((v) => !v)}
+            className="w-full text-left text-[10px] font-semibold text-gray-600 px-3 py-1.5 border-t border-gray-100 hover:bg-gray-50"
+          >
+            {searchMetaOpen ? 'Hide' : 'Show'} search notes &amp; tips
+          </button>
+        )}
+
+        {showMetaBlock && (!metaCollapsedOnMobile || searchMetaOpen) && (
+          <div className="panel-chrome-scroll px-3 sm:px-5 py-2 space-y-1.5 bg-white border-t border-gray-100">
+            {hasSearched && results?.leads?.length > 0 && countTab !== 'saved' && (
+              <div className="flex flex-wrap items-center gap-1.5 text-[10px] sm:text-xs bg-[#fffbeb] border border-[#fde68a] rounded-lg px-2.5 py-1.5 sm:px-3 sm:py-2">
+                <span className="font-semibold text-[#5b4a00]">
+                  {results.usedLiveAi ? PRODUCT.liveAiResults : `${displayLeads.length} prospects`}
+                  {results.total >= 50 ? ' · 50+ matched' : ''}
+                </span>
+                <span className="text-gray-600 hidden sm:inline">
+                  · Top <strong>{fullPreviewCount}</strong> full contact · 1 credit each after
+                </span>
+                {walletPaise < CREDIT_COST_PAISE && (
+                  <span className="text-red-800 font-medium"> · Recharge to reveal</span>
+                )}
+              </div>
+            )}
+            {results?.parsedSearch?.summary && hasSearched && countTab !== 'saved' && (
+              <p className="text-[10px] sm:text-xs text-emerald-900 bg-emerald-50 border border-emerald-100 rounded-lg px-2.5 py-1.5">
+                Understood as: <span className="font-medium">{results.parsedSearch.summary}</span>
+              </p>
+            )}
+            {filterSummary && hasSearched && countTab !== 'saved' && (
+              <p className="text-[10px] sm:text-xs text-gray-600">
+                Active filters: <span className="font-medium">{filterSummary}</span>
+              </p>
+            )}
+            {friendlyNotice && countTab !== 'saved' && (
+              <p className="text-[10px] sm:text-xs text-gray-600">{friendlyNotice}</p>
+            )}
+            {friendlyDiscoveryError && countTab !== 'saved' && (
+              <p className="text-[10px] sm:text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1.5">
+                {friendlyDiscoveryError}
+              </p>
+            )}
+            {searchError && (
+              <p className="text-[10px] sm:text-xs text-red-700 bg-red-50 border border-red-100 rounded px-2 py-1.5">
+                {searchError}
+              </p>
+            )}
+          </div>
         )}
       </div>
 
-      {(hasSearched && results?.leads?.length > 0 && countTab !== 'saved') ||
-      friendlyNotice ||
-      filterSummary ||
-      searchError ||
-      results?.discoveryError ||
-      results?.parsedSearch?.summary ? (
-        <div className="shrink-0 px-4 sm:px-5 py-2 space-y-1.5 bg-white border-b border-gray-100 max-h-[28vh] overflow-y-auto">
-          {hasSearched && results?.leads?.length > 0 && countTab !== 'saved' && (
-            <div className="flex flex-wrap items-center gap-2 text-xs bg-[#fffbeb] border border-[#fde68a] rounded-lg px-3 py-2">
-              <span className="font-semibold text-[#5b4a00]">
-                {results.usedLiveAi ? 'Live Perplexity AI results' : `${displayLeads.length} prospects`}
-                {results.total >= 50 ? ' · 50+ matched' : ''}
-              </span>
-              <span className="text-gray-600">
-                · Reveal email or phone with <strong>1 credit</strong> each (₹1 from your wallet)
-              </span>
-              {walletPaise < CREDIT_COST_PAISE && (
-                <span className="text-red-800 font-medium"> · Wallet empty — recharge first to reveal contacts</span>
-              )}
-            </div>
-          )}
-          {results?.parsedSearch?.summary && hasSearched && countTab !== 'saved' && (
-            <p className="text-xs text-emerald-900 bg-emerald-50 border border-emerald-100 rounded-lg px-3 py-2">
-              Understood as: <span className="font-medium">{results.parsedSearch.summary}</span>
-            </p>
-          )}
-          {filterSummary && hasSearched && countTab !== 'saved' && (
-            <p className="text-xs text-gray-600">
-              Active filters: <span className="font-medium">{filterSummary}</span>
-            </p>
-          )}
-          {friendlyNotice && countTab !== 'saved' && (
-            <p className="text-xs text-gray-600">{friendlyNotice}</p>
-          )}
-          {results?.discoveryError && countTab !== 'saved' && (
-            <p className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-              AI: {results.discoveryError}
-            </p>
-          )}
-          {searchError && (
-            <p className="text-xs text-red-700 bg-red-50 border border-red-100 rounded px-2 py-1.5">{searchError}</p>
-          )}
-        </div>
-      ) : null}
-
-      <div className="flex-1 flex flex-col min-h-0 min-w-0 overflow-hidden">
+      <div className="panel-body-scroll pipeline-scroll-area bg-white">
         {countTab === 'saved' ? (
           displayLeads.length ? (
             <ResultsTable {...resultsHandlers} leads={displayLeads} allSelected={allLeadsSelected} />
@@ -386,8 +464,8 @@ export default function PeopleSearch({ onNavigate }) {
           <EmptyState
             title="No matches for these filters"
             sub={
-              results?.discoveryError
-                ? `Database had no matches. AI: ${results.discoveryError}. Try a clearer sentence with product + location.`
+              friendlyDiscoveryError
+                ? `Database had no matches. ${friendlyDiscoveryError} Try a clearer sentence with product and location.`
                 : 'Try a specific product or company type with a state or city, or import more companies in Admin / Team.'
             }
             action={handleSearch}
@@ -402,7 +480,7 @@ export default function PeopleSearch({ onNavigate }) {
 
 function EmptyState({ title, sub, action, actionLabel = 'Search again' }) {
   return (
-    <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-white">
+    <div className="min-h-[min(70vh,520px)] flex flex-col items-center justify-center p-6 sm:p-8 text-center">
       <p className="font-medium text-gray-900">{title}</p>
       <p className="text-sm text-gray-500 mt-1 max-w-md leading-relaxed">{sub}</p>
       {action && (
@@ -420,10 +498,11 @@ function EmptyState({ title, sub, action, actionLabel = 'Search again' }) {
 
 function LoadingState() {
   return (
-    <div className="flex-1 flex flex-col items-center justify-center px-6 bg-white">
-      <div className="w-10 h-10 border-2 border-[#ffcb2b]/30 border-t-[#ffcb2b] rounded-full animate-spin mb-3" />
-      <p className="text-sm font-medium text-gray-800">Searching our B2B database…</p>
-      <p className="text-xs text-gray-500 mt-1">Up to 50 matches · full details on the top 10</p>
-    </div>
+    <LoadingExperience
+      message={LOADING_MESSAGES.search}
+      subtitle="Up to 50 matches · full details on the top 10"
+      showQuote={false}
+      className="bg-white min-h-[min(70vh,520px)]"
+    />
   )
 }

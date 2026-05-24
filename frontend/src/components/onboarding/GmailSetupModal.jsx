@@ -91,7 +91,7 @@ export default function GmailSetupModal({ onDone }) {
       await api.touchSession()
       const data = await api.startCrmGmailOAuth()
       if (data.url) window.location.href = data.url
-      else setError('Could not start Google authorization')
+      else setError('Could not start email authorization')
     } catch (e) {
       setError(e.message)
     } finally {
@@ -112,7 +112,7 @@ export default function GmailSetupModal({ onDone }) {
       <div className="w-full max-w-md bg-white rounded-xl shadow-xl border border-gray-200 p-6 space-y-4">
         <div>
           <h2 className="text-lg font-semibold text-gray-900">
-            {needsUpgrade ? 'Allow reply import from Gmail' : 'Connect your work Gmail'}
+            {needsUpgrade ? 'Allow reply import' : 'Connect your work email'}
           </h2>
           <p className="text-sm text-gray-600 mt-1 leading-relaxed">
             {needsUpgrade
@@ -125,18 +125,17 @@ export default function GmailSetupModal({ onDone }) {
           <div className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-950 leading-relaxed">
             <p className="font-semibold">Before you connect</p>
             <p className="mt-1">
-              Ask your company admin to add <strong>{user?.email}</strong> as a Google OAuth test user in Google
-              Cloud (Audience → Test users). Until then, Google may block the permission screen.
+              Use your company email address (<strong>{user?.email}</strong>). If sign-in is blocked, ask your
+              administrator or Connect Intel support for help.
             </p>
           </div>
         )}
 
         {isAdmin && (
           <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-950 leading-relaxed">
-            <p className="font-semibold">For your team (company admin)</p>
+            <p className="font-semibold">For your team</p>
             <p className="mt-1">
-              Add each teammate&apos;s <strong>work email</strong> under Google Cloud → OAuth consent → Test users
-              before they connect. You can connect your own Gmail now.
+              Each teammate should connect their own <strong>work email</strong> from Team or Pipeline → Email.
             </p>
           </div>
         )}
@@ -151,7 +150,7 @@ export default function GmailSetupModal({ onDone }) {
           disabled={connecting}
           className="w-full py-2.5 text-sm font-semibold bg-[#ffcb2b] text-[#242424] rounded-lg disabled:opacity-50"
         >
-          {connecting ? 'Opening Google…' : needsUpgrade ? 'Allow reply import' : 'Connect work Gmail'}
+          {connecting ? 'Connecting…' : needsUpgrade ? 'Allow reply import' : 'Connect work email'}
         </button>
 
         <button type="button" onClick={skip} className="w-full text-xs text-gray-500 underline">

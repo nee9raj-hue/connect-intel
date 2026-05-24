@@ -39,8 +39,9 @@ export default function SavedLeadsPanel({ onNavigate }) {
   }
 
   return (
-    <div className="p-6 h-full overflow-y-auto">
-      <div className="flex items-center justify-between mb-6">
+    <div className="panel-shell bg-[#f6f7f9]">
+      <header className="shrink-0 px-4 sm:px-6 py-4 border-b border-gray-200 bg-white">
+      <div className="flex items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold text-gray-900">
             {savedLeads.length} saved lead{savedLeads.length !== 1 ? 's' : ''}
@@ -68,7 +69,9 @@ export default function SavedLeadsPanel({ onNavigate }) {
           )}
         </div>
       </div>
+      </header>
 
+      <div className="panel-body-scroll p-4 sm:p-6">
       {savedLeads.length === 0 ? (
         <div className="text-center py-20 bg-white rounded-xl border border-gray-200">
           <div className="text-4xl mb-3">★</div>
@@ -135,6 +138,7 @@ export default function SavedLeadsPanel({ onNavigate }) {
           </table>
         </div>
       )}
+      </div>
     </div>
   )
 }

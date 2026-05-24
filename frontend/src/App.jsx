@@ -4,6 +4,9 @@ import GoogleAuthRoot from './components/auth/GoogleAuthRoot'
 import LandingPage from './pages/LandingPage'
 import AuthPage from './pages/AuthPage'
 import AppShell from './components/layout/AppShell'
+import GlobalLoadingBar from './components/ui/GlobalLoadingBar'
+import LoadingExperience from './components/ui/LoadingExperience'
+import { LOADING_MESSAGES } from './lib/loadingQuotes'
 
 function useInviteToken() {
   const [token, setToken] = useState(null)
@@ -35,11 +38,8 @@ function Router() {
 
   if (!ready) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#f6f7f9]">
-        <div className="text-center">
-          <div className="w-10 h-10 mx-auto border-2 border-[#ffcb2b]/30 border-t-[#ffcb2b] rounded-full animate-spin mb-3" />
-          <p className="text-sm font-medium text-gray-700">Loading workspace…</p>
-        </div>
+      <div className="min-h-screen flex flex-col bg-[#f6f7f9]">
+        <LoadingExperience message={LOADING_MESSAGES.workspace} fill className="min-h-screen" />
       </div>
     )
   }
@@ -53,6 +53,7 @@ export default function App() {
   return (
     <GoogleAuthRoot>
       <AppProvider>
+        <GlobalLoadingBar />
         <Router />
       </AppProvider>
     </GoogleAuthRoot>

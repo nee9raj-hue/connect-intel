@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { ACTIVITY_LABELS, formatDateTime } from '../../lib/crmUiConstants'
+import LoadingExperience from '../ui/LoadingExperience'
+import { LOADING_MESSAGES } from '../../lib/loadingQuotes'
 
 export default function CrmActivityLogPanel({ onNavigate }) {
   const { openPipelineLead } = useApp()
@@ -29,14 +31,16 @@ export default function CrmActivityLogPanel({ onNavigate }) {
   }, [])
 
   return (
-    <div className="flex flex-col h-full min-h-0 bg-[#f6f7f9]">
+    <div className="panel-shell bg-[#f6f7f9]">
       <header className="shrink-0 bg-white border-b border-gray-200 px-4 md:px-5 py-4">
         <h1 className="text-lg font-semibold text-gray-900">Activity log</h1>
         <p className="text-xs text-gray-500 mt-0.5">Notes, emails, calls, visits, and assignments across your pipeline</p>
       </header>
 
-      <div className="flex-1 overflow-auto p-4 md:p-5 max-w-3xl">
-        {loading && <p className="text-sm text-gray-500">Loading…</p>}
+      <div className="panel-body-scroll p-4 md:p-5 max-w-3xl">
+        {loading ? (
+          <LoadingExperience message={LOADING_MESSAGES.activity} fill={false} className="rounded-xl border border-gray-200 min-h-[200px]" />
+        ) : null}
         {error && <p className="text-sm text-red-700">{error}</p>}
         {!loading && activities.length === 0 && (
           <p className="text-sm text-gray-500">No activity yet. Open a lead in Pipeline to add notes or schedule meetings.</p>

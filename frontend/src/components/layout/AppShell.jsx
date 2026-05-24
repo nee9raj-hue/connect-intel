@@ -3,51 +3,37 @@ import { useApp } from '../../context/AppContext'
 import OnboardingModal from '../onboarding/OnboardingModal'
 import Sidebar from './Sidebar'
 import AppHeader from './AppHeader'
-import TeamDashboardPanel from '../crm/TeamDashboardPanel'
-import PeopleSearch from '../search/PeopleSearch'
-import SavedLeadsPanel from '../saved/SavedLeadsPanel'
-import PipelinePanel from '../crm/PipelinePanel'
-import TeamPanel from '../team/TeamPanel'
-import IntegrationsPanel from '../integrations/IntegrationsPanel'
-import OverviewPanel from '../overview/OverviewPanel'
-import AdminPanel from '../admin/AdminPanel'
 import EmailOAuthNotice from './EmailOAuthNotice'
+import CrmGmailOAuthNotice from './CrmGmailOAuthNotice'
 import MobileRequiredModal from '../profile/MobileRequiredModal'
-import CrmActivityLogPanel from '../crm/CrmActivityLogPanel'
-import CrmCalendarPanel from '../crm/CrmCalendarPanel'
-import BulkEmailPanel from '../crm/BulkEmailPanel'
+import PanelViewport from './PanelViewport'
 import { useWorkspaceSync } from '../../hooks/useWorkspaceSync'
 import SessionReconnectBanner from './SessionReconnectBanner'
 import { markGmailSetupDone } from '../onboarding/GmailSetupModal'
-
-const PANELS = {
-  overview: OverviewPanel,
-  search: PeopleSearch,
-  saved: SavedLeadsPanel,
-  pipeline: PipelinePanel,
-  'crm-dashboard': TeamDashboardPanel,
-  'crm-log': CrmActivityLogPanel,
-  'crm-calendar': CrmCalendarPanel,
-  'bulk-email': BulkEmailPanel,
-  team: TeamPanel,
-  integrations: IntegrationsPanel,
-  admin: AdminPanel,
-}
+import ConnectAssistant from '../assistant/ConnectAssistant'
+import MobileNavPill from './MobileNavPill'
+import useIsMobile from '../../hooks/useIsMobile'
 
 export default function AppShell() {
-  const { user, syncWorkspace, setPanelNavigate } = useApp()
-  const [activePanel, setActivePanel] = useState('pipeline')
+  const { user, syncWorkspace, setPanelNavigate, openPipelineLead, pipelineLeadId } = useApp()
+  const isMobile = useIsMobile()
+  const [activePanel, setActivePanel] = useState('overview')
+  const [panelOptions, setPanelOptions] = useState({})
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [liveToast, setLiveToast] = useState(null)
-  const Panel = PANELS[activePanel] || PeopleSearch
   const needsOnboarding = user && !user.onboardingComplete && !user.isPlatformAdmin
+  const showMobileNavPill =
+    isMobile && user && !user.isPlatformAdmin && !needsOnboarding && !pipelineLeadId
   useWorkspaceSync({
     enabled: Boolean(user?.onboardingComplete || user?.isPlatformAdmin),
     userId: user?.id,
     syncWorkspace,
     onNewNotifications: (items) => {
-      const assign = items.find((i) => i.type === 'assignment')
-      if (assign) setLiveToast(assign.title)
+      const hit =
+        items.find((i) => i.type === 'assignment') ||
+        items.find((i) => i.type === 'team_note') ||
+        items.find((i) => i.type === 'team_task')
+      if (hit) setLiveToast(hit.title)
     },
   })
 
@@ -59,7 +45,7 @@ export default function AppShell() {
 
   useEffect(() => {
     if (user?.isPlatformAdmin) {
-      setActivePanel('admin')
+      setActivePanel('admin-customers')
     }
   }, [user?.isPlatformAdmin, user?.id])
 
@@ -74,13 +60,29 @@ export default function AppShell() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
+    const panel = params.get('panel')
+    const lead = params.get('lead')
+    if (panel) setActivePanel(panel)
+    if (lead && user) openPipelineLead(lead, 'overview')
+    if (panel || lead) {
+      params.delete('panel')
+      params.delete('lead')
+      const qs = params.toString()
+      const next = `${window.location.pathname}${qs ? `?${qs}` : ''}`
+      window.history.replaceState({}, '', next)
+    }
+  }, [user?.id, openPipelineLead])
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
     if (params.get('crm_gmail') === 'connected') {
       markGmailSetupDone()
     }
   }, [])
 
-  const navigate = useCallback((id) => {
+  const navigate = useCallback((id, options = {}) => {
     setActivePanel(id)
+    setPanelOptions(options || {})
     setMobileNavOpen(false)
   }, [])
 
@@ -93,6 +95,7 @@ export default function AppShell() {
     <div className="flex h-[100dvh] w-full overflow-hidden bg-[#f6f7f9]">
       <Sidebar
         active={activePanel}
+        panelOptions={panelOptions}
         onNavigate={navigate}
         mobileOpen={mobileNavOpen}
         onMobileClose={() => setMobileNavOpen(false)}
@@ -114,6 +117,7 @@ export default function AppShell() {
         )}
         <MobileRequiredModal />
         {!user?.isPlatformAdmin && <AppHeader onNavigate={navigate} />}
+        <CrmGmailOAuthNotice onOpenTeam={() => navigate('team')} />
         <SessionReconnectBanner />
         {liveToast && (
           <div
@@ -123,11 +127,24 @@ export default function AppShell() {
             {liveToast} — pipeline updated automatically
           </div>
         )}
-        <div className="flex-1 flex flex-col min-h-0 min-w-0 overflow-hidden">
-          <Panel onNavigate={navigate} activePanel={activePanel} />
+        <div
+          className={`flex-1 flex flex-col min-h-0 min-w-0 overflow-hidden max-md:h-0 ${showMobileNavPill ? 'mobile-main-pad md:pb-0' : ''}`}
+        >
+          <PanelViewport onNavigate={navigate} activePanel={activePanel} panelOptions={panelOptions} />
         </div>
       </main>
+      {showMobileNavPill && (
+        <MobileNavPill
+          activePanel={activePanel}
+          panelOptions={panelOptions}
+          onNavigate={navigate}
+          onOpenMenu={() => setMobileNavOpen(true)}
+        />
+      )}
       {needsOnboarding && <OnboardingModal />}
+      {user && !needsOnboarding && (
+        <ConnectAssistant onNavigate={navigate} fabAboveMobilePill={showMobileNavPill} />
+      )}
     </div>
   )
 }

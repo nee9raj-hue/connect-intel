@@ -4,7 +4,6 @@ import { api } from '../../lib/api'
 import { TEAM_PIPELINE_ROLES } from '../../lib/crmConstants'
 import OrgPipelineImport from './OrgPipelineImport'
 import InviteEmailSetup from './InviteEmailSetup'
-import OrgCrmEmailSetup from './OrgCrmEmailSetup'
 import CrmGmailConnectCard from './CrmGmailConnectCard'
 
 export default function TeamPanel({ onNavigate }) {
@@ -75,7 +74,7 @@ export default function TeamPanel({ onNavigate }) {
 
     if (emailReady === false) {
       setError(
-        'Invite email is not connected yet. Click “Connect invite@connectintel.net” below and sign in with that Google account (one time).'
+        'Invite email is not connected yet. Click “Connect invite@connectintel.net” below and sign in with that account (one time).'
       )
       return
     }
@@ -154,7 +153,7 @@ export default function TeamPanel({ onNavigate }) {
       if (data.emailSent) {
         setNotice(
           data.message ||
-            `Test queued to ${user?.email}${data.resendId ? ` (Resend: ${data.resendId})` : ''}. Check inbox and spam in 1–2 min.`
+            `Test queued to ${user?.email}${data.resendId ? ` (ref: ${data.resendId})` : ''}. Check inbox and spam in 1–2 min.`
         )
       } else {
         setError([data.emailError, data.emailHint, data.message].filter(Boolean).join(' ') || 'Test email failed.')
@@ -176,7 +175,7 @@ export default function TeamPanel({ onNavigate }) {
   }
 
   return (
-    <div className="flex flex-col h-full min-h-0 bg-[#f6f7f9]">
+    <div className="panel-shell bg-[#f6f7f9]">
       <header className="shrink-0 bg-white border-b border-gray-200 px-5 py-4">
         <h1 className="text-lg font-semibold text-gray-900">Team</h1>
         <p className="text-xs text-gray-500 mt-0.5">
@@ -185,7 +184,22 @@ export default function TeamPanel({ onNavigate }) {
         </p>
       </header>
 
-      <div className="flex-1 overflow-auto p-5 space-y-6 max-w-3xl">
+      <div className="panel-body-scroll p-5 space-y-6 max-w-3xl">
+        <section className="rounded-xl border-2 border-[#25D366]/40 bg-gradient-to-br from-emerald-50/90 to-white p-4 space-y-2">
+          <h2 className="text-sm font-semibold text-gray-900">WhatsApp automatic send</h2>
+          <p className="text-xs text-gray-600 leading-relaxed">
+            Add your Meta WhatsApp Business API credentials on the dedicated settings page (sidebar:{' '}
+            <strong>Workspace → WhatsApp API</strong>).
+          </p>
+          <button
+            type="button"
+            onClick={() => onNavigate?.('whatsapp-settings')}
+            className="text-xs font-semibold px-3 py-2 bg-[#25D366] text-white rounded-lg"
+          >
+            Open WhatsApp API settings
+          </button>
+        </section>
+
         <section className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
           <h2 className="text-sm font-semibold text-gray-900">Company branding</h2>
           <form onSubmit={handleBranding} className="space-y-2">
@@ -212,13 +226,10 @@ export default function TeamPanel({ onNavigate }) {
         </section>
 
         <section className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
-          <h2 className="text-sm font-semibold text-gray-900">Outbound CRM email</h2>
+          <h2 className="text-sm font-semibold text-gray-900">CRM email</h2>
           <p className="text-xs text-gray-500 leading-relaxed">
-            <strong>Recommended for your team:</strong> verify your company domain once below. Every rep with @
-            {user?.email?.split('@')[1] || 'yourcompany.com'} can send from CRM with no Google &quot;unverified
-            app&quot; screen.
+            Connect each rep&apos;s work email once — send from Pipeline and sync replies. No DNS setup required.
           </p>
-          <OrgCrmEmailSetup />
           <CrmGmailConnectCard />
         </section>
 

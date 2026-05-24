@@ -63,10 +63,7 @@ export default function OrgPipelineImport({ onImported }) {
       setOverview(data)
       setRows([])
       setFileName('')
-      setMessage(
-        data.message ||
-          `Imported ${data.stats?.contactsCreated || 0} contacts · ${data.stats?.pipelineAdded || 0} in pipeline`
-      )
+      setMessage(data.message || 'Import complete.')
       onImported?.(data)
     } catch (err) {
       setError(err.message)
@@ -80,9 +77,8 @@ export default function OrgPipelineImport({ onImported }) {
       <div className="px-5 py-4 border-b border-gray-100">
         <h2 className="text-sm font-semibold text-gray-900">Import your pipeline</h2>
         <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-          Upload your existing leads (CSV or Excel). Contacts are saved to Connect Intel master data and
-          added to your team Pipeline for follow-up and closures. Rows with email or phone appear in
-          People search for your org.
+          Upload your existing leads (CSV or Excel). They are added to your team pipeline for follow-up,
+          email, and closures. Use our template columns for best results.
         </p>
       </div>
 
@@ -106,8 +102,7 @@ export default function OrgPipelineImport({ onImported }) {
 
         {overview && (
           <p className="text-xs text-gray-600">
-            Master DB: {overview.counts?.contacts?.toLocaleString() || 0} contacts · Pipeline:{' '}
-            <strong>{overview.pipelineCount || 0}</strong> leads
+            <strong>{overview.pipelineCount?.toLocaleString() || 0}</strong> leads in your pipeline
           </p>
         )}
 
