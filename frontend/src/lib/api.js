@@ -190,6 +190,8 @@ export const api = {
     request('/api/marketing/campaigns', { method: 'POST', body: { action: 'duplicate', id } }),
   listMarketingLists: () => request('/api/marketing/lists'),
   createMarketingList: (payload) => request('/api/marketing/lists', { method: 'POST', body: payload }),
+  createMarketingListBatches: (payload) =>
+    request('/api/marketing/lists', { method: 'POST', body: { action: 'create_batches', ...payload } }),
   updateMarketingList: (payload) => request('/api/marketing/lists', { method: 'PATCH', body: payload }),
   deleteMarketingList: (id) => request('/api/marketing/lists', { method: 'DELETE', body: { id } }),
   listMarketingTemplates: () => request('/api/marketing/templates'),

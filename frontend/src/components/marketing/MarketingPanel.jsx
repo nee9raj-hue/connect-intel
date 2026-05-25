@@ -7,6 +7,7 @@ import MarketingFormBuilder from './MarketingFormBuilder'
 import { DEFAULT_FORM_FIELDS, DEFAULT_FORM_THEME } from '../../../../lib/marketingFormSchema.js'
 import LoadingExperience from '../ui/LoadingExperience'
 import CampaignReportsView, { campaignToForm } from './CampaignReportsView'
+import MarketingListBuilder from './MarketingListBuilder'
 import { LOADING_MESSAGES } from '../../lib/loadingQuotes'
 import { leadHasCallablePhone } from '../../lib/phoneUtils'
 
@@ -26,7 +27,6 @@ const EMPTY_TEMPLATE = {
   design: { ...DEFAULT_THEME },
   previewText: '',
 }
-const EMPTY_LIST = { name: '', description: '', leadIds: [] }
 const EMPTY_FORM = {
   name: '',
   title: '',
@@ -37,7 +37,7 @@ const EMPTY_FORM = {
 }
 
 export default function MarketingPanel({ onNavigate, panelOptions }) {
-  const { savedLeads, refreshSavedLeads, user } = useApp()
+  const { savedLeads, refreshSavedLeads, user, teamMembers, refreshTeam } = useApp()
   const [tab, setTab] = useState(panelOptions?.tab || 'campaigns')
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState(false)
@@ -50,7 +50,6 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
   const [forms, setForms] = useState([])
   const [summary, setSummary] = useState(null)
 
-  const [listForm, setListForm] = useState({ ...EMPTY_LIST })
   const [templateForm, setTemplateForm] = useState({ ...EMPTY_TEMPLATE })
   const [formForm, setFormForm] = useState({ ...EMPTY_FORM })
   const [campaignForm, setCampaignForm] = useState({
@@ -72,11 +71,6 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
     useSequence: false,
   })
   const [campaignEmailStep, setCampaignEmailStep] = useState(1)
-  const pipelineLeads = useMemo(
-    () =>
-      (savedLeads || []).filter((l) => String(l.email || l.lead?.email || '').includes('@')),
-    [savedLeads]
-  )
   const pipelineLeadsWithPhone = useMemo(
     () => (savedLeads || []).filter(leadHasCallablePhone),
     [savedLeads]
@@ -112,36 +106,6 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
     const t = setTimeout(() => setNotice(null), 5000)
     return () => clearTimeout(t)
   }, [notice])
-
-  const toggleLeadInList = (leadId) => {
-    setListForm((prev) => {
-      const set = new Set(prev.leadIds)
-      if (set.has(leadId)) set.delete(leadId)
-      else set.add(leadId)
-      return { ...prev, leadIds: [...set] }
-    })
-  }
-
-  const saveList = async () => {
-    if (!listForm.name.trim()) return setError('List name is required')
-    setBusy(true)
-    setError(null)
-    try {
-      await api.createMarketingList({
-        name: listForm.name.trim(),
-        description: listForm.description.trim(),
-        leadIds: listForm.leadIds,
-      })
-      setListForm({ ...EMPTY_LIST })
-      setNotice('List saved')
-      await load()
-      setTab('lists')
-    } catch (e) {
-      setError(e.message)
-    } finally {
-      setBusy(false)
-    }
-  }
 
   const saveTemplate = async () => {
     if (!templateForm.name.trim() || !templateForm.subject.trim()) {
@@ -724,55 +688,27 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
           <div className="grid lg:grid-cols-2 gap-6 max-w-6xl">
             <section className="bg-white border border-gray-200 rounded-xl p-4 space-y-3">
               <h2 className="text-sm font-semibold text-gray-900">New list</h2>
-              <input
-                value={listForm.name}
-                onChange={(e) => setListForm((p) => ({ ...p, name: e.target.value }))}
-                placeholder="List name"
-                className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
+              <MarketingListBuilder
+                user={user}
+                teamMembers={teamMembers}
+                refreshTeam={refreshTeam}
+                savedLeads={savedLeads}
+                busy={busy}
+                setBusy={setBusy}
+                setError={setError}
+                setNotice={setNotice}
+                onListsCreated={load}
               />
-              <p className="text-xs text-gray-500">
-                Select pipeline leads with email ({listForm.leadIds.length} selected)
-              </p>
-              <div className="max-h-48 overflow-y-auto border border-gray-100 rounded-lg divide-y divide-gray-50">
-                {pipelineLeads.map((l) => (
-                  <label
-                    key={l.id}
-                    className="flex items-center gap-2 px-3 py-2 text-xs cursor-pointer hover:bg-gray-50"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={listForm.leadIds.includes(l.id)}
-                      onChange={() => toggleLeadInList(l.id)}
-                    />
-                    <span className="truncate">
-                      {l.name || l.lead?.name || 'Lead'} · {l.email || l.lead?.email}
-                    </span>
-                  </label>
-                ))}
-                {!pipelineLeads.length && (
-                  <p className="text-xs text-gray-400 px-3 py-4">
-                    No leads with email — add leads in{' '}
-                    <button type="button" className="underline" onClick={() => onNavigate?.('pipeline')}>
-                      Pipeline
-                    </button>
-                  </p>
-                )}
-              </div>
-              <button
-                type="button"
-                disabled={busy}
-                onClick={saveList}
-                className="text-xs font-semibold px-3 py-2 bg-gray-900 text-white rounded-lg disabled:opacity-50"
-              >
-                Save list
-              </button>
             </section>
             <section className="space-y-2">
               <h2 className="text-sm font-semibold text-gray-900">Saved lists</h2>
               {lists.map((l) => (
                 <div key={l.id} className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm">
                   <p className="font-medium text-gray-900">{l.name}</p>
-                  <p className="text-xs text-gray-500">{l.leadIds?.length || 0} leads</p>
+                  <p className="text-xs text-gray-500">
+                    {l.leadIds?.length || 0} leads
+                    {l.description ? ` · ${l.description}` : ''}
+                  </p>
                 </div>
               ))}
             </section>
