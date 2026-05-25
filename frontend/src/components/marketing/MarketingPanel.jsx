@@ -336,16 +336,17 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
     }
   }
 
-  const drainCampaignSends = async (campaignId, initialPending = 0) => {
-    let pending = initialPending
+  const drainCampaignSends = async (campaignId, totalEnrolled = 0, onProgress) => {
+    let pending = totalEnrolled
     let totalSent = 0
     let rounds = 0
-    const maxRounds = Math.ceil(Math.max(pending, 50) / 8) + 2
+    const maxRounds = Math.ceil(Math.max(totalEnrolled, 50) / 2) + 5
     while (pending > 0 && rounds < maxRounds) {
       rounds += 1
-      const chunk = await api.processMarketingCampaignSends(campaignId, { limit: 8, silent: true })
+      const chunk = await api.processMarketingCampaignSends(campaignId, { limit: 2, silent: true })
       totalSent += chunk.sendResult?.sent || 0
       pending = chunk.pendingSends ?? 0
+      onProgress?.({ sent: totalSent, pending, enrolled: totalEnrolled })
       if (!(chunk.sendResult?.sent || chunk.sendResult?.failed)) break
     }
     return { totalSent, pending }
@@ -355,25 +356,26 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
     setBusy(true)
     setError(null)
     try {
-      const data = await api.startMarketingCampaign(id)
+      const data = await api.startMarketingCampaign(id, { timeoutMs: 45_000 })
       const isWa = data.campaign?.channel === 'whatsapp'
-      let sent = data.sendResult?.sent || 0
-      if (!isWa && (data.pendingSends || 0) > 0) {
-        setNotice(`Sending… ${sent} of ${data.enrolled || 0} so far`)
-        const drained = await drainCampaignSends(id, data.pendingSends)
-        sent += drained.totalSent
+      const enrolled = data.enrolled || 0
+      if (!isWa && enrolled > 0) {
+        setNotice(`Queued ${enrolled} recipients — sending now…`)
+        const drained = await drainCampaignSends(id, enrolled, ({ sent, pending }) => {
+          setNotice(`Sending… ${sent} sent · ${pending} remaining`)
+        })
         if (drained.pending > 0) {
           setNotice(
-            `Campaign started — ${data.enrolled || 0} enrolled, ${sent} sent. ${drained.pending} still queued; they will send in the background.`
+            `Campaign started — ${enrolled} enrolled, ${drained.totalSent} sent. ${drained.pending} still queued (retry from Reports or wait for daily cron).`
           )
         } else {
-          setNotice(`Campaign started — ${data.enrolled || 0} enrolled, ${sent} sent`)
+          setNotice(`Campaign started — ${enrolled} enrolled, ${drained.totalSent} sent`)
         }
       } else {
         setNotice(
           isWa
-            ? `WhatsApp campaign ready — ${data.enrolled || 0} contacts. Open Reports to send from your phone.`
-            : `Campaign started — ${data.enrolled || 0} enrolled, ${sent} sent`
+            ? `WhatsApp campaign ready — ${enrolled} contacts. Open Reports to send from your phone.`
+            : `Campaign started — ${enrolled} enrolled`
         )
       }
       if (isWa) setTab('reports')
