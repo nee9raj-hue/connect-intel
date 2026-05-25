@@ -44,6 +44,7 @@ export function AppProvider({ children }) {
   const [searchHistory, setSearchHistory] = useState([])
   const [teamMembers, setTeamMembers] = useState([])
   const [ready, setReady] = useState(false)
+  const [authBusy, setAuthBusy] = useState(false)
   const [pipelineLeadId, setPipelineLeadId] = useState(null)
   const [pipelineAssigneeFilter, setPipelineAssigneeFilter] = useState(null)
   const [notifications, setNotifications] = useState([])
@@ -309,14 +310,24 @@ export function AppProvider({ children }) {
   }, [])
 
   const login = useCallback(async (payload) => {
-    const session = await api.createSession(payload)
-    if (session.token) storeSessionToken(session.token)
+    setAuthBusy(true)
     setSessionError(null)
-    setUser(session.user)
-    setScreen('app')
-    await acceptPendingInvite()
-    return session.user
-  }, [acceptPendingInvite])
+    try {
+      const session = await withTimeout(
+        api.createSession(payload),
+        20_000,
+        'Sign-in is taking too long. Please try again.'
+      )
+      if (session.token) storeSessionToken(session.token)
+      setUser(session.user)
+      setScreen('app')
+      void acceptPendingInvite()
+      void refreshSavedLeads()
+      return session.user
+    } finally {
+      setAuthBusy(false)
+    }
+  }, [acceptPendingInvite, refreshSavedLeads])
 
   const logout = useCallback(async () => {
     try {
@@ -601,6 +612,7 @@ export function AppProvider({ children }) {
       value={{
         user,
         ready,
+        authBusy,
         screen,
         setScreen,
         login,

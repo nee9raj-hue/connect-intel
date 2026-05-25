@@ -27,7 +27,7 @@ function useInviteToken() {
 }
 
 function Router() {
-  const { ready, screen, setScreen } = useApp()
+  const { ready, screen, setScreen, authBusy } = useApp()
   const inviteToken = useInviteToken()
 
   useEffect(() => {
@@ -36,10 +36,16 @@ function Router() {
     }
   }, [inviteToken, screen, setScreen])
 
-  if (!ready) {
+  if (!ready || authBusy) {
     return (
       <div className="min-h-screen flex flex-col bg-[#f6f7f9]">
-        <LoadingExperience message={LOADING_MESSAGES.workspace} fill className="min-h-screen" />
+        <LoadingExperience
+          message={authBusy ? 'Signing you in…' : LOADING_MESSAGES.workspace}
+          subtitle={authBusy ? 'Opening your workspace — one moment' : undefined}
+          showQuote={!authBusy}
+          fill
+          className="min-h-screen"
+        />
       </div>
     )
   }

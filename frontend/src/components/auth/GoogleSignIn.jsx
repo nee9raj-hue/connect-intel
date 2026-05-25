@@ -76,11 +76,12 @@ export default function GoogleSignIn({
   layout = 'block',
   label,
 }) {
-  const { login } = useApp()
+  const { login, authBusy } = useApp()
   const [containerRef, btnWidth] = useButtonWidth()
   const { clientId, ready, configured } = useGoogleClientId()
 
   const handleSuccess = async (credentialResponse) => {
+    if (authBusy) return
     if (!credentialResponse?.credential) {
       alert('Google did not return a sign-in token. Please try again.')
       return
@@ -188,10 +189,11 @@ export default function GoogleSignIn({
 }
 
 export function GoogleSignInCompact({ onBeforeLogin }) {
-  const { login, setScreen } = useApp()
+  const { login, setScreen, authBusy } = useApp()
   const { clientId, ready, configured } = useGoogleClientId()
 
   const handleSuccess = async (credentialResponse) => {
+    if (authBusy) return
     onBeforeLogin?.()
     if (!credentialResponse?.credential) return
     try {
