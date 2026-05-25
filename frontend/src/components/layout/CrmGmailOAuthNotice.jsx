@@ -23,12 +23,16 @@ export default function CrmGmailOAuthNotice({ onOpenTeam }) {
           : 'Your work email is connected. Open Pipeline → Email to send.',
       })
     } else if (oauth === 'error') {
-      const body = message
+      const raw = message
         ? sanitizeCustomerText(decodeURIComponent(message.replace(/\+/g, ' ')))
-        : 'Connection failed. Open Work email in the sidebar to try again.'
+        : ''
+      const blocked = /verification|access blocked|has not completed/i.test(raw)
+      const body = blocked
+        ? `${raw || 'Google blocked access.'}\n\nUse company domain email instead (ask your admin — Team → Outbound email), or ask Connect Intel to add your address as a Google OAuth test user. Open Work email in the sidebar for steps.`
+        : raw || 'Connection failed. Open Work email in the sidebar to try again.'
       setNotice({
         type: 'error',
-        title: 'Could not connect work email',
+        title: blocked ? 'Google has not verified Connect Intel yet' : 'Could not connect work email',
         body,
       })
     }

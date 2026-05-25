@@ -9,7 +9,7 @@ import LoadingExperience from '../ui/LoadingExperience'
 import CampaignReportsView, { campaignToForm } from './CampaignReportsView'
 import MarketingListBuilder from './MarketingListBuilder'
 import MarketingCreatorBadge, { marketingOptionLabel } from './MarketingCreatorBadge'
-import CrmGmailConnectCard from '../team/CrmGmailConnectCard'
+import WorkEmailOptions from '../team/WorkEmailOptions'
 import { LOADING_MESSAGES } from '../../lib/loadingQuotes'
 import { withTimeout } from '../../lib/fetchWithTimeout'
 import { leadHasCallablePhone } from '../../lib/phoneUtils'
@@ -53,9 +53,14 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
   const [forms, setForms] = useState([])
   const [summary, setSummary] = useState(null)
   const [gmailStatus, setGmailStatus] = useState(null)
+  const [orgCanSend, setOrgCanSend] = useState(false)
 
   const needsWorkEmail =
-    user?.accountType === 'company' && gmailStatus && !gmailStatus.connected && gmailStatus.gmailConnectAvailable
+    user?.accountType === 'company' &&
+    !orgCanSend &&
+    gmailStatus &&
+    !gmailStatus.connected &&
+    gmailStatus.gmailConnectAvailable
 
   const [templateForm, setTemplateForm] = useState({ ...EMPTY_TEMPLATE })
   const [formForm, setFormForm] = useState({ ...EMPTY_FORM })
@@ -110,6 +115,10 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
       .getCrmGmailStatus()
       .then(setGmailStatus)
       .catch(() => setGmailStatus(null))
+    api
+      .getOrgEmailDomain()
+      .then((d) => setOrgCanSend(Boolean(d?.userCanSend)))
+      .catch(() => setOrgCanSend(false))
   }, [user?.accountType, user?.id])
 
   useEffect(() => {
@@ -458,11 +467,8 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
           </p>
         ) : null}
         {needsWorkEmail && (
-          <div className="mt-3 max-w-xl space-y-2">
-            <p className="text-[11px] font-medium text-amber-950">
-              Connect work email before starting email campaigns
-            </p>
-            <CrmGmailConnectCard compact />
+          <div className="mt-3 max-w-xl">
+            <WorkEmailOptions onNavigate={onNavigate} compact />
           </div>
         )}
         {user?.isOrgAdmin && user?.accountType === 'company' && !user?.whatsappAutoSendReady && (
