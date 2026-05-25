@@ -369,14 +369,15 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
         <p className="text-sm text-gray-500 mt-0.5">
           Lists, templates, campaigns, and lead capture forms — logged on each lead in Pipeline.
         </p>
-        {user?.isOrgAdmin && user?.accountType === 'company' ? (
+        {(user?.isOrgAdmin || user?.orgRole === 'org_admin') && user?.accountType === 'company' ? (
           <p className="text-[11px] text-gray-600 bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-2 mt-2 max-w-xl">
             You see all team campaigns and templates (labeled by creator). Sales reps only see their own marketing
             assets and send stats for their pipeline leads.
           </p>
         ) : user?.accountType === 'company' ? (
           <p className="text-[11px] text-gray-600 bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-2 mt-2 max-w-xl">
-            Showing only your campaigns, lists, and templates. Send stats include contacts on your pipeline only.
+            Your campaigns and templates are private to you. Under Lists, use stage filters and batch lists (50
+            per send) for your assigned pipeline leads.
           </p>
         ) : null}
         {user?.isOrgAdmin && user?.accountType === 'company' && !user?.whatsappAutoSendReady && (

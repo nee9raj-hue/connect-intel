@@ -45,19 +45,31 @@ export default function MarketingListBuilder({
   const [listForm, setListForm] = useState({ name: '', description: '', leadIds: [] })
   const [search, setSearch] = useState('')
 
-  const isAdmin = Boolean(user?.isOrgAdmin && user?.accountType === 'company')
+  const isCompany = Boolean(user?.accountType === 'company' && user?.organizationId)
+  const isCompanyAdmin = Boolean(
+    isCompany && (user?.isOrgAdmin || user?.orgRole === 'org_admin')
+  )
 
   useEffect(() => {
-    if (isAdmin) refreshTeam?.()
-  }, [isAdmin, refreshTeam])
+    if (isCompany) refreshTeam?.()
+  }, [isCompany, refreshTeam])
 
   const repOptions = useMemo(() => {
+    if (!isCompanyAdmin && user?.id) {
+      return [{ userId: user.id, name: user.name || user.email || 'My leads' }]
+    }
     const active = (teamMembers || []).filter((m) => m.status !== 'inactive')
     return [
       { userId: UNASSIGNED, name: 'Unassigned leads' },
       ...active.map((m) => ({ userId: m.userId, name: m.name || m.email || 'Team member' })),
     ]
-  }, [teamMembers])
+  }, [teamMembers, isCompanyAdmin, user?.id, user?.name, user?.email])
+
+  useEffect(() => {
+    if (!isCompany || isCompanyAdmin || !user?.id) return
+    setAssigneeUserId(user.id)
+    setNamePrefix((prev) => prev || user.name || user.email?.split('@')[0] || 'My lists')
+  }, [isCompany, isCompanyAdmin, user?.id, user?.name, user?.email])
 
   const repLeads = useMemo(() => {
     if (!assigneeUserId) return []
@@ -204,7 +216,7 @@ export default function MarketingListBuilder({
     }
   }
 
-  if (!isAdmin) {
+  if (!isCompany) {
     return (
       <SimpleListForm
         pipelineLeads={(savedLeads || []).filter(leadHasSendableEmail)}
@@ -220,18 +232,28 @@ export default function MarketingListBuilder({
   return (
     <div className="space-y-4">
       <div className="rounded-lg border border-amber-100 bg-amber-50/80 px-3 py-2 text-xs text-amber-950 leading-relaxed">
-        <strong>Admin list builder:</strong> pick a sales leader and optional pipeline stage, then save one
-        list or auto-split into lists of {MARKETING_SEND_BATCH_SIZE} (same limit as bulk email).
+        {isCompanyAdmin ? (
+          <>
+            <strong>Team list builder:</strong> pick a sales leader and optional pipeline stage, then save
+            one list or auto-split into batches of {MARKETING_SEND_BATCH_SIZE} (same limit as bulk email).
+          </>
+        ) : (
+          <>
+            <strong>Your list builder:</strong> filter by pipeline stage, select leads manually, or create
+            auto-split batches of {MARKETING_SEND_BATCH_SIZE} from your assigned leads.
+          </>
+        )}
       </div>
 
       <label className="block text-xs font-medium text-gray-600">
-        Sales leader
+        {isCompanyAdmin ? 'Sales leader' : 'Lead owner'}
         <select
           value={assigneeUserId}
           onChange={(e) => onRepChange(e.target.value)}
-          className="mt-1 w-full text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white"
+          disabled={!isCompanyAdmin}
+          className="mt-1 w-full text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white disabled:bg-gray-50 disabled:text-gray-600"
         >
-          <option value="">Select team member…</option>
+          {isCompanyAdmin && <option value="">Select team member…</option>}
           {repOptions.map((r) => (
             <option key={r.userId} value={r.userId}>
               {r.name}
@@ -240,7 +262,7 @@ export default function MarketingListBuilder({
         </select>
       </label>
 
-      {assigneeUserId ? (
+      {(assigneeUserId || (!isCompanyAdmin && user?.id)) ? (
         <>
           <label className="block text-xs font-medium text-gray-600">
             Pipeline stage
