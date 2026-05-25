@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import { resolveGoogleClientId } from '../../lib/googleAuthConfig'
+import { withTimeout } from '../../lib/fetchWithTimeout'
 import LoadingExperience from '../ui/LoadingExperience'
 
 export default function GoogleAuthRoot({ children }) {
@@ -9,11 +10,19 @@ export default function GoogleAuthRoot({ children }) {
 
   useEffect(() => {
     let cancelled = false
-    resolveGoogleClientId().then((id) => {
-      if (cancelled) return
-      setClientId(id || '')
-      setReady(true)
-    })
+    withTimeout(resolveGoogleClientId(), 8_000)
+      .catch(() => '')
+      .then((id) => {
+        if (cancelled) return
+        setClientId(id || '')
+        setReady(true)
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setClientId('')
+          setReady(true)
+        }
+      })
     return () => {
       cancelled = true
     }

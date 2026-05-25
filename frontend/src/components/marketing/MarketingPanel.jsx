@@ -10,6 +10,7 @@ import CampaignReportsView, { campaignToForm } from './CampaignReportsView'
 import MarketingListBuilder from './MarketingListBuilder'
 import MarketingCreatorBadge, { marketingOptionLabel } from './MarketingCreatorBadge'
 import { LOADING_MESSAGES } from '../../lib/loadingQuotes'
+import { withTimeout } from '../../lib/fetchWithTimeout'
 import { leadHasCallablePhone } from '../../lib/phoneUtils'
 
 const TABS = [
@@ -81,14 +82,14 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
     setLoading(true)
     setError(null)
     try {
-      const data = await api.getMarketingOverview()
+      const data = await withTimeout(api.getMarketingOverview(), 25_000)
       setLists(data.lists || [])
       setTemplates(data.templates || [])
       setCampaigns(data.campaigns || [])
       setForms(data.forms || [])
       setSummary(data.summary || null)
     } catch (e) {
-      setError(e.message)
+      setError(e.message || 'Could not load marketing')
     } finally {
       setLoading(false)
     }

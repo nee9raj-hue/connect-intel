@@ -5,6 +5,7 @@ import { defaultCrm } from '../lib/crmConstants'
 import { loadReadNotificationIds, saveReadNotificationIds } from '../lib/notificationStorage'
 import { getNotificationTarget } from '../lib/notificationNavigation'
 import { navTargetToOptions } from '../lib/navConfig'
+import { withTimeout } from '../lib/fetchWithTimeout'
 
 const AppContext = createContext(null)
 
@@ -194,10 +195,14 @@ export function AppProvider({ children }) {
 
     const bootstrap = async () => {
       try {
-        const session = await api.getSession()
+        const session = await withTimeout(
+          api.getSession(),
+          12_000,
+          'Sign-in check timed out. You can refresh or continue from the home page.'
+        )
         if (cancelled) return
 
-        if (session.user) {
+        if (session?.user) {
           if (session.token) storeSessionToken(session.token)
           setUser(session.user)
           setScreen('app')
@@ -212,13 +217,14 @@ export function AppProvider({ children }) {
             }
           }
         }
-      } catch {
+      } catch (error) {
         if (!cancelled) {
           setUser(null)
           setScreen('landing')
+          if (error?.message) setSessionError(error.message)
         }
       } finally {
-        if (!cancelled) setReady(true)
+        setReady(true)
       }
     }
 
@@ -245,28 +251,35 @@ export function AppProvider({ children }) {
         return
       }
 
-      const run = (async () => {
-        try {
-          const [saved, history] = await Promise.all([
-            api.getSavedLeads({ silent: true, light: true }),
-            api.getSearchHistory({ silent: true }),
-          ])
+      const run = withTimeout(
+        (async () => {
+          try {
+            const [saved, history] = await Promise.all([
+              api.getSavedLeads({ silent: true, light: true }),
+              api.getSearchHistory({ silent: true }),
+            ])
 
-          if (cancelled) return
-          setSavedLeads(saved.leads || [])
-          setSearchHistory(history.history || [])
-          workspaceLoadedAtRef.current = Date.now()
+            if (cancelled) return
+            setSavedLeads(saved.leads || [])
+            setSearchHistory(history.history || [])
+            workspaceLoadedAtRef.current = Date.now()
 
-          if (user.organizationId && user.accountType === 'company') {
-            const data = await api.getTeamMembers()
-            if (!cancelled) setTeamMembers(data.members || [])
+            if (user.organizationId && user.accountType === 'company') {
+              const data = await api.getTeamMembers({ silent: true })
+              if (!cancelled) setTeamMembers(data.members || [])
+            }
+          } catch (error) {
+            if (!cancelled) {
+              if (error?.status === 401) {
+                setSessionError(error.message || 'Session expired. Please sign in again.')
+              } else if (error?.message) {
+                setSessionError(error.message)
+              }
+            }
           }
-        } catch (error) {
-          if (!cancelled && error?.status === 401) {
-            setSessionError(error.message || 'Session expired. Please sign in again.')
-          }
-        }
-      })()
+        })(),
+        28_000
+      )
 
       workspaceLoadInFlightRef.current = run
       try {

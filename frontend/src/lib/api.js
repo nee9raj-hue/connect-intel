@@ -1,5 +1,6 @@
 import { getSessionToken, storeSessionToken } from './sessionAuth'
 import { trackApiLoading } from './apiLoading'
+import { fetchWithTimeout } from './fetchWithTimeout'
 
 let refreshInFlight = null
 
@@ -7,7 +8,7 @@ async function touchSession() {
   if (refreshInFlight) return refreshInFlight
 
   refreshInFlight = (async () => {
-    const response = await fetch('/api/auth/session', {
+    const response = await fetchWithTimeout('/api/auth/session', {
       credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
     })
@@ -39,7 +40,7 @@ async function request(path, options = {}, meta = { retried: false, silent: fals
 
 async function requestInner(path, options = {}, { retried = false, silent = false } = {}) {
   const token = getSessionToken()
-  const response = await fetch(path, {
+  const response = await fetchWithTimeout(path, {
     credentials: 'same-origin',
     headers: {
       'Content-Type': 'application/json',
@@ -89,7 +90,7 @@ export const api = {
   destroySession: () => request('/api/auth/session', { method: 'DELETE' }),
   completeOnboarding: (payload) =>
     request('/api/onboarding/complete', { method: 'POST', body: payload }),
-  getTeamMembers: () => request('/api/team/members'),
+  getTeamMembers: ({ silent = false } = {}) => request('/api/team/members', {}, { silent }),
   inviteTeamMember: (payload) => request('/api/team/invite', { method: 'POST', body: payload }),
   getInviteEmailDiagnostics: () => request('/api/team/invite-email'),
   sendInviteTestEmail: () => request('/api/team/invite-email', { method: 'POST' }),

@@ -4,6 +4,7 @@ import { api } from '../../lib/api'
 import { getVisiblePipelineColumns } from '../../lib/crmConstants'
 import { QUICK_NAV_TILES, countPipelineByStatus, countUpcomingFromLeads, navTargetToOptions } from '../../lib/navConfig'
 import { formatDateTime } from '../../lib/crmUiConstants'
+import { withTimeout } from '../../lib/fetchWithTimeout'
 
 const ICONS = {
   pipeline: '◎',
@@ -50,8 +51,8 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
         to: to.toISOString(),
       }).toString()
       const [mkt, cal] = await Promise.allSettled([
-        api.getMarketingOverview(),
-        api.getCrmCalendar(q),
+        withTimeout(api.getMarketingOverview(), 20_000),
+        withTimeout(api.getCrmCalendar(q, { silent: true }), 20_000),
       ])
       if (mkt.status === 'fulfilled') setMarketingSummary(mkt.value.summary || null)
       if (cal.status === 'fulfilled') {

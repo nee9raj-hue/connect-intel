@@ -39,7 +39,10 @@ export default function ActiveCustomersPanel({ onNavigate }) {
   const isCompany = user?.accountType === 'company'
 
   const load = useCallback(async () => {
-    if (!isCompany) return
+    if (!isCompany) {
+      setLoading(false)
+      return
+    }
     setLoading(true)
     setError(null)
     try {
@@ -207,7 +210,7 @@ export default function ActiveCustomersPanel({ onNavigate }) {
             />
           </div>
           {loading ? (
-            <LoadingExperience message={LOADING_MESSAGES.workspace} className="py-16" />
+            <LoadingExperience message="Loading active customers…" className="py-16" />
           ) : !filtered.length ? (
             <p className="text-sm text-gray-500 text-center py-12 px-4">
               No active customers yet. Upload a file with mobile numbers that exist in your pipeline, or move
