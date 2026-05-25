@@ -1,14 +1,15 @@
-# Remove “Google hasn’t verified this app” (one-time platform task)
+# Google OAuth verification (Gmail-first)
 
-**You cannot hide this screen with code.** Google only removes it after **OAuth app verification** for sensitive scopes (`gmail.send`, `gmail.readonly`).
+**Full step-by-step:** [GOOGLE-OAUTH-VERIFICATION-RUNBOOK.md](./GOOGLE-OAUTH-VERIFICATION-RUNBOOK.md)  
+**Demo video script:** [GOOGLE-OAUTH-DEMO-SCRIPT.md](./GOOGLE-OAUTH-DEMO-SCRIPT.md)
 
-Until then, Connect Intel **hides “Connect work Gmail” from customers** and uses **company domain email (DNS)** so reps never see the scary Google page.
+**Product goal:** Customers sign up → connect **work Gmail** → send CRM/marketing email. **No customer DNS.**
 
-After Google approves your app:
+After Google approves `gmail.send` / `gmail.readonly`:
 
-1. Vercel → **Environment Variables** → set `GOOGLE_OAUTH_VERIFIED` = `true` (Production)
-2. **Redeploy** production
-3. Customers will see optional Gmail connect without the unverified warning (for verified scopes)
+1. Vercel Production → `GOOGLE_OAUTH_VERIFIED=true`
+2. Redeploy
+3. Remove `GOOGLE_OAUTH_ALLOW_CONNECT` if you used it for beta
 
 ---
 

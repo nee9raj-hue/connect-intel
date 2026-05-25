@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 
 import { sanitizeCustomerText } from '../../lib/productCopy'
+import { useApp } from '../../context/AppContext'
 
 /** Shows success/error after Connect work email OAuth redirect (all users). */
 export default function CrmGmailOAuthNotice({ onOpenTeam }) {
+  const { user } = useApp()
   const [notice, setNotice] = useState(null)
 
   useEffect(() => {
@@ -27,8 +29,11 @@ export default function CrmGmailOAuthNotice({ onOpenTeam }) {
         ? sanitizeCustomerText(decodeURIComponent(message.replace(/\+/g, ' ')))
         : ''
       const blocked = /verification|access blocked|has not completed/i.test(raw)
+      const adminGuidance = 'Use company domain email instead (ask your admin — Team → Outbound email), or ask Connect Intel to add your address as a Google OAuth test user.'
+      const memberGuidance = 'Use company domain email instead (ask your admin about domain setup), or ask Connect Intel to add your address as a Google OAuth test user.'
+      const guidance = user?.isOrgAdmin ? adminGuidance : memberGuidance
       const body = blocked
-        ? `${raw || 'Google blocked access.'}\n\nUse company domain email instead (ask your admin — Team → Outbound email), or ask Connect Intel to add your address as a Google OAuth test user. Open Work email in the sidebar for steps.`
+        ? `${raw || 'Google blocked access.'}\n\n${guidance} Open Work email in the sidebar for steps.`
         : raw || 'Connection failed. Open Work email in the sidebar to try again.'
       setNotice({
         type: 'error',

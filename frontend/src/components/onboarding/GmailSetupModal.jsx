@@ -37,6 +37,10 @@ export function useGmailSetupNeeded(user) {
       .then((data) => {
         if (cancelled) return
         setStatus(data)
+        if (!data.gmailConnectAvailable) {
+          setNeeded(false)
+          return
+        }
         const ready = data.connected && data.replySyncEnabled
         if (ready) {
           markGmailSetupDone()
@@ -154,7 +158,7 @@ export default function GmailSetupModal({ onDone }) {
         </button>
 
         <button type="button" onClick={skip} className="w-full text-xs text-gray-500 underline">
-          Skip for now — you can connect later from Team
+          Skip for now — connect later under Work email in the sidebar
         </button>
       </div>
     </div>

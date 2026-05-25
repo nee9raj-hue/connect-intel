@@ -9,7 +9,7 @@ import MobileRequiredModal from '../profile/MobileRequiredModal'
 import PanelViewport from './PanelViewport'
 import { useWorkspaceSync } from '../../hooks/useWorkspaceSync'
 import SessionReconnectBanner from './SessionReconnectBanner'
-import { markGmailSetupDone } from '../onboarding/GmailSetupModal'
+import GmailSetupModal, { markGmailSetupDone, useGmailSetupNeeded } from '../onboarding/GmailSetupModal'
 import ConnectAssistant from '../assistant/ConnectAssistant'
 import MobileNavPill from './MobileNavPill'
 import useIsMobile from '../../hooks/useIsMobile'
@@ -22,6 +22,7 @@ export default function AppShell() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [liveToast, setLiveToast] = useState(null)
   const needsOnboarding = user && !user.onboardingComplete && !user.isPlatformAdmin
+  const { needed: needsGmailSetup, setNeeded: setNeedsGmailSetup } = useGmailSetupNeeded(user)
   const showMobileNavPill =
     isMobile && user && !user.isPlatformAdmin && !needsOnboarding && !pipelineLeadId
   useWorkspaceSync({
@@ -146,6 +147,9 @@ export default function AppShell() {
         />
       )}
       {needsOnboarding && <OnboardingModal />}
+      {needsGmailSetup && !needsOnboarding && (
+        <GmailSetupModal onDone={() => setNeedsGmailSetup(false)} />
+      )}
       {user && !needsOnboarding && (
         <ConnectAssistant onNavigate={navigate} fabAboveMobilePill={showMobileNavPill} />
       )}

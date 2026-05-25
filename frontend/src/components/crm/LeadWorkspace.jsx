@@ -446,7 +446,10 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
     }
     const canSend = gmailStatus.connected || orgEmail?.userCanSend || user?.orgOutboundEmailReady
     if (!canSend) {
-      setError('Connect work email above (Team → CRM email) to send from CRM.')
+      const guidance = user?.isOrgAdmin
+        ? 'Connect work email above (Team → CRM email) to send from CRM.'
+        : 'Connect work email above (Work email in sidebar) to send from CRM.'
+      setError(guidance)
       return
     }
     if (sending) return

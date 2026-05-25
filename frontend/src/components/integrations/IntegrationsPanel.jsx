@@ -137,6 +137,30 @@ export default function IntegrationsPanel() {
         <StatusPill label="WhatsApp auto-send" on={status?.whatsappAutoSendReady} />
       </div>
 
+      <section className="mb-8 rounded-xl border-2 border-blue-200 bg-blue-50/80 p-4 space-y-3">
+        <h2 className="text-sm font-semibold text-[#242424]">Google OAuth — work Gmail for all customers</h2>
+        <p className="text-xs text-blue-950 leading-relaxed">
+          Phase: <strong>{status?.googleOAuthPhase || 'unknown'}</strong>
+          {status?.crmGmailOAuthRedirectUri && (
+            <span className="block mt-1 font-mono text-[10px] break-all">{status.crmGmailOAuthRedirectUri}</span>
+          )}
+        </p>
+        <ul className="text-xs text-blue-950 space-y-1 list-disc pl-4">
+          <li>
+            OAuth configured: {status?.crmGmailOAuthConfigured ? 'yes' : 'no'}
+            {status?.crmGmailOAuthMissingEnv?.length ? ` (missing: ${status.crmGmailOAuthMissingEnv.join(', ')})` : ''}
+          </li>
+          <li>Connect offered to users: {status?.crmGmailConnectOffered ? 'yes' : 'no'}</li>
+          <li>Verified (GOOGLE_OAUTH_VERIFIED): {status?.googleOAuthVerified ? 'yes' : 'no'}</li>
+        </ul>
+        <p className="text-xs text-blue-900 leading-relaxed">
+          Before approval: set <code className="bg-white/80 px-1 rounded">GOOGLE_OAUTH_ALLOW_CONNECT=true</code> and
+          add pilot emails as Test users in Google Cloud. After approval:{' '}
+          <code className="bg-white/80 px-1 rounded">GOOGLE_OAUTH_VERIFIED=true</code>. See{' '}
+          <strong>GOOGLE-OAUTH-VERIFICATION-RUNBOOK.md</strong> in the repo.
+        </p>
+      </section>
+
       <section className="mb-8 rounded-xl border-2 border-[#ffe48a] bg-[#fffbeb] p-4 space-y-3">
         <h2 className="text-sm font-semibold text-[#242424]">Team invite email (required for Team invites)</h2>
         <p className="text-xs text-[#5b4a00] leading-relaxed">

@@ -66,8 +66,7 @@ export default function WorkEmailOptions({ onNavigate, compact = false }) {
           <ul className="list-disc pl-4 mt-1 space-y-1">
             <li>
               Your <strong>company admin</strong> sets up outbound email for{' '}
-              <strong>@{companyDomain || 'yourcompany.com'}</strong> (DNS in Resend — admin only, under{' '}
-              <strong>Team &amp; email → Outbound email</strong>).
+              <strong>@{companyDomain || 'yourcompany.com'}</strong> (DNS in Resend — ask your admin to set this up).
             </li>
             <li>
               You sign in to Connect Intel with your <strong>@{companyDomain || 'company'}</strong> address
@@ -82,8 +81,7 @@ export default function WorkEmailOptions({ onNavigate, compact = false }) {
           )}
           {!orgEmail?.configured && (
             <p className="mt-2 text-amber-900 bg-amber-50 border border-amber-100 rounded px-2 py-1.5">
-              Company domain is not set up yet. Ask your admin to open <strong>Team &amp; email</strong> and
-              complete <strong>Outbound email</strong>.
+              Company domain is not set up yet. Ask your admin to complete the <strong>Outbound email setup</strong> in their Workspace settings.
             </p>
           )}
           {orgEmail?.configured && orgEmail?.verified && orgEmail?.hint && (
