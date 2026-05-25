@@ -339,17 +339,31 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
   const drainCampaignSends = async (campaignId, totalEnrolled = 0, onProgress) => {
     let pending = totalEnrolled
     let totalSent = 0
+    let totalFailed = 0
+    let lastError = null
     let rounds = 0
     const maxRounds = Math.ceil(Math.max(totalEnrolled, 50) / 2) + 5
     while (pending > 0 && rounds < maxRounds) {
       rounds += 1
-      const chunk = await api.processMarketingCampaignSends(campaignId, { limit: 2, silent: true })
+      const chunk = await api.processMarketingCampaignSends(campaignId, {
+        limit: 2,
+        silent: rounds > 1,
+      })
       totalSent += chunk.sendResult?.sent || 0
+      totalFailed += chunk.sendResult?.failed || 0
       pending = chunk.pendingSends ?? 0
-      onProgress?.({ sent: totalSent, pending, enrolled: totalEnrolled })
+      lastError = chunk.firstError || chunk.sendResult?.firstError || lastError
+      onProgress?.({ sent: totalSent, failed: totalFailed, pending, enrolled: totalEnrolled, lastError })
+
+      if (lastError && totalSent === 0 && totalFailed >= 2) {
+        throw new Error(lastError)
+      }
+      if (chunk.sendResult?.processed === 0 && pending > 0) {
+        throw new Error(lastError || 'Could not process sends. Refresh and check Team → CRM email.')
+      }
       if (!(chunk.sendResult?.sent || chunk.sendResult?.failed)) break
     }
-    return { totalSent, pending }
+    return { totalSent, totalFailed, pending, lastError }
   }
 
   const startCampaign = async (id) => {
@@ -361,15 +375,27 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
       const enrolled = data.enrolled || 0
       if (!isWa && enrolled > 0) {
         setNotice(`Queued ${enrolled} recipients — sending now…`)
-        const drained = await drainCampaignSends(id, enrolled, ({ sent, pending }) => {
-          setNotice(`Sending… ${sent} sent · ${pending} remaining`)
+        const drained = await drainCampaignSends(id, data.pendingSends ?? enrolled, (p) => {
+          const parts = [`${p.sent} sent`]
+          if (p.failed) parts.push(`${p.failed} failed`)
+          parts.push(`${p.pending} remaining`)
+          setNotice(`Sending… ${parts.join(' · ')}`)
         })
-        if (drained.pending > 0) {
+        if (drained.pending > 0 && drained.totalSent === 0) {
+          setError(
+            drained.lastError ||
+              'No emails were sent. Connect work Gmail under Team → CRM email, then start a new campaign.'
+          )
+        } else if (drained.pending > 0) {
           setNotice(
-            `Campaign started — ${enrolled} enrolled, ${drained.totalSent} sent. ${drained.pending} still queued (retry from Reports or wait for daily cron).`
+            `Campaign started — ${enrolled} enrolled, ${drained.totalSent} sent, ${drained.totalFailed} failed. ${drained.pending} still queued.`
           )
         } else {
-          setNotice(`Campaign started — ${enrolled} enrolled, ${drained.totalSent} sent`)
+          setNotice(
+            `Campaign started — ${enrolled} enrolled, ${drained.totalSent} sent${
+              drained.totalFailed ? `, ${drained.totalFailed} failed` : ''
+            }`
+          )
         }
       } else {
         setNotice(
