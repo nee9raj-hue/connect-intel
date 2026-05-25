@@ -196,7 +196,8 @@ export default function ContactsPanel({ onNavigate }) {
       <header className="shrink-0 bg-white border-b border-gray-200 px-5 py-4">
         <h1 className="text-lg font-semibold text-gray-900">Contacts</h1>
         <p className="text-xs text-gray-500 mt-0.5">
-          Master contact records — edit details here. Pipeline leads link to these contacts automatically.
+          Customers on <strong>your pipeline</strong> only (assigned to you or saved by you). Company admins see
+          the full team pipeline.
         </p>
         <div className="mt-3 flex gap-2">
           <input
