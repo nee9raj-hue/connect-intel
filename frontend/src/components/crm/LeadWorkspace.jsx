@@ -643,6 +643,63 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
               )}
             </section>
 
+            {lead.tradingProfile?.firstShipmentAt || lead.tradingProfile?.active ? (
+              <section className="rounded-xl border border-teal-100 bg-teal-50/50 p-3 space-y-2">
+                <h3 className="text-[11px] font-semibold uppercase text-teal-800">Active trading</h3>
+                <div className="grid grid-cols-2 gap-2 text-xs text-gray-700">
+                  <div>
+                    <span className="text-gray-500 block">First shipment</span>
+                    <strong>
+                      {lead.tradingProfile.firstShipmentAt
+                        ? new Date(lead.tradingProfile.firstShipmentAt).toLocaleDateString()
+                        : '—'}
+                    </strong>
+                  </div>
+                  <div>
+                    <span className="text-gray-500 block">Last shipment</span>
+                    <strong>
+                      {lead.tradingProfile.lastShipmentAt
+                        ? new Date(lead.tradingProfile.lastShipmentAt).toLocaleDateString()
+                        : '—'}
+                    </strong>
+                  </div>
+                  <div>
+                    <span className="text-gray-500 block">Shipments</span>
+                    <strong>{lead.tradingProfile.shipmentCount ?? 0}</strong>
+                  </div>
+                  {lead.tradingProfile.customerCode && (
+                    <div>
+                      <span className="text-gray-500 block">Customer code</span>
+                      <strong className="font-mono text-[11px]">{lead.tradingProfile.customerCode}</strong>
+                    </div>
+                  )}
+                </div>
+                {(lead.tradingProfile.shipments?.length ?? 0) > 0 && (
+                  <p className="text-[11px] text-gray-600">
+                    Dates:{' '}
+                    {lead.tradingProfile.shipments
+                      .map((s) =>
+                        s.date ? new Date(s.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: '2-digit' }) : ''
+                      )
+                      .filter(Boolean)
+                      .join(' · ')}
+                  </p>
+                )}
+                {lead.tradingProfile.notes && (
+                  <p className="text-[11px] text-gray-600 whitespace-pre-wrap">{lead.tradingProfile.notes}</p>
+                )}
+                {onNavigate && (
+                  <button
+                    type="button"
+                    onClick={() => onNavigate('active-customers')}
+                    className="text-[11px] font-semibold text-teal-800 underline"
+                  >
+                    Active customers dashboard
+                  </button>
+                )}
+              </section>
+            ) : null}
+
             <section className="grid grid-cols-2 gap-2">
               <label className="block">
                 <span className="text-[11px] font-semibold uppercase text-gray-400 mb-1 block">Deal value (₹)</span>

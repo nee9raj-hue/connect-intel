@@ -331,6 +331,22 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
             </button>
           </section>
 
+          {user?.accountType === 'company' && (
+            <section className="bg-white rounded-xl border border-teal-200/50 p-4">
+              <h3 className="text-sm font-semibold text-gray-900 mb-1">Active customers</h3>
+              <p className="text-xs text-gray-500 mb-3 leading-relaxed">
+                Track first shipment and repeat loads. Import ERP/shipment files by mobile number.
+              </p>
+              <button
+                type="button"
+                onClick={() => go({ panel: 'active-customers' })}
+                className="text-xs font-semibold px-3 py-2 bg-teal-700 text-white rounded-lg"
+              >
+                Active customers dashboard
+              </button>
+            </section>
+          )}
+
           {user?.isOrgAdmin && user?.accountType === 'company' && (
             <section className="bg-white rounded-xl border border-[#25D366]/30 p-4">
               <h3 className="text-sm font-semibold text-gray-900 mb-1">WhatsApp Business API</h3>

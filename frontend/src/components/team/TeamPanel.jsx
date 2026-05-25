@@ -185,6 +185,21 @@ export default function TeamPanel({ onNavigate }) {
       </header>
 
       <div className="panel-body-scroll p-5 space-y-6 max-w-3xl">
+        <section className="rounded-xl border-2 border-teal-200/60 bg-gradient-to-br from-teal-50/80 to-white p-4 space-y-2">
+          <h2 className="text-sm font-semibold text-gray-900">Active trading customers</h2>
+          <p className="text-xs text-gray-600 leading-relaxed">
+            Upload shipment data (Excel/CSV) matched by mobile. See dashboard under{' '}
+            <strong>CRM → Active customers</strong>.
+          </p>
+          <button
+            type="button"
+            onClick={() => onNavigate?.('active-customers')}
+            className="text-xs font-semibold px-3 py-2 bg-teal-700 text-white rounded-lg"
+          >
+            Open Active customers
+          </button>
+        </section>
+
         <section className="rounded-xl border-2 border-[#25D366]/40 bg-gradient-to-br from-emerald-50/90 to-white p-4 space-y-2">
           <h2 className="text-sm font-semibold text-gray-900">WhatsApp automatic send</h2>
           <p className="text-xs text-gray-600 leading-relaxed">

@@ -48,6 +48,7 @@ const ROUTES = {
   'team/tasks': () => import('../lib/server/handlers/team-tasks.js'),
   'team/mention-leads': () => import('../lib/server/handlers/team-mention-leads.js'),
   'org/imports': () => import('../lib/server/handlers/org-imports.js'),
+  'org/active-trading': () => import('../lib/server/handlers/org-active-trading.js'),
   'invite/preview': () => import('../lib/server/handlers/invite-preview.js'),
   'invite/accept': () => import('../lib/server/handlers/invite-accept.js'),
   'auth/session': () => import('../lib/server/handlers/auth-session.js'),

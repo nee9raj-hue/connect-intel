@@ -198,7 +198,7 @@ const INSTRUCTIONS_ROWS = [
   ['linkedin', 'Profile URL or path.'],
   ['seniority', 'Optional: Owner, Director, Manager.'],
   ['source_confidence', 'verified | imported | likely'],
-  ['pipeline_status', 'Optional CRM stage: new, contacted, follow_up, replied, won, lost'],
+  ['pipeline_status', 'Optional CRM stage: new, contacted, follow_up, replied, won, active_trading, lost'],
   ['notes', 'Optional free-text note shown in Pipeline'],
 ]
 

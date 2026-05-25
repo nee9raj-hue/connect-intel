@@ -18,12 +18,14 @@ import TeamTasksPanel from '../team/TeamTasksPanel'
 import ContactsPanel from '../contacts/ContactsPanel'
 import CrmSequencesPanel from '../crm/CrmSequencesPanel'
 import CrmAutomationPanel from '../crm/CrmAutomationPanel'
+import ActiveCustomersPanel from '../crm/ActiveCustomersPanel'
 
 const PANELS = {
   overview: OverviewPanel,
   search: PeopleSearch,
   saved: SavedLeadsPanel,
   pipeline: PipelinePanel,
+  'active-customers': ActiveCustomersPanel,
   contacts: ContactsPanel,
   'team-notes': TeamNotesPanel,
   'team-tasks': TeamTasksPanel,

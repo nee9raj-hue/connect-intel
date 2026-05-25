@@ -4,12 +4,17 @@ export const CRM_STATUSES = [
   { id: 'follow_up', label: 'Follow up', color: 'bg-amber-50 text-amber-800 border-amber-200' },
   { id: 'replied', label: 'Replied', color: 'bg-violet-50 text-violet-700 border-violet-200' },
   { id: 'won', label: 'Won', color: 'bg-green-50 text-green-700 border-green-200' },
+  {
+    id: 'active_trading',
+    label: 'Active trading',
+    color: 'bg-teal-50 text-teal-800 border-teal-200',
+  },
   { id: 'lost', label: 'Lost', color: 'bg-gray-100 text-gray-500 border-gray-200' },
 ]
 
 const PIPELINE_ROLE_COLUMNS = {
-  org_admin: ['new', 'contacted', 'follow_up', 'replied', 'won', 'lost'],
-  member: ['new', 'contacted', 'follow_up', 'replied', 'lost'],
+  org_admin: ['new', 'contacted', 'follow_up', 'replied', 'won', 'active_trading', 'lost'],
+  member: ['new', 'contacted', 'follow_up', 'replied', 'won', 'active_trading', 'lost'],
   sales: ['new', 'contacted', 'follow_up'],
 }
 

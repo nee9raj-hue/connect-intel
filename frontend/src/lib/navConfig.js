@@ -104,6 +104,9 @@ export function buildCustomerNavSections(user, { pipelineCounts = {}, upcomingCo
       title: 'CRM',
       groups: [
         { id: 'pipeline', label: 'Pipeline', icon: 'pipeline', children: pipelineChildren },
+        ...(isCompany
+          ? [{ id: 'active-customers', label: 'Active customers', icon: 'chart', panel: 'active-customers' }]
+          : []),
         { id: 'contacts', label: 'Contacts', icon: 'people', panel: 'contacts' },
         { id: 'marketing', label: 'Marketing', icon: 'mail', children: marketingChildren },
         { id: 'calendar', label: 'Calendar', icon: 'calendar', children: calendarChildren },

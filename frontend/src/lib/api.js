@@ -173,6 +173,9 @@ export const api = {
   getOrgImportOverview: () => request('/api/org/imports'),
   importOrgPipeline: ({ datasetType, rows, addToPipeline = true }) =>
     request('/api/org/imports', { method: 'POST', body: { datasetType, rows, addToPipeline } }),
+  getActiveTradingOverview: () => request('/api/org/active-trading'),
+  importActiveTrading: (body) =>
+    request('/api/org/active-trading', { method: 'POST', body }),
   getMyImportOverview: () => request('/api/my/imports'),
   importMyPipeline: ({ datasetType, rows, addToPipeline = true }) =>
     request('/api/my/imports', { method: 'POST', body: { datasetType, rows, addToPipeline } }),
