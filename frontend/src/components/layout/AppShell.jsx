@@ -117,7 +117,11 @@ export default function AppShell() {
         )}
         <MobileRequiredModal />
         {!user?.isPlatformAdmin && <AppHeader onNavigate={navigate} />}
-        <CrmGmailOAuthNotice onOpenTeam={() => navigate('team')} />
+        <CrmGmailOAuthNotice
+          onOpenTeam={() =>
+            navigate(user?.isOrgAdmin && user?.accountType === 'company' ? 'team' : 'my-email')
+          }
+        />
         <SessionReconnectBanner />
         {liveToast && (
           <div

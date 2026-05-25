@@ -61,8 +61,18 @@ export default function TeamPanel({ onNavigate }) {
 
   if (!user?.isOrgAdmin || user?.accountType !== 'company') {
     return (
-      <div className="p-8 text-center text-sm text-gray-500">
-        Team management is available for company admins only.
+      <div className="p-8 max-w-md mx-auto text-center space-y-3">
+        <p className="text-sm text-gray-600">
+          Team invites and company settings are for admins only. To send email and marketing campaigns, connect your
+          own work Gmail.
+        </p>
+        <button
+          type="button"
+          onClick={() => onNavigate?.('my-email')}
+          className="px-4 py-2 text-sm font-semibold bg-[#ffcb2b] text-[#242424] rounded-lg"
+        >
+          Open Work email
+        </button>
       </div>
     )
   }

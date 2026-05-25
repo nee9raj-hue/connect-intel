@@ -5,6 +5,7 @@ import PeopleSearch from '../search/PeopleSearch'
 import SavedLeadsPanel from '../saved/SavedLeadsPanel'
 import PipelinePanel from '../crm/PipelinePanel'
 import TeamPanel from '../team/TeamPanel'
+import MyEmailPanel from '../team/MyEmailPanel'
 import WhatsAppSettingsPanel from '../team/WhatsAppSettingsPanel'
 import IntegrationsPanel from '../integrations/IntegrationsPanel'
 import OverviewPanel from '../overview/OverviewPanel'
@@ -37,6 +38,7 @@ const PANELS = {
   'crm-sequences': CrmSequencesPanel,
   'crm-automation': CrmAutomationPanel,
   team: TeamPanel,
+  'my-email': MyEmailPanel,
   'whatsapp-settings': WhatsAppSettingsPanel,
   integrations: IntegrationsPanel,
   admin: AdminPanel,

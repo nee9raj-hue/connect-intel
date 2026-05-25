@@ -25,7 +25,7 @@ export default function CrmGmailOAuthNotice({ onOpenTeam }) {
     } else if (oauth === 'error') {
       const body = message
         ? sanitizeCustomerText(decodeURIComponent(message.replace(/\+/g, ' ')))
-        : 'Connection failed. See Team → CRM email for setup steps.'
+        : 'Connection failed. Open Work email in the sidebar to try again.'
       setNotice({
         type: 'error',
         title: 'Could not connect work email',
@@ -53,7 +53,7 @@ export default function CrmGmailOAuthNotice({ onOpenTeam }) {
       <p className="text-xs mt-1 leading-relaxed opacity-90 whitespace-pre-wrap">{notice.body}</p>
       {notice.type === 'error' && onOpenTeam && (
         <button type="button" onClick={onOpenTeam} className="mt-2 text-xs font-semibold underline">
-          Open Team → CRM email help
+          Open Work email setup
         </button>
       )}
       <button

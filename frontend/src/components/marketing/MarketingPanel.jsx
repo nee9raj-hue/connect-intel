@@ -9,6 +9,7 @@ import LoadingExperience from '../ui/LoadingExperience'
 import CampaignReportsView, { campaignToForm } from './CampaignReportsView'
 import MarketingListBuilder from './MarketingListBuilder'
 import MarketingCreatorBadge, { marketingOptionLabel } from './MarketingCreatorBadge'
+import CrmGmailConnectCard from '../team/CrmGmailConnectCard'
 import { LOADING_MESSAGES } from '../../lib/loadingQuotes'
 import { withTimeout } from '../../lib/fetchWithTimeout'
 import { leadHasCallablePhone } from '../../lib/phoneUtils'
@@ -51,6 +52,10 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
   const [campaigns, setCampaigns] = useState([])
   const [forms, setForms] = useState([])
   const [summary, setSummary] = useState(null)
+  const [gmailStatus, setGmailStatus] = useState(null)
+
+  const needsWorkEmail =
+    user?.accountType === 'company' && gmailStatus && !gmailStatus.connected && gmailStatus.gmailConnectAvailable
 
   const [templateForm, setTemplateForm] = useState({ ...EMPTY_TEMPLATE })
   const [formForm, setFormForm] = useState({ ...EMPTY_FORM })
@@ -98,6 +103,14 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
   useEffect(() => {
     if (panelOptions?.tab) setTab(panelOptions.tab)
   }, [panelOptions?.tab])
+
+  useEffect(() => {
+    if (user?.accountType !== 'company') return
+    api
+      .getCrmGmailStatus()
+      .then(setGmailStatus)
+      .catch(() => setGmailStatus(null))
+  }, [user?.accountType, user?.id])
 
   useEffect(() => {
     load()
@@ -359,7 +372,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
         throw new Error(lastError)
       }
       if (chunk.sendResult?.processed === 0 && pending > 0) {
-        throw new Error(lastError || 'Could not process sends. Refresh and check Team → CRM email.')
+        throw new Error(lastError || 'Could not process sends. Connect Work email in the sidebar, then retry.')
       }
       if (!(chunk.sendResult?.sent || chunk.sendResult?.failed)) break
     }
@@ -384,7 +397,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
         if (drained.pending > 0 && drained.totalSent === 0) {
           setError(
             drained.lastError ||
-              'No emails were sent. Connect work Gmail under Team → CRM email, then start a new campaign.'
+              'No emails were sent. Open Work email in the sidebar, connect Gmail, then start a new campaign.'
           )
         } else if (drained.pending > 0) {
           setNotice(
@@ -433,10 +446,25 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
           </p>
         ) : user?.accountType === 'company' ? (
           <p className="text-[11px] text-gray-600 bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-2 mt-2 max-w-xl">
-            Your campaigns and templates are private to you. Connect your work Gmail under Team → CRM email before
-            sending. Lists support stage filters and batches of 50 per send for your assigned leads.
+            Your campaigns and templates are private to you. Connect work Gmail under{' '}
+            <button
+              type="button"
+              onClick={() => onNavigate?.('my-email')}
+              className="font-semibold underline text-[#5b4a00]"
+            >
+              Work email
+            </button>{' '}
+            in the sidebar before sending. Lists support stage filters and batches of 50 per send for your leads.
           </p>
         ) : null}
+        {needsWorkEmail && (
+          <div className="mt-3 max-w-xl space-y-2">
+            <p className="text-[11px] font-medium text-amber-950">
+              Connect work email before starting email campaigns
+            </p>
+            <CrmGmailConnectCard compact />
+          </div>
+        )}
         {user?.isOrgAdmin && user?.accountType === 'company' && !user?.whatsappAutoSendReady && (
           <p className="text-[11px] text-amber-900 bg-amber-50 border border-amber-100 rounded-lg px-2.5 py-2 mt-2 max-w-xl">
             WhatsApp auto-send: connect API under{' '}
@@ -670,7 +698,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
                   ? user?.whatsappAutoSendReady
                     ? `Auto-send is on. ${pipelineLeadsWithPhone.length} contacts with phone — messages go out via your business number when you start the campaign.`
                     : `Uses saved templates as plain-text WhatsApp. ${pipelineLeadsWithPhone.length} contacts have a phone. Connect API above for automatic send.`
-                  : 'Includes unsubscribe link. Connect work email under Team first.'}
+                  : 'Includes unsubscribe link. Connect work email under Workspace → Work email first.'}
               </p>
             </section>
 

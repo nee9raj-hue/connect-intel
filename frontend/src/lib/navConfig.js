@@ -149,6 +149,11 @@ export function buildCustomerNavSections(user, { pipelineCounts = {}, upcomingCo
         { id: 'whatsapp-settings', label: 'WhatsApp API', icon: 'whatsapp', panel: 'whatsapp-settings' },
       ],
     })
+  } else if (isCompany) {
+    sections.push({
+      title: 'Workspace',
+      groups: [{ id: 'my-email', label: 'Work email', icon: 'mail', panel: 'my-email' }],
+    })
   } else if (user?.accountType === 'individual') {
     sections.push({
       title: 'Workspace',
