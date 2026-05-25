@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import MarketingCreatorBadge from './MarketingCreatorBadge'
 import {
   BLOCK_LABELS,
   DEFAULT_THEME,
@@ -454,7 +455,12 @@ export default function MarketingTemplateBuilder({
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
             {templates.map((t) => (
               <div key={t.id} className="border border-gray-100 rounded-lg px-3 py-2 text-sm">
-                <p className="font-medium text-gray-900 truncate">{t.name}</p>
+                <div className="flex items-start justify-between gap-2">
+                  <p className="font-medium text-gray-900 truncate">{t.name}</p>
+                  {t.createdByName && (
+                    <MarketingCreatorBadge name={t.createdByName} isOwn={t.isOwn} className="shrink-0" />
+                  )}
+                </div>
                 <p className="text-xs text-gray-500 truncate">{t.subject}</p>
                 <p className="text-[10px] text-gray-400 mt-0.5">
                   {t.blocks?.length ? `${t.blocks.length} blocks · designed` : 'Plain text'}

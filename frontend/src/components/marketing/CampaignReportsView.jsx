@@ -4,6 +4,7 @@ import { api } from '../../lib/api'
 import { DEFAULT_THEME } from '../../lib/marketingEmailDesign'
 import { formatDateTime } from '../../lib/crmUiConstants'
 import LoadingExperience from '../ui/LoadingExperience'
+import MarketingCreatorBadge from './MarketingCreatorBadge'
 
 const FILTERS = [
   { id: 'all', label: 'All recipients' },
@@ -294,7 +295,15 @@ function CampaignDetailReport({ campaignId, campaignName, onBack, onNavigate, on
           <button type="button" onClick={onBack} className="text-xs text-gray-500 hover:text-gray-800 underline mb-1">
             ← All campaigns
           </button>
-          <h2 className="text-lg font-semibold text-gray-900">{campaignName || report?.campaign?.name}</h2>
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="text-lg font-semibold text-gray-900">{campaignName || report?.campaign?.name}</h2>
+            {report?.campaign?.createdByName && (
+              <MarketingCreatorBadge
+                name={report.campaign.createdByName}
+                isOwn={report.campaign.createdByUserId === user?.id}
+              />
+            )}
+          </div>
           <p className="text-xs text-gray-500 mt-0.5 capitalize">
             {report?.campaign?.status} ·{' '}
             {isWhatsApp ? 'WhatsApp' : 'Email'} ·{' '}
@@ -516,6 +525,7 @@ export default function CampaignReportsView({
   onDuplicate,
   busy,
   initialCampaignId,
+  showCreator = false,
 }) {
   const [selectedId, setSelectedId] = useState(initialCampaignId || null)
 
@@ -599,7 +609,14 @@ export default function CampaignReportsView({
                       className="border-b border-gray-50 hover:bg-[#fffbeb]/40 cursor-pointer"
                       onClick={() => setSelectedId(c.id)}
                     >
-                      <td className="px-4 py-3 font-medium text-gray-900">{c.name}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="font-medium text-gray-900">{c.name}</span>
+                          {showCreator && (
+                            <MarketingCreatorBadge name={c.createdByName} isOwn={c.isOwn} />
+                          )}
+                        </div>
+                      </td>
                       <td className="px-4 py-3 capitalize text-gray-600">{c.status}</td>
                       <td className="px-4 py-3 tabular-nums">{stats.sent || 0}</td>
                       <td className="px-4 py-3 tabular-nums text-red-700">{stats.bounced || 0}</td>

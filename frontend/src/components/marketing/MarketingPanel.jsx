@@ -8,6 +8,7 @@ import { DEFAULT_FORM_FIELDS, DEFAULT_FORM_THEME } from '../../../../lib/marketi
 import LoadingExperience from '../ui/LoadingExperience'
 import CampaignReportsView, { campaignToForm } from './CampaignReportsView'
 import MarketingListBuilder from './MarketingListBuilder'
+import MarketingCreatorBadge, { marketingOptionLabel } from './MarketingCreatorBadge'
 import { LOADING_MESSAGES } from '../../lib/loadingQuotes'
 import { leadHasCallablePhone } from '../../lib/phoneUtils'
 
@@ -367,6 +368,16 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
         <p className="text-sm text-gray-500 mt-0.5">
           Lists, templates, campaigns, and lead capture forms — logged on each lead in Pipeline.
         </p>
+        {user?.isOrgAdmin && user?.accountType === 'company' ? (
+          <p className="text-[11px] text-gray-600 bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-2 mt-2 max-w-xl">
+            You see all team campaigns and templates (labeled by creator). Sales reps only see their own marketing
+            assets and send stats for their pipeline leads.
+          </p>
+        ) : user?.accountType === 'company' ? (
+          <p className="text-[11px] text-gray-600 bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-2 mt-2 max-w-xl">
+            Showing only your campaigns, lists, and templates. Send stats include contacts on your pipeline only.
+          </p>
+        ) : null}
         {user?.isOrgAdmin && user?.accountType === 'company' && !user?.whatsappAutoSendReady && (
           <p className="text-[11px] text-amber-900 bg-amber-50 border border-amber-100 rounded-lg px-2.5 py-2 mt-2 max-w-xl">
             WhatsApp auto-send: connect API under{' '}
@@ -465,7 +476,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
                   <option value="">Choose list…</option>
                   {lists.map((l) => (
                     <option key={l.id} value={l.id}>
-                      {l.name} ({l.leadIds?.length || 0})
+                      {marketingOptionLabel(l)} ({l.leadIds?.length || 0})
                     </option>
                   ))}
                 </select>
@@ -481,7 +492,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
                   </option>
                   {templates.map((t) => (
                     <option key={t.id} value={t.id}>
-                      {t.name}
+                      {marketingOptionLabel(t)}
                       {t.blocks?.length ? ' (designed)' : ''}
                     </option>
                   ))}
@@ -678,6 +689,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
                       busy={busy}
                       onStart={startCampaign}
                       onNavigate={onNavigate}
+                      showCreator={Boolean(user?.isOrgAdmin && user?.accountType === 'company')}
                     />
                   ))}
                 </div>
@@ -704,7 +716,10 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
               <h2 className="text-sm font-semibold text-gray-900">Saved lists</h2>
               {lists.map((l) => (
                 <div key={l.id} className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm">
-                  <p className="font-medium text-gray-900">{l.name}</p>
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="font-medium text-gray-900">{l.name}</p>
+                    <MarketingCreatorBadge name={l.createdByName} isOwn={l.isOwn} />
+                  </div>
                   <p className="text-xs text-gray-500">
                     {l.leadIds?.length || 0} leads
                     {l.description ? ` · ${l.description}` : ''}
@@ -721,6 +736,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
             onDuplicate={duplicateCampaignForResend}
             busy={busy}
             initialCampaignId={panelOptions?.campaignId}
+            showCreator={Boolean(user?.isOrgAdmin && user?.accountType === 'company')}
           />
         ) : tab === 'templates' ? (
           <MarketingTemplateBuilder
@@ -839,7 +855,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
   )
 }
 
-function CampaignCard({ campaign, busy, onStart, onNavigate }) {
+function CampaignCard({ campaign, busy, onStart, onNavigate, showCreator }) {
   const statusColors = {
     draft: 'bg-gray-100 text-gray-700',
     active: 'bg-green-100 text-green-800',
@@ -851,7 +867,12 @@ function CampaignCard({ campaign, busy, onStart, onNavigate }) {
     <div className="bg-white border border-gray-200 rounded-lg px-3 py-3 text-sm">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <p className="font-medium text-gray-900">{campaign.name}</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="font-medium text-gray-900">{campaign.name}</p>
+            {showCreator && (
+              <MarketingCreatorBadge name={campaign.createdByName} isOwn={campaign.isOwn} />
+            )}
+          </div>
           <p className="text-xs text-gray-500 mt-0.5">
             {campaign.type === 'sequence' ? 'Sequence' : 'One-shot'} · {stats.enrolled || 0} enrolled ·{' '}
             {stats.sent || 0} sent
