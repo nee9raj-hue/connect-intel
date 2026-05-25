@@ -105,8 +105,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
 
   useEffect(() => {
     load()
-    refreshSavedLeads?.()
-  }, [load, refreshSavedLeads])
+  }, [load])
 
   useEffect(() => {
     if (!notice) return

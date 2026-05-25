@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useDeferredValue, useMemo, useState } from 'react'
 import { useApp } from '../../context/AppContext'
+import { api } from '../../lib/api'
 import { formatCrmDate, getStatusMeta, getVisiblePipelineColumns } from '../../lib/crmConstants'
 import LeadWorkspace from './LeadWorkspace'
 import PipelineImportModal from './PipelineImportModal'
@@ -79,16 +80,48 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     if (panelOptions?.status) setFilter(panelOptions.status)
   }, [panelOptions?.status])
 
-  const selectedLead = useMemo(
+  const listLead = useMemo(
     () => savedLeads.find((l) => l.id === pipelineLeadId) || null,
     [savedLeads, pipelineLeadId]
   )
 
+  const [workspaceLead, setWorkspaceLead] = useState(null)
+
   useEffect(() => {
-    if (pipelineLeadId && !selectedLead) {
+    if (!pipelineLeadId) {
+      setWorkspaceLead(null)
+      return
+    }
+    if (!listLead) {
+      setWorkspaceLead(null)
+      return
+    }
+    if (!listLead.listLight) {
+      setWorkspaceLead(listLead)
+      return
+    }
+
+    let cancelled = false
+    setWorkspaceLead(listLead)
+    api
+      .getPipelineLead(pipelineLeadId, { silent: true })
+      .then((data) => {
+        if (!cancelled && data?.lead) setWorkspaceLead(data.lead)
+      })
+      .catch(() => {})
+
+    return () => {
+      cancelled = true
+    }
+  }, [pipelineLeadId, listLead])
+
+  const selectedLead = workspaceLead
+
+  useEffect(() => {
+    if (pipelineLeadId && !listLead) {
       setPipelineLeadId(null)
     }
-  }, [pipelineLeadId, selectedLead, setPipelineLeadId])
+  }, [pipelineLeadId, listLead, setPipelineLeadId])
 
   useEffect(() => {
     if (!bulkNotice) return

@@ -27,6 +27,15 @@ export function storeInviteToken(token) {
   }
 }
 
+function mergeLeadInList(prev, lead) {
+  if (!lead?.id) return prev
+  const index = prev.findIndex((entry) => entry.id === lead.id)
+  if (index < 0) return [...prev, lead]
+  const next = [...prev]
+  next[index] = lead
+  return next
+}
+
 export function AppProvider({ children }) {
   const [user, setUser] = useState(null)
   const [screen, setScreen] = useState('landing') // landing | auth | app
@@ -81,9 +90,9 @@ export function AppProvider({ children }) {
     }
   }, [user?.organizationId, user?.accountType])
 
-  const refreshSavedLeads = useCallback(async () => {
+  const refreshSavedLeads = useCallback(async ({ light = true } = {}) => {
     try {
-      const saved = await api.getSavedLeads()
+      const saved = await api.getSavedLeads({ light })
       setSavedLeads(saved.leads || [])
       setSessionError(null)
       return saved.leads || []
@@ -239,7 +248,7 @@ export function AppProvider({ children }) {
       const run = (async () => {
         try {
           const [saved, history] = await Promise.all([
-            api.getSavedLeads({ silent: true }),
+            api.getSavedLeads({ silent: true, light: true }),
             api.getSearchHistory({ silent: true }),
           ])
 
@@ -360,7 +369,11 @@ export function AppProvider({ children }) {
     try {
       const exists = previous.some((entry) => entry.id === lead.id)
       const data = exists ? await api.removeLead(lead.id) : await api.saveLead(lead)
-      setSavedLeads(data.leads || [])
+      if (data.leadId) {
+        setSavedLeads((current) => current.filter((entry) => entry.id !== data.leadId))
+      } else if (data.lead) {
+        setSavedLeads((current) => mergeLeadInList(current, data.lead))
+      }
     } catch {
       setSavedLeads(previous)
     }
@@ -368,9 +381,13 @@ export function AppProvider({ children }) {
 
   const addManualLead = useCallback(async (fields) => {
     const data = await api.addManualLead(fields)
-    setSavedLeads(data.leads || [])
+    if (data.lead) {
+      setSavedLeads((current) => mergeLeadInList(current, data.lead))
+    } else {
+      await refreshSavedLeads()
+    }
     return data
-  }, [])
+  }, [refreshSavedLeads])
 
   const patchLead = useCallback(async (leadId, body) => {
     let previous = []
@@ -381,7 +398,9 @@ export function AppProvider({ children }) {
 
     try {
       const data = await api.updateSavedLead(leadId, body)
-      setSavedLeads(data.leads || [])
+      if (data.lead) {
+        setSavedLeads((current) => mergeLeadInList(current, data.lead))
+      }
       return data.lead
     } catch (error) {
       setSavedLeads(previous)
@@ -396,7 +415,9 @@ export function AppProvider({ children }) {
 
   const assignLead = useCallback(async (leadId, assignToUserId) => {
     const data = await api.assignLead(leadId, assignToUserId)
-    setSavedLeads(data.leads || [])
+    if (data.lead) {
+      setSavedLeads((current) => mergeLeadInList(current, data.lead))
+    }
     return data
   }, [])
 
@@ -406,7 +427,11 @@ export function AppProvider({ children }) {
 
   const logCrmEmailSend = useCallback(async (leadId, payload) => {
     const data = await api.sendCrmEmail(leadId, payload)
-    if (data.leads) setSavedLeads(data.leads)
+    if (data.lead) {
+      setSavedLeads((current) => mergeLeadInList(current, data.lead))
+    } else if (data.leads) {
+      setSavedLeads(data.leads)
+    }
     return data
   }, [])
 
@@ -424,13 +449,21 @@ export function AppProvider({ children }) {
 
   const syncEmailThread = useCallback(async (leadId) => {
     const data = await api.syncCrmEmailThread(leadId)
-    if (data.leads) setSavedLeads(data.leads)
+    if (data.lead) {
+      setSavedLeads((current) => mergeLeadInList(current, data.lead))
+    } else if (data.leads) {
+      setSavedLeads(data.leads)
+    }
     return data
   }, [])
 
   const logEmailReply = useCallback(async (leadId, payload) => {
     const data = await api.logCrmEmailReply(leadId, payload)
-    if (data.leads) setSavedLeads(data.leads)
+    if (data.lead) {
+      setSavedLeads((current) => mergeLeadInList(current, data.lead))
+    } else if (data.leads) {
+      setSavedLeads(data.leads)
+    }
     return data
   }, [])
 

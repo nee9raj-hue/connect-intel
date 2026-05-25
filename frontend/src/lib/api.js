@@ -99,8 +99,10 @@ export const api = {
   updateTeamBranding: (payload) => request('/api/team/branding', { method: 'PATCH', body: payload }),
   updateMemberPermissions: (payload) =>
     request('/api/team/permissions', { method: 'PATCH', body: payload }),
-  getSavedLeads: ({ silent = false, light = false } = {}) =>
-    request(`/api/saved-leads${light ? '?light=1' : ''}`, {}, { silent }),
+  getSavedLeads: ({ silent = false, light = true } = {}) =>
+    request(`/api/saved-leads${light ? '?light=1' : '?light=0'}`, {}, { silent }),
+  getPipelineLead: (leadId, { silent = false } = {}) =>
+    request(`/api/saved-leads?leadId=${encodeURIComponent(leadId)}`, {}, { silent }),
   getSearchHistory: ({ silent = false } = {}) => request('/api/search-history', {}, { silent }),
   saveLead: (lead) => request('/api/saved-leads', { method: 'POST', body: { lead } }),
   addManualLead: (manual) => request('/api/saved-leads', { method: 'POST', body: { manual } }),
