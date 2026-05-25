@@ -336,17 +336,46 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
     }
   }
 
+  const drainCampaignSends = async (campaignId, initialPending = 0) => {
+    let pending = initialPending
+    let totalSent = 0
+    let rounds = 0
+    const maxRounds = Math.ceil(Math.max(pending, 50) / 8) + 2
+    while (pending > 0 && rounds < maxRounds) {
+      rounds += 1
+      const chunk = await api.processMarketingCampaignSends(campaignId, { limit: 8, silent: true })
+      totalSent += chunk.sendResult?.sent || 0
+      pending = chunk.pendingSends ?? 0
+      if (!(chunk.sendResult?.sent || chunk.sendResult?.failed)) break
+    }
+    return { totalSent, pending }
+  }
+
   const startCampaign = async (id) => {
     setBusy(true)
     setError(null)
     try {
       const data = await api.startMarketingCampaign(id)
       const isWa = data.campaign?.channel === 'whatsapp'
-      setNotice(
-        isWa
-          ? `WhatsApp campaign ready — ${data.enrolled || 0} contacts. Open Reports to send from your phone.`
-          : `Campaign started — ${data.enrolled || 0} enrolled, ${data.sendResult?.sent || 0} sent`
-      )
+      let sent = data.sendResult?.sent || 0
+      if (!isWa && (data.pendingSends || 0) > 0) {
+        setNotice(`Sending… ${sent} of ${data.enrolled || 0} so far`)
+        const drained = await drainCampaignSends(id, data.pendingSends)
+        sent += drained.totalSent
+        if (drained.pending > 0) {
+          setNotice(
+            `Campaign started — ${data.enrolled || 0} enrolled, ${sent} sent. ${drained.pending} still queued; they will send in the background.`
+          )
+        } else {
+          setNotice(`Campaign started — ${data.enrolled || 0} enrolled, ${sent} sent`)
+        }
+      } else {
+        setNotice(
+          isWa
+            ? `WhatsApp campaign ready — ${data.enrolled || 0} contacts. Open Reports to send from your phone.`
+            : `Campaign started — ${data.enrolled || 0} enrolled, ${sent} sent`
+        )
+      }
       if (isWa) setTab('reports')
       await load()
       refreshSavedLeads?.()
@@ -376,8 +405,8 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
           </p>
         ) : user?.accountType === 'company' ? (
           <p className="text-[11px] text-gray-600 bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-2 mt-2 max-w-xl">
-            Your campaigns and templates are private to you. Under Lists, use stage filters and batch lists (50
-            per send) for your assigned pipeline leads.
+            Your campaigns and templates are private to you. Connect your work Gmail under Team → CRM email before
+            sending. Lists support stage filters and batches of 50 per send for your assigned leads.
           </p>
         ) : null}
         {user?.isOrgAdmin && user?.accountType === 'company' && !user?.whatsappAutoSendReady && (

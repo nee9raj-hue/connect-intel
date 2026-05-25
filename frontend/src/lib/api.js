@@ -39,20 +39,21 @@ async function request(path, options = {}, meta = { retried: false, silent: fals
 }
 
 async function requestInner(path, options = {}, { retried = false, silent = false } = {}) {
+  const { timeoutMs, ...fetchOptions } = options
   const token = getSessionToken()
   const response = await fetchWithTimeout(path, {
     credentials: 'same-origin',
     headers: {
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(options.headers || {}),
+      ...(fetchOptions.headers || {}),
     },
-    ...options,
+    ...fetchOptions,
     body:
-      options.body && typeof options.body !== 'string'
-        ? JSON.stringify(options.body)
-        : options.body,
-  })
+      fetchOptions.body && typeof fetchOptions.body !== 'string'
+        ? JSON.stringify(fetchOptions.body)
+        : fetchOptions.body,
+  }, timeoutMs)
 
   const text = await response.text()
   let data = {}
@@ -183,7 +184,13 @@ export const api = {
   importMyPipeline: ({ datasetType, rows, addToPipeline = true }) =>
     request('/api/my/imports', { method: 'POST', body: { datasetType, rows, addToPipeline } }),
   updateUserProfile: (payload) => request('/api/user/profile', { method: 'PATCH', body: payload }),
-  sendBulkCrmEmail: (payload) => request('/api/crm/bulk-email', { method: 'POST', body: payload }),
+  sendBulkCrmEmail: (payload, opts = {}) =>
+    request('/api/crm/bulk-email', {
+      method: 'POST',
+      body: payload,
+      timeoutMs: opts.timeoutMs ?? 120_000,
+      silent: opts.silent,
+    }),
   getMarketingOverview: () => request('/api/marketing/campaigns?overview=1'),
   getMarketingCampaignReport: (campaignId) =>
     request(`/api/marketing/campaigns?campaignId=${encodeURIComponent(campaignId)}`),
@@ -206,8 +213,19 @@ export const api = {
     request('/api/marketing/campaigns', { method: 'POST', body: payload }),
   updateMarketingCampaign: (payload) =>
     request('/api/marketing/campaigns', { method: 'PATCH', body: payload }),
-  startMarketingCampaign: (id) =>
-    request('/api/marketing/campaigns', { method: 'POST', body: { action: 'start', id } }),
+  startMarketingCampaign: (id, opts = {}) =>
+    request('/api/marketing/campaigns', {
+      method: 'POST',
+      body: { action: 'start', id },
+      timeoutMs: opts.timeoutMs ?? 90_000,
+    }),
+  processMarketingCampaignSends: (id, opts = {}) =>
+    request('/api/marketing/campaigns', {
+      method: 'POST',
+      body: { action: 'process_sends', id, limit: opts.limit ?? 8 },
+      timeoutMs: opts.timeoutMs ?? 90_000,
+      silent: opts.silent,
+    }),
   logMarketingWhatsAppSent: (enrollmentId) =>
     request('/api/marketing/campaigns', {
       method: 'POST',

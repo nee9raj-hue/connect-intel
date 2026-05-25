@@ -1,5 +1,10 @@
 import { applyCors, handleOptions, sendJson } from '../lib/server/http.js'
 
+/** Marketing/bulk sends may process several Gmail API calls per request. */
+export const config = {
+  maxDuration: 60,
+}
+
 const ROUTES = {
   health: () => import('../lib/server/handlers/health.js'),
   'integrations/status': () => import('../lib/server/handlers/integrations-status.js'),

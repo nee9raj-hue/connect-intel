@@ -460,9 +460,29 @@ export function AppProvider({ children }) {
   }, [])
 
   const sendBulkEmail = useCallback(async (payload) => {
-    const data = await api.sendBulkCrmEmail(payload)
-    if (data.leads) setSavedLeads(data.leads)
-    return data
+    const ids = [...new Set(Array.isArray(payload.leadIds) ? payload.leadIds : [])]
+    const CHUNK = 10
+    const aggregate = {
+      sentCount: 0,
+      failedCount: 0,
+      skippedCount: 0,
+      results: [],
+      leads: null,
+    }
+    for (let i = 0; i < ids.length; i += CHUNK) {
+      const chunkIds = ids.slice(i, i + CHUNK)
+      const data = await api.sendBulkCrmEmail(
+        { ...payload, leadIds: chunkIds },
+        { silent: i > 0, timeoutMs: 120_000 }
+      )
+      aggregate.sentCount += data.sentCount || 0
+      aggregate.failedCount += data.failedCount || 0
+      aggregate.skippedCount += data.skippedCount || 0
+      aggregate.results.push(...(data.results || []))
+      if (data.leads) aggregate.leads = data.leads
+    }
+    if (aggregate.leads) setSavedLeads(aggregate.leads)
+    return aggregate
   }, [])
 
   const bulkUpdatePipeline = useCallback(async (leadIds, actions) => {
