@@ -2,7 +2,13 @@ import { useMemo, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { isAllCitiesSelected, isAllStatesSelected } from '../../lib/filterOptions'
-import { getResultsBadge, softenNotice, PRODUCT, sanitizeCustomerText } from '../../lib/productCopy'
+import {
+  buildSearchEmptyMessage,
+  getResultsBadge,
+  softenNotice,
+  PRODUCT,
+  sanitizeCustomerText,
+} from '../../lib/productCopy'
 import { searchLeads } from '../../lib/searchService'
 import SearchFiltersBar from './SearchFiltersBar'
 import SearchResultsView, { FULL_DETAIL_PREVIEW_COUNT } from './SearchResultsView'
@@ -463,11 +469,7 @@ export default function PeopleSearch({ onNavigate }) {
         ) : displayLeads.length === 0 ? (
           <EmptyState
             title="No matches for these filters"
-            sub={
-              friendlyDiscoveryError
-                ? `Database had no matches. ${friendlyDiscoveryError} Try a clearer sentence with product and location.`
-                : 'Try a specific product or company type with a state or city, or import more companies in Admin / Team.'
-            }
+            sub={buildSearchEmptyMessage(results)}
             action={handleSearch}
           />
         ) : (

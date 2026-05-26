@@ -60,3 +60,18 @@ export function getResultsBadge(provider) {
 export function softenNotice(notice) {
   return sanitizeCustomerText(notice)
 }
+
+/** Empty-state copy for AI prospect search when no rows returned. */
+export function buildSearchEmptyMessage(results) {
+  const discovery = sanitizeCustomerText(results?.discoveryError)
+  if (discovery) {
+    return `No matches in the database. ${discovery} Try: "textile exporters in Ludhiana, Punjab".`
+  }
+  if (results?.liveAiAvailable === false) {
+    return 'Live AI search is not enabled on the server yet — specific cities like Ludhiana need it. Ask Connect Intel support to enable it, or import companies in Admin / Team.'
+  }
+  if (results?.liveAiAttempted) {
+    return 'Live AI ran but found no companies to list. Try a clearer phrase with product and city, e.g. "textile exporters in Ludhiana, Punjab".'
+  }
+  return 'Try a specific product or company type with a state or city, or import more companies in Admin / Team.'
+}
