@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
+import { cycleSidebarMode, loadSidebarMode, saveSidebarMode } from '../../lib/sidebarLayout'
 import { useApp } from '../../context/AppContext'
 import OnboardingModal from '../onboarding/OnboardingModal'
 import Sidebar from './Sidebar'
+import SidebarToggleButton from './SidebarToggleButton'
 import AppHeader from './AppHeader'
 import EmailOAuthNotice from './EmailOAuthNotice'
 import CrmGmailOAuthNotice from './CrmGmailOAuthNotice'
@@ -20,6 +22,15 @@ export default function AppShell() {
   const [activePanel, setActivePanel] = useState('overview')
   const [panelOptions, setPanelOptions] = useState({})
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
+  const [sidebarMode, setSidebarMode] = useState(() => loadSidebarMode())
+
+  const toggleSidebarCollapsed = useCallback(() => {
+    setSidebarMode((prev) => {
+      const next = cycleSidebarMode(prev)
+      saveSidebarMode(next)
+      return next
+    })
+  }, [])
   const [liveToast, setLiveToast] = useState(null)
   const needsOnboarding = user && !user.onboardingComplete && !user.isPlatformAdmin
   const { needed: needsGmailSetup, setNeeded: setNeedsGmailSetup } = useGmailSetupNeeded(user)
@@ -100,6 +111,8 @@ export default function AppShell() {
         onNavigate={navigate}
         mobileOpen={mobileNavOpen}
         onMobileClose={() => setMobileNavOpen(false)}
+        sidebarMode={sidebarMode}
+        onToggleSidebarCollapsed={toggleSidebarCollapsed}
       />
       <main className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden">
         <div className="md:hidden shrink-0 flex items-center gap-2 px-3 py-2 bg-white border-b border-gray-200">
@@ -117,7 +130,18 @@ export default function AppShell() {
           <EmailOAuthNotice onOpenSystemStatus={() => navigate('integrations')} />
         )}
         <MobileRequiredModal />
-        {!user?.isPlatformAdmin && <AppHeader onNavigate={navigate} />}
+        {!user?.isPlatformAdmin && (
+          <AppHeader
+            onNavigate={navigate}
+            sidebarMode={sidebarMode}
+            onToggleSidebarCollapsed={toggleSidebarCollapsed}
+          />
+        )}
+        {user?.isPlatformAdmin && (
+          <div className="hidden md:flex shrink-0 items-center px-4 py-2 bg-white border-b border-gray-200">
+            <SidebarToggleButton mode={sidebarMode} onToggle={toggleSidebarCollapsed} />
+          </div>
+        )}
         <CrmGmailOAuthNotice
           onOpenTeam={() =>
             navigate(user?.isOrgAdmin && user?.accountType === 'company' ? 'team' : 'my-email')

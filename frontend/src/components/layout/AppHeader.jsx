@@ -1,7 +1,8 @@
 import { useApp } from '../../context/AppContext'
 import NotificationBell from './NotificationBell'
+import SidebarToggleButton from './SidebarToggleButton'
 
-export default function AppHeader({ onNavigate }) {
+export default function AppHeader({ onNavigate, sidebarMode = 'expanded', onToggleSidebarCollapsed }) {
   const { user } = useApp()
   if (!user || user.isPlatformAdmin) return null
 
@@ -10,7 +11,13 @@ export default function AppHeader({ onNavigate }) {
   const crmFree = user.crmFreeMode !== false
 
   return (
-    <header className="shrink-0 flex items-center justify-end gap-2 px-4 py-2 bg-white border-b border-gray-200">
+    <header className="shrink-0 flex items-center justify-between gap-2 px-4 py-2 bg-white border-b border-gray-200">
+      <SidebarToggleButton
+        mode={sidebarMode}
+        onToggle={onToggleSidebarCollapsed}
+        className="hidden md:inline-flex shrink-0"
+      />
+      <div className="flex items-center justify-end gap-2 flex-1 min-w-0">
       <NotificationBell />
       <button
         type="button"
@@ -40,6 +47,7 @@ export default function AppHeader({ onNavigate }) {
         />
         Subscription: {subscriptionActive ? 'Active' : crmFree ? 'CRM free mode' : 'Inactive'}
       </button>
+      </div>
     </header>
   )
 }
