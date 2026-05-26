@@ -541,6 +541,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
                       setCampaignForm((p) => ({
                         ...p,
                         channel: ch.id,
+                        listId: '',
                         useSequence: ch.id === 'whatsapp' ? p.useSequence : p.useSequence,
                       }))
                     }
@@ -567,12 +568,21 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
                   className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
                 >
                   <option value="">Choose list…</option>
-                  {lists.map((l) => (
-                    <option key={l.id} value={l.id}>
-                      {marketingOptionLabel(l)} ({l.leadIds?.length || 0})
-                    </option>
-                  ))}
+                  {lists
+                    .filter((l) => (l.channel || 'email') === campaignForm.channel)
+                    .map((l) => (
+                      <option key={l.id} value={l.id}>
+                        {marketingOptionLabel(l)} ({l.leadIds?.length || 0})
+                        {l.channel === 'whatsapp' ? ' · WA' : ''}
+                      </option>
+                    ))}
                 </select>
+                {!lists.some((l) => (l.channel || 'email') === campaignForm.channel) && (
+                  <p className="text-[11px] text-amber-800 mt-1">
+                    No {campaignForm.channel === 'whatsapp' ? 'WhatsApp' : 'email'} lists yet — create one
+                    under Lists and pick Email or WhatsApp first.
+                  </p>
+                )}
                 <select
                   value={campaignForm.templateId}
                   onChange={(e) => applyTemplate(e.target.value)}
@@ -814,6 +824,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
                     <MarketingCreatorBadge name={l.createdByName} isOwn={l.isOwn} />
                   </div>
                   <p className="text-xs text-gray-500">
+                    {(l.channel || 'email') === 'whatsapp' ? 'WhatsApp' : 'Email'} ·{' '}
                     {l.leadIds?.length || 0} leads
                     {l.description ? ` · ${l.description}` : ''}
                   </p>

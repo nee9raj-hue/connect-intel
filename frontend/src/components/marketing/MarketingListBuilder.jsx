@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { api } from '../../lib/api'
 import { CRM_STATUSES, getStatusMeta } from '../../lib/crmConstants'
 import { leadDisplayName, leadHasSendableEmail } from '../../lib/emailUtils'
+import { leadHasCallablePhone } from '../../lib/phoneUtils'
 import {
   MARKETING_SEND_BATCH_SIZE,
   previewBatchNames,
@@ -20,11 +21,18 @@ function leadMatchesStage(lead, pipelineStage) {
   return (lead.crm?.status || 'new') === pipelineStage
 }
 
-function defaultNamePrefix(repName, pipelineStage) {
+function leadEligibleForChannel(lead, channel) {
+  return channel === 'whatsapp' ? leadHasCallablePhone(lead) : leadHasSendableEmail(lead)
+}
+
+function defaultNamePrefix(repName, pipelineStage, channel) {
   const base = String(repName || '').trim()
-  if (!pipelineStage || pipelineStage === 'all') return base
+  const ch = channel === 'whatsapp' ? 'WhatsApp' : 'Email'
+  if (!pipelineStage || pipelineStage === 'all') {
+    return base ? `${base} · ${ch}` : ch
+  }
   const label = getStatusMeta(pipelineStage).label
-  return base ? `${base} · ${label}` : label
+  return base ? `${base} · ${ch} · ${label}` : `${ch} · ${label}`
 }
 
 export default function MarketingListBuilder({
@@ -38,6 +46,7 @@ export default function MarketingListBuilder({
   setNotice,
   onListsCreated,
 }) {
+  const [listChannel, setListChannel] = useState('email')
   const [assigneeUserId, setAssigneeUserId] = useState('')
   const [pipelineStage, setPipelineStage] = useState('all')
   const [namePrefix, setNamePrefix] = useState('')
@@ -75,23 +84,23 @@ export default function MarketingListBuilder({
     if (!assigneeUserId) return []
     return (savedLeads || []).filter(
       (l) =>
-        leadHasSendableEmail(l) &&
+        leadEligibleForChannel(l, listChannel) &&
         leadMatchesAssignee(l, assigneeUserId) &&
         leadMatchesStage(l, pipelineStage)
     )
-  }, [savedLeads, assigneeUserId, pipelineStage])
+  }, [savedLeads, assigneeUserId, pipelineStage, listChannel])
 
   const stageCounts = useMemo(() => {
     if (!assigneeUserId) return []
     const base = (savedLeads || []).filter(
-      (l) => leadHasSendableEmail(l) && leadMatchesAssignee(l, assigneeUserId)
+      (l) => leadEligibleForChannel(l, listChannel) && leadMatchesAssignee(l, assigneeUserId)
     )
     return CRM_STATUSES.map((st) => ({
       id: st.id,
       label: st.label,
       count: base.filter((l) => leadMatchesStage(l, st.id)).length,
     })).filter((row) => row.count > 0)
-  }, [savedLeads, assigneeUserId])
+  }, [savedLeads, assigneeUserId, listChannel])
 
   const filteredLeads = useMemo(() => {
     const q = search.trim().toLowerCase()
@@ -100,7 +109,13 @@ export default function MarketingListBuilder({
       const name = leadDisplayName(l).toLowerCase()
       const company = String(l.company || '').toLowerCase()
       const email = String(l.email || '').toLowerCase()
-      return name.includes(q) || company.includes(q) || email.includes(q)
+      const phone = String(l.phone || '').toLowerCase()
+      return (
+        name.includes(q) ||
+        company.includes(q) ||
+        email.includes(q) ||
+        phone.includes(q)
+      )
     })
   }, [repLeads, search])
 
@@ -114,8 +129,18 @@ export default function MarketingListBuilder({
   useEffect(() => {
     if (!assigneeUserId || prefixTouched) return
     const rep = repOptions.find((r) => r.userId === assigneeUserId)
-    setNamePrefix(defaultNamePrefix(rep?.name, pipelineStage))
-  }, [assigneeUserId, pipelineStage, repOptions, prefixTouched])
+    setNamePrefix(defaultNamePrefix(rep?.name, pipelineStage, listChannel))
+  }, [assigneeUserId, pipelineStage, repOptions, prefixTouched, listChannel])
+
+  const onChannelChange = (channel) => {
+    setListChannel(channel)
+    setPipelineStage('all')
+    setListForm({ name: '', description: '', leadIds: [] })
+    setSearch('')
+    setPrefixTouched(false)
+    const rep = repOptions.find((r) => r.userId === assigneeUserId)
+    setNamePrefix(defaultNamePrefix(rep?.name, 'all', channel))
+  }
 
   const onRepChange = (userId) => {
     setAssigneeUserId(userId)
@@ -124,7 +149,7 @@ export default function MarketingListBuilder({
     setSearch('')
     setPrefixTouched(false)
     const rep = repOptions.find((r) => r.userId === userId)
-    setNamePrefix(defaultNamePrefix(rep?.name, 'all'))
+    setNamePrefix(defaultNamePrefix(rep?.name, 'all', listChannel))
   }
 
   const onStageChange = (stageId) => {
@@ -132,7 +157,7 @@ export default function MarketingListBuilder({
     setListForm((prev) => ({ ...prev, leadIds: [] }))
     if (!prefixTouched) {
       const rep = repOptions.find((r) => r.userId === assigneeUserId)
-      setNamePrefix(defaultNamePrefix(rep?.name, stageId))
+      setNamePrefix(defaultNamePrefix(rep?.name, stageId, listChannel))
     }
   }
 
@@ -161,7 +186,13 @@ export default function MarketingListBuilder({
   const saveSingleList = async () => {
     if (!listForm.name.trim()) return setError('List name is required')
     const ids = listForm.leadIds.length ? listForm.leadIds : repLeads.map((l) => l.id)
-    if (!ids.length) return setError('Select at least one lead with email')
+    if (!ids.length) {
+      return setError(
+        listChannel === 'whatsapp'
+          ? 'Select at least one lead with a valid mobile number'
+          : 'Select at least one lead with email'
+      )
+    }
     setBusy(true)
     setError(null)
     try {
@@ -169,6 +200,8 @@ export default function MarketingListBuilder({
         name: listForm.name.trim(),
         description: listForm.description.trim(),
         leadIds: ids,
+        channel: listChannel,
+        assigneeUserId: isCompany && assigneeUserId ? assigneeUserId : undefined,
       })
       setListForm({ name: '', description: '', leadIds: [] })
       setNotice('List saved')
@@ -185,7 +218,13 @@ export default function MarketingListBuilder({
     const prefix = namePrefix.trim()
     if (!prefix) return setError('Enter a name prefix for batch lists')
     const leadIds = listForm.leadIds.length ? listForm.leadIds : repLeads.map((l) => l.id)
-    if (!leadIds.length) return setError('No leads with email for this rep')
+    if (!leadIds.length) {
+      return setError(
+        listChannel === 'whatsapp'
+          ? 'No leads with a valid mobile number for this rep'
+          : 'No leads with email for this rep'
+      )
+    }
     if (
       !window.confirm(
         `Create ${batchPreview.length} list(s) of up to ${MARKETING_SEND_BATCH_SIZE} leads each?\n\n${batchPreview
@@ -203,6 +242,7 @@ export default function MarketingListBuilder({
         namePrefix: prefix,
         leadIds,
         pipelineStatus: pipelineStage === 'all' ? null : pipelineStage,
+        channel: listChannel,
       })
       setListForm({ name: '', description: '', leadIds: [] })
       setNotice(
@@ -219,34 +259,66 @@ export default function MarketingListBuilder({
   if (!isCompany) {
     return (
       <SimpleListForm
-        pipelineLeads={(savedLeads || []).filter(leadHasSendableEmail)}
+        pipelineLeads={savedLeads || []}
         listForm={listForm}
         setListForm={setListForm}
         onToggleLead={toggleLead}
         busy={busy}
         onSave={saveSingleList}
+        listChannel={listChannel}
+        onChannelChange={onChannelChange}
       />
     )
   }
 
+  const contactLabel = listChannel === 'whatsapp' ? 'mobile number' : 'email address'
+
   return (
     <div className="space-y-4">
+      <div>
+        <p className="text-xs font-medium text-gray-600 mb-2">List channel</p>
+        <div className="flex flex-wrap gap-2">
+          {[
+            { id: 'email', label: 'Email list' },
+            { id: 'whatsapp', label: 'WhatsApp list' },
+          ].map((ch) => (
+            <button
+              key={ch.id}
+              type="button"
+              onClick={() => onChannelChange(ch.id)}
+              className={`text-xs font-semibold px-3 py-1.5 rounded-lg border ${
+                listChannel === ch.id
+                  ? 'bg-gray-900 text-white border-gray-900'
+                  : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+              }`}
+            >
+              {ch.label}
+            </button>
+          ))}
+        </div>
+        <p className="text-[11px] text-gray-500 mt-1.5 leading-relaxed">
+          {listChannel === 'whatsapp'
+            ? 'Only pipeline leads with a valid phone number appear. Use this list for WhatsApp campaigns.'
+            : 'Only pipeline leads with a valid email appear. Use this list for email campaigns.'}
+        </p>
+      </div>
+
       <div className="rounded-lg border border-amber-100 bg-amber-50/80 px-3 py-2 text-xs text-amber-950 leading-relaxed">
         {isCompanyAdmin ? (
           <>
-            <strong>Team list builder:</strong> pick a sales leader and optional pipeline stage, then save
-            one list or auto-split into batches of {MARKETING_SEND_BATCH_SIZE} (same limit as bulk email).
+            <strong>Team list builder:</strong> choose Email or WhatsApp, pick a team member and pipeline
+            stage, then save one list or auto-split into batches of {MARKETING_SEND_BATCH_SIZE}.
           </>
         ) : (
           <>
-            <strong>Your list builder:</strong> filter by pipeline stage, select leads manually, or create
-            auto-split batches of {MARKETING_SEND_BATCH_SIZE} from your assigned leads.
+            <strong>Your list builder:</strong> choose Email or WhatsApp, filter by stage, then select leads
+            or create auto-split batches of {MARKETING_SEND_BATCH_SIZE}.
           </>
         )}
       </div>
 
       <label className="block text-xs font-medium text-gray-600">
-        {isCompanyAdmin ? 'Sales leader' : 'Lead owner'}
+        {isCompanyAdmin ? 'Team member (whose pipeline)' : 'Lead owner'}
         <select
           value={assigneeUserId}
           onChange={(e) => onRepChange(e.target.value)}
@@ -291,7 +363,7 @@ export default function MarketingListBuilder({
           )}
 
           <p className="text-xs text-gray-600">
-            <strong>{repLeads.length}</strong> leads with email
+            <strong>{repLeads.length}</strong> leads with {contactLabel}
             {pipelineStage !== 'all' ? ` in ${getStatusMeta(pipelineStage).label}` : ''}
             {selectedCount > 0 ? ` · ${selectedCount} selected` : ' · none selected (uses all filtered)'}
           </p>
@@ -339,7 +411,11 @@ export default function MarketingListBuilder({
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search name, company, email…"
+            placeholder={
+              listChannel === 'whatsapp'
+                ? 'Search name, company, phone…'
+                : 'Search name, company, email…'
+            }
             className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
           />
 
@@ -355,12 +431,15 @@ export default function MarketingListBuilder({
                   onChange={() => onToggleLead(l.id)}
                 />
                 <span className="truncate">
-                  {leadDisplayName(l)} · {getStatusMeta(l.crm?.status).label} · {l.email}
+                  {leadDisplayName(l)} · {getStatusMeta(l.crm?.status).label} ·{' '}
+                  {listChannel === 'whatsapp' ? l.phone : l.email}
                 </span>
               </label>
             ))}
             {!filteredLeads.length && (
-              <p className="text-xs text-gray-400 px-3 py-4">No matching leads with email.</p>
+              <p className="text-xs text-gray-400 px-3 py-4">
+                No matching leads with {contactLabel}.
+              </p>
             )}
           </div>
 
@@ -414,9 +493,41 @@ export default function MarketingListBuilder({
   )
 }
 
-function SimpleListForm({ pipelineLeads, listForm, setListForm, onToggleLead, busy, onSave }) {
+function SimpleListForm({
+  pipelineLeads,
+  listForm,
+  setListForm,
+  onToggleLead,
+  busy,
+  onSave,
+  listChannel,
+  onChannelChange,
+}) {
+  const eligible = pipelineLeads.filter((l) => leadEligibleForChannel(l, listChannel))
   return (
     <div className="space-y-3">
+      <div>
+        <p className="text-xs font-medium text-gray-600 mb-2">List channel</p>
+        <div className="flex flex-wrap gap-2">
+          {[
+            { id: 'email', label: 'Email list' },
+            { id: 'whatsapp', label: 'WhatsApp list' },
+          ].map((ch) => (
+            <button
+              key={ch.id}
+              type="button"
+              onClick={() => onChannelChange(ch.id)}
+              className={`text-xs font-semibold px-3 py-1.5 rounded-lg border ${
+                listChannel === ch.id
+                  ? 'bg-gray-900 text-white border-gray-900'
+                  : 'bg-white text-gray-600 border-gray-200'
+              }`}
+            >
+              {ch.label}
+            </button>
+          ))}
+        </div>
+      </div>
       <input
         value={listForm.name}
         onChange={(e) => setListForm((p) => ({ ...p, name: e.target.value }))}
@@ -424,10 +535,11 @@ function SimpleListForm({ pipelineLeads, listForm, setListForm, onToggleLead, bu
         className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
       />
       <p className="text-xs text-gray-500">
-        Select pipeline leads with email ({listForm.leadIds.length} selected)
+        Select pipeline leads with {listChannel === 'whatsapp' ? 'phone' : 'email'} (
+        {listForm.leadIds.length} selected)
       </p>
       <div className="max-h-48 overflow-y-auto border border-gray-100 rounded-lg divide-y divide-gray-50">
-        {pipelineLeads.map((l) => (
+        {eligible.map((l) => (
           <label
             key={l.id}
             className="flex items-center gap-2 px-3 py-2 text-xs cursor-pointer hover:bg-gray-50"
@@ -438,12 +550,14 @@ function SimpleListForm({ pipelineLeads, listForm, setListForm, onToggleLead, bu
               onChange={() => onToggleLead(l.id)}
             />
             <span className="truncate">
-              {leadDisplayName(l)} · {l.email}
+              {leadDisplayName(l)} · {listChannel === 'whatsapp' ? l.phone : l.email}
             </span>
           </label>
         ))}
-        {!pipelineLeads.length && (
-          <p className="text-xs text-gray-400 px-3 py-4">No leads with email in your pipeline.</p>
+        {!eligible.length && (
+          <p className="text-xs text-gray-400 px-3 py-4">
+            No leads with {listChannel === 'whatsapp' ? 'phone' : 'email'} in your pipeline.
+          </p>
         )}
       </div>
       <button
