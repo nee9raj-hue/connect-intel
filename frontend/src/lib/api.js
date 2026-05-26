@@ -69,6 +69,8 @@ async function requestInner(path, options = {}, { retried = false, silent = fals
     const message = data.error || data.hint || 'Request failed'
     const error = new Error(message)
     error.status = response.status
+    if (data.blocked) error.blocked = data.blocked
+    if (data.skippedUnsubscribed) error.skippedUnsubscribed = data.skippedUnsubscribed
 
     if (response.status === 401 && !retried && !path.includes('/api/auth/session')) {
       const session = await touchSession()
@@ -225,6 +227,10 @@ export const api = {
   createMarketingListBatches: (payload) =>
     request('/api/marketing/lists', { method: 'POST', body: { action: 'create_batches', ...payload } }),
   updateMarketingList: (payload) => request('/api/marketing/lists', { method: 'PATCH', body: payload }),
+  addMarketingListLeads: (id, leadIds) =>
+    request('/api/marketing/lists', { method: 'PATCH', body: { id, action: 'add_leads', leadIds } }),
+  removeMarketingListLeads: (id, leadIds) =>
+    request('/api/marketing/lists', { method: 'PATCH', body: { id, action: 'remove_leads', leadIds } }),
   deleteMarketingList: (id) => request('/api/marketing/lists', { method: 'DELETE', body: { id } }),
   listMarketingTemplates: () => request('/api/marketing/templates'),
   createMarketingTemplate: (payload) =>

@@ -8,6 +8,7 @@ import { DEFAULT_FORM_FIELDS, DEFAULT_FORM_THEME } from '../../../../lib/marketi
 import LoadingExperience from '../ui/LoadingExperience'
 import CampaignReportsView, { campaignToForm } from './CampaignReportsView'
 import MarketingListBuilder from './MarketingListBuilder'
+import MarketingListDetail from './MarketingListDetail'
 import WhatsAppInboxPanel from './WhatsAppInboxPanel'
 import MarketingCreatorBadge, { marketingOptionLabel } from './MarketingCreatorBadge'
 import WorkEmailOptions from '../team/WorkEmailOptions'
@@ -53,6 +54,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
   const [templates, setTemplates] = useState([])
   const [campaigns, setCampaigns] = useState([])
   const [forms, setForms] = useState([])
+  const [selectedListId, setSelectedListId] = useState(null)
   const [summary, setSummary] = useState(null)
   const [gmailStatus, setGmailStatus] = useState(null)
   const [orgCanSend, setOrgCanSend] = useState(false)
@@ -820,7 +822,16 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
             <section className="space-y-2">
               <h2 className="text-sm font-semibold text-gray-900">Saved lists</h2>
               {lists.map((l) => (
-                <div key={l.id} className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                <button
+                  key={l.id}
+                  type="button"
+                  onClick={() => setSelectedListId(l.id)}
+                  className={`w-full text-left bg-white border rounded-lg px-3 py-2 text-sm transition-colors ${
+                    selectedListId === l.id
+                      ? 'border-gray-900 ring-1 ring-gray-900'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
                   <div className="flex items-start justify-between gap-2">
                     <p className="font-medium text-gray-900">{l.name}</p>
                     <MarketingCreatorBadge name={l.createdByName} isOwn={l.isOwn} />
@@ -830,8 +841,25 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
                     {l.leadIds?.length || 0} leads
                     {l.description ? ` · ${l.description}` : ''}
                   </p>
-                </div>
+                </button>
               ))}
+              {selectedListId && (
+                <MarketingListDetail
+                  list={lists.find((l) => l.id === selectedListId)}
+                  savedLeads={savedLeads}
+                  busy={busy}
+                  setBusy={setBusy}
+                  setError={setError}
+                  setNotice={setNotice}
+                  onUpdated={(list) => {
+                    setLists((prev) => prev.map((x) => (x.id === list.id ? { ...x, ...list } : x)))
+                  }}
+                  onDeleted={() => {
+                    setSelectedListId(null)
+                    load()
+                  }}
+                />
+              )}
             </section>
           </div>
         ) : tab === 'inbox' ? (

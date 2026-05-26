@@ -126,6 +126,214 @@ export const STARTER_TEMPLATES = [
       { id: 'f1', type: 'footer' },
     ],
   },
+  {
+    id: 'product-launch',
+    name: 'Product launch',
+    subject: 'Introducing something new for {{companyName}}',
+    design: { ...DEFAULT_THEME, primaryColor: '#7c3aed' },
+    blocks: [
+      { id: 'h1', type: 'header', text: 'Product update', align: 'center' },
+      {
+        id: 'hero1',
+        type: 'hero',
+        heading: 'Built for teams like {{companyName}}',
+        subtext: 'Hi {{firstName}} — we are excited to share what is new.',
+      },
+      {
+        id: 't1',
+        type: 'text',
+        content:
+          'We have been working on features that help exporters and B2B teams close faster.\n\n• Faster follow-ups\n• Clear pipeline view\n• Works with your existing workflow',
+      },
+      { id: 'b1', type: 'button', label: 'See what is new', url: 'https://connectintel.net', align: 'center' },
+      { id: 'f1', type: 'footer' },
+    ],
+  },
+  {
+    id: 'event-invite',
+    name: 'Event invite',
+    subject: 'You are invited, {{firstName}}',
+    design: { ...DEFAULT_THEME, primaryColor: '#dc2626' },
+    blocks: [
+      { id: 'h1', type: 'header', text: 'Invitation', align: 'center' },
+      {
+        id: 'hero1',
+        type: 'hero',
+        heading: 'Join us live',
+        subtext: 'A session tailored for {{companyName}} and peers in your industry.',
+      },
+      {
+        id: 't1',
+        type: 'text',
+        content:
+          'Hi {{firstName}},\n\nWe would love to have you. Reply to this message or use the button below to confirm your spot.',
+      },
+      { id: 'b1', type: 'button', label: 'Reserve my seat', url: 'https://connectintel.net', align: 'center' },
+      { id: 's1', type: 'spacer', height: 12 },
+      { id: 'f1', type: 'footer' },
+    ],
+  },
+  {
+    id: 're-engagement',
+    name: 'Re-engagement',
+    subject: 'Still interested, {{firstName}}?',
+    design: { ...DEFAULT_THEME, primaryColor: '#ea580c' },
+    blocks: [
+      { id: 'h1', type: 'header', text: 'Quick note', align: 'left' },
+      {
+        id: 't1',
+        type: 'text',
+        content:
+          'Hi {{firstName}},\n\nWe have not heard back from {{companyName}} in a while. If timing changed, no problem — just let us know.',
+      },
+      {
+        id: 't2',
+        type: 'text',
+        content: 'If you are still exploring options, I am happy to send a short summary or jump on a 10-minute call.',
+      },
+      { id: 'b1', type: 'button', label: 'Yes, still interested', url: 'https://connectintel.net', align: 'center' },
+      { id: 'f1', type: 'footer' },
+    ],
+  },
+  {
+    id: 'case-study',
+    name: 'Case study',
+    subject: 'How teams like {{companyName}} grow exports',
+    design: { ...DEFAULT_THEME, primaryColor: '#0891b2' },
+    blocks: [
+      { id: 'h1', type: 'header', text: 'Customer story', align: 'center' },
+      {
+        id: 'hero1',
+        type: 'hero',
+        heading: 'Results that speak for themselves',
+        subtext: 'Hi {{firstName}} — thought this might resonate with {{companyName}}.',
+      },
+      {
+        id: 't1',
+        type: 'text',
+        content:
+          'One of our customers increased qualified conversations by focusing on the right leads and consistent follow-up.\n\nI can share the full breakdown if useful.',
+      },
+      { id: 'b1', type: 'button', label: 'Read the story', url: 'https://connectintel.net', align: 'center' },
+      { id: 'f1', type: 'footer' },
+    ],
+  },
+  {
+    id: 'webinar',
+    name: 'Webinar',
+    subject: 'Live webinar for {{firstName}}',
+    design: { ...DEFAULT_THEME, primaryColor: '#4f46e5' },
+    blocks: [
+      { id: 'h1', type: 'header', text: 'Webinar', align: 'center' },
+      {
+        id: 'hero1',
+        type: 'hero',
+        heading: 'Export growth playbook',
+        subtext: 'Practical tactics for {{companyName}} — 45 minutes, Q&A included.',
+      },
+      { id: 't1', type: 'text', content: 'Hi {{firstName}},\n\nSave your seat for our upcoming session. Recording shared with registrants.' },
+      { id: 'b1', type: 'button', label: 'Register free', url: 'https://connectintel.net', align: 'center' },
+      { id: 'f1', type: 'footer' },
+    ],
+  },
+  {
+    id: 'thank-you',
+    name: 'Thank you',
+    subject: 'Thank you, {{firstName}}',
+    design: { ...DEFAULT_THEME, primaryColor: '#059669' },
+    blocks: [
+      { id: 'h1', type: 'header', text: 'Thank you', align: 'center' },
+      {
+        id: 'hero1',
+        type: 'hero',
+        heading: 'We appreciate you',
+        subtext: 'Hi {{firstName}} — thanks from our team to everyone at {{companyName}}.',
+      },
+      {
+        id: 't1',
+        type: 'text',
+        content: 'Your time and trust mean a lot. If there is anything we can improve, reply anytime.',
+      },
+      { id: 'f1', type: 'footer' },
+    ],
+  },
+  {
+    id: 'pricing',
+    name: 'Pricing / offer',
+    subject: 'Special offer for {{companyName}}',
+    design: { ...DEFAULT_THEME, primaryColor: '#b45309' },
+    blocks: [
+      { id: 'h1', type: 'header', text: 'Limited offer', align: 'center' },
+      {
+        id: 'hero1',
+        type: 'hero',
+        heading: 'Pricing tailored for you',
+        subtext: 'Hi {{firstName}} — here is what we can do for {{companyName}} this quarter.',
+      },
+      {
+        id: 't1',
+        type: 'text',
+        content:
+          '• Flexible plans for growing teams\n• No long lock-in\n• Onboarding support included\n\nReply for a custom quote.',
+      },
+      { id: 'b1', type: 'button', label: 'View plans', url: 'https://connectintel.net', align: 'center' },
+      { id: 'f1', type: 'footer' },
+    ],
+  },
+  {
+    id: 'testimonial',
+    name: 'Testimonial',
+    subject: 'What peers say — for {{firstName}}',
+    design: { ...DEFAULT_THEME, primaryColor: '#6366f1' },
+    blocks: [
+      { id: 'h1', type: 'header', text: 'Testimonial', align: 'center' },
+      {
+        id: 't1',
+        type: 'text',
+        content:
+          '"We cut follow-up time in half and never lost track of a lead again."\n\n— Operations lead, manufacturing exporter',
+      },
+      {
+        id: 't2',
+        type: 'text',
+        content: 'Hi {{firstName}}, thought you might find this relevant for {{companyName}}.',
+      },
+      { id: 'b1', type: 'button', label: 'Talk to us', url: 'https://connectintel.net', align: 'center' },
+      { id: 'f1', type: 'footer' },
+    ],
+  },
+  {
+    id: 'holiday',
+    name: 'Seasonal greeting',
+    subject: 'Warm wishes from our team',
+    design: { ...DEFAULT_THEME, primaryColor: '#be123c', backgroundColor: '#fef2f2' },
+    blocks: [
+      { id: 'h1', type: 'header', text: 'Season\'s greetings', align: 'center' },
+      {
+        id: 'hero1',
+        type: 'hero',
+        heading: 'Happy holidays, {{firstName}}',
+        subtext: 'Wishing you and everyone at {{companyName}} a great season ahead.',
+      },
+      { id: 't1', type: 'text', content: 'Thank you for being part of our community this year.' },
+      { id: 'f1', type: 'footer' },
+    ],
+  },
+  {
+    id: 'follow-up-short',
+    name: 'Short follow-up',
+    subject: 'Following up — {{firstName}}',
+    design: { ...DEFAULT_THEME },
+    blocks: [
+      {
+        id: 't1',
+        type: 'text',
+        content: 'Hi {{firstName}},\n\nJust bumping this to the top of your inbox. Happy to help {{companyName}} whenever timing works.',
+      },
+      { id: 'b1', type: 'button', label: 'Reply here', url: 'mailto:', align: 'left' },
+      { id: 'f1', type: 'footer' },
+    ],
+  },
 ]
 
 const PREVIEW_LEAD = {
@@ -219,6 +427,46 @@ export function mergeBlocksForLead(blocks, lead = PREVIEW_LEAD) {
     lead,
     appBase
   )
+}
+
+/** Plain text for WhatsApp (wa.me) from designed blocks. */
+export function blocksToPlainText(blocks, lead = PREVIEW_LEAD) {
+  const merged = mergeBlocksForLead(blocks, lead)
+  const parts = []
+  for (const block of merged) {
+    switch (block.type) {
+      case 'header':
+        if (block.text) parts.push(block.text)
+        break
+      case 'hero':
+        if (block.heading) parts.push(block.heading)
+        if (block.subtext) parts.push(block.subtext)
+        break
+      case 'text':
+        if (block.content) parts.push(block.content)
+        break
+      case 'button':
+        if (block.label && block.url) parts.push(`${block.label}: ${block.url}`)
+        else if (block.label) parts.push(block.label)
+        break
+      case 'form': {
+        const url = block.url || block.resolvedFormUrl
+        if (block.title && url) parts.push(`${block.title}: ${url}`)
+        break
+      }
+      case 'image':
+        if (block.alt) parts.push(block.alt)
+        else if (block.url) parts.push(block.url)
+        break
+      case 'footer':
+        if (block.text) parts.push(block.text)
+        break
+      default:
+        break
+    }
+    parts.push('')
+  }
+  return parts.join('\n').replace(/\n{3,}/g, '\n\n').trim()
 }
 
 function richInlineHtml(value, styleCss) {

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { buildWhatsAppUrl, leadHasCallablePhone } from '../../lib/phoneUtils'
+import { STARTER_TEMPLATES, blocksToPlainText } from '../../lib/marketingEmailDesign'
 import {
   CRM_STATUSES,
   EMAIL_PURPOSES,
@@ -101,6 +102,8 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
   const [waAgenda, setWaAgenda] = useState('')
   const [waKeyPoints, setWaKeyPoints] = useState('')
   const [waGenerating, setWaGenerating] = useState(false)
+  const [waTemplates, setWaTemplates] = useState([])
+  const [waTemplatePick, setWaTemplatePick] = useState('')
   const [taskTitle, setTaskTitle] = useState('')
   const [taskDue, setTaskDue] = useState('')
   const [taskAssignee, setTaskAssignee] = useState(user?.id || '')
@@ -155,6 +158,14 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
       refreshTeam()
     }
   }, [tab, user?.accountType, refreshTeam])
+
+  useEffect(() => {
+    if (tab !== 'whatsapp') return
+    api
+      .listMarketingTemplates()
+      .then((data) => setWaTemplates(data.templates || []))
+      .catch(() => setWaTemplates([]))
+  }, [tab])
 
   useEffect(() => {
     if (tab !== 'email') return
@@ -1294,9 +1305,56 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
         {tab === 'whatsapp' && (
           <>
             <p className="text-xs text-gray-600">
-              Sends from <strong>your WhatsApp</strong> ({user?.mobile || 'add mobile in profile'}) to{' '}
-              <strong>{lead.phone || 'no phone on lead'}</strong>.
+              Opens <strong>your WhatsApp app</strong> (wa.me) — not the business API. Use a marketing template or AI
+              draft, then send from your phone to <strong>{lead.phone || 'no phone'}</strong>.
             </p>
+            <label className="block text-xs font-semibold text-gray-700">
+              Load template
+              <select
+                value={waTemplatePick}
+                onChange={(e) => {
+                  const v = e.target.value
+                  setWaTemplatePick(v)
+                  if (!v) return
+                  if (v.startsWith('preset:')) {
+                    const preset = STARTER_TEMPLATES.find((s) => s.id === v.slice(7))
+                    if (preset) {
+                      setWaMessage(blocksToPlainText(preset.blocks, lead))
+                      setNotice(`Preset loaded: ${preset.name}`)
+                    }
+                  } else {
+                    const t = waTemplates.find((x) => x.id === v)
+                    if (t?.blocks?.length) {
+                      setWaMessage(blocksToPlainText(t.blocks, lead))
+                      setNotice(`Template loaded: ${t.name}`)
+                    } else if (t?.body) {
+                      setWaMessage(t.body)
+                      setNotice(`Template loaded: ${t.name}`)
+                    }
+                  }
+                  setWaTemplatePick('')
+                }}
+                className="mt-1 w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5"
+              >
+                <option value="">Choose preset or saved template…</option>
+                <optgroup label="Built-in presets">
+                  {STARTER_TEMPLATES.map((s) => (
+                    <option key={s.id} value={`preset:${s.id}`}>
+                      {s.name}
+                    </option>
+                  ))}
+                </optgroup>
+                {waTemplates.length > 0 && (
+                  <optgroup label="Your saved templates">
+                    {waTemplates.map((t) => (
+                      <option key={t.id} value={t.id}>
+                        {t.name}
+                      </option>
+                    ))}
+                  </optgroup>
+                )}
+              </select>
+            </label>
             {!hasLeadPhone && (
               <p className="text-xs text-amber-900 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1.5">
                 This lead needs a valid phone number on the record.

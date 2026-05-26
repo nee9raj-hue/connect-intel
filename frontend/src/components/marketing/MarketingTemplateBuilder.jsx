@@ -14,16 +14,35 @@ import {
 import MarketingBlockEditor from './MarketingBlockEditor'
 
 const PALETTE = [
-  { type: 'header', label: 'Header', hint: 'Brand bar' },
-  { type: 'hero', label: 'Hero', hint: 'Big headline' },
-  { type: 'text', label: 'Text', hint: 'Paragraphs' },
-  { type: 'image', label: 'Image', hint: 'Photo banner' },
-  { type: 'social', label: 'Social', hint: 'Brand icons row' },
-  { type: 'button', label: 'Button', hint: 'Call to action' },
-  { type: 'form', label: 'Form', hint: 'Google or your form' },
-  { type: 'divider', label: 'Divider', hint: 'Line break' },
-  { type: 'spacer', label: 'Spacer', hint: 'Vertical space' },
-  { type: 'footer', label: 'Footer', hint: 'Small print' },
+  { type: 'header', label: 'Heading', hint: 'Brand bar' },
+  { type: 'hero', label: 'Hero', hint: 'Headline' },
+  { type: 'text', label: 'Paragraph', hint: 'Body text' },
+  { type: 'image', label: 'Image', hint: 'Banner' },
+  { type: 'button', label: 'Button', hint: 'CTA' },
+  { type: 'divider', label: 'Divider', hint: 'Line' },
+  { type: 'spacer', label: 'Spacer', hint: 'Space' },
+  { type: 'social', label: 'Social', hint: 'Icons' },
+  { type: 'form', label: 'Form', hint: 'Capture' },
+  { type: 'footer', label: 'Footer', hint: 'Legal' },
+]
+
+const BLOCK_ICONS = {
+  header: 'H',
+  hero: '★',
+  text: '¶',
+  image: '▣',
+  button: '▶',
+  divider: '—',
+  spacer: '↕',
+  social: '◎',
+  form: '☰',
+  footer: 'ⓘ',
+}
+
+const BUILDER_TABS = [
+  { id: 'blocks', label: 'Blocks' },
+  { id: 'styles', label: 'Styles' },
+  { id: 'presets', label: 'Presets' },
 ]
 
 const FOLLOW_UP_STARTER = {
@@ -146,8 +165,11 @@ export default function MarketingTemplateBuilder({
   marketingForms = [],
 }) {
   const [previewMode, setPreviewMode] = useState('desktop')
+  const [sideTab, setSideTab] = useState('blocks')
+  const [selectedBlockIndex, setSelectedBlockIndex] = useState(0)
   const [dragIndex, setDragIndex] = useState(null)
   const [dropIndex, setDropIndex] = useState(null)
+  const [paletteDragType, setPaletteDragType] = useState(null)
 
   const previewHtml = useMemo(
     () => renderEmailHtml(value.blocks || [], value.design || DEFAULT_THEME, { previewText: value.previewText }),
@@ -177,7 +199,29 @@ export default function MarketingTemplateBuilder({
   }
 
   const addBlock = (type) => {
-    onChange({ ...value, blocks: [...(value.blocks || []), createBlock(type)] })
+    const blocks = [...(value.blocks || []), createBlock(type)]
+    onChange({ ...value, blocks })
+    setSelectedBlockIndex(blocks.length - 1)
+  }
+
+  const handlePaletteDragStart = (e, type) => {
+    setPaletteDragType(type)
+    e.dataTransfer.effectAllowed = 'copy'
+    e.dataTransfer.setData('application/x-ci-block-type', type)
+  }
+
+  const handleCanvasDragOver = (e) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = paletteDragType ? 'copy' : 'move'
+  }
+
+  const handleCanvasDrop = (e) => {
+    e.preventDefault()
+    const type = paletteDragType || e.dataTransfer.getData('application/x-ci-block-type')
+    if (type) {
+      addBlock(type)
+      setPaletteDragType(null)
+    }
   }
 
   const handleDragStart = (e, index) => {
@@ -266,160 +310,30 @@ export default function MarketingTemplateBuilder({
         </div>
       )}
 
-      <div className="grid xl:grid-cols-[220px_1fr_360px] gap-4">
-        <aside className="bg-white border border-gray-200 rounded-xl p-3 space-y-3 h-fit">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">Add blocks</p>
-          <div className="grid gap-1.5">
-            {PALETTE.map((item) => (
-              <button
-                key={item.type}
-                type="button"
-                onClick={() => addBlock(item.type)}
-                className="text-left px-2.5 py-2 rounded-lg border border-gray-100 hover:border-gray-300 hover:bg-gray-50"
-              >
-                <span className="block text-xs font-semibold text-gray-900">{item.label}</span>
-                <span className="block text-[10px] text-gray-400">{item.hint}</span>
-              </button>
-            ))}
-          </div>
-          <div className="pt-2 border-t border-gray-100">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-500 mb-1.5">Starters</p>
-            <select
-              defaultValue=""
-              onChange={(e) => {
-                if (e.target.value) loadStarter(e.target.value)
-                e.target.value = ''
-              }}
-              className="w-full text-xs border border-gray-200 rounded-lg px-2 py-1.5"
-            >
-              <option value="">Load preset…</option>
-              {starters.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="pt-2 border-t border-gray-100">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-500 mb-1.5">Merge fields</p>
-            <div className="flex flex-wrap gap-1">
-              {MERGE_FIELDS.map((f) => (
-                <span key={f.token} className="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">
-                  {f.token}
-                </span>
-              ))}
-            </div>
-          </div>
-        </aside>
-
-        <section className="space-y-3">
-          <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-3">
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col min-h-[560px] max-h-[calc(100vh-10rem)]">
+        <div className="shrink-0 px-4 py-3 border-b border-gray-100 space-y-2">
+          <div className="flex flex-wrap gap-2">
             {showNameField && (
               <input
                 value={value.name || ''}
                 onChange={(e) => onChange({ ...value, name: e.target.value })}
                 placeholder="Template name"
-                className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
+                className="flex-1 min-w-[140px] text-sm border border-gray-200 rounded-lg px-3 py-2"
               />
             )}
             <input
               value={value.subject || ''}
               onChange={(e) => onChange({ ...value, subject: e.target.value })}
-              placeholder="Email subject — {{firstName}}, your update"
-              className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
+              placeholder="Subject — {{firstName}}, your update"
+              className="flex-[2] min-w-[200px] text-sm border border-gray-200 rounded-lg px-3 py-2"
             />
-            <input
-              value={value.previewText || ''}
-              onChange={(e) => onChange({ ...value, previewText: e.target.value })}
-              placeholder="Preview text (inbox snippet, optional)"
-              className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
-            />
-            <label className="text-xs text-gray-600 block">
-              Default font
-              <select
-                value={FONT_OPTIONS.find((f) => f.stack === value.design?.fontFamily)?.id || 'arial'}
-                onChange={(e) => {
-                  const font = FONT_OPTIONS.find((f) => f.id === e.target.value)
-                  onChange({
-                    ...value,
-                    design: { ...DEFAULT_THEME, ...value.design, fontFamily: font?.stack || DEFAULT_THEME.fontFamily },
-                  })
-                }}
-                className="mt-1 w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5"
-              >
-                {FONT_OPTIONS.map((f) => (
-                  <option key={f.id} value={f.id}>{f.label}</option>
-                ))}
-              </select>
-            </label>
-            <div className="grid sm:grid-cols-2 gap-2">
-              <label className="text-xs text-gray-600">
-                Brand color
-                <input
-                  type="color"
-                  value={value.design?.primaryColor || DEFAULT_THEME.primaryColor}
-                  onChange={(e) =>
-                    onChange({ ...value, design: { ...DEFAULT_THEME, ...value.design, primaryColor: e.target.value } })
-                  }
-                  className="block mt-1 h-9 w-full rounded border border-gray-200"
-                />
-              </label>
-              <label className="text-xs text-gray-600">
-                Background
-                <input
-                  type="color"
-                  value={value.design?.backgroundColor || DEFAULT_THEME.backgroundColor}
-                  onChange={(e) =>
-                    onChange({
-                      ...value,
-                      design: { ...DEFAULT_THEME, ...value.design, backgroundColor: e.target.value },
-                    })
-                  }
-                  className="block mt-1 h-9 w-full rounded border border-gray-200"
-                />
-              </label>
-            </div>
-          </div>
-
-          {!value.blocks?.length ? (
-            <div className="bg-white border border-dashed border-gray-300 rounded-xl p-8 text-center">
-              <p className="text-sm text-gray-600">No blocks yet.</p>
-              <p className="text-xs text-gray-400 mt-1">Add blocks from the left or load a starter template.</p>
-            </div>
-          ) : (
-            value.blocks.map((block, index) => (
-              <DraggableBlockCard
-                key={block.id}
-                block={block}
-                index={index}
-                total={value.blocks.length}
-                isDragging={dragIndex === index}
-                isDropTarget={dropIndex === index && dragIndex !== index}
-                onDragStart={handleDragStart}
-                onDragOver={handleDragOver}
-                onDrop={handleDrop}
-                onDragEnd={handleDragEnd}
-                onMoveUp={(i) => moveBlock(i, -1)}
-                onMoveDown={(i) => moveBlock(i, 1)}
-                onDuplicate={duplicateBlockAt}
-                onRemove={removeBlock}
-                onChange={(next) => updateBlock(index, next)}
-                marketingForms={marketingForms}
-              />
-            ))
-          )}
-        </section>
-
-        <aside className="bg-white border border-gray-200 rounded-xl overflow-hidden h-fit sticky top-4">
-          <div className="flex items-center justify-between px-3 py-2 border-b border-gray-100">
-            <p className="text-xs font-semibold text-gray-900">Live preview</p>
-            <div className="flex gap-1">
+            <div className="flex gap-1 items-center">
               {['desktop', 'mobile'].map((mode) => (
                 <button
                   key={mode}
                   type="button"
                   onClick={() => setPreviewMode(mode)}
-                  className={`text-[10px] px-2 py-0.5 rounded ${
+                  className={`text-[10px] px-2.5 py-1.5 rounded-md font-semibold capitalize ${
                     previewMode === mode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600'
                   }`}
                 >
@@ -428,25 +342,216 @@ export default function MarketingTemplateBuilder({
               ))}
             </div>
           </div>
-          <div
-            className={`bg-gray-100 p-3 ${previewMode === 'mobile' ? 'flex justify-center' : ''}`}
-            style={{ minHeight: 420 }}
+          <input
+            value={value.previewText || ''}
+            onChange={(e) => onChange({ ...value, previewText: e.target.value })}
+            placeholder="Inbox preview text (optional)"
+            className="w-full text-xs border border-gray-200 rounded-lg px-3 py-1.5"
+          />
+        </div>
+
+        <div className="flex flex-1 min-h-0">
+          <aside className="w-56 shrink-0 border-r border-gray-100 bg-white flex flex-col min-h-0">
+            <div className="shrink-0 flex border-b border-gray-100">
+              {BUILDER_TABS.map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setSideTab(tab.id)}
+                  className={`flex-1 py-2.5 text-[10px] font-bold uppercase tracking-wide border-b-2 -mb-px ${
+                    sideTab === tab.id
+                      ? 'border-gray-900 text-gray-900'
+                      : 'border-transparent text-gray-400 hover:text-gray-700'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+            <p className="shrink-0 px-3 py-1.5 text-[10px] text-gray-400 border-b border-gray-50">
+              {sideTab === 'blocks' && 'Drag to add content to your email'}
+              {sideTab === 'styles' && 'Theme colors and fonts'}
+              {sideTab === 'presets' && 'Start from a full layout'}
+            </p>
+            <div className="flex-1 overflow-y-auto p-2">
+              {sideTab === 'blocks' && (
+                <>
+                  <p className="text-[10px] text-gray-400 mb-2 px-1">Drag or click to add</p>
+                  <div className="grid grid-cols-3 gap-1.5">
+                    {PALETTE.map((item) => (
+                      <button
+                        key={item.type}
+                        type="button"
+                        draggable
+                        onDragStart={(e) => handlePaletteDragStart(e, item.type)}
+                        onDragEnd={() => setPaletteDragType(null)}
+                        onClick={() => addBlock(item.type)}
+                        className="flex flex-col items-center justify-center gap-1 p-2 rounded-lg border border-gray-100 hover:border-gray-300 hover:bg-gray-50 text-center min-h-[72px]"
+                      >
+                        <span className="text-lg text-gray-700 leading-none">{BLOCK_ICONS[item.type]}</span>
+                        <span className="text-[9px] font-semibold text-gray-800 leading-tight">{item.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <div className="mt-3 pt-2 border-t border-gray-100">
+                    <p className="text-[10px] font-semibold text-gray-500 mb-1">Merge fields</p>
+                    <div className="flex flex-wrap gap-1">
+                      {MERGE_FIELDS.map((f) => (
+                        <span key={f.token} className="text-[9px] bg-gray-100 text-gray-600 px-1 py-0.5 rounded">
+                          {f.token}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+              {sideTab === 'styles' && (
+                <div className="space-y-3 text-xs">
+                  <label className="block text-gray-600">
+                    Font
+                    <select
+                      value={FONT_OPTIONS.find((f) => f.stack === value.design?.fontFamily)?.id || 'arial'}
+                      onChange={(e) => {
+                        const font = FONT_OPTIONS.find((f) => f.id === e.target.value)
+                        onChange({
+                          ...value,
+                          design: {
+                            ...DEFAULT_THEME,
+                            ...value.design,
+                            fontFamily: font?.stack || DEFAULT_THEME.fontFamily,
+                          },
+                        })
+                      }}
+                      className="mt-1 w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5"
+                    >
+                      {FONT_OPTIONS.map((f) => (
+                        <option key={f.id} value={f.id}>
+                          {f.label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="block text-gray-600">
+                    Brand color
+                    <input
+                      type="color"
+                      value={value.design?.primaryColor || DEFAULT_THEME.primaryColor}
+                      onChange={(e) =>
+                        onChange({
+                          ...value,
+                          design: { ...DEFAULT_THEME, ...value.design, primaryColor: e.target.value },
+                        })
+                      }
+                      className="mt-1 h-9 w-full rounded border border-gray-200"
+                    />
+                  </label>
+                  <label className="block text-gray-600">
+                    Page background
+                    <input
+                      type="color"
+                      value={value.design?.backgroundColor || DEFAULT_THEME.backgroundColor}
+                      onChange={(e) =>
+                        onChange({
+                          ...value,
+                          design: { ...DEFAULT_THEME, ...value.design, backgroundColor: e.target.value },
+                        })
+                      }
+                      className="mt-1 h-9 w-full rounded border border-gray-200"
+                    />
+                  </label>
+                  <label className="block text-gray-600">
+                    Content background
+                    <input
+                      type="color"
+                      value={value.design?.contentBackground || DEFAULT_THEME.contentBackground}
+                      onChange={(e) =>
+                        onChange({
+                          ...value,
+                          design: { ...DEFAULT_THEME, ...value.design, contentBackground: e.target.value },
+                        })
+                      }
+                      className="mt-1 h-9 w-full rounded border border-gray-200"
+                    />
+                  </label>
+                </div>
+              )}
+              {sideTab === 'presets' && (
+                <div className="space-y-1.5">
+                  {starters.map((s) => (
+                    <button
+                      key={s.id}
+                      type="button"
+                      onClick={() => loadStarter(s.id)}
+                      className="w-full text-left px-2.5 py-2 rounded-lg border border-gray-100 hover:border-gray-300 hover:bg-gray-50"
+                    >
+                      <span className="block text-xs font-semibold text-gray-900">{s.name}</span>
+                      <span className="block text-[10px] text-gray-400 truncate">{s.subject}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </aside>
+
+          <main
+            className="flex-1 min-w-0 flex flex-col min-h-0 bg-[#e8eaed]"
+            onDragOver={handleCanvasDragOver}
+            onDrop={handleCanvasDrop}
           >
-            <iframe
-              title="Email preview"
-              srcDoc={previewHtml}
-              className="bg-white rounded-lg border border-gray-200"
-              style={{
-                width: previewMode === 'mobile' ? 320 : '100%',
-                height: 480,
-                border: 'none',
-              }}
-            />
-          </div>
-          <p className="text-[10px] text-gray-400 px-3 py-2 border-t border-gray-100">
-            Preview uses sample data: Alex @ Acme Corp
-          </p>
-        </aside>
+            <div className="flex-1 overflow-y-auto p-4 flex justify-center">
+              <iframe
+                title="Email canvas"
+                srcDoc={previewHtml}
+                className="bg-white shadow-lg rounded-sm border border-gray-200"
+                style={{
+                  width: previewMode === 'mobile' ? 320 : Math.min(value.design?.contentWidth || 600, 640),
+                  minHeight: 520,
+                  height: 520,
+                  border: 'none',
+                }}
+              />
+            </div>
+          </main>
+
+          <aside className="w-80 shrink-0 border-l border-gray-100 bg-white flex flex-col min-h-0">
+            <p className="shrink-0 px-3 py-2 text-[10px] font-bold uppercase tracking-wide text-gray-500 border-b border-gray-50">
+              Block structure
+            </p>
+            <div className="flex-1 overflow-y-auto p-2 space-y-2">
+              {!value.blocks?.length ? (
+                <p className="text-xs text-gray-400 text-center py-8 px-2">
+                  Drop blocks here or pick from the left. Presets load a full layout instantly.
+                </p>
+              ) : (
+                value.blocks.map((block, index) => (
+                  <div
+                    key={block.id}
+                    className={selectedBlockIndex === index ? 'ring-2 ring-gray-900 rounded-xl' : ''}
+                    onClick={() => setSelectedBlockIndex(index)}
+                  >
+                    <DraggableBlockCard
+                      block={block}
+                      index={index}
+                      total={value.blocks.length}
+                      isDragging={dragIndex === index}
+                      isDropTarget={dropIndex === index && dragIndex !== index}
+                      onDragStart={handleDragStart}
+                      onDragOver={handleDragOver}
+                      onDrop={handleDrop}
+                      onDragEnd={handleDragEnd}
+                      onMoveUp={(i) => moveBlock(i, -1)}
+                      onMoveDown={(i) => moveBlock(i, 1)}
+                      onDuplicate={duplicateBlockAt}
+                      onRemove={removeBlock}
+                      onChange={(next) => updateBlock(index, next)}
+                      marketingForms={marketingForms}
+                    />
+                  </div>
+                ))
+              )}
+            </div>
+          </aside>
+        </div>
       </div>
 
       {showSavedTemplates && templates.length > 0 && (

@@ -49,6 +49,25 @@ Enable **Gmail API** for the project.
 
 Link [Search Console](https://search.google.com/search-console) property `connectintel.net` to this Cloud project if Verification center requests it.
 
+### 4. App security (recommended — helps review, not a substitute for verification)
+
+In [Google Auth Platform](https://console.cloud.google.com/auth/overview) → **App security**:
+
+| Item | Helps customer Gmail? | What to do |
+|------|------------------------|------------|
+| **OAuth verification** (`gmail.send` approved) | **Yes — required** | Verification center submission (Phase D) |
+| **Cross-Account Protection** | Indirectly (trust / security review) | Turn on if Google offers it for your project |
+| **Use secure flows** (OAuth `state`) | Indirectly | See below |
+
+**“Use secure flows — Web client 1 not using state”**
+
+- **Work Gmail connect** already sends a signed `state` on the redirect URL (`lib/server/gmailOAuth.js` → `buildGmailOAuthStartUrl`, verified in `team-email-oauth-callback.js`).
+- **Sign-in with Google** uses Google Identity Services (JWT button in `GoogleSignIn.jsx`), which does **not** use the same redirect+`state` pattern — Google’s scanner often still flags the **same** OAuth client ID.
+- Fixing App security warnings **does not** remove “Access blocked: app has not completed verification”; only **scope verification** + `GOOGLE_OAUTH_VERIFIED=true` does.
+- Still worth fixing/enabling: reviewers see a healthier app; may speed security assessment.
+
+If the `state` warning persists after Gmail connect works in Testing: note in Verification center that redirect flows use `state`; sign-in uses GIS credential flow per Google’s Sign-In docs.
+
 ---
 
 ## Phase B — Vercel env (before & after approval)
