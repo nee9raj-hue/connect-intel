@@ -176,13 +176,21 @@ export const api = {
     request('/api/admin/research-leads', { method: 'POST', body: { filters, count } }),
   getOrgImportOverview: () => request('/api/org/imports'),
   importOrgPipeline: ({ datasetType, rows, addToPipeline = true }) =>
-    request('/api/org/imports', { method: 'POST', body: { datasetType, rows, addToPipeline } }),
+    request('/api/org/imports', {
+      method: 'POST',
+      body: { datasetType, rows, addToPipeline },
+      timeoutMs: 120_000,
+    }),
   getActiveTradingOverview: () => request('/api/org/active-trading'),
   importActiveTrading: (body) =>
     request('/api/org/active-trading', { method: 'POST', body }),
   getMyImportOverview: () => request('/api/my/imports'),
   importMyPipeline: ({ datasetType, rows, addToPipeline = true }) =>
-    request('/api/my/imports', { method: 'POST', body: { datasetType, rows, addToPipeline } }),
+    request('/api/my/imports', {
+      method: 'POST',
+      body: { datasetType, rows, addToPipeline },
+      timeoutMs: 120_000,
+    }),
   updateUserProfile: (payload) => request('/api/user/profile', { method: 'PATCH', body: payload }),
   sendBulkCrmEmail: (payload, opts = {}) =>
     request('/api/crm/bulk-email', {

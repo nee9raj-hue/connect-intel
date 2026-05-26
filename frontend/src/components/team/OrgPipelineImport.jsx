@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../../lib/api'
-import { parseUploadFile } from '../../lib/parseUpload'
+import { parseUploadFile, summarizeImportRows } from '../../lib/parseUpload'
 import {
   IMPORT_TEMPLATE_COLUMNS,
   downloadImportTemplateCsv,
@@ -43,9 +43,22 @@ export default function OrgPipelineImport({ onImported }) {
     setMessage('')
     try {
       const parsedRows = await parseUploadFile(file)
-      setRows(parsedRows)
+      const summary = summarizeImportRows(parsedRows)
+      setRows(summary.rows)
       setFileName(file.name)
-      setMessage(`Loaded ${parsedRows.length} row(s) from ${file.name}`)
+      if (!summary.total) {
+        setError('No data rows found. Use the Excel "Data" sheet or CSV with a company column.')
+        return
+      }
+      if (!summary.withCompany) {
+        setError(
+          `Found ${summary.total} row(s) but none have a company name. Use the "company" column from the template.`
+        )
+        return
+      }
+      setMessage(
+        `Loaded ${summary.total} row(s) — ${summary.withCompany} ready to import from ${file.name}.`
+      )
     } catch (err) {
       setRows([])
       setFileName('')
@@ -59,7 +72,10 @@ export default function OrgPipelineImport({ onImported }) {
     setError('')
     setMessage('')
     try {
-      const data = await api.importOrgPipeline({ datasetType, rows, addToPipeline })
+      const importRows = rows.filter((r) =>
+        Boolean(String(r.company || r.business_name || r.company_name || '').trim())
+      )
+      const data = await api.importOrgPipeline({ datasetType, rows: importRows, addToPipeline })
       setOverview(data)
       setRows([])
       setFileName('')
@@ -134,7 +150,7 @@ export default function OrgPipelineImport({ onImported }) {
           type="file"
           accept=".csv,.xlsx,.xls"
           onChange={handleFileChange}
-          className="block w-full text-sm text-gray-600 file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-gray-100 file:text-gray-800 hover:file:bg-gray-200"
+          className="block w-full text-sm text-gray-600 file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#ffcb2b] file:text-[#242424] hover:file:bg-[#f0bc00]"
         />
         {fileName && <p className="text-xs text-gray-500">{fileName}</p>}
 
