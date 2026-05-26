@@ -3,7 +3,17 @@ import { api } from '../../lib/api'
 import { leadDisplayName, leadHasSendableEmail } from '../../lib/emailUtils'
 import { leadHasCallablePhone } from '../../lib/phoneUtils'
 
-export default function MarketingListDetail({ list, savedLeads, onUpdated, onDeleted, busy, setBusy, setError, setNotice }) {
+export default function MarketingListDetail({
+  list,
+  savedLeads,
+  onUpdated,
+  onDeleted,
+  onClose,
+  busy,
+  setBusy,
+  setError,
+  setNotice,
+}) {
   const [search, setSearch] = useState('')
   const [addSearch, setAddSearch] = useState('')
   const [unsubPrompt, setUnsubPrompt] = useState(null)
@@ -38,7 +48,7 @@ export default function MarketingListDetail({ list, savedLeads, onUpdated, onDel
         const name = leadDisplayName(l).toLowerCase()
         return name.includes(q) || String(l.email || '').toLowerCase().includes(q)
       })
-      .slice(0, 40)
+      .slice(0, 80)
   }, [savedLeads, list?.leadIds, addSearch, channel])
 
   const removeLeads = async (leadIds) => {
@@ -103,90 +113,117 @@ export default function MarketingListDetail({ list, savedLeads, onUpdated, onDel
   if (!list) return null
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-4">
-      <div className="flex flex-wrap items-start justify-between gap-2">
-        <div>
-          <h3 className="text-sm font-semibold text-gray-900">{list.name}</h3>
+    <div className="flex flex-col h-full min-h-0">
+      <div className="shrink-0 px-4 py-3 border-b border-gray-100 flex items-start justify-between gap-3 bg-gray-50/50">
+        <div className="min-w-0">
+          <p className="text-[10px] font-bold uppercase tracking-wide text-gray-400">Editing list</p>
+          <h3 className="text-base font-semibold text-gray-900 truncate">{list.name}</h3>
           <p className="text-xs text-gray-500 mt-0.5">
             {channel === 'whatsapp' ? 'WhatsApp' : 'Email'} · {list.leadIds?.length || 0} contacts
+            {list.description ? ` · ${list.description}` : ''}
           </p>
         </div>
-        <button
-          type="button"
-          onClick={deleteList}
-          disabled={busy}
-          className="text-xs font-semibold text-red-700 underline disabled:opacity-50"
-        >
-          Delete list
-        </button>
+        <div className="flex items-center gap-2 shrink-0">
+          {onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-xs font-medium px-2 py-1 border border-gray-200 rounded-md text-gray-600 hover:bg-white"
+            >
+              Close
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={deleteList}
+            disabled={busy}
+            className="text-xs font-semibold text-red-700 px-2 py-1 rounded-md hover:bg-red-50 disabled:opacity-50"
+          >
+            Delete list
+          </button>
+        </div>
       </div>
 
       {unsubPrompt && (
-        <p className="text-xs text-amber-900 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+        <p className="shrink-0 mx-4 mt-3 text-xs text-amber-900 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
           {unsubPrompt}
         </p>
       )}
 
-      <div>
-        <p className="text-xs font-semibold text-gray-700 mb-1">People on this list</p>
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search members…"
-          className="w-full text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 mb-2"
-        />
-        <div className="max-h-48 overflow-y-auto border border-gray-100 rounded-lg divide-y divide-gray-50">
-          {!filteredMembers.length && (
-            <p className="text-xs text-gray-400 p-3 text-center">No contacts on this list yet.</p>
-          )}
-          {filteredMembers.map((l) => (
-            <div key={l.id} className="flex items-center justify-between gap-2 px-2.5 py-2 text-xs">
-              <div className="min-w-0">
-                <p className="font-medium text-gray-900 truncate">{leadDisplayName(l)}</p>
-                <p className="text-gray-400 truncate">{l.email || l.phone}</p>
-              </div>
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => removeLeads([l.id])}
-                className="shrink-0 text-red-700 font-semibold hover:underline disabled:opacity-50"
+      <div className="flex-1 min-h-0 grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-100">
+        <section className="flex flex-col min-h-0">
+          <div className="shrink-0 px-4 py-2.5 border-b border-gray-50 bg-white">
+            <p className="text-xs font-semibold text-gray-800">On this list</p>
+            <p className="text-[10px] text-gray-400">Remove contacts you no longer want to target</p>
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search members…"
+              className="mt-2 w-full text-xs border border-gray-200 rounded-lg px-2.5 py-1.5"
+            />
+          </div>
+          <div className="flex-1 overflow-y-auto min-h-0">
+            {!filteredMembers.length && (
+              <p className="text-xs text-gray-400 p-6 text-center">No contacts on this list yet.</p>
+            )}
+            {filteredMembers.map((l) => (
+              <div
+                key={l.id}
+                className="flex items-center justify-between gap-2 px-4 py-2.5 text-xs border-b border-gray-50 hover:bg-gray-50/80"
               >
-                Remove
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
+                <div className="min-w-0">
+                  <p className="font-medium text-gray-900 truncate">{leadDisplayName(l)}</p>
+                  <p className="text-gray-400 truncate">{l.email || l.phone}</p>
+                </div>
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => removeLeads([l.id])}
+                  className="shrink-0 text-red-700 font-semibold hover:underline disabled:opacity-50"
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+          </div>
+        </section>
 
-      <div>
-        <p className="text-xs font-semibold text-gray-700 mb-1">Add from pipeline</p>
-        <input
-          value={addSearch}
-          onChange={(e) => setAddSearch(e.target.value)}
-          placeholder="Search leads to add…"
-          className="w-full text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 mb-2"
-        />
-        <div className="max-h-40 overflow-y-auto border border-gray-100 rounded-lg divide-y divide-gray-50">
-          {!addCandidates.length && (
-            <p className="text-xs text-gray-400 p-3 text-center">No matching leads to add.</p>
-          )}
-          {addCandidates.map((l) => (
-            <div key={l.id} className="flex items-center justify-between gap-2 px-2.5 py-2 text-xs">
-              <div className="min-w-0">
-                <p className="font-medium text-gray-900 truncate">{leadDisplayName(l)}</p>
-                <p className="text-gray-400 truncate">{l.email || l.phone}</p>
-              </div>
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => addLeads([l.id])}
-                className="shrink-0 text-gray-900 font-semibold hover:underline disabled:opacity-50"
+        <section className="flex flex-col min-h-0">
+          <div className="shrink-0 px-4 py-2.5 border-b border-gray-50 bg-white">
+            <p className="text-xs font-semibold text-gray-800">Add from pipeline</p>
+            <p className="text-[10px] text-gray-400">Search and add leads to this list</p>
+            <input
+              value={addSearch}
+              onChange={(e) => setAddSearch(e.target.value)}
+              placeholder="Search leads to add…"
+              className="mt-2 w-full text-xs border border-gray-200 rounded-lg px-2.5 py-1.5"
+            />
+          </div>
+          <div className="flex-1 overflow-y-auto min-h-0">
+            {!addCandidates.length && (
+              <p className="text-xs text-gray-400 p-6 text-center">No matching leads to add.</p>
+            )}
+            {addCandidates.map((l) => (
+              <div
+                key={l.id}
+                className="flex items-center justify-between gap-2 px-4 py-2.5 text-xs border-b border-gray-50 hover:bg-gray-50/80"
               >
-                Add
-              </button>
-            </div>
-          ))}
-        </div>
+                <div className="min-w-0">
+                  <p className="font-medium text-gray-900 truncate">{leadDisplayName(l)}</p>
+                  <p className="text-gray-400 truncate">{l.email || l.phone}</p>
+                </div>
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => addLeads([l.id])}
+                  className="shrink-0 text-[#242424] font-semibold hover:underline disabled:opacity-50"
+                >
+                  Add
+                </button>
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
     </div>
   )

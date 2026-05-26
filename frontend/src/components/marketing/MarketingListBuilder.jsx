@@ -196,7 +196,7 @@ export default function MarketingListBuilder({
     setBusy(true)
     setError(null)
     try {
-      await api.createMarketingList({
+      const data = await api.createMarketingList({
         name: listForm.name.trim(),
         description: listForm.description.trim(),
         leadIds: ids,
@@ -205,7 +205,7 @@ export default function MarketingListBuilder({
       })
       setListForm({ name: '', description: '', leadIds: [] })
       setNotice('List saved')
-      await onListsCreated?.()
+      await onListsCreated?.(data)
     } catch (e) {
       setError(e.message)
     } finally {
@@ -248,7 +248,7 @@ export default function MarketingListBuilder({
       setNotice(
         `Created ${data.batchCount} list(s) · ${data.totalLeads} leads (max ${MARKETING_SEND_BATCH_SIZE} per send batch)`
       )
-      await onListsCreated?.()
+      await onListsCreated?.(data)
     } catch (e) {
       setError(e.message)
     } finally {

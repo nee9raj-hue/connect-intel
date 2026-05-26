@@ -804,8 +804,8 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
             </section>
           </div>
         ) : tab === 'lists' ? (
-          <div className="grid lg:grid-cols-2 gap-6 max-w-6xl">
-            <section className="bg-white border border-gray-200 rounded-xl p-4 space-y-3">
+          <div className="flex flex-col gap-4 max-w-6xl min-h-[min(720px,calc(100vh-11rem))]">
+            <section className="shrink-0 bg-white border border-gray-200 rounded-xl p-4 space-y-3">
               <h2 className="text-sm font-semibold text-gray-900">New list</h2>
               <MarketingListBuilder
                 user={user}
@@ -816,51 +816,78 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
                 setBusy={setBusy}
                 setError={setError}
                 setNotice={setNotice}
-                onListsCreated={load}
+                onListsCreated={async (result) => {
+                  await load()
+                  const pickId = result?.list?.id || result?.lists?.[0]?.id
+                  if (pickId) setSelectedListId(pickId)
+                }}
               />
             </section>
-            <section className="space-y-2">
-              <h2 className="text-sm font-semibold text-gray-900">Saved lists</h2>
-              {lists.map((l) => (
-                <button
-                  key={l.id}
-                  type="button"
-                  onClick={() => setSelectedListId(l.id)}
-                  className={`w-full text-left bg-white border rounded-lg px-3 py-2 text-sm transition-colors ${
-                    selectedListId === l.id
-                      ? 'border-gray-900 ring-1 ring-gray-900'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <p className="font-medium text-gray-900">{l.name}</p>
-                    <MarketingCreatorBadge name={l.createdByName} isOwn={l.isOwn} />
-                  </div>
-                  <p className="text-xs text-gray-500">
-                    {(l.channel || 'email') === 'whatsapp' ? 'WhatsApp' : 'Email'} ·{' '}
-                    {l.leadIds?.length || 0} leads
-                    {l.description ? ` · ${l.description}` : ''}
+
+            <div className="flex flex-1 min-h-[400px] border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
+              <div className="w-[min(100%,280px)] sm:w-72 shrink-0 flex flex-col border-r border-gray-200 bg-gray-50/80">
+                <div className="shrink-0 px-3 py-3 border-b border-gray-200 bg-white">
+                  <h2 className="text-sm font-semibold text-gray-900">Saved lists</h2>
+                  <p className="text-[11px] text-gray-500 mt-0.5 leading-snug">
+                    Click a list — contacts open on the right
                   </p>
-                </button>
-              ))}
-              {selectedListId && (
-                <MarketingListDetail
-                  list={lists.find((l) => l.id === selectedListId)}
-                  savedLeads={savedLeads}
-                  busy={busy}
-                  setBusy={setBusy}
-                  setError={setError}
-                  setNotice={setNotice}
-                  onUpdated={(list) => {
-                    setLists((prev) => prev.map((x) => (x.id === list.id ? { ...x, ...list } : x)))
-                  }}
-                  onDeleted={() => {
-                    setSelectedListId(null)
-                    load()
-                  }}
-                />
-              )}
-            </section>
+                </div>
+                <div className="flex-1 overflow-y-auto p-2 space-y-1.5 min-h-0">
+                  {!lists.length && (
+                    <p className="text-xs text-gray-400 text-center py-8 px-2">No lists yet. Create one above.</p>
+                  )}
+                  {lists.map((l) => (
+                    <button
+                      key={l.id}
+                      type="button"
+                      onClick={() => setSelectedListId(l.id)}
+                      className={`w-full text-left rounded-lg px-3 py-2.5 text-sm transition-all ${
+                        selectedListId === l.id
+                          ? 'bg-white border-2 border-gray-900 shadow-sm'
+                          : 'bg-white/60 border border-gray-200 hover:bg-white hover:border-gray-300'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="font-medium text-gray-900 leading-snug">{l.name}</p>
+                        <MarketingCreatorBadge name={l.createdByName} isOwn={l.isOwn} />
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {(l.channel || 'email') === 'whatsapp' ? 'WhatsApp' : 'Email'} ·{' '}
+                        {l.leadIds?.length || 0} contacts
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex-1 flex flex-col min-w-0 min-h-0 bg-white">
+                {selectedListId ? (
+                  <MarketingListDetail
+                    list={lists.find((l) => l.id === selectedListId)}
+                    savedLeads={savedLeads}
+                    busy={busy}
+                    setBusy={setBusy}
+                    setError={setError}
+                    setNotice={setNotice}
+                    onClose={() => setSelectedListId(null)}
+                    onUpdated={(list) => {
+                      setLists((prev) => prev.map((x) => (x.id === list.id ? { ...x, ...list } : x)))
+                    }}
+                    onDeleted={() => {
+                      setSelectedListId(null)
+                      load()
+                    }}
+                  />
+                ) : (
+                  <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
+                    <p className="text-sm font-medium text-gray-700">No list selected</p>
+                    <p className="text-xs text-gray-500 mt-2 max-w-xs leading-relaxed">
+                      Choose a list on the left to add or remove contacts. Both panels scroll independently.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         ) : tab === 'inbox' ? (
           <WhatsAppInboxPanel onNavigate={onNavigate} />
