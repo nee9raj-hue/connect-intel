@@ -133,8 +133,8 @@ export default function Sidebar({
         />
       )}
       <aside
-        className={`fixed md:static z-50 md:z-auto shrink-0 h-full bg-white border-r border-gray-200 flex flex-col overflow-hidden transition-[transform,width] duration-200 ease-in-out ${
-          mobileOpen ? 'translate-x-0 w-[260px]' : '-translate-x-full md:transform-none'
+        className={`fixed md:static z-50 shrink-0 h-full bg-white border-r border-gray-200 flex flex-col overflow-hidden transition-[width] duration-200 ease-in-out max-md:transition-transform ${
+          mobileOpen ? 'max-md:translate-x-0' : 'max-md:-translate-x-full'
         } w-[260px] ${railMode ? 'md:w-14' : 'md:w-60'}`}
       >
         <div
