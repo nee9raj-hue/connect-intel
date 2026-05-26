@@ -55,6 +55,10 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
   const [campaigns, setCampaigns] = useState([])
   const [forms, setForms] = useState([])
   const [selectedListId, setSelectedListId] = useState(null)
+  const [marketingTipsOpen, setMarketingTipsOpen] = useState(false)
+  const [campaignSetupOpen, setCampaignSetupOpen] = useState(false)
+
+  const isBuilderTab = tab === 'campaigns' || tab === 'templates'
   const [summary, setSummary] = useState(null)
   const [gmailStatus, setGmailStatus] = useState(null)
   const [orgCanSend, setOrgCanSend] = useState(false)
@@ -446,73 +450,115 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
   }
 
   return (
-    <div className="panel-shell bg-[#fafafa]">
-      <header className="shrink-0 px-4 sm:px-6 py-4 border-b border-gray-200 bg-white">
-        <h1 className="text-lg font-semibold text-gray-900">Marketing</h1>
-        <p className="text-sm text-gray-500 mt-0.5">
-          Lists, templates, campaigns, and lead capture forms — logged on each lead in Pipeline.
-        </p>
-        {(user?.isOrgAdmin || user?.orgRole === 'org_admin') && user?.accountType === 'company' ? (
-          <p className="text-[11px] text-gray-600 bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-2 mt-2 max-w-xl">
-            You see all team campaigns and templates (labeled by creator). Sales reps only see their own marketing
-            assets and send stats for their pipeline leads.
+    <div
+      className={`panel-shell bg-[#fafafa] ${
+        tab === 'campaigns' || tab === 'templates' ? 'marketing-campaigns-shell' : ''
+      }`}
+    >
+      <header
+        className={`shrink-0 border-b border-gray-200 bg-white ${
+          isBuilderTab ? 'px-3 sm:px-4 py-2' : 'px-4 sm:px-6 py-4'
+        }`}
+      >
+        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+          <div className="flex items-center gap-2 min-w-0 flex-wrap">
+            <h1 className={`font-semibold text-gray-900 ${isBuilderTab ? 'text-base' : 'text-lg'}`}>
+              Marketing
+            </h1>
+            {summary && isBuilderTab && (
+              <span className="text-[10px] text-gray-400 hidden md:inline">
+                {summary.campaigns} campaigns · {summary.sent} sent
+              </span>
+            )}
+            {needsWorkEmail && isBuilderTab && (
+              <span className="text-[10px] font-semibold text-amber-800 bg-amber-50 px-2 py-0.5 rounded">
+                Connect work email to send
+              </span>
+            )}
+          </div>
+          <div className="flex flex-wrap items-center gap-1">
+            {(needsWorkEmail ||
+              (user?.accountType === 'company' && !isBuilderTab) ||
+              (user?.isOrgAdmin && user?.accountType === 'company')) && (
+              <button
+                type="button"
+                onClick={() => setMarketingTipsOpen((o) => !o)}
+                className="text-[10px] font-semibold px-2 py-1 border border-gray-200 rounded-md text-gray-600 hover:bg-gray-50"
+              >
+                {marketingTipsOpen ? 'Hide tips' : 'Tips'}
+              </button>
+            )}
+            {TABS.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setTab(t.id)}
+                className={`text-xs font-semibold px-2.5 py-1 rounded-lg border ${
+                  tab === t.id
+                    ? 'bg-gray-900 text-white border-gray-900'
+                    : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {!isBuilderTab && (
+          <p className="text-sm text-gray-500 mt-2">
+            Lists, templates, campaigns, and lead capture forms — logged on each lead in Pipeline.
           </p>
-        ) : user?.accountType === 'company' ? (
-          <p className="text-[11px] text-gray-600 bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-2 mt-2 max-w-xl">
-            Your campaigns and templates are private to you. Connect work Gmail under{' '}
-            <button
-              type="button"
-              onClick={() => onNavigate?.('my-email')}
-              className="font-semibold underline text-[#5b4a00]"
-            >
-              Work email
-            </button>{' '}
-            in the sidebar before sending. Lists support stage filters and batches of 50 per send for your leads.
-          </p>
-        ) : null}
-        {needsWorkEmail && (
-          <div className="mt-3 max-w-xl">
-            <WorkEmailOptions onNavigate={onNavigate} compact />
+        )}
+
+        {marketingTipsOpen && (
+          <div className="mt-2 space-y-2 max-h-[28vh] overflow-y-auto">
+            {(user?.isOrgAdmin || user?.orgRole === 'org_admin') && user?.accountType === 'company' ? (
+              <p className="text-[11px] text-gray-600 bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-1.5">
+                Admins see all team campaigns. Reps only see their own assets.
+              </p>
+            ) : user?.accountType === 'company' ? (
+              <p className="text-[11px] text-gray-600 bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-1.5">
+                Connect work Gmail under{' '}
+                <button
+                  type="button"
+                  onClick={() => onNavigate?.('my-email')}
+                  className="font-semibold underline text-[#5b4a00]"
+                >
+                  Work email
+                </button>{' '}
+                before sending email campaigns.
+              </p>
+            ) : null}
+            {needsWorkEmail && (
+              <div className="max-w-xl">
+                <WorkEmailOptions onNavigate={onNavigate} compact />
+              </div>
+            )}
+            {user?.isOrgAdmin && user?.accountType === 'company' && !user?.whatsappAutoSendReady && (
+              <p className="text-[11px] text-amber-900 bg-amber-50 border border-amber-100 rounded-lg px-2.5 py-1.5">
+                WhatsApp API:{' '}
+                <button
+                  type="button"
+                  onClick={() => onNavigate?.('whatsapp-settings')}
+                  className="font-semibold underline text-[#5b4a00]"
+                >
+                  Workspace → WhatsApp API
+                </button>
+              </p>
+            )}
+            {summary && !isBuilderTab && (
+              <p className="text-[11px] text-gray-500">
+                {summary.campaigns} campaigns · {summary.enrolled} enrolled · {summary.sent} sent ·{' '}
+                {summary.opens} opens · {summary.clicks} clicks
+              </p>
+            )}
           </div>
         )}
-        {user?.isOrgAdmin && user?.accountType === 'company' && !user?.whatsappAutoSendReady && (
-          <p className="text-[11px] text-amber-900 bg-amber-50 border border-amber-100 rounded-lg px-2.5 py-2 mt-2 max-w-xl">
-            WhatsApp auto-send: connect API under{' '}
-            <button
-              type="button"
-              onClick={() => onNavigate?.('whatsapp-settings')}
-              className="font-semibold underline text-[#5b4a00]"
-            >
-              Workspace → WhatsApp API
-            </button>
-          </p>
-        )}
-        {summary && (
-          <p className="text-[11px] text-gray-500 mt-1">
-            {summary.campaigns} campaigns · {summary.enrolled} enrolled · {summary.sent} sent ·{' '}
-            {summary.opens} opens · {summary.clicks} clicks
-          </p>
-        )}
-        <div className="flex gap-1 mt-3">
-          {TABS.map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              onClick={() => setTab(t.id)}
-              className={`text-xs font-semibold px-3 py-1.5 rounded-lg border ${
-                tab === t.id
-                  ? 'bg-gray-900 text-white border-gray-900'
-                  : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
       </header>
 
       {(error || notice) && (
-        <div className="shrink-0 px-4 sm:px-6 pt-3">
+        <div className={`shrink-0 ${isBuilderTab ? 'px-3 sm:px-4 pt-1.5' : 'px-4 sm:px-6 pt-3'}`}>
           {error && (
             <p className="text-xs text-red-800 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
               {error}
@@ -526,14 +572,29 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
         </div>
       )}
 
-      <div className="panel-body-scroll px-4 sm:px-6 py-4">
+      <div
+        className={
+          tab === 'campaigns' || tab === 'templates'
+            ? 'panel-body-scroll flex flex-col min-h-0 overflow-hidden px-2 sm:px-3 py-2'
+            : 'panel-body-scroll px-4 sm:px-6 py-4'
+        }
+      >
         {loading ? (
           <LoadingExperience message={LOADING_MESSAGES.marketing} />
         ) : tab === 'campaigns' ? (
-          <div className="space-y-6 max-w-[1400px]">
-            <section className="bg-white border border-gray-200 rounded-xl p-4 space-y-3">
-              <h2 className="text-sm font-semibold text-gray-900">New campaign</h2>
-              <div className="flex flex-wrap gap-2 mb-1">
+          <div className="flex flex-col flex-1 min-h-0 max-w-[1400px] gap-2">
+            <details
+              open={campaignSetupOpen}
+              onToggle={(e) => setCampaignSetupOpen(e.target.open)}
+              className="shrink-0 bg-white border border-gray-200 rounded-lg overflow-hidden group"
+            >
+              <summary className="cursor-pointer list-none px-3 py-2 flex items-center justify-between gap-2 hover:bg-gray-50">
+                <span className="text-xs font-semibold text-gray-900">Campaign setup</span>
+                <span className="text-[10px] text-gray-400 group-open:hidden">Show to edit name, list, send</span>
+                <span className="text-[10px] text-gray-400 hidden group-open:inline">Click to collapse ↑</span>
+              </summary>
+              <div className="px-3 pb-3 pt-0 space-y-2 border-t border-gray-100">
+              <div className="flex flex-wrap gap-1.5 pt-2">
                 {[
                   { id: 'email', label: 'Email campaign' },
                   { id: 'whatsapp', label: 'WhatsApp campaign' },
@@ -713,18 +774,14 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
                   </p>
                 </div>
               )}
-              <p className="text-[10px] text-gray-400">
-                {campaignForm.channel === 'whatsapp'
-                  ? user?.whatsappAutoSendReady
-                    ? `Auto-send is on. ${pipelineLeadsWithPhone.length} contacts with phone — messages go out via your business number when you start the campaign.`
-                    : `Uses saved templates as plain-text WhatsApp. ${pipelineLeadsWithPhone.length} contacts have a phone. Connect API above for automatic send.`
-                  : 'Includes unsubscribe link. Connect work email under Workspace → Work email first.'}
-              </p>
-            </section>
+              </div>
+            </details>
 
+            <div className="flex-1 min-h-0 flex flex-col">
             {(!campaignForm.useSequence || campaignEmailStep === 1) && (
               <MarketingTemplateBuilder
                 embedded
+                fillHeight
                 showNameField={false}
                 showSavedTemplates={false}
                 title={campaignForm.channel === 'whatsapp' ? 'WhatsApp message 1' : 'Email 1'}
@@ -757,6 +814,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
             {campaignForm.useSequence && campaignEmailStep === 2 && (
               <MarketingTemplateBuilder
                 embedded
+                fillHeight
                 showNameField={false}
                 showSavedTemplates={false}
                 title="Follow-up email"
@@ -782,13 +840,17 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
                 marketingForms={forms}
               />
             )}
+            </div>
 
-            <section className="space-y-2">
-              <h2 className="text-sm font-semibold text-gray-900">Your campaigns</h2>
+            <details className="shrink-0 bg-white border border-gray-200 rounded-lg">
+              <summary className="cursor-pointer list-none px-3 py-2 text-xs font-semibold text-gray-900 hover:bg-gray-50">
+                Your campaigns ({campaigns.length})
+              </summary>
+              <div className="px-3 pb-3 border-t border-gray-100 max-h-[240px] overflow-y-auto">
               {!campaigns.length ? (
-                <p className="text-sm text-gray-500">No campaigns yet.</p>
+                <p className="text-xs text-gray-500 py-2">No campaigns yet.</p>
               ) : (
-                <div className="grid sm:grid-cols-2 gap-2">
+                <div className="grid sm:grid-cols-2 gap-2 pt-2">
                   {campaigns.map((c) => (
                     <CampaignCard
                       key={c.id}
@@ -801,7 +863,8 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
                   ))}
                 </div>
               )}
-            </section>
+              </div>
+            </details>
           </div>
         ) : tab === 'lists' ? (
           <div className="flex flex-col gap-4 max-w-6xl min-h-[min(720px,calc(100vh-11rem))]">
@@ -902,7 +965,9 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
             showCreator={Boolean(user?.isOrgAdmin && user?.accountType === 'company')}
           />
         ) : tab === 'templates' ? (
+          <div className="flex flex-col flex-1 min-h-0 max-w-[1400px]">
           <MarketingTemplateBuilder
+            fillHeight
             value={templateForm}
             onChange={setTemplateForm}
             onSave={saveTemplate}
@@ -917,6 +982,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
             onDelete={deleteTemplate}
             marketingForms={forms}
           />
+          </div>
         ) : (
           <div className="grid lg:grid-cols-2 gap-6 max-w-6xl">
             <section className="bg-white border border-gray-200 rounded-xl p-4 space-y-3">

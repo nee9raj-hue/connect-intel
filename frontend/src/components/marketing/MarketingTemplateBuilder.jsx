@@ -157,6 +157,7 @@ export default function MarketingTemplateBuilder({
   onEdit,
   onDelete,
   embedded = false,
+  fillHeight = false,
   showNameField = true,
   showSavedTemplates = true,
   title,
@@ -276,13 +277,19 @@ export default function MarketingTemplateBuilder({
       ? 'Build with blocks — drag to reorder, duplicate, and preview live.'
       : 'Drag blocks to reorder — use Insert icon inside text blocks for inline icons.')
 
+  const builderShellClass = fillHeight
+    ? 'flex-1 min-h-[min(680px,calc(100vh-9.5rem))] h-full'
+    : 'min-h-[560px] max-h-[calc(100vh-10rem)]'
+
   return (
-    <div className={`${embedded ? '' : 'max-w-[1400px] mx-auto'} space-y-4`}>
-      {(!embedded || onSave) && (
+    <div
+      className={`${embedded ? (fillHeight ? 'flex flex-col flex-1 min-h-0 h-full' : '') : 'max-w-[1400px] mx-auto'} ${fillHeight ? '' : 'space-y-4'}`}
+    >
+      {(!embedded || onSave) && !fillHeight && (
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="text-sm font-semibold text-gray-900">{headerTitle}</h2>
-            <p className="text-xs text-gray-500 mt-0.5">{headerSubtitle}</p>
+            {!fillHeight && <p className="text-xs text-gray-500 mt-0.5">{headerSubtitle}</p>}
           </div>
           {(onSave || onCancel) && (
             <div className="flex flex-wrap gap-2">
@@ -310,8 +317,15 @@ export default function MarketingTemplateBuilder({
         </div>
       )}
 
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col min-h-[560px] max-h-[calc(100vh-10rem)]">
-        <div className="shrink-0 px-4 py-3 border-b border-gray-100 space-y-2">
+      <div
+        className={`bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col ${builderShellClass}`}
+      >
+        {fillHeight && embedded && title && (
+          <p className="shrink-0 px-3 py-1.5 text-[11px] font-semibold text-gray-700 border-b border-gray-100 bg-gray-50/80">
+            {headerTitle}
+          </p>
+        )}
+        <div className="shrink-0 px-3 py-2 border-b border-gray-100 space-y-1.5">
           <div className="flex flex-wrap gap-2">
             {showNameField && (
               <input

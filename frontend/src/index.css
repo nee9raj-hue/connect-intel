@@ -90,6 +90,18 @@ body {
   overscroll-behavior-y: contain;
 }
 
+.marketing-campaigns-shell > .panel-body-scroll {
+  overflow: hidden;
+}
+
+details summary {
+  list-style: none;
+}
+
+details summary::-webkit-details-marker {
+  display: none;
+}
+
 .panel-chrome-scroll {
   flex-shrink: 0;
   max-height: min(36vh, 320px);
