@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useApp } from '../../context/AppContext'
 import {
   buildCustomerNavSections,
@@ -10,6 +11,25 @@ import {
 } from '../../lib/navConfig'
 
 import SidebarToggleButton from './SidebarToggleButton'
+
+const EXPAND_KEY = 'ci_nav_expanded'
+
+function loadExpanded() {
+  try {
+    const raw = localStorage.getItem(EXPAND_KEY)
+    return raw ? JSON.parse(raw) : {}
+  } catch {
+    return {}
+  }
+}
+
+function saveExpanded(state) {
+  try {
+    localStorage.setItem(EXPAND_KEY, JSON.stringify(state))
+  } catch {
+    // ignore
+  }
+}
 
 const ICONS = {
   home: HomeIcon,
@@ -59,10 +79,34 @@ export default function Sidebar({
     })
   }, [isOperator, user, pipelineCounts, upcomingCount])
 
+  const [expanded, setExpanded] = useState(() => loadExpanded())
+
   const isTargetActive = useCallback(
     (target) => isNavTargetActive(active, panelOptions, target),
     [active, panelOptions]
   )
+
+  useEffect(() => {
+    setExpanded((prev) => {
+      const next = { ...prev }
+      for (const section of sections) {
+        for (const group of section.groups) {
+          if (group.children?.some((child) => isTargetActive(child))) {
+            next[group.id] = true
+          }
+        }
+      }
+      return next
+    })
+  }, [active, panelOptions, sections, isTargetActive])
+
+  const toggleGroup = (groupId) => {
+    setExpanded((prev) => {
+      const next = { ...prev, [groupId]: !prev[groupId] }
+      saveExpanded(next)
+      return next
+    })
+  }
 
   const go = (target) => {
     onNavigate(target.panel, navTargetToOptions(target))
@@ -90,7 +134,7 @@ export default function Sidebar({
       )}
       <aside
         className={`fixed md:static z-50 md:z-auto shrink-0 h-full bg-white border-r border-gray-200 flex flex-col overflow-hidden transition-[transform,width] duration-200 ease-in-out ${
-          mobileOpen ? 'translate-x-0 w-[260px]' : '-translate-x-full md:translate-x-0'
+          mobileOpen ? 'translate-x-0 w-[260px]' : '-translate-x-full md:transform-none'
         } w-[260px] ${railMode ? 'md:w-14' : 'md:w-60'}`}
       >
         <div
@@ -146,6 +190,8 @@ export default function Sidebar({
                   group={group}
                   icons={ICONS}
                   compact={compactNav}
+                  navExpanded={Boolean(expanded[group.id])}
+                  onToggle={() => toggleGroup(group.id)}
                   isTargetActive={isTargetActive}
                   onGo={go}
                   resolveBadge={resolveBadge}
@@ -231,7 +277,17 @@ export default function Sidebar({
   )
 }
 
-function NavGroup({ group, icons, compact, isTargetActive, onGo, resolveBadge, muted = false }) {
+function NavGroup({
+  group,
+  icons,
+  compact,
+  navExpanded,
+  onToggle,
+  isTargetActive,
+  onGo,
+  resolveBadge,
+  muted = false,
+}) {
   const Icon = icons[group.icon] || HomeIcon
   const hasChildren = group.children?.length > 0
   const groupActive = hasChildren && group.children.some((child) => isTargetActive(child))
@@ -252,24 +308,56 @@ function NavGroup({ group, icons, compact, isTargetActive, onGo, resolveBadge, m
     )
   }
 
+  if (compact) {
+    return (
+      <RailNavPopup label={group.label} groupActive={groupActive} muted={muted} badge={badge} icon={Icon}>
+        {group.children.map((child) => (
+          <NavSubBtn
+            key={child.id}
+            label={child.label}
+            active={isTargetActive(child)}
+            badge={resolveBadge(child)}
+            onClick={() => onGo(child)}
+          />
+        ))}
+      </RailNavPopup>
+    )
+  }
+
   return (
-    <NavFlyoutMenu label={group.label} groupActive={groupActive} muted={muted} badge={badge} icon={Icon} compact={compact}>
-      {group.children.map((child) => (
-        <NavSubBtn
-          key={child.id}
-          label={child.label}
-          active={isTargetActive(child)}
-          badge={resolveBadge(child)}
-          onClick={() => onGo(child)}
-        />
-      ))}
-    </NavFlyoutMenu>
+    <div className="mb-0.5">
+      <button
+        type="button"
+        onClick={onToggle}
+        className={`w-full flex items-center gap-2 px-3 py-2 rounded-md text-[13px] font-medium transition-colors ${
+          groupActive ? 'bg-gray-100 text-gray-900' : muted ? 'text-gray-500 hover:bg-gray-50' : 'text-gray-600 hover:bg-gray-100'
+        }`}
+      >
+        <Icon className={`w-4 h-4 shrink-0 ${groupActive ? 'text-gray-700' : 'text-gray-500'}`} />
+        <span className="flex-1 text-left truncate">{group.label}</span>
+        <ChevronIcon className={`w-3.5 h-3.5 shrink-0 transition-transform ${navExpanded ? 'rotate-90' : ''}`} />
+      </button>
+      {navExpanded && (
+        <div className="ml-3 pl-2 border-l border-gray-100 mt-0.5 mb-1 space-y-0.5">
+          {group.children.map((child) => (
+            <NavSubBtn
+              key={child.id}
+              label={child.label}
+              active={isTargetActive(child)}
+              badge={resolveBadge(child)}
+              onClick={() => onGo(child)}
+            />
+          ))}
+        </div>
+      )}
+    </div>
   )
 }
 
-function NavFlyoutMenu({ label, groupActive, muted, badge, icon: Icon, compact, children }) {
+/** Popup submenu for icon-rail mode (portaled so it is not clipped by sidebar overflow/transform). */
+function RailNavPopup({ label, groupActive, muted, badge, icon: Icon, children }) {
   const [open, setOpen] = useState(false)
-  const [flyoutPos, setFlyoutPos] = useState({ top: 0, left: 0 })
+  const [flyoutPos, setFlyoutPos] = useState(null)
   const rootRef = useRef(null)
   const flyoutRef = useRef(null)
 
@@ -277,32 +365,64 @@ function NavFlyoutMenu({ label, groupActive, muted, badge, icon: Icon, compact, 
     const anchor = rootRef.current
     if (!anchor) return
     const rect = anchor.getBoundingClientRect()
-    const gap = 4
-    const panelWidth = 220
+    const gap = 6
+    const panelWidth = 224
+    const panelMaxHeight = Math.min(window.innerHeight * 0.65, 360)
     let left = rect.right + gap
     let top = rect.top
     if (left + panelWidth > window.innerWidth - 8) {
       left = Math.max(8, rect.left - panelWidth - gap)
     }
-    const maxTop = window.innerHeight - 320
-    if (top > maxTop) top = Math.max(8, maxTop)
+    if (top + panelMaxHeight > window.innerHeight - 8) {
+      top = Math.max(8, window.innerHeight - panelMaxHeight - 8)
+    }
     setFlyoutPos({ top, left })
   }, [])
 
-  useEffect(() => {
-    if (!open) return undefined
+  useLayoutEffect(() => {
+    if (!open) {
+      setFlyoutPos(null)
+      return undefined
+    }
     updateFlyoutPos()
     const onDoc = (e) => {
       if (rootRef.current?.contains(e.target) || flyoutRef.current?.contains(e.target)) return
       setOpen(false)
     }
+    const onKey = (e) => {
+      if (e.key === 'Escape') setOpen(false)
+    }
     window.addEventListener('resize', updateFlyoutPos)
+    window.addEventListener('scroll', updateFlyoutPos, true)
     document.addEventListener('mousedown', onDoc)
+    document.addEventListener('keydown', onKey)
     return () => {
       window.removeEventListener('resize', updateFlyoutPos)
+      window.removeEventListener('scroll', updateFlyoutPos, true)
       document.removeEventListener('mousedown', onDoc)
+      document.removeEventListener('keydown', onKey)
     }
   }, [open, updateFlyoutPos])
+
+  const popup =
+    open &&
+    flyoutPos &&
+    createPortal(
+      <div
+        ref={flyoutRef}
+        role="menu"
+        aria-label={label}
+        className="fixed z-[250] min-w-[200px] max-w-[240px] rounded-lg border border-gray-200 bg-white shadow-2xl py-1"
+        style={{ top: flyoutPos.top, left: flyoutPos.left }}
+        onClick={(e) => {
+          if (e.target.closest('button')) setOpen(false)
+        }}
+      >
+        <p className="px-3 py-2 text-xs font-semibold text-gray-900 border-b border-gray-100">{label}</p>
+        <div className="max-h-[min(65vh,360px)] overflow-y-auto p-1 space-y-0.5">{children}</div>
+      </div>,
+      document.body
+    )
 
   return (
     <div ref={rootRef} className="relative mb-0.5">
@@ -310,15 +430,9 @@ function NavFlyoutMenu({ label, groupActive, muted, badge, icon: Icon, compact, 
         type="button"
         title={label}
         aria-expanded={open}
-        onClick={() => {
-          setOpen((v) => {
-            if (!v) updateFlyoutPos()
-            return !v
-          })
-        }}
-        className={`relative w-full flex items-center rounded-md transition-colors ${
-          compact ? 'justify-center p-2.5' : 'gap-2 px-3 py-2 text-[13px] font-medium'
-        } ${
+        aria-haspopup="menu"
+        onClick={() => setOpen((v) => !v)}
+        className={`relative w-full flex justify-center items-center p-2.5 rounded-md transition-colors ${
           groupActive || open
             ? 'bg-gray-900 text-white'
             : muted
@@ -326,20 +440,8 @@ function NavFlyoutMenu({ label, groupActive, muted, badge, icon: Icon, compact, 
               : 'text-gray-600 hover:bg-gray-100'
         }`}
       >
-        <Icon
-          className={`shrink-0 ${compact ? 'w-5 h-5' : 'w-4 h-4'} ${groupActive || open ? 'text-white' : 'text-gray-500'}`}
-        />
-        {!compact && <span className="flex-1 text-left truncate">{label}</span>}
-        {!compact && badge != null && (
-          <span
-            className={`text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0 ${
-              groupActive || open ? 'bg-white/20 text-white' : 'bg-gray-200 text-gray-700'
-            }`}
-          >
-            {badge}
-          </span>
-        )}
-        {compact && badge != null && (
+        <Icon className={`w-5 h-5 shrink-0 ${groupActive || open ? 'text-white' : 'text-gray-500'}`} />
+        {badge != null && (
           <span
             className={`absolute top-1 right-1 min-w-[14px] h-[14px] px-0.5 flex items-center justify-center text-[8px] font-bold rounded-full ${
               groupActive || open ? 'bg-white text-gray-900' : 'bg-gray-900 text-white'
@@ -349,20 +451,16 @@ function NavFlyoutMenu({ label, groupActive, muted, badge, icon: Icon, compact, 
           </span>
         )}
       </button>
-      {open && (
-        <div
-          ref={flyoutRef}
-          className="fixed z-[80] min-w-[200px] max-w-[240px] rounded-lg border border-gray-200 bg-white shadow-xl py-1"
-          style={{ top: flyoutPos.top, left: flyoutPos.left }}
-          onClick={(e) => {
-            if (e.target.closest('button')) setOpen(false)
-          }}
-        >
-          <p className="px-3 py-2 text-xs font-semibold text-gray-900 border-b border-gray-100">{label}</p>
-          <div className="max-h-[min(60vh,320px)] overflow-y-auto p-1">{children}</div>
-        </div>
-      )}
+      {popup}
     </div>
+  )
+}
+
+function ChevronIcon({ className }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+    </svg>
   )
 }
 
