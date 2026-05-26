@@ -7,6 +7,15 @@ export function normalizePhoneDigits(input, defaultCountryCode = '91') {
   return digits
 }
 
+export function formatPhoneDisplay(digits) {
+  if (!digits) return ''
+  const d = String(digits).replace(/\D/g, '')
+  if (d.startsWith('91') && d.length === 12) {
+    return `+91 ${d.slice(2, 7)} ${d.slice(7)}`
+  }
+  return `+${d}`
+}
+
 export function buildWhatsAppUrl(phone, message = '') {
   const digits = normalizePhoneDigits(phone)
   if (!digits) return null

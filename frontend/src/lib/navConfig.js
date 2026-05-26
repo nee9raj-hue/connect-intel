@@ -65,6 +65,7 @@ export function buildCustomerNavSections(user, { pipelineCounts = {}, upcomingCo
 
   const marketingChildren = [
     { id: 'marketing-campaigns', label: 'Campaigns', panel: 'marketing', tab: 'campaigns' },
+    { id: 'marketing-inbox', label: 'WA Inbox', panel: 'marketing', tab: 'inbox' },
     { id: 'marketing-lists', label: 'Lists', panel: 'marketing', tab: 'lists' },
     { id: 'marketing-reports', label: 'Campaign reports', panel: 'marketing', tab: 'reports' },
     { id: 'marketing-templates', label: 'Templates', panel: 'marketing', tab: 'templates' },

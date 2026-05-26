@@ -8,6 +8,7 @@ import { DEFAULT_FORM_FIELDS, DEFAULT_FORM_THEME } from '../../../../lib/marketi
 import LoadingExperience from '../ui/LoadingExperience'
 import CampaignReportsView, { campaignToForm } from './CampaignReportsView'
 import MarketingListBuilder from './MarketingListBuilder'
+import WhatsAppInboxPanel from './WhatsAppInboxPanel'
 import MarketingCreatorBadge, { marketingOptionLabel } from './MarketingCreatorBadge'
 import WorkEmailOptions from '../team/WorkEmailOptions'
 import { LOADING_MESSAGES } from '../../lib/loadingQuotes'
@@ -16,6 +17,7 @@ import { leadHasCallablePhone } from '../../lib/phoneUtils'
 
 const TABS = [
   { id: 'campaigns', label: 'Campaigns' },
+  { id: 'inbox', label: 'WA Inbox' },
   { id: 'lists', label: 'Lists' },
   { id: 'reports', label: 'Reports' },
   { id: 'templates', label: 'Templates' },
@@ -832,6 +834,8 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
               ))}
             </section>
           </div>
+        ) : tab === 'inbox' ? (
+          <WhatsAppInboxPanel onNavigate={onNavigate} />
         ) : tab === 'reports' ? (
           <CampaignReportsView
             campaigns={campaigns}

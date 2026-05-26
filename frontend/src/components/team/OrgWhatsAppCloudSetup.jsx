@@ -235,6 +235,25 @@ export default function OrgWhatsAppCloudSetup({ compact = false, scope = 'org' }
           Update credentials
         </button>
       )}
+
+      {configured && (
+        <div className="mt-3 rounded-lg border border-green-100 bg-green-50/80 px-3 py-2.5 space-y-1.5">
+          <p className="text-[11px] font-semibold text-green-900">Inbox webhook (Meta App Dashboard)</p>
+          <p className="text-[10px] text-green-900/90 leading-relaxed">
+            To receive replies in <strong>Marketing → WA Inbox</strong>, add this callback URL in Meta → WhatsApp →
+            Configuration → Webhook:
+          </p>
+          <code className="block text-[10px] break-all bg-white/80 border border-green-100 rounded px-2 py-1">
+            {typeof window !== 'undefined'
+              ? `${window.location.origin}/api/whatsapp/webhook`
+              : 'https://connectintel.net/api/whatsapp/webhook'}
+          </code>
+          <p className="text-[10px] text-green-900/80">
+            Set the same verify token in Meta and as <code className="text-green-950">WHATSAPP_WEBHOOK_VERIFY_TOKEN</code>{' '}
+            on Vercel. Subscribe to <strong>messages</strong>.
+          </p>
+        </div>
+      )}
     </div>
   )
 }

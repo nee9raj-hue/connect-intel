@@ -571,7 +571,11 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
     }
     try {
       await patchLead(lead.id, {
-        activity: { type: 'whatsapp', summary: `WhatsApp: ${waMessage.trim().slice(0, 120)}` },
+        activity: {
+          type: 'whatsapp',
+          summary: `WhatsApp: ${waMessage.trim().slice(0, 120)}`,
+          meta: { message: waMessage.trim() },
+        },
       })
       setNotice('WhatsApp opened — send from your app')
     } catch {
@@ -1335,6 +1339,15 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
             >
               Open in WhatsApp & log
             </button>
+            {onNavigate && (
+              <button
+                type="button"
+                onClick={() => onNavigate('marketing', { tab: 'inbox' })}
+                className="w-full py-2 text-xs font-semibold border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50"
+              >
+                Open team WA Inbox (Cloud API)
+              </button>
+            )}
           </>
         )}
 

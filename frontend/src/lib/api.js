@@ -142,6 +142,22 @@ export const api = {
     request('/api/admin/whatsapp-cloud', { method: 'POST', body: { action: 'disconnect' } }),
   bulkSendWhatsApp: (payload) =>
     request('/api/crm/bulk-whatsapp', { method: 'POST', body: payload }),
+  getWhatsAppInbox: (query = '') => request(`/api/crm/whatsapp-inbox${query}`),
+  getWhatsAppInboxStats: () => request('/api/crm/whatsapp-inbox?stats=1'),
+  getWhatsAppThread: (threadId) =>
+    request(`/api/crm/whatsapp-inbox?threadId=${encodeURIComponent(threadId)}`),
+  replyWhatsAppInbox: (threadId, message) =>
+    request(`/api/crm/whatsapp-inbox?threadId=${encodeURIComponent(threadId)}`, {
+      method: 'POST',
+      body: { action: 'reply', threadId, message },
+    }),
+  tagWhatsAppThread: (threadId, tag) =>
+    request(`/api/crm/whatsapp-inbox?threadId=${encodeURIComponent(threadId)}`, {
+      method: 'PATCH',
+      body: { action: 'tag', threadId, tag },
+    }),
+  syncWhatsAppInbox: () =>
+    request('/api/crm/whatsapp-inbox', { method: 'POST', body: { action: 'sync' } }),
   generateCrmEmail: (leadId, options = {}) =>
     request('/api/crm-generate-email', { method: 'POST', body: { leadId, ...options } }),
   sendCrmEmail: (leadId, payload) =>
