@@ -28,10 +28,11 @@ export default function AuthPage({ inviteToken = null }) {
       <div className="hidden lg:flex lg:w-[44%] bg-ci-nav text-white flex-col justify-between p-12">
         <div>
           <button onClick={() => setScreen('landing')} className="flex items-center gap-2 mb-20">
-            <div className="w-9 h-9 rounded-md bg-ci-yellow flex items-center justify-center text-ci-dark font-bold text-sm">
-              CI
-            </div>
-            <span className="font-display font-bold text-lg">Connect Intel</span>
+            <img
+              src="/connect-intel-logo-mark.png"
+              alt="Connect Intel"
+              className="h-10 w-auto object-contain"
+            />
           </button>
           <h2 className="text-3xl font-bold leading-tight mb-4">
             The smarter way to

@@ -143,9 +143,11 @@ export default function Sidebar({
           }`}
         >
           {isOperator ? (
-            <div className="w-8 h-8 rounded-lg bg-[#242424] flex items-center justify-center shrink-0">
-              <span className="text-[#ffcb2b] font-bold text-xs">CI</span>
-            </div>
+            <img
+              src="/connect-intel-logo-icon.png"
+              alt="Connect Intel"
+              className="w-8 h-8 rounded-lg object-cover shrink-0"
+            />
           ) : user?.organizationLogoUrl ? (
             <img
               src={user.organizationLogoUrl}
@@ -153,9 +155,11 @@ export default function Sidebar({
               className="w-8 h-8 rounded-lg object-cover border border-gray-200 shrink-0"
             />
           ) : (
-            <div className="w-8 h-8 rounded-lg bg-[#242424] flex items-center justify-center shrink-0">
-              <span className="text-[#ffcb2b] font-bold text-xs">CI</span>
-            </div>
+            <img
+              src="/connect-intel-logo-icon.png"
+              alt="Connect Intel"
+              className="w-8 h-8 rounded-lg object-cover shrink-0"
+            />
           )}
           {!railMode && (
             <div className="min-w-0 flex-1">

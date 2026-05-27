@@ -379,11 +379,12 @@ function StatCard({ value, label }) {
 
 function Logo() {
   return (
-    <div className="flex items-center gap-2">
-      <div className="w-8 h-8 rounded-md bg-ci-nav flex items-center justify-center">
-        <span className="text-ci-yellow font-bold text-xs">CI</span>
-      </div>
-      <span className="font-display font-bold text-ci-dark text-[15px]">Connect Intel</span>
+    <div className="flex items-center">
+      <img
+        src="/connect-intel-logo-mark.png"
+        alt="Connect Intel"
+        className="h-8 w-auto object-contain"
+      />
     </div>
   )
 }

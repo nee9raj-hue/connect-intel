@@ -124,7 +124,11 @@ export default function AppShell() {
           >
             ☰
           </button>
-          <span className="text-sm font-semibold text-gray-900 truncate">Connect Intel</span>
+          <img
+            src="/connect-intel-logo-mark.png"
+            alt="Connect Intel"
+            className="h-6 w-auto max-w-[180px] object-contain"
+          />
         </div>
         {user?.isPlatformAdmin && (
           <EmailOAuthNotice onOpenSystemStatus={() => navigate('integrations')} />
