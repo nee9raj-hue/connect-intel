@@ -398,11 +398,13 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
     let totalFailed = 0
     let lastError = null
     let rounds = 0
-    const maxRounds = Math.ceil(Math.max(totalEnrolled, 50) / 2) + 5
+    const chunkSize = 5
+    const maxRounds = Math.ceil(Math.max(totalEnrolled, 50) / chunkSize) + 5
     while (pending > 0 && rounds < maxRounds) {
       rounds += 1
       const chunk = await api.processMarketingCampaignSends(campaignId, {
-        limit: 2,
+        limit: chunkSize,
+        timeoutMs: 115_000,
         silent: rounds > 1,
       })
       totalSent += chunk.sendResult?.sent || 0
@@ -426,7 +428,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
     setBusy(true)
     setError(null)
     try {
-      const data = await api.startMarketingCampaign(id, { timeoutMs: 45_000 })
+      const data = await api.startMarketingCampaign(id, { timeoutMs: 115_000 })
       const isWa = data.campaign?.channel === 'whatsapp'
       const enrolled = data.enrolled || 0
       if (!isWa && enrolled > 0) {
@@ -444,7 +446,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
           )
         } else if (drained.pending > 0) {
           setNotice(
-            `Campaign started — ${enrolled} enrolled, ${drained.totalSent} sent, ${drained.totalFailed} failed. ${drained.pending} still queued.`
+            `Campaign started — ${enrolled} enrolled, ${drained.totalSent} sent, ${drained.totalFailed} failed. ${drained.pending} still queued; remaining sends continue automatically every 30 minutes.`
           )
         } else {
           setNotice(

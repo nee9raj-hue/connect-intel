@@ -49,7 +49,7 @@
   "crons": [
     {
       "path": "/api/marketing/cron",
-      "schedule": "0 9 * * *"
+      "schedule": "*/30 * * * *"
     }
   ]
 }

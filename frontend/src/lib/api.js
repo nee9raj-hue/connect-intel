@@ -306,13 +306,13 @@ export const api = {
     request('/api/marketing/campaigns', {
       method: 'POST',
       body: { action: 'start', id },
-      timeoutMs: opts.timeoutMs ?? 45_000,
+      timeoutMs: opts.timeoutMs ?? 115_000,
     }),
   processMarketingCampaignSends: (id, opts = {}) =>
     request('/api/marketing/campaigns', {
       method: 'POST',
-      body: { action: 'process_sends', id, limit: opts.limit ?? 2 },
-      timeoutMs: opts.timeoutMs ?? 60_000,
+      body: { action: 'process_sends', id, limit: opts.limit ?? 5 },
+      timeoutMs: opts.timeoutMs ?? 115_000,
       silent: opts.silent,
     }),
   logMarketingWhatsAppSent: (enrollmentId) =>
