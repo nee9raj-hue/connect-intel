@@ -59,7 +59,7 @@ export default function Sidebar({
   sidebarMode = 'expanded',
   onToggleSidebarCollapsed,
 }) {
-  const { user, logout, savedLeads } = useApp()
+  const { user, logout, savedLeads, pipelineSummary } = useApp()
   const isOperator = Boolean(user?.isPlatformAdmin)
   const orgName = isOperator ? 'Connect Intel' : user?.organizationName || 'Connect Intel'
   const orgSubtitle = isOperator
@@ -114,7 +114,10 @@ export default function Sidebar({
   }
 
   const resolveBadge = (item) => {
-    if (item.badgeKey === 'saved' && savedLeads.length > 0) return savedLeads.length
+    if (item.badgeKey === 'saved') {
+      const total = pipelineSummary.total || savedLeads.length
+      if (total > 0) return total
+    }
     if (item.badge != null && item.badge > 0) return item.badge
     return null
   }

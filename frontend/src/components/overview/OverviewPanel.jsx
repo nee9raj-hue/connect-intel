@@ -22,6 +22,7 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
     user,
     savedLeads,
     pipelineLoad,
+    pipelineSummary,
     searchHistory,
     unreadNotificationCount,
     notifications,
@@ -103,9 +104,9 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
           {[
             {
               label: 'Pipeline leads',
-              value: pipelineLoad.total > savedLeads.length ? pipelineLoad.total : savedLeads.length,
-              hint: pipelineLoad.backgroundLoading
-                ? `Loading… ${pipelineLoad.loaded.toLocaleString()} ready`
+              value: pipelineSummary.total || savedLeads.length,
+              hint: pipelineLoad.hasMore
+                ? `${savedLeads.length.toLocaleString()} loaded · ${replied} replied`
                 : `${replied} replied`,
               onClick: () => go({ panel: 'pipeline', status: 'all' }),
             },

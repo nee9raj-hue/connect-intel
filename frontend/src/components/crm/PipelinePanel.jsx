@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useDeferredValue, useMemo, useState } from 'react'
+import { useCallback, useEffect, useDeferredValue, useMemo, useRef, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { formatCrmDate, getStatusMeta, getVisiblePipelineColumns } from '../../lib/crmConstants'
@@ -40,6 +40,9 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     user,
     savedLeads,
     pipelineLoad,
+    pipelineSummary,
+    loadPipelineList,
+    loadMorePipelineLeads,
     toggleSaveLead,
     pipelineLeadId,
     setPipelineLeadId,
@@ -149,7 +152,10 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const [smartViewId, setSmartViewId] = useState(null)
   const [smartViewFilters, setSmartViewFilters] = useState({})
 
-  const deferFilters = scopedLeads.length > 60
+  const serverSidePipeline = pipelineSummary.total > 120
+  const [boardLeadsByStatus, setBoardLeadsByStatus] = useState(null)
+
+  const deferFilters = !serverSidePipeline && scopedLeads.length > 60
   const deferredSearch = useDeferredValue(search)
   const deferredAdvancedFilters = useDeferredValue(advancedFilters)
   const filterSearch = deferFilters ? deferredSearch : search
@@ -157,9 +163,52 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const isFilterPending =
     deferFilters && (search !== deferredSearch || advancedFilters !== deferredAdvancedFilters)
 
+  const serverFilters = useMemo(
+    () => ({
+      status: filter !== 'all' ? filter : undefined,
+      q: search.trim() || undefined,
+      assigneeUserId: pipelineAssigneeFilter || undefined,
+      tagIds: filterAdvanced.tagIds?.length ? filterAdvanced.tagIds : undefined,
+    }),
+    [filter, search, pipelineAssigneeFilter, filterAdvanced.tagIds]
+  )
+
+  const pipelineFiltersBootRef = useRef(false)
+  useEffect(() => {
+    if (!serverSidePipeline) return undefined
+    if (!pipelineFiltersBootRef.current) {
+      pipelineFiltersBootRef.current = true
+      return undefined
+    }
+    const timer = setTimeout(() => {
+      loadPipelineList(serverFilters, { append: false, silent: true }).catch(() => {})
+    }, 350)
+    return () => clearTimeout(timer)
+  }, [serverSidePipeline, serverFilters, loadPipelineList])
+
+  useEffect(() => {
+    if (!serverSidePipeline || view !== 'board') {
+      setBoardLeadsByStatus(null)
+      return undefined
+    }
+    let cancelled = false
+    api
+      .fetchPipelineBoard(serverFilters)
+      .then((data) => {
+        if (!cancelled) setBoardLeadsByStatus(data.board || {})
+      })
+      .catch(() => {
+        if (!cancelled) setBoardLeadsByStatus({})
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [serverSidePipeline, view, serverFilters])
+
   const filtered = useMemo(
-    () =>
-      applyPipelineFilters(scopedLeads, {
+    () => {
+      if (serverSidePipeline) return savedLeads
+      return applyPipelineFilters(scopedLeads, {
         status: filter,
         city: filterAdvanced.city,
         state: filterAdvanced.state,
@@ -168,8 +217,9 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
         tagMode: filterAdvanced.tagMode,
         search: filterSearch,
         ...smartViewFilters,
-      }),
-    [scopedLeads, filter, filterAdvanced, filterSearch, smartViewFilters]
+      })
+    },
+    [scopedLeads, filter, filterAdvanced, filterSearch, smartViewFilters, serverSidePipeline, savedLeads]
   )
 
   const applySmartView = useCallback((view) => {
@@ -210,6 +260,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   )
 
   const byStatus = useMemo(() => {
+    if (serverSidePipeline && boardLeadsByStatus) return boardLeadsByStatus
     const map = Object.fromEntries(columns.map((s) => [s.id, []]))
     const hidden = []
     for (const lead of filtered) {
@@ -221,7 +272,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       map[columns[0].id].push(...hidden)
     }
     return map
-  }, [filtered, columns])
+  }, [filtered, columns, serverSidePipeline, boardLeadsByStatus])
 
   const clearAllFilters = () => {
     setSearch('')
@@ -335,9 +386,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                 <p className="text-[10px] md:text-[11px] text-gray-500 mt-0.5 truncate">
                   {savedLeads.length === 0
                     ? 'Add or import leads'
-                    : pipelineLoad.backgroundLoading
-                      ? `Loading ${pipelineLoad.loaded.toLocaleString()} of ${pipelineLoad.total.toLocaleString()} leads in the background — you can work with what is loaded`
-                      : `${filtered.length}/${scopedLeads.length} shown`}
+                    : `${filtered.length} shown · ${pipelineSummary.total.toLocaleString()} in pipeline`}
                 </p>
               )}
             </div>
@@ -654,6 +703,22 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                 </tbody>
               </table>
               </div>
+              {pipelineLoad.hasMore && (
+                <div className="border-t border-gray-100 px-4 py-3 flex items-center justify-between gap-3 bg-gray-50">
+                  <p className="text-xs text-gray-600">
+                    Showing {savedLeads.length.toLocaleString()} of{' '}
+                    {pipelineSummary.total.toLocaleString()} leads
+                  </p>
+                  <button
+                    type="button"
+                    disabled={pipelineLoad.loadingMore}
+                    onClick={() => loadMorePipelineLeads(serverFilters)}
+                    className="text-xs font-semibold px-3 py-1.5 rounded-md bg-gray-900 text-white disabled:opacity-50"
+                  >
+                    {pipelineLoad.loadingMore ? 'Loading…' : 'Load more'}
+                  </button>
+                </div>
+              )}
             </div>
           )}
           </div>

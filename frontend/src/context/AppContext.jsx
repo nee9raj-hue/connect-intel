@@ -56,11 +56,12 @@ export function AppProvider({ children }) {
   const pendingLeadOpenRef = useRef({ leadId: null, tab: null })
   const workspaceLoadedAtRef = useRef(0)
   const workspaceLoadInFlightRef = useRef(null)
-  const pipelineBackgroundAbortRef = useRef(null)
+  const [pipelineSummary, setPipelineSummary] = useState({ total: 0, byStatus: [] })
   const [pipelineLoad, setPipelineLoad] = useState({
     total: 0,
     loaded: 0,
-    backgroundLoading: false,
+    hasMore: false,
+    loadingMore: false,
   })
   const [contactsFocusId, setContactsFocusId] = useState(null)
   const [calendarFocus, setCalendarFocus] = useState(null)
@@ -114,98 +115,69 @@ export function AppProvider({ children }) {
     }
   }, [user?.accountType, user?.organizationId])
 
-  const abortPipelineBackgroundLoad = useCallback(() => {
-    pipelineBackgroundAbortRef.current?.abort()
-    pipelineBackgroundAbortRef.current = null
-  }, [])
+  const loadPipelineList = useCallback(async (filters = {}, { append = false, silent = false } = {}) => {
+    const offset = append ? savedLeads.length : 0
+    const data = await api.fetchPipelineLeads({
+      offset,
+      limit: 100,
+      silent,
+      ...filters,
+    })
+    const leads = data.leads || []
+    setSavedLeads((prev) => (append ? [...prev, ...leads] : leads))
+    setPipelineLoad({
+      total: data.total ?? data.pipelineTotal ?? 0,
+      loaded: append ? offset + leads.length : leads.length,
+      hasMore: Boolean(data.hasMore),
+      loadingMore: false,
+    })
+    workspaceLoadedAtRef.current = Date.now()
+    return leads
+  }, [savedLeads.length])
 
-  const continuePipelineBackgroundLoad = useCallback(
-    (firstPage, { total, hasMore }) => {
-      if (!hasMore || !firstPage?.length) {
-        setPipelineLoad({
-          total: total || firstPage?.length || 0,
-          loaded: firstPage?.length || 0,
-          backgroundLoading: false,
-        })
-        return
+  const loadMorePipelineLeads = useCallback(
+    async (filters = {}) => {
+      if (pipelineLoad.loadingMore || !pipelineLoad.hasMore) return
+      setPipelineLoad((prev) => ({ ...prev, loadingMore: true }))
+      try {
+        await loadPipelineList(filters, { append: true, silent: true })
+      } catch {
+        setPipelineLoad((prev) => ({ ...prev, loadingMore: false }))
       }
-
-      abortPipelineBackgroundLoad()
-      const ac = new AbortController()
-      pipelineBackgroundAbortRef.current = ac
-
-      void (async () => {
-        try {
-          let leads = firstPage.slice()
-          let offset = leads.length
-          const targetTotal = total || leads.length
-
-          while (offset < targetTotal && !ac.signal.aborted) {
-            const page = await api.fetchSavedLeadsPage({
-              offset,
-              limit: 2000,
-              light: true,
-              silent: true,
-            })
-            const batch = page.leads || []
-            if (!batch.length) break
-            leads = leads.concat(batch)
-            offset = leads.length
-            if (!ac.signal.aborted) {
-              setPipelineLoad({
-                total: page.total ?? targetTotal,
-                loaded: leads.length,
-                backgroundLoading: Boolean(page.hasMore) && leads.length < (page.total ?? targetTotal),
-              })
-            }
-            if (!page.hasMore) break
-          }
-
-          if (!ac.signal.aborted) {
-            setSavedLeads(leads)
-            setPipelineLoad({
-              total: targetTotal,
-              loaded: leads.length,
-              backgroundLoading: false,
-            })
-            workspaceLoadedAtRef.current = Date.now()
-          }
-        } catch {
-          if (!ac.signal.aborted) {
-            setPipelineLoad((prev) => ({ ...prev, backgroundLoading: false }))
-          }
-        }
-      })()
     },
-    [abortPipelineBackgroundLoad]
+    [loadPipelineList, pipelineLoad.hasMore, pipelineLoad.loadingMore]
   )
 
   const refreshSavedLeads = useCallback(
-    async ({ light = true } = {}) => {
-      abortPipelineBackgroundLoad()
+    async () => {
       try {
-        setPipelineLoad((prev) => ({ ...prev, backgroundLoading: true }))
-        const first = await api.fetchSavedLeadsPage({ offset: 0, limit: 2000, light, silent: false })
-        const leads = first.leads || []
-        const total = first.total ?? leads.length
+        const [summary, page] = await Promise.all([
+          api.getPipelineSummary({ silent: false }),
+          api.fetchPipelineLeads({ offset: 0, limit: 100, silent: false }),
+        ])
+        const leads = page.leads || []
+        setPipelineSummary({
+          total: summary.total ?? 0,
+          byStatus: summary.byStatus || [],
+        })
         setSavedLeads(leads)
         setSessionError(null)
         setPipelineLoad({
-          total,
+          total: summary.total ?? page.pipelineTotal ?? leads.length,
           loaded: leads.length,
-          backgroundLoading: Boolean(first.hasMore),
+          hasMore: Boolean(page.hasMore),
+          loadingMore: false,
         })
-        continuePipelineBackgroundLoad(leads, { total, hasMore: first.hasMore })
+        workspaceLoadedAtRef.current = Date.now()
         return leads
       } catch (error) {
-        setPipelineLoad((prev) => ({ ...prev, backgroundLoading: false }))
         if (error.status === 401) {
           setSessionError(error.message || 'Session expired. Please sign in again.')
         }
         return null
       }
     },
-    [abortPipelineBackgroundLoad, continuePipelineBackgroundLoad]
+    []
   )
 
   const mergeNotificationItems = useCallback((newItems) => {
@@ -243,7 +215,7 @@ export function AppProvider({ children }) {
         newItems = mergeNotificationItems(notifResult.value.items || [])
       }
 
-      if (tagsResult.status === 'rejected' && notifResult.reason?.status === 401) {
+      if (notifResult.status === 'rejected' && notifResult.reason?.status === 401) {
         setSessionError(
           notifResult.reason.message || 'Session expired. Please sign in again.'
         )
@@ -332,11 +304,11 @@ export function AppProvider({ children }) {
 
     const loadWorkspace = async () => {
       if (!user) {
-        abortPipelineBackgroundLoad()
         setSavedLeads([])
         setSearchHistory([])
         setTeamMembers([])
-        setPipelineLoad({ total: 0, loaded: 0, backgroundLoading: false })
+        setPipelineSummary({ total: 0, byStatus: [] })
+        setPipelineLoad({ total: 0, loaded: 0, hasMore: false, loadingMore: false })
         workspaceLoadedAtRef.current = 0
         return
       }
@@ -348,22 +320,26 @@ export function AppProvider({ children }) {
 
       const run = (async () => {
         try {
-          abortPipelineBackgroundLoad()
-          const [firstResult, historyResult] = await Promise.all([
-            api.fetchSavedLeadsPage({ offset: 0, limit: 2000, light: true, silent: true }),
+          const [summary, page, historyResult] = await Promise.all([
+            api.getPipelineSummary({ silent: true }),
+            api.fetchPipelineLeads({ offset: 0, limit: 100, silent: true }),
             api.getSearchHistory({ silent: true }),
           ])
 
           if (cancelled) return
 
-          const leads = firstResult.leads || []
-          const total = firstResult.total ?? leads.length
+          const leads = page.leads || []
+          setPipelineSummary({
+            total: summary.total ?? 0,
+            byStatus: summary.byStatus || [],
+          })
           setSavedLeads(leads)
           setSearchHistory(historyResult.history || [])
           setPipelineLoad({
-            total,
+            total: summary.total ?? page.pipelineTotal ?? leads.length,
             loaded: leads.length,
-            backgroundLoading: Boolean(firstResult.hasMore),
+            hasMore: Boolean(page.hasMore),
+            loadingMore: false,
           })
           workspaceLoadedAtRef.current = Date.now()
           setSessionError(null)
@@ -372,16 +348,8 @@ export function AppProvider({ children }) {
             const data = await api.getTeamMembers({ silent: true })
             if (!cancelled) setTeamMembers(data.members || [])
           }
-
-          if (!cancelled && firstResult.hasMore) {
-            continuePipelineBackgroundLoad(leads, {
-              total,
-              hasMore: firstResult.hasMore,
-            })
-          }
         } catch (error) {
           if (!cancelled) {
-            setPipelineLoad((prev) => ({ ...prev, backgroundLoading: false }))
             if (error?.status === 401) {
               setSessionError(error.message || 'Session expired. Please sign in again.')
             } else if (error?.message) {
@@ -402,15 +370,8 @@ export function AppProvider({ children }) {
     loadWorkspace()
     return () => {
       cancelled = true
-      abortPipelineBackgroundLoad()
     }
-  }, [
-    user?.id,
-    user?.organizationId,
-    user?.accountType,
-    abortPipelineBackgroundLoad,
-    continuePipelineBackgroundLoad,
-  ])
+  }, [user?.id, user?.organizationId, user?.accountType])
 
   const acceptPendingInvite = useCallback(async () => {
     const token = getStoredInviteToken()
@@ -757,7 +718,10 @@ export function AppProvider({ children }) {
         setSessionError,
         updateUser,
         savedLeads,
+        pipelineSummary,
         pipelineLoad,
+        loadPipelineList,
+        loadMorePipelineLeads,
         toggleSaveLead,
         updateSavedLeadCrm,
         addManualLead,

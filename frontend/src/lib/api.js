@@ -112,38 +112,47 @@ export const api = {
   deleteOrgLeadTag: (id) => request('/api/org/lead-tags', { method: 'DELETE', body: { id } }),
   updateMemberPermissions: (payload) =>
     request('/api/team/permissions', { method: 'PATCH', body: payload }),
-  /** One pipeline page (default 2000 rows, minimal list payload). */
-  fetchSavedLeadsPage: async ({ offset = 0, limit = 2000, light = true, silent = false } = {}) => {
+  getPipelineSummary: ({ silent = false } = {}) =>
+    request('/api/saved-leads?summary=1&light=1', { timeoutMs: 45_000 }, { silent }),
+
+  fetchPipelineBoard: (params = {}) => {
+    const qs = new URLSearchParams({ view: 'board', light: '1' })
+    if (params.status && params.status !== 'all') qs.set('status', params.status)
+    if (params.q) qs.set('q', params.q)
+    if (params.assigneeUserId) qs.set('assigneeUserId', params.assigneeUserId)
+    for (const id of params.tagIds || []) qs.append('tagId', id)
+    return request(`/api/saved-leads?${qs}`, { timeoutMs: 60_000 })
+  },
+
+  fetchPipelineLeads: ({
+    offset = 0,
+    limit = 100,
+    status,
+    q,
+    assigneeUserId,
+    tagIds,
+    silent = false,
+  } = {}) => {
     const qs = new URLSearchParams({
       limit: String(limit),
       offset: String(offset),
-      light: light ? '1' : '0',
+      light: '1',
     })
-    return request(`/api/saved-leads?${qs}`, { timeoutMs: 120_000 }, { silent })
+    if (status && status !== 'all') qs.set('status', status)
+    if (q) qs.set('q', q)
+    if (assigneeUserId) qs.set('assigneeUserId', assigneeUserId)
+    for (const id of tagIds || []) qs.append('tagId', id)
+    return request(`/api/saved-leads?${qs}`, { timeoutMs: 45_000 }, { silent })
   },
-  /** Load every page (for explicit refresh). Prefer fetchSavedLeadsPage + background load in AppContext. */
+
+  /** First page only — use fetchPipelineLeads / loadMore in AppContext for large pipelines. */
   getSavedLeads: async ({ silent = false, light = true } = {}) => {
-    const PAGE_SIZE = 2000
-    let offset = 0
-    let leads = []
-    let total = 0
-    for (let i = 0; i < 50; i += 1) {
-      const data = await request(
-        `/api/saved-leads?${new URLSearchParams({
-          limit: String(PAGE_SIZE),
-          offset: String(offset),
-          light: light ? '1' : '0',
-        })}`,
-        { timeoutMs: 120_000 },
-        { silent }
-      )
-      total = typeof data.total === 'number' ? data.total : leads.length + (data.leads?.length || 0)
-      const batch = data.leads || []
-      leads = leads.concat(batch)
-      if (!data.hasMore || batch.length === 0) break
-      offset += batch.length
-    }
-    return { leads, total }
+    const data = await request(
+      `/api/saved-leads?${new URLSearchParams({ limit: '100', offset: '0', light: light ? '1' : '0' })}`,
+      { timeoutMs: 45_000 },
+      { silent }
+    )
+    return { leads: data.leads || [], total: data.pipelineTotal ?? data.total ?? 0 }
   },
   getPipelineLead: (leadId, { silent = false } = {}) =>
     request(`/api/saved-leads?leadId=${encodeURIComponent(leadId)}`, { timeoutMs: 60_000 }, { silent }),
