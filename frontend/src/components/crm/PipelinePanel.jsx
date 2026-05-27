@@ -64,7 +64,6 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     }
     return 'board'
   })
-  const [mobileActionsOpen, setMobileActionsOpen] = useState(false)
   const [filter, setFilter] = useState(panelOptions?.status || 'all')
   const [search, setSearch] = useState('')
   const [advancedFilters, setAdvancedFilters] = useState({ ...DEFAULT_PIPELINE_FILTERS })
@@ -227,6 +226,25 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     setAppliedAdvanced({ ...advancedFilters })
   }, [search, advancedFilters])
 
+  const removeAppliedFilter = useCallback(
+    (patch) => {
+      const nextAdv = { ...appliedAdvanced, ...patch }
+      const nextSearch = patch.search !== undefined ? patch.search : appliedSearch
+      setAdvancedFilters((f) => ({ ...f, ...patch }))
+      setAppliedAdvanced(nextAdv)
+      if (patch.search !== undefined) {
+        setSearch(patch.search)
+        setAppliedSearch(patch.search)
+      }
+      if (serverSidePipeline) {
+        loadPipelineList(buildServerFilters(nextAdv, nextSearch), { append: false, silent: false }).catch(
+          () => {}
+        )
+      }
+    },
+    [appliedAdvanced, appliedSearch, serverSidePipeline, loadPipelineList, buildServerFilters]
+  )
+
   const pipelineFiltersBootRef = useRef(false)
   const lastServerFiltersRef = useRef('')
   useEffect(() => {
@@ -385,15 +403,6 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     setSelectedIds(new Set(filtered.map((l) => l.id)))
   }
 
-  const stats = useMemo(
-    () => ({
-      total: scopedLeads.length,
-      contacted: scopedLeads.filter((l) => l.crm?.lastEmailSentAt).length,
-      replied: scopedLeads.filter((l) => l.crm?.responseReceived).length,
-    }),
-    [scopedLeads]
-  )
-
   const toggleSelect = (id, checked) => {
     setSelectedIds((prev) => {
       const next = new Set(prev)
@@ -461,140 +470,71 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   }
 
   return (
-    <div className="flex h-full min-h-0 w-full overflow-hidden relative">
+    <div className="flex h-full min-h-0 w-full overflow-hidden relative bg-[var(--color-ci-page)]">
       <div
-        className={`flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden ${
+        className={`crm-workspace flex-1 min-w-0 min-h-0 flex flex-col ${
           selectedLead ? 'hidden md:flex' : 'flex'
         }`}
       >
-        <header className="shrink-0 bg-white border-b border-gray-200 px-2.5 py-2 md:px-4 md:py-3">
-          <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0 flex-1">
-              <h1 className="text-sm md:text-base font-semibold text-gray-900">
+        <header className="crm-page-header">
+          <div className="crm-page-header-top">
+            <div className="min-w-0">
+              <h1 className="crm-page-title">
                 {stageListMode ? getStatusMeta(filter).label : 'Pipeline'}
               </h1>
-              {assigneeName ? (
-                <p className="text-[10px] md:text-[11px] text-[#8a6600] mt-0.5 flex items-center gap-1.5 flex-wrap">
-                  <span className="truncate">
-                    <strong>{assigneeName}</strong>
-                  </span>
-                  <button
-                    type="button"
-                    className="underline shrink-0"
-                    onClick={() => setPipelineAssigneeFilter?.(null)}
-                  >
-                    Clear
-                  </button>
-                </p>
-              ) : (
-                <p className="text-[10px] md:text-[11px] text-gray-500 mt-0.5 truncate">
-                  {savedLeads.length === 0
-                    ? 'Add or import leads'
-                    : hasMoreLeads
-                      ? `${pipelineLoad.loaded.toLocaleString()} loaded · ${(pipelineLoad.total || pipelineSummary.total).toLocaleString()} matching`
-                      : `${filtered.length} shown · ${pipelineSummary.total.toLocaleString()} in pipeline`}
-                </p>
-              )}
+              <p className="crm-page-subtitle">
+                {assigneeName ? (
+                  <>
+                    Viewing <strong>{assigneeName}</strong>
+                    {' · '}
+                    <button
+                      type="button"
+                      className="text-[#0091ae] hover:underline"
+                      onClick={() => setPipelineAssigneeFilter?.(null)}
+                    >
+                      Clear assignee
+                    </button>
+                  </>
+                ) : savedLeads.length === 0 ? (
+                  'Add or import leads to get started'
+                ) : (
+                  <>
+                    {pipelineSummary.total.toLocaleString()} leads
+                    {hasMoreLeads &&
+                      ` · ${pipelineLoad.loaded.toLocaleString()} loaded`}
+                  </>
+                )}
+              </p>
             </div>
-            <div className="flex items-center gap-1 shrink-0">
-              <button
-                type="button"
-                onClick={() => setAddOpen(true)}
-                className="text-[11px] md:text-xs font-semibold px-2 py-1 md:px-3 md:py-1.5 bg-gray-900 text-white rounded-md"
-              >
-                + Add
-              </button>
-              <button
-                type="button"
-                onClick={() => setImportOpen(true)}
-                className="text-[11px] md:text-xs font-medium px-2 py-1 md:px-3 md:py-1.5 border border-[#ffcb2b] bg-[#fffbeb] rounded-md"
-              >
+            <div className="crm-page-actions">
+              {!stageListMode && (
+                <div className="crm-view-tabs">
+                  {[
+                    { id: 'board', label: 'Board' },
+                    { id: 'list', label: 'List' },
+                  ].map((v) => (
+                    <button
+                      key={v.id}
+                      type="button"
+                      onClick={() => setView(v.id)}
+                      className={`crm-view-tab ${view === v.id ? 'is-active' : ''}`}
+                    >
+                      {v.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <button type="button" onClick={() => setImportOpen(true)} className="crm-btn crm-btn-secondary">
                 Import
               </button>
-              {isMobile ? (
-                <button
-                  type="button"
-                  onClick={() => setMobileActionsOpen((v) => !v)}
-                  className="text-[11px] font-medium px-2 py-1 border border-gray-200 rounded-md bg-white"
-                  aria-expanded={mobileActionsOpen}
-                >
-                  ⋯
-                </button>
-              ) : (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => onNavigate?.('marketing')}
-                    className="text-xs font-medium px-3 py-1.5 border border-gray-200 rounded-md hover:bg-gray-50"
-                  >
-                    Bulk email
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onNavigate?.('search')}
-                    className="text-xs font-medium px-3 py-1.5 border border-gray-200 rounded-md hover:bg-gray-50"
-                  >
-                    AI search
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-
-          {isMobile && mobileActionsOpen && (
-            <div className="mt-2 flex flex-wrap gap-1">
-              <button
-                type="button"
-                onClick={() => {
-                  onNavigate?.('marketing')
-                  setMobileActionsOpen(false)
-                }}
-                className="text-[10px] font-medium px-2 py-1 border border-gray-200 rounded-md bg-gray-50"
-              >
-                Bulk email
+              <button type="button" onClick={() => setAddOpen(true)} className="crm-btn crm-btn-primary">
+                Add lead
               </button>
-              <button
-                type="button"
-                onClick={() => {
-                  onNavigate?.('search')
-                  setMobileActionsOpen(false)
-                }}
-                className="text-[10px] font-medium px-2 py-1 border border-gray-200 rounded-md bg-gray-50"
-              >
-                AI search
-              </button>
-            </div>
-          )}
-
-          <div className="flex items-center gap-1.5 mt-1.5 md:mt-2">
-            <div className="hidden sm:flex gap-1 text-[10px] md:text-[11px] overflow-x-auto no-scrollbar">
-              <MiniStat label="Saved" value={stats.total} compact />
-              <MiniStat label="Sent" value={stats.contacted} compact />
-              <MiniStat label="Reply" value={stats.replied} compact />
-            </div>
-            <div className="flex gap-0.5 ml-auto shrink-0">
-              {!stageListMode &&
-                [
-                  { id: 'list', label: 'List' },
-                  { id: 'board', label: 'Board' },
-                ].map((v) => (
-                  <button
-                    key={v.id}
-                    type="button"
-                    onClick={() => setView(v.id)}
-                    className={`px-2 py-0.5 md:px-2.5 md:py-1 rounded-md text-[10px] md:text-xs font-semibold ${
-                      view === v.id ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600'
-                    }`}
-                  >
-                    {v.label}
-                  </button>
-                ))}
             </div>
           </div>
 
           {savedLeads.length > 0 && (
             <PipelineFiltersBar
-              compact={isMobile}
               search={search}
               onSearchChange={setSearch}
               filters={advancedFilters}
@@ -617,7 +557,6 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               }
               pipelineTotal={pipelineSummary.total}
               onSelectAllFiltered={selectAllFiltered}
-              selectableCount={filtered.length}
               hasActiveFilters={activeFilterCount > 0 || filter !== 'all'}
               onClearFilters={() => {
                 clearAllFilters()
@@ -628,12 +567,15 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               onApplySmartView={applySmartView}
               activeSmartViewId={smartViewId}
               orgLeadTags={orgLeadTags}
+              stageListMode={stageListMode}
+              onRemoveAppliedFilter={removeAppliedFilter}
             />
           )}
         </header>
 
-        <div className="flex-1 flex flex-col min-h-0 min-w-0 overflow-hidden">
-          <PipelineBulkActionsBar
+        <div className="crm-page-body">
+          <div className="crm-content-card">
+            <PipelineBulkActionsBar
             count={selectedIds.size}
             statusOptions={columns}
             teamMembers={teamMembers}
@@ -659,7 +601,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
             </div>
           )}
 
-          <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden pipeline-scroll-area px-2 pb-3 pt-1 md:px-4 md:pb-4 md:pt-2 touch-pan-y">
+          <div className="crm-content-scroll pipeline-scroll-area">
           {savedLeads.length === 0 ? (
             <EmptyPipeline
               onNavigate={onNavigate}
@@ -668,9 +610,14 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               compact={isMobile}
             />
           ) : filtered.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-10 md:py-16 text-center max-w-md mx-auto px-2">
-              <p className="text-sm font-medium text-gray-900">No leads match your filters</p>
-              <p className="text-xs text-gray-500 mt-2">Try clearing search or contact filters.</p>
+            <div className="flex flex-col items-center justify-center py-16 text-center max-w-md mx-auto px-4">
+              <div className="w-16 h-16 rounded-full bg-[#eaf0f6] flex items-center justify-center mb-4 text-2xl text-[#7c98b6]">
+                ⌕
+              </div>
+              <p className="text-base font-semibold text-[#33475b]">No leads match your filters</p>
+              <p className="text-sm text-[#516f90] mt-2">
+                Try adjusting search or filters, or clear all to see your full pipeline.
+              </p>
               <button
                 type="button"
                 onClick={() => {
@@ -679,7 +626,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                   setSmartViewId(null)
                   setSmartViewFilters({})
                 }}
-                className="mt-4 text-xs font-semibold px-4 py-2 border border-gray-200 rounded-lg hover:bg-white"
+                className="crm-btn crm-btn-secondary mt-6"
               >
                 Clear all filters
               </button>
@@ -726,13 +673,16 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
           )}
           </div>
           {(view === 'list' || stageListMode) && hasMoreLeads && filtered.length > 0 && (
-            <PipelineLoadMoreBar
-              loaded={pipelineLoad.loaded}
-              total={pipelineLoad.total || pipelineSummary.total}
-              loading={pipelineLoad.loadingMore}
-              onLoadMore={handleLoadMore}
-            />
+            <div className="crm-load-more-bar">
+              <PipelineLoadMoreBar
+                loaded={pipelineLoad.loaded}
+                total={pipelineLoad.total || pipelineSummary.total}
+                loading={pipelineLoad.loadingMore}
+                onLoadMore={handleLoadMore}
+              />
+            </div>
           )}
+          </div>
         </div>
       </div>
 
@@ -782,24 +732,20 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
 
 function PipelineLoadMoreBar({ loaded, total, loading, onLoadMore }) {
   return (
-    <div
-      className="shrink-0 z-10 border-t border-[#ffcb2b]/40 bg-[#fffbeb] px-3 py-2.5 md:px-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-[0_-6px_16px_rgba(0,0,0,0.06)]"
-      role="region"
-      aria-label="Load more pipeline leads"
-    >
-      <p className="text-xs text-gray-800">
-        Showing <strong>{loaded.toLocaleString()}</strong> of{' '}
-        <strong>{total.toLocaleString()}</strong> leads
+    <>
+      <p className="text-sm text-[#516f90]">
+        Showing <strong className="text-[#33475b]">{loaded.toLocaleString()}</strong> of{' '}
+        <strong className="text-[#33475b]">{total.toLocaleString()}</strong> leads
       </p>
       <button
         type="button"
         disabled={loading}
         onClick={onLoadMore}
-        className="text-xs font-semibold px-4 py-2 rounded-lg bg-gray-900 text-white disabled:opacity-50 shrink-0 w-full sm:w-auto"
+        className="crm-btn crm-btn-primary"
       >
-        {loading ? 'Loading…' : 'Load more leads'}
+        {loading ? 'Loading…' : 'Load more'}
       </button>
-    </div>
+    </>
   )
 }
 
@@ -825,9 +771,9 @@ function StagePipelineList({
         return (
           <li key={lead.id}>
             <div
-              className={`rounded-xl border bg-white transition-shadow hover:shadow-sm ${
-                isSelected ? 'border-[#ffcb2b] ring-2 ring-[#ffcb2b]/30' : 'border-gray-200'
-              } ${selectedIds.has(lead.id) ? 'ring-1 ring-gray-300' : ''}`}
+              className={`crm-lead-card ${isSelected ? 'is-selected' : ''} ${
+                selectedIds.has(lead.id) ? 'ring-1 ring-slate-300' : ''
+              }`}
             >
               <div className="flex items-stretch gap-0 min-h-[72px]">
                 <label className="flex items-center pl-3 pr-1 shrink-0">
@@ -892,11 +838,11 @@ function StagePipelineList({
                     <LeadTagDots lead={lead} tagById={tagById} />
                   </div>
                 </button>
-                <div className="flex flex-col justify-center gap-1 pr-3 shrink-0 border-l border-gray-100 pl-2">
+                <div className="flex flex-col justify-center gap-1 pr-3 shrink-0 border-l border-slate-100 pl-2">
                   <button
                     type="button"
                     onClick={() => onSelect(lead.id, 'overview')}
-                    className="text-[10px] font-semibold px-2 py-1 rounded-md bg-gray-900 text-white whitespace-nowrap"
+                    className="crm-btn crm-btn-primary text-[11px] py-1 px-2.5"
                   >
                     Open
                   </button>
@@ -904,7 +850,7 @@ function StagePipelineList({
                     <button
                       type="button"
                       onClick={() => onSelect(lead.id, 'email')}
-                      className="text-[10px] font-semibold px-2 py-1 rounded-md border border-gray-200 bg-white whitespace-nowrap"
+                      className="crm-btn crm-btn-secondary text-[11px] py-1 px-2.5"
                     >
                       Email
                     </button>
@@ -943,14 +889,10 @@ function KanbanColumn({
   const allSelected = leads.length > 0 && leads.every((l) => selectedIds.has(l.id))
 
   return (
-    <div
-      className={`${
-        compact ? 'w-[168px]' : 'w-[240px]'
-      } shrink-0 flex flex-col bg-gray-100/80 rounded-xl border border-gray-200/80 max-h-[75vh]`}
-    >
-      <div className="shrink-0 px-2.5 py-2 md:px-3 md:py-2.5 border-b border-gray-200/60 flex items-center justify-between gap-1 sticky top-0 bg-gray-100/95 backdrop-blur-sm rounded-t-xl z-[1]">
-        <span className="text-xs font-semibold text-gray-700">{column.label}</span>
-        <div className="flex items-center gap-1">
+    <div className={`crm-kanban-column ${compact ? 'w-[200px]' : ''}`}>
+      <div className="crm-kanban-column-header">
+        <span className="text-sm font-semibold text-[#33475b]">{column.label}</span>
+        <div className="flex items-center gap-1.5">
           <input
             type="checkbox"
             checked={allSelected}
@@ -959,22 +901,22 @@ function KanbanColumn({
             aria-label={`Select all in ${column.label}`}
             className="w-3.5 h-3.5"
           />
-          <span className="text-[10px] font-bold text-gray-500 bg-white px-1.5 py-0.5 rounded tabular-nums">
+          <span className="text-xs font-semibold text-[#516f90] bg-[#eaf0f6] px-2 py-0.5 rounded tabular-nums">
             {leads.length}
-            {totalInColumn > leads.length ? `/${totalInColumn}` : ''}
+            {totalInColumn > leads.length ? ` / ${totalInColumn}` : ''}
           </span>
         </div>
       </div>
-      <div className="flex-1 min-h-0 p-2 space-y-2 overflow-y-auto">
+      <div className="crm-kanban-column-body">
         {leads.length === 0 ? (
-          <p className="text-[10px] text-gray-400 text-center py-4">No leads</p>
+          <p className="text-xs text-[#7c98b6] text-center py-6">No leads</p>
         ) : (
           leads.map((lead) => (
             <div
               key={lead.id}
-              className={`rounded-lg border bg-white transition-colors ${
-                selectedId === lead.id ? 'border-[#ffcb2b] ring-1 ring-[#ffcb2b]/30' : 'border-gray-200'
-              } ${selectedIds.has(lead.id) ? 'ring-1 ring-gray-400' : ''}`}
+              className={`crm-kanban-card ${selectedId === lead.id ? 'is-active' : ''} ${
+                selectedIds.has(lead.id) ? 'ring-1 ring-slate-400' : ''
+              }`}
             >
               <div className="flex items-start gap-1 p-2">
                 <input
@@ -1010,12 +952,8 @@ function KanbanColumn({
         )}
       </div>
       {hasMoreInColumn && onShowMore && (
-        <div className="shrink-0 p-2 border-t border-gray-200/60">
-          <button
-            type="button"
-            onClick={onShowMore}
-            className="w-full text-[10px] font-semibold py-2 rounded-lg bg-white border border-gray-200 hover:bg-gray-50 text-gray-800"
-          >
+        <div className="shrink-0 p-2 border-t border-[#dfe3eb]">
+          <button type="button" onClick={onShowMore} className="crm-btn crm-btn-secondary w-full text-xs py-2">
             Show more ({totalInColumn - leads.length} left)
           </button>
         </div>
@@ -1094,16 +1032,3 @@ function EmptyPipeline({ onNavigate, onImport, onAdd, compact = false }) {
     </div>
   )
 }
-
-function MiniStat({ label, value, compact = false }) {
-  return (
-    <span
-      className={`rounded-md bg-gray-100 text-gray-700 font-medium whitespace-nowrap ${
-        compact ? 'px-1.5 py-0.5 text-[10px]' : 'px-2.5 py-1 text-[11px]'
-      }`}
-    >
-      {label}: <strong>{value}</strong>
-    </span>
-  )
-}
-

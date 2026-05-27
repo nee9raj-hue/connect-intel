@@ -136,13 +136,13 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
               key={kpi.label}
               type="button"
               onClick={kpi.onClick}
-              className="text-left bg-white rounded-xl border border-gray-200 p-4 md:p-5 hover:border-[#ffcb2b] hover:shadow-sm transition-all"
+              className="text-left bg-white rounded-lg border border-[#dfe3eb] p-4 md:p-5 hover:border-[#0091ae] hover:shadow-sm transition-all"
             >
-              <p className="text-[10px] md:text-xs font-semibold uppercase tracking-wide text-gray-500">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-[#7c98b6]">
                 {kpi.label}
               </p>
-              <p className="text-2xl md:text-3xl font-bold text-gray-900 mt-1 tabular-nums">{kpi.value}</p>
-              <p className="text-xs text-gray-400 mt-1">{kpi.hint}</p>
+              <p className="text-2xl md:text-3xl font-bold text-[#33475b] mt-1 tabular-nums">{kpi.value}</p>
+              <p className="text-xs text-[#516f90] mt-1">{kpi.hint}</p>
             </button>
           ))}
         </section>
@@ -170,12 +170,12 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
         </section>
 
         <div className="grid lg:grid-cols-3 gap-4">
-          <section className="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-4">
-            <div className="flex items-center justify-between mb-3">
+          <section className="lg:col-span-2 bg-white rounded-lg border border-[#dfe3eb] p-4 md:p-5">
+            <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-sm font-semibold text-gray-900">Pipeline by stage</h3>
+                <h3 className="text-sm font-semibold text-[#33475b]">Pipeline by stage</h3>
                 {pipelineSummary.total > 0 && (
-                  <p className="text-[10px] text-gray-500 mt-0.5 tabular-nums">
+                  <p className="text-xs text-[#516f90] mt-0.5 tabular-nums">
                     {pipelineSummary.total.toLocaleString()} leads total
                   </p>
                 )}
@@ -183,12 +183,12 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
               <button
                 type="button"
                 onClick={() => go({ panel: 'pipeline', status: 'all' })}
-                className="text-xs font-semibold text-[#5b4a00] hover:underline"
+                className="text-xs font-semibold text-[#0091ae] hover:underline"
               >
                 Open pipeline
               </button>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {columns.map((col) => {
                 const count = pipelineCounts[col.id] || 0
                 const pct = pipelineCounts.all ? Math.round((count / pipelineCounts.all) * 100) : 0
@@ -197,18 +197,20 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
                     key={col.id}
                     type="button"
                     onClick={() => go({ panel: 'pipeline', status: col.id })}
-                    className="w-full flex items-center gap-3 group"
+                    className="w-full flex items-center gap-3 group py-0.5"
                   >
-                    <span className="text-xs text-gray-600 w-20 text-left shrink-0 group-hover:text-gray-900">
+                    <span className="text-sm text-[#516f90] w-24 text-left shrink-0 group-hover:text-[#33475b]">
                       {col.label}
                     </span>
-                    <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="flex-1 h-2.5 bg-[#eaf0f6] rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-[#ffcb2b] rounded-full transition-all"
-                        style={{ width: `${Math.max(pct, count ? 8 : 0)}%` }}
+                        className="h-full bg-[#0091ae] rounded-full transition-all"
+                        style={{ width: `${Math.max(pct, count ? 4 : 0)}%` }}
                       />
                     </div>
-                    <span className="text-xs font-bold text-gray-700 w-8 text-right tabular-nums">{count}</span>
+                    <span className="text-sm font-semibold text-[#33475b] w-10 text-right tabular-nums">
+                      {count.toLocaleString()}
+                    </span>
                   </button>
                 )
               })}
