@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { DEFAULT_THEME } from '../../lib/marketingEmailDesign'
@@ -42,6 +42,25 @@ const EMPTY_FORM = {
   theme: { ...DEFAULT_FORM_THEME },
 }
 
+const EMPTY_CAMPAIGN = {
+  name: '',
+  channel: 'email',
+  listId: '',
+  templateId: '',
+  subject: '',
+  body: '',
+  blocks: [],
+  design: { ...DEFAULT_THEME },
+  previewText: '',
+  step2Subject: '',
+  step2Body: '',
+  step2Blocks: [],
+  step2Design: { ...DEFAULT_THEME },
+  step2PreviewText: '',
+  step2Delay: 3,
+  useSequence: false,
+}
+
 export default function MarketingPanel({ onNavigate, panelOptions }) {
   const { savedLeads, refreshSavedLeads, user, teamMembers, refreshTeam } = useApp()
   const [tab, setTab] = useState(panelOptions?.tab || 'campaigns')
@@ -73,24 +92,24 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
   const [templateForm, setTemplateForm] = useState({ ...EMPTY_TEMPLATE })
   const [formForm, setFormForm] = useState({ ...EMPTY_FORM })
   const [campaignForm, setCampaignForm] = useState({
-    name: '',
-    channel: 'email',
-    listId: '',
-    templateId: '',
-    subject: '',
-    body: '',
-    blocks: [],
+    ...EMPTY_CAMPAIGN,
     design: { ...DEFAULT_THEME },
-    previewText: '',
-    step2Subject: '',
-    step2Body: '',
-    step2Blocks: [],
     step2Design: { ...DEFAULT_THEME },
-    step2PreviewText: '',
-    step2Delay: 3,
-    useSequence: false,
   })
   const [campaignEmailStep, setCampaignEmailStep] = useState(1)
+  const prevTabRef = useRef(tab)
+  const skipNextCampaignResetRef = useRef(false)
+
+  const resetCampaignForm = useCallback(() => {
+    setCampaignForm({
+      ...EMPTY_CAMPAIGN,
+      design: { ...DEFAULT_THEME },
+      step2Design: { ...DEFAULT_THEME },
+    })
+    setCampaignEmailStep(1)
+    setCampaignSetupOpen(true)
+    setError(null)
+  }, [])
   const pipelineLeadsWithPhone = useMemo(
     () => (savedLeads || []).filter(leadHasCallablePhone),
     [savedLeads]
@@ -138,6 +157,22 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
     const t = setTimeout(() => setNotice(null), 5000)
     return () => clearTimeout(t)
   }, [notice])
+
+  useEffect(() => {
+    if (tab !== 'campaigns') {
+      prevTabRef.current = tab
+      return
+    }
+    if (skipNextCampaignResetRef.current) {
+      skipNextCampaignResetRef.current = false
+      prevTabRef.current = tab
+      return
+    }
+    if (prevTabRef.current !== 'campaigns') {
+      resetCampaignForm()
+    }
+    prevTabRef.current = tab
+  }, [tab, resetCampaignForm])
 
   const saveTemplate = async () => {
     if (!templateForm.name.trim() || !templateForm.subject.trim()) {
@@ -256,6 +291,10 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
   }
 
   const applyTemplate = (templateId) => {
+    if (!templateId) {
+      setCampaignForm((prev) => ({ ...prev, templateId: '' }))
+      return
+    }
     const tpl = templates.find((t) => t.id === templateId)
     if (!tpl) return
     setCampaignForm((prev) => ({
@@ -268,6 +307,11 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
       previewText: tpl.previewText || '',
     }))
   }
+
+  const canSaveCampaignDraft =
+    Boolean(campaignForm.listId) &&
+    Boolean(campaignForm.name.trim()) &&
+    (Boolean(campaignForm.body.trim()) || Boolean(campaignForm.blocks?.length))
 
   const createCampaign = async () => {
     if (!campaignForm.name.trim()) return setError('Campaign name is required')
@@ -318,25 +362,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
         steps,
       })
       setNotice('Campaign created as draft')
-      setCampaignForm({
-        name: '',
-        channel: 'email',
-        listId: '',
-        templateId: '',
-        subject: '',
-        body: '',
-        blocks: [],
-        design: { ...DEFAULT_THEME },
-        previewText: '',
-        step2Subject: '',
-        step2Body: '',
-        step2Blocks: [],
-        step2Design: { ...DEFAULT_THEME },
-        step2PreviewText: '',
-        step2Delay: 3,
-        useSequence: false,
-      })
-      setCampaignEmailStep(1)
+      resetCampaignForm()
       await load()
       return data.campaign?.id
     } catch (e) {
@@ -353,8 +379,10 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
     try {
       const data = await api.duplicateMarketingCampaign(campaignId)
       if (data.campaign) {
+        skipNextCampaignResetRef.current = true
         setCampaignForm(campaignToForm(data.campaign))
         setCampaignEmailStep(1)
+        setCampaignSetupOpen(true)
         setTab('campaigns')
         setNotice('Draft copy ready — review the message and list, then Start campaign to resend.')
       }
@@ -493,10 +521,10 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
                 key={t.id}
                 type="button"
                 onClick={() => setTab(t.id)}
-                className={`text-xs font-semibold px-2.5 py-1 rounded-lg border ${
+                className={`text-xs font-semibold px-2.5 py-1 rounded-lg border transition-colors ${
                   tab === t.id
-                    ? 'bg-gray-900 text-white border-gray-900'
-                    : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                    ? 'marketing-tab-active'
+                    : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:border-slate-300'
                 }`}
               >
                 {t.label}
@@ -588,10 +616,12 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
               onToggle={(e) => setCampaignSetupOpen(e.target.open)}
               className="shrink-0 bg-white border border-gray-200 rounded-lg overflow-hidden group"
             >
-              <summary className="cursor-pointer list-none px-3 py-2 flex items-center justify-between gap-2 hover:bg-gray-50">
-                <span className="text-xs font-semibold text-gray-900">Campaign setup</span>
-                <span className="text-[10px] text-gray-400 group-open:hidden">Show to edit name, list, send</span>
-                <span className="text-[10px] text-gray-400 hidden group-open:inline">Click to collapse ↑</span>
+              <summary className="cursor-pointer list-none px-3 py-2 flex items-center justify-between gap-2 hover:bg-slate-50 bg-slate-50/50">
+                <span className="text-xs font-semibold text-slate-900">Campaign setup</span>
+                <span className="text-[10px] text-slate-500 group-open:hidden">
+                  Name, list, optional template — then design below
+                </span>
+                <span className="text-[10px] text-slate-500 hidden group-open:inline">Collapse ↑</span>
               </summary>
               <div className="px-3 pb-3 pt-0 space-y-2 border-t border-gray-100">
               <div className="flex flex-wrap gap-1.5 pt-2">
@@ -655,8 +685,8 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
                 >
                   <option value="">
                     {campaignForm.channel === 'whatsapp'
-                      ? 'Use saved template…'
-                      : 'Optional template for email 1…'}
+                      ? 'Start fresh (no template)'
+                      : 'Start fresh — build below'}
                   </option>
                   {templates.map((t) => (
                     <option key={t.id} value={t.id}>
@@ -738,28 +768,6 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
                   ))}
                 </div>
               )}
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={createCampaign}
-                  className="text-xs font-semibold px-3 py-2 border border-gray-300 rounded-lg disabled:opacity-50"
-                >
-                  Save draft
-                </button>
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={createAndStart}
-                  className="text-xs font-semibold px-3 py-2 bg-gray-900 text-white rounded-lg disabled:opacity-50"
-                >
-                  {busy
-                    ? 'Working…'
-                    : campaignForm.channel === 'whatsapp'
-                      ? 'Start WhatsApp campaign'
-                      : 'Start campaign'}
-                </button>
-              </div>
               {campaignForm.channel === 'whatsapp' && !user?.whatsappAutoSendReady && user?.isOrgAdmin && (
                 <div className="rounded-lg border border-amber-100 bg-amber-50/80 p-3 space-y-2">
                   <p className="text-[11px] text-amber-950 leading-relaxed">
@@ -840,6 +848,52 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
                 marketingForms={forms}
               />
             )}
+            </div>
+
+            <div className="shrink-0 sticky bottom-0 z-20 flex flex-wrap items-center gap-2 px-3 py-2.5 bg-white/95 backdrop-blur-sm border border-slate-200 rounded-lg shadow-[0_-2px_12px_rgba(15,23,42,0.08)]">
+              <button
+                type="button"
+                onClick={resetCampaignForm}
+                className="text-xs font-semibold px-3 py-2 border border-slate-200 rounded-lg text-slate-700 hover:bg-slate-50"
+              >
+                New campaign
+              </button>
+              <p className="text-[10px] text-slate-500 flex-1 min-w-[140px] leading-snug">
+                {!campaignForm.listId
+                  ? 'Pick a list in setup above to save a draft'
+                  : !campaignForm.name.trim()
+                    ? 'Add a campaign name'
+                    : canSaveCampaignDraft
+                      ? 'Ready — save draft or start sending'
+                      : 'Add message blocks or body text'}
+              </p>
+              <button
+                type="button"
+                disabled={busy || !canSaveCampaignDraft}
+                title={
+                  !campaignForm.listId
+                    ? 'Choose a list first'
+                    : !campaignForm.name.trim()
+                      ? 'Enter a campaign name'
+                      : undefined
+                }
+                onClick={createCampaign}
+                className="text-xs font-semibold px-3 py-2 border border-slate-300 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50"
+              >
+                Save draft
+              </button>
+              <button
+                type="button"
+                disabled={busy || !canSaveCampaignDraft}
+                onClick={createAndStart}
+                className="text-xs font-semibold px-3 py-2 bg-slate-900 text-white rounded-lg disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-800"
+              >
+                {busy
+                  ? 'Working…'
+                  : campaignForm.channel === 'whatsapp'
+                    ? 'Start WhatsApp'
+                    : 'Start campaign'}
+              </button>
             </div>
 
             <details className="shrink-0 bg-white border border-gray-200 rounded-lg">
@@ -971,10 +1025,8 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
             value={templateForm}
             onChange={setTemplateForm}
             onSave={saveTemplate}
-            onCancel={
-              templateForm.id
-                ? () => setTemplateForm({ ...EMPTY_TEMPLATE, design: { ...DEFAULT_THEME } })
-                : undefined
+            onCancel={() =>
+              setTemplateForm({ ...EMPTY_TEMPLATE, design: { ...DEFAULT_THEME } })
             }
             busy={busy}
             templates={templates}

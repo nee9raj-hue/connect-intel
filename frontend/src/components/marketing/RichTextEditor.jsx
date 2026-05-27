@@ -17,6 +17,7 @@ export default function RichTextEditor({
   singleLine = false,
 }) {
   const editorRef = useRef(null)
+  const isInternalChange = useRef(false)
   const [hasSelection, setHasSelection] = useState(false)
   const [fmtSize, setFmtSize] = useState(15)
   const [fmtColor, setFmtColor] = useState('#374151')
@@ -24,21 +25,29 @@ export default function RichTextEditor({
   const [iconSize, setIconSize] = useState(20)
   const [showIcons, setShowIcons] = useState(false)
 
-  const syncFromValue = useCallback(() => {
-    const el = editorRef.current
-    if (!el) return
-    const html = isRichHtml(value) ? value : plainTextToEditorHtml(value)
-    if (el.innerHTML !== html) el.innerHTML = html
+  const getHtmlFromValue = useCallback(() => {
+    return isRichHtml(value) ? value : plainTextToEditorHtml(value)
   }, [value])
 
   useEffect(() => {
-    syncFromValue()
-  }, [syncFromValue])
+    const el = editorRef.current
+    if (!el || isInternalChange.current) return
+    if (document.activeElement === el) return
+
+    const html = getHtmlFromValue()
+    if (el.innerHTML !== html) {
+      el.innerHTML = html
+    }
+  }, [value, getHtmlFromValue])
 
   const emitChange = useCallback(() => {
     const el = editorRef.current
     if (!el) return
+    isInternalChange.current = true
     onChange(sanitizeRichHtml(el.innerHTML))
+    requestAnimationFrame(() => {
+      isInternalChange.current = false
+    })
   }, [onChange])
 
   const updateSelectionState = useCallback(() => {
@@ -194,7 +203,7 @@ export default function RichTextEditor({
         onMouseUp={updateSelectionState}
         onKeyUp={updateSelectionState}
         onPaste={handlePaste}
-        className={`rich-text-editor w-full text-sm border border-gray-200 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-gray-900/10 empty:before:content-[attr(data-placeholder)] empty:before:text-gray-400 ${
+        className={`rich-text-editor w-full text-sm border border-gray-200 rounded-lg px-3 py-2.5 bg-white focus:ring-2 focus:ring-[#ffcb2b]/40 focus:border-[#ffcb2b] empty:before:content-[attr(data-placeholder)] empty:before:text-gray-400 ${
           singleLine ? 'min-h-[40px] whitespace-nowrap overflow-x-auto' : ''
         }`}
         style={{ minHeight: singleLine ? 40 : minHeight }}

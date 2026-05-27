@@ -94,6 +94,43 @@ body {
   overflow: hidden;
 }
 
+/* Marketing builder & rich text */
+.rich-text-editor {
+  direction: ltr;
+  text-align: left;
+  unicode-bidi: plaintext;
+  word-break: break-word;
+  white-space: pre-wrap;
+  line-height: 1.55;
+}
+
+.rich-text-editor:focus {
+  outline: none;
+}
+
+.marketing-tab-active {
+  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+  border-color: #0f172a;
+  color: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.15);
+}
+
+.marketing-builder-canvas {
+  background: linear-gradient(180deg, #eef1f5 0%, #e2e6ec 100%);
+}
+
+.marketing-block-selected {
+  box-shadow: 0 0 0 2px #ffcb2b, 0 4px 14px rgba(15, 23, 42, 0.12);
+}
+
+.marketing-block-card {
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.marketing-block-card:hover {
+  border-color: #cbd5e1;
+}
+
 details summary {
   list-style: none;
 }

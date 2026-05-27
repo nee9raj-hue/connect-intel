@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import MarketingCreatorBadge from './MarketingCreatorBadge'
 import {
   BLOCK_LABELS,
@@ -11,6 +11,7 @@ import {
   renderEmailHtml,
   reorderBlocks,
 } from '../../lib/marketingEmailDesign'
+import { BLOCK_PALETTE_STYLES } from '../../lib/marketingUiConstants'
 import MarketingBlockEditor from './MarketingBlockEditor'
 
 const PALETTE = [
@@ -25,19 +26,6 @@ const PALETTE = [
   { type: 'form', label: 'Form', hint: 'Capture' },
   { type: 'footer', label: 'Footer', hint: 'Legal' },
 ]
-
-const BLOCK_ICONS = {
-  header: 'H',
-  hero: '★',
-  text: '¶',
-  image: '▣',
-  button: '▶',
-  divider: '—',
-  spacer: '↕',
-  social: '◎',
-  form: '☰',
-  footer: 'ⓘ',
-}
 
 const BUILDER_TABS = [
   { id: 'blocks', label: 'Blocks' },
@@ -172,6 +160,13 @@ export default function MarketingTemplateBuilder({
   const [dropIndex, setDropIndex] = useState(null)
   const [paletteDragType, setPaletteDragType] = useState(null)
 
+  const blockCount = value.blocks?.length || 0
+  useEffect(() => {
+    if (selectedBlockIndex >= blockCount && blockCount > 0) {
+      setSelectedBlockIndex(blockCount - 1)
+    }
+  }, [blockCount, selectedBlockIndex])
+
   const previewHtml = useMemo(
     () => renderEmailHtml(value.blocks || [], value.design || DEFAULT_THEME, { previewText: value.previewText }),
     [value.blocks, value.design, value.previewText]
@@ -285,11 +280,15 @@ export default function MarketingTemplateBuilder({
     <div
       className={`${embedded ? (fillHeight ? 'flex flex-col flex-1 min-h-0 h-full' : '') : 'max-w-[1400px] mx-auto'} ${fillHeight ? '' : 'space-y-4'}`}
     >
-      {(!embedded || onSave) && !fillHeight && (
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
+      {(!embedded || onSave || onCancel) && (
+        <div
+          className={`flex flex-wrap items-center justify-between gap-3 ${
+            fillHeight ? 'shrink-0 px-1 pb-2' : ''
+          }`}
+        >
+          <div className="min-w-0">
             <h2 className="text-sm font-semibold text-gray-900">{headerTitle}</h2>
-            {!fillHeight && <p className="text-xs text-gray-500 mt-0.5">{headerSubtitle}</p>}
+            <p className="text-xs text-gray-500 mt-0.5">{headerSubtitle}</p>
           </div>
           {(onSave || onCancel) && (
             <div className="flex flex-wrap gap-2">
@@ -297,9 +296,9 @@ export default function MarketingTemplateBuilder({
                 <button
                   type="button"
                   onClick={onCancel}
-                  className="text-xs font-semibold px-3 py-2 border border-gray-300 rounded-lg"
+                  className="text-xs font-semibold px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
                 >
-                  Cancel
+                  {isEditing ? 'Cancel edit' : 'Clear & start over'}
                 </button>
               )}
               {onSave && (
@@ -307,7 +306,7 @@ export default function MarketingTemplateBuilder({
                   type="button"
                   disabled={busy}
                   onClick={onSave}
-                  className="text-xs font-semibold px-3 py-2 bg-gray-900 text-white rounded-lg disabled:opacity-50"
+                  className="text-xs font-semibold px-3 py-2 bg-slate-900 text-white rounded-lg disabled:opacity-50 hover:bg-slate-800"
                 >
                   {busy ? 'Saving…' : isEditing ? 'Update template' : 'Save template'}
                 </button>
@@ -320,8 +319,8 @@ export default function MarketingTemplateBuilder({
       <div
         className={`bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col ${builderShellClass}`}
       >
-        {fillHeight && embedded && title && (
-          <p className="shrink-0 px-3 py-1.5 text-[11px] font-semibold text-gray-700 border-b border-gray-100 bg-gray-50/80">
+        {fillHeight && embedded && title && !onSave && (
+          <p className="shrink-0 px-3 py-1.5 text-[11px] font-semibold text-slate-700 border-b border-gray-100 bg-slate-50/90">
             {headerTitle}
           </p>
         )}
@@ -392,20 +391,27 @@ export default function MarketingTemplateBuilder({
                 <>
                   <p className="text-[10px] text-gray-400 mb-2 px-1">Drag or click to add</p>
                   <div className="grid grid-cols-3 gap-1.5">
-                    {PALETTE.map((item) => (
-                      <button
-                        key={item.type}
-                        type="button"
-                        draggable
-                        onDragStart={(e) => handlePaletteDragStart(e, item.type)}
-                        onDragEnd={() => setPaletteDragType(null)}
-                        onClick={() => addBlock(item.type)}
-                        className="flex flex-col items-center justify-center gap-1 p-2 rounded-lg border border-gray-100 hover:border-gray-300 hover:bg-gray-50 text-center min-h-[72px]"
-                      >
-                        <span className="text-lg text-gray-700 leading-none">{BLOCK_ICONS[item.type]}</span>
-                        <span className="text-[9px] font-semibold text-gray-800 leading-tight">{item.label}</span>
-                      </button>
-                    ))}
+                    {PALETTE.map((item) => {
+                      const style = BLOCK_PALETTE_STYLES[item.type] || BLOCK_PALETTE_STYLES.text
+                      return (
+                        <button
+                          key={item.type}
+                          type="button"
+                          draggable
+                          onDragStart={(e) => handlePaletteDragStart(e, item.type)}
+                          onDragEnd={() => setPaletteDragType(null)}
+                          onClick={() => addBlock(item.type)}
+                          className={`flex flex-col items-center justify-center gap-1 p-2 rounded-lg border ${style.border} ${style.bg} hover:brightness-[0.97] text-center min-h-[72px] marketing-block-card`}
+                        >
+                          <span className={`text-lg leading-none ${style.text}`}>
+                            {style.icon}
+                          </span>
+                          <span className={`text-[9px] font-semibold leading-tight ${style.text}`}>
+                            {item.label}
+                          </span>
+                        </button>
+                      )
+                    })}
                   </div>
                   <div className="mt-3 pt-2 border-t border-gray-100">
                     <p className="text-[10px] font-semibold text-gray-500 mb-1">Merge fields</p>
@@ -508,7 +514,7 @@ export default function MarketingTemplateBuilder({
           </aside>
 
           <main
-            className="flex-1 min-w-0 flex flex-col min-h-0 bg-[#e8eaed]"
+            className="flex-1 min-w-0 flex flex-col min-h-0 marketing-builder-canvas"
             onDragOver={handleCanvasDragOver}
             onDrop={handleCanvasDrop}
           >
@@ -527,41 +533,67 @@ export default function MarketingTemplateBuilder({
             </div>
           </main>
 
-          <aside className="w-80 shrink-0 border-l border-gray-100 bg-white flex flex-col min-h-0">
-            <p className="shrink-0 px-3 py-2 text-[10px] font-bold uppercase tracking-wide text-gray-500 border-b border-gray-50">
-              Block structure
+          <aside className="w-[min(100%,320px)] sm:w-80 shrink-0 border-l border-gray-100 bg-white flex flex-col min-h-0">
+            <p className="shrink-0 px-3 py-2 text-[10px] font-bold uppercase tracking-wide text-slate-500 border-b border-gray-50">
+              Edit block
             </p>
-            <div className="flex-1 overflow-y-auto p-2 space-y-2">
+            <div className="shrink-0 p-2 border-b border-gray-50 flex gap-1 overflow-x-auto no-scrollbar">
               {!value.blocks?.length ? (
-                <p className="text-xs text-gray-400 text-center py-8 px-2">
-                  Drop blocks here or pick from the left. Presets load a full layout instantly.
+                <p className="text-[10px] text-gray-400 px-1 py-1">Add blocks from the left panel</p>
+              ) : (
+                value.blocks.map((block, index) => {
+                  const style = BLOCK_PALETTE_STYLES[block.type] || BLOCK_PALETTE_STYLES.text
+                  const selected = selectedBlockIndex === index
+                  return (
+                    <button
+                      key={block.id}
+                      type="button"
+                      onClick={() => setSelectedBlockIndex(index)}
+                      className={`shrink-0 flex items-center gap-1 px-2 py-1 rounded-lg border text-[10px] font-semibold marketing-block-card ${
+                        selected
+                          ? `marketing-block-selected ${style.border} ${style.bg} ${style.text}`
+                          : 'border-gray-200 bg-white text-gray-600'
+                      }`}
+                    >
+                      <span>{style.icon}</span>
+                      <span>{BLOCK_LABELS[block.type] || block.type}</span>
+                    </button>
+                  )
+                })
+              )}
+            </div>
+            <div className="flex-1 overflow-y-auto p-2 min-h-0 overscroll-contain">
+              {!value.blocks?.length ? (
+                <p className="text-xs text-gray-400 text-center py-8 px-2 leading-relaxed">
+                  Drop blocks on the preview or click a colored tile on the left. Presets load a full layout instantly.
                 </p>
               ) : (
-                value.blocks.map((block, index) => (
-                  <div
-                    key={block.id}
-                    className={selectedBlockIndex === index ? 'ring-2 ring-gray-900 rounded-xl' : ''}
-                    onClick={() => setSelectedBlockIndex(index)}
-                  >
-                    <DraggableBlockCard
-                      block={block}
-                      index={index}
-                      total={value.blocks.length}
-                      isDragging={dragIndex === index}
-                      isDropTarget={dropIndex === index && dragIndex !== index}
-                      onDragStart={handleDragStart}
-                      onDragOver={handleDragOver}
-                      onDrop={handleDrop}
-                      onDragEnd={handleDragEnd}
-                      onMoveUp={(i) => moveBlock(i, -1)}
-                      onMoveDown={(i) => moveBlock(i, 1)}
-                      onDuplicate={duplicateBlockAt}
-                      onRemove={removeBlock}
-                      onChange={(next) => updateBlock(index, next)}
-                      marketingForms={marketingForms}
-                    />
-                  </div>
-                ))
+                <DraggableBlockCard
+                  block={value.blocks[selectedBlockIndex] || value.blocks[0]}
+                  index={selectedBlockIndex}
+                  total={value.blocks.length}
+                  isDragging={dragIndex === selectedBlockIndex}
+                  isDropTarget={dropIndex === selectedBlockIndex && dragIndex !== selectedBlockIndex}
+                  onDragStart={handleDragStart}
+                  onDragOver={handleDragOver}
+                  onDrop={handleDrop}
+                  onDragEnd={handleDragEnd}
+                  onMoveUp={(i) => {
+                    moveBlock(i, -1)
+                    setSelectedBlockIndex(Math.max(0, i - 1))
+                  }}
+                  onMoveDown={(i) => {
+                    moveBlock(i, 1)
+                    setSelectedBlockIndex(Math.min(value.blocks.length - 1, i + 1))
+                  }}
+                  onDuplicate={duplicateBlockAt}
+                  onRemove={(i) => {
+                    removeBlock(i)
+                    setSelectedBlockIndex(Math.max(0, i - 1))
+                  }}
+                  onChange={(next) => updateBlock(selectedBlockIndex, next)}
+                  marketingForms={marketingForms}
+                />
               )}
             </div>
           </aside>
