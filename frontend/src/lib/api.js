@@ -222,7 +222,7 @@ export const api = {
   generateCrmEmail: (leadId, options = {}) =>
     request('/api/crm-generate-email', { method: 'POST', body: { leadId, ...options } }),
   sendCrmEmail: (leadId, payload) =>
-    request('/api/crm-send-email', { method: 'POST', body: { leadId, ...payload } }),
+    request('/api/crm-send-email', { method: 'POST', body: { leadId, ...payload }, timeoutMs: 120_000 }),
   searchLeads: (filters, count = 50, provider = 'free') =>
     request('/api/search-leads', { method: 'POST', body: { filters, count, provider } }),
   addSearchHistory: (entry) => request('/api/search-history', { method: 'POST', body: { entry } }),
