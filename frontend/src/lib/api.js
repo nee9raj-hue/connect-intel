@@ -8,10 +8,14 @@ async function touchSession() {
   if (refreshInFlight) return refreshInFlight
 
   refreshInFlight = (async () => {
-    const response = await fetchWithTimeout('/api/auth/session', {
-      credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/json' },
-    })
+    const response = await fetchWithTimeout(
+      '/api/auth/session',
+      {
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+      },
+      45_000
+    )
     const text = await response.text()
     let data = {}
     if (text) {
@@ -88,8 +92,9 @@ async function requestInner(path, options = {}, { retried = false, silent = fals
 export const api = {
   touchSession,
   getIntegrationStatus: () => request('/api/integrations/status'),
-  getSession: () => request('/api/auth/session'),
-  createSession: (payload) => request('/api/auth/session', { method: 'POST', body: payload }),
+  getSession: () => request('/api/auth/session', { timeoutMs: 45_000 }),
+  createSession: (payload) =>
+    request('/api/auth/session', { method: 'POST', body: payload, timeoutMs: 55_000 }),
   destroySession: () => request('/api/auth/session', { method: 'DELETE' }),
   completeOnboarding: (payload) =>
     request('/api/onboarding/complete', { method: 'POST', body: payload }),
@@ -107,10 +112,28 @@ export const api = {
   deleteOrgLeadTag: (id) => request('/api/org/lead-tags', { method: 'DELETE', body: { id } }),
   updateMemberPermissions: (payload) =>
     request('/api/team/permissions', { method: 'PATCH', body: payload }),
-  getSavedLeads: ({ silent = false, light = true } = {}) =>
-    request(`/api/saved-leads${light ? '?light=1' : '?light=0'}`, {}, { silent }),
+  getSavedLeads: async ({ silent = false, light = true } = {}) => {
+    const PAGE_SIZE = 2000
+    let offset = 0
+    let leads = []
+    let total = 0
+    for (let i = 0; i < 50; i += 1) {
+      const qs = new URLSearchParams({
+        limit: String(PAGE_SIZE),
+        offset: String(offset),
+        light: light ? '1' : '0',
+      })
+      const data = await request(`/api/saved-leads?${qs}`, { timeoutMs: 90_000 }, { silent })
+      total = typeof data.total === 'number' ? data.total : leads.length + (data.leads?.length || 0)
+      const batch = data.leads || []
+      leads = leads.concat(batch)
+      if (!data.hasMore || batch.length === 0) break
+      offset += batch.length
+    }
+    return { leads, total }
+  },
   getPipelineLead: (leadId, { silent = false } = {}) =>
-    request(`/api/saved-leads?leadId=${encodeURIComponent(leadId)}`, {}, { silent }),
+    request(`/api/saved-leads?leadId=${encodeURIComponent(leadId)}`, { timeoutMs: 60_000 }, { silent }),
   getSearchHistory: ({ silent = false } = {}) => request('/api/search-history', {}, { silent }),
   saveLead: (lead) => request('/api/saved-leads', { method: 'POST', body: { lead } }),
   addManualLead: (manual) => request('/api/saved-leads', { method: 'POST', body: { manual } }),
@@ -121,7 +144,7 @@ export const api = {
     request('/api/saved-leads', { method: 'PATCH', body: { leadId, assignToUserId } }),
   getCrmCalendar: (query = '', { silent = false } = {}) =>
     request(`/api/crm/calendar${query ? `?${query}` : ''}`, {}, { silent }),
-  getCrmActivityLog: () => request('/api/crm/activity-log'),
+  getCrmActivityLog: () => request('/api/crm/activity-log', { timeoutMs: 60_000 }),
   getCrmNotifications: (since, { silent = false } = {}) =>
     request(
       `/api/crm/notifications${since ? `?since=${encodeURIComponent(since)}` : ''}`,
@@ -129,7 +152,7 @@ export const api = {
       { silent }
     ),
   getCrmTeamDashboard: (query = '') =>
-    request(`/api/crm/team-dashboard${query ? `?${query}` : ''}`),
+    request(`/api/crm/team-dashboard${query ? `?${query}` : ''}`, { timeoutMs: 60_000 }),
   ackMeetingReminder: (leadId, meetingId, { silent = false } = {}) =>
     request('/api/crm/reminders-ack', { method: 'POST', body: { leadId, meetingId } }, { silent }),
   getCrmGmailStatus: () => request('/api/crm/email-gmail-status'),
