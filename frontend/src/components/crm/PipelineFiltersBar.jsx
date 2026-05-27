@@ -16,6 +16,11 @@ function FilterChip({ active, onClick, label }) {
   )
 }
 
+const SMART_TAG_OPTIONS = [
+  { id: 'not_touched', label: 'Not touched' },
+  { id: 'hot_score', label: 'Hot (Score 70+)' },
+]
+
 export default function PipelineFiltersBar({
   search,
   onSearchChange,
@@ -65,6 +70,7 @@ export default function PipelineFiltersBar({
     (filters.state ? 1 : 0) +
     (filters.contact && filters.contact !== 'any' ? 1 : 0) +
     (filters.tagIds?.length ? 1 : 0) +
+    (filters.smartTags?.length ? 1 : 0) +
     (statusFilter && statusFilter !== 'all' ? 1 : 0)
 
   const showExpandHint = hasActiveFilters || activeRefineCount > 0
@@ -155,6 +161,33 @@ export default function PipelineFiltersBar({
           ))}
         </div>
       )}
+
+      <div className={`flex flex-wrap items-center gap-1 ${compact ? 'mt-1.5' : 'mt-2'}`}>
+        <span className="text-[10px] font-semibold uppercase tracking-wide text-gray-400 mr-1">Smart</span>
+        {SMART_TAG_OPTIONS.map((opt) => {
+          const active = (filters.smartTags || []).includes(opt.id)
+          return (
+            <button
+              key={opt.id}
+              type="button"
+              onClick={() => {
+                const current = filters.smartTags || []
+                const next = current.includes(opt.id)
+                  ? current.filter((id) => id !== opt.id)
+                  : [...current, opt.id]
+                set({ smartTags: next })
+              }}
+              className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
+                active
+                  ? 'bg-gray-900 text-white border-gray-900'
+                  : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+              }`}
+            >
+              {opt.label}
+            </button>
+          )
+        })}
+      </div>
 
       {expanded && (
         <div className="mt-3 rounded-lg border border-gray-200 bg-gray-50/60 p-3 space-y-3">

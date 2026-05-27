@@ -17,6 +17,7 @@ export const DEFAULT_PIPELINE_FILTERS = {
   contact: 'any',
   tagIds: [],
   tagMode: 'any',
+  smartTags: [],
 }
 
 export function getLeadCity(lead) {
@@ -88,9 +89,23 @@ export function applyPipelineFilters(
     overdueFollowUp = false,
     tagIds = [],
     tagMode = 'any',
+    smartTags = [],
   } = {}
 ) {
   let list = leads || []
+
+  const activeSmartTags = Array.isArray(smartTags) ? smartTags.filter(Boolean) : []
+  if (activeSmartTags.includes('not_touched')) {
+    const cutoff = Date.now() - 7 * MS_DAY
+    list = list.filter((l) => {
+      const last = l.crm?.lastCommunicationAt || l.crm?.lastEmailSentAt || l.savedAt
+      if (!last) return true
+      return new Date(last).getTime() < cutoff
+    })
+  }
+  if (activeSmartTags.includes('hot_score')) {
+    list = list.filter((l) => (l.crm?.leadScore ?? 0) >= 70)
+  }
 
   const filterTagIds = Array.isArray(tagIds) ? tagIds.filter(Boolean) : []
   if (filterTagIds.length > 0) {
@@ -182,6 +197,7 @@ export function countActiveFilters(filters, search) {
   if (filters.state) n += 1
   if (filters.contact && filters.contact !== 'any') n += 1
   if (filters.tagIds?.length) n += 1
+  if (filters.smartTags?.length) n += 1
   if (search?.trim()) n += 1
   return n
 }
