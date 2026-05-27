@@ -259,6 +259,15 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     [selectedLeads]
   )
 
+  const hasMoreLeads =
+    pipelineLoad.hasMore ||
+    (pipelineSummary.total > savedLeads.length && savedLeads.length > 0)
+
+  const handleLoadMore = useCallback(() => {
+    if (view === 'board') setView('list')
+    loadMorePipelineLeads(serverFilters)
+  }, [view, loadMorePipelineLeads, serverFilters])
+
   const byStatus = useMemo(() => {
     if (serverSidePipeline && boardLeadsByStatus) return boardLeadsByStatus
     const map = Object.fromEntries(columns.map((s) => [s.id, []]))
@@ -386,7 +395,9 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                 <p className="text-[10px] md:text-[11px] text-gray-500 mt-0.5 truncate">
                   {savedLeads.length === 0
                     ? 'Add or import leads'
-                    : `${filtered.length} shown · ${pipelineSummary.total.toLocaleString()} in pipeline`}
+                    : hasMoreLeads
+                      ? `${savedLeads.length.toLocaleString()} loaded · ${pipelineSummary.total.toLocaleString()} total — use Load more below`
+                      : `${filtered.length} shown · ${pipelineSummary.total.toLocaleString()} in pipeline`}
                 </p>
               )}
             </div>
@@ -703,25 +714,18 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                 </tbody>
               </table>
               </div>
-              {pipelineLoad.hasMore && (
-                <div className="border-t border-gray-100 px-4 py-3 flex items-center justify-between gap-3 bg-gray-50">
-                  <p className="text-xs text-gray-600">
-                    Showing {savedLeads.length.toLocaleString()} of{' '}
-                    {pipelineSummary.total.toLocaleString()} leads
-                  </p>
-                  <button
-                    type="button"
-                    disabled={pipelineLoad.loadingMore}
-                    onClick={() => loadMorePipelineLeads(serverFilters)}
-                    className="text-xs font-semibold px-3 py-1.5 rounded-md bg-gray-900 text-white disabled:opacity-50"
-                  >
-                    {pipelineLoad.loadingMore ? 'Loading…' : 'Load more'}
-                  </button>
-                </div>
-              )}
             </div>
           )}
           </div>
+          {hasMoreLeads && savedLeads.length > 0 && filtered.length > 0 && (
+            <PipelineLoadMoreBar
+              loaded={savedLeads.length}
+              total={pipelineSummary.total}
+              loading={pipelineLoad.loadingMore}
+              view={view}
+              onLoadMore={handleLoadMore}
+            />
+          )}
         </div>
       </div>
 
@@ -759,6 +763,34 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
         }}
       />
       <BulkWhatsAppModal open={waOpen} leads={selectedLeads} onClose={() => setWaOpen(false)} />
+    </div>
+  )
+}
+
+function PipelineLoadMoreBar({ loaded, total, loading, view, onLoadMore }) {
+  return (
+    <div
+      className="shrink-0 z-10 border-t border-[#ffcb2b]/40 bg-[#fffbeb] px-3 py-2.5 md:px-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-[0_-6px_16px_rgba(0,0,0,0.06)]"
+      role="region"
+      aria-label="Load more pipeline leads"
+    >
+      <p className="text-xs text-gray-800">
+        Showing <strong>{loaded.toLocaleString()}</strong> of{' '}
+        <strong>{total.toLocaleString()}</strong> leads
+        {view === 'board' ? (
+          <span className="block sm:inline sm:ml-1 text-[10px] text-gray-600 font-normal">
+            (board shows up to 50 per stage — load more opens list view)
+          </span>
+        ) : null}
+      </p>
+      <button
+        type="button"
+        disabled={loading}
+        onClick={onLoadMore}
+        className="text-xs font-semibold px-4 py-2 rounded-lg bg-gray-900 text-white disabled:opacity-50 shrink-0 w-full sm:w-auto"
+      >
+        {loading ? 'Loading…' : 'Load more leads'}
+      </button>
     </div>
   )
 }
