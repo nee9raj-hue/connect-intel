@@ -13,7 +13,7 @@ const PRESET_COLORS = [
   '#dc2626',
 ]
 
-export default function OrgLeadTagsPanel({ onTagsChange }) {
+export default function OrgLeadTagsPanel({ onTagsChange, embedded = false }) {
   const [tags, setTags] = useState([])
   const [loading, setLoading] = useState(true)
   const [name, setName] = useState('')
@@ -121,16 +121,24 @@ export default function OrgLeadTagsPanel({ onTagsChange }) {
     }
   }
 
-  return (
-    <section className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
-      <div>
-        <h2 className="text-sm font-semibold text-gray-900">Lead tags</h2>
-        <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-          Add one tag or several at once separated by commas (e.g.{' '}
-          <span className="font-medium text-gray-700">B2B, B2C, UK, USA, Air, Ocean</span>). Each tag gets its
-          own color. Anyone on the team can tag leads; only admins manage the list here.
+  const inner = (
+    <>
+      {!embedded && (
+        <div>
+          <h2 className="text-sm font-semibold text-gray-900">Lead tags</h2>
+          <p className="text-xs text-gray-500 mt-1 leading-relaxed">
+            Add one tag or several at once separated by commas (e.g.{' '}
+            <span className="font-medium text-gray-700">B2B, B2C, UK, USA, Air, Ocean</span>). Each tag gets its
+            own color. Anyone on the team can tag leads; only admins manage the list here.
+          </p>
+        </div>
+      )}
+      {embedded && (
+        <p className="text-xs text-gray-500 leading-relaxed">
+          Comma-separated names create multiple tags with different colors. Team members apply tags on leads in
+          Pipeline.
         </p>
-      </div>
+      )}
 
       {error && (
         <p className="text-xs text-red-700 bg-red-50 border border-red-100 rounded-lg px-3 py-2">{error}</p>
@@ -240,6 +248,16 @@ export default function OrgLeadTagsPanel({ onTagsChange }) {
           ))}
         </ul>
       )}
+    </>
+  )
+
+  if (embedded) {
+    return <div className="space-y-3">{inner}</div>
+  }
+
+  return (
+    <section className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
+      {inner}
     </section>
   )
 }

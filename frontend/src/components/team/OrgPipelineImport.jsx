@@ -13,7 +13,7 @@ const DATASET_OPTIONS = [
   { id: 'general', label: 'General' },
 ]
 
-export default function OrgPipelineImport({ onImported }) {
+export default function OrgPipelineImport({ onImported, embedded = false }) {
   const [datasetType, setDatasetType] = useState('exporters')
   const [overview, setOverview] = useState(null)
   const [rows, setRows] = useState([])
@@ -88,17 +88,8 @@ export default function OrgPipelineImport({ onImported }) {
     }
   }
 
-  return (
-    <section className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-      <div className="px-5 py-4 border-b border-gray-100">
-        <h2 className="text-sm font-semibold text-gray-900">Import your pipeline</h2>
-        <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-          Upload your existing leads (CSV or Excel). They are added to your team pipeline for follow-up,
-          email, and closures. Use our template columns for best results.
-        </p>
-      </div>
-
-      <div className="p-5 space-y-4">
+  const body = (
+    <div className={`space-y-4 ${embedded ? '' : 'p-5'}`}>
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
@@ -176,7 +167,30 @@ export default function OrgPipelineImport({ onImported }) {
         {error && (
           <p className="text-xs text-red-700 bg-red-50 border border-red-100 rounded-lg px-3 py-2">{error}</p>
         )}
+    </div>
+  )
+
+  if (embedded) {
+    return (
+      <div className="space-y-3">
+        <p className="text-xs text-gray-500 leading-relaxed">
+          Upload CSV or Excel — leads go to your team pipeline. Download a template first for best column mapping.
+        </p>
+        {body}
       </div>
+    )
+  }
+
+  return (
+    <section className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="px-5 py-4 border-b border-gray-100">
+        <h2 className="text-sm font-semibold text-gray-900">Import your pipeline</h2>
+        <p className="text-xs text-gray-500 mt-1 leading-relaxed">
+          Upload your existing leads (CSV or Excel). They are added to your team pipeline for follow-up,
+          email, and closures. Use our template columns for best results.
+        </p>
+      </div>
+      {body}
     </section>
   )
 }
