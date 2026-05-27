@@ -446,7 +446,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
           )
         } else if (drained.pending > 0) {
           setNotice(
-            `Campaign started — ${enrolled} enrolled, ${drained.totalSent} sent, ${drained.totalFailed} failed. ${drained.pending} still queued; remaining sends continue automatically every 30 minutes.`
+            `Campaign started — ${enrolled} enrolled, ${drained.totalSent} sent, ${drained.totalFailed} failed. ${drained.pending} still queued — start the campaign again or wait for the daily send job to finish the rest.`
           )
         } else {
           setNotice(
