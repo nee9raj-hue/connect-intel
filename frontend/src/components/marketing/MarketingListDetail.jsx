@@ -114,22 +114,18 @@ export default function MarketingListDetail({
 
   return (
     <div className="flex flex-col h-full min-h-0">
-      <div className="shrink-0 px-4 py-3 border-b border-gray-100 flex items-start justify-between gap-3 bg-gray-50/50">
+      <div className="shrink-0 px-4 py-3 border-b border-[#dfe3eb] flex items-start justify-between gap-3 bg-[#f5f8fa]">
         <div className="min-w-0">
-          <p className="text-[10px] font-bold uppercase tracking-wide text-gray-400">Editing list</p>
-          <h3 className="text-base font-semibold text-gray-900 truncate">{list.name}</h3>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <p className="crm-field-label mb-1">Editing list</p>
+          <h3 className="crm-detail-title truncate">{list.name}</h3>
+          <p className="crm-detail-subtitle">
             {channel === 'whatsapp' ? 'WhatsApp' : 'Email'} · {list.leadIds?.length || 0} contacts
             {list.description ? ` · ${list.description}` : ''}
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           {onClose && (
-            <button
-              type="button"
-              onClick={onClose}
-              className="text-xs font-medium px-2 py-1 border border-gray-200 rounded-md text-gray-600 hover:bg-white"
-            >
+            <button type="button" onClick={onClose} className="crm-btn crm-btn-secondary">
               Close
             </button>
           )}
@@ -137,7 +133,7 @@ export default function MarketingListDetail({
             type="button"
             onClick={deleteList}
             disabled={busy}
-            className="text-xs font-semibold text-red-700 px-2 py-1 rounded-md hover:bg-red-50 disabled:opacity-50"
+            className="crm-btn crm-btn-ghost text-red-700 hover:bg-red-50 disabled:opacity-50"
           >
             Delete list
           </button>
@@ -145,41 +141,39 @@ export default function MarketingListDetail({
       </div>
 
       {unsubPrompt && (
-        <p className="shrink-0 mx-4 mt-3 text-xs text-amber-900 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-          {unsubPrompt}
-        </p>
+        <p className="shrink-0 mx-4 mt-3 crm-alert crm-alert-error">{unsubPrompt}</p>
       )}
 
-      <div className="flex-1 min-h-0 grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-100">
+      <div className="flex-1 min-h-0 grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[#dfe3eb]">
         <section className="flex flex-col min-h-0">
-          <div className="shrink-0 px-4 py-2.5 border-b border-gray-50 bg-white">
-            <p className="text-xs font-semibold text-gray-800">On this list</p>
-            <p className="text-[10px] text-gray-400">Remove contacts you no longer want to target</p>
+          <div className="shrink-0 px-4 py-2.5 border-b border-[#eaf0f6] bg-white">
+            <p className="text-xs font-semibold text-[#33475b]">On this list</p>
+            <p className="text-[11px] text-[#7c98b6]">Remove contacts you no longer want to target</p>
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search members…"
-              className="mt-2 w-full text-xs border border-gray-200 rounded-lg px-2.5 py-1.5"
+              className="crm-input mt-2 text-sm"
             />
           </div>
-          <div className="flex-1 overflow-y-auto min-h-0">
+          <div className="flex-1 overflow-y-auto min-h-0 crm-list-scroll">
             {!filteredMembers.length && (
-              <p className="text-xs text-gray-400 p-6 text-center">No contacts on this list yet.</p>
+              <p className="text-xs text-[#7c98b6] p-6 text-center">No contacts on this list yet.</p>
             )}
             {filteredMembers.map((l) => (
               <div
                 key={l.id}
-                className="flex items-center justify-between gap-2 px-4 py-2.5 text-xs border-b border-gray-50 hover:bg-gray-50/80"
+                className="flex items-center justify-between gap-2 px-4 py-2.5 text-xs border-b border-[#eaf0f6] hover:bg-[#f5f8fa]"
               >
                 <div className="min-w-0">
-                  <p className="font-medium text-gray-900 truncate">{leadDisplayName(l)}</p>
-                  <p className="text-gray-400 truncate">{l.email || l.phone}</p>
+                  <p className="font-medium text-[#33475b] truncate">{leadDisplayName(l)}</p>
+                  <p className="text-[#7c98b6] truncate">{l.email || l.phone}</p>
                 </div>
                 <button
                   type="button"
                   disabled={busy}
                   onClick={() => removeLeads([l.id])}
-                  className="shrink-0 text-red-700 font-semibold hover:underline disabled:opacity-50"
+                  className="crm-link-btn p-0 text-red-700 disabled:opacity-50"
                 >
                   Remove
                 </button>
@@ -189,34 +183,34 @@ export default function MarketingListDetail({
         </section>
 
         <section className="flex flex-col min-h-0">
-          <div className="shrink-0 px-4 py-2.5 border-b border-gray-50 bg-white">
-            <p className="text-xs font-semibold text-gray-800">Add from pipeline</p>
-            <p className="text-[10px] text-gray-400">Search and add leads to this list</p>
+          <div className="shrink-0 px-4 py-2.5 border-b border-[#eaf0f6] bg-white">
+            <p className="text-xs font-semibold text-[#33475b]">Add from pipeline</p>
+            <p className="text-[11px] text-[#7c98b6]">Search and add leads to this list</p>
             <input
               value={addSearch}
               onChange={(e) => setAddSearch(e.target.value)}
               placeholder="Search leads to add…"
-              className="mt-2 w-full text-xs border border-gray-200 rounded-lg px-2.5 py-1.5"
+              className="crm-input mt-2 text-sm"
             />
           </div>
-          <div className="flex-1 overflow-y-auto min-h-0">
+          <div className="flex-1 overflow-y-auto min-h-0 crm-list-scroll">
             {!addCandidates.length && (
-              <p className="text-xs text-gray-400 p-6 text-center">No matching leads to add.</p>
+              <p className="text-xs text-[#7c98b6] p-6 text-center">No matching leads to add.</p>
             )}
             {addCandidates.map((l) => (
               <div
                 key={l.id}
-                className="flex items-center justify-between gap-2 px-4 py-2.5 text-xs border-b border-gray-50 hover:bg-gray-50/80"
+                className="flex items-center justify-between gap-2 px-4 py-2.5 text-xs border-b border-[#eaf0f6] hover:bg-[#f5f8fa]"
               >
                 <div className="min-w-0">
-                  <p className="font-medium text-gray-900 truncate">{leadDisplayName(l)}</p>
-                  <p className="text-gray-400 truncate">{l.email || l.phone}</p>
+                  <p className="font-medium text-[#33475b] truncate">{leadDisplayName(l)}</p>
+                  <p className="text-[#7c98b6] truncate">{l.email || l.phone}</p>
                 </div>
                 <button
                   type="button"
                   disabled={busy}
                   onClick={() => addLeads([l.id])}
-                  className="shrink-0 text-[#242424] font-semibold hover:underline disabled:opacity-50"
+                  className="crm-link-btn p-0 disabled:opacity-50"
                 >
                   Add
                 </button>

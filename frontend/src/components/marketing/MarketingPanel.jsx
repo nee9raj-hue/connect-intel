@@ -479,81 +479,88 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
 
   return (
     <div
-      className={`panel-shell ${
-        isBuilderTab ? 'marketing-campaigns-shell' : 'bg-[#f0f4f8]'
+      className={`crm-workspace flex h-full min-h-0 w-full overflow-hidden ${
+        isBuilderTab ? 'marketing-campaigns-shell' : ''
       }`}
     >
-      <header
-        className={`marketing-page-header shrink-0 ${
-          isBuilderTab ? 'px-3 sm:px-4 py-2.5' : 'px-4 sm:px-6 py-4'
-        }`}
-      >
-        <div className="marketing-brand-stripe" aria-hidden />
-        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
-          <div className="flex items-center gap-2 min-w-0 flex-wrap">
-            <h1 className={`font-semibold text-gray-900 ${isBuilderTab ? 'text-base' : 'text-lg'}`}>
-              Marketing
-            </h1>
-            {summary && isBuilderTab && (
-              <span className="text-[10px] text-gray-400 hidden md:inline">
-                {summary.campaigns} campaigns · {summary.sent} sent
-              </span>
-            )}
-            {needsWorkEmail && isBuilderTab && (
-              <span className="text-[10px] font-semibold text-amber-800 bg-amber-50 px-2 py-0.5 rounded">
-                Connect work email to send
-              </span>
-            )}
+      <header className="crm-page-header shrink-0">
+        <div className="crm-page-header-top">
+          <div className="min-w-0 flex-1">
+            <h1 className="crm-page-title">Marketing</h1>
+            <p className="crm-page-subtitle">
+              {summary && !isBuilderTab ? (
+                <span className="crm-marketing-kpis">
+                  <span>
+                    <strong>{summary.campaigns}</strong> campaigns
+                  </span>
+                  <span>
+                    <strong>{summary.enrolled}</strong> enrolled
+                  </span>
+                  <span>
+                    <strong>{summary.sent}</strong> sent
+                  </span>
+                  <span>
+                    <strong>{summary.opens}</strong> opens
+                  </span>
+                  <span>
+                    <strong>{summary.clicks}</strong> clicks
+                  </span>
+                </span>
+              ) : summary && isBuilderTab ? (
+                <>
+                  {summary.campaigns} campaigns · {summary.sent} sent
+                  {needsWorkEmail && (
+                    <>
+                      {' '}
+                      ·{' '}
+                      <span className="text-amber-800 font-semibold">
+                        Connect work email to send
+                      </span>
+                    </>
+                  )}
+                </>
+              ) : (
+                'Lists, templates, campaigns, and lead capture forms — logged on each lead in Pipeline.'
+              )}
+            </p>
           </div>
-          <div className="flex flex-wrap items-center gap-1">
+          <div className="crm-page-actions flex-wrap">
             {(needsWorkEmail ||
               (user?.accountType === 'company' && !isBuilderTab) ||
               (user?.isOrgAdmin && user?.accountType === 'company')) && (
               <button
                 type="button"
                 onClick={() => setMarketingTipsOpen((o) => !o)}
-                className="text-[10px] font-semibold px-2 py-1 border border-gray-200 rounded-md text-gray-600 hover:bg-gray-50"
+                className="crm-btn crm-btn-ghost"
               >
                 {marketingTipsOpen ? 'Hide tips' : 'Tips'}
               </button>
             )}
-            {TABS.map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() => setTab(t.id)}
-                className={`text-xs font-semibold px-2.5 py-1 rounded-lg border transition-colors ${
-                  tab === t.id
-                    ? 'marketing-tab-active'
-                    : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-white hover:border-slate-300 shadow-sm'
-                }`}
-              >
-                {t.label}
-              </button>
-            ))}
+            <div className="crm-view-tabs">
+              {TABS.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => setTab(t.id)}
+                  className={`crm-view-tab ${tab === t.id ? 'is-active' : ''}`}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
-        {!isBuilderTab && (
-          <p className="text-sm text-gray-500 mt-2">
-            Lists, templates, campaigns, and lead capture forms — logged on each lead in Pipeline.
-          </p>
-        )}
-
         {marketingTipsOpen && (
-          <div className="mt-2 space-y-2 max-h-[28vh] overflow-y-auto">
+          <div className="pb-3 space-y-2 max-h-[28vh] overflow-y-auto">
             {(user?.isOrgAdmin || user?.orgRole === 'org_admin') && user?.accountType === 'company' ? (
-              <p className="text-[11px] text-gray-600 bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-1.5">
+              <p className="crm-alert text-[#516f90] bg-[#f5f8fa] border-[#dfe3eb] mb-0">
                 Admins see all team campaigns. Reps only see their own assets.
               </p>
             ) : user?.accountType === 'company' ? (
-              <p className="text-[11px] text-gray-600 bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-1.5">
+              <p className="crm-alert text-[#516f90] bg-[#f5f8fa] border-[#dfe3eb] mb-0">
                 Connect work Gmail under{' '}
-                <button
-                  type="button"
-                  onClick={() => onNavigate?.('my-email')}
-                  className="font-semibold underline text-[#5b4a00]"
-                >
+                <button type="button" onClick={() => onNavigate?.('my-email')} className="crm-link-btn p-0">
                   Work email
                 </button>{' '}
                 before sending email campaigns.
@@ -565,21 +572,15 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
               </div>
             )}
             {user?.isOrgAdmin && user?.accountType === 'company' && !user?.whatsappAutoSendReady && (
-              <p className="text-[11px] text-amber-900 bg-amber-50 border border-amber-100 rounded-lg px-2.5 py-1.5">
+              <p className="crm-alert crm-alert-error mb-0">
                 WhatsApp API:{' '}
                 <button
                   type="button"
                   onClick={() => onNavigate?.('whatsapp-settings')}
-                  className="font-semibold underline text-[#5b4a00]"
+                  className="crm-link-btn p-0"
                 >
                   Workspace → WhatsApp API
                 </button>
-              </p>
-            )}
-            {summary && !isBuilderTab && (
-              <p className="text-[11px] text-gray-500">
-                {summary.campaigns} campaigns · {summary.enrolled} enrolled · {summary.sent} sent ·{' '}
-                {summary.opens} opens · {summary.clicks} clicks
               </p>
             )}
           </div>
@@ -587,29 +588,23 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
       </header>
 
       {(error || notice) && (
-        <div className={`shrink-0 ${isBuilderTab ? 'px-3 sm:px-4 pt-1.5' : 'px-4 sm:px-6 pt-3'}`}>
-          {error && (
-            <p className="text-xs text-red-800 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
-              {error}
-            </p>
-          )}
-          {notice && (
-            <p className="text-xs text-green-900 bg-green-50 border border-green-100 rounded-lg px-3 py-2 mt-2">
-              {notice}
-            </p>
-          )}
+        <div className={`shrink-0 px-4 sm:px-6 ${isBuilderTab ? 'pt-1.5' : 'pt-2'}`}>
+          {error && <p className="crm-alert crm-alert-error">{error}</p>}
+          {notice && <p className="crm-alert crm-alert-success mt-2">{notice}</p>}
         </div>
       )}
 
       <div
         className={
           isBuilderTab
-            ? 'panel-body-scroll px-2 sm:px-3 py-1.5 pb-8'
-            : 'panel-body-scroll px-4 sm:px-6 py-4'
+            ? 'panel-body-scroll px-2 sm:px-3 py-1.5 pb-8 flex-1 min-h-0'
+            : 'crm-page-body'
         }
       >
         {loading ? (
-          <LoadingExperience message={LOADING_MESSAGES.marketing} />
+          <div className={isBuilderTab ? '' : 'crm-content-card crm-content-scroll'}>
+            <LoadingExperience message={LOADING_MESSAGES.marketing} />
+          </div>
         ) : tab === 'campaigns' ? (
           <div className="marketing-workspace">
             <details
@@ -847,11 +842,11 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
             )}
             </div>
 
-            <div className="marketing-campaign-actions flex flex-wrap items-center gap-3 px-4 py-2.5">
-              <button type="button" onClick={resetCampaignForm} className="ci-btn ci-btn-secondary">
+            <div className="marketing-campaign-actions flex flex-wrap items-center gap-3 px-4 py-2.5 border-t border-[#dfe3eb] bg-[#f5f8fa]">
+              <button type="button" onClick={resetCampaignForm} className="crm-btn crm-btn-secondary">
                 New campaign
               </button>
-              <p className="text-xs text-slate-600 flex-1 min-w-[140px] leading-snug">
+              <p className="text-xs text-[#516f90] flex-1 min-w-[140px] leading-snug">
                 {!campaignForm.listId
                   ? 'Pick a list in setup above to save a draft'
                   : !campaignForm.name.trim()
@@ -871,7 +866,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
                       : undefined
                 }
                 onClick={createCampaign}
-                className="ci-btn ci-btn-secondary"
+                className="crm-btn crm-btn-secondary"
               >
                 Save draft
               </button>
@@ -879,7 +874,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
                 type="button"
                 disabled={busy || !canSaveCampaignDraft}
                 onClick={createAndStart}
-                className="ci-btn ci-btn-primary"
+                className="crm-btn crm-btn-primary"
               >
                 {busy
                   ? 'Working…'
@@ -914,9 +909,9 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
             </details>
           </div>
         ) : tab === 'lists' ? (
-          <div className="flex flex-col gap-4 max-w-6xl min-h-[min(720px,calc(100vh-11rem))]">
-            <section className="shrink-0 bg-white border border-gray-200 rounded-xl p-4 space-y-3">
-              <h2 className="text-sm font-semibold text-gray-900">New list</h2>
+          <div className="crm-content-card flex flex-col min-h-0 flex-1 overflow-hidden">
+            <div className="crm-content-scroll shrink-0 border-b border-[#dfe3eb]">
+              <h2 className="crm-section-title">New list</h2>
               <MarketingListBuilder
                 user={user}
                 teamMembers={teamMembers}
@@ -932,45 +927,44 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
                   if (pickId) setSelectedListId(pickId)
                 }}
               />
-            </section>
+            </div>
 
-            <div className="flex flex-1 min-h-[400px] border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
-              <div className="w-[min(100%,280px)] sm:w-72 shrink-0 flex flex-col border-r border-gray-200 bg-gray-50/80">
-                <div className="shrink-0 px-3 py-3 border-b border-gray-200 bg-white">
-                  <h2 className="text-sm font-semibold text-gray-900">Saved lists</h2>
-                  <p className="text-[11px] text-gray-500 mt-0.5 leading-snug">
-                    Click a list — contacts open on the right
-                  </p>
+            <div className="crm-split-card flex-1 min-h-[400px] border-0 rounded-none shadow-none">
+              <aside className="crm-split-sidebar">
+                <div className="crm-list-header">
+                  Saved lists
+                  <span className="block font-normal text-[#7c98b6] mt-0.5">
+                    Click a list to manage contacts
+                  </span>
                 </div>
-                <div className="flex-1 overflow-y-auto p-2 space-y-1.5 min-h-0">
+                <div className="crm-list-scroll">
                   {!lists.length && (
-                    <p className="text-xs text-gray-400 text-center py-8 px-2">No lists yet. Create one above.</p>
+                    <div className="crm-empty-state py-8">
+                      <p>No lists yet</p>
+                      <p className="crm-empty-hint">Create one above.</p>
+                    </div>
                   )}
                   {lists.map((l) => (
                     <button
                       key={l.id}
                       type="button"
                       onClick={() => setSelectedListId(l.id)}
-                      className={`w-full text-left rounded-lg px-3 py-2.5 text-sm transition-all ${
-                        selectedListId === l.id
-                          ? 'bg-white border-2 border-gray-900 shadow-sm'
-                          : 'bg-white/60 border border-gray-200 hover:bg-white hover:border-gray-300'
-                      }`}
+                      className={`crm-list-item ${selectedListId === l.id ? 'is-selected' : ''}`}
                     >
                       <div className="flex items-start justify-between gap-2">
-                        <p className="font-medium text-gray-900 leading-snug">{l.name}</p>
+                        <p className="crm-list-item-name">{l.name}</p>
                         <MarketingCreatorBadge name={l.createdByName} isOwn={l.isOwn} />
                       </div>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="crm-list-item-meta">
                         {(l.channel || 'email') === 'whatsapp' ? 'WhatsApp' : 'Email'} ·{' '}
                         {l.leadIds?.length || 0} contacts
                       </p>
                     </button>
                   ))}
                 </div>
-              </div>
+              </aside>
 
-              <div className="flex-1 flex flex-col min-w-0 min-h-0 bg-white">
+              <section className="crm-split-main">
                 {selectedListId ? (
                   <MarketingListDetail
                     list={lists.find((l) => l.id === selectedListId)}
@@ -989,19 +983,22 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
                     }}
                   />
                 ) : (
-                  <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-                    <p className="text-sm font-medium text-gray-700">No list selected</p>
-                    <p className="text-xs text-gray-500 mt-2 max-w-xs leading-relaxed">
-                      Choose a list on the left to add or remove contacts. Both panels scroll independently.
+                  <div className="crm-empty-state">
+                    <p>No list selected</p>
+                    <p className="crm-empty-hint">
+                      Choose a list on the left to add or remove contacts.
                     </p>
                   </div>
                 )}
-              </div>
+              </section>
             </div>
           </div>
         ) : tab === 'inbox' ? (
-          <WhatsAppInboxPanel onNavigate={onNavigate} />
+          <div className="crm-content-card crm-content-scroll flex-1 min-h-0">
+            <WhatsAppInboxPanel onNavigate={onNavigate} />
+          </div>
         ) : tab === 'reports' ? (
+          <div className="crm-content-card crm-content-scroll flex-1 min-h-0">
           <CampaignReportsView
             campaigns={campaigns}
             summary={summary}
@@ -1011,6 +1008,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
             initialCampaignId={panelOptions?.campaignId}
             showCreator={Boolean(user?.isOrgAdmin && user?.accountType === 'company')}
           />
+          </div>
         ) : tab === 'templates' ? (
           <div className="marketing-workspace">
           <div className="marketing-builder-slot">
@@ -1031,99 +1029,102 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
           </div>
           </div>
         ) : (
-          <div className="grid lg:grid-cols-2 gap-6 max-w-6xl">
-            <section className="bg-white border border-gray-200 rounded-xl p-4 space-y-3">
-              <div className="flex items-center justify-between gap-2">
-                <h2 className="text-sm font-semibold text-gray-900">
-                  {formForm.id ? 'Edit form' : 'New capture form'}
-                </h2>
-                {formForm.id && (
-                  <button
-                    type="button"
-                    onClick={() => setFormForm({ ...EMPTY_FORM })}
-                    className="text-[10px] text-gray-500 underline"
-                  >
-                    Cancel edit
-                  </button>
-                )}
-              </div>
-              <input
-                value={formForm.name}
-                onChange={(e) => setFormForm((p) => ({ ...p, name: e.target.value }))}
-                placeholder="Internal name"
-                className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
-              />
-              <input
-                value={formForm.title}
-                onChange={(e) => setFormForm((p) => ({ ...p, title: e.target.value }))}
-                placeholder="Public title (optional)"
-                className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
-              />
-              <textarea
-                value={formForm.description}
-                onChange={(e) => setFormForm((p) => ({ ...p, description: e.target.value }))}
-                rows={2}
-                placeholder="Short description on the form page"
-                className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
-              />
-              <input
-                value={formForm.submitLabel}
-                onChange={(e) => setFormForm((p) => ({ ...p, submitLabel: e.target.value }))}
-                placeholder="Submit button label"
-                className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
-              />
-              <MarketingFormBuilder value={formForm} onChange={setFormForm} />
-              <button
-                type="button"
-                disabled={busy}
-                onClick={saveForm}
-                className="text-xs font-semibold px-3 py-2 bg-gray-900 text-white rounded-lg disabled:opacity-50"
-              >
-                {formForm.id ? 'Save form' : 'Create form'}
-              </button>
-              <p className="text-[10px] text-gray-400 leading-relaxed">
-                Build flexible questions like Google Forms. In campaigns, add a <strong>Form</strong> block to email.
-                Responses appear on the lead in <strong>Pipeline → open lead → Notes &amp; log</strong> (activity +
-                customer notes). Existing contacts can submit again without errors — new emails create new leads.
-              </p>
-            </section>
-            <section className="space-y-2">
-              <h2 className="text-sm font-semibold text-gray-900">Your forms</h2>
-              {!forms.length ? (
-                <p className="text-sm text-gray-500">No forms yet.</p>
-              ) : (
-                forms.map((f) => (
-                  <div key={f.id} className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm">
-                    <p className="font-medium text-gray-900">{f.name}</p>
-                    <p className="text-xs text-gray-500">
-                      {f.submissions || 0} submissions · slug {f.slug}
-                    </p>
-                    {(f.responses || []).slice(0, 2).map((r) => (
-                      <p key={r.id} className="text-[10px] text-gray-600 mt-1 line-clamp-2">
-                        {r.email || 'Anonymous'} ·{' '}
-                        {r.answers?.slice(0, 2).map((a) => `${a.label}: ${a.value}`).join(' · ') || 'Submitted'}
-                      </p>
+          <div className="crm-content-card crm-content-scroll">
+            <div className="grid lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
+              <section className="space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <h2 className="crm-section-title mb-0">
+                    {formForm.id ? 'Edit form' : 'New capture form'}
+                  </h2>
+                  {formForm.id && (
+                    <button
+                      type="button"
+                      onClick={() => setFormForm({ ...EMPTY_FORM })}
+                      className="crm-link-btn"
+                    >
+                      Cancel edit
+                    </button>
+                  )}
+                </div>
+                <div className="crm-form-grid">
+                  <input
+                    value={formForm.name}
+                    onChange={(e) => setFormForm((p) => ({ ...p, name: e.target.value }))}
+                    placeholder="Internal name"
+                    className="crm-input"
+                  />
+                  <input
+                    value={formForm.title}
+                    onChange={(e) => setFormForm((p) => ({ ...p, title: e.target.value }))}
+                    placeholder="Public title (optional)"
+                    className="crm-input"
+                  />
+                  <textarea
+                    value={formForm.description}
+                    onChange={(e) => setFormForm((p) => ({ ...p, description: e.target.value }))}
+                    rows={2}
+                    placeholder="Short description on the form page"
+                    className="crm-input"
+                  />
+                  <input
+                    value={formForm.submitLabel}
+                    onChange={(e) => setFormForm((p) => ({ ...p, submitLabel: e.target.value }))}
+                    placeholder="Submit button label"
+                    className="crm-input"
+                  />
+                </div>
+                <MarketingFormBuilder value={formForm} onChange={setFormForm} />
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={saveForm}
+                  className="crm-btn crm-btn-primary"
+                >
+                  {formForm.id ? 'Save form' : 'Create form'}
+                </button>
+                <p className="text-xs text-[#7c98b6] leading-relaxed">
+                  Build flexible questions like Google Forms. In campaigns, add a <strong>Form</strong> block to
+                  email. Responses appear on the lead in{' '}
+                  <strong>Pipeline → open lead → Notes &amp; log</strong>.
+                </p>
+              </section>
+              <section>
+                <h2 className="crm-section-title">Your forms</h2>
+                {!forms.length ? (
+                  <p className="text-sm text-[#516f90]">No forms yet.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {forms.map((f) => (
+                      <div key={f.id} className="crm-campaign-card text-sm">
+                        <p className="font-semibold text-[#33475b]">{f.name}</p>
+                        <p className="text-xs text-[#516f90] mt-0.5">
+                          {f.submissions || 0} submissions · slug {f.slug}
+                        </p>
+                        {(f.responses || []).slice(0, 2).map((r) => (
+                          <p key={r.id} className="text-[11px] text-[#7c98b6] mt-1 line-clamp-2">
+                            {r.email || 'Anonymous'} ·{' '}
+                            {r.answers?.slice(0, 2).map((a) => `${a.label}: ${a.value}`).join(' · ') ||
+                              'Submitted'}
+                          </p>
+                        ))}
+                        <div className="mt-2 flex flex-wrap gap-3">
+                          <button type="button" onClick={() => editForm(f)} className="crm-link-btn p-0">
+                            Edit fields
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => copyFormLink(f.slug)}
+                            className="crm-link-btn p-0"
+                          >
+                            Copy public link
+                          </button>
+                        </div>
+                      </div>
                     ))}
-                    <div className="mt-2 flex flex-wrap gap-3">
-                      <button
-                        type="button"
-                        onClick={() => editForm(f)}
-                        className="text-xs font-semibold text-gray-900 underline"
-                      >
-                        Edit fields
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => copyFormLink(f.slug)}
-                        className="text-xs font-semibold text-gray-900 underline"
-                      >
-                        Copy public link
-                      </button>
-                    </div>
                   </div>
-                ))
-              )}
-            </section>
+                )}
+              </section>
+            </div>
           </div>
         )}
       </div>
@@ -1132,24 +1133,24 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
 }
 
 function CampaignCard({ campaign, busy, onStart, onNavigate, showCreator }) {
-  const statusColors = {
-    draft: 'bg-gray-100 text-gray-700',
-    active: 'bg-green-100 text-green-800',
-    paused: 'bg-amber-100 text-amber-900',
-    completed: 'bg-blue-100 text-blue-800',
+  const statusClass = {
+    draft: 'crm-status-draft',
+    active: 'crm-status-active',
+    paused: 'crm-status-paused',
+    completed: 'crm-status-completed',
   }
   const stats = campaign.stats || {}
   return (
-    <div className="bg-white border border-gray-200 rounded-lg px-3 py-3 text-sm">
+    <div className="crm-campaign-card text-sm">
       <div className="flex items-start justify-between gap-2">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <p className="font-medium text-gray-900">{campaign.name}</p>
+            <p className="font-semibold text-[#33475b]">{campaign.name}</p>
             {showCreator && (
               <MarketingCreatorBadge name={campaign.createdByName} isOwn={campaign.isOwn} />
             )}
           </div>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <p className="text-xs text-[#516f90] mt-0.5">
             {campaign.type === 'sequence' ? 'Sequence' : 'One-shot'} · {stats.enrolled || 0} enrolled ·{' '}
             {stats.sent || 0} sent
             {(stats.opens > 0 || stats.clicks > 0) && (
@@ -1164,7 +1165,7 @@ function CampaignCard({ campaign, busy, onStart, onNavigate, showCreator }) {
           </p>
         </div>
         <span
-          className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${statusColors[campaign.status] || statusColors.draft}`}
+          className={`crm-status-pill ${statusClass[campaign.status] || statusClass.draft}`}
         >
           {campaign.status}
         </span>
@@ -1174,7 +1175,7 @@ function CampaignCard({ campaign, busy, onStart, onNavigate, showCreator }) {
           <button
             type="button"
             onClick={() => onNavigate?.('marketing', { tab: 'reports', campaignId: campaign.id })}
-            className="text-xs font-semibold text-[#5b4a00] hover:underline"
+            className="crm-link-btn p-0"
           >
             View report
           </button>
@@ -1184,7 +1185,7 @@ function CampaignCard({ campaign, busy, onStart, onNavigate, showCreator }) {
             type="button"
             disabled={busy}
             onClick={() => onStart(campaign.id)}
-            className="text-xs font-semibold text-gray-900 underline disabled:opacity-50"
+            className="crm-link-btn p-0 disabled:opacity-50"
           >
             Start
           </button>

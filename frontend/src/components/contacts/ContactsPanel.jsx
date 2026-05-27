@@ -32,6 +32,7 @@ export default function ContactsPanel({ onNavigate }) {
   const [contacts, setContacts] = useState([])
   const [total, setTotal] = useState(0)
   const [search, setSearch] = useState('')
+  const [appliedSearch, setAppliedSearch] = useState('')
   const [loading, setLoading] = useState(true)
   const [selectedId, setSelectedId] = useState(null)
   const [form, setForm] = useState({ ...EMPTY })
@@ -43,7 +44,7 @@ export default function ContactsPanel({ onNavigate }) {
   const [aiError, setAiError] = useState(null)
   const [aiNotice, setAiNotice] = useState(null)
 
-  const loadList = useCallback(async (q = search) => {
+  const loadList = useCallback(async (q = appliedSearch) => {
     setLoading(true)
     setError(null)
     try {
@@ -57,7 +58,7 @@ export default function ContactsPanel({ onNavigate }) {
     } finally {
       setLoading(false)
     }
-  }, [search])
+  }, [appliedSearch])
 
   useEffect(() => {
     loadList()
@@ -114,6 +115,10 @@ export default function ContactsPanel({ onNavigate }) {
   }, [savedLeads, selectedId])
 
   const setField = (key, value) => setForm((f) => ({ ...f, [key]: value }))
+
+  const applySearch = () => {
+    setAppliedSearch(search.trim())
+  }
 
   const runLinkedinAiSearch = async () => {
     if (!selectedId || aiSearching) return
@@ -191,294 +196,339 @@ export default function ContactsPanel({ onNavigate }) {
     onNavigate?.('pipeline')
   }
 
+  const searchDirty = search.trim() !== appliedSearch
+
   return (
-    <div className="panel-shell bg-[#f6f7f9]">
-      <header className="shrink-0 bg-white border-b border-gray-200 px-5 py-4">
-        <h1 className="text-lg font-semibold text-gray-900">Contacts</h1>
-        <p className="text-xs text-gray-500 mt-0.5">
-          Customers on <strong>your pipeline</strong> only (assigned to you or saved by you). Company admins see
-          the full team pipeline.
-        </p>
-        <div className="mt-3 flex gap-2">
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && loadList(search)}
-            placeholder="Search name, company, email…"
-            className="flex-1 text-sm border border-gray-300 rounded-lg px-3 py-2"
-          />
-          <button
-            type="button"
-            onClick={() => loadList(search)}
-            className="text-sm font-semibold px-4 py-2 bg-gray-900 text-white rounded-lg"
-          >
-            Search
-          </button>
+    <div className="crm-workspace flex h-full min-h-0 w-full overflow-hidden">
+      <header className="crm-page-header">
+        <div className="crm-page-header-top">
+          <div className="min-w-0">
+            <h1 className="crm-page-title">Contacts</h1>
+            <p className="crm-page-subtitle">
+              Customers on your pipeline (assigned to you or saved by you). Company admins see the
+              full team pipeline.
+            </p>
+          </div>
+        </div>
+
+        <div className="crm-toolbar">
+          <div className="crm-toolbar-row">
+            <div className="crm-search-wrap">
+              <svg className="crm-search-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
+                <path
+                  fillRule="evenodd"
+                  d="M8.5 3a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 8.5a6.5 6.5 0 1111.436 4.23l3.07 3.07a.75.75 0 11-1.06 1.06l-3.07-3.07A6.5 6.5 0 012 8.5z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <input
+                type="search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    applySearch()
+                  }
+                }}
+                placeholder="Search name, company, email…"
+                className="crm-search-input"
+                aria-label="Search contacts"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={applySearch}
+              className={`crm-btn ${searchDirty ? 'crm-btn-primary' : 'crm-btn-secondary'}`}
+            >
+              Search
+            </button>
+          </div>
+          <div className="crm-toolbar-footer">
+            <span className="crm-toolbar-count">
+              {loading
+                ? 'Loading…'
+                : `${total.toLocaleString()} contact${total === 1 ? '' : 's'}`}
+              {appliedSearch ? ` · matching “${appliedSearch}”` : ''}
+            </span>
+          </div>
         </div>
       </header>
 
-      <div className="flex-1 flex min-h-0">
-        <aside className="w-full md:w-[300px] shrink-0 border-r border-gray-200 bg-white flex flex-col min-h-0">
-          <div className="px-3 py-2 border-b text-[11px] text-gray-500 font-medium">
-            {loading ? 'Loading…' : `${total} contact${total === 1 ? '' : 's'}`}
-          </div>
-          <ul className="flex-1 overflow-y-auto divide-y divide-gray-100">
-            {loading && !contacts.length ? (
-              <li className="flex-1 min-h-[160px]">
-                <LoadingExperience message={LOADING_MESSAGES.contacts} compact fill={false} className="bg-white" />
-              </li>
-            ) : null}
-            {contacts.map((c) => {
-              const name = c.fullName || [c.firstName, c.lastName].filter(Boolean).join(' ') || 'Unnamed'
-              return (
-                <li key={c.id}>
+      <div className="crm-page-body">
+        <div className="crm-content-card crm-split-card">
+          <aside className="crm-split-sidebar">
+            <div className="crm-list-header">All contacts</div>
+            <div className="crm-list-scroll">
+              {loading && !contacts.length ? (
+                <LoadingExperience
+                  message={LOADING_MESSAGES.contacts}
+                  compact
+                  fill={false}
+                  className="bg-white min-h-[160px]"
+                />
+              ) : null}
+              {contacts.map((c) => {
+                const name =
+                  c.fullName || [c.firstName, c.lastName].filter(Boolean).join(' ') || 'Unnamed'
+                return (
                   <button
+                    key={c.id}
                     type="button"
                     onClick={() => setSelectedId(c.id)}
-                    className={`w-full text-left px-3 py-2.5 hover:bg-gray-50 ${
-                      selectedId === c.id ? 'bg-[#fffbeb] border-l-2 border-[#ffcb2b]' : ''
-                    }`}
+                    className={`crm-list-item ${selectedId === c.id ? 'is-selected' : ''}`}
                   >
-                    <p className="text-sm font-medium text-gray-900 truncate">{name}</p>
-                    <p className="text-xs text-gray-600 truncate">{c.company || '—'}</p>
-                    {c.email && <p className="text-[11px] text-gray-400 truncate mt-0.5">{c.email}</p>}
+                    <p className="crm-list-item-name">{name}</p>
+                    <p className="crm-list-item-meta">{c.company || '—'}</p>
+                    {c.email && <p className="crm-list-item-sub">{c.email}</p>}
                   </button>
-                </li>
-              )
-            })}
-            {!loading && !contacts.length && (
-              <li className="px-3 py-8 text-center text-xs text-gray-500">
-                No contacts yet. Add a lead in Pipeline or import a sheet — a contact record is created automatically.
-              </li>
-            )}
-          </ul>
-        </aside>
-
-        <section className="flex-1 min-w-0 overflow-y-auto p-5">
-          {!selectedId ? (
-            <div className="max-w-md mx-auto mt-16 text-center text-sm text-gray-500">
-              Select a contact to view and edit details, or open one from Pipeline → Edit contact.
-            </div>
-          ) : (
-            <div className="max-w-lg mx-auto bg-white rounded-xl border border-gray-200 p-5 space-y-3">
-              <div className="flex flex-wrap items-start justify-between gap-2">
-                <div>
-                  <h2 className="text-base font-semibold text-gray-900">
-                    {[form.firstName, form.lastName].filter(Boolean).join(' ') || 'Contact'}
-                  </h2>
-                  <p className="text-xs text-gray-500">{form.company || 'No company'}</p>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {pipelineLeadForContact ? (
-                    <button
-                      type="button"
-                      onClick={openInPipeline}
-                      className="text-xs font-semibold px-2.5 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-50"
-                    >
-                      Open in pipeline
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        try {
-                          await toggleSaveLead({
-                            id: selectedId,
-                            ...form,
-                            contactId: selectedId,
-                            companyId: selected?.companyId,
-                          })
-                          setNotice('Added to pipeline')
-                          await refreshSavedLeads?.()
-                        } catch (e) {
-                          setError(e.message)
-                        }
-                      }}
-                      disabled={isSaved(selectedId)}
-                      className="text-xs font-semibold px-2.5 py-1.5 bg-[#ffcb2b] text-[#242424] rounded-lg disabled:opacity-50"
-                    >
-                      {isSaved(selectedId) ? 'In pipeline' : '+ Add to pipeline'}
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {(notice || error) && (
-                <p
-                  className={`text-xs rounded-lg px-2 py-1.5 ${
-                    error ? 'bg-red-50 text-red-800' : 'bg-green-50 text-green-800'
-                  }`}
-                >
-                  {error || notice}
-                </p>
-              )}
-
-              <div className="grid grid-cols-2 gap-2">
-                <input
-                  value={form.firstName}
-                  onChange={(e) => setField('firstName', e.target.value)}
-                  placeholder="First name"
-                  className="text-sm border rounded-lg px-3 py-2"
-                />
-                <input
-                  value={form.lastName}
-                  onChange={(e) => setField('lastName', e.target.value)}
-                  placeholder="Last name"
-                  className="text-sm border rounded-lg px-3 py-2"
-                />
-              </div>
-              <input
-                value={form.company}
-                onChange={(e) => setField('company', e.target.value)}
-                placeholder="Company"
-                className="w-full text-sm border rounded-lg px-3 py-2"
-              />
-              <input
-                value={form.title}
-                onChange={(e) => setField('title', e.target.value)}
-                placeholder="Job title"
-                className="w-full text-sm border rounded-lg px-3 py-2"
-              />
-              <input
-                type="email"
-                value={form.email}
-                onChange={(e) => setField('email', e.target.value)}
-                placeholder="Email"
-                className="w-full text-sm border rounded-lg px-3 py-2"
-              />
-              <input
-                value={form.phone}
-                onChange={(e) => setField('phone', e.target.value)}
-                placeholder="Phone"
-                className="w-full text-sm border rounded-lg px-3 py-2"
-              />
-              <div className="grid grid-cols-2 gap-2">
-                <input
-                  value={form.city}
-                  onChange={(e) => setField('city', e.target.value)}
-                  placeholder="City"
-                  className="text-sm border rounded-lg px-3 py-2"
-                />
-                <input
-                  value={form.state}
-                  onChange={(e) => setField('state', e.target.value)}
-                  placeholder="State"
-                  className="text-sm border rounded-lg px-3 py-2"
-                />
-              </div>
-              <input
-                value={form.industry}
-                onChange={(e) => setField('industry', e.target.value)}
-                placeholder="Industry"
-                className="w-full text-sm border rounded-lg px-3 py-2"
-              />
-              <input
-                value={form.website}
-                onChange={(e) => setField('website', e.target.value)}
-                placeholder="Website"
-                className="w-full text-sm border rounded-lg px-3 py-2"
-              />
-              <div className="space-y-2">
-                <label className="text-[11px] font-medium text-gray-500">LinkedIn</label>
-                <div className="flex gap-2">
-                  <input
-                    value={form.linkedin}
-                    onChange={(e) => {
-                      setField('linkedin', e.target.value)
-                      if (e.target.value.trim()) {
-                        setAiMatches([])
-                        setAiError(null)
-                      }
-                    }}
-                    placeholder="https://linkedin.com/in/…"
-                    className="flex-1 min-w-0 text-sm border rounded-lg px-3 py-2"
-                  />
-                  {!form.linkedin.trim() && (
-                    <button
-                      type="button"
-                      onClick={runLinkedinAiSearch}
-                      disabled={aiSearching}
-                      className="shrink-0 text-xs font-semibold px-3 py-2 rounded-lg border border-[#ffcb2b] bg-[#fffbeb] text-[#5b4a00] hover:bg-[#fff4cc] disabled:opacity-50 whitespace-nowrap"
-                    >
-                      {aiSearching ? 'Searching…' : 'Search with AI'}
-                    </button>
-                  )}
-                </div>
-                {aiError && (
-                  <p className="text-xs text-red-700 bg-red-50 border border-red-100 rounded-lg px-2.5 py-1.5">
-                    {aiError}
+                )
+              })}
+              {!loading && !contacts.length && (
+                <div className="crm-empty-state px-4 py-8">
+                  <p>No contacts yet</p>
+                  <p className="crm-empty-hint">
+                    Add a lead in Pipeline or import a sheet — a contact record is created
+                    automatically.
                   </p>
-                )}
-                {aiNotice && !aiMatches.length && !aiError && (
-                  <p className="text-xs text-gray-600">{aiNotice}</p>
-                )}
-                {aiMatches.length > 0 && (
-                  <div className="rounded-lg border border-gray-200 bg-gray-50 p-2 space-y-2">
-                    <p className="text-[11px] font-semibold text-gray-700">
-                      AI matches — pick the best profile
-                    </p>
-                    {aiMatches.map((match, index) => {
-                      const label =
-                        match.fullName ||
-                        [match.firstName, match.lastName].filter(Boolean).join(' ') ||
-                        'LinkedIn profile'
-                      const confidence = String(match.confidence || '').toLowerCase()
-                      return (
-                        <div
-                          key={match.id || match.linkedin || index}
-                          className="bg-white border border-gray-200 rounded-lg p-2.5 text-left"
-                        >
-                          <div className="flex flex-wrap items-start justify-between gap-2">
-                            <div className="min-w-0">
-                              <p className="text-sm font-semibold text-gray-900">{label}</p>
-                              <p className="text-xs text-gray-600 mt-0.5">
-                                {[match.title, match.company].filter(Boolean).join(' · ') || '—'}
-                              </p>
-                              <p className="text-[11px] text-blue-700 truncate mt-1">{match.linkedin}</p>
-                              {match.reason && (
-                                <p className="text-[11px] text-gray-500 mt-1 leading-snug">{match.reason}</p>
-                              )}
-                            </div>
-                            {confidence && (
-                              <span
-                                className={`shrink-0 text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${
-                                  confidence === 'high'
-                                    ? 'bg-green-100 text-green-800'
-                                    : confidence === 'low'
-                                      ? 'bg-gray-100 text-gray-600'
-                                      : 'bg-amber-100 text-amber-900'
-                                }`}
-                              >
-                                {confidence}
-                              </span>
-                            )}
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => applyLinkedinMatch(match)}
-                            className="mt-2 text-xs font-semibold text-[#5b4a00] hover:underline"
-                          >
-                            Use this profile
-                          </button>
-                        </div>
-                      )
-                    })}
-                    {aiNotice && <p className="text-[10px] text-gray-500">{aiNotice}</p>}
-                  </div>
-                )}
-              </div>
-
-              <button
-                type="button"
-                onClick={save}
-                disabled={saving}
-                className="w-full py-2.5 text-sm font-semibold bg-gray-900 text-white rounded-lg disabled:opacity-50"
-              >
-                {saving ? 'Saving…' : 'Save contact'}
-              </button>
+                </div>
+              )}
             </div>
-          )}
-        </section>
+          </aside>
+
+          <section className="crm-split-main">
+            {!selectedId ? (
+              <div className="crm-empty-state">
+                <p>Select a contact</p>
+                <p className="crm-empty-hint">
+                  View and edit details here, or open one from Pipeline → Edit contact.
+                </p>
+              </div>
+            ) : (
+              <div className="crm-detail-pane">
+                <div className="crm-detail-card crm-detail-card-wide">
+                  <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
+                    <div>
+                      <h2 className="crm-detail-title">
+                        {[form.firstName, form.lastName].filter(Boolean).join(' ') || 'Contact'}
+                      </h2>
+                      <p className="crm-detail-subtitle">{form.company || 'No company'}</p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {pipelineLeadForContact ? (
+                        <button
+                          type="button"
+                          onClick={openInPipeline}
+                          className="crm-btn crm-btn-secondary"
+                        >
+                          Open in pipeline
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            try {
+                              await toggleSaveLead({
+                                id: selectedId,
+                                ...form,
+                                contactId: selectedId,
+                                companyId: selected?.companyId,
+                              })
+                              setNotice('Added to pipeline')
+                              await refreshSavedLeads?.()
+                            } catch (e) {
+                              setError(e.message)
+                            }
+                          }}
+                          disabled={isSaved(selectedId)}
+                          className="crm-btn crm-btn-primary"
+                        >
+                          {isSaved(selectedId) ? 'In pipeline' : '+ Add to pipeline'}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {(notice || error) && (
+                    <p className={`crm-alert ${error ? 'crm-alert-error' : 'crm-alert-success'}`}>
+                      {error || notice}
+                    </p>
+                  )}
+
+                  <div className="crm-form-grid crm-form-grid-2">
+                    <input
+                      value={form.firstName}
+                      onChange={(e) => setField('firstName', e.target.value)}
+                      placeholder="First name"
+                      className="crm-input"
+                    />
+                    <input
+                      value={form.lastName}
+                      onChange={(e) => setField('lastName', e.target.value)}
+                      placeholder="Last name"
+                      className="crm-input"
+                    />
+                  </div>
+                  <div className="crm-form-grid mt-2.5">
+                    <input
+                      value={form.company}
+                      onChange={(e) => setField('company', e.target.value)}
+                      placeholder="Company"
+                      className="crm-input"
+                    />
+                    <input
+                      value={form.title}
+                      onChange={(e) => setField('title', e.target.value)}
+                      placeholder="Job title"
+                      className="crm-input"
+                    />
+                    <input
+                      type="email"
+                      value={form.email}
+                      onChange={(e) => setField('email', e.target.value)}
+                      placeholder="Email"
+                      className="crm-input"
+                    />
+                    <input
+                      value={form.phone}
+                      onChange={(e) => setField('phone', e.target.value)}
+                      placeholder="Phone"
+                      className="crm-input"
+                    />
+                    <div className="crm-form-grid crm-form-grid-2">
+                      <input
+                        value={form.city}
+                        onChange={(e) => setField('city', e.target.value)}
+                        placeholder="City"
+                        className="crm-input"
+                      />
+                      <input
+                        value={form.state}
+                        onChange={(e) => setField('state', e.target.value)}
+                        placeholder="State"
+                        className="crm-input"
+                      />
+                    </div>
+                    <input
+                      value={form.industry}
+                      onChange={(e) => setField('industry', e.target.value)}
+                      placeholder="Industry"
+                      className="crm-input"
+                    />
+                    <input
+                      value={form.website}
+                      onChange={(e) => setField('website', e.target.value)}
+                      placeholder="Website"
+                      className="crm-input"
+                    />
+                  </div>
+
+                  <div className="mt-4 space-y-2">
+                    <label className="crm-field-label">LinkedIn</label>
+                    <div className="flex gap-2">
+                      <input
+                        value={form.linkedin}
+                        onChange={(e) => {
+                          setField('linkedin', e.target.value)
+                          if (e.target.value.trim()) {
+                            setAiMatches([])
+                            setAiError(null)
+                          }
+                        }}
+                        placeholder="https://linkedin.com/in/…"
+                        className="crm-input flex-1 min-w-0"
+                      />
+                      {!form.linkedin.trim() && (
+                        <button
+                          type="button"
+                          onClick={runLinkedinAiSearch}
+                          disabled={aiSearching}
+                          className="crm-btn crm-btn-secondary shrink-0"
+                        >
+                          {aiSearching ? 'Searching…' : 'Search with AI'}
+                        </button>
+                      )}
+                    </div>
+                    {aiError && <p className="crm-alert crm-alert-error">{aiError}</p>}
+                    {aiNotice && !aiMatches.length && !aiError && (
+                      <p className="text-xs text-[#516f90]">{aiNotice}</p>
+                    )}
+                    {aiMatches.length > 0 && (
+                      <div className="rounded-lg border border-[#dfe3eb] bg-[#f5f8fa] p-3 space-y-2">
+                        <p className="text-xs font-semibold text-[#33475b]">
+                          AI matches — pick the best profile
+                        </p>
+                        {aiMatches.map((match, index) => {
+                          const label =
+                            match.fullName ||
+                            [match.firstName, match.lastName].filter(Boolean).join(' ') ||
+                            'LinkedIn profile'
+                          const confidence = String(match.confidence || '').toLowerCase()
+                          return (
+                            <div
+                              key={match.id || match.linkedin || index}
+                              className="bg-white border border-[#dfe3eb] rounded-lg p-3"
+                            >
+                              <div className="flex flex-wrap items-start justify-between gap-2">
+                                <div className="min-w-0">
+                                  <p className="text-sm font-semibold text-[#33475b]">{label}</p>
+                                  <p className="text-xs text-[#516f90] mt-0.5">
+                                    {[match.title, match.company].filter(Boolean).join(' · ') ||
+                                      '—'}
+                                  </p>
+                                  <p className="text-xs text-[#0091ae] truncate mt-1">
+                                    {match.linkedin}
+                                  </p>
+                                  {match.reason && (
+                                    <p className="text-[11px] text-[#7c98b6] mt-1 leading-snug">
+                                      {match.reason}
+                                    </p>
+                                  )}
+                                </div>
+                                {confidence && (
+                                  <span
+                                    className={`crm-status-pill ${
+                                      confidence === 'high'
+                                        ? 'crm-status-active'
+                                        : confidence === 'low'
+                                          ? 'crm-status-draft'
+                                          : 'crm-status-paused'
+                                    }`}
+                                  >
+                                    {confidence}
+                                  </span>
+                                )}
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => applyLinkedinMatch(match)}
+                                className="crm-link-btn mt-2 p-0"
+                              >
+                                Use this profile
+                              </button>
+                            </div>
+                          )
+                        })}
+                        {aiNotice && (
+                          <p className="text-[10px] text-[#7c98b6]">{aiNotice}</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={save}
+                    disabled={saving}
+                    className="crm-btn crm-btn-primary w-full mt-5"
+                  >
+                    {saving ? 'Saving…' : 'Save contact'}
+                  </button>
+                </div>
+              </div>
+            )}
+          </section>
+        </div>
       </div>
     </div>
   )
