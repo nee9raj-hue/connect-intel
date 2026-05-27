@@ -147,7 +147,13 @@ export function AppProvider({ children }) {
       const [savedResult, notifResult, tagsResult] = await Promise.allSettled([
         skipLeadsFetch
           ? Promise.resolve({ leads: null })
-          : api.getSavedLeads({ silent: true, light: true }),
+          : api.getSavedLeads({
+              silent: true,
+              light: true,
+              onBatch: (batch) => {
+                if (batch.length) setSavedLeads(batch)
+              },
+            }),
         api.getCrmNotifications(since || undefined, { silent: true }),
         isCompany ? api.getOrgLeadTags({ silent: true }) : Promise.resolve({ tags: null }),
       ])
@@ -274,35 +280,43 @@ export function AppProvider({ children }) {
         return
       }
 
-      const run = withTimeout(
-        (async () => {
-          try {
-            const [saved, history] = await Promise.all([
-              api.getSavedLeads({ silent: true, light: true }),
-              api.getSearchHistory({ silent: true }),
-            ])
+      const run = (async () => {
+        try {
+          const historyPromise = api.getSearchHistory({ silent: true })
 
-            if (cancelled) return
-            setSavedLeads(saved.leads || [])
-            setSearchHistory(history.history || [])
-            workspaceLoadedAtRef.current = Date.now()
-
-            if (user.organizationId && user.accountType === 'company') {
-              const data = await api.getTeamMembers({ silent: true })
-              if (!cancelled) setTeamMembers(data.members || [])
-            }
-          } catch (error) {
-            if (!cancelled) {
-              if (error?.status === 401) {
-                setSessionError(error.message || 'Session expired. Please sign in again.')
-              } else if (error?.message) {
-                setSessionError(error.message)
+          const savedPromise = api.getSavedLeads({
+            silent: true,
+            light: true,
+            onBatch: (batch) => {
+              if (!cancelled && batch.length) {
+                setSavedLeads(batch)
+                workspaceLoadedAtRef.current = Date.now()
               }
+            },
+          })
+
+          const [saved, history] = await Promise.all([savedPromise, historyPromise])
+
+          if (cancelled) return
+          setSavedLeads(saved.leads || [])
+          setSearchHistory(history.history || [])
+          workspaceLoadedAtRef.current = Date.now()
+          setSessionError(null)
+
+          if (user.organizationId && user.accountType === 'company') {
+            const data = await api.getTeamMembers({ silent: true })
+            if (!cancelled) setTeamMembers(data.members || [])
+          }
+        } catch (error) {
+          if (!cancelled) {
+            if (error?.status === 401) {
+              setSessionError(error.message || 'Session expired. Please sign in again.')
+            } else if (error?.message) {
+              setSessionError(error.message)
             }
           }
-        })(),
-        28_000
-      )
+        }
+      })()
 
       workspaceLoadInFlightRef.current = run
       try {
@@ -344,12 +358,11 @@ export function AppProvider({ children }) {
       setUser(session.user)
       setScreen('app')
       void acceptPendingInvite()
-      void refreshSavedLeads()
       return session.user
     } finally {
       setAuthBusy(false)
     }
-  }, [acceptPendingInvite, refreshSavedLeads])
+  }, [acceptPendingInvite])
 
   const logout = useCallback(async () => {
     try {

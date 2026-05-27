@@ -112,8 +112,8 @@ export const api = {
   deleteOrgLeadTag: (id) => request('/api/org/lead-tags', { method: 'DELETE', body: { id } }),
   updateMemberPermissions: (payload) =>
     request('/api/team/permissions', { method: 'PATCH', body: payload }),
-  getSavedLeads: async ({ silent = false, light = true } = {}) => {
-    const PAGE_SIZE = 2000
+  getSavedLeads: async ({ silent = false, light = true, onBatch } = {}) => {
+    const PAGE_SIZE = 1000
     let offset = 0
     let leads = []
     let total = 0
@@ -123,10 +123,11 @@ export const api = {
         offset: String(offset),
         light: light ? '1' : '0',
       })
-      const data = await request(`/api/saved-leads?${qs}`, { timeoutMs: 90_000 }, { silent })
+      const data = await request(`/api/saved-leads?${qs}`, { timeoutMs: 120_000 }, { silent })
       total = typeof data.total === 'number' ? data.total : leads.length + (data.leads?.length || 0)
       const batch = data.leads || []
       leads = leads.concat(batch)
+      onBatch?.(leads.slice(), { total, hasMore: Boolean(data.hasMore), offset })
       if (!data.hasMore || batch.length === 0) break
       offset += batch.length
     }
@@ -134,7 +135,8 @@ export const api = {
   },
   getPipelineLead: (leadId, { silent = false } = {}) =>
     request(`/api/saved-leads?leadId=${encodeURIComponent(leadId)}`, { timeoutMs: 60_000 }, { silent }),
-  getSearchHistory: ({ silent = false } = {}) => request('/api/search-history', {}, { silent }),
+  getSearchHistory: ({ silent = false } = {}) =>
+    request('/api/search-history', { timeoutMs: 30_000 }, { silent }),
   saveLead: (lead) => request('/api/saved-leads', { method: 'POST', body: { lead } }),
   addManualLead: (manual) => request('/api/saved-leads', { method: 'POST', body: { manual } }),
   removeLead: (leadId) => request('/api/saved-leads', { method: 'DELETE', body: { leadId } }),

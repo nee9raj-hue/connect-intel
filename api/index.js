@@ -2,7 +2,7 @@ import { applyCors, handleOptions, sendJson } from '../lib/server/http.js'
 
 /** Marketing/bulk sends may process several Gmail API calls per request. */
 export const config = {
-  maxDuration: 60,
+  maxDuration: 120,
 }
 
 const ROUTES = {
