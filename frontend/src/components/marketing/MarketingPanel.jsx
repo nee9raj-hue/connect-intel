@@ -7,8 +7,7 @@ import MarketingFormBuilder from './MarketingFormBuilder'
 import { DEFAULT_FORM_FIELDS, DEFAULT_FORM_THEME } from '../../../../lib/marketingFormSchema.js'
 import LoadingExperience from '../ui/LoadingExperience'
 import CampaignReportsView, { campaignToForm } from './CampaignReportsView'
-import MarketingListBuilder from './MarketingListBuilder'
-import MarketingListDetail from './MarketingListDetail'
+import MarketingListsPanel from './MarketingListsPanel'
 import WhatsAppInboxPanel from './WhatsAppInboxPanel'
 import MarketingCreatorBadge, { marketingOptionLabel } from './MarketingCreatorBadge'
 import WorkEmailOptions from '../team/WorkEmailOptions'
@@ -73,7 +72,6 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
   const [templates, setTemplates] = useState([])
   const [campaigns, setCampaigns] = useState([])
   const [forms, setForms] = useState([])
-  const [selectedListId, setSelectedListId] = useState(null)
   const [marketingTipsOpen, setMarketingTipsOpen] = useState(false)
   const [campaignSetupOpen, setCampaignSetupOpen] = useState(false)
 
@@ -909,94 +907,19 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
             </details>
           </div>
         ) : tab === 'lists' ? (
-          <div className="crm-content-card flex flex-col min-h-0 flex-1 overflow-hidden">
-            <div className="crm-content-scroll shrink-0 border-b border-[#dfe3eb]">
-              <h2 className="crm-section-title">New list</h2>
-              <MarketingListBuilder
-                user={user}
-                teamMembers={teamMembers}
-                refreshTeam={refreshTeam}
-                savedLeads={savedLeads}
-                busy={busy}
-                setBusy={setBusy}
-                setError={setError}
-                setNotice={setNotice}
-                onListsCreated={async (result) => {
-                  await load()
-                  const pickId = result?.list?.id || result?.lists?.[0]?.id
-                  if (pickId) setSelectedListId(pickId)
-                }}
-              />
-            </div>
-
-            <div className="crm-split-card flex-1 min-h-[280px] border-0 rounded-none shadow-none">
-              <aside
-                className={`crm-split-sidebar ${selectedListId ? 'is-hidden-mobile' : ''}`}
-              >
-                <div className="crm-list-header">
-                  Saved lists
-                  <span className="block font-normal text-[#7c98b6] mt-0.5">
-                    Click a list to manage contacts
-                  </span>
-                </div>
-                <div className="crm-list-scroll">
-                  {!lists.length && (
-                    <div className="crm-empty-state py-8">
-                      <p>No lists yet</p>
-                      <p className="crm-empty-hint">Create one above.</p>
-                    </div>
-                  )}
-                  {lists.map((l) => (
-                    <button
-                      key={l.id}
-                      type="button"
-                      onClick={() => setSelectedListId(l.id)}
-                      className={`crm-list-item ${selectedListId === l.id ? 'is-selected' : ''}`}
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <p className="crm-list-item-name">{l.name}</p>
-                        <MarketingCreatorBadge name={l.createdByName} isOwn={l.isOwn} />
-                      </div>
-                      <p className="crm-list-item-meta">
-                        {(l.channel || 'email') === 'whatsapp' ? 'WhatsApp' : 'Email'} ·{' '}
-                        {l.leadIds?.length || 0} contacts
-                      </p>
-                    </button>
-                  ))}
-                </div>
-              </aside>
-
-              <section
-                className={`crm-split-main ${selectedListId ? 'is-full-mobile' : ''}`}
-              >
-                {selectedListId ? (
-                  <MarketingListDetail
-                    list={lists.find((l) => l.id === selectedListId)}
-                    savedLeads={savedLeads}
-                    busy={busy}
-                    setBusy={setBusy}
-                    setError={setError}
-                    setNotice={setNotice}
-                    onClose={() => setSelectedListId(null)}
-                    onUpdated={(list) => {
-                      setLists((prev) => prev.map((x) => (x.id === list.id ? { ...x, ...list } : x)))
-                    }}
-                    onDeleted={() => {
-                      setSelectedListId(null)
-                      load()
-                    }}
-                  />
-                ) : (
-                  <div className="crm-empty-state">
-                    <p>No list selected</p>
-                    <p className="crm-empty-hint">
-                      Choose a list on the left to add or remove contacts.
-                    </p>
-                  </div>
-                )}
-              </section>
-            </div>
-          </div>
+          <MarketingListsPanel
+            user={user}
+            teamMembers={teamMembers}
+            refreshTeam={refreshTeam}
+            savedLeads={savedLeads}
+            lists={lists}
+            setLists={setLists}
+            busy={busy}
+            setBusy={setBusy}
+            setError={setError}
+            setNotice={setNotice}
+            onListsReload={load}
+          />
         ) : tab === 'inbox' ? (
           <div className="crm-content-card crm-content-scroll flex-1 min-h-0">
             <WhatsAppInboxPanel onNavigate={onNavigate} />

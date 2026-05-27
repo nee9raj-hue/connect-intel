@@ -17,6 +17,17 @@ export default function MarketingListDetail({
   const [search, setSearch] = useState('')
   const [addSearch, setAddSearch] = useState('')
   const [unsubPrompt, setUnsubPrompt] = useState(null)
+  const [editName, setEditName] = useState('')
+  const [editDescription, setEditDescription] = useState('')
+  const [savingMeta, setSavingMeta] = useState(false)
+
+  useEffect(() => {
+    setEditName(list?.name || '')
+    setEditDescription(list?.description || '')
+    setSearch('')
+    setAddSearch('')
+    setUnsubPrompt(null)
+  }, [list?.id, list?.name, list?.description])
 
   const channel = list?.channel || 'email'
   const eligible = (lead) =>
@@ -134,10 +145,21 @@ export default function MarketingListDetail({
     }
   }
 
-  if (!list) return null
+  if (!list) {
+    return (
+      <div className="crm-empty-state h-full min-h-[200px]">
+        <p>List not found</p>
+        {onClose && (
+          <button type="button" onClick={onClose} className="crm-btn crm-btn-secondary mt-3">
+            ← Back to lists
+          </button>
+        )}
+      </div>
+    )
+  }
 
   return (
-    <div className="flex flex-col h-full min-h-0">
+    <div className="flex flex-col h-full min-h-0 w-full">
       <div className="shrink-0 px-4 py-3 border-b border-[#dfe3eb] bg-[#f5f8fa] space-y-3">
         <div className="flex items-start justify-between gap-3">
           <p className="crm-field-label mb-0">Edit list</p>

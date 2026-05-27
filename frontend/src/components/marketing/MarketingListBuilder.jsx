@@ -45,10 +45,23 @@ export default function MarketingListBuilder({
   setError,
   setNotice,
   onListsCreated,
+  hideSetupFields = false,
+  listChannel: listChannelProp,
+  onListChannelChange,
+  assigneeUserId: assigneeProp,
+  onAssigneeChange,
+  pipelineStage: stageProp,
+  onPipelineStageChange,
 }) {
-  const [listChannel, setListChannel] = useState('email')
-  const [assigneeUserId, setAssigneeUserId] = useState('')
-  const [pipelineStage, setPipelineStage] = useState('all')
+  const [listChannelInternal, setListChannelInternal] = useState('email')
+  const [assigneeInternal, setAssigneeInternal] = useState('')
+  const [pipelineStageInternal, setPipelineStageInternal] = useState('all')
+  const listChannel = listChannelProp ?? listChannelInternal
+  const setListChannel = onListChannelChange ?? setListChannelInternal
+  const assigneeUserId = assigneeProp ?? assigneeInternal
+  const setAssigneeUserId = onAssigneeChange ?? setAssigneeInternal
+  const pipelineStage = stageProp ?? pipelineStageInternal
+  const setPipelineStage = onPipelineStageChange ?? setPipelineStageInternal
   const [namePrefix, setNamePrefix] = useState('')
   const [prefixTouched, setPrefixTouched] = useState(false)
   const [listForm, setListForm] = useState({ name: '', description: '', leadIds: [] })
@@ -152,7 +165,7 @@ export default function MarketingListBuilder({
     setNamePrefix(defaultNamePrefix(rep?.name, 'all', listChannel))
   }
 
-  const onStageChange = (stageId) => {
+  const handleStageChange = (stageId) => {
     setPipelineStage(stageId)
     setListForm((prev) => ({ ...prev, leadIds: [] }))
     if (!prefixTouched) {
@@ -267,92 +280,87 @@ export default function MarketingListBuilder({
         onSave={saveSingleList}
         listChannel={listChannel}
         onChannelChange={onChannelChange}
+        hideSetupFields={hideSetupFields}
       />
     )
   }
 
   const contactLabel = listChannel === 'whatsapp' ? 'mobile number' : 'email address'
+  const showSetup = !hideSetupFields
+  const canPickLeads = assigneeUserId || (!isCompanyAdmin && user?.id)
 
   return (
-    <div className="space-y-4">
-      <div>
-        <p className="text-xs font-medium text-gray-600 mb-2">List channel</p>
-        <div className="flex flex-wrap gap-2">
-          {[
-            { id: 'email', label: 'Email list' },
-            { id: 'whatsapp', label: 'WhatsApp list' },
-          ].map((ch) => (
-            <button
-              key={ch.id}
-              type="button"
-              onClick={() => onChannelChange(ch.id)}
-              className={`text-xs font-semibold px-3 py-1.5 rounded-lg border ${
-                listChannel === ch.id
-                  ? 'bg-gray-900 text-white border-gray-900'
-                  : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
-              }`}
-            >
-              {ch.label}
-            </button>
-          ))}
-        </div>
-        <p className="text-[11px] text-gray-500 mt-1.5 leading-relaxed">
-          {listChannel === 'whatsapp'
-            ? 'Only pipeline leads with a valid phone number appear. Use this list for WhatsApp campaigns.'
-            : 'Only pipeline leads with a valid email appear. Use this list for email campaigns.'}
-        </p>
-      </div>
-
-      <div className="rounded-lg border border-amber-100 bg-amber-50/80 px-3 py-2 text-xs text-amber-950 leading-relaxed">
-        {isCompanyAdmin ? (
-          <>
-            <strong>Team list builder:</strong> choose Email or WhatsApp, pick a team member and pipeline
-            stage, then save one list or auto-split into batches of {MARKETING_SEND_BATCH_SIZE}.
-          </>
-        ) : (
-          <>
-            <strong>Your list builder:</strong> choose Email or WhatsApp, filter by stage, then select leads
-            or create auto-split batches of {MARKETING_SEND_BATCH_SIZE}.
-          </>
-        )}
-      </div>
-
-      <label className="block text-xs font-medium text-gray-600">
-        {isCompanyAdmin ? 'Team member (whose pipeline)' : 'Lead owner'}
-        <select
-          value={assigneeUserId}
-          onChange={(e) => onRepChange(e.target.value)}
-          disabled={!isCompanyAdmin}
-          className="mt-1 w-full text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white disabled:bg-gray-50 disabled:text-gray-600"
-        >
-          {isCompanyAdmin && <option value="">Select team member…</option>}
-          {repOptions.map((r) => (
-            <option key={r.userId} value={r.userId}>
-              {r.name}
-            </option>
-          ))}
-        </select>
-      </label>
-
-      {(assigneeUserId || (!isCompanyAdmin && user?.id)) ? (
+    <div className="space-y-3">
+      {showSetup && (
         <>
+          <div>
+            <p className="text-xs font-medium text-gray-600 mb-2">List channel</p>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { id: 'email', label: 'Email list' },
+                { id: 'whatsapp', label: 'WhatsApp list' },
+              ].map((ch) => (
+                <button
+                  key={ch.id}
+                  type="button"
+                  onClick={() => onChannelChange(ch.id)}
+                  className={`text-xs font-semibold px-3 py-1.5 rounded-lg border ${
+                    listChannel === ch.id
+                      ? 'bg-gray-900 text-white border-gray-900'
+                      : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                  }`}
+                >
+                  {ch.label}
+                </button>
+              ))}
+            </div>
+            <p className="text-[11px] text-gray-500 mt-1.5 leading-relaxed">
+              {listChannel === 'whatsapp'
+                ? 'Only pipeline leads with a valid phone number appear. Use this list for WhatsApp campaigns.'
+                : 'Only pipeline leads with a valid email appear. Use this list for email campaigns.'}
+            </p>
+          </div>
+
           <label className="block text-xs font-medium text-gray-600">
-            Pipeline stage
+            {isCompanyAdmin ? 'Team member (whose pipeline)' : 'Lead owner'}
             <select
-              value={pipelineStage}
-              onChange={(e) => onStageChange(e.target.value)}
-              className="mt-1 w-full text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white"
+              value={assigneeUserId}
+              onChange={(e) => onRepChange(e.target.value)}
+              disabled={!isCompanyAdmin}
+              className="mt-1 w-full text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white disabled:bg-gray-50 disabled:text-gray-600"
             >
-              <option value="all">All stages</option>
-              {CRM_STATUSES.map((st) => (
-                <option key={st.id} value={st.id}>
-                  {st.label}
+              {isCompanyAdmin && <option value="">Select team member…</option>}
+              {repOptions.map((r) => (
+                <option key={r.userId} value={r.userId}>
+                  {r.name}
                 </option>
               ))}
             </select>
           </label>
+        </>
+      )}
 
-          {stageCounts.length > 0 && (
+      {canPickLeads ? (
+        <>
+          {showSetup && (
+            <label className="block text-xs font-medium text-gray-600">
+              Pipeline stage
+              <select
+                value={pipelineStage}
+                onChange={(e) => handleStageChange(e.target.value)}
+                className="mt-1 w-full text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white"
+              >
+                <option value="all">All stages</option>
+                {CRM_STATUSES.map((st) => (
+                  <option key={st.id} value={st.id}>
+                    {st.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+
+          {showSetup && stageCounts.length > 0 && (
             <p className="text-[11px] text-gray-500 leading-relaxed">
               {stageCounts.map((row) => (
                 <span key={row.id} className="inline-block mr-2">
@@ -487,7 +495,11 @@ export default function MarketingListBuilder({
           </div>
         </>
       ) : (
-        <p className="text-sm text-gray-500">Choose a sales leader to load their pipeline leads.</p>
+        <p className="text-sm text-[#516f90]">
+          {hideSetupFields
+            ? 'Select a team member in the toolbar above to load pipeline leads.'
+            : 'Choose a sales leader to load their pipeline leads.'}
+        </p>
       )}
     </div>
   )
@@ -502,32 +514,35 @@ function SimpleListForm({
   onSave,
   listChannel,
   onChannelChange,
+  hideSetupFields = false,
 }) {
   const eligible = pipelineLeads.filter((l) => leadEligibleForChannel(l, listChannel))
   return (
     <div className="space-y-3">
-      <div>
-        <p className="text-xs font-medium text-gray-600 mb-2">List channel</p>
-        <div className="flex flex-wrap gap-2">
-          {[
-            { id: 'email', label: 'Email list' },
-            { id: 'whatsapp', label: 'WhatsApp list' },
-          ].map((ch) => (
-            <button
-              key={ch.id}
-              type="button"
-              onClick={() => onChannelChange(ch.id)}
-              className={`text-xs font-semibold px-3 py-1.5 rounded-lg border ${
-                listChannel === ch.id
-                  ? 'bg-gray-900 text-white border-gray-900'
-                  : 'bg-white text-gray-600 border-gray-200'
-              }`}
-            >
-              {ch.label}
-            </button>
-          ))}
+      {!hideSetupFields && (
+        <div>
+          <p className="text-xs font-medium text-gray-600 mb-2">List channel</p>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { id: 'email', label: 'Email list' },
+              { id: 'whatsapp', label: 'WhatsApp list' },
+            ].map((ch) => (
+              <button
+                key={ch.id}
+                type="button"
+                onClick={() => onChannelChange(ch.id)}
+                className={`text-xs font-semibold px-3 py-1.5 rounded-lg border ${
+                  listChannel === ch.id
+                    ? 'bg-gray-900 text-white border-gray-900'
+                    : 'bg-white text-gray-600 border-gray-200'
+                }`}
+              >
+                {ch.label}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
       <input
         value={listForm.name}
         onChange={(e) => setListForm((p) => ({ ...p, name: e.target.value }))}
