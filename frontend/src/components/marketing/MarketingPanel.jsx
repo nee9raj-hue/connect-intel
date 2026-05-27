@@ -929,8 +929,10 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
               />
             </div>
 
-            <div className="crm-split-card flex-1 min-h-[400px] border-0 rounded-none shadow-none">
-              <aside className="crm-split-sidebar">
+            <div className="crm-split-card flex-1 min-h-[280px] border-0 rounded-none shadow-none">
+              <aside
+                className={`crm-split-sidebar ${selectedListId ? 'is-hidden-mobile' : ''}`}
+              >
                 <div className="crm-list-header">
                   Saved lists
                   <span className="block font-normal text-[#7c98b6] mt-0.5">
@@ -964,7 +966,9 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
                 </div>
               </aside>
 
-              <section className="crm-split-main">
+              <section
+                className={`crm-split-main ${selectedListId ? 'is-full-mobile' : ''}`}
+              >
                 {selectedListId ? (
                   <MarketingListDetail
                     list={lists.find((l) => l.id === selectedListId)}

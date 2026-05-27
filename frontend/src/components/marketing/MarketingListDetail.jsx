@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { api } from '../../lib/api'
 import { leadDisplayName, leadHasSendableEmail } from '../../lib/emailUtils'
 import { leadHasCallablePhone } from '../../lib/phoneUtils'
@@ -96,6 +96,30 @@ export default function MarketingListDetail({
     }
   }
 
+  const saveListMeta = async () => {
+    if (!list?.id || savingMeta) return
+    const name = editName.trim()
+    if (!name) {
+      setError('List name is required')
+      return
+    }
+    setSavingMeta(true)
+    setError(null)
+    try {
+      const data = await api.updateMarketingList({
+        id: list.id,
+        name,
+        description: editDescription.trim(),
+      })
+      onUpdated?.(data.list)
+      setNotice('List updated')
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setSavingMeta(false)
+    }
+  }
+
   const deleteList = async () => {
     if (!window.confirm(`Delete list "${list.name}"?`)) return
     setBusy(true)
@@ -114,29 +138,51 @@ export default function MarketingListDetail({
 
   return (
     <div className="flex flex-col h-full min-h-0">
-      <div className="shrink-0 px-4 py-3 border-b border-[#dfe3eb] flex items-start justify-between gap-3 bg-[#f5f8fa]">
-        <div className="min-w-0">
-          <p className="crm-field-label mb-1">Editing list</p>
-          <h3 className="crm-detail-title truncate">{list.name}</h3>
-          <p className="crm-detail-subtitle">
-            {channel === 'whatsapp' ? 'WhatsApp' : 'Email'} · {list.leadIds?.length || 0} contacts
-            {list.description ? ` · ${list.description}` : ''}
-          </p>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
-          {onClose && (
-            <button type="button" onClick={onClose} className="crm-btn crm-btn-secondary">
-              Close
+      <div className="shrink-0 px-4 py-3 border-b border-[#dfe3eb] bg-[#f5f8fa] space-y-3">
+        <div className="flex items-start justify-between gap-3">
+          <p className="crm-field-label mb-0">Edit list</p>
+          <div className="flex items-center gap-2 shrink-0">
+            {onClose && (
+              <button type="button" onClick={onClose} className="crm-btn crm-btn-secondary">
+                ← Back
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={deleteList}
+              disabled={busy}
+              className="crm-btn crm-btn-ghost text-red-700 hover:bg-red-50 disabled:opacity-50"
+            >
+              Delete
             </button>
-          )}
+          </div>
+        </div>
+        <div className="crm-form-grid">
+          <input
+            value={editName}
+            onChange={(e) => setEditName(e.target.value)}
+            placeholder="List name"
+            className="crm-input"
+          />
+          <input
+            value={editDescription}
+            onChange={(e) => setEditDescription(e.target.value)}
+            placeholder="Description (optional)"
+            className="crm-input"
+          />
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
-            onClick={deleteList}
-            disabled={busy}
-            className="crm-btn crm-btn-ghost text-red-700 hover:bg-red-50 disabled:opacity-50"
+            onClick={saveListMeta}
+            disabled={savingMeta || busy || !editName.trim()}
+            className="crm-btn crm-btn-primary"
           >
-            Delete list
+            {savingMeta ? 'Saving…' : 'Save list'}
           </button>
+          <p className="text-xs text-[#516f90]">
+            {channel === 'whatsapp' ? 'WhatsApp' : 'Email'} · {list.leadIds?.length || 0} contacts
+          </p>
         </div>
       </div>
 
