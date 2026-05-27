@@ -6,8 +6,10 @@ import {
   FONT_OPTIONS,
   MERGE_FIELDS,
   STARTER_TEMPLATES,
+  attachDefaultMarketingForm,
   createBlock,
   duplicateBlock,
+  PREVIEW_LEAD,
   renderEmailCanvasHtml,
   renderEmailHtml,
   reorderBlocks,
@@ -172,7 +174,11 @@ export default function MarketingTemplateBuilder({
   }, [blockCount, selectedBlockIndex])
 
   const previewHtml = useMemo(
-    () => renderEmailHtml(value.blocks || [], value.design || DEFAULT_THEME, { previewText: value.previewText }),
+    () =>
+      renderEmailHtml(value.blocks || [], value.design || DEFAULT_THEME, {
+        previewText: value.previewText,
+        lead: PREVIEW_LEAD,
+      }),
     [value.blocks, value.design, value.previewText]
   )
 
@@ -207,7 +213,11 @@ export default function MarketingTemplateBuilder({
   }
 
   const addBlock = (type) => {
-    const blocks = [...(value.blocks || []), createBlock(type)]
+    let block = createBlock(type)
+    if (type === 'form') {
+      block = attachDefaultMarketingForm(block, marketingForms)
+    }
+    const blocks = [...(value.blocks || []), block]
     onChange({ ...value, blocks })
     setSelectedBlockIndex(blocks.length - 1)
   }

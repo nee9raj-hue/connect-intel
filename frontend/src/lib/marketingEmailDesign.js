@@ -15,7 +15,11 @@ import {
   richFieldToEmailHtml,
   sanitizeRichHtml,
 } from './marketingRichText.js'
-import { mergeFormBlocksForLead, resolveFormBlockUrl } from '../../../lib/marketingFormSchema.js'
+import {
+  applyFormBlockUrl,
+  mergeFormBlocksForLead,
+  resolveFormBlockUrl,
+} from '../../../lib/marketingFormSchema.js'
 
 export { FONT_OPTIONS, FONT_SIZE_OPTIONS, IMAGE_PRESETS, POPULAR_ICONS, SOCIAL_NETWORKS, iconifyUrl, socialIconUrl }
 
@@ -336,7 +340,7 @@ export const STARTER_TEMPLATES = [
   },
 ]
 
-const PREVIEW_LEAD = {
+export const PREVIEW_LEAD = {
   firstName: 'Alex',
   companyName: 'Acme Corp',
   name: 'Alex Rivera',
@@ -418,14 +422,10 @@ function mergeBlock(block, lead) {
 }
 
 export function mergeBlocksForLead(blocks, lead = PREVIEW_LEAD) {
-  const appBase =
-    typeof window !== 'undefined' && window.location?.origin
-      ? window.location.origin
-      : 'https://connectintel.net'
   return mergeFormBlocksForLead(
     (blocks || []).map((block) => mergeBlock(block, lead)),
     lead,
-    appBase
+    canvasAppBase()
   )
 }
 
@@ -494,7 +494,18 @@ function textToHtmlParagraphs(text, styleCss) {
     .join('')
 }
 
-function renderBlockHtml(block, theme) {
+function canvasAppBase() {
+  return typeof window !== 'undefined' && window.location?.origin
+    ? window.location.origin
+    : 'https://connectintel.net'
+}
+
+function resolveFormBlockUrlForRender(block, lead = null) {
+  const prepared = applyFormBlockUrl(block, { lead, appBase: canvasAppBase() })
+  return sanitizeUrl(prepared.url || resolveFormBlockUrl(prepared, { lead, appBase: canvasAppBase() }))
+}
+
+function renderBlockHtml(block, theme, renderOpts = {}) {
   const primary = theme.primaryColor || DEFAULT_THEME.primaryColor
   const align = block.align || 'left'
   const bg = theme.contentBackground || DEFAULT_THEME.contentBackground
@@ -579,11 +590,11 @@ function renderBlockHtml(block, theme) {
       </td></tr>`
     }
     case 'form': {
-      const url = sanitizeUrl(block.url || resolveFormBlockUrl(block, { lead: null }))
+      const lead = renderOpts.lead ?? null
+      const url = resolveFormBlockUrlForRender(block, lead)
       const title = block.title || 'Share your feedback'
       const desc = block.description || ''
       const btn = block.buttonLabel || 'Open form'
-      if (!url) return ''
       const bgColor = block.buttonColor || primary
       const btnStyle = textStyle(block, theme, {
         fontSize: clampSize(block.fontSize, 12, 20, 14),
@@ -596,13 +607,23 @@ function renderBlockHtml(block, theme) {
         block.formSource === 'google'
           ? '<span style="display:inline-block;font-size:11px;font-weight:600;color:#6b7280;margin-bottom:8px;">Google Form</span>'
           : '<span style="display:inline-block;font-size:11px;font-weight:600;color:#6b7280;margin-bottom:8px;">Connect Intel form</span>'
+      const borderStyle = url
+        ? 'border:1px solid #e5e7eb;background:#fafafa;'
+        : 'border:2px dashed #cbd5e1;background:#f8fafc;'
+      const hint = url
+        ? ''
+        : `<p style="margin:12px 0 0;font-size:12px;line-height:1.45;color:#94a3b8;${descStyle}">Select a form in the block editor (or paste a Google Form link).</p>`
+      const btnHtml = url
+        ? `<a href="${escapeHtml(url)}" style="display:inline-block;padding:11px 20px;background:${bgColor};text-decoration:none;border-radius:8px;${btnStyle}">${escapeHtml(btn)}</a>`
+        : `<span style="display:inline-block;padding:11px 20px;background:${bgColor};opacity:0.85;border-radius:8px;${btnStyle}">${escapeHtml(btn)}</span>`
       return `<tr><td style="padding:16px 32px;background:${bg};text-align:${align};">
-        <table role="presentation" cellspacing="0" cellpadding="0" style="width:100%;max-width:100%;border:1px solid #e5e7eb;border-radius:12px;background:#fafafa;">
+        <table role="presentation" cellspacing="0" cellpadding="0" style="width:100%;max-width:100%;${borderStyle}border-radius:12px;">
         <tr><td style="padding:20px 20px 16px;text-align:${align};">
         ${badge}
         <p style="margin:0 0 8px;${titleStyle}">${escapeHtml(title)}</p>
         ${desc ? `<p style="margin:0 0 16px;${descStyle}">${escapeHtml(desc)}</p>` : ''}
-        <a href="${escapeHtml(url)}" style="display:inline-block;padding:11px 20px;background:${bgColor};text-decoration:none;border-radius:8px;${btnStyle}">${escapeHtml(btn)}</a>
+        ${btnHtml}
+        ${hint}
         </td></tr></table>
       </td></tr>`
     }
@@ -625,8 +646,10 @@ function renderBlockHtml(block, theme) {
 function buildEmailPresentation(blocks, design = {}, options = {}) {
   const theme = { ...DEFAULT_THEME, ...design }
   const width = Math.max(320, Math.min(720, Number(theme.contentWidth) || 600))
-  const mergedBlocks = options.lead ? mergeBlocksForLead(blocks, options.lead) : blocks || []
-  const rows = mergedBlocks.map((block) => renderBlockHtml(block, theme)).join('')
+  const lead = options.lead ?? null
+  const mergedBlocks = lead ? mergeBlocksForLead(blocks, lead, canvasAppBase()) : blocks || []
+  const renderOpts = { lead }
+  const rows = mergedBlocks.map((block) => renderBlockHtml(block, theme, renderOpts)).join('')
   const preview = options.previewText
     ? `<span style="display:none!important;visibility:hidden;opacity:0;color:transparent;height:0;width:0;">${escapeHtml(options.previewText)}</span>`
     : ''
@@ -638,8 +661,27 @@ function buildEmailPresentation(blocks, design = {}, options = {}) {
 
 /** Inline HTML for the visual builder canvas (natural document height, page scroll). */
 export function renderEmailCanvasHtml(blocks, design = {}, options = {}) {
-  const { theme, preview, outerTable } = buildEmailPresentation(blocks, design, options)
+  const lead = options.lead ?? PREVIEW_LEAD
+  const { theme, preview, outerTable } = buildEmailPresentation(blocks, design, { ...options, lead })
   return `${preview}<div class="marketing-email-canvas-root" style="margin:0;padding:0;background:${theme.backgroundColor};font-family:${theme.fontFamily};">${outerTable}</div>`
+}
+
+/** Attach first saved form when adding a form block in the builder. */
+export function attachDefaultMarketingForm(block, marketingForms = []) {
+  if (block?.type !== 'form' || !marketingForms?.length) return block
+  if (block.formId || block.formSlug || block.googleUrl) return block
+  const f = marketingForms[0]
+  return applyFormBlockUrl(
+    {
+      ...block,
+      formSource: 'native',
+      formId: f.id,
+      formSlug: f.slug,
+      title: block.title || f.title || f.name,
+      description: block.description || f.description || '',
+    },
+    { appBase: canvasAppBase() }
+  )
 }
 
 export function renderEmailHtml(blocks, design = {}, options = {}) {

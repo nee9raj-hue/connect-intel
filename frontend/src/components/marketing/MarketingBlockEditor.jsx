@@ -4,7 +4,7 @@ import {
   IMAGE_PRESETS,
   SOCIAL_NETWORKS,
 } from '../../lib/marketingEmailTokens'
-import { normalizeGoogleFormUrl } from '../../../../lib/marketingFormSchema.js'
+import { applyFormBlockUrl, normalizeGoogleFormUrl } from '../../../../lib/marketingFormSchema.js'
 import RichTextEditor from './RichTextEditor'
 
 function AlignSelect({ value, onChange }) {
@@ -362,14 +362,19 @@ export default function MarketingBlockEditor({ block, onChange, marketingForms =
     const pickNativeForm = (formId) => {
       const f = marketingForms.find((row) => row.id === formId)
       if (!f) return
-      set({
-        formSource: 'native',
-        formId: f.id,
-        formSlug: f.slug,
-        title: block.title || f.title || f.name,
-        description: block.description || f.description || '',
-        buttonLabel: block.buttonLabel || 'Open form',
-      })
+      const next = applyFormBlockUrl(
+        {
+          ...block,
+          formSource: 'native',
+          formId: f.id,
+          formSlug: f.slug,
+          title: block.title || f.title || f.name,
+          description: block.description || f.description || '',
+          buttonLabel: block.buttonLabel || 'Open form',
+        },
+        { appBase: typeof window !== 'undefined' ? window.location.origin : undefined }
+      )
+      set(next)
     }
     return (
       <div className="space-y-2">
