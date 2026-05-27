@@ -847,7 +847,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
             )}
             </div>
 
-            <div className="marketing-setup-bar shrink-0 ci-card flex flex-wrap items-center gap-3 px-4 py-2.5">
+            <div className="marketing-campaign-actions flex flex-wrap items-center gap-3 px-4 py-2.5">
               <button type="button" onClick={resetCampaignForm} className="ci-btn ci-btn-secondary">
                 New campaign
               </button>

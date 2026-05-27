@@ -98,7 +98,10 @@ body {
 }
 
 .marketing-campaigns-shell > .panel-body-scroll {
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -111,10 +114,9 @@ body {
 .marketing-workspace {
   display: flex;
   flex-direction: column;
-  flex: 1 1 0%;
-  min-height: 0;
   width: 100%;
   gap: 0.5rem;
+  padding-bottom: 0.75rem;
 }
 
 .marketing-setup-bar {
@@ -122,11 +124,23 @@ body {
 }
 
 .marketing-builder-slot {
-  flex: 1 1 0%;
-  min-height: 0;
   display: flex;
   flex-direction: column;
-  min-height: calc(100dvh - 11.5rem);
+  flex-shrink: 0;
+  min-height: 420px;
+  max-height: min(58vh, 640px);
+}
+
+.marketing-campaign-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 40;
+  flex-shrink: 0;
+  background: #fff;
+  border: 1px solid var(--color-ci-card-border);
+  border-radius: 12px;
+  box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.1);
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
 }
 
 /* —— App design system —— */
@@ -239,8 +253,9 @@ body {
 
 .marketing-studio.is-focus {
   flex: 1 1 auto;
-  min-height: calc(100dvh - 12rem);
-  height: 100%;
+  min-height: 400px;
+  max-height: min(58vh, 640px);
+  height: auto;
   border-radius: 10px;
 }
 
@@ -255,11 +270,8 @@ body {
   display: flex;
   flex: 1 1 0%;
   min-height: 0;
-  min-height: calc(100dvh - 15rem);
-}
-
-.marketing-studio.is-focus .marketing-studio-body {
-  min-height: calc(100dvh - 15rem);
+  min-height: 360px;
+  max-height: min(50vh, 560px);
 }
 
 .marketing-studio-rail {
@@ -399,8 +411,9 @@ body {
 .marketing-email-frame-wrap iframe {
   width: 100% !important;
   flex: 1 1 auto;
-  min-height: min(68vh, 720px) !important;
-  height: auto !important;
+  min-height: min(40vh, 460px) !important;
+  max-height: min(48vh, 520px) !important;
+  height: 100% !important;
   border: none;
 }
 

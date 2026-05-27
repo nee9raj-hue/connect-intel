@@ -649,7 +649,7 @@ export default function MarketingTemplateBuilder({
 
   return (
     <div
-      className={`${embedded && fillHeight ? 'flex flex-col flex-1 min-h-0 h-full' : 'max-w-[1400px] mx-auto space-y-4'}`}
+      className={`${embedded && fillHeight ? 'flex flex-col flex-1 min-h-0 max-h-full' : 'max-w-[1400px] mx-auto space-y-4'}`}
     >
       {!studio && (
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -677,7 +677,7 @@ export default function MarketingTemplateBuilder({
       <div
         className={
           studio
-            ? `marketing-studio is-focus flex-1 min-h-0 ${embedded ? 'h-full' : ''}`
+            ? 'marketing-studio is-focus flex-1 min-h-0 h-full max-h-full'
             : 'ci-card min-h-[560px] flex flex-col'
         }
       >
