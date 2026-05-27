@@ -392,66 +392,152 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
     }
   }
 
-  const drainCampaignSends = async (campaignId, totalEnrolled = 0, onProgress) => {
-    let pending = totalEnrolled
-    let totalSent = 0
-    let totalFailed = 0
-    let lastError = null
-    let rounds = 0
-    const chunkSize = 5
-    const maxRounds = Math.ceil(Math.max(totalEnrolled, 50) / chunkSize) + 5
-    while (pending > 0 && rounds < maxRounds) {
-      rounds += 1
-      const chunk = await api.processMarketingCampaignSends(campaignId, {
-        limit: chunkSize,
-        timeoutMs: 115_000,
-        silent: rounds > 1,
-      })
-      totalSent += chunk.sendResult?.sent || 0
-      totalFailed += chunk.sendResult?.failed || 0
-      pending = chunk.pendingSends ?? 0
-      lastError = chunk.firstError || chunk.sendResult?.firstError || lastError
-      onProgress?.({ sent: totalSent, failed: totalFailed, pending, enrolled: totalEnrolled, lastError })
+  const sendPollRef = useRef(null)
+  const sendStateRef = useRef(null)
 
-      if (lastError && totalSent === 0 && totalFailed >= 2) {
-        throw new Error(lastError)
-      }
-      if (chunk.sendResult?.processed === 0 && pending > 0) {
-        throw new Error(lastError || 'Could not process sends. Connect Work email in the sidebar, then retry.')
-      }
-      if (!(chunk.sendResult?.sent || chunk.sendResult?.failed)) break
+  const stopCampaignSendPoll = useCallback(() => {
+    if (sendPollRef.current) {
+      clearTimeout(sendPollRef.current)
+      sendPollRef.current = null
     }
-    return { totalSent, totalFailed, pending, lastError }
-  }
+    sendStateRef.current = null
+  }, [])
+
+  useEffect(() => () => stopCampaignSendPoll(), [stopCampaignSendPoll])
+
+  const pollCampaignSendsOnce = useCallback(async (campaignId) => {
+    const state = sendStateRef.current
+    if (!state || state.campaignId !== campaignId) return
+
+    try {
+      const chunk = await api.processMarketingCampaignSends(campaignId, {
+        limit: 1,
+        timeoutMs: 50_000,
+        silent: true,
+      })
+      state.totalSent += chunk.sendResult?.sent || 0
+      state.totalFailed += chunk.sendResult?.failed || 0
+      state.pending = chunk.pendingSends ?? 0
+      state.lastError = chunk.firstError || chunk.sendResult?.firstError || state.lastError
+
+      const parts = [`${state.totalSent} sent`]
+      if (state.totalFailed) parts.push(`${state.totalFailed} failed`)
+      if (state.pending > 0) parts.push(`${state.pending} remaining`)
+      setNotice(`Sending… ${parts.join(' · ')}`)
+
+      if (state.lastError && state.totalSent === 0 && state.totalFailed >= 3) {
+        stopCampaignSendPoll()
+        setError(state.lastError)
+        await load()
+        return
+      }
+
+      if (chunk.sendResult?.processed === 0 && state.pending > 0) {
+        stopCampaignSendPoll()
+        setError(
+          state.lastError ||
+            'Could not process sends. Connect Work email in the sidebar, then start the campaign again.'
+        )
+        await load()
+        return
+      }
+
+      if (state.pending > 0 && (chunk.sendResult?.sent || chunk.sendResult?.failed)) {
+        sendPollRef.current = setTimeout(() => {
+          void pollCampaignSendsOnce(campaignId)
+        }, 500)
+        return
+      }
+
+      stopCampaignSendPoll()
+      if (state.pending > 0 && state.totalSent === 0) {
+        setError(
+          state.lastError ||
+            'No emails were sent. Open Work email in the sidebar, connect Gmail, then start the campaign again.'
+        )
+      } else if (state.pending > 0) {
+        setNotice(
+          `Campaign started — ${state.enrolled} enrolled, ${state.totalSent} sent${
+            state.totalFailed ? `, ${state.totalFailed} failed` : ''
+          }. ${state.pending} still queued — keep this tab open or start the campaign again to continue.`
+        )
+      } else {
+        setNotice(
+          `Campaign finished — ${state.enrolled} enrolled, ${state.totalSent} sent${
+            state.totalFailed ? `, ${state.totalFailed} failed` : ''
+          }`
+        )
+      }
+      await load()
+      refreshSavedLeads?.()
+    } catch (e) {
+      stopCampaignSendPoll()
+      if (state.totalSent > 0) {
+        setNotice(
+          `Sending paused after ${state.totalSent} sent — ${state.pending} still queued. Start the campaign again to continue.`
+        )
+      } else {
+        setError(e.message)
+      }
+      await load()
+    }
+  }, [load, refreshSavedLeads, stopCampaignSendPoll])
+
+  const beginCampaignSendPoll = useCallback(
+    (campaignId, enrolled, initial = {}) => {
+      stopCampaignSendPoll()
+      sendStateRef.current = {
+        campaignId,
+        enrolled,
+        totalSent: initial.sent || 0,
+        totalFailed: initial.failed || 0,
+        pending: initial.pending ?? enrolled,
+        lastError: initial.lastError || null,
+      }
+      if (sendStateRef.current.pending > 0) {
+        sendPollRef.current = setTimeout(() => {
+          void pollCampaignSendsOnce(campaignId)
+        }, 400)
+      }
+    },
+    [pollCampaignSendsOnce, stopCampaignSendPoll]
+  )
 
   const startCampaign = async (id) => {
+    stopCampaignSendPoll()
     setBusy(true)
     setError(null)
     try {
-      const data = await api.startMarketingCampaign(id, { timeoutMs: 115_000 })
+      const data = await api.startMarketingCampaign(id, { timeoutMs: 60_000 })
       const isWa = data.campaign?.channel === 'whatsapp'
       const enrolled = data.enrolled || 0
+      const initialSent = data.sendResult?.sent || 0
+      const initialFailed = data.sendResult?.failed || 0
+      const pending = data.pendingSends ?? 0
+
       if (!isWa && enrolled > 0) {
-        setNotice(`Queued ${enrolled} recipients — sending now…`)
-        const drained = await drainCampaignSends(id, data.pendingSends ?? enrolled, (p) => {
-          const parts = [`${p.sent} sent`]
-          if (p.failed) parts.push(`${p.failed} failed`)
-          parts.push(`${p.pending} remaining`)
-          setNotice(`Sending… ${parts.join(' · ')}`)
-        })
-        if (drained.pending > 0 && drained.totalSent === 0) {
-          setError(
-            drained.lastError ||
-              'No emails were sent. Open Work email in the sidebar, connect Gmail, then start a new campaign.'
-          )
-        } else if (drained.pending > 0) {
+        if (pending > 0) {
           setNotice(
-            `Campaign started — ${enrolled} enrolled, ${drained.totalSent} sent, ${drained.totalFailed} failed. ${drained.pending} still queued — start the campaign again or wait for the daily send job to finish the rest.`
+            initialSent || initialFailed
+              ? `Campaign started — ${initialSent} sent, ${pending} remaining…`
+              : `Queued ${enrolled} recipients — sending one email at a time…`
+          )
+          beginCampaignSendPoll(id, enrolled, {
+            sent: initialSent,
+            failed: initialFailed,
+            pending,
+            lastError: data.sendResult?.firstError || data.firstError,
+          })
+        } else if (initialSent === 0 && initialFailed > 0) {
+          setError(
+            data.sendResult?.firstError ||
+              data.firstError ||
+              'No emails were sent. Connect Work email in the sidebar, then try again.'
           )
         } else {
           setNotice(
-            `Campaign started — ${enrolled} enrolled, ${drained.totalSent} sent${
-              drained.totalFailed ? `, ${drained.totalFailed} failed` : ''
+            `Campaign finished — ${enrolled} enrolled, ${initialSent} sent${
+              initialFailed ? `, ${initialFailed} failed` : ''
             }`
           )
         }
