@@ -39,6 +39,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const {
     user,
     savedLeads,
+    pipelineLoad,
     toggleSaveLead,
     pipelineLeadId,
     setPipelineLeadId,
@@ -334,7 +335,9 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                 <p className="text-[10px] md:text-[11px] text-gray-500 mt-0.5 truncate">
                   {savedLeads.length === 0
                     ? 'Add or import leads'
-                    : `${filtered.length}/${scopedLeads.length} shown`}
+                    : pipelineLoad.backgroundLoading
+                      ? `Loading ${pipelineLoad.loaded.toLocaleString()} of ${pipelineLoad.total.toLocaleString()} leads in the background — you can work with what is loaded`
+                      : `${filtered.length}/${scopedLeads.length} shown`}
                 </p>
               )}
             </div>

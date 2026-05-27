@@ -1,8 +1,9 @@
 import { useEffect, useRef } from 'react'
 
-const POLL_MS = 60 * 1000
-const INITIAL_DELAY_MS = 12 * 1000
+const POLL_MS = 90 * 1000
+const INITIAL_DELAY_MS = 20 * 1000
 const AUTH_FAIL_PAUSE_MS = 2 * 60 * 1000
+const FOCUS_SYNC_MIN_GAP_MS = 3 * 60 * 1000
 
 function showBrowserNotification(item) {
   if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return
@@ -25,6 +26,7 @@ export function useWorkspaceSync({
   const sinceRef = useRef(null)
   const seenRef = useRef(new Set())
   const pausedUntilRef = useRef(0)
+  const lastSyncAtRef = useRef(0)
   const syncRef = useRef(syncWorkspace)
   const notifyRef = useRef(onNewNotifications)
 
@@ -67,6 +69,7 @@ export function useWorkspaceSync({
             }
           }
         }
+        lastSyncAtRef.current = Date.now()
       } catch (error) {
         if (error?.status === 401) {
           pausedUntilRef.current = Date.now() + AUTH_FAIL_PAUSE_MS
@@ -79,10 +82,10 @@ export function useWorkspaceSync({
     const intervalId = setInterval(run, POLL_MS)
 
     const onVisible = () => {
-      if (document.visibilityState === 'visible') {
-        pausedUntilRef.current = 0
-        run()
-      }
+      if (document.visibilityState !== 'visible') return
+      if (Date.now() - lastSyncAtRef.current < FOCUS_SYNC_MIN_GAP_MS) return
+      pausedUntilRef.current = 0
+      run()
     }
     document.addEventListener('visibilitychange', onVisible)
     window.addEventListener('focus', onVisible)

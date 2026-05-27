@@ -56,6 +56,12 @@ export function AppProvider({ children }) {
   const pendingLeadOpenRef = useRef({ leadId: null, tab: null })
   const workspaceLoadedAtRef = useRef(0)
   const workspaceLoadInFlightRef = useRef(null)
+  const pipelineBackgroundAbortRef = useRef(null)
+  const [pipelineLoad, setPipelineLoad] = useState({
+    total: 0,
+    loaded: 0,
+    backgroundLoading: false,
+  })
   const [contactsFocusId, setContactsFocusId] = useState(null)
   const [calendarFocus, setCalendarFocus] = useState(null)
 
@@ -108,19 +114,99 @@ export function AppProvider({ children }) {
     }
   }, [user?.accountType, user?.organizationId])
 
-  const refreshSavedLeads = useCallback(async ({ light = true } = {}) => {
-    try {
-      const saved = await api.getSavedLeads({ light })
-      setSavedLeads(saved.leads || [])
-      setSessionError(null)
-      return saved.leads || []
-    } catch (error) {
-      if (error.status === 401) {
-        setSessionError(error.message || 'Session expired. Please sign in again.')
-      }
-      return null
-    }
+  const abortPipelineBackgroundLoad = useCallback(() => {
+    pipelineBackgroundAbortRef.current?.abort()
+    pipelineBackgroundAbortRef.current = null
   }, [])
+
+  const continuePipelineBackgroundLoad = useCallback(
+    (firstPage, { total, hasMore }) => {
+      if (!hasMore || !firstPage?.length) {
+        setPipelineLoad({
+          total: total || firstPage?.length || 0,
+          loaded: firstPage?.length || 0,
+          backgroundLoading: false,
+        })
+        return
+      }
+
+      abortPipelineBackgroundLoad()
+      const ac = new AbortController()
+      pipelineBackgroundAbortRef.current = ac
+
+      void (async () => {
+        try {
+          let leads = firstPage.slice()
+          let offset = leads.length
+          const targetTotal = total || leads.length
+
+          while (offset < targetTotal && !ac.signal.aborted) {
+            const page = await api.fetchSavedLeadsPage({
+              offset,
+              limit: 2000,
+              light: true,
+              silent: true,
+            })
+            const batch = page.leads || []
+            if (!batch.length) break
+            leads = leads.concat(batch)
+            offset = leads.length
+            if (!ac.signal.aborted) {
+              setPipelineLoad({
+                total: page.total ?? targetTotal,
+                loaded: leads.length,
+                backgroundLoading: Boolean(page.hasMore) && leads.length < (page.total ?? targetTotal),
+              })
+            }
+            if (!page.hasMore) break
+          }
+
+          if (!ac.signal.aborted) {
+            setSavedLeads(leads)
+            setPipelineLoad({
+              total: targetTotal,
+              loaded: leads.length,
+              backgroundLoading: false,
+            })
+            workspaceLoadedAtRef.current = Date.now()
+          }
+        } catch {
+          if (!ac.signal.aborted) {
+            setPipelineLoad((prev) => ({ ...prev, backgroundLoading: false }))
+          }
+        }
+      })()
+    },
+    [abortPipelineBackgroundLoad]
+  )
+
+  const refreshSavedLeads = useCallback(
+    async ({ light = true } = {}) => {
+      abortPipelineBackgroundLoad()
+      try {
+        setPipelineLoad((prev) => ({ ...prev, backgroundLoading: true }))
+        const first = await api.fetchSavedLeadsPage({ offset: 0, limit: 2000, light, silent: false })
+        const leads = first.leads || []
+        const total = first.total ?? leads.length
+        setSavedLeads(leads)
+        setSessionError(null)
+        setPipelineLoad({
+          total,
+          loaded: leads.length,
+          backgroundLoading: Boolean(first.hasMore),
+        })
+        continuePipelineBackgroundLoad(leads, { total, hasMore: first.hasMore })
+        return leads
+      } catch (error) {
+        setPipelineLoad((prev) => ({ ...prev, backgroundLoading: false }))
+        if (error.status === 401) {
+          setSessionError(error.message || 'Session expired. Please sign in again.')
+        }
+        return null
+      }
+    },
+    [abortPipelineBackgroundLoad, continuePipelineBackgroundLoad]
+  )
 
   const mergeNotificationItems = useCallback((newItems) => {
     if (!newItems?.length) return []
@@ -142,48 +228,26 @@ export function AppProvider({ children }) {
 
   const syncWorkspace = useCallback(
     async (since) => {
-      const skipLeadsFetch = Date.now() - workspaceLoadedAtRef.current < 20_000
       const isCompany = user?.accountType === 'company' && user?.organizationId
-      const [savedResult, notifResult, tagsResult] = await Promise.allSettled([
-        skipLeadsFetch
-          ? Promise.resolve({ leads: null })
-          : api.getSavedLeads({
-              silent: true,
-              light: true,
-              onBatch: (batch) => {
-                if (batch.length) setSavedLeads(batch)
-              },
-            }),
+      const [notifResult, tagsResult] = await Promise.allSettled([
         api.getCrmNotifications(since || undefined, { silent: true }),
         isCompany ? api.getOrgLeadTags({ silent: true }) : Promise.resolve({ tags: null }),
       ])
 
-      let leads = []
+      let leads = null
       let serverTime = new Date().toISOString()
       let newItems = []
-
-      if (savedResult.status === 'fulfilled' && savedResult.value?.leads) {
-        leads = savedResult.value.leads || []
-        setSavedLeads((prev) => {
-          if (
-            prev.length === leads.length &&
-            prev.every((p, i) => p.id === leads[i]?.id && p.updatedAt === leads[i]?.updatedAt)
-          ) {
-            return prev
-          }
-          return leads
-        })
-        setSessionError(null)
-      } else if (savedResult.status === 'rejected' && savedResult.reason?.status === 401) {
-        setSessionError(
-          savedResult.reason.message || 'Session expired. Please sign in again.'
-        )
-        throw savedResult.reason
-      }
 
       if (notifResult.status === 'fulfilled') {
         serverTime = notifResult.value.serverTime || serverTime
         newItems = mergeNotificationItems(notifResult.value.items || [])
+      }
+
+      if (tagsResult.status === 'rejected' && notifResult.reason?.status === 401) {
+        setSessionError(
+          notifResult.reason.message || 'Session expired. Please sign in again.'
+        )
+        throw notifResult.reason
       }
 
       if (tagsResult.status === 'fulfilled' && tagsResult.value?.tags) {
@@ -268,9 +332,11 @@ export function AppProvider({ children }) {
 
     const loadWorkspace = async () => {
       if (!user) {
+        abortPipelineBackgroundLoad()
         setSavedLeads([])
         setSearchHistory([])
         setTeamMembers([])
+        setPipelineLoad({ total: 0, loaded: 0, backgroundLoading: false })
         workspaceLoadedAtRef.current = 0
         return
       }
@@ -282,24 +348,23 @@ export function AppProvider({ children }) {
 
       const run = (async () => {
         try {
-          const historyPromise = api.getSearchHistory({ silent: true })
-
-          const savedPromise = api.getSavedLeads({
-            silent: true,
-            light: true,
-            onBatch: (batch) => {
-              if (!cancelled && batch.length) {
-                setSavedLeads(batch)
-                workspaceLoadedAtRef.current = Date.now()
-              }
-            },
-          })
-
-          const [saved, history] = await Promise.all([savedPromise, historyPromise])
+          abortPipelineBackgroundLoad()
+          const [firstResult, historyResult] = await Promise.all([
+            api.fetchSavedLeadsPage({ offset: 0, limit: 2000, light: true, silent: true }),
+            api.getSearchHistory({ silent: true }),
+          ])
 
           if (cancelled) return
-          setSavedLeads(saved.leads || [])
-          setSearchHistory(history.history || [])
+
+          const leads = firstResult.leads || []
+          const total = firstResult.total ?? leads.length
+          setSavedLeads(leads)
+          setSearchHistory(historyResult.history || [])
+          setPipelineLoad({
+            total,
+            loaded: leads.length,
+            backgroundLoading: Boolean(firstResult.hasMore),
+          })
           workspaceLoadedAtRef.current = Date.now()
           setSessionError(null)
 
@@ -307,8 +372,16 @@ export function AppProvider({ children }) {
             const data = await api.getTeamMembers({ silent: true })
             if (!cancelled) setTeamMembers(data.members || [])
           }
+
+          if (!cancelled && firstResult.hasMore) {
+            continuePipelineBackgroundLoad(leads, {
+              total,
+              hasMore: firstResult.hasMore,
+            })
+          }
         } catch (error) {
           if (!cancelled) {
+            setPipelineLoad((prev) => ({ ...prev, backgroundLoading: false }))
             if (error?.status === 401) {
               setSessionError(error.message || 'Session expired. Please sign in again.')
             } else if (error?.message) {
@@ -329,8 +402,15 @@ export function AppProvider({ children }) {
     loadWorkspace()
     return () => {
       cancelled = true
+      abortPipelineBackgroundLoad()
     }
-  }, [user?.id, user?.organizationId, user?.accountType])
+  }, [
+    user?.id,
+    user?.organizationId,
+    user?.accountType,
+    abortPipelineBackgroundLoad,
+    continuePipelineBackgroundLoad,
+  ])
 
   const acceptPendingInvite = useCallback(async () => {
     const token = getStoredInviteToken()
@@ -677,6 +757,7 @@ export function AppProvider({ children }) {
         setSessionError,
         updateUser,
         savedLeads,
+        pipelineLoad,
         toggleSaveLead,
         updateSavedLeadCrm,
         addManualLead,

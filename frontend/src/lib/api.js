@@ -112,22 +112,34 @@ export const api = {
   deleteOrgLeadTag: (id) => request('/api/org/lead-tags', { method: 'DELETE', body: { id } }),
   updateMemberPermissions: (payload) =>
     request('/api/team/permissions', { method: 'PATCH', body: payload }),
-  getSavedLeads: async ({ silent = false, light = true, onBatch } = {}) => {
-    const PAGE_SIZE = 1000
+  /** One pipeline page (default 2000 rows, minimal list payload). */
+  fetchSavedLeadsPage: async ({ offset = 0, limit = 2000, light = true, silent = false } = {}) => {
+    const qs = new URLSearchParams({
+      limit: String(limit),
+      offset: String(offset),
+      light: light ? '1' : '0',
+    })
+    return request(`/api/saved-leads?${qs}`, { timeoutMs: 120_000 }, { silent })
+  },
+  /** Load every page (for explicit refresh). Prefer fetchSavedLeadsPage + background load in AppContext. */
+  getSavedLeads: async ({ silent = false, light = true } = {}) => {
+    const PAGE_SIZE = 2000
     let offset = 0
     let leads = []
     let total = 0
     for (let i = 0; i < 50; i += 1) {
-      const qs = new URLSearchParams({
-        limit: String(PAGE_SIZE),
-        offset: String(offset),
-        light: light ? '1' : '0',
-      })
-      const data = await request(`/api/saved-leads?${qs}`, { timeoutMs: 120_000 }, { silent })
+      const data = await request(
+        `/api/saved-leads?${new URLSearchParams({
+          limit: String(PAGE_SIZE),
+          offset: String(offset),
+          light: light ? '1' : '0',
+        })}`,
+        { timeoutMs: 120_000 },
+        { silent }
+      )
       total = typeof data.total === 'number' ? data.total : leads.length + (data.leads?.length || 0)
       const batch = data.leads || []
       leads = leads.concat(batch)
-      onBatch?.(leads.slice(), { total, hasMore: Boolean(data.hasMore), offset })
       if (!data.hasMore || batch.length === 0) break
       offset += batch.length
     }
