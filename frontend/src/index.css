@@ -664,6 +664,14 @@ body {
   border-collapse: collapse;
 }
 
+.marketing-canvas-html--interactive [data-ci-block-index]:hover {
+  background-color: rgba(13, 148, 136, 0.06);
+}
+
+.marketing-canvas-html--interactive [data-ci-block-index] a {
+  pointer-events: none;
+}
+
 .marketing-studio-canvas-label {
   position: absolute;
   top: 0.75rem;

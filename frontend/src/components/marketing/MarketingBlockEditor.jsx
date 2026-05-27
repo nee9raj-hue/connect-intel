@@ -390,15 +390,21 @@ export default function MarketingBlockEditor({ block, onChange, marketingForms =
           </select>
         </label>
         {block.formSource === 'google' ? (
-          <input
-            value={block.googleUrl || ''}
-            onChange={(e) => {
-              const googleUrl = normalizeGoogleFormUrl(e.target.value) || e.target.value
-              set({ googleUrl, url: normalizeGoogleFormUrl(e.target.value) || undefined })
-            }}
-            placeholder="https://docs.google.com/forms/d/…/viewform"
-            className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
-          />
+          <>
+            <input
+              value={block.googleUrl || ''}
+              onChange={(e) => {
+                const googleUrl = normalizeGoogleFormUrl(e.target.value) || e.target.value
+                set({ googleUrl, url: normalizeGoogleFormUrl(e.target.value) || undefined })
+              }}
+              placeholder="https://docs.google.com/forms/d/…/viewform"
+              className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
+            />
+            <p className="text-[10px] text-slate-500 leading-relaxed">
+              In email, Google Forms appear as a single button (recipients open the form in their browser).
+              Forms cannot be filled inside the email itself.
+            </p>
+          </>
         ) : (
           <select
             value={block.formId || ''}
@@ -413,19 +419,23 @@ export default function MarketingBlockEditor({ block, onChange, marketingForms =
             ))}
           </select>
         )}
-        <input
-          value={block.title || ''}
-          onChange={(e) => set({ title: e.target.value })}
-          placeholder="Card title in email"
-          className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
-        />
-        <textarea
-          value={block.description || ''}
-          onChange={(e) => set({ description: e.target.value })}
-          placeholder="Short description under the title"
-          rows={2}
-          className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
-        />
+        {block.formSource !== 'google' && (
+          <>
+            <input
+              value={block.title || ''}
+              onChange={(e) => set({ title: e.target.value })}
+              placeholder="Card title in email"
+              className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
+            />
+            <textarea
+              value={block.description || ''}
+              onChange={(e) => set({ description: e.target.value })}
+              placeholder="Short description under the title"
+              rows={2}
+              className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
+            />
+          </>
+        )}
         <input
           value={block.buttonLabel || ''}
           onChange={(e) => set({ buttonLabel: e.target.value })}

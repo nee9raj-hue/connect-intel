@@ -451,7 +451,12 @@ export function blocksToPlainText(blocks, lead = PREVIEW_LEAD) {
         break
       case 'form': {
         const url = block.url || block.resolvedFormUrl
-        if (block.title && url) parts.push(`${block.title}: ${url}`)
+        if (!url) break
+        const label =
+          block.formSource === 'google'
+            ? block.buttonLabel || block.title
+            : block.title
+        if (label) parts.push(`${label}: ${url}`)
         break
       }
       case 'image':
@@ -503,6 +508,18 @@ function canvasAppBase() {
 function resolveFormBlockUrlForRender(block, lead = null) {
   const prepared = applyFormBlockUrl(block, { lead, appBase: canvasAppBase() })
   return sanitizeUrl(prepared.url || resolveFormBlockUrl(prepared, { lead, appBase: canvasAppBase() }))
+}
+
+function wrapInteractiveCanvasRow(trHtml, blockIndex, renderOpts) {
+  if (!renderOpts.canvasInteractive || !trHtml?.startsWith('<tr')) return trHtml || ''
+  const selected = renderOpts.selectedBlockIndex === blockIndex
+  const selStyle = selected
+    ? 'outline:2px solid #0d9488;outline-offset:-2px;background-color:rgba(13,148,136,0.05);'
+    : ''
+  return trHtml.replace(
+    /^<tr>/i,
+    `<tr data-ci-block-index="${blockIndex}" data-ci-block-selectable="true" style="cursor:pointer;${selStyle}"`
+  )
 }
 
 function renderBlockHtml(block, theme, renderOpts = {}) {
@@ -601,12 +618,18 @@ function renderBlockHtml(block, theme, renderOpts = {}) {
         color: block.buttonTextColor || '#ffffff',
         fontWeight: '600',
       })
+      const isGoogle = block.formSource === 'google'
+      if (isGoogle && url) {
+        const label = btn || title
+        return `<tr><td style="padding:16px 32px;background:${bg};text-align:${align};">
+        <a href="${escapeHtml(url)}" data-ci-canvas-link="1" style="display:inline-block;padding:12px 24px;background:${bgColor};text-decoration:none;border-radius:8px;${btnStyle}">${escapeHtml(label)}</a>
+      </td></tr>`
+      }
       const titleStyle = textStyle(block, theme, { fontSize: 17, color: '#111827', fontWeight: '700' })
       const descStyle = textStyle(block, theme, { fontSize: 14, color: '#6b7280' })
-      const badge =
-        block.formSource === 'google'
-          ? '<span style="display:inline-block;font-size:11px;font-weight:600;color:#6b7280;margin-bottom:8px;">Google Form</span>'
-          : '<span style="display:inline-block;font-size:11px;font-weight:600;color:#6b7280;margin-bottom:8px;">Connect Intel form</span>'
+      const badge = isGoogle
+        ? '<span style="display:inline-block;font-size:11px;font-weight:600;color:#6b7280;margin-bottom:8px;">Google Form</span>'
+        : '<span style="display:inline-block;font-size:11px;font-weight:600;color:#6b7280;margin-bottom:8px;">Connect Intel form</span>'
       const borderStyle = url
         ? 'border:1px solid #e5e7eb;background:#fafafa;'
         : 'border:2px dashed #cbd5e1;background:#f8fafc;'
@@ -614,7 +637,7 @@ function renderBlockHtml(block, theme, renderOpts = {}) {
         ? ''
         : `<p style="margin:12px 0 0;font-size:12px;line-height:1.45;color:#94a3b8;${descStyle}">Select a form in the block editor (or paste a Google Form link).</p>`
       const btnHtml = url
-        ? `<a href="${escapeHtml(url)}" style="display:inline-block;padding:11px 20px;background:${bgColor};text-decoration:none;border-radius:8px;${btnStyle}">${escapeHtml(btn)}</a>`
+        ? `<a href="${escapeHtml(url)}" data-ci-canvas-link="1" style="display:inline-block;padding:11px 20px;background:${bgColor};text-decoration:none;border-radius:8px;${btnStyle}">${escapeHtml(btn)}</a>`
         : `<span style="display:inline-block;padding:11px 20px;background:${bgColor};opacity:0.85;border-radius:8px;${btnStyle}">${escapeHtml(btn)}</span>`
       return `<tr><td style="padding:16px 32px;background:${bg};text-align:${align};">
         <table role="presentation" cellspacing="0" cellpadding="0" style="width:100%;max-width:100%;${borderStyle}border-radius:12px;">
@@ -648,8 +671,17 @@ function buildEmailPresentation(blocks, design = {}, options = {}) {
   const width = Math.max(320, Math.min(720, Number(theme.contentWidth) || 600))
   const lead = options.lead ?? null
   const mergedBlocks = lead ? mergeBlocksForLead(blocks, lead, canvasAppBase()) : blocks || []
-  const renderOpts = { lead }
-  const rows = mergedBlocks.map((block) => renderBlockHtml(block, theme, renderOpts)).join('')
+  const renderOpts = {
+    lead,
+    canvasInteractive: Boolean(options.canvasInteractive),
+    selectedBlockIndex: options.selectedBlockIndex ?? -1,
+  }
+  const rows = mergedBlocks
+    .map((block, index) => {
+      const html = renderBlockHtml(block, theme, renderOpts)
+      return wrapInteractiveCanvasRow(html, index, renderOpts)
+    })
+    .join('')
   const preview = options.previewText
     ? `<span style="display:none!important;visibility:hidden;opacity:0;color:transparent;height:0;width:0;">${escapeHtml(options.previewText)}</span>`
     : ''
@@ -662,7 +694,12 @@ function buildEmailPresentation(blocks, design = {}, options = {}) {
 /** Inline HTML for the visual builder canvas (natural document height, page scroll). */
 export function renderEmailCanvasHtml(blocks, design = {}, options = {}) {
   const lead = options.lead ?? PREVIEW_LEAD
-  const { theme, preview, outerTable } = buildEmailPresentation(blocks, design, { ...options, lead })
+  const { theme, preview, outerTable } = buildEmailPresentation(blocks, design, {
+    ...options,
+    lead,
+    canvasInteractive: true,
+    selectedBlockIndex: options.selectedBlockIndex ?? -1,
+  })
   return `${preview}<div class="marketing-email-canvas-root" style="margin:0;padding:0;background:${theme.backgroundColor};font-family:${theme.fontFamily};">${outerTable}</div>`
 }
 

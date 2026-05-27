@@ -186,9 +186,20 @@ export default function MarketingTemplateBuilder({
     () =>
       renderEmailCanvasHtml(value.blocks || [], value.design || DEFAULT_THEME, {
         previewText: value.previewText,
+        selectedBlockIndex,
       }),
-    [value.blocks, value.design, value.previewText]
+    [value.blocks, value.design, value.previewText, selectedBlockIndex]
   )
+
+  const handleCanvasBlockClick = (e) => {
+    const row = e.target.closest('[data-ci-block-index]')
+    if (!row) return
+    if (e.target.closest('a')) e.preventDefault()
+    const idx = Number(row.getAttribute('data-ci-block-index'))
+    if (Number.isNaN(idx)) return
+    setSelectedBlockIndex(idx)
+    setInspectorOpen(true)
+  }
 
   const moveBlock = (index, dir) => {
     const next = index + dir
@@ -504,27 +515,20 @@ export default function MarketingTemplateBuilder({
       onDragOver={handleCanvasDragOver}
       onDrop={handleCanvasDrop}
     >
-      <span className="marketing-studio-canvas-label">Email canvas — drag blocks here</span>
+      <span className="marketing-studio-canvas-label">Click a block to edit · drag new blocks here</span>
       <div className="marketing-studio-canvas-inner">
         <div
           className={`marketing-email-frame-wrap ${previewMode === 'mobile' ? 'is-mobile' : ''}`}
           style={previewMode === 'desktop' ? { maxWidth: emailWidth } : undefined}
         >
-          {pageScroll ? (
-            <div
-              className="marketing-canvas-html bg-white shadow-xl rounded-lg border border-slate-200/80 overflow-hidden"
-              role="document"
-              aria-label="Email canvas"
-              dangerouslySetInnerHTML={{ __html: canvasHtml }}
-            />
-          ) : (
-            <iframe
-              title="Email canvas"
-              srcDoc={previewHtml}
-              className="bg-white shadow-xl rounded-lg border border-slate-200/80"
-              style={{ width: '100%', minHeight: 560, height: 560, border: 'none' }}
-            />
-          )}
+          <div
+            className="marketing-canvas-html marketing-canvas-html--interactive bg-white shadow-xl rounded-lg border border-slate-200/80 overflow-hidden"
+            role="document"
+            aria-label="Email canvas"
+            onClick={handleCanvasBlockClick}
+            dangerouslySetInnerHTML={{ __html: canvasHtml }}
+            style={!pageScroll ? { minHeight: 560 } : undefined}
+          />
         </div>
       </div>
     </main>
