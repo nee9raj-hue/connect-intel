@@ -480,7 +480,9 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
   return (
     <div
       className={`panel-shell ${
-        tab === 'campaigns' || tab === 'templates' ? 'marketing-campaigns-shell' : 'bg-[#f0f4f8]'
+        isBuilderTab
+          ? 'marketing-campaigns-shell panel-scroll-page'
+          : 'bg-[#f0f4f8]'
       }`}
     >
       <header
@@ -603,8 +605,8 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
 
       <div
         className={
-          tab === 'campaigns' || tab === 'templates'
-            ? 'panel-body-scroll flex flex-col min-h-0 px-2 sm:px-3 py-1.5'
+          isBuilderTab
+            ? 'panel-body-scroll px-2 sm:px-3 py-1.5 pb-8'
             : 'panel-body-scroll px-4 sm:px-6 py-4'
         }
       >
@@ -893,7 +895,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
               <summary className="cursor-pointer list-none px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50/80">
                 All campaigns ({campaigns.length}) — click to expand
               </summary>
-              <div className="px-4 pb-3 border-t border-slate-100 max-h-[200px] overflow-y-auto">
+              <div className="px-4 pb-3 border-t border-slate-100">
               {!campaigns.length ? (
                 <p className="text-xs text-gray-500 py-2">No campaigns yet.</p>
               ) : (
