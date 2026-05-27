@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { api } from '../../lib/api'
+import { parseTagNamesInput } from '../../lib/orgLeadTags'
 
 const PRESET_COLORS = [
   '#2563eb',
@@ -23,6 +24,9 @@ export default function OrgLeadTagsPanel({ onTagsChange }) {
   const [editingId, setEditingId] = useState(null)
   const [editName, setEditName] = useState('')
 
+  const pendingNames = useMemo(() => parseTagNamesInput(name), [name])
+  const isBulk = pendingNames.length > 1
+
   const load = useCallback(async () => {
     setLoading(true)
     setError(null)
@@ -44,18 +48,31 @@ export default function OrgLeadTagsPanel({ onTagsChange }) {
 
   const handleCreate = async (e) => {
     e.preventDefault()
-    const trimmed = name.trim()
-    if (!trimmed) return
+    const names = parseTagNamesInput(name)
+    if (!names.length) return
     setBusy(true)
     setError(null)
     setNotice(null)
     try {
-      const data = await api.createOrgLeadTag({ name: trimmed, color: color || PRESET_COLORS[0] })
+      const payload =
+        names.length === 1 ? { name: names[0], color: color || PRESET_COLORS[0] } : { names }
+      const data = await api.createOrgLeadTag(payload)
       const next = data.tags || []
       setTags(next)
       onTagsChange?.(next)
       setName('')
-      setNotice(`Tag “${data.tag?.name || trimmed}” created`)
+
+      const created = data.created || (data.tag ? [data.tag] : [])
+      const skipped = data.skipped || []
+      if (created.length > 1) {
+        setNotice(
+          `Created ${created.length} tags${skipped.length ? ` (${skipped.length} skipped — already exist)` : ''}`
+        )
+      } else if (created.length === 1) {
+        setNotice(`Tag “${created[0].name}” created`)
+      } else if (skipped.length) {
+        setError('Those tag names already exist')
+      }
     } catch (e) {
       setError(e.message || 'Could not create tag')
     } finally {
@@ -109,8 +126,9 @@ export default function OrgLeadTagsPanel({ onTagsChange }) {
       <div>
         <h2 className="text-sm font-semibold text-gray-900">Lead tags</h2>
         <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-          Create labels for your team (e.g. B2B, B2C, UK, Air). Anyone on the team can tag leads; only admins
-          manage the tag list here.
+          Add one tag or several at once separated by commas (e.g.{' '}
+          <span className="font-medium text-gray-700">B2B, B2C, UK, USA, Air, Ocean</span>). Each tag gets its
+          own color. Anyone on the team can tag leads; only admins manage the list here.
         </p>
       </div>
 
@@ -123,38 +141,50 @@ export default function OrgLeadTagsPanel({ onTagsChange }) {
         </p>
       )}
 
-      <form onSubmit={handleCreate} className="flex flex-wrap items-end gap-2">
-        <div className="flex-1 min-w-[140px]">
-          <label className="block text-[10px] font-semibold uppercase text-gray-400 mb-1">New tag</label>
+      <form onSubmit={handleCreate} className="space-y-2">
+        <div>
+          <label className="block text-[10px] font-semibold uppercase text-gray-400 mb-1">
+            New tag{isBulk ? 's' : ''}
+          </label>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="e.g. B2B, Ocean, USA"
-            maxLength={48}
+            placeholder="B2B, B2C, UK, USA, Air, Ocean"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
           />
+          {pendingNames.length > 0 && (
+            <p className="text-[10px] text-gray-500 mt-1">
+              {isBulk
+                ? `Will create ${pendingNames.length} tags with different colors`
+                : 'One tag — pick a color below (optional)'}
+            </p>
+          )}
         </div>
-        <div>
-          <label className="block text-[10px] font-semibold uppercase text-gray-400 mb-1">Color</label>
-          <div className="flex gap-1">
-            {PRESET_COLORS.map((c) => (
-              <button
-                key={c}
-                type="button"
-                onClick={() => setColor(c)}
-                className={`w-6 h-6 rounded-full border-2 ${color === c ? 'border-gray-900 scale-110' : 'border-transparent'}`}
-                style={{ backgroundColor: c }}
-                title={c}
-              />
-            ))}
+
+        {!isBulk && (
+          <div>
+            <label className="block text-[10px] font-semibold uppercase text-gray-400 mb-1">Color</label>
+            <div className="flex gap-1 flex-wrap">
+              {PRESET_COLORS.map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => setColor(c)}
+                  className={`w-6 h-6 rounded-full border-2 ${color === c ? 'border-gray-900 scale-110' : 'border-transparent'}`}
+                  style={{ backgroundColor: c }}
+                  title={c}
+                />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
+
         <button
           type="submit"
-          disabled={busy || !name.trim()}
+          disabled={busy || !pendingNames.length}
           className="text-xs font-semibold px-3 py-2 bg-gray-900 text-white rounded-lg disabled:opacity-50"
         >
-          Add tag
+          {busy ? 'Adding…' : isBulk ? `Add ${pendingNames.length} tags` : 'Add tag'}
         </button>
       </form>
 

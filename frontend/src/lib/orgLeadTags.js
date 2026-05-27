@@ -1,3 +1,18 @@
+/** Split comma, semicolon, or newline-separated tag input. */
+export function parseTagNamesInput(input) {
+  const seen = new Set()
+  const names = []
+  for (const part of String(input || '').split(/[,;\n]+/)) {
+    const trimmed = part.trim()
+    if (!trimmed) continue
+    const key = trimmed.toLowerCase()
+    if (seen.has(key)) continue
+    seen.add(key)
+    names.push(trimmed)
+  }
+  return names
+}
+
 export function tagMapById(tags = []) {
   const map = new Map()
   for (const tag of tags || []) {
