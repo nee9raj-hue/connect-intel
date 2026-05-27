@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import MarketingCreatorBadge from './MarketingCreatorBadge'
 import {
   BLOCK_LABELS,
@@ -32,6 +32,70 @@ const STUDIO_RAIL = [
   { id: 'styles', label: 'Styles', icon: '◐' },
   { id: 'presets', label: 'Layouts', icon: '☰' },
 ]
+
+const CANVAS_IFRAME_MIN_HEIGHT = 520
+
+/** Expand iframe to full rendered email height (no inner scrollbar). */
+function EmailCanvasIframe({ srcDoc, title, className, minHeight = CANVAS_IFRAME_MIN_HEIGHT }) {
+  const iframeRef = useRef(null)
+  const [height, setHeight] = useState(minHeight)
+
+  const syncHeight = useCallback(() => {
+    const iframe = iframeRef.current
+    if (!iframe) return
+    try {
+      const doc = iframe.contentDocument || iframe.contentWindow?.document
+      if (!doc) return
+      const body = doc.body
+      const html = doc.documentElement
+      const contentHeight = Math.max(
+        body?.scrollHeight || 0,
+        body?.offsetHeight || 0,
+        html?.scrollHeight || 0,
+        html?.offsetHeight || 0,
+        minHeight
+      )
+      setHeight(contentHeight + 16)
+    } catch {
+      setHeight(minHeight)
+    }
+  }, [minHeight])
+
+  useEffect(() => {
+    setHeight(minHeight)
+  }, [srcDoc, minHeight])
+
+  useEffect(() => {
+    const iframe = iframeRef.current
+    if (!iframe) return undefined
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(() => syncHeight()) : null
+    try {
+      const doc = iframe.contentDocument
+      if (doc?.body && ro) ro.observe(doc.body)
+    } catch {
+      /* srcDoc same-origin; ignore */
+    }
+    return () => ro?.disconnect()
+  }, [srcDoc, syncHeight])
+
+  return (
+    <iframe
+      ref={iframeRef}
+      title={title}
+      srcDoc={srcDoc}
+      className={className}
+      scrolling="no"
+      style={{
+        width: '100%',
+        height,
+        minHeight,
+        border: 'none',
+        display: 'block',
+      }}
+      onLoad={syncHeight}
+    />
+  )
+}
 
 const FOLLOW_UP_STARTER = {
   subject: 'Following up, {{firstName}}',
@@ -490,10 +554,11 @@ export default function MarketingTemplateBuilder({
           className={`marketing-email-frame-wrap ${previewMode === 'mobile' ? 'is-mobile' : ''}`}
           style={previewMode === 'desktop' ? { maxWidth: emailWidth } : undefined}
         >
-          <iframe
+          <EmailCanvasIframe
             title="Email canvas"
             srcDoc={previewHtml}
-            className="bg-white shadow-xl rounded-lg border border-slate-200/80"
+            className="bg-white shadow-xl rounded-lg border border-slate-200/80 marketing-canvas-iframe"
+            minHeight={CANVAS_IFRAME_MIN_HEIGHT}
           />
         </div>
       </div>
