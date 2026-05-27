@@ -334,22 +334,35 @@ function NavGroup({
 
   if (!hasChildren) {
     const target = { panel: group.panel, tab: group.tab, status: group.status, upcomingOnly: group.upcomingOnly }
+    const active = isTargetActive(target)
+    if (compact) {
+      return (
+        <RailFlyoutAnchor
+          label={group.label}
+          icon={Icon}
+          active={active}
+          muted={muted}
+          badge={badge}
+          leaf
+          onNavigate={() => onGo(target)}
+        />
+      )
+    }
     return (
       <NavBtn
         label={group.label}
         icon={Icon}
-        active={isTargetActive(target)}
+        active={active}
         onClick={() => onGo(target)}
         badge={badge}
         muted={muted}
-        compact={compact}
       />
     )
   }
 
   if (compact) {
     return (
-      <RailNavPopup label={group.label} groupActive={groupActive} muted={muted} badge={badge} icon={Icon}>
+      <RailFlyoutAnchor label={group.label} active={groupActive} muted={muted} badge={badge} icon={Icon}>
         {group.children.map((child) => (
           <NavSubBtn
             key={child.id}
@@ -360,7 +373,7 @@ function NavGroup({
             inRailFlyout
           />
         ))}
-      </RailNavPopup>
+      </RailFlyoutAnchor>
     )
   }
 
@@ -400,20 +413,30 @@ function NavGroup({
   )
 }
 
-function RailNavPopup({ label, groupActive, muted, badge, icon: Icon, children }) {
+function RailFlyoutAnchor({
+  label,
+  active: itemActive = false,
+  muted,
+  badge,
+  icon: Icon,
+  children,
+  leaf = false,
+  onNavigate,
+}) {
   const [open, setOpen] = useState(false)
   const [flyoutPos, setFlyoutPos] = useState(null)
   const rootRef = useRef(null)
   const flyoutRef = useRef(null)
   const closeTimerRef = useRef(null)
+  const hasMenu = !leaf && Boolean(children)
 
   const updateFlyoutPos = useCallback(() => {
     const anchor = rootRef.current
     if (!anchor) return
     const rect = anchor.getBoundingClientRect()
     const gap = 8
-    const panelWidth = 224
-    const panelMaxHeight = Math.min(window.innerHeight * 0.65, 360)
+    const panelWidth = leaf ? 200 : 224
+    const panelMaxHeight = leaf ? 120 : Math.min(window.innerHeight * 0.65, 360)
     let left = rect.right + gap
     let top = rect.top
     if (left + panelWidth > window.innerWidth - 8) {
@@ -480,15 +503,27 @@ function RailNavPopup({ label, groupActive, muted, badge, icon: Icon, children }
     }, 120)
   }
 
+  const handleIconClick = () => {
+    clearCloseTimer()
+    if (leaf && onNavigate) {
+      onNavigate()
+      closeNow()
+      return
+    }
+    setOpen((v) => !v)
+  }
+
   const popup =
     open &&
     flyoutPos &&
     createPortal(
       <div
         ref={flyoutRef}
-        role="menu"
+        role={hasMenu ? 'menu' : 'dialog'}
         aria-label={label}
-        className="sidebar-rail-flyout fixed z-[250] min-w-[204px] max-w-[240px] rounded-2xl border border-[#3a3836] bg-[#2b2928] py-1 shadow-[0_16px_40px_rgba(0,0,0,0.45)]"
+        className={`sidebar-rail-flyout fixed z-[250] rounded-2xl border border-[#3a3836] bg-[#2b2928] py-1 shadow-[0_16px_40px_rgba(0,0,0,0.45)] ${
+          leaf ? 'min-w-[188px] max-w-[220px]' : 'min-w-[204px] max-w-[240px]'
+        }`}
         style={{ top: flyoutPos.top, left: flyoutPos.left }}
         onMouseEnter={openNow}
         onMouseLeave={closeSoon}
@@ -499,9 +534,40 @@ function RailNavPopup({ label, groupActive, muted, badge, icon: Icon, children }
         <p className="sidebar-rail-flyout__title border-b border-[#3a3836] px-3 py-2 text-[11px] font-semibold tracking-[-0.02em] text-white">
           {label}
         </p>
-        <div className="sidebar-rail-flyout__items max-h-[min(65vh,360px)] overflow-y-auto p-1.5 space-y-0.5">
-          {children}
-        </div>
+        {leaf ? (
+          <div className="sidebar-rail-flyout__items p-1.5">
+            <button
+              type="button"
+              onClick={() => {
+                onNavigate?.()
+                closeNow()
+              }}
+              className={`sidebar-rail-flyout__leaf w-full flex items-center gap-2.5 px-2.5 py-2.5 rounded-xl text-[12px] font-medium tracking-[-0.015em] transition-colors ${
+                itemActive
+                  ? 'nav-sub-active'
+                  : muted
+                    ? 'text-[#9aa3ac] hover:bg-white/8 hover:text-white'
+                    : 'text-[#e8ecef] hover:bg-white/8 hover:text-white'
+              }`}
+            >
+              <Icon className={`w-4 h-4 shrink-0 ${itemActive ? 'text-[#17191c]' : 'text-[#aab3bb]'}`} />
+              <span className="flex-1 text-left truncate">{label}</span>
+              {badge != null && (
+                <span
+                  className={`shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-bold tabular-nums ${
+                    itemActive ? 'bg-[#17191c]/10 text-[#17191c]' : 'bg-white/14 text-white'
+                  }`}
+                >
+                  {badge > 99 ? '99+' : badge}
+                </span>
+              )}
+            </button>
+          </div>
+        ) : (
+          <div className="sidebar-rail-flyout__items max-h-[min(65vh,360px)] overflow-y-auto p-1.5 space-y-0.5">
+            {children}
+          </div>
+        )}
       </div>,
       document.body
     )
@@ -515,28 +581,24 @@ function RailNavPopup({ label, groupActive, muted, badge, icon: Icon, children }
     >
       <button
         type="button"
-        title={label}
         aria-expanded={open}
-        aria-haspopup="menu"
+        aria-haspopup={hasMenu ? 'menu' : 'true'}
         onFocus={openNow}
         onBlur={closeSoon}
-        onClick={() => {
-          clearCloseTimer()
-          setOpen((v) => !v)
-        }}
+        onClick={handleIconClick}
         className={`relative w-full flex justify-center items-center rounded-2xl p-2.5 transition-colors ${
-          groupActive || open
+          itemActive || open
             ? 'nav-item-active'
             : muted
               ? 'text-[#808892] hover:bg-white/6'
               : 'text-[#d4d9de] hover:bg-white/6 hover:text-white'
         }`}
       >
-        <Icon className={`w-5 h-5 shrink-0 ${groupActive || open ? 'text-[#17191c]' : 'text-[#aab3bb]'}`} />
+        <Icon className={`w-5 h-5 shrink-0 ${itemActive || open ? 'text-[#17191c]' : 'text-[#aab3bb]'}`} />
         {badge != null && (
           <span
             className={`absolute top-1 right-1 flex h-[14px] min-w-[14px] items-center justify-center rounded-full px-0.5 text-[8px] font-bold ${
-              groupActive || open ? 'bg-[#17191c] text-white' : 'bg-white/20 text-white'
+              itemActive || open ? 'bg-[#17191c] text-white' : 'bg-white/20 text-white'
             }`}
           >
             {badge > 99 ? '99+' : badge}
@@ -548,35 +610,7 @@ function RailNavPopup({ label, groupActive, muted, badge, icon: Icon, children }
   )
 }
 
-function NavBtn({ label, icon: Icon, active, onClick, badge, muted = false, compact = false }) {
-  if (compact) {
-    return (
-      <button
-        type="button"
-        onClick={onClick}
-        title={label}
-        className={`relative w-full flex justify-center items-center rounded-2xl p-2.5 mb-1 transition-colors ${
-          active
-            ? 'nav-item-active'
-            : muted
-              ? 'text-[#808892] hover:bg-white/6'
-              : 'text-[#d4d9de] hover:bg-white/6 hover:text-white'
-        }`}
-      >
-        <Icon className={`w-5 h-5 shrink-0 ${active ? 'text-[#17191c]' : 'text-[#aab3bb]'}`} />
-        {badge != null && (
-          <span
-            className={`absolute top-1 right-1 flex h-[14px] min-w-[14px] items-center justify-center rounded-full px-0.5 text-[8px] font-bold ${
-              active ? 'bg-[#17191c] text-white' : 'bg-white/18 text-white'
-            }`}
-          >
-            {badge > 99 ? '99+' : badge}
-          </span>
-        )}
-      </button>
-    )
-  }
-
+function NavBtn({ label, icon: Icon, active, onClick, badge, muted = false }) {
   return (
     <button
       type="button"
