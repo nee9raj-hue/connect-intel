@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import MarketingCreatorBadge from './MarketingCreatorBadge'
 import {
   BLOCK_LABELS,
@@ -8,6 +8,7 @@ import {
   STARTER_TEMPLATES,
   createBlock,
   duplicateBlock,
+  renderEmailCanvasHtml,
   renderEmailHtml,
   reorderBlocks,
 } from '../../lib/marketingEmailDesign'
@@ -32,70 +33,6 @@ const STUDIO_RAIL = [
   { id: 'styles', label: 'Styles', icon: '◐' },
   { id: 'presets', label: 'Layouts', icon: '☰' },
 ]
-
-const CANVAS_IFRAME_MIN_HEIGHT = 520
-
-/** Expand iframe to full rendered email height (no inner scrollbar). */
-function EmailCanvasIframe({ srcDoc, title, className, minHeight = CANVAS_IFRAME_MIN_HEIGHT }) {
-  const iframeRef = useRef(null)
-  const [height, setHeight] = useState(minHeight)
-
-  const syncHeight = useCallback(() => {
-    const iframe = iframeRef.current
-    if (!iframe) return
-    try {
-      const doc = iframe.contentDocument || iframe.contentWindow?.document
-      if (!doc) return
-      const body = doc.body
-      const html = doc.documentElement
-      const contentHeight = Math.max(
-        body?.scrollHeight || 0,
-        body?.offsetHeight || 0,
-        html?.scrollHeight || 0,
-        html?.offsetHeight || 0,
-        minHeight
-      )
-      setHeight(contentHeight + 16)
-    } catch {
-      setHeight(minHeight)
-    }
-  }, [minHeight])
-
-  useEffect(() => {
-    setHeight(minHeight)
-  }, [srcDoc, minHeight])
-
-  useEffect(() => {
-    const iframe = iframeRef.current
-    if (!iframe) return undefined
-    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(() => syncHeight()) : null
-    try {
-      const doc = iframe.contentDocument
-      if (doc?.body && ro) ro.observe(doc.body)
-    } catch {
-      /* srcDoc same-origin; ignore */
-    }
-    return () => ro?.disconnect()
-  }, [srcDoc, syncHeight])
-
-  return (
-    <iframe
-      ref={iframeRef}
-      title={title}
-      srcDoc={srcDoc}
-      className={className}
-      scrolling="no"
-      style={{
-        width: '100%',
-        height,
-        minHeight,
-        border: 'none',
-        display: 'block',
-      }}
-      onLoad={syncHeight}
-    />
-  )
-}
 
 const FOLLOW_UP_STARTER = {
   subject: 'Following up, {{firstName}}',
@@ -239,6 +176,14 @@ export default function MarketingTemplateBuilder({
     [value.blocks, value.design, value.previewText]
   )
 
+  const canvasHtml = useMemo(
+    () =>
+      renderEmailCanvasHtml(value.blocks || [], value.design || DEFAULT_THEME, {
+        previewText: value.previewText,
+      }),
+    [value.blocks, value.design, value.previewText]
+  )
+
   const moveBlock = (index, dir) => {
     const next = index + dir
     if (next < 0 || next >= (value.blocks || []).length) return
@@ -339,6 +284,7 @@ export default function MarketingTemplateBuilder({
       ? 'Build with blocks — drag to reorder, duplicate, and preview live.'
       : 'Drag blocks to reorder — use Insert icon inside text blocks for inline icons.')
 
+  const pageScroll = fillHeight
   const studio = fillHeight
 
   const sideTabHint =
@@ -554,12 +500,21 @@ export default function MarketingTemplateBuilder({
           className={`marketing-email-frame-wrap ${previewMode === 'mobile' ? 'is-mobile' : ''}`}
           style={previewMode === 'desktop' ? { maxWidth: emailWidth } : undefined}
         >
-          <EmailCanvasIframe
-            title="Email canvas"
-            srcDoc={previewHtml}
-            className="bg-white shadow-xl rounded-lg border border-slate-200/80 marketing-canvas-iframe"
-            minHeight={CANVAS_IFRAME_MIN_HEIGHT}
-          />
+          {pageScroll ? (
+            <div
+              className="marketing-canvas-html bg-white shadow-xl rounded-lg border border-slate-200/80 overflow-hidden"
+              role="document"
+              aria-label="Email canvas"
+              dangerouslySetInnerHTML={{ __html: canvasHtml }}
+            />
+          ) : (
+            <iframe
+              title="Email canvas"
+              srcDoc={previewHtml}
+              className="bg-white shadow-xl rounded-lg border border-slate-200/80"
+              style={{ width: '100%', minHeight: 560, height: 560, border: 'none' }}
+            />
+          )}
         </div>
       </div>
     </main>
@@ -746,7 +701,7 @@ export default function MarketingTemplateBuilder({
       <div
         className={
           studio
-            ? 'marketing-studio marketing-studio--flow'
+            ? 'marketing-studio marketing-studio--page'
             : 'ci-card min-h-[560px] flex flex-col'
         }
       >

@@ -622,7 +622,7 @@ function renderBlockHtml(block, theme) {
   }
 }
 
-export function renderEmailHtml(blocks, design = {}, options = {}) {
+function buildEmailPresentation(blocks, design = {}, options = {}) {
   const theme = { ...DEFAULT_THEME, ...design }
   const width = Math.max(320, Math.min(720, Number(theme.contentWidth) || 600))
   const mergedBlocks = options.lead ? mergeBlocksForLead(blocks, options.lead) : blocks || []
@@ -630,13 +630,22 @@ export function renderEmailHtml(blocks, design = {}, options = {}) {
   const preview = options.previewText
     ? `<span style="display:none!important;visibility:hidden;opacity:0;color:transparent;height:0;width:0;">${escapeHtml(options.previewText)}</span>`
     : ''
+  const footer = `<tr><td style="padding:0 32px 24px;background:#ffffff;text-align:center;border-top:1px solid #f3f4f6;"><p style="margin:12px 0 0;font-size:11px;line-height:1.5;color:#9ca3af;">Your company · Unsubscribe link added when sent</p></td></tr>`
+  const innerTable = `<table role="presentation" width="${width}" cellspacing="0" cellpadding="0" style="max-width:${width}px;width:100%;background:${theme.contentBackground};border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06);">${rows}${footer}</table>`
+  const outerTable = `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:${theme.backgroundColor};padding:24px 12px;"><tr><td align="center">${innerTable}</td></tr></table>`
+  return { theme, width, preview, outerTable }
+}
 
+/** Inline HTML for the visual builder canvas (natural document height, page scroll). */
+export function renderEmailCanvasHtml(blocks, design = {}, options = {}) {
+  const { theme, preview, outerTable } = buildEmailPresentation(blocks, design, options)
+  return `${preview}<div class="marketing-email-canvas-root" style="margin:0;padding:0;background:${theme.backgroundColor};font-family:${theme.fontFamily};">${outerTable}</div>`
+}
+
+export function renderEmailHtml(blocks, design = {}, options = {}) {
+  const { theme, preview, outerTable } = buildEmailPresentation(blocks, design, options)
   return `<!DOCTYPE html><html><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /></head>
-<body style="margin:0;padding:0;background:${theme.backgroundColor};font-family:${theme.fontFamily};">${preview}
-<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:${theme.backgroundColor};padding:24px 12px;">
-<tr><td align="center"><table role="presentation" width="${width}" cellspacing="0" cellpadding="0" style="max-width:${width}px;width:100%;background:${theme.contentBackground};border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06);">${rows}
-<tr><td style="padding:0 32px 24px;background:#ffffff;text-align:center;border-top:1px solid #f3f4f6;"><p style="margin:12px 0 0;font-size:11px;line-height:1.5;color:#9ca3af;">Your company · Unsubscribe link added when sent</p></td></tr>
-</table></td></tr></table></body></html>`
+<body style="margin:0;padding:0;background:${theme.backgroundColor};font-family:${theme.fontFamily};">${preview}${outerTable}</body></html>`
 }
 
 export function createBlock(type) {

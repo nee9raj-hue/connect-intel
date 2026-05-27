@@ -480,9 +480,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
   return (
     <div
       className={`panel-shell ${
-        isBuilderTab
-          ? 'marketing-campaigns-shell panel-scroll-page'
-          : 'bg-[#f0f4f8]'
+        isBuilderTab ? 'marketing-campaigns-shell' : 'bg-[#f0f4f8]'
       }`}
     >
       <header

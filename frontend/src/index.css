@@ -97,26 +97,23 @@ body {
   overscroll-behavior-y: contain;
 }
 
+/* Marketing campaigns/templates: header fixed, body scrolls, builder grows naturally */
 .marketing-campaigns-shell.panel-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
   background: var(--color-ci-page);
 }
 
-/* Campaigns + Templates: scroll the whole page (no nested viewport trap) */
-.marketing-campaigns-shell.panel-scroll-page {
-  display: block;
-  height: 100%;
+.marketing-campaigns-shell .panel-body-scroll {
+  flex: 1 1 0%;
   min-height: 0;
   overflow-x: hidden;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
-}
-
-.marketing-campaigns-shell.panel-scroll-page .panel-body-scroll {
-  display: block;
-  flex: none;
-  min-height: auto;
-  overflow: visible;
 }
 
 .marketing-workspace {
@@ -267,63 +264,86 @@ body {
   border-radius: 10px;
 }
 
-/* Full-page scroll layout (campaigns + templates tabs) */
-.marketing-campaigns-shell .marketing-studio--flow {
+/* Page-scroll builder (campaigns + templates): no nested traps, tall canvas */
+.marketing-campaigns-shell .marketing-studio--page {
+  display: flex;
+  flex-direction: column;
   flex: none;
   width: 100%;
-  min-height: max(720px, calc(100dvh - 200px));
-  max-height: none !important;
   height: auto;
+  min-height: calc(100dvh - 12rem);
+  max-height: none !important;
   overflow: visible;
   border-radius: 12px;
 }
 
-.marketing-campaigns-shell .marketing-studio--flow .marketing-studio-body {
+.marketing-campaigns-shell .marketing-studio--page .marketing-studio-body {
+  display: flex;
   flex: 1 1 auto;
-  min-height: max(640px, calc(100dvh - 280px));
+  width: 100%;
+  min-height: calc(100dvh - 15rem);
   max-height: none !important;
   height: auto;
   align-items: stretch;
+  overflow: visible;
 }
 
-.marketing-campaigns-shell .marketing-studio--flow .marketing-studio-canvas {
+.marketing-campaigns-shell .marketing-studio--page .marketing-studio-canvas {
   flex: 1 1 auto;
-  min-height: max(560px, calc(100dvh - 320px));
   min-width: 0;
+  min-height: calc(100dvh - 17rem);
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
 }
 
-.marketing-campaigns-shell .marketing-studio--flow .marketing-studio-canvas-inner {
+.marketing-campaigns-shell .marketing-studio--page .marketing-studio-canvas-inner {
   flex: 1 1 auto;
-  overflow: visible !important;
-  min-height: max(520px, calc(100dvh - 360px));
-  padding: 1.25rem 1.5rem 2rem;
+  display: flex;
+  justify-content: center;
   align-items: flex-start;
+  overflow: visible !important;
+  min-height: calc(100dvh - 19rem);
+  padding: 1.5rem 1.5rem 2.5rem;
 }
 
-.marketing-campaigns-shell .marketing-studio--flow .marketing-email-frame-wrap {
-  min-height: auto;
-  height: auto;
-  flex: none;
+.marketing-campaigns-shell .marketing-studio--page .marketing-email-frame-wrap {
   width: 100%;
+  flex: none;
+  min-height: calc(100dvh - 21rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 
-.marketing-campaigns-shell .marketing-studio--flow .marketing-canvas-iframe,
-.marketing-campaigns-shell .marketing-studio--flow .marketing-email-frame-wrap iframe {
-  max-height: none !important;
-  height: auto;
-  flex: none !important;
-}
-
-.marketing-campaigns-shell .marketing-studio--flow .marketing-studio-inspector {
-  align-self: stretch;
-  max-height: none;
-}
-
-.marketing-campaigns-shell .marketing-studio--flow .marketing-studio-inspector-body {
+.marketing-campaigns-shell .marketing-studio--page .marketing-canvas-html {
+  width: 100%;
   flex: 1 1 auto;
-  min-height: 12rem;
+  min-height: calc(100dvh - 22rem);
+}
+
+.marketing-campaigns-shell .marketing-studio--page .marketing-email-canvas-root {
+  min-height: calc(100dvh - 22rem);
+}
+
+.marketing-campaigns-shell .marketing-studio--page .marketing-studio-inspector {
+  align-self: stretch;
+}
+
+.marketing-campaigns-shell .marketing-studio--page .marketing-studio-inspector-body {
+  flex: 1 1 auto;
+  min-height: 10rem;
   max-height: none;
   overflow-y: auto;
+}
+
+.marketing-campaigns-shell .marketing-studio--page .marketing-studio-panel {
+  align-self: stretch;
+}
+
+.marketing-campaigns-shell .marketing-studio--page .marketing-studio-panel-scroll {
+  max-height: none;
+  flex: 1 1 auto;
 }
 
 .marketing-studio-toolbar {
@@ -484,8 +504,17 @@ body {
   border: none;
 }
 
-.marketing-campaigns-shell .marketing-canvas-iframe {
+.marketing-campaigns-shell .marketing-email-frame-wrap iframe {
   max-height: none !important;
+}
+
+.marketing-canvas-html {
+  width: 100%;
+  line-height: 1.5;
+}
+
+.marketing-canvas-html table {
+  border-collapse: collapse;
 }
 
 .marketing-studio-canvas-label {
