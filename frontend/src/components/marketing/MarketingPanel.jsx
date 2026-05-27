@@ -12,7 +12,6 @@ import WhatsAppInboxPanel from './WhatsAppInboxPanel'
 import MarketingCreatorBadge, { marketingOptionLabel } from './MarketingCreatorBadge'
 import WorkEmailOptions from '../team/WorkEmailOptions'
 import { LOADING_MESSAGES } from '../../lib/loadingQuotes'
-import { withTimeout } from '../../lib/fetchWithTimeout'
 import { leadHasCallablePhone } from '../../lib/phoneUtils'
 
 const TABS = [
@@ -117,7 +116,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
     setLoading(true)
     setError(null)
     try {
-      const data = await withTimeout(api.getMarketingOverview(), 25_000)
+      const data = await api.getMarketingOverview({ light: true, timeoutMs: 60_000 })
       setLists(data.lists || [])
       setTemplates(data.templates || [])
       setCampaigns(data.campaigns || [])
@@ -415,7 +414,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
       try {
         return await api.processMarketingCampaignSends(campaignId, {
           limit: 1,
-          timeoutMs: 90_000,
+          timeoutMs: 120_000,
           silent: true,
         })
       } catch (e) {
@@ -531,7 +530,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
     setBusy(true)
     setError(null)
     try {
-      const data = await api.startMarketingCampaign(id, { timeoutMs: 90_000 })
+      const data = await api.startMarketingCampaign(id, { timeoutMs: 120_000 })
       const isWa = data.campaign?.channel === 'whatsapp'
       const enrolled = data.enrolled || 0
       const initialSent = data.sendResult?.sent || 0

@@ -276,7 +276,10 @@ export const api = {
       timeoutMs: opts.timeoutMs ?? 120_000,
       silent: opts.silent,
     }),
-  getMarketingOverview: () => request('/api/marketing/campaigns?overview=1'),
+  getMarketingOverview: (opts = {}) =>
+    request(`/api/marketing/campaigns?overview=1${opts.light ? '&light=1' : ''}`, {
+      timeoutMs: opts.timeoutMs ?? 60_000,
+    }),
   getMarketingCampaignReport: (campaignId) =>
     request(`/api/marketing/campaigns?campaignId=${encodeURIComponent(campaignId)}`),
   duplicateMarketingCampaign: (id) =>
@@ -306,13 +309,13 @@ export const api = {
     request('/api/marketing/campaigns', {
       method: 'POST',
       body: { action: 'start', id },
-      timeoutMs: opts.timeoutMs ?? 90_000,
+      timeoutMs: opts.timeoutMs ?? 120_000,
     }),
   processMarketingCampaignSends: (id, opts = {}) =>
     request('/api/marketing/campaigns', {
       method: 'POST',
       body: { action: 'process_sends', id, limit: opts.limit ?? 1 },
-      timeoutMs: opts.timeoutMs ?? 90_000,
+      timeoutMs: opts.timeoutMs ?? 120_000,
       silent: opts.silent,
     }),
   logMarketingWhatsAppSent: (enrollmentId) =>
