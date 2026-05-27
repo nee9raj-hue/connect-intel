@@ -4,6 +4,17 @@ import * as XLSX from 'xlsx'
  * Canonical column names for Connect Intel imports.
  * Keep this sheet as the first row header; do not rename columns.
  */
+/** Mirrors server `CRM_STATUSES` — use these values for pipeline_stage / pipeline_status. */
+export const CRM_PIPELINE_STAGE_OPTIONS = [
+  'new',
+  'contacted',
+  'follow_up',
+  'replied',
+  'won',
+  'active_trading',
+  'lost',
+]
+
 export const IMPORT_TEMPLATE_COLUMNS = [
   'company',
   'legal_name',
@@ -27,6 +38,9 @@ export const IMPORT_TEMPLATE_COLUMNS = [
   'source_confidence',
   'pipeline_status',
   'notes',
+  'assignee_email',
+  'team_leader',
+  'lead_tags',
 ]
 
 /** Example rows — replace with your data; structure must stay the same. */
@@ -54,6 +68,9 @@ export const IMPORT_TEMPLATE_SAMPLE_ROWS = [
     source_confidence: 'verified',
     pipeline_status: 'contacted',
     notes: 'Met at trade fair — follow up on samples',
+    assignee_email: '',
+    team_leader: '',
+    lead_tags: '',
   },
   {
     company: 'Ganesh Marble & Granite Exports',
@@ -76,6 +93,11 @@ export const IMPORT_TEMPLATE_SAMPLE_ROWS = [
     linkedin: 'linkedin.com/in/vikram-meena-marble',
     seniority: 'Director',
     source_confidence: 'verified',
+    pipeline_status: 'new',
+    notes: '',
+    assignee_email: '',
+    team_leader: '',
+    lead_tags: '',
   },
   {
     company: 'Mumbai Pharma Exports Ltd',
@@ -98,6 +120,11 @@ export const IMPORT_TEMPLATE_SAMPLE_ROWS = [
     linkedin: 'linkedin.com/in/anita-desai-pharma',
     seniority: 'Director',
     source_confidence: 'imported',
+    pipeline_status: 'new',
+    notes: '',
+    assignee_email: '',
+    team_leader: '',
+    lead_tags: '',
   },
   {
     company: 'Coastal Freight Logistics',
@@ -120,6 +147,11 @@ export const IMPORT_TEMPLATE_SAMPLE_ROWS = [
     linkedin: 'linkedin.com/in/karthik-rajan-logistics',
     seniority: 'Manager',
     source_confidence: 'imported',
+    pipeline_status: 'new',
+    notes: '',
+    assignee_email: '',
+    team_leader: '',
+    lead_tags: '',
   },
   {
     company: 'Surat Diamond Export Consortium',
@@ -142,6 +174,11 @@ export const IMPORT_TEMPLATE_SAMPLE_ROWS = [
     linkedin: '',
     seniority: 'Owner',
     source_confidence: 'verified',
+    pipeline_status: 'new',
+    notes: '',
+    assignee_email: '',
+    team_leader: '',
+    lead_tags: '',
   },
   {
     company: 'Bengal Agro Exports',
@@ -164,6 +201,11 @@ export const IMPORT_TEMPLATE_SAMPLE_ROWS = [
     linkedin: 'linkedin.com/in/sourav-banerjee-agro',
     seniority: 'Manager',
     source_confidence: 'imported',
+    pipeline_status: 'new',
+    notes: '',
+    assignee_email: '',
+    team_leader: '',
+    lead_tags: '',
   },
 ]
 
@@ -176,6 +218,7 @@ const INSTRUCTIONS_ROWS = [
   ['3. Required: company. For search results with email/phone, include contact fields.'],
   ['4. In Admin, choose dataset type (Exporters / Shipping / General) then upload this file.'],
   ['5. Delete sample rows before importing your real list (or replace them).'],
+  ['6. Re-importing the same email or mobile updates the existing CRM lead (no duplicate pipeline row).'],
   [''],
   ['Column reference'],
   ['company', 'Required. Business name shown in search results.'],
@@ -198,8 +241,17 @@ const INSTRUCTIONS_ROWS = [
   ['linkedin', 'Profile URL or path.'],
   ['seniority', 'Optional: Owner, Director, Manager.'],
   ['source_confidence', 'verified | imported | likely'],
-  ['pipeline_status', 'Optional CRM stage: new, contacted, follow_up, replied, won, active_trading, lost'],
+  ['pipeline_status', 'Optional CRM stage (use Data column dropdown in Excel when available).'],
   ['notes', 'Optional free-text note shown in Pipeline'],
+  [
+    'assignee_email',
+    'Optional — team member login email; lead is assigned to them (works for org admin imports).',
+  ],
+  ['team_leader', 'Optional — team member display name; small typos are matched to a real member.'],
+  [
+    'lead_tags',
+    'Optional — comma-separated tag names that already exist in Settings → Lead tags (merged with tags you pick on the import screen).',
+  ],
 ]
 
 function triggerDownload(blob, filename) {
@@ -216,6 +268,20 @@ export function downloadImportTemplateXlsx(filename = 'connect-intel-import-temp
   const dataSheet = XLSX.utils.json_to_sheet(IMPORT_TEMPLATE_SAMPLE_ROWS, {
     header: IMPORT_TEMPLATE_COLUMNS,
   })
+  const psCol = IMPORT_TEMPLATE_COLUMNS.indexOf('pipeline_status')
+  if (psCol >= 0 && typeof XLSX.utils.encode_col === 'function') {
+    const letter = XLSX.utils.encode_col(psCol)
+    const list = CRM_PIPELINE_STAGE_OPTIONS.join(',')
+    dataSheet['!dataValidations'] = [
+      {
+        type: 'list',
+        allowBlank: true,
+        showDropDown: true,
+        sqref: `${letter}2:${letter}20000`,
+        formula1: `"${list}"`,
+      },
+    ]
+  }
   const instructionsSheet = XLSX.utils.aoa_to_sheet(INSTRUCTIONS_ROWS)
 
   dataSheet['!cols'] = IMPORT_TEMPLATE_COLUMNS.map(() => ({ wch: 18 }))

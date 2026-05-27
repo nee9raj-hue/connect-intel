@@ -18,7 +18,7 @@ const FILE_INPUT_CLASS =
   'block w-full text-sm text-gray-600 file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#ffcb2b] file:text-[#242424] hover:file:bg-[#f0bc00]'
 
 export default function PipelineImportModal({ open, onClose, onImported }) {
-  const { user, refreshSavedLeads } = useApp()
+  const { user, refreshSavedLeads, orgLeadTags, refreshOrgLeadTags } = useApp()
   const isCompany = user?.accountType === 'company' && user?.organizationId
   const [datasetType, setDatasetType] = useState('general')
   const [rows, setRows] = useState([])
@@ -27,8 +27,13 @@ export default function PipelineImportModal({ open, onClose, onImported }) {
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
   const [addToPipeline, setAddToPipeline] = useState(true)
+  const [importTagIds, setImportTagIds] = useState([])
 
   const preview = useMemo(() => summarizeImportRows(rows), [rows])
+
+  useEffect(() => {
+    if (open && isCompany) refreshOrgLeadTags?.()
+  }, [open, isCompany, refreshOrgLeadTags])
 
   useEffect(() => {
     if (!open) {
@@ -36,6 +41,7 @@ export default function PipelineImportModal({ open, onClose, onImported }) {
       setFileName('')
       setMessage('')
       setError('')
+      setImportTagIds([])
     }
   }, [open])
 
@@ -81,7 +87,12 @@ export default function PipelineImportModal({ open, onClose, onImported }) {
         Boolean(String(r.company || r.business_name || r.company_name || '').trim())
       )
       const data = isCompany
-        ? await api.importOrgPipeline({ datasetType, rows: importRows, addToPipeline })
+        ? await api.importOrgPipeline({
+            datasetType,
+            rows: importRows,
+            addToPipeline,
+            tagIds: importTagIds,
+          })
         : await api.importMyPipeline({ datasetType, rows: importRows, addToPipeline })
       setRows([])
       setFileName('')
@@ -156,6 +167,27 @@ export default function PipelineImportModal({ open, onClose, onImported }) {
               ))}
             </select>
           </div>
+
+          {isCompany && orgLeadTags?.length > 0 && (
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
+                Lead tags for this import (optional)
+              </label>
+              <select
+                multiple
+                value={importTagIds}
+                onChange={(e) => setImportTagIds([...e.target.selectedOptions].map((o) => o.value))}
+                className="w-full border rounded-lg px-3 py-2 text-sm min-h-[4.25rem]"
+              >
+                {orgLeadTags.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.name}
+                  </option>
+                ))}
+              </select>
+              <p className="text-[10px] text-gray-500 mt-1">Cmd/Ctrl-click to select multiple. Merged with sheet column lead_tags.</p>
+            </div>
+          )}
 
           <div>
             <label className="block text-xs font-semibold text-gray-700 mb-1">3. Choose your file</label>

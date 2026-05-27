@@ -197,10 +197,10 @@ export const api = {
   researchLeads: (filters, count = 10) =>
     request('/api/admin/research-leads', { method: 'POST', body: { filters, count } }),
   getOrgImportOverview: () => request('/api/org/imports'),
-  importOrgPipeline: ({ datasetType, rows, addToPipeline = true }) =>
+  importOrgPipeline: ({ datasetType, rows, addToPipeline = true, tagIds = [] }) =>
     request('/api/org/imports', {
       method: 'POST',
-      body: { datasetType, rows, addToPipeline },
+      body: { datasetType, rows, addToPipeline, tagIds },
       timeoutMs: 120_000,
     }),
   getActiveTradingOverview: () => request('/api/org/active-trading'),

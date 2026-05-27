@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
+import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { parseUploadFile, summarizeImportRows } from '../../lib/parseUpload'
 import {
-  IMPORT_TEMPLATE_COLUMNS,
   downloadImportTemplateCsv,
   downloadImportTemplateXlsx,
 } from '../../lib/importTemplate'
@@ -14,6 +14,7 @@ const DATASET_OPTIONS = [
 ]
 
 export default function OrgPipelineImport({ onImported, embedded = false }) {
+  const { orgLeadTags, refreshOrgLeadTags } = useApp()
   const [datasetType, setDatasetType] = useState('exporters')
   const [overview, setOverview] = useState(null)
   const [rows, setRows] = useState([])
@@ -22,6 +23,7 @@ export default function OrgPipelineImport({ onImported, embedded = false }) {
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
   const [addToPipeline, setAddToPipeline] = useState(true)
+  const [importTagIds, setImportTagIds] = useState([])
 
   const loadOverview = async () => {
     try {
@@ -35,6 +37,10 @@ export default function OrgPipelineImport({ onImported, embedded = false }) {
   useEffect(() => {
     loadOverview()
   }, [])
+
+  useEffect(() => {
+    refreshOrgLeadTags?.()
+  }, [refreshOrgLeadTags])
 
   const handleFileChange = async (event) => {
     const file = event.target.files?.[0]
@@ -75,7 +81,12 @@ export default function OrgPipelineImport({ onImported, embedded = false }) {
       const importRows = rows.filter((r) =>
         Boolean(String(r.company || r.business_name || r.company_name || '').trim())
       )
-      const data = await api.importOrgPipeline({ datasetType, rows: importRows, addToPipeline })
+      const data = await api.importOrgPipeline({
+        datasetType,
+        rows: importRows,
+        addToPipeline,
+        tagIds: importTagIds,
+      })
       setOverview(data)
       setRows([])
       setFileName('')
@@ -137,6 +148,29 @@ export default function OrgPipelineImport({ onImported, embedded = false }) {
           </label>
         </div>
 
+        {orgLeadTags?.length > 0 && (
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">
+              Apply lead tags (optional — hold Cmd/Ctrl to select several)
+            </label>
+            <select
+              multiple
+              value={importTagIds}
+              onChange={(e) => {
+                const next = [...e.target.selectedOptions].map((o) => o.value)
+                setImportTagIds(next)
+              }}
+              className="w-full max-w-md text-sm border border-gray-200 rounded-md px-2 py-1.5 min-h-[4.5rem]"
+            >
+              {orgLeadTags.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
         <input
           type="file"
           accept=".csv,.xlsx,.xls"
@@ -155,8 +189,10 @@ export default function OrgPipelineImport({ onImported, embedded = false }) {
         </button>
 
         <p className="text-[11px] text-gray-500">
-          Template columns: {IMPORT_TEMPLATE_COLUMNS.slice(0, 8).join(', ')}… plus optional{' '}
+          Template columns include optional <code className="text-gray-700">assignee_email</code>,{' '}
+          <code className="text-gray-700">team_leader</code>, <code className="text-gray-700">lead_tags</code>,{' '}
           <code className="text-gray-700">pipeline_status</code>, <code className="text-gray-700">notes</code>.
+          Same email or phone as an existing lead updates that lead instead of creating a duplicate.
         </p>
 
         {message && (
