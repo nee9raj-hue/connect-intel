@@ -123,6 +123,9 @@ export const api = {
     if (params.state) qs.set('state', params.state)
     if (params.assigneeUserId) qs.set('assigneeUserId', params.assigneeUserId)
     for (const id of params.tagIds || []) qs.append('tagId', id)
+    for (const [col, limit] of Object.entries(params.columnLimits || {})) {
+      if (limit > 0) qs.set(`col_${col}`, String(limit))
+    }
     return request(`/api/saved-leads?${qs}`, { timeoutMs: 60_000 })
   },
 

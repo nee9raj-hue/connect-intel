@@ -120,8 +120,14 @@ export function AppProvider({ children }) {
     }
   }, [user?.accountType, user?.organizationId])
 
+  const loadedCountRef = useRef(0)
+  const pipelineLoadRef = useRef(pipelineLoad)
+  useEffect(() => {
+    pipelineLoadRef.current = pipelineLoad
+  }, [pipelineLoad])
+
   const loadPipelineList = useCallback(async (filters = {}, { append = false, silent = false } = {}) => {
-    const offset = append ? savedLeads.length : 0
+    const offset = append ? loadedCountRef.current : 0
     const data = await api.fetchPipelineLeads({
       offset,
       limit: 100,
@@ -129,20 +135,23 @@ export function AppProvider({ children }) {
       ...filters,
     })
     const leads = data.leads || []
+    const newLoaded = append ? offset + leads.length : leads.length
+    loadedCountRef.current = newLoaded
     setSavedLeads((prev) => (append ? [...prev, ...leads] : leads))
     setPipelineLoad({
       total: data.total ?? data.pipelineTotal ?? 0,
-      loaded: append ? offset + leads.length : leads.length,
+      loaded: newLoaded,
       hasMore: Boolean(data.hasMore),
       loadingMore: false,
     })
     workspaceLoadedAtRef.current = Date.now()
     return leads
-  }, [savedLeads.length])
+  }, [])
 
   const loadMorePipelineLeads = useCallback(
     async (filters = {}) => {
-      if (pipelineLoad.loadingMore || !pipelineLoad.hasMore) return
+      const load = pipelineLoadRef.current
+      if (load.loadingMore || !load.hasMore) return
       setPipelineLoad((prev) => ({ ...prev, loadingMore: true }))
       try {
         await loadPipelineList(filters, { append: true, silent: true })
@@ -150,7 +159,7 @@ export function AppProvider({ children }) {
         setPipelineLoad((prev) => ({ ...prev, loadingMore: false }))
       }
     },
-    [loadPipelineList, pipelineLoad.hasMore, pipelineLoad.loadingMore]
+    [loadPipelineList]
   )
 
   const refreshSavedLeads = useCallback(
@@ -175,6 +184,7 @@ export function AppProvider({ children }) {
           hasMore: Boolean(page.hasMore),
           loadingMore: false,
         })
+        loadedCountRef.current = leads.length
         workspaceLoadedAtRef.current = Date.now()
         return leads
       } catch (error) {
@@ -350,6 +360,7 @@ export function AppProvider({ children }) {
             hasMore: Boolean(page.hasMore),
             loadingMore: false,
           })
+          loadedCountRef.current = leads.length
           workspaceLoadedAtRef.current = Date.now()
           setSessionError(null)
 
