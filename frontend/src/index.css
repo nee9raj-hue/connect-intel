@@ -223,14 +223,14 @@ body {
 }
 
 .nav-item-active {
-  background: var(--color-ci-accent-soft) !important;
-  color: #0f766e !important;
-  box-shadow: inset 3px 0 0 var(--color-ci-accent);
+  background: #f3f4f6 !important;
+  color: #111827 !important;
+  box-shadow: inset 3px 0 0 #111827;
 }
 
 .nav-sub-active {
-  background: var(--color-ci-accent-muted) !important;
-  color: #115e59 !important;
+  background: #111827 !important;
+  color: #ffffff !important;
   font-weight: 600;
 }
 
@@ -400,8 +400,8 @@ body {
 
 .marketing-studio-rail-btn.is-active {
   background: #fff;
-  color: #0d9488;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08), inset 2px 0 0 #0d9488;
+  color: #111827;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08), inset 2px 0 0 #111827;
 }
 
 .marketing-studio-panel {
@@ -578,7 +578,7 @@ body {
 
 .marketing-studio-rail-toggle:hover {
   background: #e2e8f0;
-  color: #0f766e;
+  color: #111827;
 }
 
 .marketing-studio-rail-toggle.is-off {
