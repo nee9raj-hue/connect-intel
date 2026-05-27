@@ -107,7 +107,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
       step2Design: { ...DEFAULT_THEME },
     })
     setCampaignEmailStep(1)
-    setCampaignSetupOpen(true)
+    setCampaignSetupOpen(false)
     setError(null)
   }, [])
   const pipelineLeadsWithPhone = useMemo(
@@ -604,21 +604,21 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
       <div
         className={
           tab === 'campaigns' || tab === 'templates'
-            ? 'panel-body-scroll flex flex-col min-h-0 px-2 sm:px-3 py-2'
+            ? 'panel-body-scroll flex flex-col min-h-0 px-2 sm:px-3 py-1.5'
             : 'panel-body-scroll px-4 sm:px-6 py-4'
         }
       >
         {loading ? (
           <LoadingExperience message={LOADING_MESSAGES.marketing} />
         ) : tab === 'campaigns' ? (
-          <div className="flex flex-col flex-1 min-h-0 w-full max-w-[1600px] mx-auto gap-4 pb-4">
+          <div className="marketing-workspace">
             <details
               open={campaignSetupOpen}
               onToggle={(e) => setCampaignSetupOpen(e.target.open)}
-              className="shrink-0 ci-card overflow-hidden group"
+              className="marketing-setup-bar ci-card overflow-hidden group"
             >
-              <summary className="cursor-pointer list-none px-4 py-3 flex items-center justify-between gap-2 hover:bg-[#ecfdf5]/50 bg-gradient-to-r from-[#ecfdf5]/80 to-white">
-                <span className="text-sm font-semibold text-slate-900">① Campaign setup</span>
+              <summary className="cursor-pointer list-none px-4 py-2.5 flex items-center justify-between gap-2 hover:bg-[#ecfdf5]/50 bg-gradient-to-r from-[#ecfdf5]/80 to-white">
+                <span className="text-sm font-semibold text-slate-900">Campaign setup</span>
                 <span className="text-[10px] text-slate-500 group-open:hidden">
                   Name, list, optional template — then design below
                 </span>
@@ -782,7 +782,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
               </div>
             </details>
 
-            <div className="flex-1 min-h-0 flex flex-col">
+            <div className="marketing-builder-slot">
             {(!campaignForm.useSequence || campaignEmailStep === 1) && (
               <MarketingTemplateBuilder
                 embedded
@@ -847,7 +847,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
             )}
             </div>
 
-            <div className="shrink-0 ci-card flex flex-wrap items-center gap-3 px-4 py-3">
+            <div className="marketing-setup-bar shrink-0 ci-card flex flex-wrap items-center gap-3 px-4 py-2.5">
               <button type="button" onClick={resetCampaignForm} className="ci-btn ci-btn-secondary">
                 New campaign
               </button>
@@ -889,11 +889,11 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
               </button>
             </div>
 
-            <details className="shrink-0 ci-card">
-              <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-50/80">
-                Your campaigns ({campaigns.length})
+            <details className="marketing-setup-bar shrink-0 ci-card">
+              <summary className="cursor-pointer list-none px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50/80">
+                All campaigns ({campaigns.length}) — click to expand
               </summary>
-              <div className="px-4 pb-4 border-t border-slate-100 max-h-[280px] overflow-y-auto">
+              <div className="px-4 pb-3 border-t border-slate-100 max-h-[200px] overflow-y-auto">
               {!campaigns.length ? (
                 <p className="text-xs text-gray-500 py-2">No campaigns yet.</p>
               ) : (
@@ -1012,7 +1012,8 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
             showCreator={Boolean(user?.isOrgAdmin && user?.accountType === 'company')}
           />
         ) : tab === 'templates' ? (
-          <div className="flex flex-col flex-1 min-h-0 w-full max-w-[1600px] mx-auto pb-4">
+          <div className="marketing-workspace">
+          <div className="marketing-builder-slot">
           <MarketingTemplateBuilder
             fillHeight
             value={templateForm}
@@ -1027,6 +1028,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
             onDelete={deleteTemplate}
             marketingForms={forms}
           />
+          </div>
           </div>
         ) : (
           <div className="grid lg:grid-cols-2 gap-6 max-w-6xl">

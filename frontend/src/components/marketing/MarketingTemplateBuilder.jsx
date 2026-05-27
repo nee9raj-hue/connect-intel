@@ -160,6 +160,8 @@ export default function MarketingTemplateBuilder({
   const [dropIndex, setDropIndex] = useState(null)
   const [paletteDragType, setPaletteDragType] = useState(null)
   const [previewOpen, setPreviewOpen] = useState(false)
+  const [panelOpen, setPanelOpen] = useState(true)
+  const [inspectorOpen, setInspectorOpen] = useState(true)
 
   const blockCount = value.blocks?.length || 0
   useEffect(() => {
@@ -474,25 +476,26 @@ export default function MarketingTemplateBuilder({
     </>
   )
 
+  const emailWidth = Math.min(value.design?.contentWidth || 600, 640)
+
   const canvas = (
     <main
       className="marketing-studio-canvas relative"
       onDragOver={handleCanvasDragOver}
       onDrop={handleCanvasDrop}
     >
-      <span className="marketing-studio-canvas-label">Email preview</span>
+      <span className="marketing-studio-canvas-label">Email canvas — drag blocks here</span>
       <div className="marketing-studio-canvas-inner">
-        <iframe
-          title="Email canvas"
-          srcDoc={previewHtml}
-          className="bg-white shadow-xl rounded-lg border border-slate-200/80"
-          style={{
-            width: previewMode === 'mobile' ? 320 : Math.min(value.design?.contentWidth || 600, 640),
-            minHeight: 480,
-            height: 480,
-            border: 'none',
-          }}
-        />
+        <div
+          className={`marketing-email-frame-wrap ${previewMode === 'mobile' ? 'is-mobile' : ''}`}
+          style={previewMode === 'desktop' ? { maxWidth: emailWidth } : undefined}
+        >
+          <iframe
+            title="Email canvas"
+            srcDoc={previewHtml}
+            className="bg-white shadow-xl rounded-lg border border-slate-200/80"
+          />
+        </div>
       </div>
     </main>
   )
@@ -512,8 +515,28 @@ export default function MarketingTemplateBuilder({
             <span>{tab.label}</span>
           </button>
         ))}
+        <div className="marketing-studio-rail-footer hidden sm:flex">
+          <button
+            type="button"
+            title={panelOpen ? 'Hide blocks panel' : 'Show blocks panel'}
+            onClick={() => setPanelOpen((v) => !v)}
+            className={`marketing-studio-rail-toggle ${panelOpen ? '' : 'is-off'}`}
+          >
+            ◧
+          </button>
+          <button
+            type="button"
+            title={inspectorOpen ? 'Hide block editor' : 'Show block editor'}
+            onClick={() => setInspectorOpen((v) => !v)}
+            className={`marketing-studio-rail-toggle ${inspectorOpen ? '' : 'is-off'}`}
+          >
+            ◨
+          </button>
+        </div>
       </nav>
-      <aside className="marketing-studio-panel hidden sm:flex">
+      <aside
+        className={`marketing-studio-panel hidden sm:flex ${panelOpen ? '' : 'is-collapsed'}`}
+      >
         <div className="marketing-studio-panel-head">
           <h3>{STUDIO_RAIL.find((t) => t.id === sideTab)?.label}</h3>
           <p>{sideTabHint}</p>
@@ -521,19 +544,34 @@ export default function MarketingTemplateBuilder({
         <div className="marketing-studio-panel-scroll">{panelContent}</div>
       </aside>
       {canvas}
-      <aside className="marketing-studio-inspector flex flex-col min-h-0">
-        <p className="marketing-studio-inspector-head">Edit selected block</p>
-        {inspector}
+      <aside
+        className={`marketing-studio-inspector flex flex-col min-h-0 ${
+          inspectorOpen ? '' : 'is-collapsed'
+        }`}
+      >
+        <button
+          type="button"
+          className="marketing-studio-inspector-head w-full text-left hover:bg-slate-50"
+          onClick={() => setInspectorOpen((v) => !v)}
+          title={inspectorOpen ? 'Collapse editor' : 'Expand editor'}
+        >
+          {inspectorOpen ? 'Edit block ▾' : 'Edit ▸'}
+        </button>
+        <div className="marketing-studio-inspector-body flex flex-col flex-1 min-h-0">
+          {inspector}
+        </div>
       </aside>
     </div>
   )
 
   const toolbar = (
-    <div className="marketing-studio-toolbar space-y-2.5">
+    <div className="marketing-studio-toolbar space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="min-w-0">
           <h2 className="text-sm font-semibold text-slate-900">{headerTitle}</h2>
-          <p className="text-[11px] text-slate-500 mt-0.5 max-w-xl">{headerSubtitle}</p>
+          {!embedded && (
+            <p className="text-[11px] text-slate-500 mt-0.5 max-w-xl">{headerSubtitle}</p>
+          )}
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex rounded-lg border border-slate-200 bg-slate-50 p-0.5">
@@ -636,7 +674,13 @@ export default function MarketingTemplateBuilder({
         </div>
       )}
 
-      <div className={studio ? 'marketing-studio flex-1 min-h-[min(520px,calc(100vh-12rem))]' : 'ci-card min-h-[560px] flex flex-col'}>
+      <div
+        className={
+          studio
+            ? `marketing-studio is-focus flex-1 min-h-0 ${embedded ? 'h-full' : ''}`
+            : 'ci-card min-h-[560px] flex flex-col'
+        }
+      >
         {studio ? (
           <>
             {toolbar}

@@ -98,12 +98,35 @@ body {
 }
 
 .marketing-campaigns-shell > .panel-body-scroll {
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .marketing-campaigns-shell.panel-shell {
   background: var(--color-ci-page);
+}
+
+.marketing-workspace {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0%;
+  min-height: 0;
+  width: 100%;
+  gap: 0.5rem;
+}
+
+.marketing-setup-bar {
+  flex-shrink: 0;
+}
+
+.marketing-builder-slot {
+  flex: 1 1 0%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100dvh - 11.5rem);
 }
 
 /* —— App design system —— */
@@ -214,6 +237,13 @@ body {
   box-shadow: 0 4px 24px rgba(15, 23, 42, 0.06);
 }
 
+.marketing-studio.is-focus {
+  flex: 1 1 auto;
+  min-height: calc(100dvh - 12rem);
+  height: 100%;
+  border-radius: 10px;
+}
+
 .marketing-studio-toolbar {
   flex-shrink: 0;
   padding: 0.625rem 1rem;
@@ -225,6 +255,11 @@ body {
   display: flex;
   flex: 1 1 0%;
   min-height: 0;
+  min-height: calc(100dvh - 15rem);
+}
+
+.marketing-studio.is-focus .marketing-studio-body {
+  min-height: calc(100dvh - 15rem);
 }
 
 .marketing-studio-rail {
@@ -271,13 +306,29 @@ body {
 }
 
 .marketing-studio-panel {
-  width: 240px;
+  width: 188px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
   min-height: 0;
   border-right: 1px solid #e2e8f0;
   background: #fff;
+  transition: width 0.2s ease, opacity 0.15s ease;
+}
+
+.marketing-studio-panel.is-collapsed {
+  width: 0 !important;
+  min-width: 0 !important;
+  opacity: 0;
+  overflow: hidden;
+  border-right-width: 0;
+  pointer-events: none;
+}
+
+@media (min-width: 1280px) {
+  .marketing-studio-panel {
+    width: 212px;
+  }
 }
 
 .marketing-studio-panel-head {
@@ -311,8 +362,9 @@ body {
 }
 
 .marketing-studio-canvas {
-  flex: 1 1 0%;
+  flex: 1 1 auto;
   min-width: 0;
+  width: 100%;
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -322,11 +374,34 @@ body {
 .marketing-studio-canvas-inner {
   flex: 1 1 0%;
   overflow-y: auto;
-  padding: 1.5rem 1rem;
+  padding: 1.25rem 1.5rem;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: stretch;
+  width: 100%;
+  min-height: 100%;
   overscroll-behavior: contain;
+}
+
+.marketing-email-frame-wrap {
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  min-height: min(72vh, 760px);
+  display: flex;
+  flex-direction: column;
+}
+
+.marketing-email-frame-wrap.is-mobile {
+  max-width: 375px;
+}
+
+.marketing-email-frame-wrap iframe {
+  width: 100% !important;
+  flex: 1 1 auto;
+  min-height: min(68vh, 720px) !important;
+  height: auto !important;
+  border: none;
 }
 
 .marketing-studio-canvas-label {
@@ -346,13 +421,55 @@ body {
 }
 
 .marketing-studio-inspector {
-  width: min(100%, 300px);
+  width: 272px;
+  max-width: 30vw;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
   min-height: 0;
   border-left: 1px solid #e2e8f0;
   background: #fafbfc;
+  transition: width 0.2s ease, max-width 0.2s ease;
+}
+
+.marketing-studio-inspector.is-collapsed {
+  width: 44px !important;
+  max-width: 44px !important;
+  min-width: 44px !important;
+}
+
+.marketing-studio-inspector.is-collapsed .marketing-studio-inspector-body {
+  display: none;
+}
+
+.marketing-studio-rail-footer {
+  margin-top: auto;
+  padding: 0.35rem;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.marketing-studio-rail-toggle {
+  width: 100%;
+  padding: 0.35rem;
+  font-size: 14px;
+  line-height: 1;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.marketing-studio-rail-toggle:hover {
+  background: #e2e8f0;
+  color: #0f766e;
+}
+
+.marketing-studio-rail-toggle.is-off {
+  opacity: 0.45;
 }
 
 .marketing-studio-inspector-head {
