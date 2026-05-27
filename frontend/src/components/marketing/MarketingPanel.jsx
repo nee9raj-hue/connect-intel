@@ -409,6 +409,25 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
     if (!isActive) stopCampaignSendPoll()
   }, [isActive, stopCampaignSendPoll])
 
+  const processSendChunk = async (campaignId) => {
+    let lastError = null
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      try {
+        return await api.processMarketingCampaignSends(campaignId, {
+          limit: 1,
+          timeoutMs: 90_000,
+          silent: true,
+        })
+      } catch (e) {
+        lastError = e
+        const timedOut = /timed out/i.test(e?.message || '')
+        if (!timedOut || attempt === 1) throw e
+        await new Promise((r) => setTimeout(r, 2000))
+      }
+    }
+    throw lastError
+  }
+
   const pollCampaignSendsOnce = useCallback(async (campaignId) => {
     if (!isActive) {
       stopCampaignSendPoll()
@@ -418,11 +437,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
     if (!state || state.campaignId !== campaignId) return
 
     try {
-      const chunk = await api.processMarketingCampaignSends(campaignId, {
-        limit: 1,
-        timeoutMs: 50_000,
-        silent: true,
-      })
+      const chunk = await processSendChunk(campaignId)
       state.totalSent += chunk.sendResult?.sent || 0
       state.totalFailed += chunk.sendResult?.failed || 0
       state.pending = chunk.pendingSends ?? 0
@@ -436,7 +451,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
       if (state.lastError && state.totalSent === 0 && state.totalFailed >= 3) {
         stopCampaignSendPoll()
         setError(state.lastError)
-        await load()
+        void load().catch(() => {})
         return
       }
 
@@ -446,7 +461,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
           state.lastError ||
             'Could not process sends. Connect Work email in the sidebar, then start the campaign again.'
         )
-        await load()
+        void load().catch(() => {})
         return
       }
 
@@ -476,7 +491,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
           }`
         )
       }
-      await load()
+      void load().catch(() => {})
       refreshSavedLeads?.()
     } catch (e) {
       stopCampaignSendPoll()
@@ -487,7 +502,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
       } else {
         setError(e.message)
       }
-      await load()
+      void load().catch(() => {})
     }
   }, [isActive, load, refreshSavedLeads, stopCampaignSendPoll])
 
@@ -516,7 +531,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
     setBusy(true)
     setError(null)
     try {
-      const data = await api.startMarketingCampaign(id, { timeoutMs: 60_000 })
+      const data = await api.startMarketingCampaign(id, { timeoutMs: 90_000 })
       const isWa = data.campaign?.channel === 'whatsapp'
       const enrolled = data.enrolled || 0
       const initialSent = data.sendResult?.sent || 0
@@ -557,7 +572,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
         )
       }
       if (isWa) setTab('reports')
-      await load()
+      void load().catch(() => {})
       refreshSavedLeads?.()
     } catch (e) {
       setError(e.message)
