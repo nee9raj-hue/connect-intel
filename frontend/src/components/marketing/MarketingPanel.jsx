@@ -60,7 +60,7 @@ const EMPTY_CAMPAIGN = {
   useSequence: false,
 }
 
-export default function MarketingPanel({ onNavigate, panelOptions }) {
+export default function MarketingPanel({ onNavigate, panelOptions, isActive = true }) {
   const { savedLeads, refreshSavedLeads, user, teamMembers, refreshTeam } = useApp()
   const [tab, setTab] = useState(panelOptions?.tab || 'campaigns')
   const [loading, setLoading] = useState(true)
@@ -405,7 +405,15 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
 
   useEffect(() => () => stopCampaignSendPoll(), [stopCampaignSendPoll])
 
+  useEffect(() => {
+    if (!isActive) stopCampaignSendPoll()
+  }, [isActive, stopCampaignSendPoll])
+
   const pollCampaignSendsOnce = useCallback(async (campaignId) => {
+    if (!isActive) {
+      stopCampaignSendPoll()
+      return
+    }
     const state = sendStateRef.current
     if (!state || state.campaignId !== campaignId) return
 
@@ -445,7 +453,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
       if (state.pending > 0 && (chunk.sendResult?.sent || chunk.sendResult?.failed)) {
         sendPollRef.current = setTimeout(() => {
           void pollCampaignSendsOnce(campaignId)
-        }, 500)
+        }, 2500)
         return
       }
 
@@ -481,7 +489,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
       }
       await load()
     }
-  }, [load, refreshSavedLeads, stopCampaignSendPoll])
+  }, [isActive, load, refreshSavedLeads, stopCampaignSendPoll])
 
   const beginCampaignSendPoll = useCallback(
     (campaignId, enrolled, initial = {}) => {
@@ -497,7 +505,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
       if (sendStateRef.current.pending > 0) {
         sendPollRef.current = setTimeout(() => {
           void pollCampaignSendsOnce(campaignId)
-        }, 400)
+        }, 800)
       }
     },
     [pollCampaignSendsOnce, stopCampaignSendPoll]
