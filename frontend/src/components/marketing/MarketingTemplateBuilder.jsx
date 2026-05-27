@@ -191,14 +191,18 @@ export default function MarketingTemplateBuilder({
     [value.blocks, value.design, value.previewText, selectedBlockIndex]
   )
 
-  const handleCanvasBlockClick = (e) => {
-    const row = e.target.closest('[data-ci-block-index]')
-    if (!row) return
-    if (e.target.closest('a')) e.preventDefault()
-    const idx = Number(row.getAttribute('data-ci-block-index'))
-    if (Number.isNaN(idx)) return
-    setSelectedBlockIndex(idx)
+  const selectCanvasBlock = (index) => {
+    if (Number.isNaN(index) || index < 0) return
+    setSelectedBlockIndex(index)
     setInspectorOpen(true)
+  }
+
+  const handleCanvasBlockPointer = (e) => {
+    const hit = e.target.closest('[data-ci-block-index]')
+    if (!hit) return
+    e.preventDefault()
+    e.stopPropagation()
+    selectCanvasBlock(Number(hit.getAttribute('data-ci-block-index')))
   }
 
   const moveBlock = (index, dir) => {
@@ -515,7 +519,12 @@ export default function MarketingTemplateBuilder({
       onDragOver={handleCanvasDragOver}
       onDrop={handleCanvasDrop}
     >
-      <span className="marketing-studio-canvas-label">Click a block to edit · drag new blocks here</span>
+      <div className="marketing-studio-canvas-top">
+        <span className="marketing-studio-canvas-label">
+          Click any section in the email to edit it
+        </span>
+        {studio ? blockChipStrip : null}
+      </div>
       <div className="marketing-studio-canvas-inner">
         <div
           className={`marketing-email-frame-wrap ${previewMode === 'mobile' ? 'is-mobile' : ''}`}
@@ -525,7 +534,7 @@ export default function MarketingTemplateBuilder({
             className="marketing-canvas-html marketing-canvas-html--interactive bg-white shadow-xl rounded-lg border border-slate-200/80 overflow-hidden"
             role="document"
             aria-label="Email canvas"
-            onClick={handleCanvasBlockClick}
+            onPointerDown={handleCanvasBlockPointer}
             dangerouslySetInnerHTML={{ __html: canvasHtml }}
             style={!pageScroll ? { minHeight: 560 } : undefined}
           />

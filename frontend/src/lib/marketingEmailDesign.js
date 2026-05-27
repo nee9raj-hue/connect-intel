@@ -514,12 +514,10 @@ function wrapInteractiveCanvasRow(trHtml, blockIndex, renderOpts) {
   if (!renderOpts.canvasInteractive || !trHtml?.startsWith('<tr')) return trHtml || ''
   const selected = renderOpts.selectedBlockIndex === blockIndex
   const selStyle = selected
-    ? 'outline:2px solid #0d9488;outline-offset:-2px;background-color:rgba(13,148,136,0.05);'
+    ? 'outline:2px solid #0d9488;outline-offset:-2px;background-color:rgba(13,148,136,0.06);'
     : ''
-  return trHtml.replace(
-    /^<tr>/i,
-    `<tr data-ci-block-index="${blockIndex}" data-ci-block-selectable="true" style="cursor:pointer;${selStyle}"`
-  )
+  const attrs = `data-ci-block-index="${blockIndex}" data-ci-block-selectable="true"`
+  return trHtml.replace(/^<tr>/i, `<tr ${attrs} class="ci-canvas-block-row" style="cursor:pointer;${selStyle}"`)
 }
 
 function renderBlockHtml(block, theme, renderOpts = {}) {
