@@ -5,19 +5,32 @@ import { getStatusMeta } from '../../lib/crmConstants'
 import LoadingExperience from '../ui/LoadingExperience'
 import { LOADING_MESSAGES } from '../../lib/loadingQuotes'
 import { formatDealValue } from '../../lib/crmTimeline'
+import {
+  DashboardShell,
+  DashboardKpiCard,
+  DashboardSection,
+  DashboardSegmented,
+  DashboardEmpty,
+} from '../dashboard/dashboardUi'
 
 const KPI = [
-  { key: 'totalLeads', label: 'Pipeline leads', nav: 'pipeline' },
-  { key: 'pipelineValue', label: 'Pipeline value', nav: 'pipeline', format: 'currency' },
-  { key: 'weightedPipelineValue', label: 'Weighted forecast', nav: 'pipeline', format: 'currency' },
-  { key: 'wonValue', label: 'Won value', nav: 'pipeline', filter: 'won', format: 'currency' },
-  { key: 'avgLeadScore', label: 'Avg lead score', nav: 'pipeline' },
-  { key: 'staleLeads', label: 'Stale 7d+', nav: 'pipeline' },
-  { key: 'activitiesInPeriod', label: 'Activities', nav: 'crm-log' },
-  { key: 'emailsSent', label: 'Emails sent', nav: 'crm-log' },
-  { key: 'meetingsUpcoming', label: 'Upcoming meetings', nav: 'crm-calendar' },
-  { key: 'needsFollowUp', label: 'Follow-up due', nav: 'pipeline', filter: 'follow_up' },
-  { key: 'won', label: 'Won deals', nav: 'pipeline', filter: 'won' },
+  { key: 'totalLeads', label: 'Pipeline leads', nav: 'pipeline', icon: 'pipeline' },
+  { key: 'pipelineValue', label: 'Pipeline value', nav: 'pipeline', format: 'currency', icon: 'chart' },
+  {
+    key: 'weightedPipelineValue',
+    label: 'Weighted forecast',
+    nav: 'pipeline',
+    format: 'currency',
+    icon: 'chart',
+  },
+  { key: 'wonValue', label: 'Won value', nav: 'pipeline', filter: 'won', format: 'currency', icon: 'chart' },
+  { key: 'avgLeadScore', label: 'Avg lead score', nav: 'pipeline', icon: 'pipeline' },
+  { key: 'staleLeads', label: 'Stale 7d+', nav: 'pipeline', icon: 'pipeline' },
+  { key: 'activitiesInPeriod', label: 'Activities', nav: 'crm-log', icon: 'log' },
+  { key: 'emailsSent', label: 'Emails sent', nav: 'crm-log', icon: 'mail' },
+  { key: 'meetingsUpcoming', label: 'Upcoming meetings', nav: 'crm-calendar', icon: 'calendar' },
+  { key: 'needsFollowUp', label: 'Follow-up due', nav: 'pipeline', filter: 'follow_up', icon: 'task' },
+  { key: 'won', label: 'Won deals', nav: 'pipeline', filter: 'won', icon: 'pipeline' },
 ]
 
 export default function TeamDashboardPanel({ onNavigate }) {
@@ -69,178 +82,165 @@ export default function TeamDashboardPanel({ onNavigate }) {
   const summary = data?.summary || {}
   const maxActivity = Math.max(1, ...(data?.activityByDay || []).map((d) => d.count))
 
+  const headerActions = (
+    <>
+      <DashboardSegmented
+        value={period}
+        onChange={setPeriod}
+        options={[
+          { value: 'week', label: 'This week' },
+          { value: 'month', label: 'This month' },
+        ]}
+      />
+      {data?.isAdmin && data?.memberOptions?.length > 0 ? (
+        <select
+          value={memberUserId}
+          onChange={(e) => setMemberUserId(e.target.value)}
+          className="dashboard-select"
+          aria-label="Filter by team member"
+        >
+          <option value="">All team members</option>
+          {data.memberOptions.map((m) => (
+            <option key={m.userId} value={m.userId}>
+              {m.name}
+            </option>
+          ))}
+        </select>
+      ) : null}
+    </>
+  )
+
   return (
-    <div className="panel-shell bg-[#f6f7f9]">
-      <header className="shrink-0 bg-white border-b border-gray-200 px-5 py-4">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h1 className="text-lg font-semibold text-gray-900">Team dashboard</h1>
-            <p className="text-xs text-gray-500 mt-0.5">
-              Weekly and monthly activity — click any metric to open pipeline or logs
-            </p>
+    <DashboardShell
+      title="Team metrics"
+      subtitle="Weekly and monthly performance — click any metric to open pipeline, calendar, or activity log"
+      actions={headerActions}
+    >
+      {error ? (
+        <p className="text-sm text-red-800 bg-red-50 border border-red-200 rounded-xl px-3 py-2 font-medium">
+          {error}
+        </p>
+      ) : null}
+
+      {loading && !data ? (
+        <LoadingExperience
+          message={LOADING_MESSAGES.team}
+          fill={false}
+          className="rounded-2xl border border-[#dde3ea] min-h-[240px] bg-white"
+        />
+      ) : (
+        <>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 md:gap-3">
+            {KPI.map((item) => (
+              <DashboardKpiCard
+                key={item.key}
+                icon={item.icon}
+                label={item.label}
+                value={
+                  item.format === 'currency'
+                    ? formatDealValue(summary[item.key])
+                    : (summary[item.key] ?? 0).toLocaleString()
+                }
+                hint="View in CRM"
+                onClick={() => onKpiClick(item)}
+              />
+            ))}
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="flex rounded-lg border border-gray-200 overflow-hidden text-xs font-semibold">
-              {['week', 'month'].map((p) => (
-                <button
-                  key={p}
-                  type="button"
-                  onClick={() => setPeriod(p)}
-                  className={`px-3 py-1.5 capitalize ${
-                    period === p ? 'bg-gray-900 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'
-                  }`}
-                >
-                  {p === 'week' ? 'This week' : 'This month'}
-                </button>
-              ))}
-            </div>
-            {data?.isAdmin && (data?.memberOptions?.length > 0) && (
-              <select
-                value={memberUserId}
-                onChange={(e) => setMemberUserId(e.target.value)}
-                className="text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 bg-white min-w-[160px]"
-                aria-label="Filter by team member"
-              >
-                <option value="">All team members</option>
-                {data.memberOptions.map((m) => (
-                  <option key={m.userId} value={m.userId}>
-                    {m.name}
-                  </option>
+
+          <div className="dashboard-layout-2-1">
+            <DashboardSection
+              title={`Activity (${period === 'week' ? '7 days' : '30 days'})`}
+              subtitle="Emails, calls, WhatsApp, notes, and new pipeline entries"
+            >
+              <div className="dashboard-chart-bars">
+                {(data?.activityByDay || []).map((day) => (
+                  <div key={day.date} className="dashboard-chart-bar" title={`${day.count} activities`}>
+                    <div
+                      className="dashboard-chart-bar__fill"
+                      style={{ height: `${Math.max(4, (day.count / maxActivity) * 100)}%` }}
+                    />
+                    <span className="dashboard-chart-bar__label">{day.label}</span>
+                  </div>
                 ))}
-              </select>
-            )}
-          </div>
-        </div>
-      </header>
-
-      <div className="panel-body-scroll p-5 space-y-5">
-        {error && (
-          <p className="text-sm text-red-700 bg-red-50 border border-red-100 rounded-lg px-3 py-2">{error}</p>
-        )}
-
-        {loading && !data ? (
-          <LoadingExperience message={LOADING_MESSAGES.team} fill={false} className="rounded-xl border border-gray-200 min-h-[240px]" />
-        ) : (
-          <>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-              {KPI.map((item) => (
-                <button
-                  key={item.key}
-                  type="button"
-                  onClick={() => onKpiClick(item)}
-                  className="text-left bg-white rounded-xl border border-gray-200 p-4 hover:border-[#ffcb2b] hover:shadow-sm transition-all"
-                >
-                  <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-500">{item.label}</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1 tabular-nums">
-                    {item.format === 'currency'
-                      ? formatDealValue(summary[item.key])
-                      : summary[item.key] ?? 0}
-                  </p>
-                </button>
-              ))}
-            </div>
-
-            <div className="grid lg:grid-cols-3 gap-5">
-              <section className="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-4">
-                <h2 className="text-sm font-semibold text-gray-900 mb-3">Activity ({period === 'week' ? '7 days' : '30 days'})</h2>
-                <div className="flex items-end gap-1 h-36">
-                  {(data?.activityByDay || []).map((day) => (
-                    <div key={day.date} className="flex-1 flex flex-col items-center gap-1 min-w-0">
-                      <div
-                        className="w-full max-w-[28px] rounded-t bg-[#ffcb2b] transition-all"
-                        style={{ height: `${Math.max(4, (day.count / maxActivity) * 100)}%` }}
-                        title={`${day.count} activities`}
-                      />
-                      <span className="text-[9px] text-gray-500 truncate w-full text-center">{day.label}</span>
-                    </div>
-                  ))}
-                </div>
-                <p className="text-[10px] text-gray-400 mt-2">
-                  Emails sent, calls, WhatsApp, notes, and new leads added to pipeline
+              </div>
+              {summary.activitiesInPeriod === 0 && summary.totalLeads > 0 ? (
+                <p className="text-[0.6875rem] font-medium text-amber-900 bg-amber-50 border border-amber-100 rounded-xl px-2.5 py-2 mt-3">
+                  No touchpoints in this period yet — log activity or send email from a lead in Pipeline.
                 </p>
-                {summary.activitiesInPeriod === 0 && summary.totalLeads > 0 && (
-                  <p className="text-[10px] text-amber-800 bg-amber-50 border border-amber-100 rounded-lg px-2 py-1.5 mt-2">
-                    No touchpoints in this period yet — send email or log activity from a lead in Pipeline.
-                  </p>
-                )}
-              </section>
+              ) : null}
+            </DashboardSection>
 
-              <section className="bg-white rounded-xl border border-gray-200 p-4">
-                <h2 className="text-sm font-semibold text-gray-900 mb-3">Pipeline funnel</h2>
-                <ul className="space-y-2">
-                  {(data?.statusBreakdown || []).map((row) => {
-                    const meta = getStatusMeta(row.status)
-                    const total = summary.totalLeads || 1
-                    const pct = Math.round((row.count / total) * 100)
-                    return (
-                      <li key={row.status}>
-                        <div className="flex justify-between text-xs mb-0.5">
-                          <span className="font-medium text-gray-700">{meta?.label || row.status}</span>
-                          <span className="text-gray-500 tabular-nums">{row.count}</span>
-                        </div>
-                        <div className="h-2 rounded-full bg-gray-100 overflow-hidden">
-                          <div
-                            className="h-full rounded-full bg-gray-800"
-                            style={{ width: `${Math.min(100, pct)}%` }}
-                          />
-                        </div>
-                      </li>
-                    )
-                  })}
-                </ul>
-              </section>
-            </div>
+            <DashboardSection title="Pipeline funnel" subtitle="Share of leads by stage">
+              <ul className="space-y-2.5">
+                {(data?.statusBreakdown || []).map((row) => {
+                  const meta = getStatusMeta(row.status)
+                  const total = summary.totalLeads || 1
+                  const pct = Math.min(100, Math.round((row.count / total) * 100))
+                  return (
+                    <li key={row.status}>
+                      <div className="dashboard-funnel-row__head">
+                        <span>{meta?.label || row.status}</span>
+                        <span>{row.count}</span>
+                      </div>
+                      <div className="dashboard-funnel-row__track">
+                        <div className="dashboard-funnel-row__fill" style={{ width: `${pct}%` }} />
+                      </div>
+                    </li>
+                  )
+                })}
+              </ul>
+              {!data?.statusBreakdown?.length ? (
+                <DashboardEmpty>No pipeline data for this period.</DashboardEmpty>
+              ) : null}
+            </DashboardSection>
+          </div>
 
-            {data?.members?.length > 0 && (
-              <section className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                <div className="px-4 py-3 border-b border-gray-100">
-                  <h2 className="text-sm font-semibold text-gray-900">Team performance</h2>
-                  <p className="text-xs text-gray-500 mt-0.5">Click a row to view that member&apos;s pipeline</p>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead className="bg-gray-50 text-left text-[11px] font-semibold text-gray-500 uppercase">
-                      <tr>
-                        <th className="px-4 py-2.5">Member</th>
-                        <th className="px-4 py-2.5">Leads</th>
-                        <th className="px-4 py-2.5">Activities</th>
-                        <th className="px-4 py-2.5">Emails</th>
-                        <th className="px-4 py-2.5">Follow-ups</th>
-                        <th className="px-4 py-2.5">Status</th>
+          {data?.members?.length > 0 ? (
+            <DashboardSection
+              title="Team performance"
+              subtitle="Click a row to filter pipeline by that member"
+            >
+              <div className="dashboard-table-wrap -mx-4 -mb-1">
+                <table className="dashboard-table">
+                  <thead>
+                    <tr>
+                      <th>Member</th>
+                      <th>Leads</th>
+                      <th>Activities</th>
+                      <th>Emails</th>
+                      <th>Follow-ups</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.members.map((m) => (
+                      <tr key={m.userId} onClick={() => onMemberRow(m)}>
+                        <td>
+                          <span className="block">{m.name}</span>
+                          <span className="block text-[0.6875rem] font-medium text-[#647185] mt-0.5">
+                            {m.email}
+                          </span>
+                        </td>
+                        <td className="tabular">{m.totalLeads}</td>
+                        <td className="tabular">{m.activitiesInPeriod}</td>
+                        <td className="tabular">{m.emailsSent}</td>
+                        <td className="tabular">{m.needsFollowUp}</td>
+                        <td className="text-[0.75rem]">{m.needsHelp}</td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {data.members.map((m) => (
-                        <tr
-                          key={m.userId}
-                          className="border-t border-gray-100 hover:bg-[#fffbeb]/50 cursor-pointer"
-                          onClick={() => onMemberRow(m)}
-                        >
-                          <td className="px-4 py-3">
-                            <p className="font-medium text-gray-900">{m.name}</p>
-                            <p className="text-[11px] text-gray-500">{m.email}</p>
-                          </td>
-                          <td className="px-4 py-3 tabular-nums">{m.totalLeads}</td>
-                          <td className="px-4 py-3 tabular-nums">{m.activitiesInPeriod}</td>
-                          <td className="px-4 py-3 tabular-nums">{m.emailsSent}</td>
-                          <td className="px-4 py-3 tabular-nums">{m.needsFollowUp}</td>
-                          <td className="px-4 py-3 text-xs text-gray-600">{m.needsHelp}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </section>
-            )}
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </DashboardSection>
+          ) : null}
 
-            {data?.personal && (
-              <p className="text-xs text-gray-500 text-center">
-                Individual account — metrics reflect your assigned pipeline only.
-              </p>
-            )}
-          </>
-        )}
-      </div>
-    </div>
+          {data?.personal ? (
+            <p className="dashboard-footnote">
+              Individual account — metrics reflect your assigned pipeline only.
+            </p>
+          ) : null}
+        </>
+      )}
+    </DashboardShell>
   )
 }

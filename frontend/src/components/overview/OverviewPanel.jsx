@@ -2,20 +2,24 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { getVisiblePipelineColumns } from '../../lib/crmConstants'
-import { QUICK_NAV_TILES, pipelineCountsFromSummary, countUpcomingFromLeads, navTargetToOptions } from '../../lib/navConfig'
+import {
+  QUICK_NAV_TILES,
+  pipelineCountsFromSummary,
+  countUpcomingFromLeads,
+  navTargetToOptions,
+} from '../../lib/navConfig'
 import { formatDateTime } from '../../lib/crmUiConstants'
 import { withTimeout } from '../../lib/fetchWithTimeout'
-
-const ICONS = {
-  pipeline: '◎',
-  spark: '✦',
-  mail: '✉',
-  people: '👤',
-  calendar: '📅',
-  log: '📋',
-  note: '📝',
-  task: '✓',
-}
+import {
+  DashboardShell,
+  DashboardKpiCard,
+  DashboardSection,
+  DashboardQuickTile,
+  DashboardListRow,
+  DashboardProgressRow,
+  DashboardEmpty,
+  DashboardFeatureCard,
+} from '../dashboard/dashboardUi'
 
 export default function OverviewPanel({ onNavigate, isActive = true }) {
   const {
@@ -85,326 +89,288 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
 
   const quickTiles = useMemo(() => {
     const isCompany = user?.accountType === 'company'
-    return QUICK_NAV_TILES.filter((t) => {
+    const tiles = QUICK_NAV_TILES.filter((t) => {
       if (t.panel === 'team-notes' || t.panel === 'team-tasks') return isCompany
       return true
     })
+    if (isCompany) {
+      tiles.push({
+        id: 'team-metrics',
+        label: 'Team metrics',
+        panel: 'crm-dashboard',
+        icon: 'chart',
+        desc: 'Performance',
+      })
+    }
+    return tiles
   }, [user?.accountType])
 
   const recentNotifs = notifications.filter((n) => n.unread).slice(0, 5)
+  const pipelineTotal = pipelineSummary.total || savedLeads.length
+
+  const headerActions =
+    user?.accountType === 'company' ? (
+      <button
+        type="button"
+        className="crm-btn crm-btn-secondary crm-btn-sm"
+        onClick={() => go({ panel: 'crm-dashboard' })}
+      >
+        Team metrics
+      </button>
+    ) : null
 
   return (
-    <div className="panel-shell panel-scroll-page bg-[#f6f7f9]">
-      <header className="shrink-0 bg-white border-b border-gray-200 px-4 py-3 max-md:block md:px-6 md:pt-6 md:pb-0 md:border-0 md:bg-transparent">
-        <h1 className="text-base md:text-lg font-semibold text-gray-900">Home</h1>
-        <p className="text-xs text-gray-500 mt-0.5">
-          Welcome back{user?.name ? `, ${user.name.split(' ')[0]}` : ''} — your CRM at a glance
-        </p>
-      </header>
+    <DashboardShell
+      title="Dashboard"
+      subtitle={
+        user?.name
+          ? `Welcome back, ${user.name.split(' ')[0]} — pipeline, marketing, and calendar at a glance`
+          : 'Your CRM at a glance — click any card to jump in'
+      }
+      actions={headerActions}
+    >
+      <div className="dashboard-kpi-grid">
+        <DashboardKpiCard
+          icon="pipeline"
+          label="Pipeline leads"
+          value={(pipelineTotal || 0).toLocaleString()}
+          hint={
+            pipelineLoad.hasMore
+              ? `${savedLeads.length.toLocaleString()} loaded · ${replied} replied`
+              : `${replied} replied`
+          }
+          onClick={() => go({ panel: 'pipeline', status: 'all' })}
+        />
+        <DashboardKpiCard
+          icon="calendar"
+          label="Follow-up due"
+          value={followUpDue.toLocaleString()}
+          hint="Next 7 days"
+          onClick={() => go({ panel: 'pipeline', status: 'follow_up' })}
+        />
+        <DashboardKpiCard
+          icon="task"
+          label="Upcoming"
+          value={(upcomingLocal || upcomingEvents.length).toLocaleString()}
+          hint="Meetings & tasks"
+          onClick={() => go({ panel: 'crm-calendar', upcomingOnly: true })}
+        />
+        <DashboardKpiCard
+          icon="spark"
+          label="Credits"
+          value={`₹${((user?.creditsPaise ?? 0) / 100).toFixed(0)}`}
+          hint={`${user?.searchesLeft ?? 0} AI searches left`}
+          onClick={() => go({ panel: 'search' })}
+        />
+      </div>
 
-      <div className="panel-body-scroll p-4 md:p-6 max-md:pt-3 space-y-5 md:space-y-6 w-full">
-        <section className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-          {[
-            {
-              label: 'Pipeline leads',
-              value: pipelineSummary.total || savedLeads.length,
-              hint: pipelineLoad.hasMore
-                ? `${savedLeads.length.toLocaleString()} loaded · ${replied} replied`
-                : `${replied} replied`,
-              onClick: () => go({ panel: 'pipeline', status: 'all' }),
-            },
-            {
-              label: 'Follow-up due',
-              value: followUpDue,
-              hint: 'Next 7 days',
-              onClick: () => go({ panel: 'pipeline', status: 'follow_up' }),
-            },
-            {
-              label: 'Upcoming',
-              value: upcomingLocal || upcomingEvents.length,
-              hint: 'Meetings & tasks',
-              onClick: () => go({ panel: 'crm-calendar', upcomingOnly: true }),
-            },
-            {
-              label: 'Credits',
-              value: `₹${((user?.creditsPaise ?? 0) / 100).toFixed(0)}`,
-              hint: `${user?.searchesLeft ?? 0} AI searches`,
-              onClick: () => go({ panel: 'search' }),
-            },
-          ].map((kpi) => (
-            <button
-              key={kpi.label}
-              type="button"
-              onClick={kpi.onClick}
-              className="text-left bg-white rounded-lg border border-[#dfe3eb] p-4 md:p-5 hover:border-[#0091ae] hover:shadow-sm transition-all"
-            >
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-[#7c98b6]">
-                {kpi.label}
-              </p>
-              <p className="text-2xl md:text-3xl font-bold text-[#33475b] mt-1 tabular-nums">{kpi.value}</p>
-              <p className="text-xs text-[#516f90] mt-1">{kpi.hint}</p>
-            </button>
+      <div>
+        <p className="dashboard-section-label">Jump to</p>
+        <div className="dashboard-quick-grid">
+          {quickTiles.map((tile) => (
+            <DashboardQuickTile key={tile.id} tile={tile} onClick={() => go(tile)} />
           ))}
-        </section>
-
-        <section>
-          <h2 className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">Jump to</h2>
-          <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-8 gap-2 md:gap-3">
-            {quickTiles.map((tile) => (
-              <button
-                key={tile.id}
-                type="button"
-                onClick={() => go(tile)}
-                className="flex flex-col items-center gap-1.5 p-3 rounded-xl border border-gray-200 bg-white hover:bg-[#fffbeb] hover:border-[#fde68a] transition-colors"
-                title={tile.desc}
-              >
-                <span className="text-xl leading-none" aria-hidden>
-                  {ICONS[tile.icon] || '→'}
-                </span>
-                <span className="text-[10px] font-semibold text-gray-800 text-center leading-tight">
-                  {tile.label}
-                </span>
-              </button>
-            ))}
-          </div>
-        </section>
-
-        <div className="grid lg:grid-cols-3 gap-4">
-          <section className="lg:col-span-2 bg-white rounded-lg border border-[#dfe3eb] p-4 md:p-5">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h3 className="text-sm font-semibold text-[#33475b]">Pipeline by stage</h3>
-                {pipelineSummary.total > 0 && (
-                  <p className="text-xs text-[#516f90] mt-0.5 tabular-nums">
-                    {pipelineSummary.total.toLocaleString()} leads total
-                  </p>
-                )}
-              </div>
-              <button
-                type="button"
-                onClick={() => go({ panel: 'pipeline', status: 'all' })}
-                className="text-xs font-semibold text-[#0091ae] hover:underline"
-              >
-                Open pipeline
-              </button>
-            </div>
-            <div className="space-y-3">
-              {columns.map((col) => {
-                const count = pipelineCounts[col.id] || 0
-                const pct = pipelineCounts.all ? Math.round((count / pipelineCounts.all) * 100) : 0
-                return (
-                  <button
-                    key={col.id}
-                    type="button"
-                    onClick={() => go({ panel: 'pipeline', status: col.id })}
-                    className="w-full flex items-center gap-3 group py-0.5"
-                  >
-                    <span className="text-sm text-[#516f90] w-24 text-left shrink-0 group-hover:text-[#33475b]">
-                      {col.label}
-                    </span>
-                    <div className="flex-1 h-2.5 bg-[#eaf0f6] rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-[#0091ae] rounded-full transition-all"
-                        style={{ width: `${Math.max(pct, count ? 4 : 0)}%` }}
-                      />
-                    </div>
-                    <span className="text-sm font-semibold text-[#33475b] w-10 text-right tabular-nums">
-                      {count.toLocaleString()}
-                    </span>
-                  </button>
-                )
-              })}
-            </div>
-          </section>
-
-          <section className="bg-white rounded-xl border border-gray-200 p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-gray-900">Marketing</h3>
-              <button
-                type="button"
-                onClick={() => go({ panel: 'marketing', tab: 'reports' })}
-                className="text-xs font-semibold text-[#5b4a00] hover:underline"
-              >
-                Reports
-              </button>
-            </div>
-            {loadingExtras ? (
-              <p className="text-xs text-gray-400">Loading…</p>
-            ) : marketingSummary ? (
-              <ul className="space-y-2 text-sm text-gray-700">
-                <li className="flex justify-between">
-                  <span>Campaigns</span>
-                  <span className="font-semibold tabular-nums">{marketingSummary.campaigns}</span>
-                </li>
-                <li className="flex justify-between">
-                  <span>Sent</span>
-                  <span className="font-semibold tabular-nums">{marketingSummary.sent}</span>
-                </li>
-                <li className="flex justify-between">
-                  <span>Opens</span>
-                  <span className="font-semibold tabular-nums">{marketingSummary.opens}</span>
-                </li>
-                <li className="flex justify-between">
-                  <span>Clicks</span>
-                  <span className="font-semibold tabular-nums">{marketingSummary.clicks}</span>
-                </li>
-              </ul>
-            ) : (
-              <p className="text-xs text-gray-500">No campaigns yet.</p>
-            )}
-            <button
-              type="button"
-              onClick={() => go({ panel: 'marketing', tab: 'campaigns' })}
-              className="mt-3 text-xs font-semibold w-full py-2 rounded-lg border border-gray-200 hover:bg-gray-50"
-            >
-              Create campaign
-            </button>
-          </section>
-        </div>
-
-        <div className="grid lg:grid-cols-2 gap-4">
-          <section className="bg-white rounded-xl border border-gray-200 p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-gray-900">Upcoming meetings & tasks</h3>
-              <button
-                type="button"
-                onClick={() => go({ panel: 'crm-calendar', upcomingOnly: true })}
-                className="text-xs font-semibold text-[#5b4a00] hover:underline"
-              >
-                View all
-              </button>
-            </div>
-            {loadingExtras ? (
-              <p className="text-xs text-gray-400">Loading calendar…</p>
-            ) : upcomingEvents.length === 0 ? (
-              <p className="text-sm text-gray-500">Nothing scheduled — add from Pipeline.</p>
-            ) : (
-              <ul className="space-y-2">
-                {upcomingEvents.map((ev) => (
-                  <li key={ev.id}>
-                    <button
-                      type="button"
-                      onClick={() => go({ panel: 'crm-calendar', upcomingOnly: true })}
-                      className="w-full text-left px-2 py-2 rounded-lg hover:bg-gray-50 border border-transparent hover:border-gray-100"
-                    >
-                      <p className="text-sm font-medium text-gray-900 truncate">{ev.title}</p>
-                      <p className="text-xs text-gray-500 truncate">
-                        {ev.leadName} · {formatDateTime(ev.scheduledAt)}
-                      </p>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
-
-          <section className="bg-white rounded-xl border border-gray-200 p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-gray-900">
-                Notifications
-                {unreadNotificationCount > 0 && (
-                  <span className="ml-2 text-[10px] font-bold bg-[#ffcb2b] text-[#242424] px-1.5 py-0.5 rounded">
-                    {unreadNotificationCount}
-                  </span>
-                )}
-              </h3>
-            </div>
-            {recentNotifs.length === 0 ? (
-              <p className="text-sm text-gray-500">You are all caught up.</p>
-            ) : (
-              <ul className="space-y-2">
-                {recentNotifs.map((n) => (
-                  <li key={n.id} className="text-xs text-gray-700 border-b border-gray-50 pb-2 last:border-0">
-                    <p className="font-medium text-gray-900">{n.title}</p>
-                    <p className="text-gray-500 mt-0.5 line-clamp-2">{n.body}</p>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
-        </div>
-
-        <div className="grid lg:grid-cols-2 gap-4">
-          <section className="bg-white rounded-xl border border-gray-200 p-4">
-            <h3 className="text-sm font-semibold text-gray-900 mb-3">Recent AI searches</h3>
-            {searchHistory.length === 0 ? (
-              <p className="text-sm text-gray-500">No searches yet.</p>
-            ) : (
-              <ul className="space-y-2">
-                {searchHistory.slice(0, 4).map((h, i) => (
-                  <li key={i} className="flex justify-between gap-2 text-sm border-b border-gray-50 pb-2">
-                    <span className="text-gray-800 truncate">{formatFilters(h.filters)}</span>
-                    <span className="text-xs font-bold text-gray-500 shrink-0">{h.count} leads</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-            <button
-              type="button"
-              onClick={() => go({ panel: 'search' })}
-              className="mt-3 text-xs font-semibold text-[#5b4a00] hover:underline"
-            >
-              New search
-            </button>
-          </section>
-
-          {user?.accountType === 'company' && (
-            <section className="bg-white rounded-xl border border-teal-200/50 p-4">
-              <h3 className="text-sm font-semibold text-gray-900 mb-1">Active customers</h3>
-              <p className="text-xs text-gray-500 mb-3 leading-relaxed">
-                Track first shipment and repeat loads. Import ERP/shipment files by mobile number.
-              </p>
-              <button
-                type="button"
-                onClick={() => go({ panel: 'active-customers' })}
-                className="text-xs font-semibold px-3 py-2 bg-teal-700 text-white rounded-lg"
-              >
-                Active customers dashboard
-              </button>
-            </section>
-          )}
-
-          {user?.isOrgAdmin && user?.accountType === 'company' && (
-            <section className="bg-white rounded-xl border border-[#25D366]/30 p-4">
-              <h3 className="text-sm font-semibold text-gray-900 mb-1">WhatsApp Business API</h3>
-              <p className="text-xs text-gray-500 mb-3 leading-relaxed">
-                {user?.whatsappAutoSendReady
-                  ? 'Automatic bulk WhatsApp is connected for your company.'
-                  : 'Connect Meta API credentials to send marketing and pipeline WhatsApp without opening the app.'}
-              </p>
-              <button
-                type="button"
-                onClick={() => go({ panel: 'whatsapp-settings' })}
-                className="text-xs font-semibold px-3 py-2 bg-[#25D366] text-white rounded-lg"
-              >
-                {user?.whatsappAutoSendReady ? 'WhatsApp API settings' : 'Set up WhatsApp API'}
-              </button>
-            </section>
-          )}
-
-          {user?.accountType === 'company' && teamMembers.length > 0 && (
-            <section className="bg-white rounded-xl border border-gray-200 p-4">
-              <h3 className="text-sm font-semibold text-gray-900 mb-3">Team</h3>
-              <ul className="space-y-1">
-                {teamMembers.slice(0, 6).map((m) => (
-                  <li key={m.userId} className="text-sm text-gray-700 flex justify-between">
-                    <span>{m.name}</span>
-                    <span className="text-xs text-gray-400">{m.orgRole === 'org_admin' ? 'Admin' : 'Member'}</span>
-                  </li>
-                ))}
-              </ul>
-              <button
-                type="button"
-                onClick={() => go({ panel: 'team' })}
-                className="mt-3 text-xs font-semibold text-[#5b4a00] hover:underline"
-              >
-                Team settings
-              </button>
-            </section>
-          )}
         </div>
       </div>
-    </div>
+
+      <div className="dashboard-layout-2-1">
+        <DashboardSection
+          title="Pipeline by stage"
+          subtitle={
+            pipelineTotal > 0
+              ? `${pipelineTotal.toLocaleString()} leads total — click a stage to filter`
+              : 'Add leads from AI search or import'
+          }
+          actionLabel="Open pipeline"
+          onAction={() => go({ panel: 'pipeline', status: 'all' })}
+        >
+          <div className="flex flex-col gap-0.5">
+            {columns.map((col) => (
+              <DashboardProgressRow
+                key={col.id}
+                label={col.label}
+                count={pipelineCounts[col.id] || 0}
+                total={pipelineCounts.all || 0}
+                onClick={() => go({ panel: 'pipeline', status: col.id })}
+              />
+            ))}
+          </div>
+        </DashboardSection>
+
+        <DashboardSection
+          title="Marketing"
+          subtitle="Campaign performance"
+          actionLabel="Reports"
+          onAction={() => go({ panel: 'marketing', tab: 'reports' })}
+        >
+          {loadingExtras ? (
+            <DashboardEmpty>Loading marketing stats…</DashboardEmpty>
+          ) : marketingSummary ? (
+            <ul className="dashboard-stat-list">
+              <li>
+                <span>Campaigns</span>
+                <span>{marketingSummary.campaigns}</span>
+              </li>
+              <li>
+                <span>Sent</span>
+                <span>{marketingSummary.sent}</span>
+              </li>
+              <li>
+                <span>Opens</span>
+                <span>{marketingSummary.opens}</span>
+              </li>
+              <li>
+                <span>Clicks</span>
+                <span>{marketingSummary.clicks}</span>
+              </li>
+            </ul>
+          ) : (
+            <DashboardEmpty>No campaigns yet — create your first outreach.</DashboardEmpty>
+          )}
+          <button
+            type="button"
+            className="crm-btn crm-btn-secondary crm-btn-sm w-full mt-3"
+            onClick={() => go({ panel: 'marketing', tab: 'campaigns' })}
+          >
+            Create campaign
+          </button>
+        </DashboardSection>
+      </div>
+
+      <div className="dashboard-layout-2">
+        <DashboardSection
+          title="Upcoming meetings & tasks"
+          subtitle="Next 90 days"
+          actionLabel="View calendar"
+          onAction={() => go({ panel: 'crm-calendar', upcomingOnly: true })}
+        >
+          {loadingExtras ? (
+            <DashboardEmpty>Loading calendar…</DashboardEmpty>
+          ) : upcomingEvents.length === 0 ? (
+            <DashboardEmpty>Nothing scheduled — add meetings or tasks from Pipeline.</DashboardEmpty>
+          ) : (
+            <ul className="dashboard-list">
+              {upcomingEvents.map((ev) => (
+                <DashboardListRow
+                  key={ev.id}
+                  title={ev.title}
+                  meta={`${ev.leadName || 'Lead'} · ${formatDateTime(ev.scheduledAt)}`}
+                  onClick={() => go({ panel: 'crm-calendar', upcomingOnly: true })}
+                />
+              ))}
+            </ul>
+          )}
+        </DashboardSection>
+
+        <DashboardSection
+          title={
+            <>
+              Notifications
+              {unreadNotificationCount > 0 ? (
+                <span className="dashboard-badge-pill">{unreadNotificationCount}</span>
+              ) : null}
+            </>
+          }
+          subtitle={unreadNotificationCount ? 'Unread updates' : 'All caught up'}
+        >
+          {recentNotifs.length === 0 ? (
+            <DashboardEmpty>You are all caught up.</DashboardEmpty>
+          ) : (
+            <ul className="dashboard-list">
+              {recentNotifs.map((n) => (
+                <li key={n.id} className="dashboard-notif-item">
+                  <p className="dashboard-notif-item__title">{n.title}</p>
+                  <p className="dashboard-notif-item__body">{n.body}</p>
+                </li>
+              ))}
+            </ul>
+          )}
+          <button
+            type="button"
+            className="dashboard-link-btn mt-2"
+            onClick={() => go({ panel: 'pipeline', status: 'all' })}
+          >
+            Open pipeline
+          </button>
+        </DashboardSection>
+      </div>
+
+      <div className="dashboard-layout-2">
+        <DashboardSection
+          title="Recent AI searches"
+          subtitle="Pick up where you left off"
+          actionLabel="New search"
+          onAction={() => go({ panel: 'search' })}
+        >
+          {searchHistory.length === 0 ? (
+            <DashboardEmpty>No searches yet — find prospects with AI.</DashboardEmpty>
+          ) : (
+            <ul className="dashboard-list">
+              {searchHistory.slice(0, 4).map((h, i) => (
+                <DashboardListRow
+                  key={i}
+                  title={formatFilters(h.filters)}
+                  meta={`${h.count} leads found`}
+                  badge={h.count}
+                  onClick={() => go({ panel: 'search' })}
+                />
+              ))}
+            </ul>
+          )}
+        </DashboardSection>
+
+        {user?.accountType === 'company' && teamMembers.length > 0 && (
+          <DashboardSection
+            title="Team"
+            subtitle={`${teamMembers.length} member${teamMembers.length === 1 ? '' : 's'}`}
+            actionLabel="Team settings"
+            onAction={() => go({ panel: 'team' })}
+          >
+            <ul className="dashboard-list">
+              {teamMembers.slice(0, 6).map((m) => (
+                <DashboardListRow
+                  key={m.userId}
+                  title={m.name}
+                  meta={m.email}
+                  badge={m.orgRole === 'org_admin' ? 'Admin' : 'Member'}
+                  onClick={() => go({ panel: 'team' })}
+                />
+              ))}
+            </ul>
+          </DashboardSection>
+        )}
+      </div>
+
+      {(user?.accountType === 'company' ||
+        (user?.isOrgAdmin && user?.accountType === 'company')) && (
+        <div className="dashboard-layout-2">
+          {user?.accountType === 'company' && (
+            <DashboardFeatureCard
+              icon="chart"
+              title="Active customers"
+              description="Track first shipment and repeat loads. Import ERP or shipment files by mobile number."
+              actionLabel="Open dashboard"
+              accent="teal"
+              onAction={() => go({ panel: 'active-customers' })}
+            />
+          )}
+          {user?.isOrgAdmin && user?.accountType === 'company' && (
+            <DashboardFeatureCard
+              icon="whatsapp"
+              title="WhatsApp Business API"
+              description={
+                user?.whatsappAutoSendReady
+                  ? 'Bulk WhatsApp is connected for your company workspace.'
+                  : 'Connect Meta API credentials to send marketing and pipeline WhatsApp automatically.'
+              }
+              actionLabel={user?.whatsappAutoSendReady ? 'API settings' : 'Set up WhatsApp API'}
+              accent="whatsapp"
+              onAction={() => go({ panel: 'whatsapp-settings' })}
+            />
+          )}
+        </div>
+      )}
+    </DashboardShell>
   )
 }
 
