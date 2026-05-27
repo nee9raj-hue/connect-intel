@@ -767,7 +767,7 @@ function StagePipelineList({
   if (!leads.length) return null
 
   return (
-    <ul className={`space-y-2 ${compact ? 'pb-2' : 'pb-4'}`}>
+    <ul className={`space-y-1.5 ${compact ? 'pb-2' : 'pb-3'}`}>
       {leads.map((lead) => {
         const meta = getStatusMeta(lead.crm?.status)
         const loc = [getLeadCity(lead), getLeadState(lead)].filter(Boolean).join(', ')
@@ -779,74 +779,74 @@ function StagePipelineList({
                 selectedIds.has(lead.id) ? 'ring-1 ring-slate-300' : ''
               }`}
             >
-              <div className="flex items-stretch gap-0 min-h-[72px]">
-                <label className="flex items-center pl-3 pr-1 shrink-0">
+              <div className="flex items-stretch gap-0 min-h-[52px]">
+                <label className="flex items-center pl-2 pr-0.5 shrink-0">
                   <input
                     type="checkbox"
                     checked={selectedIds.has(lead.id)}
                     onChange={(e) => onToggleSelect(lead.id, e.target.checked)}
                     aria-label="Select lead"
-                    className="w-4 h-4"
+                    className="w-3.5 h-3.5"
                   />
                 </label>
                 <button
                   type="button"
                   onClick={() => onSelect(lead.id)}
-                  className="flex-1 min-w-0 text-left py-3 pr-2"
+                  className="flex-1 min-w-0 text-left py-2 pr-1.5"
                 >
-                  <div className="flex flex-wrap items-start justify-between gap-2">
+                  <div className="flex flex-wrap items-start justify-between gap-1.5">
                     <div className="min-w-0">
-                      <p className={`font-semibold text-gray-900 truncate ${compact ? 'text-sm' : 'text-base'}`}>
+                      <p className="text-[13px] font-medium text-[#1e2f3d] truncate leading-tight tracking-tight">
                         {lead.firstName} {lead.lastName}
                       </p>
-                      <p className="text-xs text-gray-600 truncate mt-0.5">{lead.company || '—'}</p>
+                      <p className="text-[11px] text-[#4a6578] truncate mt-0.5 leading-snug">{lead.company || '—'}</p>
                     </div>
                     {showStatus && (
-                      <span className={`shrink-0 text-[10px] font-bold px-2 py-0.5 rounded border ${meta.color}`}>
+                      <span className={`shrink-0 text-[9px] font-medium px-1.5 py-0.5 rounded border ${meta.color}`}>
                         {meta.label}
                       </span>
                     )}
                   </div>
-                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-[11px] text-gray-500">
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1 text-[10px] text-[#5f7d94] leading-snug">
                     {lead.email && <span className="truncate max-w-[200px]">{lead.email}</span>}
                     {lead.phone && <span>{lead.phone}</span>}
                     {loc && <span>{loc}</span>}
                     {lead.title && <span className="text-gray-400">{lead.title}</span>}
                   </div>
-                  <div className="flex flex-wrap items-center gap-2 mt-2">
+                  <div className="flex flex-wrap items-center gap-1 mt-1">
                     {leadHasSendableEmail(lead) && (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 font-medium">
+                      <span className="text-[9px] px-1 py-0.5 rounded bg-blue-50 text-blue-800 font-medium">
                         Email
                       </span>
                     )}
                     {leadHasCallablePhone(lead) && (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-green-50 text-green-700 font-medium">
+                      <span className="text-[9px] px-1 py-0.5 rounded bg-green-50 text-green-800 font-medium">
                         Phone
                       </span>
                     )}
                     {lead.crm?.responseReceived && (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-violet-50 text-violet-700 font-medium">
+                      <span className="text-[9px] px-1 py-0.5 rounded bg-violet-50 text-violet-800 font-medium">
                         Replied
                       </span>
                     )}
                     {lead.crm?.lastEmailSentAt && (
-                      <span className="text-[10px] text-gray-400">
+                      <span className="text-[9px] text-[#5f7d94]">
                         Emailed {formatCrmDate(lead.crm.lastEmailSentAt)}
                       </span>
                     )}
                     {lead.crm?.nextFollowUpAt && (
-                      <span className="text-[10px] text-amber-700">
+                      <span className="text-[9px] text-amber-800">
                         Follow-up {formatCrmDate(lead.crm.nextFollowUpAt)}
                       </span>
                     )}
                     <LeadTagDots lead={lead} tagById={tagById} />
                   </div>
                 </button>
-                <div className="flex flex-col justify-center gap-1 pr-3 shrink-0 border-l border-slate-100 pl-2">
+                <div className="flex flex-col justify-center gap-0.5 pr-2 shrink-0 border-l border-slate-100 pl-1.5">
                   <button
                     type="button"
                     onClick={() => onSelect(lead.id, 'overview')}
-                    className="crm-btn crm-btn-primary text-[11px] py-1 px-2.5"
+                    className="crm-btn crm-btn-sm crm-btn-primary"
                   >
                     Open
                   </button>
@@ -854,7 +854,7 @@ function StagePipelineList({
                     <button
                       type="button"
                       onClick={() => onSelect(lead.id, 'email')}
-                      className="crm-btn crm-btn-secondary text-[11px] py-1 px-2.5"
+                      className="crm-btn crm-btn-sm crm-btn-secondary"
                     >
                       Email
                     </button>
@@ -862,7 +862,7 @@ function StagePipelineList({
                   <button
                     type="button"
                     onClick={() => onToggleSaveLead(lead)}
-                    className="text-[10px] text-red-500 hover:text-red-700"
+                    className="text-[9px] text-red-600 hover:text-red-700"
                   >
                     Remove
                   </button>
@@ -894,9 +894,9 @@ function KanbanColumn({
 
   return (
     <div className={`crm-kanban-column ${compact ? 'w-[200px]' : ''}`}>
-      <div className="crm-kanban-column-header">
-        <span className="text-sm font-semibold text-[#33475b]">{column.label}</span>
-        <div className="flex items-center gap-1.5">
+      <div className="crm-kanban-column-header flex items-center justify-between gap-1">
+        <span className="truncate">{column.label}</span>
+        <div className="flex items-center gap-1 shrink-0">
           <input
             type="checkbox"
             checked={allSelected}
@@ -905,7 +905,7 @@ function KanbanColumn({
             aria-label={`Select all in ${column.label}`}
             className="w-3.5 h-3.5"
           />
-          <span className="text-xs font-semibold text-[#516f90] bg-[#eaf0f6] px-2 py-0.5 rounded tabular-nums">
+          <span className="text-[10px] font-medium text-[#4a6578] bg-[#eaf0f6] px-1.5 py-0.5 rounded tabular-nums">
             {leads.length}
             {totalInColumn > leads.length ? ` / ${totalInColumn}` : ''}
           </span>
@@ -922,7 +922,7 @@ function KanbanColumn({
                 selectedIds.has(lead.id) ? 'ring-1 ring-slate-400' : ''
               }`}
             >
-              <div className="flex items-start gap-1 p-2">
+              <div className="flex items-start gap-1 p-1.5">
                 <input
                   type="checkbox"
                   className="mt-0.5 shrink-0"
@@ -936,10 +936,10 @@ function KanbanColumn({
                   onClick={() => onSelect(lead.id)}
                   className="flex-1 min-w-0 text-left"
                 >
-                  <div className="text-xs font-semibold text-gray-900 truncate">
+                  <div className="text-[11px] font-medium text-[#1e2f3d] truncate leading-tight">
                     {lead.firstName} {lead.lastName}
                   </div>
-                  <div className="text-[10px] text-gray-500 truncate mt-0.5">{lead.company}</div>
+                  <div className="text-[10px] text-[#4a6578] truncate mt-0.5 leading-snug">{lead.company}</div>
                   <LeadTagDots lead={lead} tagById={tagById} />
                   {lead.crm?.lastEmailSentAt && (
                     <div className="text-[10px] text-gray-400 mt-1">

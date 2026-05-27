@@ -204,9 +204,8 @@ export default function ContactsPanel({ onNavigate }) {
         <div className="crm-page-header-top">
           <div className="min-w-0">
             <h1 className="crm-page-title">Contacts</h1>
-            <p className="crm-page-subtitle">
-              Customers on your pipeline (assigned to you or saved by you). Company admins see the
-              full team pipeline.
+            <p className="crm-page-subtitle hidden sm:block">
+              Pipeline contacts assigned to you or saved by you.
             </p>
           </div>
         </div>
@@ -231,7 +230,7 @@ export default function ContactsPanel({ onNavigate }) {
                     applySearch()
                   }
                 }}
-                placeholder="Search name, company, email…"
+                placeholder="Search contacts…"
                 className="crm-search-input"
                 aria-label="Search contacts"
               />
@@ -239,17 +238,15 @@ export default function ContactsPanel({ onNavigate }) {
             <button
               type="button"
               onClick={applySearch}
-              className={`crm-btn ${searchDirty ? 'crm-btn-primary' : 'crm-btn-secondary'}`}
+              className={`crm-btn crm-btn-sm ${searchDirty ? 'crm-btn-primary' : 'crm-btn-secondary'}`}
             >
               Search
             </button>
-          </div>
-          <div className="crm-toolbar-footer">
-            <span className="crm-toolbar-count">
+            <span className="crm-toolbar-count crm-toolbar-count--inline">
               {loading
                 ? 'Loading…'
                 : `${total.toLocaleString()} contact${total === 1 ? '' : 's'}`}
-              {appliedSearch ? ` · matching “${appliedSearch}”` : ''}
+              {appliedSearch ? ` · “${appliedSearch}”` : ''}
             </span>
           </div>
         </div>

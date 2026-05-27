@@ -103,8 +103,8 @@ export default function MarketingListsPanel({
 
   return (
     <div className="crm-content-card flex flex-col min-h-0 flex-1 overflow-hidden">
-      <div className="crm-toolbar shrink-0 border-b border-[#dfe3eb] px-4 pt-3 pb-2 bg-white">
-        <div className="crm-toolbar-row">
+      <div className="crm-toolbar crm-toolbar--compact shrink-0 border-b border-[#dfe3eb] px-3 pt-2 pb-1.5 bg-white">
+        <div className="crm-toolbar-primary">
           <div className="crm-view-tabs">
             {[
               { id: 'email', label: 'Email' },
@@ -156,29 +156,45 @@ export default function MarketingListsPanel({
               type="search"
               value={listSearch}
               onChange={(e) => setListSearch(e.target.value)}
-              placeholder="Search saved lists…"
+              placeholder="Search lists…"
               className="crm-search-input"
               aria-label="Search lists"
             />
           </div>
 
+          {isCompany && (
+            <FilterDropdown
+              compact
+              label="Member"
+              value={assigneeUserId}
+              displayValue={assigneeLabel}
+              options={repOptionsForDropdown}
+              onChange={(v) => setAssigneeUserId(v || '')}
+              emptyLabel="All"
+            />
+          )}
+
+          <FilterDropdown
+            compact
+            label="Stage"
+            value={pipelineStage !== 'all' ? pipelineStage : ''}
+            displayValue={stageLabel}
+            options={stageOptions}
+            onChange={(v) => setPipelineStage(v || 'all')}
+            emptyLabel="All"
+          />
+
           <button
             type="button"
             onClick={() => setCreateOpen(true)}
-            className="crm-btn crm-btn-primary"
+            className="crm-btn crm-btn-sm crm-btn-primary"
           >
-            + Create list
+            + List
           </button>
-        </div>
 
-        <div className="crm-toolbar-footer">
-          <span className="crm-toolbar-count">
+          <span className="crm-toolbar-count crm-toolbar-count--inline">
             {filteredLists.length} list{filteredLists.length === 1 ? '' : 's'} ·{' '}
             {totalContacts.toLocaleString()} contacts
-            {listChannel === 'whatsapp' ? ' · WhatsApp' : ' · Email'}
-          </span>
-          <span className="text-xs text-[#7c98b6] hidden sm:inline">
-            Filters apply when creating lists · click a list below to edit
           </span>
         </div>
       </div>

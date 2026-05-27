@@ -68,25 +68,21 @@ export default function PipelineFiltersBar({
     value: o.id,
   }))
 
-  const activeFilterCount =
-    (appliedFilters.city ? 1 : 0) +
-    (appliedFilters.state ? 1 : 0) +
-    (appliedFilters.contact && appliedFilters.contact !== 'any' ? 1 : 0) +
-    (appliedFilters.tagIds?.length ? 1 : 0) +
-    (appliedFilters.smartTags?.length ? 1 : 0) +
-    (statusFilter && statusFilter !== 'all' ? 1 : 0) +
-    (appliedSearch ? 1 : 0)
+  const advancedFilterCount =
+    (appliedFilters.tagIds?.length ? 1 : 0) + (appliedFilters.smartTags?.length ? 1 : 0)
 
   const countLabel =
     pipelineTotal > totalCount
       ? `${resultCount.toLocaleString()} of ${totalCount.toLocaleString()} · ${pipelineTotal.toLocaleString()} total`
       : `${resultCount.toLocaleString()} lead${resultCount !== 1 ? 's' : ''}`
 
+  const hasSecondaryFilters =
+    savedViews.length > 0 || orgLeadTags.length > 0 || SMART_TAG_OPTIONS.length > 0
+
   return (
-    <div className="crm-toolbar">
-      {/* Row 1 — search (HubSpot-style) */}
-      <div className="crm-toolbar-row">
-        <div className="crm-search-wrap">
+    <div className="crm-toolbar crm-toolbar--compact">
+      <div className="crm-toolbar-primary">
+        <div className="crm-search-wrap crm-search-wrap--compact">
           <svg className="crm-search-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
             <path
               fillRule="evenodd"
@@ -104,116 +100,127 @@ export default function PipelineFiltersBar({
                 handleApply()
               }
             }}
-            placeholder="Search name, email, phone, company, city…"
+            placeholder="Search leads…"
             className="crm-search-input"
             aria-label="Search pipeline"
           />
         </div>
-        <button
-          type="button"
-          onClick={handleApply}
-          disabled={applying}
-          className={`crm-btn ${filtersDirty ? 'crm-btn-primary' : 'crm-btn-secondary'}`}
-        >
-          {applying ? 'Searching…' : 'Search'}
-        </button>
-        {resultCount > 0 && (
-          <button type="button" onClick={onSelectAllFiltered} className="crm-btn crm-btn-ghost hidden sm:inline-flex">
-            Select all
-          </button>
-        )}
-      </div>
 
-      {/* Row 2 — filter dropdowns */}
-      <div className="crm-toolbar-filters">
         {!stageListMode && (
           <FilterDropdown
+            compact
             label="Stage"
             value={statusFilter !== 'all' ? statusFilter : ''}
             displayValue={statusOptions.find((s) => s.id === statusFilter)?.label}
             options={stageOptions}
             onChange={(v) => onStatusFilterChange?.(v || 'all')}
-            emptyLabel="All stages"
+            emptyLabel="All"
           />
         )}
         <FilterDropdown
+          compact
           label="City"
           value={filters.city}
           options={cityOptions}
           onChange={(v) => set({ city: v })}
           searchable
-          placeholder="Search cities…"
-          emptyLabel="All cities"
+          placeholder="City…"
+          emptyLabel="All"
         />
         <FilterDropdown
+          compact
           label="State"
           value={filters.state}
           options={stateOptions}
           onChange={(v) => set({ state: v })}
           searchable
-          placeholder="Search states…"
-          emptyLabel="All states"
+          placeholder="State…"
+          emptyLabel="All"
         />
         <FilterDropdown
+          compact
           label="Contact"
           value={filters.contact !== 'any' ? filters.contact : ''}
           displayValue={CONTACT_FILTER_OPTIONS.find((o) => o.id === filters.contact)?.label}
           options={contactOptions}
           onChange={(v) => set({ contact: v || 'any' })}
-          emptyLabel="All contacts"
+          emptyLabel="All"
         />
 
-        {activeFilterCount > 0 && (
-          <button type="button" onClick={onClearFilters} className="crm-link-btn">
-            Clear all
-          </button>
-        )}
         <button
           type="button"
-          onClick={() => setAdvancedOpen((v) => !v)}
-          className="crm-link-btn ml-auto"
+          onClick={handleApply}
+          disabled={applying}
+          className={`crm-btn crm-btn-sm ${filtersDirty ? 'crm-btn-primary' : 'crm-btn-secondary'}`}
         >
-          {advancedOpen ? 'Hide filters' : 'More filters'}
+          {applying ? '…' : 'Search'}
         </button>
+
+        {hasSecondaryFilters && (
+          <button
+            type="button"
+            onClick={() => setAdvancedOpen((v) => !v)}
+            className={`crm-btn crm-btn-sm crm-btn-ghost ${advancedOpen ? 'is-active' : ''}`}
+          >
+            {advancedOpen ? 'Less' : 'More'}
+            {advancedFilterCount > 0 ? ` (${advancedFilterCount})` : ''}
+          </button>
+        )}
+
+        {(appliedSearch || appliedFilters.city || appliedFilters.state || hasActiveFilters) && (
+          <button type="button" onClick={onClearFilters} className="crm-link-btn crm-link-btn--sm">
+            Clear
+          </button>
+        )}
+
+        {resultCount > 0 && (
+          <button
+            type="button"
+            onClick={onSelectAllFiltered}
+            className="crm-link-btn crm-link-btn--sm hidden lg:inline-flex"
+          >
+            Select all
+          </button>
+        )}
+
+        <span className="crm-toolbar-count crm-toolbar-count--inline">{countLabel}</span>
       </div>
 
-      {/* Active filter chips */}
       {(appliedSearch || appliedFilters.city || appliedFilters.state) && (
         <div className="crm-active-filters">
           {appliedSearch && (
             <FilterChipButton
-              label={`Search: ${appliedSearch}`}
+              label={`“${appliedSearch}”`}
               onRemove={() => onRemoveAppliedFilter?.({ search: '' })}
             />
           )}
           {appliedFilters.city && (
             <FilterChipButton
-              label={`City: ${appliedFilters.city}`}
+              label={appliedFilters.city}
               onRemove={() => onRemoveAppliedFilter?.({ city: '' })}
             />
           )}
           {appliedFilters.state && (
             <FilterChipButton
-              label={`State: ${appliedFilters.state}`}
+              label={appliedFilters.state}
               onRemove={() => onRemoveAppliedFilter?.({ state: '' })}
             />
           )}
         </div>
       )}
 
-      {/* Advanced panel */}
-      {advancedOpen && (
-        <div className="crm-advanced-panel">
+      {advancedOpen && hasSecondaryFilters && (
+        <div className="crm-advanced-panel crm-advanced-panel--compact">
           {savedViews.length > 0 && (
             <div>
               <p className="crm-advanced-label">Saved views</p>
-              <div className="flex flex-wrap gap-2 mt-1">
+              <div className="flex flex-wrap gap-1.5 mt-1">
                 {savedViews.map((v) => (
                   <button
                     key={v.id}
                     type="button"
                     onClick={() => onApplySmartView?.(v)}
-                    className={`crm-pill ${activeSmartViewId === v.id ? 'crm-pill-active' : ''}`}
+                    className={`crm-pill crm-pill--sm ${activeSmartViewId === v.id ? 'crm-pill-active' : ''}`}
                   >
                     {v.name}
                   </button>
@@ -224,18 +231,18 @@ export default function PipelineFiltersBar({
 
           {orgLeadTags.length > 0 && (
             <div>
-              <div className="flex items-center justify-between gap-2 mb-2">
-                <p className="crm-advanced-label">Lead tags</p>
+              <div className="flex items-center justify-between gap-2 mb-1.5">
+                <p className="crm-advanced-label">Tags</p>
                 <select
                   value={filters.tagMode || 'any'}
                   onChange={(e) => set({ tagMode: e.target.value })}
                   className="crm-select-sm"
                 >
-                  <option value="any">Match any</option>
-                  <option value="all">Match all</option>
+                  <option value="any">Any</option>
+                  <option value="all">All</option>
                 </select>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5">
                 {orgLeadTags.map((tag) => {
                   const active = (filters.tagIds || []).includes(tag.id)
                   return (
@@ -243,8 +250,10 @@ export default function PipelineFiltersBar({
                       key={tag.id}
                       type="button"
                       onClick={() => toggleTagFilter(tag.id)}
-                      className={`crm-pill ${active ? 'crm-pill-active' : ''}`}
-                      style={active ? { backgroundColor: tag.color, borderColor: tag.color, color: '#fff' } : undefined}
+                      className={`crm-pill crm-pill--sm ${active ? 'crm-pill-active' : ''}`}
+                      style={
+                        active ? { backgroundColor: tag.color, borderColor: tag.color, color: '#fff' } : undefined
+                      }
                     >
                       {tag.name}
                     </button>
@@ -255,8 +264,8 @@ export default function PipelineFiltersBar({
           )}
 
           <div>
-            <p className="crm-advanced-label">Smart filters</p>
-            <div className="flex flex-wrap gap-2 mt-1">
+            <p className="crm-advanced-label">Smart</p>
+            <div className="flex flex-wrap gap-1.5 mt-1">
               {SMART_TAG_OPTIONS.map((opt) => {
                 const active = (filters.smartTags || []).includes(opt.id)
                 return (
@@ -270,7 +279,7 @@ export default function PipelineFiltersBar({
                         : [...current, opt.id]
                       set({ smartTags: next })
                     }}
-                    className={`crm-pill ${active ? 'crm-pill-active' : ''}`}
+                    className={`crm-pill crm-pill--sm ${active ? 'crm-pill-active' : ''}`}
                   >
                     {opt.label}
                   </button>
@@ -279,21 +288,11 @@ export default function PipelineFiltersBar({
             </div>
           </div>
 
-          <button type="button" onClick={handleApply} disabled={applying} className="crm-btn crm-btn-primary">
-            {applying ? 'Applying…' : 'Apply filters'}
+          <button type="button" onClick={handleApply} disabled={applying} className="crm-btn crm-btn-sm crm-btn-primary">
+            {applying ? 'Applying…' : 'Apply'}
           </button>
         </div>
       )}
-
-      {/* Footer status bar */}
-      <div className="crm-toolbar-footer">
-        <span className="crm-toolbar-count">{countLabel}</span>
-        {hasActiveFilters && !activeFilterCount && (
-          <button type="button" onClick={onClearFilters} className="crm-link-btn">
-            Clear filters
-          </button>
-        )}
-      </div>
     </div>
   )
 }

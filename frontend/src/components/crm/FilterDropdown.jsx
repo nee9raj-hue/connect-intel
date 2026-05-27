@@ -13,6 +13,7 @@ export default function FilterDropdown({
   placeholder = 'Search…',
   emptyLabel = 'Any',
   className = '',
+  compact = false,
 }) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
@@ -41,12 +42,11 @@ export default function FilterDropdown({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className={`crm-filter-btn ${active ? 'crm-filter-btn-active' : ''}`}
+        className={`crm-filter-btn ${compact ? 'crm-filter-btn--compact' : ''} ${active ? 'crm-filter-btn-active' : ''}`}
         aria-expanded={open}
       >
-        <span className="truncate max-w-[140px]">
-          {label}
-          {active ? `: ${shown}` : ''}
+        <span className={`truncate ${compact ? 'max-w-[96px]' : 'max-w-[140px]'}`}>
+          {active ? shown : label}
         </span>
         <svg className="crm-filter-chevron" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
           <path d="M4.5 6l3.5 3.5L11.5 6H4.5z" />
