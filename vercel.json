@@ -41,7 +41,10 @@
     { "source": "/setup-dns", "destination": "/setup-dns.html" },
     { "source": "/privacy", "destination": "/privacy.html" },
     { "source": "/terms", "destination": "/terms.html" },
-    { "source": "/((?!api/|assets/|setup-dns|privacy).*)", "destination": "/index.html" }
+    {
+      "source": "/((?!api/|assets/|setup-dns|privacy|terms|connect-intel-|favicon|icons\\.svg|robots\\.txt|manifest\\.json|sitemap\\.xml).*)",
+      "destination": "/index.html"
+    }
   ],
   "crons": [
     {
