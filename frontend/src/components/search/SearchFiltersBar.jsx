@@ -7,6 +7,7 @@ import {
   isAllStatesSelected,
   pruneCitiesForStates,
 } from '../../lib/filterOptions'
+import { SearchIcon } from '../ui/icons'
 
 export default function SearchFiltersBar({
   filters,
@@ -34,6 +35,14 @@ export default function SearchFiltersBar({
     onChange({ ...filters, [key]: next })
   }
 
+  const changeStates = (nextStates) => {
+    onChange({
+      ...filters,
+      states: nextStates,
+      cities: pruneCitiesForStates(nextStates, filters.cities),
+    })
+  }
+
   const toggleAllStates = () => {
     if (allStatesExplicit) {
       changeStates([])
@@ -49,14 +58,6 @@ export default function SearchFiltersBar({
       return
     }
     onChange({ ...filters, cities: [...all] })
-  }
-
-  const changeStates = (nextStates) => {
-    onChange({
-      ...filters,
-      states: nextStates,
-      cities: pruneCitiesForStates(nextStates, filters.cities),
-    })
   }
 
   const clearFilters = () => {
@@ -82,17 +83,18 @@ export default function SearchFiltersBar({
       : `${filters.cities.length} selected`
 
   return (
-    <div className="shrink-0 bg-white border-b border-gray-200 px-4 sm:px-5 py-3 space-y-2">
-      <div className="flex flex-col sm:flex-row gap-2">
-        <div className="flex-1">
+    <div className="crm-toolbar crm-toolbar--compact crm-search-toolbar space-y-2">
+      <div className="crm-toolbar-primary">
+        <div className="crm-search-wrap !max-w-none">
+          <SearchIcon className="crm-search-icon" />
           <label className="sr-only">What are you looking for?</label>
           <input
             type="text"
-            placeholder="e.g. ghee manufacturers in Alwar, Rajasthan · CEO email at Xindus Network Trade"
+            placeholder="Try: procurement heads in Jaipur, exporters in Gujarat, founders with email"
             value={filters.keywords}
             onChange={(e) => onChange({ ...filters, keywords: e.target.value })}
             onKeyDown={(e) => e.key === 'Enter' && onSearch()}
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#ffcb2b]/50 focus:border-[#ffcb2b]"
+            className="crm-search-input"
           />
         </div>
         <div className="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap">
@@ -100,7 +102,7 @@ export default function SearchFiltersBar({
             type="button"
             onClick={onSearch}
             disabled={loading}
-            className="flex-1 sm:flex-none px-5 py-2.5 bg-[#ffcb2b] hover:bg-[#f0bc00] text-[#242424] text-sm font-semibold rounded-lg disabled:opacity-60 min-w-[100px]"
+            className="crm-btn crm-btn-primary min-w-[104px]"
           >
             {loading ? 'Searching…' : 'Search'}
           </button>
@@ -108,20 +110,14 @@ export default function SearchFiltersBar({
             <button
               type="button"
               onClick={onToggleFilters}
-              className="px-3 py-2.5 text-sm font-medium text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50"
+              className={`crm-btn ${filtersExpanded ? 'crm-btn-ghost is-active' : 'crm-btn-secondary'}`}
             >
               {filtersExpanded ? 'Hide filters' : 'Location & industry'}
-              {activeCount > 0 && !filtersExpanded ? (
-                <span className="ml-1 text-[#8a6600]">({activeCount})</span>
-              ) : null}
+              {activeCount > 0 && !filtersExpanded ? <span className="ml-1">({activeCount})</span> : null}
             </button>
           )}
           {activeCount > 0 && filtersExpanded && (
-            <button
-              type="button"
-              onClick={clearFilters}
-              className="px-3 py-2.5 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50"
-            >
+            <button type="button" onClick={clearFilters} className="crm-link-btn crm-link-btn--sm">
               Clear
             </button>
           )}
@@ -129,77 +125,76 @@ export default function SearchFiltersBar({
       </div>
 
       {filtersExpanded && (
-      <div className="panel-chrome-scroll">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 pt-1 pb-1">
-        <MultiSelectField
-          label="State"
-          hint={stateHint}
-          searchPlaceholder="Search states…"
-          options={stateOptions}
-          selected={filters.states || []}
-          onSelectAll={toggleAllStates}
-          onToggle={(val) => {
-            const current = filters.states || []
-            const next = current.includes(val)
-              ? current.filter((s) => s !== val)
-              : [...current, val]
-            changeStates(next)
-          }}
-        />
-        <MultiSelectField
-          label="City"
-          hint={cityHint}
-          searchPlaceholder="Search cities…"
-          options={cityOptions}
-          selected={filters.cities || []}
-          onSelectAll={toggleAllCities}
-          onToggle={(val) => toggle('cities', val)}
-        />
-        <MultiSelectField
-          label="Industry"
-          hint="Optional"
-          searchPlaceholder="Search industries…"
-          options={INDUSTRIES}
-          selected={filters.industries || []}
-          onSelectAll={() => {
-            if ((filters.industries || []).length === INDUSTRIES.length) {
-              onChange({ ...filters, industries: [] })
-            } else {
-              onChange({ ...filters, industries: [...INDUSTRIES] })
-            }
-          }}
-          onToggle={(val) => toggle('industries', val)}
-        />
-      </div>
-      </div>
-
+        <div className="crm-advanced-panel crm-search-advanced">
+          <div className="crm-filter-matrix">
+            <MultiSelectField
+              label="State"
+              hint={stateHint}
+              searchPlaceholder="Search states…"
+              options={stateOptions}
+              selected={filters.states || []}
+              onSelectAll={toggleAllStates}
+              onToggle={(val) => {
+                const current = filters.states || []
+                const next = current.includes(val)
+                  ? current.filter((s) => s !== val)
+                  : [...current, val]
+                changeStates(next)
+              }}
+            />
+            <MultiSelectField
+              label="City"
+              hint={cityHint}
+              searchPlaceholder="Search cities…"
+              options={cityOptions}
+              selected={filters.cities || []}
+              onSelectAll={toggleAllCities}
+              onToggle={(val) => toggle('cities', val)}
+            />
+            <MultiSelectField
+              label="Industry"
+              hint="Optional"
+              searchPlaceholder="Search industries…"
+              options={INDUSTRIES}
+              selected={filters.industries || []}
+              onSelectAll={() => {
+                if ((filters.industries || []).length === INDUSTRIES.length) {
+                  onChange({ ...filters, industries: [] })
+                } else {
+                  onChange({ ...filters, industries: [...INDUSTRIES] })
+                }
+              }}
+              onToggle={(val) => toggle('industries', val)}
+            />
+          </div>
+        </div>
       )}
 
       {filtersExpanded &&
-      (filters.states?.length || filters.cities?.length || filters.industries?.length) > 0 && (
-        <div className="flex flex-wrap gap-1.5 pt-1">
+      (filters.states?.length || filters.cities?.length || filters.industries?.length) > 0 ? (
+        <div className="crm-active-filters pt-1">
           {!allStatesExplicit &&
-            (filters.states || []).map((v) => (
-              <Chip key={`s-${v}`} label={v} onRemove={() => changeStates(filters.states.filter((s) => s !== v))} />
+            (filters.states || []).map((value) => (
+              <Chip key={`s-${value}`} label={value} onRemove={() => changeStates(filters.states.filter((s) => s !== value))} />
             ))}
           {allStatesExplicit && filters.states?.length > 0 && (
             <Chip label="All states" onRemove={() => changeStates([])} />
           )}
           {!allCitiesExplicit &&
-            (filters.cities || []).map((v) => (
-              <Chip key={`c-${v}`} label={v} onRemove={() => toggle('cities', v)} />
+            (filters.cities || []).map((value) => (
+              <Chip key={`c-${value}`} label={value} onRemove={() => toggle('cities', value)} />
             ))}
           {allCitiesExplicit && filters.cities?.length > 0 && (
             <Chip label="All cities" onRemove={() => onChange({ ...filters, cities: [] })} />
           )}
-          {(filters.industries || []).map((v) => (
-            <Chip key={`i-${v}`} label={v} onRemove={() => toggle('industries', v)} />
+          {(filters.industries || []).map((value) => (
+            <Chip key={`i-${value}`} label={value} onRemove={() => toggle('industries', value)} />
           ))}
         </div>
-      )}
+      ) : null}
 
       {!filtersExpanded && activeCount > 0 && (
-        <p className="text-[11px] text-gray-500">
+        <p className="text-[11px] text-[#647185]">
           {stateHint} · {cityHint}
           {filters.industries?.length ? ` · ${filters.industries.length} industries` : ''}
         </p>
@@ -219,61 +214,57 @@ function MultiSelectField({
 }) {
   const [query, setQuery] = useState('')
   const filteredOptions = useMemo(() => {
-    const q = query.trim().toLowerCase()
-    if (!q) return options
-    return options.filter((opt) => opt.toLowerCase().includes(q))
+    const trimmed = query.trim().toLowerCase()
+    if (!trimmed) return options
+    return options.filter((option) => option.toLowerCase().includes(trimmed))
   }, [options, query])
 
   const allSelected =
-    options.length > 0 && selected.length === options.length && options.every((o) => selected.includes(o))
-
+    options.length > 0 && selected.length === options.length && options.every((option) => selected.includes(option))
   const someSelected = selected.length > 0 && !allSelected
 
   return (
-    <div>
-      <div className="flex items-baseline justify-between gap-2 mb-1">
-        <label className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">{label}</label>
-        <span className="text-[10px] text-gray-400">{hint}</span>
+    <div className="crm-filter-card">
+      <div className="crm-filter-card-head">
+        <label className="crm-filter-card-label">{label}</label>
+        <span className="crm-filter-card-hint">{hint}</span>
       </div>
-      <div className="border border-gray-200 rounded-lg bg-gray-50/80 overflow-hidden">
-        <div className="p-1.5 border-b border-gray-200 bg-white sticky top-0 z-20 space-y-1.5">
+      <div className="crm-filter-card-box">
+        <div className="crm-filter-card-search">
           <input
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={searchPlaceholder}
-            className="w-full px-2 py-1.5 text-[13px] border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-[#ffcb2b]/50 focus:border-[#ffcb2b]"
+            className="crm-filter-search-input"
           />
-          <label className="flex items-center gap-2 px-2 py-1 rounded bg-[#fffbeb] border border-[#ffe48a] cursor-pointer text-[13px] font-semibold text-[#5b4a00]">
+          <label className="crm-filter-bulk-toggle">
             <input
               type="checkbox"
               checked={allSelected}
-              ref={(el) => {
-                if (el) el.indeterminate = someSelected
+              ref={(element) => {
+                if (element) element.indeterminate = someSelected
               }}
               onChange={onSelectAll}
-              className="rounded border-gray-300 text-gray-900 focus:ring-[#ffcb2b]"
+              className="rounded border-gray-300 text-gray-900"
             />
             <span>Select all{query.trim() ? ` (${filteredOptions.length} shown)` : ` (${options.length})`}</span>
           </label>
         </div>
-        <div className="max-h-[200px] overflow-y-auto p-1.5">
+        <div className="crm-filter-card-options">
           {filteredOptions.length === 0 ? (
             <p className="px-2 py-3 text-[12px] text-gray-500 text-center">No matches</p>
           ) : (
-            filteredOptions.map((opt) => (
-              <label
-                key={opt}
-                className="flex items-center gap-2 px-2 py-1 rounded hover:bg-white cursor-pointer text-[13px] text-gray-700"
-              >
+            filteredOptions.map((option) => (
+              <label key={option} className={`crm-filter-check ${selected.includes(option) ? 'is-checked' : ''}`}>
                 <input
                   type="checkbox"
-                  checked={selected.includes(opt)}
-                  onChange={() => onToggle(opt)}
-                  className="rounded border-gray-300 text-gray-900 focus:ring-[#ffcb2b]"
+                  checked={selected.includes(option)}
+                  onChange={() => onToggle(option)}
+                  className="rounded border-gray-300 text-gray-900"
                 />
-                <span className="truncate" title={opt}>
-                  {opt}
+                <span className="truncate" title={option}>
+                  {option}
                 </span>
               </label>
             ))
@@ -286,9 +277,9 @@ function MultiSelectField({
 
 function Chip({ label, onRemove }) {
   return (
-    <span className="inline-flex items-center gap-1 text-[11px] font-medium bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full border border-gray-200">
-      {label}
-      <button type="button" onClick={onRemove} className="text-gray-400 hover:text-gray-700" aria-label="Remove">
+    <span className="crm-filter-chip">
+      <span>{label}</span>
+      <button type="button" onClick={onRemove} className="crm-filter-chip-x" aria-label={`Remove ${label}`}>
         ×
       </button>
     </span>

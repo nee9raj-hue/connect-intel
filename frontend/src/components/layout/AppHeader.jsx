@@ -11,7 +11,7 @@ export default function AppHeader({ onNavigate, sidebarMode = 'expanded', onTogg
   const crmFree = user.crmFreeMode !== false
 
   return (
-    <header className="shrink-0 flex items-center justify-between gap-2 px-4 py-2 bg-white border-b border-gray-200">
+    <header className="shrink-0 flex items-center justify-between gap-2 border-b border-[#e5e9ee] bg-white px-4 py-2.5">
       <SidebarToggleButton
         mode={sidebarMode}
         onToggle={onToggleSidebarCollapsed}
@@ -22,19 +22,19 @@ export default function AppHeader({ onNavigate, sidebarMode = 'expanded', onTogg
       <button
         type="button"
         onClick={() => onNavigate?.('search')}
-        className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#5b4a00] bg-[#fff6d6] px-3 py-1.5 rounded-full border border-[#ffe48a] hover:bg-[#fff0b8] transition-colors"
+        className="inline-flex items-center gap-1.5 rounded-full border border-[#d9dee5] bg-[#f7f9fb] px-3 py-1.5 text-[11px] font-semibold tracking-[-0.015em] text-[#202938] transition-colors hover:bg-[#eef2f6]"
         title="Credits are used for AI prospect search and lead unlocks"
       >
-        <span className="w-1.5 h-1.5 rounded-full bg-[#ffcb2b]" />
+        <span className="w-1.5 h-1.5 rounded-full bg-[#17191c]" />
         AI credits: Rs {credits}
       </button>
       <button
         type="button"
         onClick={() => onNavigate?.('team')}
-        className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border transition-colors ${
+        className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-semibold tracking-[-0.015em] transition-colors ${
           subscriptionActive
-            ? 'text-emerald-800 bg-emerald-50 border-emerald-200'
-            : 'text-gray-700 bg-gray-50 border-gray-200 hover:bg-gray-100'
+            ? 'border-[#b8e3d2] bg-[#eefaf5] text-[#0f6a4c]'
+            : 'border-[#d9dee5] bg-white text-[#536072] hover:bg-[#f7f9fb]'
         }`}
         title={
           subscriptionActive
@@ -43,7 +43,7 @@ export default function AppHeader({ onNavigate, sidebarMode = 'expanded', onTogg
         }
       >
         <span
-          className={`w-1.5 h-1.5 rounded-full ${subscriptionActive ? 'bg-emerald-500' : 'bg-gray-400'}`}
+          className={`w-1.5 h-1.5 rounded-full ${subscriptionActive ? 'bg-[#0f6a4c]' : 'bg-[#7f8b99]'}`}
         />
         Subscription: {subscriptionActive ? 'Active' : crmFree ? 'CRM free mode' : 'Inactive'}
       </button>

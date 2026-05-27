@@ -16,6 +16,16 @@ import {
 } from '../../lib/marketingEmailDesign'
 import { BLOCK_PALETTE_STYLES } from '../../lib/marketingUiConstants'
 import MarketingBlockEditor from './MarketingBlockEditor'
+import {
+  BlocksIcon,
+  DesktopIcon,
+  EyeIcon,
+  LayoutTemplateIcon,
+  MobileDeviceIcon,
+  PanelLeftIcon,
+  PanelRightIcon,
+  SwatchIcon,
+} from '../ui/icons'
 
 const PALETTE = [
   { type: 'header', label: 'Heading', hint: 'Brand bar' },
@@ -31,9 +41,9 @@ const PALETTE = [
 ]
 
 const STUDIO_RAIL = [
-  { id: 'blocks', label: 'Blocks', icon: '⊞' },
-  { id: 'styles', label: 'Styles', icon: '◐' },
-  { id: 'presets', label: 'Layouts', icon: '☰' },
+  { id: 'blocks', label: 'Blocks', icon: BlocksIcon },
+  { id: 'styles', label: 'Styles', icon: SwatchIcon },
+  { id: 'presets', label: 'Layouts', icon: LayoutTemplateIcon },
 ]
 
 const FOLLOW_UP_STARTER = {
@@ -319,46 +329,68 @@ export default function MarketingTemplateBuilder({
         ? 'Fonts and brand colors'
         : 'Start from a full email layout'
 
+  const blockChipStrip =
+    value.blocks?.length > 0 ? (
+      <div className="marketing-canvas-block-bar">
+        {value.blocks.map((block, index) => (
+          <button
+            key={block.id}
+            type="button"
+            onClick={() => setSelectedBlockIndex(index)}
+            className={`marketing-canvas-block-chip ${selectedBlockIndex === index ? 'is-active' : ''}`}
+          >
+            <span>{index + 1}</span>
+            <span>{BLOCK_LABELS[block.type] || block.type}</span>
+          </button>
+        ))}
+      </div>
+    ) : null
+
+  const starterPreview = (starter) =>
+    renderEmailHtml(starter.blocks || [], starter.design || DEFAULT_THEME, {
+      previewText: starter.previewText || '',
+      lead: PREVIEW_LEAD,
+    })
+
   const panelContent = (
     <>
       {sideTab === 'blocks' && (
-                <>
-                  <p className="text-[10px] text-gray-400 mb-2 px-1">Drag or click to add</p>
-                  <div className="grid grid-cols-3 gap-1.5">
-                    {PALETTE.map((item) => {
-                      const style = BLOCK_PALETTE_STYLES[item.type] || BLOCK_PALETTE_STYLES.text
-                      return (
-                        <button
-                          key={item.type}
-                          type="button"
-                          draggable
-                          onDragStart={(e) => handlePaletteDragStart(e, item.type)}
-                          onDragEnd={() => setPaletteDragType(null)}
-                          onClick={() => addBlock(item.type)}
-                          className={`flex flex-col items-center justify-center gap-1 p-2 rounded-lg border ${style.border} ${style.bg} hover:brightness-[0.97] text-center min-h-[72px] marketing-block-card`}
-                        >
-                          <span className={`text-lg leading-none ${style.text}`}>
-                            {style.icon}
-                          </span>
-                          <span className={`text-[9px] font-semibold leading-tight ${style.text}`}>
-                            {item.label}
-                          </span>
-                        </button>
-                      )
-                    })}
-                  </div>
-                  <div className="mt-3 pt-2 border-t border-gray-100">
-                    <p className="text-[10px] font-semibold text-gray-500 mb-1">Merge fields</p>
-                    <div className="flex flex-wrap gap-1">
-                      {MERGE_FIELDS.map((f) => (
-                        <span key={f.token} className="text-[9px] bg-gray-100 text-gray-600 px-1 py-0.5 rounded">
-                          {f.token}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </>
-              )}
+        <>
+          <div className="marketing-panel-caption">Drag or click to add</div>
+          <div className="grid grid-cols-2 gap-2">
+            {PALETTE.map((item) => {
+              const style = BLOCK_PALETTE_STYLES[item.type] || BLOCK_PALETTE_STYLES.text
+              return (
+                <button
+                  key={item.type}
+                  type="button"
+                  draggable
+                  onDragStart={(e) => handlePaletteDragStart(e, item.type)}
+                  onDragEnd={() => setPaletteDragType(null)}
+                  onClick={() => addBlock(item.type)}
+                  className={`marketing-palette-tile ${style.border} ${style.bg} ${style.text}`}
+                >
+                  <span className="marketing-palette-glyph">{style.icon}</span>
+                  <span className="marketing-palette-label">{item.label}</span>
+                  <span className="marketing-palette-hint">{item.hint}</span>
+                </button>
+              )
+            })}
+          </div>
+          <div className="mt-4 border-t border-slate-100 pt-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500 mb-2">
+              Personalization
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {MERGE_FIELDS.map((field) => (
+                <span key={field.token} className="marketing-token-pill">
+                  {field.token}
+                </span>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
               {sideTab === 'styles' && (
                 <div className="space-y-3 text-xs">
                   <label className="block text-gray-600">
@@ -430,16 +462,20 @@ export default function MarketingTemplateBuilder({
                 </div>
               )}
               {sideTab === 'presets' && (
-                <div className="space-y-1.5">
+                <div className="space-y-3">
+                  <div className="marketing-panel-caption">Start from a full layout</div>
                   {starters.map((s) => (
                     <button
                       key={s.id}
                       type="button"
                       onClick={() => loadStarter(s.id)}
-                      className="w-full text-left px-2.5 py-2 rounded-lg border border-gray-100 hover:border-gray-300 hover:bg-gray-50"
+                      className="marketing-layout-card"
                     >
-                      <span className="block text-xs font-semibold text-gray-900">{s.name}</span>
-                      <span className="block text-[10px] text-gray-400 truncate">{s.subject}</span>
+                      <span className="marketing-layout-thumb">
+                        <iframe title={s.name} srcDoc={starterPreview(s)} tabIndex={-1} />
+                      </span>
+                      <span className="block text-xs font-semibold text-slate-900">{s.name}</span>
+                      <span className="block text-[10px] text-slate-500 truncate">{s.subject}</span>
                     </button>
                   ))}
                 </div>
@@ -554,7 +590,7 @@ export default function MarketingTemplateBuilder({
             onClick={() => setSideTab(tab.id)}
             className={`marketing-studio-rail-btn ${sideTab === tab.id ? 'is-active' : ''}`}
           >
-            <span className="text-base leading-none">{tab.icon}</span>
+            <tab.icon className="h-4 w-4" />
             <span>{tab.label}</span>
           </button>
         ))}
@@ -565,7 +601,7 @@ export default function MarketingTemplateBuilder({
             onClick={() => setPanelOpen((v) => !v)}
             className={`marketing-studio-rail-toggle ${panelOpen ? '' : 'is-off'}`}
           >
-            ◧
+            <PanelLeftIcon className="h-4 w-4" />
           </button>
           <button
             type="button"
@@ -573,7 +609,7 @@ export default function MarketingTemplateBuilder({
             onClick={() => setInspectorOpen((v) => !v)}
             className={`marketing-studio-rail-toggle ${inspectorOpen ? '' : 'is-off'}`}
           >
-            ◨
+            <PanelRightIcon className="h-4 w-4" />
           </button>
         </div>
       </nav>
@@ -598,7 +634,7 @@ export default function MarketingTemplateBuilder({
           onClick={() => setInspectorOpen((v) => !v)}
           title={inspectorOpen ? 'Collapse editor' : 'Expand editor'}
         >
-          {inspectorOpen ? 'Edit block ▾' : 'Edit ▸'}
+          {inspectorOpen ? 'Edit block ▾' : 'Edit'}
         </button>
         <div className="marketing-studio-inspector-body flex flex-col flex-1 min-h-0">
           {inspector}
@@ -608,7 +644,7 @@ export default function MarketingTemplateBuilder({
   )
 
   const toolbar = (
-    <div className="marketing-studio-toolbar space-y-2">
+      <div className="marketing-studio-toolbar space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="min-w-0">
           <h2 className="text-sm font-semibold text-slate-900">{headerTitle}</h2>
@@ -629,11 +665,19 @@ export default function MarketingTemplateBuilder({
                     : '!bg-transparent !text-slate-500'
                 }`}
               >
-                {mode}
+                <span className="flex items-center gap-1.5">
+                  {mode === 'desktop' ? (
+                    <DesktopIcon className="h-3.5 w-3.5" />
+                  ) : (
+                    <MobileDeviceIcon className="h-3.5 w-3.5" />
+                  )}
+                  {mode}
+                </span>
               </button>
             ))}
           </div>
           <button type="button" className="ci-btn ci-btn-secondary" onClick={() => setPreviewOpen(true)}>
+            <EyeIcon className="h-3.5 w-3.5" />
             Preview
           </button>
           {onCancel && (
@@ -647,6 +691,14 @@ export default function MarketingTemplateBuilder({
             </button>
           )}
         </div>
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="marketing-toolbar-status">
+          {isEditing ? 'Editing template' : embedded ? 'Campaign content' : 'Template draft'}
+        </span>
+        <span className="text-[11px] text-slate-500">
+          Click the email canvas to edit blocks, or switch to Layouts for full sections.
+        </span>
       </div>
       <div className="flex flex-wrap gap-2">
         {showNameField && (
@@ -772,10 +824,28 @@ export default function MarketingTemplateBuilder({
 
       {showSavedTemplates && templates.length > 0 && (
         <section className="ci-card p-4 mt-3 shrink-0">
-          <h3 className="text-sm font-semibold text-slate-900 mb-3">Your saved templates</h3>
+          <div className="flex items-center justify-between gap-3 mb-3">
+            <div>
+              <h3 className="text-sm font-semibold text-slate-900">Your saved templates</h3>
+              <p className="text-[11px] text-slate-500 mt-0.5">
+                Reuse layouts quickly the same way teams browse templates in Mailchimp.
+              </p>
+            </div>
+            <span className="crm-toolbar-count">{templates.length} saved</span>
+          </div>
           <div className="marketing-template-grid">
             {templates.map((t) => (
               <div key={t.id} className="marketing-template-tile">
+                <div className="marketing-template-preview">
+                  <iframe
+                    title={`${t.name} preview`}
+                    srcDoc={renderEmailHtml(t.blocks || [], t.design || DEFAULT_THEME, {
+                      previewText: t.previewText || '',
+                      lead: PREVIEW_LEAD,
+                    })}
+                    tabIndex={-1}
+                  />
+                </div>
                 <div className="flex items-start justify-between gap-2">
                   <p className="font-semibold text-slate-900 truncate text-sm">{t.name}</p>
                   {t.createdByName && (

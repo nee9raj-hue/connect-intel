@@ -15,6 +15,7 @@ import GmailSetupModal, { markGmailSetupDone, useGmailSetupNeeded } from '../onb
 import ConnectAssistant from '../assistant/ConnectAssistant'
 import MobileNavPill from './MobileNavPill'
 import useIsMobile from '../../hooks/useIsMobile'
+import { MenuIcon } from '../ui/icons'
 
 export default function AppShell() {
   const { user, syncWorkspace, setPanelNavigate, openPipelineLead, pipelineLeadId } = useApp()
@@ -104,7 +105,7 @@ export default function AppShell() {
   }, [navigate, setPanelNavigate])
 
   return (
-    <div className="flex h-[100dvh] w-full overflow-hidden bg-[#f0f4f8]">
+    <div className="flex h-[100dvh] w-full overflow-hidden bg-[var(--color-ci-page)]">
       <Sidebar
         active={activePanel}
         panelOptions={panelOptions}
@@ -115,14 +116,14 @@ export default function AppShell() {
         onToggleSidebarCollapsed={toggleSidebarCollapsed}
       />
       <main className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden">
-        <div className="md:hidden shrink-0 flex items-center gap-2 px-3 py-2 bg-white border-b border-gray-200">
+        <div className="md:hidden shrink-0 flex items-center gap-2 border-b border-[#e5e9ee] bg-white px-3 py-2.5">
           <button
             type="button"
             onClick={() => setMobileNavOpen(true)}
-            className="p-2 rounded-lg border border-gray-200 text-gray-700"
+            className="rounded-xl border border-[#d7dde5] bg-white p-2 text-[#536072]"
             aria-label="Open menu"
           >
-            ☰
+            <MenuIcon className="w-5 h-5" />
           </button>
           <img
             src="/connect-intel-logo-mark.png"
@@ -142,7 +143,7 @@ export default function AppShell() {
           />
         )}
         {user?.isPlatformAdmin && (
-          <div className="hidden md:flex shrink-0 items-center px-4 py-2 bg-white border-b border-gray-200">
+          <div className="hidden md:flex shrink-0 items-center border-b border-[#e5e9ee] bg-white px-4 py-2.5">
             <SidebarToggleButton mode={sidebarMode} onToggle={toggleSidebarCollapsed} />
           </div>
         )}
@@ -154,10 +155,10 @@ export default function AppShell() {
         <SessionReconnectBanner />
         {liveToast && (
           <div
-            className="shrink-0 mx-3 mt-2 text-xs font-medium text-[#5b4a00] bg-[#fffbeb] border border-[#ffe48a] rounded-lg px-3 py-2"
+            className="shrink-0 mx-3 mt-2 rounded-2xl border border-[#d7dde5] bg-white px-3 py-2 text-[11px] font-medium tracking-[-0.015em] text-[#202938]"
             role="status"
           >
-            {liveToast} — pipeline updated automatically
+            {liveToast} · pipeline updated automatically
           </div>
         )}
         <div

@@ -73,7 +73,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
   const [campaigns, setCampaigns] = useState([])
   const [forms, setForms] = useState([])
   const [marketingTipsOpen, setMarketingTipsOpen] = useState(false)
-  const [campaignSetupOpen, setCampaignSetupOpen] = useState(false)
+  const [campaignSetupOpen, setCampaignSetupOpen] = useState(true)
 
   const isBuilderTab = tab === 'campaigns' || tab === 'templates'
   const [summary, setSummary] = useState(null)
@@ -549,6 +549,29 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
           </div>
         </div>
 
+        {summary && (
+          <div className="marketing-summary-strip">
+            <span className="marketing-summary-pill">
+              <strong>{summary.campaigns || 0}</strong> campaigns
+            </span>
+            <span className="marketing-summary-pill">
+              <strong>{summary.sent || 0}</strong> sent
+            </span>
+            <span className="marketing-summary-pill">
+              <strong>{summary.opens || 0}</strong> opens
+            </span>
+            <span className="marketing-summary-pill">
+              <strong>{summary.clicks || 0}</strong> clicks
+            </span>
+            <span className="marketing-summary-pill">
+              <strong>{lists.length || 0}</strong> lists
+            </span>
+            <span className="marketing-summary-pill">
+              <strong>{templates.length || 0}</strong> templates
+            </span>
+          </div>
+        )}
+
         {marketingTipsOpen && (
           <div className="pb-3 space-y-2 max-h-[28vh] overflow-y-auto">
             {(user?.isOrgAdmin || user?.orgRole === 'org_admin') && user?.accountType === 'company' ? (
@@ -605,6 +628,25 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
           </div>
         ) : tab === 'campaigns' ? (
           <div className="marketing-workspace">
+            <div className="marketing-flow-card ci-card">
+              <div>
+                <p className="marketing-flow-label">Campaign flow</p>
+                <h2 className="marketing-flow-title">
+                  Pick a list, choose a starter, then design and send
+                </h2>
+                <p className="marketing-flow-copy">
+                  Built to feel closer to Mailchimp: setup on top, visual builder in the middle,
+                  saved drafts and reports below.
+                </p>
+              </div>
+              <div className="marketing-flow-steps">
+                {['Audience', 'Template', 'Design', 'Review', 'Send'].map((step, index) => (
+                  <span key={step} className="marketing-flow-step">
+                    <strong>{index + 1}</strong> {step}
+                  </span>
+                ))}
+              </div>
+            </div>
             <details
               open={campaignSetupOpen}
               onToggle={(e) => setCampaignSetupOpen(e.target.open)}
@@ -938,6 +980,22 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
           </div>
         ) : tab === 'templates' ? (
           <div className="marketing-workspace">
+          <div className="marketing-flow-card ci-card">
+            <div>
+              <p className="marketing-flow-label">Template library</p>
+              <h2 className="marketing-flow-title">Create reusable email layouts your team can send fast</h2>
+              <p className="marketing-flow-copy">
+                Use layouts on the left, edit sections in the canvas, then save polished templates for campaigns.
+              </p>
+            </div>
+            <div className="marketing-flow-steps">
+              {['Choose layout', 'Customize blocks', 'Preview', 'Save'].map((step, index) => (
+                <span key={step} className="marketing-flow-step">
+                  <strong>{index + 1}</strong> {step}
+                </span>
+              ))}
+            </div>
+          </div>
           <div className="marketing-builder-slot">
           <MarketingTemplateBuilder
             fillHeight

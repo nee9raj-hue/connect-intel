@@ -20,10 +20,10 @@ export default function SearchResultsView({
   const compact = leads.slice(fullPreviewCount)
 
   return (
-    <div className="bg-[#fafafa] min-h-full">
+    <div className="crm-search-results min-h-full bg-[#fafafa]">
       {detailed.length > 0 && (
         <section className="bg-white border-b border-gray-200">
-          <div className="sticky top-0 z-20 flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 bg-white/95 backdrop-blur border-b border-gray-100">
+          <div className="crm-results-head sticky top-0 z-20">
             <div>
               <h2 className="text-sm font-semibold text-gray-900">Top matches</h2>
               <p className="text-[11px] text-gray-500 mt-0.5">
@@ -51,7 +51,7 @@ export default function SearchResultsView({
 
       {compact.length > 0 && (
         <section>
-          <div className="sticky top-0 z-20 flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 bg-gray-50/95 backdrop-blur border-b border-gray-200">
+          <div className="crm-results-head crm-results-head-secondary sticky top-0 z-20">
             <div>
               <h2 className="text-sm font-semibold text-gray-900">More matches</h2>
               <p className="text-[11px] text-gray-500 mt-0.5">
@@ -89,14 +89,13 @@ function CompactResultsList({
   const { isSaved } = useApp()
 
   return (
-    <ul className="divide-y divide-gray-100 bg-white">
+    <ul className="crm-search-compact-list divide-y divide-gray-100 bg-white">
       {leads.map((lead) => {
         const name = [lead.firstName, lead.lastName].filter(Boolean).join(' ') || 'Contact'
-        const masked = lead.access?.emailLocked || lead.access?.phoneLocked
         return (
           <li
             key={lead.id}
-            className="flex items-start gap-3 px-4 py-3 hover:bg-gray-50/80 transition-colors group"
+            className="crm-search-compact-item group"
           >
             <input
               type="checkbox"
@@ -104,14 +103,14 @@ function CompactResultsList({
               onChange={() => onSelect(lead.id)}
               className="rounded mt-1 shrink-0"
             />
-            <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-[11px] font-bold text-gray-500 shrink-0">
+            <div className="crm-search-avatar">
               {name
                 .split(' ')
                 .map((n) => n[0])
                 .join('')
                 .slice(0, 2) || '?'}
             </div>
-            <div className="flex-1 min-w-0 grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-x-4 gap-y-1">
+            <div className="flex-1 min-w-0 grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-x-4 gap-y-1.5">
               <div className="min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">{name}</p>
                 <p className="text-[12px] text-gray-600 truncate">{lead.title || '—'}</p>

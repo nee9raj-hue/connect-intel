@@ -255,7 +255,15 @@ export default function ContactsPanel({ onNavigate }) {
       <div className="crm-page-body">
         <div className="crm-content-card crm-split-card">
           <aside className="crm-split-sidebar">
-            <div className="crm-list-header">All contacts</div>
+            <div className="crm-list-header">
+              <div className="flex items-center justify-between gap-2">
+                <span>All contacts</span>
+                <span className="crm-toolbar-count">{total.toLocaleString()}</span>
+              </div>
+              <p className="mt-1 text-[11px] normal-case tracking-normal font-medium text-[#7a8696]">
+                Saved leads and pipeline contacts
+              </p>
+            </div>
             <div className="crm-list-scroll">
               {loading && !contacts.length ? (
                 <LoadingExperience
@@ -304,12 +312,30 @@ export default function ContactsPanel({ onNavigate }) {
             ) : (
               <div className="crm-detail-pane">
                 <div className="crm-detail-card crm-detail-card-wide">
-                  <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
-                    <div>
+                  <div className="crm-contact-hero">
+                    <div className="crm-contact-avatar">
+                      {([form.firstName, form.lastName]
+                        .filter(Boolean)
+                        .join(' ')
+                        .split(' ')
+                        .map((part) => part[0])
+                        .join('')
+                        .slice(0, 2) || 'C').toUpperCase()}
+                    </div>
+                    <div className="min-w-0 flex-1">
                       <h2 className="crm-detail-title">
                         {[form.firstName, form.lastName].filter(Boolean).join(' ') || 'Contact'}
                       </h2>
-                      <p className="crm-detail-subtitle">{form.company || 'No company'}</p>
+                      <p className="crm-detail-subtitle">
+                        {[form.title, form.company].filter(Boolean).join(' at ') || 'No company'}
+                      </p>
+                      <div className="crm-contact-meta">
+                        {form.email ? <span className="crm-contact-meta-pill">{form.email}</span> : null}
+                        {form.phone ? <span className="crm-contact-meta-pill">{form.phone}</span> : null}
+                        {selected?.industry ? (
+                          <span className="crm-contact-meta-pill">{selected.industry}</span>
+                        ) : null}
+                      </div>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {pipelineLeadForContact ? (
@@ -352,6 +378,13 @@ export default function ContactsPanel({ onNavigate }) {
                     </p>
                   )}
 
+                  <div className="crm-contact-section">
+                    <div className="crm-contact-section-head">
+                      <div>
+                        <p className="crm-field-label mb-1">Core details</p>
+                        <p className="text-[11px] text-[#7a8696]">Keep contact and company details clean for campaigns and pipeline.</p>
+                      </div>
+                    </div>
                   <div className="crm-form-grid crm-form-grid-2">
                     <input
                       value={form.firstName}
@@ -419,9 +452,15 @@ export default function ContactsPanel({ onNavigate }) {
                       className="crm-input"
                     />
                   </div>
+                  </div>
 
-                  <div className="mt-4 space-y-2">
-                    <label className="crm-field-label">LinkedIn</label>
+                  <div className="crm-contact-section mt-4 space-y-2">
+                    <div className="crm-contact-section-head">
+                      <div>
+                        <label className="crm-field-label">LinkedIn</label>
+                        <p className="text-[11px] text-[#7a8696]">Find or confirm the right profile before saving the contact.</p>
+                      </div>
+                    </div>
                     <div className="flex gap-2">
                       <input
                         value={form.linkedin}

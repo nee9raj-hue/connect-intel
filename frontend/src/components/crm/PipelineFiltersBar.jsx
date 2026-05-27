@@ -79,6 +79,9 @@ export default function PipelineFiltersBar({
   const hasSecondaryFilters =
     savedViews.length > 0 || orgLeadTags.length > 0 || SMART_TAG_OPTIONS.length > 0
 
+  const activeStageLabel = statusOptions.find((s) => s.id === statusFilter)?.label
+  const activeContactLabel = CONTACT_FILTER_OPTIONS.find((o) => o.id === appliedFilters.contact)?.label
+
   return (
     <div className="crm-toolbar crm-toolbar--compact">
       <div className="crm-toolbar-primary">
@@ -162,7 +165,7 @@ export default function PipelineFiltersBar({
             onClick={() => setAdvancedOpen((v) => !v)}
             className={`crm-btn crm-btn-sm crm-btn-ghost ${advancedOpen ? 'is-active' : ''}`}
           >
-            {advancedOpen ? 'Less' : 'More'}
+            {advancedOpen ? 'Less' : 'Advanced'}
             {advancedFilterCount > 0 ? ` (${advancedFilterCount})` : ''}
           </button>
         )}
@@ -204,6 +207,15 @@ export default function PipelineFiltersBar({
             <FilterChipButton
               label={appliedFilters.state}
               onRemove={() => onRemoveAppliedFilter?.({ state: '' })}
+            />
+          )}
+          {!stageListMode && statusFilter !== 'all' && activeStageLabel && (
+            <FilterChipButton label={activeStageLabel} onRemove={() => onStatusFilterChange?.('all')} />
+          )}
+          {appliedFilters.contact && appliedFilters.contact !== 'any' && activeContactLabel && (
+            <FilterChipButton
+              label={activeContactLabel}
+              onRemove={() => onRemoveAppliedFilter?.({ contact: 'any' })}
             />
           )}
         </div>

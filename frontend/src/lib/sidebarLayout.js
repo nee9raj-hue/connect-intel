@@ -9,9 +9,9 @@ export function loadSidebarMode() {
     const mode = localStorage.getItem(SIDEBAR_MODE_KEY)
     if (mode === 'expanded' || mode === 'rail') return mode
     if (mode === 'hidden') return 'expanded'
-    return localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === '1' ? 'rail' : 'expanded'
+    return 'rail'
   } catch {
-    return 'expanded'
+    return 'rail'
   }
 }
 

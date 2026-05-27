@@ -298,56 +298,53 @@ export default function PeopleSearch({ onNavigate }) {
   const metaCollapsedOnMobile = isMobile && hasSearched && displayLeads.length > 0 && countTab !== 'saved'
 
   return (
-    <div className="panel-shell bg-[#f6f7f9]">
+    <div className="crm-workspace">
       <RechargeWalletModal
         open={rechargeOpen}
         onClose={() => setRechargeOpen(false)}
         balanceRupees={walletRupees}
       />
-      <header className="shrink-0 bg-white border-b border-gray-200 px-3 sm:px-5 py-2 md:py-2.5">
-        <div className="flex items-center justify-between gap-2 md:gap-3">
+      <header className="crm-page-header">
+        <div className="crm-page-header-top">
           <div className="min-w-0">
-            <h1 className="text-sm sm:text-lg font-semibold text-gray-900 truncate">AI prospect search</h1>
-            <p className="text-[10px] sm:text-[11px] text-gray-500 truncate hidden sm:block">
+            <h1 className="crm-page-title">AI prospect search</h1>
+            <p className="crm-page-subtitle hidden sm:block">
               {PRODUCT.databaseLine}
             </p>
           </div>
-          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+          <div className="crm-page-actions flex-wrap">
             <button
               type="button"
               onClick={() => walletPaise < CREDIT_COST_PAISE && setRechargeOpen(true)}
-              className={`hidden sm:inline text-xs font-medium px-2 py-1 rounded-full border ${
+              className={`crm-btn crm-btn-sm hidden sm:inline-flex ${
                 walletPaise < CREDIT_COST_PAISE
-                  ? 'text-red-800 bg-red-50 border-red-200'
-                  : 'text-[#5b4a00] bg-[#fff6d6] border-[#ffe48a]'
+                  ? 'crm-btn-secondary !text-red-800 !border-red-200 !bg-red-50'
+                  : 'crm-btn-secondary !text-[#5b4a00] !border-[#ffe48a] !bg-[#fff6d6]'
               }`}
             >
-              {walletPaise < CREDIT_COST_PAISE ? 'Recharge wallet' : `${walletRupees} credits`}
+              {walletPaise < CREDIT_COST_PAISE ? 'Recharge wallet' : `${walletRupees} credits left`}
             </button>
-            <span className="hidden md:inline text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
+            <span className="crm-toolbar-count hidden md:inline-flex rounded-full border border-[#d7dde5] bg-[#f7f9fb] px-2.5 py-1">
               {user?.aiDiscoverySearchesLeft ?? 3} live AI searches
             </span>
             <button
               type="button"
               onClick={saveToMarketingList}
               disabled={!displayLeads.length || listSaving}
-              className="text-[10px] sm:text-xs font-medium px-2 sm:px-3 py-1 sm:py-1.5 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-40"
+              className="crm-btn crm-btn-secondary"
             >
-              {listSaving ? '…' : 'List'}
+              {listSaving ? 'Saving…' : 'Save as list'}
             </button>
             <button
               type="button"
               onClick={exportCSV}
               disabled={!displayLeads.length}
-              className="text-[10px] sm:text-xs font-medium px-2 sm:px-3 py-1 sm:py-1.5 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-40"
+              className="crm-btn crm-btn-secondary"
             >
               Export
             </button>
           </div>
         </div>
-      </header>
-
-      <div className="shrink-0 bg-white border-b border-gray-200">
         <SearchFiltersBar
           filters={filters}
           onChange={setFilters}
@@ -357,41 +354,39 @@ export default function PeopleSearch({ onNavigate }) {
           onToggleFilters={() => setFiltersExpanded((v) => !v)}
         />
 
-        <div className="px-3 sm:px-5 pb-2 flex flex-wrap items-center gap-1.5 border-t border-gray-100">
-        {[
-          { id: 'total', label: 'Total', value: results?.total },
-          { id: 'netNew', label: 'Net new', value: results?.netNew },
-          { id: 'saved', label: 'Saved', value: savedLeads.length },
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            type="button"
-            onClick={() => setCountTab(tab.id)}
-            className={`px-3 py-1.5 rounded-md text-xs font-semibold border transition-colors ${
-              countTab === tab.id
-                ? 'bg-gray-900 text-white border-gray-900'
-                : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
-            }`}
-          >
-            {tab.label}
-            {tab.value != null && (
-              <span className="ml-1 opacity-80">
-                ({typeof tab.value === 'number' ? tab.value.toLocaleString() : tab.value})
-              </span>
-            )}
-          </button>
-        ))}
-        {hasSearched && results && countTab !== 'saved' && resultBadge && (
-          <span className={`ml-auto text-[10px] sm:text-xs font-medium ${resultBadge.className}`}>
-            <strong>{displayLeads.length}</strong> shown
-            {results.total > displayLeads.length ? (
-              <>
-                {' '}
-                · <strong>{results.total}+</strong> matched
-              </>
-            ) : null}
-          </span>
-        )}
+        <div className="flex flex-wrap items-center gap-2 border-t border-[#edf1f5] pb-2 pt-2">
+          <div className="crm-view-tabs">
+            {[
+              { id: 'total', label: 'Total', value: results?.total },
+              { id: 'netNew', label: 'Net new', value: results?.netNew },
+              { id: 'saved', label: 'Saved', value: savedLeads.length },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setCountTab(tab.id)}
+                className={`crm-view-tab ${countTab === tab.id ? 'is-active' : ''}`}
+              >
+                {tab.label}
+                {tab.value != null ? (
+                  <span className="ml-1 opacity-75">
+                    {typeof tab.value === 'number' ? tab.value.toLocaleString() : tab.value}
+                  </span>
+                ) : null}
+              </button>
+            ))}
+          </div>
+          {hasSearched && results && countTab !== 'saved' && resultBadge && (
+            <span className={`crm-toolbar-count ml-auto ${resultBadge.className}`}>
+              <strong>{displayLeads.length}</strong> shown
+              {results.total > displayLeads.length ? (
+                <>
+                  {' '}
+                  · <strong>{results.total}+</strong> matched
+                </>
+              ) : null}
+            </span>
+          )}
         </div>
 
         {showMetaBlock && metaCollapsedOnMobile && (
@@ -445,36 +440,40 @@ export default function PeopleSearch({ onNavigate }) {
             )}
           </div>
         )}
-      </div>
+      </header>
 
-      <div className="panel-body-scroll pipeline-scroll-area bg-white">
-        {countTab === 'saved' ? (
-          displayLeads.length ? (
-            <ResultsTable {...resultsHandlers} leads={displayLeads} allSelected={allLeadsSelected} />
-          ) : (
-            <EmptyState
-              title="No saved leads"
-              sub="Save prospects from search, then open Pipeline to email and track status."
-              action={() => onNavigate?.('pipeline')}
-              actionLabel="Open pipeline"
-            />
-          )
-        ) : !hasSearched ? (
-          <EmptyState
-            title="Search your B2B database"
-            sub='Type who you need above and press Search. Results fill this page — full contacts for the top 10, more matches listed below.'
-          />
-        ) : loading ? (
-          <LoadingState />
-        ) : displayLeads.length === 0 ? (
-          <EmptyState
-            title="No matches for these filters"
-            sub={buildSearchEmptyMessage(results)}
-            action={handleSearch}
-          />
-        ) : (
-          <SearchResultsView leads={displayLeads} {...resultsHandlers} />
-        )}
+      <div className="crm-page-body">
+        <div className="crm-content-card">
+          <div className="crm-content-scroll !p-0">
+            {countTab === 'saved' ? (
+              displayLeads.length ? (
+                <ResultsTable {...resultsHandlers} leads={displayLeads} allSelected={allLeadsSelected} />
+              ) : (
+                <EmptyState
+                  title="No saved leads"
+                  sub="Save prospects from search, then open Pipeline to email and track status."
+                  action={() => onNavigate?.('pipeline')}
+                  actionLabel="Open pipeline"
+                />
+              )
+            ) : !hasSearched ? (
+              <EmptyState
+                title="Search your B2B database"
+                sub="Type who you need above and press Search. Results fill this page with full details first, then broader matched accounts below."
+              />
+            ) : loading ? (
+              <LoadingState />
+            ) : displayLeads.length === 0 ? (
+              <EmptyState
+                title="No matches for these filters"
+                sub={buildSearchEmptyMessage(results)}
+                action={handleSearch}
+              />
+            ) : (
+              <SearchResultsView leads={displayLeads} {...resultsHandlers} />
+            )}
+          </div>
+        </div>
       </div>
     </div>
   )
@@ -482,14 +481,14 @@ export default function PeopleSearch({ onNavigate }) {
 
 function EmptyState({ title, sub, action, actionLabel = 'Search again' }) {
   return (
-    <div className="min-h-[min(70vh,520px)] flex flex-col items-center justify-center p-6 sm:p-8 text-center">
+    <div className="crm-empty-state min-h-[min(70vh,520px)]">
       <p className="font-medium text-gray-900">{title}</p>
-      <p className="text-sm text-gray-500 mt-1 max-w-md leading-relaxed">{sub}</p>
+      <p className="crm-empty-hint mt-1 max-w-md leading-relaxed">{sub}</p>
       {action && (
         <button
           type="button"
           onClick={action}
-          className="mt-4 px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md"
+          className="crm-btn crm-btn-primary mt-4"
         >
           {actionLabel}
         </button>
