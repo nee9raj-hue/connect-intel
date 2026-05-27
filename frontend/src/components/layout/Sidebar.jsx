@@ -434,7 +434,7 @@ function RailNavPopup({ label, groupActive, muted, badge, icon: Icon, children }
         onClick={() => setOpen((v) => !v)}
         className={`relative w-full flex justify-center items-center p-2.5 rounded-md transition-colors ${
           groupActive || open
-            ? 'bg-gray-900 text-white'
+            ? 'nav-item-active'
             : muted
               ? 'text-gray-500 hover:bg-gray-100'
               : 'text-gray-600 hover:bg-gray-100'
@@ -473,17 +473,17 @@ function NavBtn({ label, icon: Icon, active, onClick, badge, muted = false, comp
         title={label}
         className={`relative w-full flex justify-center items-center p-2.5 rounded-md mb-0.5 transition-colors ${
           active
-            ? 'bg-gray-900 text-white'
+            ? 'nav-item-active'
             : muted
               ? 'text-gray-500 hover:bg-gray-50'
               : 'text-gray-600 hover:bg-gray-100'
         }`}
       >
-        <Icon className={`w-5 h-5 shrink-0 ${active ? 'text-white' : 'text-gray-500'}`} />
+        <Icon className={`w-5 h-5 shrink-0 ${active ? 'text-[#0f766e]' : 'text-gray-500'}`} />
         {badge != null && (
           <span
             className={`absolute top-1 right-1 min-w-[14px] h-[14px] px-0.5 flex items-center justify-center text-[8px] font-bold rounded-full ${
-              active ? 'bg-white text-gray-900' : 'bg-gray-900 text-white'
+              active ? 'bg-[#0d9488] text-white' : 'bg-gray-200 text-gray-700'
             }`}
           >
             {badge > 99 ? '99+' : badge}
@@ -505,12 +505,12 @@ function NavBtn({ label, icon: Icon, active, onClick, badge, muted = false, comp
             : 'text-gray-600 hover:bg-gray-100'
       }`}
     >
-      <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-white' : 'text-gray-500'}`} />
+      <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-[#0f766e]' : 'text-gray-500'}`} />
       <span className="flex-1 text-left truncate">{label}</span>
       {badge != null && (
         <span
           className={`text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0 ${
-            active ? 'bg-white/20 text-white' : 'bg-gray-200 text-gray-700'
+            active ? 'bg-[#0d9488] text-white' : 'bg-gray-200 text-gray-700'
           }`}
         >
           {badge}
@@ -526,7 +526,7 @@ function NavSubBtn({ label, active, badge, onClick }) {
       type="button"
       onClick={onClick}
       className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-[12px] font-medium transition-colors ${
-        active ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-50'
+        active ? 'nav-sub-active' : 'text-gray-600 hover:bg-gray-50'
       }`}
     >
       <span className="flex-1 text-left truncate">{label}</span>

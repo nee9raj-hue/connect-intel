@@ -27,10 +27,10 @@ const PALETTE = [
   { type: 'footer', label: 'Footer', hint: 'Legal' },
 ]
 
-const BUILDER_TABS = [
-  { id: 'blocks', label: 'Blocks' },
-  { id: 'styles', label: 'Styles' },
-  { id: 'presets', label: 'Presets' },
+const STUDIO_RAIL = [
+  { id: 'blocks', label: 'Blocks', icon: '⊞' },
+  { id: 'styles', label: 'Styles', icon: '◐' },
+  { id: 'presets', label: 'Layouts', icon: '☰' },
 ]
 
 const FOLLOW_UP_STARTER = {
@@ -77,9 +77,9 @@ function DraggableBlockCard({
       onDragOver={(e) => onDragOver(e, index)}
       onDrop={(e) => onDrop(e, index)}
       onDragEnd={onDragEnd}
-      className={`bg-white border rounded-xl p-3 transition-colors ${
-        isDragging ? 'opacity-50 border-gray-300' : 'border-gray-200'
-      } ${isDropTarget ? 'ring-2 ring-gray-900 ring-offset-2' : ''}`}
+      className={`ci-card p-3 transition-colors ${
+        isDragging ? 'opacity-50' : ''
+      } ${isDropTarget ? 'ring-2 ring-[#0d9488] ring-offset-2' : ''}`}
     >
       <div className="flex items-center justify-between gap-2 mb-2">
         <div className="flex items-center gap-2 min-w-0">
@@ -159,6 +159,7 @@ export default function MarketingTemplateBuilder({
   const [dragIndex, setDragIndex] = useState(null)
   const [dropIndex, setDropIndex] = useState(null)
   const [paletteDragType, setPaletteDragType] = useState(null)
+  const [previewOpen, setPreviewOpen] = useState(false)
 
   const blockCount = value.blocks?.length || 0
   useEffect(() => {
@@ -272,122 +273,18 @@ export default function MarketingTemplateBuilder({
       ? 'Build with blocks — drag to reorder, duplicate, and preview live.'
       : 'Drag blocks to reorder — use Insert icon inside text blocks for inline icons.')
 
-  const builderShellClass = fillHeight
-    ? 'flex-1 min-h-[min(680px,calc(100vh-9.5rem))] h-full'
-    : 'min-h-[560px] max-h-[calc(100vh-10rem)]'
+  const studio = fillHeight
 
-  return (
-    <div
-      className={`${embedded ? (fillHeight ? 'flex flex-col flex-1 min-h-0 h-full' : '') : 'max-w-[1400px] mx-auto'} ${fillHeight ? '' : 'space-y-4'}`}
-    >
-      {(!embedded || onSave || onCancel) && (
-        <div
-          className={`flex flex-wrap items-center justify-between gap-3 ${
-            fillHeight ? 'shrink-0 px-1 pb-2' : ''
-          }`}
-        >
-          <div className="min-w-0">
-            <h2 className="text-sm font-semibold text-gray-900">{headerTitle}</h2>
-            <p className="text-xs text-gray-500 mt-0.5">{headerSubtitle}</p>
-          </div>
-          {(onSave || onCancel) && (
-            <div className="flex flex-wrap gap-2">
-              {onCancel && (
-                <button
-                  type="button"
-                  onClick={onCancel}
-                  className="text-xs font-semibold px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-                >
-                  {isEditing ? 'Cancel edit' : 'Clear & start over'}
-                </button>
-              )}
-              {onSave && (
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={onSave}
-                  className="text-xs font-semibold px-3 py-2 bg-slate-900 text-white rounded-lg disabled:opacity-50 hover:bg-slate-800"
-                >
-                  {busy ? 'Saving…' : isEditing ? 'Update template' : 'Save template'}
-                </button>
-              )}
-            </div>
-          )}
-        </div>
-      )}
+  const sideTabHint =
+    sideTab === 'blocks'
+      ? 'Drag or click blocks to add content'
+      : sideTab === 'styles'
+        ? 'Fonts and brand colors'
+        : 'Start from a full email layout'
 
-      <div
-        className={`bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col ${builderShellClass}`}
-      >
-        {fillHeight && embedded && title && !onSave && (
-          <p className="shrink-0 px-3 py-1.5 text-[11px] font-semibold text-slate-700 border-b border-gray-100 bg-slate-50/90">
-            {headerTitle}
-          </p>
-        )}
-        <div className="shrink-0 px-3 py-2 border-b border-gray-100 space-y-1.5">
-          <div className="flex flex-wrap gap-2">
-            {showNameField && (
-              <input
-                value={value.name || ''}
-                onChange={(e) => onChange({ ...value, name: e.target.value })}
-                placeholder="Template name"
-                className="flex-1 min-w-[140px] text-sm border border-gray-200 rounded-lg px-3 py-2"
-              />
-            )}
-            <input
-              value={value.subject || ''}
-              onChange={(e) => onChange({ ...value, subject: e.target.value })}
-              placeholder="Subject — {{firstName}}, your update"
-              className="flex-[2] min-w-[200px] text-sm border border-gray-200 rounded-lg px-3 py-2"
-            />
-            <div className="flex gap-1 items-center">
-              {['desktop', 'mobile'].map((mode) => (
-                <button
-                  key={mode}
-                  type="button"
-                  onClick={() => setPreviewMode(mode)}
-                  className={`text-[10px] px-2.5 py-1.5 rounded-md font-semibold capitalize ${
-                    previewMode === mode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600'
-                  }`}
-                >
-                  {mode}
-                </button>
-              ))}
-            </div>
-          </div>
-          <input
-            value={value.previewText || ''}
-            onChange={(e) => onChange({ ...value, previewText: e.target.value })}
-            placeholder="Inbox preview text (optional)"
-            className="w-full text-xs border border-gray-200 rounded-lg px-3 py-1.5"
-          />
-        </div>
-
-        <div className="flex flex-1 min-h-0">
-          <aside className="w-56 shrink-0 border-r border-gray-100 bg-white flex flex-col min-h-0">
-            <div className="shrink-0 flex border-b border-gray-100">
-              {BUILDER_TABS.map((tab) => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setSideTab(tab.id)}
-                  className={`flex-1 py-2.5 text-[10px] font-bold uppercase tracking-wide border-b-2 -mb-px ${
-                    sideTab === tab.id
-                      ? 'border-gray-900 text-gray-900'
-                      : 'border-transparent text-gray-400 hover:text-gray-700'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-            <p className="shrink-0 px-3 py-1.5 text-[10px] text-gray-400 border-b border-gray-50">
-              {sideTab === 'blocks' && 'Drag to add content to your email'}
-              {sideTab === 'styles' && 'Theme colors and fonts'}
-              {sideTab === 'presets' && 'Start from a full layout'}
-            </p>
-            <div className="flex-1 overflow-y-auto p-2">
-              {sideTab === 'blocks' && (
+  const panelContent = (
+    <>
+      {sideTab === 'blocks' && (
                 <>
                   <p className="text-[10px] text-gray-400 mb-2 px-1">Drag or click to add</p>
                   <div className="grid grid-cols-3 gap-1.5">
@@ -509,20 +406,267 @@ export default function MarketingTemplateBuilder({
                     </button>
                   ))}
                 </div>
+      )}
+    </>
+  )
+
+  const inspector = (
+    <>
+      <div className="shrink-0 p-2.5 border-b border-slate-200/80 flex gap-1.5 overflow-x-auto no-scrollbar bg-white">
+        {!value.blocks?.length ? (
+          <p className="text-[10px] text-slate-400 px-1 py-1">Add blocks from the left</p>
+        ) : (
+          value.blocks.map((block, index) => {
+            const style = BLOCK_PALETTE_STYLES[block.type] || BLOCK_PALETTE_STYLES.text
+            const selected = selectedBlockIndex === index
+            return (
+              <button
+                key={block.id}
+                type="button"
+                onClick={() => setSelectedBlockIndex(index)}
+                className={`shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-[10px] font-semibold marketing-block-card ${
+                  selected
+                    ? `marketing-block-selected ${style.border} ${style.bg} ${style.text}`
+                    : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+                }`}
+              >
+                <span>{style.icon}</span>
+                <span>{BLOCK_LABELS[block.type] || block.type}</span>
+              </button>
+            )
+          })
+        )}
+      </div>
+      <div className="flex-1 overflow-y-auto p-3 min-h-0 overscroll-contain">
+        {!value.blocks?.length ? (
+          <p className="text-xs text-slate-500 text-center py-10 px-3 leading-relaxed">
+            Pick a block from the left, or load a layout preset to get started quickly.
+          </p>
+        ) : (
+          <DraggableBlockCard
+            block={value.blocks[selectedBlockIndex] || value.blocks[0]}
+            index={selectedBlockIndex}
+            total={value.blocks.length}
+            isDragging={dragIndex === selectedBlockIndex}
+            isDropTarget={dropIndex === selectedBlockIndex && dragIndex !== selectedBlockIndex}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+            onDragEnd={handleDragEnd}
+            onMoveUp={(i) => {
+              moveBlock(i, -1)
+              setSelectedBlockIndex(Math.max(0, i - 1))
+            }}
+            onMoveDown={(i) => {
+              moveBlock(i, 1)
+              setSelectedBlockIndex(Math.min(value.blocks.length - 1, i + 1))
+            }}
+            onDuplicate={duplicateBlockAt}
+            onRemove={(i) => {
+              removeBlock(i)
+              setSelectedBlockIndex(Math.max(0, i - 1))
+            }}
+            onChange={(next) => updateBlock(selectedBlockIndex, next)}
+            marketingForms={marketingForms}
+          />
+        )}
+      </div>
+    </>
+  )
+
+  const canvas = (
+    <main
+      className="marketing-studio-canvas relative"
+      onDragOver={handleCanvasDragOver}
+      onDrop={handleCanvasDrop}
+    >
+      <span className="marketing-studio-canvas-label">Email preview</span>
+      <div className="marketing-studio-canvas-inner">
+        <iframe
+          title="Email canvas"
+          srcDoc={previewHtml}
+          className="bg-white shadow-xl rounded-lg border border-slate-200/80"
+          style={{
+            width: previewMode === 'mobile' ? 320 : Math.min(value.design?.contentWidth || 600, 640),
+            minHeight: 480,
+            height: 480,
+            border: 'none',
+          }}
+        />
+      </div>
+    </main>
+  )
+
+  const studioBody = (
+    <div className="marketing-studio-body">
+      <nav className="marketing-studio-rail" aria-label="Builder tools">
+        {STUDIO_RAIL.map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            title={tab.label}
+            onClick={() => setSideTab(tab.id)}
+            className={`marketing-studio-rail-btn ${sideTab === tab.id ? 'is-active' : ''}`}
+          >
+            <span className="text-base leading-none">{tab.icon}</span>
+            <span>{tab.label}</span>
+          </button>
+        ))}
+      </nav>
+      <aside className="marketing-studio-panel hidden sm:flex">
+        <div className="marketing-studio-panel-head">
+          <h3>{STUDIO_RAIL.find((t) => t.id === sideTab)?.label}</h3>
+          <p>{sideTabHint}</p>
+        </div>
+        <div className="marketing-studio-panel-scroll">{panelContent}</div>
+      </aside>
+      {canvas}
+      <aside className="marketing-studio-inspector flex flex-col min-h-0">
+        <p className="marketing-studio-inspector-head">Edit selected block</p>
+        {inspector}
+      </aside>
+    </div>
+  )
+
+  const toolbar = (
+    <div className="marketing-studio-toolbar space-y-2.5">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="min-w-0">
+          <h2 className="text-sm font-semibold text-slate-900">{headerTitle}</h2>
+          <p className="text-[11px] text-slate-500 mt-0.5 max-w-xl">{headerSubtitle}</p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex rounded-lg border border-slate-200 bg-slate-50 p-0.5">
+            {['desktop', 'mobile'].map((mode) => (
+              <button
+                key={mode}
+                type="button"
+                onClick={() => setPreviewMode(mode)}
+                className={`ci-btn !py-1 !px-2.5 !text-[10px] capitalize !rounded-md !border-0 ${
+                  previewMode === mode
+                    ? '!bg-white !text-[#0f766e] shadow-sm'
+                    : '!bg-transparent !text-slate-500'
+                }`}
+              >
+                {mode}
+              </button>
+            ))}
+          </div>
+          <button type="button" className="ci-btn ci-btn-secondary" onClick={() => setPreviewOpen(true)}>
+            Preview
+          </button>
+          {onCancel && (
+            <button type="button" className="ci-btn ci-btn-secondary" onClick={onCancel}>
+              {isEditing ? 'Cancel' : 'Clear'}
+            </button>
+          )}
+          {onSave && (
+            <button type="button" className="ci-btn ci-btn-accent" disabled={busy} onClick={onSave}>
+              {busy ? 'Saving…' : isEditing ? 'Save template' : 'Save template'}
+            </button>
+          )}
+        </div>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {showNameField && (
+          <input
+            value={value.name || ''}
+            onChange={(e) => onChange({ ...value, name: e.target.value })}
+            placeholder="Template name"
+            className="ci-input flex-1 min-w-[140px]"
+          />
+        )}
+        <input
+          value={value.subject || ''}
+          onChange={(e) => onChange({ ...value, subject: e.target.value })}
+          placeholder="Subject line — {{firstName}}, your update"
+          className="ci-input flex-[2] min-w-[200px]"
+        />
+        <input
+          value={value.previewText || ''}
+          onChange={(e) => onChange({ ...value, previewText: e.target.value })}
+          placeholder="Inbox preview text (optional)"
+          className="ci-input flex-1 min-w-[180px]"
+        />
+      </div>
+      <div className="flex gap-1.5 sm:hidden overflow-x-auto no-scrollbar">
+        {STUDIO_RAIL.map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            onClick={() => setSideTab(tab.id)}
+            className={`ci-btn !py-1 !text-[10px] shrink-0 ${
+              sideTab === tab.id ? 'ci-btn-accent' : 'ci-btn-secondary'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+      <div className="sm:hidden marketing-studio-panel-scroll max-h-[200px] border border-slate-200 rounded-lg bg-white">
+        {panelContent}
+      </div>
+    </div>
+  )
+
+  return (
+    <div
+      className={`${embedded && fillHeight ? 'flex flex-col flex-1 min-h-0 h-full' : 'max-w-[1400px] mx-auto space-y-4'}`}
+    >
+      {!studio && (
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="text-sm font-semibold text-gray-900">{headerTitle}</h2>
+            <p className="text-xs text-gray-500 mt-0.5">{headerSubtitle}</p>
+          </div>
+          {(onSave || onCancel) && (
+            <div className="flex gap-2">
+              {onCancel && (
+                <button type="button" className="ci-btn ci-btn-secondary" onClick={onCancel}>
+                  Clear
+                </button>
+              )}
+              {onSave && (
+                <button type="button" className="ci-btn ci-btn-accent" disabled={busy} onClick={onSave}>
+                  Save
+                </button>
               )}
             </div>
-          </aside>
+          )}
+        </div>
+      )}
 
-          <main
-            className="flex-1 min-w-0 flex flex-col min-h-0 marketing-builder-canvas"
-            onDragOver={handleCanvasDragOver}
-            onDrop={handleCanvasDrop}
-          >
-            <div className="flex-1 overflow-y-auto p-4 flex justify-center">
+      <div className={studio ? 'marketing-studio flex-1 min-h-[min(520px,calc(100vh-12rem))]' : 'ci-card min-h-[560px] flex flex-col'}>
+        {studio ? (
+          <>
+            {toolbar}
+            {studioBody}
+          </>
+        ) : (
+          <>
+            <div className="p-3 border-b border-slate-100 space-y-2">{toolbar}</div>
+            {studioBody}
+          </>
+        )}
+      </div>
+
+      {previewOpen && (
+        <div className="marketing-preview-modal" role="dialog" aria-modal="true" aria-label="Email preview">
+          <div className="marketing-preview-dialog">
+            <header>
+              <div>
+                <p className="text-sm font-semibold text-slate-900">Preview</p>
+                <p className="text-xs text-slate-500 mt-0.5">{value.subject || 'No subject'}</p>
+              </div>
+              <button type="button" className="ci-btn ci-btn-secondary" onClick={() => setPreviewOpen(false)}>
+                Close
+              </button>
+            </header>
+            <main>
               <iframe
-                title="Email canvas"
+                title="Full preview"
                 srcDoc={previewHtml}
-                className="bg-white shadow-lg rounded-sm border border-gray-200"
+                className="bg-white shadow-lg rounded-lg border border-slate-200"
                 style={{
                   width: previewMode === 'mobile' ? 320 : Math.min(value.design?.contentWidth || 600, 640),
                   minHeight: 520,
@@ -530,100 +674,35 @@ export default function MarketingTemplateBuilder({
                   border: 'none',
                 }}
               />
-            </div>
-          </main>
-
-          <aside className="w-[min(100%,320px)] sm:w-80 shrink-0 border-l border-gray-100 bg-white flex flex-col min-h-0">
-            <p className="shrink-0 px-3 py-2 text-[10px] font-bold uppercase tracking-wide text-slate-500 border-b border-gray-50">
-              Edit block
-            </p>
-            <div className="shrink-0 p-2 border-b border-gray-50 flex gap-1 overflow-x-auto no-scrollbar">
-              {!value.blocks?.length ? (
-                <p className="text-[10px] text-gray-400 px-1 py-1">Add blocks from the left panel</p>
-              ) : (
-                value.blocks.map((block, index) => {
-                  const style = BLOCK_PALETTE_STYLES[block.type] || BLOCK_PALETTE_STYLES.text
-                  const selected = selectedBlockIndex === index
-                  return (
-                    <button
-                      key={block.id}
-                      type="button"
-                      onClick={() => setSelectedBlockIndex(index)}
-                      className={`shrink-0 flex items-center gap-1 px-2 py-1 rounded-lg border text-[10px] font-semibold marketing-block-card ${
-                        selected
-                          ? `marketing-block-selected ${style.border} ${style.bg} ${style.text}`
-                          : 'border-gray-200 bg-white text-gray-600'
-                      }`}
-                    >
-                      <span>{style.icon}</span>
-                      <span>{BLOCK_LABELS[block.type] || block.type}</span>
-                    </button>
-                  )
-                })
-              )}
-            </div>
-            <div className="flex-1 overflow-y-auto p-2 min-h-0 overscroll-contain">
-              {!value.blocks?.length ? (
-                <p className="text-xs text-gray-400 text-center py-8 px-2 leading-relaxed">
-                  Drop blocks on the preview or click a colored tile on the left. Presets load a full layout instantly.
-                </p>
-              ) : (
-                <DraggableBlockCard
-                  block={value.blocks[selectedBlockIndex] || value.blocks[0]}
-                  index={selectedBlockIndex}
-                  total={value.blocks.length}
-                  isDragging={dragIndex === selectedBlockIndex}
-                  isDropTarget={dropIndex === selectedBlockIndex && dragIndex !== selectedBlockIndex}
-                  onDragStart={handleDragStart}
-                  onDragOver={handleDragOver}
-                  onDrop={handleDrop}
-                  onDragEnd={handleDragEnd}
-                  onMoveUp={(i) => {
-                    moveBlock(i, -1)
-                    setSelectedBlockIndex(Math.max(0, i - 1))
-                  }}
-                  onMoveDown={(i) => {
-                    moveBlock(i, 1)
-                    setSelectedBlockIndex(Math.min(value.blocks.length - 1, i + 1))
-                  }}
-                  onDuplicate={duplicateBlockAt}
-                  onRemove={(i) => {
-                    removeBlock(i)
-                    setSelectedBlockIndex(Math.max(0, i - 1))
-                  }}
-                  onChange={(next) => updateBlock(selectedBlockIndex, next)}
-                  marketingForms={marketingForms}
-                />
-              )}
-            </div>
-          </aside>
+            </main>
+          </div>
         </div>
-      </div>
+      )}
 
       {showSavedTemplates && templates.length > 0 && (
-        <section className="bg-white border border-gray-200 rounded-xl p-4">
-          <h3 className="text-sm font-semibold text-gray-900 mb-2">Saved templates</h3>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
+        <section className="ci-card p-4 mt-3 shrink-0">
+          <h3 className="text-sm font-semibold text-slate-900 mb-3">Your saved templates</h3>
+          <div className="marketing-template-grid">
             {templates.map((t) => (
-              <div key={t.id} className="border border-gray-100 rounded-lg px-3 py-2 text-sm">
+              <div key={t.id} className="marketing-template-tile">
                 <div className="flex items-start justify-between gap-2">
-                  <p className="font-medium text-gray-900 truncate">{t.name}</p>
+                  <p className="font-semibold text-slate-900 truncate text-sm">{t.name}</p>
                   {t.createdByName && (
                     <MarketingCreatorBadge name={t.createdByName} isOwn={t.isOwn} className="shrink-0" />
                   )}
                 </div>
-                <p className="text-xs text-gray-500 truncate">{t.subject}</p>
-                <p className="text-[10px] text-gray-400 mt-0.5">
-                  {t.blocks?.length ? `${t.blocks.length} blocks · designed` : 'Plain text'}
+                <p className="text-xs text-slate-500 truncate mt-1">{t.subject}</p>
+                <p className="text-[10px] text-slate-400 mt-1">
+                  {t.blocks?.length ? `${t.blocks.length} blocks` : 'Plain text'}
                 </p>
-                <div className="flex gap-2 mt-2">
-                  <button type="button" onClick={() => onEdit?.(t)} className="text-xs font-semibold underline">
+                <div className="flex gap-2 mt-3">
+                  <button type="button" className="ci-btn ci-btn-secondary !py-1 !text-[10px]" onClick={() => onEdit?.(t)}>
                     Edit
                   </button>
                   <button
                     type="button"
+                    className="ci-btn ci-btn-secondary !py-1 !text-[10px] !text-red-700 !border-red-100"
                     onClick={() => onDelete?.(t.id)}
-                    className="text-xs font-semibold text-red-700 underline"
                   >
                     Delete
                   </button>

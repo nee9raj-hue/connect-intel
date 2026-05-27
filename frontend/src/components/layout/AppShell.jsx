@@ -104,7 +104,7 @@ export default function AppShell() {
   }, [navigate, setPanelNavigate])
 
   return (
-    <div className="flex h-[100dvh] w-full overflow-hidden bg-[#f6f7f9]">
+    <div className="flex h-[100dvh] w-full overflow-hidden bg-[#f0f4f8]">
       <Sidebar
         active={activePanel}
         panelOptions={panelOptions}

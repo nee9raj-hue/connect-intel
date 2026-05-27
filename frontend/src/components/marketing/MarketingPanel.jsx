@@ -479,15 +479,16 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
 
   return (
     <div
-      className={`panel-shell bg-[#fafafa] ${
-        tab === 'campaigns' || tab === 'templates' ? 'marketing-campaigns-shell' : ''
+      className={`panel-shell ${
+        tab === 'campaigns' || tab === 'templates' ? 'marketing-campaigns-shell' : 'bg-[#f0f4f8]'
       }`}
     >
       <header
-        className={`shrink-0 border-b border-gray-200 bg-white ${
-          isBuilderTab ? 'px-3 sm:px-4 py-2' : 'px-4 sm:px-6 py-4'
+        className={`marketing-page-header shrink-0 ${
+          isBuilderTab ? 'px-3 sm:px-4 py-2.5' : 'px-4 sm:px-6 py-4'
         }`}
       >
+        <div className="marketing-brand-stripe" aria-hidden />
         <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
           <div className="flex items-center gap-2 min-w-0 flex-wrap">
             <h1 className={`font-semibold text-gray-900 ${isBuilderTab ? 'text-base' : 'text-lg'}`}>
@@ -610,21 +611,21 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
         {loading ? (
           <LoadingExperience message={LOADING_MESSAGES.marketing} />
         ) : tab === 'campaigns' ? (
-          <div className="flex flex-col flex-1 min-h-0 max-w-[1400px] gap-3">
+          <div className="flex flex-col flex-1 min-h-0 w-full max-w-[1600px] mx-auto gap-4 pb-4">
             <details
               open={campaignSetupOpen}
               onToggle={(e) => setCampaignSetupOpen(e.target.open)}
-              className="shrink-0 bg-white border border-gray-200 rounded-lg overflow-hidden group"
+              className="shrink-0 ci-card overflow-hidden group"
             >
-              <summary className="cursor-pointer list-none px-3 py-2 flex items-center justify-between gap-2 hover:bg-slate-50 bg-slate-50/50">
-                <span className="text-xs font-semibold text-slate-900">Campaign setup</span>
+              <summary className="cursor-pointer list-none px-4 py-3 flex items-center justify-between gap-2 hover:bg-[#ecfdf5]/50 bg-gradient-to-r from-[#ecfdf5]/80 to-white">
+                <span className="text-sm font-semibold text-slate-900">① Campaign setup</span>
                 <span className="text-[10px] text-slate-500 group-open:hidden">
                   Name, list, optional template — then design below
                 </span>
                 <span className="text-[10px] text-slate-500 hidden group-open:inline">Collapse ↑</span>
               </summary>
-              <div className="px-3 pb-3 pt-0 space-y-2 border-t border-gray-100">
-              <div className="flex flex-wrap gap-1.5 pt-2">
+              <div className="px-4 pb-4 pt-0 space-y-3 border-t border-slate-100">
+              <div className="flex flex-wrap gap-2 pt-3">
                 {[
                   { id: 'email', label: 'Email campaign' },
                   { id: 'whatsapp', label: 'WhatsApp campaign' },
@@ -640,10 +641,8 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
                         useSequence: ch.id === 'whatsapp' ? p.useSequence : p.useSequence,
                       }))
                     }
-                    className={`text-xs font-semibold px-3 py-1.5 rounded-lg border ${
-                      campaignForm.channel === ch.id
-                        ? 'bg-gray-900 text-white border-gray-900'
-                        : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                    className={`ci-btn !text-xs ${
+                      campaignForm.channel === ch.id ? 'ci-btn-accent' : 'ci-btn-secondary'
                     }`}
                   >
                     {ch.label}
@@ -655,12 +654,12 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
                   value={campaignForm.name}
                   onChange={(e) => setCampaignForm((p) => ({ ...p, name: e.target.value }))}
                   placeholder="Campaign name"
-                  className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
+                  className="ci-input"
                 />
                 <select
                   value={campaignForm.listId}
                   onChange={(e) => setCampaignForm((p) => ({ ...p, listId: e.target.value }))}
-                  className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
+                  className="ci-input"
                 >
                   <option value="">Choose list…</option>
                   {lists
@@ -681,7 +680,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
                 <select
                   value={campaignForm.templateId}
                   onChange={(e) => applyTemplate(e.target.value)}
-                  className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
+                  className="ci-input"
                 >
                   <option value="">
                     {campaignForm.channel === 'whatsapp'
@@ -757,10 +756,8 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
                       key={step.id}
                       type="button"
                       onClick={() => setCampaignEmailStep(step.id)}
-                      className={`text-xs font-semibold px-3 py-1.5 rounded-lg border ${
-                        campaignEmailStep === step.id
-                          ? 'bg-gray-900 text-white border-gray-900'
-                          : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                      className={`ci-btn !text-xs ${
+                        campaignEmailStep === step.id ? 'ci-btn-accent' : 'ci-btn-secondary'
                       }`}
                     >
                       {step.label}
@@ -850,15 +847,11 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
             )}
             </div>
 
-            <div className="shrink-0 flex flex-wrap items-center gap-2 px-3 py-2.5 bg-white border border-slate-200 rounded-lg shadow-sm mt-2">
-              <button
-                type="button"
-                onClick={resetCampaignForm}
-                className="text-xs font-semibold px-3 py-2 border border-slate-200 rounded-lg text-slate-700 hover:bg-slate-50"
-              >
+            <div className="shrink-0 ci-card flex flex-wrap items-center gap-3 px-4 py-3">
+              <button type="button" onClick={resetCampaignForm} className="ci-btn ci-btn-secondary">
                 New campaign
               </button>
-              <p className="text-[10px] text-slate-500 flex-1 min-w-[140px] leading-snug">
+              <p className="text-xs text-slate-600 flex-1 min-w-[140px] leading-snug">
                 {!campaignForm.listId
                   ? 'Pick a list in setup above to save a draft'
                   : !campaignForm.name.trim()
@@ -878,7 +871,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
                       : undefined
                 }
                 onClick={createCampaign}
-                className="text-xs font-semibold px-3 py-2 border border-slate-300 rounded-lg bg-slate-50 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="ci-btn ci-btn-secondary"
               >
                 Save draft
               </button>
@@ -886,7 +879,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
                 type="button"
                 disabled={busy || !canSaveCampaignDraft}
                 onClick={createAndStart}
-                className="text-xs font-semibold px-3 py-2 bg-[#ffcb2b] text-[#242424] rounded-lg disabled:opacity-40 disabled:cursor-not-allowed hover:brightness-[0.98]"
+                className="ci-btn ci-btn-primary"
               >
                 {busy
                   ? 'Working…'
@@ -896,11 +889,11 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
               </button>
             </div>
 
-            <details className="shrink-0 bg-white border border-gray-200 rounded-lg">
-              <summary className="cursor-pointer list-none px-3 py-2 text-xs font-semibold text-gray-900 hover:bg-gray-50">
+            <details className="shrink-0 ci-card">
+              <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-50/80">
                 Your campaigns ({campaigns.length})
               </summary>
-              <div className="px-3 pb-3 border-t border-gray-100 max-h-[240px] overflow-y-auto">
+              <div className="px-4 pb-4 border-t border-slate-100 max-h-[280px] overflow-y-auto">
               {!campaigns.length ? (
                 <p className="text-xs text-gray-500 py-2">No campaigns yet.</p>
               ) : (
@@ -1019,7 +1012,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
             showCreator={Boolean(user?.isOrgAdmin && user?.accountType === 'company')}
           />
         ) : tab === 'templates' ? (
-          <div className="flex flex-col flex-1 min-h-0 max-w-[1400px]">
+          <div className="flex flex-col flex-1 min-h-0 w-full max-w-[1600px] mx-auto pb-4">
           <MarketingTemplateBuilder
             fillHeight
             value={templateForm}
