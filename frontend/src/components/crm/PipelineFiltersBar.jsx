@@ -189,6 +189,51 @@ export default function PipelineFiltersBar({
         })}
       </div>
 
+      {orgLeadTags.length > 0 && (
+        <div className={`flex flex-wrap items-center gap-1 ${compact ? 'mt-1.5' : 'mt-2'}`}>
+          <span className="text-[10px] font-semibold uppercase tracking-wide text-gray-400 mr-1">Lead tags</span>
+          <div className="inline-flex rounded-full border border-gray-200 bg-white overflow-hidden mr-1">
+            <button
+              type="button"
+              onClick={() => set({ tagMode: 'any' })}
+              className={`px-2 py-0.5 text-[10px] font-semibold ${
+                (filters.tagMode || 'any') === 'any' ? 'bg-gray-900 text-white' : 'text-gray-600'
+              }`}
+              title="Show leads with any selected tag"
+            >
+              Any
+            </button>
+            <button
+              type="button"
+              onClick={() => set({ tagMode: 'all' })}
+              className={`px-2 py-0.5 text-[10px] font-semibold border-l border-gray-200 ${
+                filters.tagMode === 'all' ? 'bg-gray-900 text-white border-l-gray-900' : 'text-gray-600'
+              }`}
+              title="Show leads with all selected tags"
+            >
+              All
+            </button>
+          </div>
+          {orgLeadTags.map((tag) => {
+            const active = (filters.tagIds || []).includes(tag.id)
+            return (
+              <button
+                key={tag.id}
+                type="button"
+                onClick={() => toggleTagFilter(tag.id)}
+                className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
+                  active ? 'text-white border-transparent' : 'bg-white text-gray-700 border-gray-200'
+                }`}
+                style={active ? { backgroundColor: tag.color } : undefined}
+                title={tag.name}
+              >
+                {tag.name}
+              </button>
+            )
+          })}
+        </div>
+      )}
+
       {expanded && (
         <div className="mt-3 rounded-lg border border-gray-200 bg-gray-50/60 p-3 space-y-3">
           <div>
