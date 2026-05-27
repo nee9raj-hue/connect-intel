@@ -107,15 +107,22 @@ export default function PipelineImportModal({ open, onClose, onImported }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="w-full max-w-lg bg-white rounded-xl shadow-xl border border-gray-200 max-h-[90vh] overflow-y-auto">
-        <div className="px-5 py-4 border-b flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">Import pipeline</h2>
-          <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-700 text-2xl leading-none">
+    <div
+      className="crm-modal-overlay"
+      role="dialog"
+      aria-modal="true"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose()
+      }}
+    >
+      <div className="crm-modal-dialog" onClick={(e) => e.stopPropagation()}>
+        <header className="crm-modal-header">
+          <h2>Import pipeline</h2>
+          <button type="button" onClick={onClose} className="crm-modal-close" aria-label="Close">
             ×
           </button>
-        </div>
-        <div className="p-5 space-y-4 text-sm">
+        </header>
+        <div className="crm-modal-body crm-modal-body-padded space-y-4 text-sm">
           <ol className="text-xs text-gray-600 space-y-1 list-decimal list-inside">
             <li>Download the CSV or Excel template below.</li>
             <li>Fill your leads (required: <strong>company</strong> on every row).</li>
@@ -220,17 +227,19 @@ export default function PipelineImportModal({ open, onClose, onImported }) {
             <p className="text-xs text-red-700 bg-red-50 border border-red-100 rounded-lg px-2 py-1.5">{error}</p>
           )}
 
+        </div>
+        <footer className="crm-modal-footer">
           <button
             type="button"
             disabled={loading || !preview.withCompany}
             onClick={handleUpload}
-            className="w-full py-2.5 bg-[#ffcb2b] text-[#242424] font-semibold rounded-lg disabled:opacity-50"
+            className="crm-btn crm-btn-primary w-full sm:w-auto bg-[#ffcb2b] text-[#242424] border-[#ffcb2b] hover:bg-[#f0bc00]"
           >
             {loading
               ? 'Importing…'
               : `4. Import ${preview.withCompany || 0} row${preview.withCompany === 1 ? '' : 's'}`}
           </button>
-        </div>
+        </footer>
       </div>
     </div>
   )

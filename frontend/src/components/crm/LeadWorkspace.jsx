@@ -598,8 +598,8 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
   }
 
   return (
-    <aside className="fixed inset-0 z-[75] md:static md:inset-auto md:w-full md:max-w-[420px] shrink-0 bg-white flex flex-col h-[100dvh] md:h-full shadow-xl md:shadow-none border-l border-gray-200">
-      <div className="shrink-0 px-2.5 py-2 md:px-4 md:py-3 border-b border-gray-100">
+    <aside className="crm-drawer fixed inset-0 z-[75] md:static md:inset-auto md:w-full md:max-w-[420px] shrink-0">
+      <div className="crm-drawer-header">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0 flex-1">
             <h2 className="text-sm md:text-base font-semibold text-gray-900 truncate">
@@ -644,7 +644,7 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
         )}
       </div>
 
-      <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden pipeline-scroll-area px-2.5 py-2 md:px-4 md:py-3 space-y-3 md:space-y-4 pb-6">
+      <div className="crm-drawer-body space-y-3 md:space-y-4">
         {tab === 'overview' && (
           <>
             <section>

@@ -52,19 +52,27 @@ export default function AddLeadModal({ open, onClose, onAdded }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+    <div
+      className="crm-modal-overlay"
+      role="dialog"
+      aria-modal="true"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose()
+      }}
+    >
       <form
         onSubmit={submit}
-        className="w-full max-w-lg bg-white rounded-xl shadow-xl border border-gray-200 max-h-[90vh] overflow-y-auto"
+        className="crm-modal-dialog"
+        onClick={(e) => e.stopPropagation()}
       >
-        <div className="px-5 py-4 border-b flex items-center justify-between sticky top-0 bg-white">
-          <h2 className="text-lg font-semibold text-gray-900">Add lead manually</h2>
-          <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-700 text-2xl leading-none">
+        <header className="crm-modal-header">
+          <h2>Add lead manually</h2>
+          <button type="button" onClick={onClose} className="crm-modal-close" aria-label="Close">
             ×
           </button>
-        </div>
+        </header>
 
-        <div className="p-5 space-y-3 text-sm">
+        <div className="crm-modal-body crm-modal-body-padded space-y-3 text-sm">
           <p className="text-xs text-gray-500">Creates a pipeline lead and a linked contact record. You can fill in email, phone, and company details later.</p>
 
           <div className="grid grid-cols-2 gap-2">
@@ -160,16 +168,18 @@ export default function AddLeadModal({ open, onClose, onAdded }) {
             className="w-full border rounded-lg px-3 py-2"
           />
 
-          {error && <p className="text-xs text-red-700 bg-red-50 rounded-lg px-2 py-1.5">{error}</p>}
+          {error && <p className="crm-alert crm-alert-error mb-0">{error}</p>}
+        </div>
 
+        <footer className="crm-modal-footer">
           <button
             type="submit"
             disabled={loading || (!form.company.trim() && !form.firstName.trim() && !form.lastName.trim())}
-            className="w-full py-2.5 bg-gray-900 text-white font-semibold rounded-lg disabled:opacity-50"
+            className="crm-btn crm-btn-primary w-full sm:w-auto"
           >
             {loading ? 'Adding…' : 'Add to pipeline'}
           </button>
-        </div>
+        </footer>
       </form>
     </div>
   )

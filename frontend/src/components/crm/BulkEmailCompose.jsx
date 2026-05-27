@@ -118,16 +118,29 @@ export default function BulkEmailCompose({ leadIds, leads, onDone, compact = fal
     (composeTab === 'ai' && !personalizeEach && (!subject.trim() || !body.trim()))
 
   return (
-    <div className={`flex flex-col ${compact ? '' : 'h-full'} text-sm`}>
-      <div className={`shrink-0 ${compact ? 'pb-3' : 'px-4 py-3 border-b border-gray-200 bg-white'}`}>
-        <h2 className="text-sm font-semibold text-gray-900">Compose</h2>
-        <p className="text-xs text-gray-500 mt-0.5">
+    <div className={`flex flex-col min-h-0 text-sm ${compact ? 'h-full' : 'h-full'}`}>
+      {!compact && (
+        <div className="shrink-0 px-4 py-3 border-b border-[#dfe3eb] bg-white">
+          <h2 className="text-sm font-semibold text-[#33475b]">Compose</h2>
+          <p className="text-xs text-[#516f90] mt-0.5">
+            {withEmail.length} recipient{withEmail.length === 1 ? '' : 's'}
+            {missingEmail > 0 ? ` · ${missingEmail} skipped (no email)` : ''}
+          </p>
+        </div>
+      )}
+
+      {compact && (
+        <p className="shrink-0 px-5 pt-4 pb-1 text-xs text-[#516f90]">
           {withEmail.length} recipient{withEmail.length === 1 ? '' : 's'}
           {missingEmail > 0 ? ` · ${missingEmail} skipped (no email)` : ''}
         </p>
-      </div>
+      )}
 
-      <div className={`flex-1 overflow-y-auto space-y-3 ${compact ? '' : 'p-4'}`}>
+      <div
+        className={`flex-1 min-h-0 overflow-y-auto pipeline-scroll-area space-y-3 ${
+          compact ? 'px-5 pb-3' : 'p-4'
+        }`}
+      >
         <div className="flex gap-1 p-0.5 bg-gray-100 rounded-lg">
           {COMPOSE_TABS.map((t) => (
             <button
@@ -263,12 +276,16 @@ export default function BulkEmailCompose({ leadIds, leads, onDone, compact = fal
         )}
       </div>
 
-      <div className={`shrink-0 ${compact ? 'pt-3' : 'p-4 border-t border-gray-200 bg-white'}`}>
+      <div
+        className={`shrink-0 ${
+          compact ? 'px-5 py-4 border-t border-[#dfe3eb] bg-[#f5f8fa]' : 'p-4 border-t border-[#dfe3eb] bg-white'
+        }`}
+      >
         <button
           type="button"
           disabled={sendDisabled}
           onClick={submit}
-          className="w-full py-2.5 bg-gray-900 text-white font-semibold rounded-lg disabled:opacity-50 text-sm"
+          className="crm-btn crm-btn-primary w-full py-2.5 disabled:opacity-50"
         >
           {busy ? 'Sending…' : `Send to ${withEmail.length} lead${withEmail.length === 1 ? '' : 's'}`}
         </button>

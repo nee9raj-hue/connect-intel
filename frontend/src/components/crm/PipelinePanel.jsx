@@ -573,8 +573,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
           )}
         </header>
 
-        <div className="crm-page-body">
-          <div className="crm-content-card">
+        <div className="crm-page-body flex-1 min-h-0">
+          <div className="crm-content-card flex-1 min-h-0">
             <PipelineBulkActionsBar
             count={selectedIds.size}
             statusOptions={columns}
@@ -601,7 +601,11 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
             </div>
           )}
 
-          <div className="crm-content-scroll pipeline-scroll-area">
+          <div
+            className={`crm-content-scroll pipeline-scroll-area ${
+              view === 'board' && !stageListMode ? 'crm-content-scroll-board' : ''
+            }`}
+          >
           {savedLeads.length === 0 ? (
             <EmptyPipeline
               onNavigate={onNavigate}
@@ -632,7 +636,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               </button>
             </div>
           ) : view === 'board' && !stageListMode ? (
-            <div className="flex gap-2 md:gap-3 overflow-x-auto pb-4 min-w-0 items-start">
+            <div className="crm-kanban-board min-w-0">
               {columns.map((col) => {
                 const colLeads = byStatus[col.id] || []
                 const colTotal = serverSidePipeline
