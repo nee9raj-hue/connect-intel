@@ -91,12 +91,21 @@ export default async function handler(req, res) {
   applyCors(req, res)
 
   const pathKey = resolvePath(req)
-  const load = ROUTES[pathKey]
 
-  if (!load) {
-    return sendJson(res, 404, { error: `Unknown API route: ${pathKey || '(empty)'}` })
+  try {
+    const load = ROUTES[pathKey]
+
+    if (!load) {
+      return sendJson(res, 404, { error: `Unknown API route: ${pathKey || '(empty)'}` })
+    }
+
+    const mod = await load()
+    return await mod.default(req, res)
+  } catch (error) {
+    console.error(`API ${pathKey || '(empty)'} failed:`, error)
+    return sendJson(res, 500, {
+      error: error?.message || 'Server error',
+      route: pathKey || null,
+    })
   }
-
-  const mod = await load()
-  return mod.default(req, res)
 }
