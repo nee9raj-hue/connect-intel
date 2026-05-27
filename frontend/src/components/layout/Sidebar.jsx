@@ -444,7 +444,7 @@ function RailNavPopup({ label, groupActive, muted, badge, icon: Icon, children }
               : 'text-gray-600 hover:bg-gray-100'
         }`}
       >
-        <Icon className={`w-5 h-5 shrink-0 ${groupActive || open ? 'text-white' : 'text-gray-500'}`} />
+        <Icon className={`w-5 h-5 shrink-0 ${groupActive || open ? 'text-gray-900' : 'text-gray-500'}`} />
         {badge != null && (
           <span
             className={`absolute top-1 right-1 min-w-[14px] h-[14px] px-0.5 flex items-center justify-center text-[8px] font-bold rounded-full ${
@@ -483,7 +483,7 @@ function NavBtn({ label, icon: Icon, active, onClick, badge, muted = false, comp
               : 'text-gray-600 hover:bg-gray-100'
         }`}
       >
-        <Icon className={`w-5 h-5 shrink-0 ${active ? 'text-[#0f766e]' : 'text-gray-500'}`} />
+        <Icon className={`w-5 h-5 shrink-0 ${active ? 'text-gray-900' : 'text-gray-500'}`} />
         {badge != null && (
           <span
             className={`absolute top-1 right-1 min-w-[14px] h-[14px] px-0.5 flex items-center justify-center text-[8px] font-bold rounded-full ${
