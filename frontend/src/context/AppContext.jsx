@@ -43,6 +43,7 @@ export function AppProvider({ children }) {
   const [savedLeads, setSavedLeads] = useState([])
   const [searchHistory, setSearchHistory] = useState([])
   const [teamMembers, setTeamMembers] = useState([])
+  const [orgLeadTags, setOrgLeadTags] = useState([])
   const [ready, setReady] = useState(false)
   const [authBusy, setAuthBusy] = useState(false)
   const [pipelineLeadId, setPipelineLeadId] = useState(null)
@@ -92,6 +93,21 @@ export function AppProvider({ children }) {
     }
   }, [user?.organizationId, user?.accountType])
 
+  const refreshOrgLeadTags = useCallback(async () => {
+    if (user?.accountType !== 'company' || !user?.organizationId) {
+      setOrgLeadTags([])
+      return []
+    }
+    try {
+      const data = await api.getOrgLeadTags({ silent: true })
+      const tags = data.tags || []
+      setOrgLeadTags(tags)
+      return tags
+    } catch {
+      return []
+    }
+  }, [user?.accountType, user?.organizationId])
+
   const refreshSavedLeads = useCallback(async ({ light = true } = {}) => {
     try {
       const saved = await api.getSavedLeads({ light })
@@ -127,11 +143,13 @@ export function AppProvider({ children }) {
   const syncWorkspace = useCallback(
     async (since) => {
       const skipLeadsFetch = Date.now() - workspaceLoadedAtRef.current < 20_000
-      const [savedResult, notifResult] = await Promise.allSettled([
+      const isCompany = user?.accountType === 'company' && user?.organizationId
+      const [savedResult, notifResult, tagsResult] = await Promise.allSettled([
         skipLeadsFetch
           ? Promise.resolve({ leads: null })
           : api.getSavedLeads({ silent: true, light: true }),
         api.getCrmNotifications(since || undefined, { silent: true }),
+        isCompany ? api.getOrgLeadTags({ silent: true }) : Promise.resolve({ tags: null }),
       ])
 
       let leads = []
@@ -162,9 +180,13 @@ export function AppProvider({ children }) {
         newItems = mergeNotificationItems(notifResult.value.items || [])
       }
 
+      if (tagsResult.status === 'fulfilled' && tagsResult.value?.tags) {
+        setOrgLeadTags(tagsResult.value.tags)
+      }
+
       return { leads, serverTime, newItems }
     },
-    [mergeNotificationItems]
+    [mergeNotificationItems, user?.accountType, user?.organizationId]
   )
 
   const markNotificationRead = useCallback((id) => {
@@ -675,6 +697,8 @@ export function AppProvider({ children }) {
         addSearchHistory,
         completeOnboarding,
         teamMembers,
+        orgLeadTags,
+        refreshOrgLeadTags,
         refreshTeam,
         refreshSavedLeads,
         syncWorkspace,

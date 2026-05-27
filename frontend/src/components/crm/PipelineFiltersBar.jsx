@@ -34,6 +34,7 @@ export default function PipelineFiltersBar({
   onClearFilters,
   onApplySmartView,
   activeSmartViewId,
+  orgLeadTags = [],
   compact = false,
 }) {
   const [expanded, setExpanded] = useState(false)
@@ -53,10 +54,17 @@ export default function PipelineFiltersBar({
     loadViews()
   }, [loadViews])
 
+  const toggleTagFilter = (tagId) => {
+    const current = filters.tagIds || []
+    const next = current.includes(tagId) ? current.filter((id) => id !== tagId) : [...current, tagId]
+    set({ tagIds: next })
+  }
+
   const activeRefineCount =
     (filters.city ? 1 : 0) +
     (filters.state ? 1 : 0) +
     (filters.contact && filters.contact !== 'any' ? 1 : 0) +
+    (filters.tagIds?.length ? 1 : 0) +
     (statusFilter && statusFilter !== 'all' ? 1 : 0)
 
   const showExpandHint = hasActiveFilters || activeRefineCount > 0
@@ -168,6 +176,43 @@ export default function PipelineFiltersBar({
               ))}
             </div>
           </div>
+
+          {orgLeadTags.length > 0 && (
+            <div>
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <p className="text-[10px] font-bold uppercase tracking-wide text-gray-500">Tags</p>
+                <label className="flex items-center gap-1 text-[10px] text-gray-500">
+                  <span>Match</span>
+                  <select
+                    value={filters.tagMode || 'any'}
+                    onChange={(e) => set({ tagMode: e.target.value })}
+                    className="text-[10px] border border-gray-200 rounded px-1 py-0.5 bg-white"
+                  >
+                    <option value="any">Any selected</option>
+                    <option value="all">All selected</option>
+                  </select>
+                </label>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {orgLeadTags.map((tag) => {
+                  const active = (filters.tagIds || []).includes(tag.id)
+                  return (
+                    <button
+                      key={tag.id}
+                      type="button"
+                      onClick={() => toggleTagFilter(tag.id)}
+                      className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
+                        active ? 'text-white border-transparent' : 'bg-white text-gray-700 border-gray-200'
+                      }`}
+                      style={active ? { backgroundColor: tag.color } : undefined}
+                    >
+                      {tag.name}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             <label className="block">

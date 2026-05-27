@@ -17,6 +17,7 @@ import {
   toDatetimeLocalValue,
 } from '../../lib/crmUiConstants'
 import TeamParticipantPicker from './TeamParticipantPicker'
+import LeadTagsEditor from './LeadTagsEditor'
 import CrmEmailThread from './CrmEmailThread'
 import { buildUnifiedTimeline, formatDealValue, timelineTypeLabel } from '../../lib/crmTimeline'
 
@@ -54,7 +55,7 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
     user,
     teamMembers,
     assignLead,
-    updateSavedLeadCrm,
+    updateSavedLeadCrm: updateLeadCrmFromContext,
     patchLead,
     generateEmailDraft,
     logCrmEmailSend,
@@ -65,6 +66,7 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
     consumePendingLeadTab,
     openContact,
     saveEmailSignature,
+    orgLeadTags,
   } = useApp()
   const [tab, setTab] = useState('overview')
   const [notes, setNotes] = useState(lead.crm?.notes || '')
@@ -660,6 +662,20 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
                 </p>
               )}
             </section>
+
+            {user?.accountType === 'company' && (
+              <section>
+                <h3 className="text-[11px] font-semibold uppercase text-gray-400 mb-2">Tags</h3>
+                <LeadTagsEditor
+                  lead={lead}
+                  orgLeadTags={orgLeadTags}
+                  onSave={async (tagIds) => {
+                    await updateLeadCrmFromContext(lead.id, { tagIds })
+                    setNotice('Tags updated')
+                  }}
+                />
+              </section>
+            )}
 
             {lead.tradingProfile?.firstShipmentAt || lead.tradingProfile?.active ? (
               <section className="rounded-xl border border-teal-100 bg-teal-50/50 p-3 space-y-2">

@@ -15,6 +15,8 @@ export const DEFAULT_PIPELINE_FILTERS = {
   city: '',
   state: '',
   contact: 'any',
+  tagIds: [],
+  tagMode: 'any',
 }
 
 export function getLeadCity(lead) {
@@ -84,9 +86,21 @@ export function applyPipelineFilters(
     minDealValue = null,
     staleDays = null,
     overdueFollowUp = false,
+    tagIds = [],
+    tagMode = 'any',
   } = {}
 ) {
   let list = leads || []
+
+  const filterTagIds = Array.isArray(tagIds) ? tagIds.filter(Boolean) : []
+  if (filterTagIds.length > 0) {
+    const modeAll = tagMode === 'all'
+    list = list.filter((l) => {
+      const leadTags = l.crm?.tagIds || []
+      if (modeAll) return filterTagIds.every((id) => leadTags.includes(id))
+      return filterTagIds.some((id) => leadTags.includes(id))
+    })
+  }
 
   if (status && status !== 'all') {
     list = list.filter((l) => (l.crm?.status || 'new') === status)
@@ -167,6 +181,7 @@ export function countActiveFilters(filters, search) {
   if (filters.city) n += 1
   if (filters.state) n += 1
   if (filters.contact && filters.contact !== 'any') n += 1
+  if (filters.tagIds?.length) n += 1
   if (search?.trim()) n += 1
   return n
 }

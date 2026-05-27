@@ -101,6 +101,10 @@ export const api = {
   previewInvite: (token) => request(`/api/invite/preview?token=${encodeURIComponent(token)}`),
   acceptInvite: (token) => request('/api/invite/accept', { method: 'POST', body: { token } }),
   updateTeamBranding: (payload) => request('/api/team/branding', { method: 'PATCH', body: payload }),
+  getOrgLeadTags: ({ silent = false } = {}) => request('/api/org/lead-tags', {}, { silent }),
+  createOrgLeadTag: (payload) => request('/api/org/lead-tags', { method: 'POST', body: payload }),
+  updateOrgLeadTag: (payload) => request('/api/org/lead-tags', { method: 'PATCH', body: payload }),
+  deleteOrgLeadTag: (id) => request('/api/org/lead-tags', { method: 'DELETE', body: { id } }),
   updateMemberPermissions: (payload) =>
     request('/api/team/permissions', { method: 'PATCH', body: payload }),
   getSavedLeads: ({ silent = false, light = true } = {}) =>

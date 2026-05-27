@@ -3,6 +3,7 @@ import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { TEAM_PIPELINE_ROLES } from '../../lib/crmConstants'
 import OrgPipelineImport from './OrgPipelineImport'
+import OrgLeadTagsPanel from './OrgLeadTagsPanel'
 import InviteEmailSetup from './InviteEmailSetup'
 import CrmGmailConnectCard from './CrmGmailConnectCard'
 
@@ -12,6 +13,7 @@ export default function TeamPanel({ onNavigate }) {
     teamMembers,
     refreshTeam,
     refreshSavedLeads,
+    refreshOrgLeadTags,
     inviteTeamMember,
     updateTeamBranding,
     updateMemberPermissions,
@@ -411,6 +413,8 @@ export default function TeamPanel({ onNavigate }) {
             </ul>
           )}
         </section>
+
+        <OrgLeadTagsPanel onTagsChange={refreshOrgLeadTags} />
 
         <OrgPipelineImport
           onImported={async () => {

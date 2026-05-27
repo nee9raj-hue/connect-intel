@@ -14,6 +14,7 @@ import {
   collectLocationOptions,
   countActiveFilters,
 } from '../../lib/pipelineFilters'
+import { tagMapById } from '../../lib/orgLeadTags'
 import { leadHasCallablePhone } from '../../lib/phoneUtils'
 import { leadHasSendableEmail } from '../../lib/emailUtils'
 import { formatDealValue } from '../../lib/crmTimeline'
@@ -48,6 +49,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     teamMembers,
     refreshTeam,
     bulkUpdatePipeline,
+    orgLeadTags,
   } = useApp()
 
   const columns = useMemo(() => getVisiblePipelineColumns(user), [user])
@@ -141,6 +143,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   }, [savedLeads, pipelineAssigneeFilter])
 
   const locationOptions = useMemo(() => collectLocationOptions(scopedLeads), [scopedLeads])
+  const tagById = useMemo(() => tagMapById(orgLeadTags), [orgLeadTags])
 
   const [smartViewId, setSmartViewId] = useState(null)
   const [smartViewFilters, setSmartViewFilters] = useState({})
@@ -160,6 +163,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
         city: filterAdvanced.city,
         state: filterAdvanced.state,
         contact: filterAdvanced.contact,
+        tagIds: filterAdvanced.tagIds,
+        tagMode: filterAdvanced.tagMode,
         search: filterSearch,
         ...smartViewFilters,
       }),
@@ -453,6 +458,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               }}
               onApplySmartView={applySmartView}
               activeSmartViewId={smartViewId}
+              orgLeadTags={orgLeadTags}
             />
           )}
         </header>
@@ -526,6 +532,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                   onToggleSelect={toggleSelect}
                   onSelectAllInColumn={(checked) => selectAllInColumn(col.id, checked)}
                   compact={isMobile}
+                  tagById={tagById}
                 />
               ))}
             </div>
@@ -777,6 +784,7 @@ function KanbanColumn({
   onSelect,
   onToggleSelect,
   onSelectAllInColumn,
+  tagById,
   compact = false,
 }) {
   const allSelected = leads.length > 0 && leads.every((l) => selectedIds.has(l.id))
@@ -832,6 +840,7 @@ function KanbanColumn({
                     {lead.firstName} {lead.lastName}
                   </div>
                   <div className="text-[10px] text-gray-500 truncate mt-0.5">{lead.company}</div>
+                  <LeadTagDots lead={lead} tagById={tagById} />
                   {lead.crm?.lastEmailSentAt && (
                     <div className="text-[10px] text-gray-400 mt-1">
                       Emailed {formatCrmDate(lead.crm.lastEmailSentAt)}
@@ -846,6 +855,27 @@ function KanbanColumn({
           ))
         )}
       </div>
+    </div>
+  )
+}
+
+function LeadTagDots({ lead, tagById }) {
+  if (!tagById?.size) return null
+  const tags = (lead.crm?.tagIds || []).map((id) => tagById.get(id)).filter(Boolean)
+  if (!tags.length) return null
+  return (
+    <div className="flex flex-wrap gap-1 mt-1">
+      {tags.slice(0, 4).map((tag) => (
+        <span
+          key={tag.id}
+          className="text-[9px] font-semibold px-1.5 py-0 rounded text-white max-w-[72px] truncate"
+          style={{ backgroundColor: tag.color }}
+          title={tag.name}
+        >
+          {tag.name}
+        </span>
+      ))}
+      {tags.length > 4 && <span className="text-[9px] text-gray-400">+{tags.length - 4}</span>}
     </div>
   )
 }
