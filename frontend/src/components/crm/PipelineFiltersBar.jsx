@@ -26,6 +26,11 @@ export default function PipelineFiltersBar({
   onSearchChange,
   filters,
   onFiltersChange,
+  appliedFilters = DEFAULT_PIPELINE_FILTERS,
+  appliedSearch = '',
+  filtersDirty = false,
+  onApplyFilters,
+  applying = false,
   cities = [],
   states = [],
   statusFilter = 'all',
@@ -33,6 +38,7 @@ export default function PipelineFiltersBar({
   statusOptions = [],
   resultCount = 0,
   totalCount = 0,
+  pipelineTotal = 0,
   onSelectAllFiltered,
   selectableCount = 0,
   hasActiveFilters = false,
@@ -66,14 +72,21 @@ export default function PipelineFiltersBar({
   }
 
   const activeRefineCount =
-    (filters.city ? 1 : 0) +
-    (filters.state ? 1 : 0) +
-    (filters.contact && filters.contact !== 'any' ? 1 : 0) +
-    (filters.tagIds?.length ? 1 : 0) +
-    (filters.smartTags?.length ? 1 : 0) +
-    (statusFilter && statusFilter !== 'all' ? 1 : 0)
+    (appliedFilters.city ? 1 : 0) +
+    (appliedFilters.state ? 1 : 0) +
+    (appliedFilters.contact && appliedFilters.contact !== 'any' ? 1 : 0) +
+    (appliedFilters.tagIds?.length ? 1 : 0) +
+    (appliedFilters.smartTags?.length ? 1 : 0) +
+    (statusFilter && statusFilter !== 'all' ? 1 : 0) +
+    (appliedSearch ? 1 : 0)
 
   const showExpandHint = hasActiveFilters || activeRefineCount > 0
+
+  const handleApply = () => {
+    onApplyFilters?.()
+  }
+
+  const appliedLocationLabel = [appliedFilters.city, appliedFilters.state].filter(Boolean).join(', ')
 
   return (
     <div className={`border-t border-gray-100 ${compact ? 'mt-2 pt-2' : 'mt-3 pt-3'}`}>
@@ -90,13 +103,34 @@ export default function PipelineFiltersBar({
             type="search"
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder={compact ? 'Search…' : 'Search name, email, phone, company…'}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                handleApply()
+              }
+            }}
+            placeholder={compact ? 'Search…' : 'Name, email, phone, company, city…'}
             className={`w-full border border-gray-200 rounded-lg pl-7 pr-2 bg-white focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400 ${
               compact ? 'text-xs py-1' : 'text-sm py-1.5 pl-8 pr-3'
             }`}
             aria-label="Search pipeline"
           />
         </div>
+
+        <button
+          type="button"
+          onClick={handleApply}
+          disabled={applying}
+          className={`shrink-0 font-semibold rounded-lg border transition-colors ${
+            compact ? 'text-[10px] px-2.5 py-1' : 'text-xs px-3 py-1.5'
+          } ${
+            filtersDirty
+              ? 'bg-[#ffcb2b] border-[#e6b800] text-[#242424] hover:bg-[#ffe48a]'
+              : 'bg-gray-900 border-gray-900 text-white hover:bg-gray-800'
+          } disabled:opacity-60`}
+        >
+          {applying ? 'Searching…' : filtersDirty ? 'Search *' : 'Search'}
+        </button>
 
         <button
           type="button"
@@ -122,6 +156,9 @@ export default function PipelineFiltersBar({
         <span className="text-xs text-gray-500 tabular-nums shrink-0">
           <strong className="text-gray-900">{resultCount}</strong>
           {resultCount !== totalCount ? `/${totalCount}` : ''}
+          {pipelineTotal > totalCount ? (
+            <span className="text-gray-400"> · {pipelineTotal.toLocaleString()} total</span>
+          ) : null}
         </span>
 
         {resultCount > 0 && (
@@ -140,6 +177,27 @@ export default function PipelineFiltersBar({
           </button>
         )}
       </div>
+
+      {(appliedSearch || appliedLocationLabel) && (
+        <div className={`flex flex-wrap items-center gap-1.5 ${compact ? 'mt-1.5' : 'mt-2'}`}>
+          <span className="text-[10px] font-semibold uppercase tracking-wide text-gray-400">Active</span>
+          {appliedSearch ? (
+            <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-900 text-white">
+              Search: {appliedSearch}
+            </span>
+          ) : null}
+          {appliedFilters.city ? (
+            <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#fffbeb] border border-[#ffe48a] text-[#5b4a00]">
+              City: {appliedFilters.city}
+            </span>
+          ) : null}
+          {appliedFilters.state ? (
+            <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#fffbeb] border border-[#ffe48a] text-[#5b4a00]">
+              State: {appliedFilters.state}
+            </span>
+          ) : null}
+        </div>
+      )}
 
       {savedViews.length > 0 && (
         <div className={`flex flex-wrap gap-1 overflow-x-auto no-scrollbar ${compact ? 'mt-1.5' : 'mt-2 gap-1.5'}`}>
@@ -236,6 +294,11 @@ export default function PipelineFiltersBar({
 
       {expanded && (
         <div className="mt-3 rounded-lg border border-gray-200 bg-gray-50/60 p-3 space-y-3">
+          <p className="text-[10px] text-gray-600">
+            Choose city/state from your pipeline data, then click <strong>Search</strong> (matches
+            Mumbai, MUMBAI, mumbai the same way).
+          </p>
+
           <div>
             <p className="text-[10px] font-bold uppercase tracking-wide text-gray-500 mb-2">Stage</p>
             <div className="flex flex-wrap gap-1.5">
@@ -295,33 +358,33 @@ export default function PipelineFiltersBar({
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             <label className="block">
               <span className="text-[10px] font-medium text-gray-500 mb-0.5 block">City</span>
-              <input
-                list="pipeline-city-list"
+              <select
                 value={filters.city}
                 onChange={(e) => set({ city: e.target.value })}
-                placeholder="Any"
                 className="w-full text-sm border border-gray-200 rounded-md px-2 py-1.5 bg-white"
-              />
-              <datalist id="pipeline-city-list">
+              >
+                <option value="">All cities</option>
                 {cities.map((c) => (
-                  <option key={c} value={c} />
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
                 ))}
-              </datalist>
+              </select>
             </label>
             <label className="block">
               <span className="text-[10px] font-medium text-gray-500 mb-0.5 block">State</span>
-              <input
-                list="pipeline-state-list"
+              <select
                 value={filters.state}
                 onChange={(e) => set({ state: e.target.value })}
-                placeholder="Any"
                 className="w-full text-sm border border-gray-200 rounded-md px-2 py-1.5 bg-white"
-              />
-              <datalist id="pipeline-state-list">
+              >
+                <option value="">All states</option>
                 {states.map((s) => (
-                  <option key={s} value={s} />
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
                 ))}
-              </datalist>
+              </select>
             </label>
             <label className="block">
               <span className="text-[10px] font-medium text-gray-500 mb-0.5 block">Contact</span>
@@ -337,6 +400,17 @@ export default function PipelineFiltersBar({
                 ))}
               </select>
             </label>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={handleApply}
+              disabled={applying}
+              className="text-xs font-semibold px-4 py-2 rounded-lg bg-gray-900 text-white disabled:opacity-50"
+            >
+              {applying ? 'Searching…' : 'Apply filters'}
+            </button>
           </div>
 
           <div className="flex flex-wrap gap-1">

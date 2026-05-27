@@ -119,6 +119,8 @@ export const api = {
     const qs = new URLSearchParams({ view: 'board', light: '1' })
     if (params.status && params.status !== 'all') qs.set('status', params.status)
     if (params.q) qs.set('q', params.q)
+    if (params.city) qs.set('city', params.city)
+    if (params.state) qs.set('state', params.state)
     if (params.assigneeUserId) qs.set('assigneeUserId', params.assigneeUserId)
     for (const id of params.tagIds || []) qs.append('tagId', id)
     return request(`/api/saved-leads?${qs}`, { timeoutMs: 60_000 })
@@ -129,6 +131,8 @@ export const api = {
     limit = 100,
     status,
     q,
+    city,
+    state,
     assigneeUserId,
     tagIds,
     silent = false,
@@ -140,6 +144,8 @@ export const api = {
     })
     if (status && status !== 'all') qs.set('status', status)
     if (q) qs.set('q', q)
+    if (city) qs.set('city', city)
+    if (state) qs.set('state', state)
     if (assigneeUserId) qs.set('assigneeUserId', assigneeUserId)
     for (const id of tagIds || []) qs.append('tagId', id)
     return request(`/api/saved-leads?${qs}`, { timeoutMs: 45_000 }, { silent })

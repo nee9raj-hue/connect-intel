@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useDeferredValue, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { formatCrmDate, getStatusMeta, getVisiblePipelineColumns } from '../../lib/crmConstants'
@@ -13,6 +13,7 @@ import {
   applyPipelineFilters,
   collectLocationOptions,
   countActiveFilters,
+  normalizeLocationKey,
 } from '../../lib/pipelineFilters'
 import { tagMapById } from '../../lib/orgLeadTags'
 import { leadHasCallablePhone } from '../../lib/phoneUtils'
@@ -68,6 +69,9 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const [filter, setFilter] = useState(panelOptions?.status || 'all')
   const [search, setSearch] = useState('')
   const [advancedFilters, setAdvancedFilters] = useState({ ...DEFAULT_PIPELINE_FILTERS })
+  const [appliedSearch, setAppliedSearch] = useState('')
+  const [appliedAdvanced, setAppliedAdvanced] = useState({ ...DEFAULT_PIPELINE_FILTERS })
+  const [filterApplying, setFilterApplying] = useState(false)
   const [selectedIds, setSelectedIds] = useState(new Set())
   const [importOpen, setImportOpen] = useState(false)
   const [addOpen, setAddOpen] = useState(false)
@@ -146,7 +150,21 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     return savedLeads.filter((l) => (l.assignedToUserId || l.savedByUserId) === pipelineAssigneeFilter)
   }, [savedLeads, pipelineAssigneeFilter])
 
-  const locationOptions = useMemo(() => collectLocationOptions(scopedLeads), [scopedLeads])
+  const locationOptions = useMemo(() => {
+    const fromLoaded = collectLocationOptions(scopedLeads)
+    const mergeNames = (summaryList, loadedList) => {
+      const map = new Map()
+      for (const name of [...(summaryList || []), ...(loadedList || [])]) {
+        const key = normalizeLocationKey(name)
+        if (key && !map.has(key)) map.set(key, name)
+      }
+      return [...map.values()].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }))
+    }
+    return {
+      cities: mergeNames(pipelineSummary.cities, fromLoaded.cities),
+      states: mergeNames(pipelineSummary.states, fromLoaded.states),
+    }
+  }, [scopedLeads, pipelineSummary.cities, pipelineSummary.states])
   const tagById = useMemo(() => tagMapById(orgLeadTags), [orgLeadTags])
 
   const [smartViewId, setSmartViewId] = useState(null)
@@ -155,23 +173,35 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const serverSidePipeline = pipelineSummary.total > 120
   const [boardLeadsByStatus, setBoardLeadsByStatus] = useState(null)
 
-  const deferFilters = !serverSidePipeline && scopedLeads.length > 60
-  const deferredSearch = useDeferredValue(search)
-  const deferredAdvancedFilters = useDeferredValue(advancedFilters)
-  const filterSearch = deferFilters ? deferredSearch : search
-  const filterAdvanced = deferFilters ? deferredAdvancedFilters : advancedFilters
-  const isFilterPending =
-    deferFilters && (search !== deferredSearch || advancedFilters !== deferredAdvancedFilters)
+  const filtersDirty =
+    search.trim() !== appliedSearch ||
+    advancedFilters.city !== appliedAdvanced.city ||
+    advancedFilters.state !== appliedAdvanced.state ||
+    advancedFilters.contact !== appliedAdvanced.contact ||
+    (advancedFilters.tagIds || []).join(',') !== (appliedAdvanced.tagIds || []).join(',') ||
+    (advancedFilters.smartTags || []).join(',') !== (appliedAdvanced.smartTags || []).join(',')
+
+  const buildServerFilters = useCallback(
+    (adv, q) => ({
+      status: filter !== 'all' ? filter : undefined,
+      q: q || undefined,
+      city: adv.city || undefined,
+      state: adv.state || undefined,
+      assigneeUserId: pipelineAssigneeFilter || undefined,
+      tagIds: adv.tagIds?.length ? adv.tagIds : undefined,
+    }),
+    [filter, pipelineAssigneeFilter]
+  )
 
   const serverFilters = useMemo(
-    () => ({
-      status: filter !== 'all' ? filter : undefined,
-      q: search.trim() || undefined,
-      assigneeUserId: pipelineAssigneeFilter || undefined,
-      tagIds: filterAdvanced.tagIds?.length ? filterAdvanced.tagIds : undefined,
-    }),
-    [filter, search, pipelineAssigneeFilter, filterAdvanced.tagIds]
+    () => buildServerFilters(appliedAdvanced, appliedSearch),
+    [buildServerFilters, appliedAdvanced, appliedSearch]
   )
+
+  const applyFilters = useCallback(() => {
+    setAppliedSearch(search.trim())
+    setAppliedAdvanced({ ...advancedFilters })
+  }, [search, advancedFilters])
 
   const pipelineFiltersBootRef = useRef(false)
   useEffect(() => {
@@ -180,10 +210,10 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       pipelineFiltersBootRef.current = true
       return undefined
     }
-    const timer = setTimeout(() => {
-      loadPipelineList(serverFilters, { append: false, silent: true }).catch(() => {})
-    }, 350)
-    return () => clearTimeout(timer)
+    setFilterApplying(true)
+    loadPipelineList(serverFilters, { append: false, silent: false })
+      .catch(() => {})
+      .finally(() => setFilterApplying(false))
   }, [serverSidePipeline, serverFilters, loadPipelineList])
 
   useEffect(() => {
@@ -205,22 +235,28 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     }
   }, [serverSidePipeline, view, serverFilters])
 
-  const filtered = useMemo(
-    () => {
-      if (serverSidePipeline) return savedLeads
-      return applyPipelineFilters(scopedLeads, {
-        status: filter,
-        city: filterAdvanced.city,
-        state: filterAdvanced.state,
-        contact: filterAdvanced.contact,
-        tagIds: filterAdvanced.tagIds,
-        tagMode: filterAdvanced.tagMode,
-        search: filterSearch,
-        ...smartViewFilters,
-      })
-    },
-    [scopedLeads, filter, filterAdvanced, filterSearch, smartViewFilters, serverSidePipeline, savedLeads]
-  )
+  const filtered = useMemo(() => {
+    const base = serverSidePipeline ? savedLeads : scopedLeads
+    return applyPipelineFilters(base, {
+      status: serverSidePipeline ? 'all' : filter,
+      city: serverSidePipeline ? '' : appliedAdvanced.city,
+      state: serverSidePipeline ? '' : appliedAdvanced.state,
+      contact: appliedAdvanced.contact,
+      tagIds: serverSidePipeline ? [] : appliedAdvanced.tagIds,
+      tagMode: appliedAdvanced.tagMode,
+      search: serverSidePipeline ? '' : appliedSearch,
+      smartTags: appliedAdvanced.smartTags,
+      ...smartViewFilters,
+    })
+  }, [
+    scopedLeads,
+    filter,
+    appliedAdvanced,
+    appliedSearch,
+    smartViewFilters,
+    serverSidePipeline,
+    savedLeads,
+  ])
 
   const applySmartView = useCallback((view) => {
     if (!view) return
@@ -232,16 +268,28 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       staleDays: f.staleDays ?? null,
       overdueFollowUp: f.overdueFollowUp || false,
     })
-    if (f.contact) setAdvancedFilters((prev) => ({ ...prev, contact: f.contact }))
-    if (f.city) setAdvancedFilters((prev) => ({ ...prev, city: f.city }))
-    if (f.state) setAdvancedFilters((prev) => ({ ...prev, state: f.state }))
+    if (f.contact) {
+      setAdvancedFilters((prev) => ({ ...prev, contact: f.contact }))
+      setAppliedAdvanced((prev) => ({ ...prev, contact: f.contact }))
+    }
+    if (f.city) {
+      setAdvancedFilters((prev) => ({ ...prev, city: f.city }))
+      setAppliedAdvanced((prev) => ({ ...prev, city: f.city }))
+    }
+    if (f.state) {
+      setAdvancedFilters((prev) => ({ ...prev, state: f.state }))
+      setAppliedAdvanced((prev) => ({ ...prev, state: f.state }))
+    }
     if (f.status && f.status !== 'all') setFilter(f.status)
-    if (f.search) setSearch(f.search)
+    if (f.search) {
+      setSearch(f.search)
+      setAppliedSearch(f.search)
+    }
   }, [])
 
   const activeFilterCount = useMemo(
-    () => countActiveFilters(advancedFilters, search),
-    [advancedFilters, search]
+    () => countActiveFilters(appliedAdvanced, appliedSearch),
+    [appliedAdvanced, appliedSearch]
   )
 
   const selectedLeads = useMemo(
@@ -283,10 +331,13 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     return map
   }, [filtered, columns, serverSidePipeline, boardLeadsByStatus])
 
-  const clearAllFilters = () => {
+  const clearAllFilters = useCallback(() => {
+    const empty = { ...DEFAULT_PIPELINE_FILTERS }
     setSearch('')
-    setAdvancedFilters({ ...DEFAULT_PIPELINE_FILTERS })
-  }
+    setAdvancedFilters(empty)
+    setAppliedSearch('')
+    setAppliedAdvanced(empty)
+  }, [])
 
   const selectAllFiltered = () => {
     setSelectedIds(new Set(filtered.map((l) => l.id)))
@@ -503,16 +554,26 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               onSearchChange={setSearch}
               filters={advancedFilters}
               onFiltersChange={setAdvancedFilters}
+              appliedFilters={appliedAdvanced}
+              appliedSearch={appliedSearch}
+              filtersDirty={filtersDirty}
+              onApplyFilters={applyFilters}
+              applying={filterApplying}
               cities={locationOptions.cities}
               states={locationOptions.states}
               statusFilter={filter}
               onStatusFilterChange={setFilter}
               statusOptions={columns}
               resultCount={filtered.length}
-              totalCount={scopedLeads.length}
+              totalCount={
+                serverSidePipeline && (appliedSearch || appliedAdvanced.city || appliedAdvanced.state)
+                  ? pipelineLoad.total || filtered.length
+                  : scopedLeads.length
+              }
+              pipelineTotal={pipelineSummary.total}
               onSelectAllFiltered={selectAllFiltered}
               selectableCount={filtered.length}
-              hasActiveFilters={activeFilterCount > 0 || filter !== 'all' || Boolean(search.trim())}
+              hasActiveFilters={activeFilterCount > 0 || filter !== 'all'}
               onClearFilters={() => {
                 clearAllFilters()
                 setFilter('all')

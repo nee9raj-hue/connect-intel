@@ -56,7 +56,12 @@ export function AppProvider({ children }) {
   const pendingLeadOpenRef = useRef({ leadId: null, tab: null })
   const workspaceLoadedAtRef = useRef(0)
   const workspaceLoadInFlightRef = useRef(null)
-  const [pipelineSummary, setPipelineSummary] = useState({ total: 0, byStatus: [] })
+  const [pipelineSummary, setPipelineSummary] = useState({
+    total: 0,
+    byStatus: [],
+    cities: [],
+    states: [],
+  })
   const [pipelineLoad, setPipelineLoad] = useState({
     total: 0,
     loaded: 0,
@@ -159,6 +164,8 @@ export function AppProvider({ children }) {
         setPipelineSummary({
           total: summary.total ?? 0,
           byStatus: summary.byStatus || [],
+          cities: summary.cities || [],
+          states: summary.states || [],
         })
         setSavedLeads(leads)
         setSessionError(null)
@@ -307,7 +314,7 @@ export function AppProvider({ children }) {
         setSavedLeads([])
         setSearchHistory([])
         setTeamMembers([])
-        setPipelineSummary({ total: 0, byStatus: [] })
+          setPipelineSummary({ total: 0, byStatus: [], cities: [], states: [] })
         setPipelineLoad({ total: 0, loaded: 0, hasMore: false, loadingMore: false })
         workspaceLoadedAtRef.current = 0
         return
@@ -332,6 +339,8 @@ export function AppProvider({ children }) {
           setPipelineSummary({
             total: summary.total ?? 0,
             byStatus: summary.byStatus || [],
+            cities: summary.cities || [],
+            states: summary.states || [],
           })
           setSavedLeads(leads)
           setSearchHistory(historyResult.history || [])

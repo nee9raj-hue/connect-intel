@@ -31,6 +31,23 @@ export function getLeadState(lead) {
   return String(lead?.state || '').trim()
 }
 
+export function normalizeLocationKey(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+}
+
+/** Case-insensitive; treats MUMBAI and Mumbai as the same when matching. */
+export function locationMatchesField(value, filter) {
+  const v = normalizeLocationKey(value)
+  const f = normalizeLocationKey(filter)
+  if (!f) return true
+  if (!v) return false
+  if (v === f) return true
+  return v.includes(f) || f.includes(v)
+}
+
 function matchesContactFilter(lead, contact) {
   const hasEmail = leadHasSendableEmail(lead)
   const hasPhone = leadHasCallablePhone(lead)
@@ -155,14 +172,14 @@ export function applyPipelineFilters(
     }
   }
 
-  const cityQ = String(city || '').trim().toLowerCase()
+  const cityQ = String(city || '').trim()
   if (cityQ) {
-    list = list.filter((l) => getLeadCity(l).toLowerCase().includes(cityQ))
+    list = list.filter((l) => locationMatchesField(getLeadCity(l), cityQ))
   }
 
-  const stateQ = String(state || '').trim().toLowerCase()
+  const stateQ = String(state || '').trim()
   if (stateQ) {
-    list = list.filter((l) => getLeadState(l).toLowerCase().includes(stateQ))
+    list = list.filter((l) => locationMatchesField(getLeadState(l), stateQ))
   }
 
   if (contact && contact !== 'any') {
@@ -177,17 +194,24 @@ export function applyPipelineFilters(
 }
 
 export function collectLocationOptions(leads) {
-  const cities = new Set()
-  const states = new Set()
+  const cityByKey = new Map()
+  const stateByKey = new Map()
   for (const lead of leads || []) {
     const c = getLeadCity(lead)
     const s = getLeadState(lead)
-    if (c) cities.add(c)
-    if (s) states.add(s)
+    if (c) {
+      const key = normalizeLocationKey(c)
+      if (!cityByKey.has(key)) cityByKey.set(key, c)
+    }
+    if (s) {
+      const key = normalizeLocationKey(s)
+      if (!stateByKey.has(key)) stateByKey.set(key, s)
+    }
   }
+  const sortNames = (a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' })
   return {
-    cities: [...cities].sort((a, b) => a.localeCompare(b)),
-    states: [...states].sort((a, b) => a.localeCompare(b)),
+    cities: [...cityByKey.values()].sort(sortNames),
+    states: [...stateByKey.values()].sort(sortNames),
   }
 }
 
