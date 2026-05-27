@@ -524,7 +524,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
                 className={`text-xs font-semibold px-2.5 py-1 rounded-lg border transition-colors ${
                   tab === t.id
                     ? 'marketing-tab-active'
-                    : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:border-slate-300'
+                    : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-white hover:border-slate-300 shadow-sm'
                 }`}
               >
                 {t.label}
@@ -603,14 +603,14 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
       <div
         className={
           tab === 'campaigns' || tab === 'templates'
-            ? 'panel-body-scroll flex flex-col min-h-0 overflow-hidden px-2 sm:px-3 py-2'
+            ? 'panel-body-scroll flex flex-col min-h-0 px-2 sm:px-3 py-2'
             : 'panel-body-scroll px-4 sm:px-6 py-4'
         }
       >
         {loading ? (
           <LoadingExperience message={LOADING_MESSAGES.marketing} />
         ) : tab === 'campaigns' ? (
-          <div className="flex flex-col flex-1 min-h-0 max-w-[1400px] gap-2">
+          <div className="flex flex-col flex-1 min-h-0 max-w-[1400px] gap-3">
             <details
               open={campaignSetupOpen}
               onToggle={(e) => setCampaignSetupOpen(e.target.open)}
@@ -850,7 +850,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
             )}
             </div>
 
-            <div className="shrink-0 sticky bottom-0 z-20 flex flex-wrap items-center gap-2 px-3 py-2.5 bg-white/95 backdrop-blur-sm border border-slate-200 rounded-lg shadow-[0_-2px_12px_rgba(15,23,42,0.08)]">
+            <div className="shrink-0 flex flex-wrap items-center gap-2 px-3 py-2.5 bg-white border border-slate-200 rounded-lg shadow-sm mt-2">
               <button
                 type="button"
                 onClick={resetCampaignForm}
@@ -878,7 +878,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
                       : undefined
                 }
                 onClick={createCampaign}
-                className="text-xs font-semibold px-3 py-2 border border-slate-300 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50"
+                className="text-xs font-semibold px-3 py-2 border border-slate-300 rounded-lg bg-slate-50 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Save draft
               </button>
@@ -886,7 +886,7 @@ export default function MarketingPanel({ onNavigate, panelOptions }) {
                 type="button"
                 disabled={busy || !canSaveCampaignDraft}
                 onClick={createAndStart}
-                className="text-xs font-semibold px-3 py-2 bg-slate-900 text-white rounded-lg disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-800"
+                className="text-xs font-semibold px-3 py-2 bg-[#ffcb2b] text-[#242424] rounded-lg disabled:opacity-40 disabled:cursor-not-allowed hover:brightness-[0.98]"
               >
                 {busy
                   ? 'Working…'
