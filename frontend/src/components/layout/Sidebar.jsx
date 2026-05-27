@@ -4,7 +4,7 @@ import { useApp } from '../../context/AppContext'
 import {
   buildCustomerNavSections,
   buildOperatorNavSections,
-  countPipelineByStatus,
+  pipelineCountsFromSummary,
   countUpcomingFromLeads,
   isNavTargetActive,
   navTargetToOptions,
@@ -68,7 +68,10 @@ export default function Sidebar({
       ? 'Team workspace'
       : null
 
-  const pipelineCounts = useMemo(() => countPipelineByStatus(savedLeads), [savedLeads])
+  const pipelineCounts = useMemo(
+    () => pipelineCountsFromSummary(pipelineSummary, savedLeads),
+    [pipelineSummary, savedLeads]
+  )
   const upcomingCount = useMemo(() => countUpcomingFromLeads(savedLeads), [savedLeads])
 
   const sections = useMemo(() => {

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { getVisiblePipelineColumns } from '../../lib/crmConstants'
-import { QUICK_NAV_TILES, countPipelineByStatus, countUpcomingFromLeads, navTargetToOptions } from '../../lib/navConfig'
+import { QUICK_NAV_TILES, pipelineCountsFromSummary, countUpcomingFromLeads, navTargetToOptions } from '../../lib/navConfig'
 import { formatDateTime } from '../../lib/crmUiConstants'
 import { withTimeout } from '../../lib/fetchWithTimeout'
 
@@ -33,7 +33,10 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
   const [upcomingEvents, setUpcomingEvents] = useState([])
   const [loadingExtras, setLoadingExtras] = useState(true)
 
-  const pipelineCounts = useMemo(() => countPipelineByStatus(savedLeads), [savedLeads])
+  const pipelineCounts = useMemo(
+    () => pipelineCountsFromSummary(pipelineSummary, savedLeads),
+    [pipelineSummary, savedLeads]
+  )
   const columns = useMemo(() => getVisiblePipelineColumns(user), [user])
   const upcomingLocal = useMemo(() => countUpcomingFromLeads(savedLeads), [savedLeads])
 
@@ -169,7 +172,14 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
         <div className="grid lg:grid-cols-3 gap-4">
           <section className="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-4">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-gray-900">Pipeline by stage</h3>
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900">Pipeline by stage</h3>
+                {pipelineSummary.total > 0 && (
+                  <p className="text-[10px] text-gray-500 mt-0.5 tabular-nums">
+                    {pipelineSummary.total.toLocaleString()} leads total
+                  </p>
+                )}
+              </div>
               <button
                 type="button"
                 onClick={() => go({ panel: 'pipeline', status: 'all' })}

@@ -10,6 +10,18 @@ export function countPipelineByStatus(leads = []) {
   return counts
 }
 
+/** Full org totals from server summary (fast); falls back to loaded leads. */
+export function pipelineCountsFromSummary(pipelineSummary, savedLeads = []) {
+  if (Array.isArray(pipelineSummary?.byStatus) && pipelineSummary.byStatus.length) {
+    const counts = { all: Number(pipelineSummary.total) || 0 }
+    for (const row of pipelineSummary.byStatus) {
+      if (row?.status) counts[row.status] = Number(row.count) || 0
+    }
+    return counts
+  }
+  return countPipelineByStatus(savedLeads)
+}
+
 export function countUpcomingFromLeads(leads = []) {
   const now = Date.now()
   let n = 0
