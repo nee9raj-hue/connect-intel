@@ -7,6 +7,7 @@ export const config = {
 
 const ROUTES = {
   health: () => import('../lib/server/handlers/health.js'),
+  'google/risc': () => import('../lib/server/handlers/google-risc.js'),
   'integrations/status': () => import('../lib/server/handlers/integrations-status.js'),
   'search-leads': () => import('../lib/server/handlers/search-leads.js'),
   'saved-leads': () => import('../lib/server/handlers/saved-leads.js'),
