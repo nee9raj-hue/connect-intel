@@ -397,7 +397,7 @@ function NavGroup({
         />
       </button>
       {navExpanded && (
-        <div className="ml-3 mt-1 mb-1 space-y-1 border-l border-white/10 pl-2">
+        <div className="ml-3 mt-0.5 mb-0.5 space-y-0 border-l border-white/10 pl-2">
           {group.children.map((child) => (
             <NavSubBtn
               key={child.id}
@@ -531,18 +531,18 @@ function RailFlyoutAnchor({
           if (e.target.closest('button')) closeNow()
         }}
       >
-        <p className="sidebar-rail-flyout__title border-b border-[#3a3836] px-3 py-2 text-[11px] font-semibold tracking-[-0.02em] text-white">
+        <p className="sidebar-rail-flyout__title border-b border-[#3a3836] px-2.5 py-1.5 text-[10px] font-semibold tracking-[-0.02em] text-white">
           {label}
         </p>
         {leaf ? (
-          <div className="sidebar-rail-flyout__items p-1.5">
+          <div className="sidebar-rail-flyout__items p-1">
             <button
               type="button"
               onClick={() => {
                 onNavigate?.()
                 closeNow()
               }}
-              className={`sidebar-rail-flyout__leaf w-full flex items-center gap-2.5 px-2.5 py-2.5 rounded-xl text-[12px] font-medium tracking-[-0.015em] transition-colors ${
+              className={`sidebar-rail-flyout__leaf w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-[11px] font-medium leading-tight tracking-[-0.015em] transition-colors ${
                 itemActive
                   ? 'nav-sub-active'
                   : muted
@@ -564,7 +564,7 @@ function RailFlyoutAnchor({
             </button>
           </div>
         ) : (
-          <div className="sidebar-rail-flyout__items max-h-[min(65vh,360px)] overflow-y-auto p-1.5 space-y-0.5">
+          <div className="sidebar-rail-flyout__items max-h-[min(65vh,360px)] overflow-y-auto p-1 space-y-0">
             {children}
           </div>
         )}
@@ -647,7 +647,7 @@ function NavSubBtn({ label, active, badge, onClick, inRailFlyout = false }) {
     <button
       type="button"
       onClick={onClick}
-      className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-xl text-[11px] font-medium tracking-[-0.015em] transition-colors ${
+      className={`w-full flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-medium leading-tight tracking-[-0.015em] transition-colors ${
         active ? 'nav-sub-active' : inactiveClass
       }`}
     >
