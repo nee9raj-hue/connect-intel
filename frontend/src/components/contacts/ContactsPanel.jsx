@@ -116,17 +116,43 @@ export default function ContactsPanel({ onNavigate }) {
 
   const setField = (key, value) => setForm((f) => ({ ...f, [key]: value }))
 
+  const buildLinkedinSearchPayload = () => {
+    const lead = pipelineLeadForContact?.lead || {}
+    const pick = (primary, ...fallbacks) => {
+      const value = String(primary || '').trim()
+      if (value) return value
+      for (const entry of fallbacks) {
+        const next = String(entry || '').trim()
+        if (next) return next
+      }
+      return ''
+    }
+    return {
+      firstName: pick(form.firstName, lead.firstName, lead.first_name),
+      lastName: pick(form.lastName, lead.lastName, lead.last_name),
+      title: pick(form.title, lead.title),
+      company: pick(form.company, lead.company),
+      email: pick(form.email, lead.email),
+      phone: pick(form.phone, lead.phone),
+      city: pick(form.city, lead.city),
+      state: pick(form.state, lead.state),
+      industry: pick(form.industry, lead.industry),
+      website: pick(form.website, lead.companyDomain, lead.website),
+    }
+  }
+
   const applySearch = () => {
     setAppliedSearch(search.trim())
   }
 
   const runLinkedinAiSearch = async () => {
     if (!selectedId || aiSearching) return
+    const payload = buildLinkedinSearchPayload()
     const hasHint =
-      form.firstName?.trim() ||
-      form.lastName?.trim() ||
-      form.company?.trim() ||
-      form.email?.trim()
+      payload.firstName ||
+      payload.lastName ||
+      payload.company ||
+      payload.email
     if (!hasHint) {
       setAiError('Add a name, company, or email first.')
       return
@@ -139,7 +165,7 @@ export default function ContactsPanel({ onNavigate }) {
     setNotice(null)
 
     try {
-      const data = await api.searchContactLinkedin(selectedId, form)
+      const data = await api.searchContactLinkedin(selectedId, payload)
       setAiMatches(data.matches || [])
       setAiNotice(data.notice || null)
       if (data.error && !(data.matches || []).length) {
