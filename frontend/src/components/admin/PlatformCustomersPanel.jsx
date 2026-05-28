@@ -1,294 +1,737 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { useApp } from '../../context/AppContext'
+import { api } from '../../lib/api'
+import { formatDateTime } from '../../lib/crmUiConstants'
+import LoadingExperience from '../ui/LoadingExperience'
+import { LOADING_MESSAGES } from '../../lib/loadingQuotes'
+import PlatformSupportTickets from './PlatformSupportTickets'
 
-const MEMBERS = [
-  { id: 1, name: 'Neeraj Kumar', email: 'neeraj@connectintel.net', role: 'admin', initials: 'NK', color: 'blue', emailStatus: 'reconnect', emailNote: 'Gmail reconnect needed' },
-  { id: 2, name: 'Dakash Rantiya', email: 'dakash@xindus.net', role: 'admin', initials: 'DR', color: 'purple', emailStatus: 'error', emailNote: 'Token expired — 58 fails' },
-  { id: 3, name: 'Sales Rep A', email: 'rep.a@xindus.net', role: 'member', initials: 'SA', color: 'teal', emailStatus: 'connected', emailNote: 'Gmail connected' },
-  { id: 4, name: 'Sales Rep B', email: 'rep.b@xindus.net', role: 'member', initials: 'SB', color: 'amber', emailStatus: 'connected', emailNote: 'Gmail connected' },
+const TABS = [
+  { id: 'tickets', label: 'Support tickets' },
+  { id: 'users', label: 'Customers' },
+  { id: 'organizations', label: 'Organizations' },
 ]
-
-const INVOICES = [
-  { id: 'INV-2026-005', date: 'May 21, 2026', desc: 'Pro plan — May', amount: '₹4,999' },
-  { id: 'INV-2026-004', date: 'Apr 21, 2026', desc: 'Pro plan — April', amount: '₹4,999' },
-  { id: 'INV-2026-003', date: 'Mar 21, 2026', desc: 'Pro plan — March', amount: '₹4,999' },
-  { id: 'INV-2026-002', date: 'Feb 21, 2026', desc: 'Pro plan — February', amount: '₹4,999' },
-  { id: 'INV-2026-001', date: 'Jan 21, 2026', desc: 'Pro plan — January + setup', amount: '₹6,499' },
-]
-
-const CREDIT_OPTIONS = [
-  { amount: '₹1,000', emails: '+200 emails' },
-  { amount: '₹2,500', emails: '+600 emails' },
-  { amount: '₹5,000', emails: '+1,500 emails', best: true },
-  { amount: '₹10,000', emails: '+3,500 emails' },
-]
-
-const USAGE = [
-  { label: 'Emails sent', used: 710, total: 1000, warn: false },
-  { label: 'Contacts', used: 8200, total: 10000, warn: true },
-  { label: 'Team seats', used: 4, total: 10, warn: false },
-  { label: 'Campaigns', used: 11, total: 20, warn: false },
-]
-
-const avatarColors = {
-  blue:   { bg: '#E6F1FB', color: '#185FA5' },
-  purple: { bg: '#EEEDFE', color: '#3C3489' },
-  teal:   { bg: '#E1F5EE', color: '#085041' },
-  amber:  { bg: '#FAEEDA', color: '#633806' },
-}
-
-const statusDot = {
-  connected: '#1D9E75',
-  reconnect: '#EF9F27',
-  error:     '#E24B4A',
-}
 
 export default function PlatformCustomersPanel() {
-  const [tab, setTab] = useState('team')
-  const [members, setMembers] = useState(MEMBERS)
-  const [inviteEmail, setInviteEmail] = useState('')
-  const [inviteRole, setInviteRole] = useState('member')
-  const [selectedCredit, setSelectedCredit] = useState('₹5,000')
+  const { user } = useApp()
+  const [tab, setTab] = useState('tickets')
+  const [query, setQuery] = useState('')
+  const [overview, setOverview] = useState(null)
+  const [rows, setRows] = useState([])
+  const [selectedUserId, setSelectedUserId] = useState(null)
+  const [selectedOrgId, setSelectedOrgId] = useState(null)
+  const [detail, setDetail] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [detailLoading, setDetailLoading] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState(null)
+  const [notice, setNotice] = useState(null)
 
-  const removeMe = (id) => setMembers((m) => m.filter((x) => x.id !== id))
+  const loadOverview = useCallback(async () => {
+    try {
+      const data = await api.getAdminSupportOverview()
+      setOverview(data)
+    } catch {
+      // non-blocking
+    }
+  }, [])
 
-  return (
-    <div className="panel-shell bg-[#f3f4f6]">
-      <div className="panel-body-scroll">
-        <div style={{ fontFamily: 'system-ui, sans-serif', maxWidth: 780, margin: '0 auto', padding: '1.5rem 1rem', color: '#1a202c' }}>
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: 12 }}>
-        <div>
-          <h1 style={{ fontSize: 20, fontWeight: 500, margin: 0 }}>Team & billing</h1>
-          <p style={{ fontSize: 13, color: '#718096', margin: '4px 0 0' }}>Manage members, email connections, and your subscription</p>
-        </div>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <PrimaryBtn onClick={() => { setTab('team'); setTimeout(() => document.getElementById('inviteInput')?.focus(), 50) }}>+ Invite member</PrimaryBtn>
+  const loadList = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      if (tab === 'organizations') {
+        const data = await api.listAdminOrganizations(query)
+        setRows(data.organizations || [])
+      } else {
+        const data = await api.listAdminCustomers(query)
+        setRows(data.customers || [])
+      }
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setLoading(false)
+    }
+  }, [tab, query])
+
+  const loadDetail = useCallback(async () => {
+    if (tab === 'users' && selectedUserId) {
+      setDetailLoading(true)
+      try {
+        const data = await api.getAdminCustomer(selectedUserId)
+        setDetail(data)
+      } catch (e) {
+        setError(e.message)
+      } finally {
+        setDetailLoading(false)
+      }
+    } else if (tab === 'organizations' && selectedOrgId) {
+      setDetailLoading(true)
+      try {
+        const data = await api.getAdminOrganization(selectedOrgId)
+        setDetail(data)
+      } catch (e) {
+        setError(e.message)
+      } finally {
+        setDetailLoading(false)
+      }
+    } else {
+      setDetail(null)
+    }
+  }, [tab, selectedUserId, selectedOrgId])
+
+  useEffect(() => {
+    if (user?.isPlatformAdmin) loadOverview()
+  }, [user, loadOverview])
+
+  useEffect(() => {
+    if (!user?.isPlatformAdmin) return
+    const t = setTimeout(loadList, 200)
+    return () => clearTimeout(t)
+  }, [user, loadList])
+
+  useEffect(() => {
+    loadDetail()
+  }, [loadDetail])
+
+  useEffect(() => {
+    setSelectedUserId(null)
+    setSelectedOrgId(null)
+    setDetail(null)
+  }, [tab])
+
+  useEffect(() => {
+    if (!notice) return
+    const t = setTimeout(() => setNotice(null), 4000)
+    return () => clearTimeout(t)
+  }, [notice])
+
+  const runAction = async (payload) => {
+    setBusy(true)
+    setError(null)
+    try {
+      const data = await api.adminCustomerAction(payload)
+      setDetail(data.detail)
+      setNotice('Saved')
+      await loadList()
+      await loadOverview()
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  if (!user?.isPlatformAdmin) {
+    return (
+      <div className="p-6">
+        <div className="bg-white rounded-2xl border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold text-gray-900">Platform operator access required</h2>
+          <p className="mt-2 text-sm text-gray-500">Sign in with an email listed in ADMIN_EMAILS on Vercel.</p>
         </div>
       </div>
+    )
+  }
 
-      <div style={{ display: 'flex', borderBottom: '0.5px solid #e2e8f0', marginBottom: '1.5rem', gap: 2 }}>
-        {['team', 'billing', 'invoices'].map((t) => (
-          <button key={t} onClick={() => setTab(t)} style={{
-            padding: '10px 18px', fontSize: 14, cursor: 'pointer', border: 'none', background: 'none',
-            borderBottom: tab === t ? '2px solid #1a202c' : '2px solid transparent',
-            color: tab === t ? '#1a202c' : '#718096', fontWeight: tab === t ? 500 : 400,
-            textTransform: 'capitalize', marginBottom: -1,
-          }}>{t === 'team' ? 'Team members' : t === 'billing' ? 'Billing & usage' : 'Invoices'}</button>
+  const metrics = overview?.metrics || {}
+
+  return (
+    <div className="h-full flex flex-col bg-[#f0f1f4] overflow-hidden">
+      <header className="shrink-0 bg-gray-900 text-white px-5 py-4 border-b border-gray-800">
+        <p className="text-[10px] font-bold uppercase tracking-widest text-[#ffcb2b]">Connect Intel · Support desk</p>
+        <h1 className="text-xl font-semibold mt-0.5">Platform support backend</h1>
+        <p className="text-sm text-gray-400 mt-1 max-w-2xl">
+          Triage customer tickets (24–48h SLA), reply by email, and manage credits, access, and onboarding — no live call
+          queue.
+        </p>
+      </header>
+
+      <div className="shrink-0 px-5 py-3 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 border-b border-gray-200 bg-white">
+        <Metric
+          label="Open tickets"
+          value={metrics.supportTicketsActive}
+          warn={metrics.supportTicketsActive > 0}
+        />
+        <Metric
+          label="Over SLA"
+          value={metrics.supportTicketsOverdue}
+          warn={metrics.supportTicketsOverdue > 0}
+        />
+        <Metric label="Customers" value={metrics.totalUsers} />
+        <Metric label="Companies" value={metrics.totalOrganizations} />
+        <Metric label="Active 7d" value={metrics.activeUsers7d} />
+        <Metric label="Low credits" value={metrics.lowCreditUsers} warn={metrics.lowCreditUsers > 0} />
+        <Metric label="Onboarding stuck" value={metrics.pendingOnboarding} warn={metrics.pendingOnboarding > 0} />
+        <Metric label="New tickets 24h" value={metrics.supportTicketsOpen24h} />
+      </div>
+
+      <div className="shrink-0 px-5 py-2 flex flex-wrap items-center gap-2 bg-white border-b border-gray-200">
+        {TABS.map((t) => (
+          <button
+            key={t.id}
+            type="button"
+            onClick={() => setTab(t.id)}
+            className={`text-xs font-semibold px-3 py-1.5 rounded-lg border ${
+              tab === t.id ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-600 border-gray-200'
+            }`}
+          >
+            {t.label}
+          </button>
         ))}
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search email, name, company…"
+          className="ml-auto text-sm border border-gray-200 rounded-lg px-3 py-1.5 w-full sm:w-64"
+        />
       </div>
 
-      {tab === 'team' && (
-        <>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(140px,1fr))', gap: 10, marginBottom: '1.5rem' }}>
-            {[
-              { label: 'Total members', value: members.length, sub: '2 admins · 2 reps' },
-              { label: 'Email connected', value: members.filter(m => m.emailStatus === 'connected').length, sub: '1 needs reconnect' },
-              { label: 'Emails sent (May)', value: 142, sub: 'across all members' },
-              { label: 'Pending invites', value: 1, sub: 'expires in 6 days' },
-            ].map((m) => (
-              <MetricCard key={m.label} label={m.label} value={m.value} sub={m.sub} />
-            ))}
-          </div>
-
-          <Card style={{ marginBottom: '1rem' }}>
-            <p style={{ fontSize: 15, fontWeight: 500, marginBottom: 2 }}>Invite a new member</p>
-            <p style={{ fontSize: 12, color: '#718096', marginBottom: 12 }}>They will receive an email with a sign-in link.</p>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              <input id="inviteInput" type="email" placeholder="colleague@xindus.net" value={inviteEmail}
-                onChange={(e) => setInviteEmail(e.target.value)}
-                style={{ flex: 1, minWidth: 200, padding: '8px 12px', fontSize: 13, border: '0.5px solid #cbd5e0', borderRadius: 8, outline: 'none' }} />
-              <select value={inviteRole} onChange={(e) => setInviteRole(e.target.value)}
-                style={{ padding: '8px 12px', fontSize: 13, border: '0.5px solid #cbd5e0', borderRadius: 8, background: '#fff' }}>
-                <option value="member">Member</option>
-                <option value="admin">Admin</option>
-              </select>
-              <PrimaryBtn onClick={() => { alert(`Invite sent to ${inviteEmail}`); setInviteEmail('') }}>Send invite</PrimaryBtn>
-            </div>
-          </Card>
-
-          <Card>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-              <p style={{ fontSize: 15, fontWeight: 500 }}>Members</p>
-              <p style={{ fontSize: 12, color: '#718096' }}>{members.length} of 10 seats used</p>
-            </div>
-            <ProgressBar pct={members.length / 10 * 100} />
-            {members.map((m, i) => (
-              <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: i < members.length - 1 ? '0.5px solid #e2e8f0' : 'none', flexWrap: 'wrap' }}>
-                <div style={{ width: 38, height: 38, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 500, fontSize: 13, flexShrink: 0, background: avatarColors[m.color].bg, color: avatarColors[m.color].color }}>{m.initials}</div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 14, fontWeight: 500, display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                    {m.name}
-                    <span style={{ fontSize: 11, padding: '2px 7px', borderRadius: 6, background: m.role === 'admin' ? '#EBF4FF' : '#f7fafc', color: m.role === 'admin' ? '#2b6cb0' : '#718096', fontWeight: 500 }}>{m.role}</span>
-                  </div>
-                  <div style={{ fontSize: 12, color: '#718096', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.email}</div>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 5 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                    <div style={{ width: 7, height: 7, borderRadius: '50%', background: statusDot[m.emailStatus], flexShrink: 0 }} />
-                    <span style={{ fontSize: 12, color: m.emailStatus === 'error' ? '#e53e3e' : '#718096' }}>{m.emailNote}</span>
-                  </div>
-                  <div style={{ display: 'flex', gap: 6 }}>
-                    {m.emailStatus !== 'connected' && <SmallBtn>Reconnect Gmail</SmallBtn>}
-                    {m.emailStatus === 'connected' && m.role !== 'admin' && (
-                      <SmallBtn danger onClick={() => removeMe(m.id)}>Remove</SmallBtn>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </Card>
-        </>
-      )}
-
-      {tab === 'billing' && (
-        <>
-          <Card style={{ marginBottom: '1rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-                  <span style={{ fontSize: 20, fontWeight: 500 }}>Pro plan</span>
-                  <span style={{ background: '#E1F5EE', color: '#085041', padding: '3px 10px', borderRadius: 6, fontSize: 12, fontWeight: 500 }}>Active</span>
-                </div>
-                <p style={{ fontSize: 13, color: '#718096' }}>₹4,999 / month · renews on June 21, 2026</p>
-              </div>
-              <div style={{ display: 'flex', gap: 8 }}>
-                <PrimaryBtn>Manage plan</PrimaryBtn>
-              </div>
-            </div>
-            <div style={{ borderTop: '0.5px solid #e2e8f0', marginTop: '1rem', paddingTop: '1rem', display: 'flex', gap: 24, flexWrap: 'wrap' }}>
-              <InfoField label="Payment method" value="Visa ending 4242" />
-              <InfoField label="Billing email" value="neeraj@connectintel.net" />
-              <InfoField label="Next charge" value="₹4,999 on Jun 21" />
-            </div>
-          </Card>
-
-          <Card style={{ marginBottom: '1rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-              <p style={{ fontSize: 15, fontWeight: 500 }}>Usage this month</p>
-              <p style={{ fontSize: 12, color: '#718096' }}>May 1 – 28, 2026</p>
-            </div>
-            {USAGE.map((u) => (
-              <div key={u.label} style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
-                <div style={{ fontSize: 13, color: '#718096', width: 120, flexShrink: 0 }}>{u.label}</div>
-                <div style={{ flex: 1, height: 6, background: '#edf2f7', borderRadius: 3, overflow: 'hidden' }}>
-                  <div style={{ height: '100%', borderRadius: 3, background: u.warn ? '#EF9F27' : '#1D9E75', width: `${Math.round(u.used / u.total * 100)}%` }} />
-                </div>
-                <div style={{ fontSize: 12, color: '#a0aec0', width: 80, textAlign: 'right', flexShrink: 0 }}>{u.used.toLocaleString()} / {u.total.toLocaleString()}</div>
-              </div>
-            ))}
-          </Card>
-
-          <Card>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-              <p style={{ fontSize: 15, fontWeight: 500 }}>Add credits</p>
-              <p style={{ fontSize: 12, color: '#718096' }}>Current balance: ₹0</p>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(120px,1fr))', gap: 10, marginBottom: '1rem' }}>
-              {CREDIT_OPTIONS.map((opt) => (
-                <button key={opt.amount} onClick={() => setSelectedCredit(opt.amount)} style={{
-                  padding: '14px 10px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
-                  border: selectedCredit === opt.amount ? '2px solid #3182ce' : opt.best ? '2px solid #3182ce' : '0.5px solid #e2e8f0',
-                  borderRadius: 8, background: selectedCredit === opt.amount ? '#EBF4FF' : '#fff', cursor: 'pointer',
-                }}>
-                  {opt.best && <span style={{ fontSize: 10, background: '#EBF4FF', color: '#2b6cb0', padding: '1px 6px', borderRadius: 4 }}>Best value</span>}
-                  <span style={{ fontSize: 15, fontWeight: 500 }}>{opt.amount}</span>
-                  <span style={{ fontSize: 11, color: '#718096' }}>{opt.emails}</span>
-                </button>
-              ))}
-            </div>
-            <PrimaryBtn style={{ width: '100%', justifyContent: 'center' }}>Recharge {selectedCredit}</PrimaryBtn>
-          </Card>
-        </>
-      )}
-
-      {tab === 'invoices' && (
-        <>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-            <p style={{ fontSize: 15, fontWeight: 500 }}>Invoice history</p>
-          </div>
-          <Card>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-              <thead>
-                <tr>
-                  {['Invoice', 'Date', 'Description', 'Amount', 'Status'].map((h) => (
-                    <th key={h} style={{ textAlign: h === '' ? 'right' : 'left', padding: '8px 10px', fontSize: 12, fontWeight: 500, color: '#718096', borderBottom: '0.5px solid #e2e8f0' }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {INVOICES.map((inv) => (
-                  <tr key={inv.id}>
-                    <td style={{ padding: '10px 10px', borderBottom: '0.5px solid #e2e8f0', color: '#718096' }}>{inv.id}</td>
-                    <td style={{ padding: '10px 10px', borderBottom: '0.5px solid #e2e8f0' }}>{inv.date}</td>
-                    <td style={{ padding: '10px 10px', borderBottom: '0.5px solid #e2e8f0' }}>{inv.desc}</td>
-                    <td style={{ padding: '10px 10px', borderBottom: '0.5px solid #e2e8f0', fontWeight: 500 }}>{inv.amount}</td>
-                    <td style={{ padding: '10px 10px', borderBottom: '0.5px solid #e2e8f0' }}>
-                      <span style={{ background: '#F0FFF4', color: '#276749', padding: '2px 8px', borderRadius: 6, fontSize: 11, fontWeight: 500 }}>Paid</span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </Card>
-        </>
-      )}
+      {(error || notice) && (
+        <div className="shrink-0 px-5 pt-2">
+          {error && <p className="text-xs text-red-800 bg-red-50 border border-red-100 rounded-lg px-3 py-2">{error}</p>}
+          {notice && <p className="text-xs text-green-900 bg-green-50 border border-green-100 rounded-lg px-3 py-2 mt-1">{notice}</p>}
         </div>
+      )}
+
+      {tab === 'tickets' ? (
+        <PlatformSupportTickets
+          onSelectCustomer={(userId) => {
+            setTab('users')
+            setSelectedUserId(userId)
+          }}
+        />
+      ) : (
+      <div className="flex-1 min-h-0 grid lg:grid-cols-[minmax(280px,360px)_1fr]">
+        <aside className="border-r border-gray-200 bg-white overflow-y-auto">
+          {loading ? (
+            <LoadingExperience message={LOADING_MESSAGES.customers} compact fill={false} className="m-2 rounded-lg border border-gray-200" />
+          ) : !rows.length ? (
+            <p className="p-4 text-sm text-gray-500">No results.</p>
+          ) : tab === 'users' ? (
+            rows.map((row) => (
+              <button
+                key={row.id}
+                type="button"
+                onClick={() => setSelectedUserId(row.id)}
+                className={`w-full text-left px-4 py-3 border-b border-gray-100 hover:bg-gray-50 ${
+                  selectedUserId === row.id ? 'bg-[#fffbeb] border-l-2 border-l-[#ffcb2b]' : ''
+                }`}
+              >
+                <p className="text-sm font-medium text-gray-900 truncate">{row.name}</p>
+                <p className="text-xs text-gray-500 truncate">{row.email}</p>
+                <p className="text-[10px] text-gray-400 mt-1 truncate">
+                  {row.organizationName || row.accountType} · ₹{row.creditBalanceRupees} ·{' '}
+                  {row.onboardingComplete ? 'Active' : 'Onboarding'}
+                </p>
+              </button>
+            ))
+          ) : (
+            rows.map((row) => (
+              <button
+                key={row.id}
+                type="button"
+                onClick={() => setSelectedOrgId(row.id)}
+                className={`w-full text-left px-4 py-3 border-b border-gray-100 hover:bg-gray-50 ${
+                  selectedOrgId === row.id ? 'bg-[#fffbeb] border-l-2 border-l-[#ffcb2b]' : ''
+                }`}
+              >
+                <p className="text-sm font-medium text-gray-900 truncate">{row.name}</p>
+                <p className="text-xs text-gray-500 truncate">{row.ownerEmail || row.domain}</p>
+                <p className="text-[10px] text-gray-400 mt-1">
+                  {row.memberCount} members · {row.pipelineLeads} leads
+                </p>
+              </button>
+            ))
+          )}
+        </aside>
+
+        <main className="overflow-y-auto p-4 sm:p-5">
+          {detailLoading ? (
+            <LoadingExperience message="Loading customer details…" compact fill={false} className="rounded-xl border border-gray-200" />
+          ) : tab === 'users' && detail?.user ? (
+            <CustomerDetail detail={detail} busy={busy} onAction={runAction} />
+          ) : tab === 'organizations' && detail?.organization ? (
+            <OrganizationDetail detail={detail} busy={busy} onAction={runAction} />
+          ) : (
+            <div className="h-full flex items-center justify-center text-sm text-gray-500">
+              Select a {tab === 'users' ? 'customer' : 'organization'} to manage access and credits.
+            </div>
+          )}
+        </main>
       </div>
+      )}
+
+      {overview?.recentAudit?.length > 0 && tab !== 'tickets' && (
+        <footer className="shrink-0 border-t border-gray-200 bg-white px-5 py-2 max-h-24 overflow-y-auto">
+          <p className="text-[10px] font-semibold uppercase text-gray-400 mb-1">Recent support actions</p>
+          <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-gray-600">
+            {overview.recentAudit.map((a) => (
+              <span key={a.id}>
+                {a.action} · {a.targetType} {a.targetId?.slice(0, 8)}… · {formatDateTime(a.createdAt)}
+              </span>
+            ))}
+          </div>
+        </footer>
+      )}
     </div>
   )
 }
 
-function Card({ children, style }) {
-  return <div style={{ background: '#fff', border: '0.5px solid #e2e8f0', borderRadius: 12, padding: '1rem 1.25rem', ...style }}>{children}</div>
-}
-
-function MetricCard({ label, value, sub }) {
+function Metric({ label, value, warn = false }) {
   return (
-    <div style={{ background: '#f7fafc', borderRadius: 8, padding: '1rem' }}>
-      <div style={{ fontSize: 12, color: '#718096', marginBottom: 6 }}>{label}</div>
-      <div style={{ fontSize: 22, fontWeight: 500 }}>{value}</div>
-      {sub && <div style={{ fontSize: 11, color: '#a0aec0', marginTop: 3 }}>{sub}</div>}
+    <div className={`rounded-lg border px-2 py-1.5 ${warn ? 'border-amber-200 bg-amber-50' : 'border-gray-100 bg-gray-50'}`}>
+      <p className="text-[10px] text-gray-500 uppercase font-semibold">{label}</p>
+      <p className={`text-lg font-bold ${warn ? 'text-amber-900' : 'text-gray-900'}`}>{value ?? '—'}</p>
     </div>
   )
 }
 
-function ProgressBar({ pct, warn, danger }) {
-  const fill = danger ? '#E24B4A' : warn ? '#EF9F27' : '#1D9E75'
+function CustomerDetail({ detail, busy, onAction }) {
+  const u = detail.user
+  const [creditRupees, setCreditRupees] = useState('')
+  const [paymentRef, setPaymentRef] = useState('')
+  const [billingNote, setBillingNote] = useState(u.billingNote || '')
+  const invoiceRows = buildInvoicesFromLedger(detail.creditLedger || [], detail.payment)
+
   return (
-    <div style={{ height: 6, background: '#edf2f7', borderRadius: 3, overflow: 'hidden', margin: '8px 0 4px' }}>
-      <div style={{ height: '100%', borderRadius: 3, background: fill, width: `${Math.round(pct)}%` }} />
+    <div className="max-w-3xl space-y-4">
+      <section className="bg-white rounded-xl border border-gray-200 p-4">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">{u.name}</h2>
+            <p className="text-sm text-gray-600">{u.email}</p>
+            <p className="text-xs text-gray-500 mt-1">
+              {u.organizationName || 'Individual'} · {u.accountType} · Last login{' '}
+              {u.lastLoginAt ? formatDateTime(u.lastLoginAt) : '—'}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-1">
+            <Badge ok={u.onboardingComplete} label={u.onboardingComplete ? 'Onboarded' : 'Onboarding pending'} />
+            <Badge ok={u.canSearch} label={u.canSearch ? 'Search on' : 'Search off'} />
+            <Badge ok={u.subscriptionActive} label={u.subscriptionActive ? 'Sub active' : 'No sub flag'} />
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white rounded-xl border border-gray-200 p-4">
+        <h3 className="text-sm font-semibold text-gray-900 mb-2">Company details</h3>
+        <div className="grid sm:grid-cols-2 gap-2 text-xs text-gray-700">
+          <Field label="Company" value={u.organizationName || u.company || '—'} />
+          <Field label="Account type" value={u.accountType} />
+          <Field label="Organization role" value={u.orgRole || 'individual'} />
+          <Field label="Pipeline role" value={u.pipelineRole || '—'} />
+          <Field label="Mobile" value={u.mobile || '—'} />
+          <Field label="Created" value={u.createdAt ? formatDateTime(u.createdAt) : '—'} />
+        </div>
+      </section>
+
+      <div className="grid sm:grid-cols-3 gap-3">
+        <Stat label="Wallet" value={`₹${u.creditBalanceRupees}`} />
+        <Stat label="Pipeline leads" value={detail.usage?.pipelineLeads ?? 0} />
+        <Stat label="Email unlocks" value={detail.usage?.unlocks ?? 0} />
+        <Stat label="AI searches left" value={u.aiDiscoverySearchesLeft ?? '—'} />
+        <Stat label="DB searches left" value={u.searchesLeft ?? '—'} />
+        <Stat label="Gmail CRM" value={u.crmGmailConnected ? 'Connected' : 'Not connected'} />
+      </div>
+
+      <section className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
+        <h3 className="text-sm font-semibold text-gray-900">Billing</h3>
+        <p className="text-xs text-gray-500">
+          {detail.payment?.paymentGateway} · Plan: {u.plan || 'free'} · Subscription:{' '}
+          {u.subscriptionActive ? 'Active' : 'Inactive'}
+        </p>
+        {detail.payment?.lastCreditGrant && (
+          <p className="text-xs text-gray-600">
+            Last grant: ₹{(detail.payment.lastCreditGrant.amountPaise / 100).toFixed(0)} —{' '}
+            {detail.payment.lastCreditGrant.description} ({formatDateTime(detail.payment.lastCreditGrant.createdAt)})
+          </p>
+        )}
+        <div className="pt-2 border-t border-gray-100">
+          <h4 className="text-xs font-semibold text-gray-800 mb-2">Recharge wallet</h4>
+          <div className="flex flex-wrap gap-2 items-end">
+            <label className="text-xs">
+              <span className="block text-gray-500 mb-1">Add credits (₹)</span>
+              <input
+                type="number"
+                min={1}
+                value={creditRupees}
+                onChange={(e) => setCreditRupees(e.target.value)}
+                className="w-28 text-sm border border-gray-200 rounded-lg px-2 py-1.5"
+                placeholder="500"
+              />
+            </label>
+            <ActionBtn
+              disabled={busy || !creditRupees}
+              onClick={() =>
+                onAction({
+                  userId: u.id,
+                  action: 'grant_credits',
+                  amountPaise: Math.round(Number(creditRupees) * 100),
+                  reason: 'Platform support credit grant',
+                })
+              }
+            >
+              Grant credits
+            </ActionBtn>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2 items-end pt-2 border-t border-gray-100">
+          <label className="text-xs">
+            <span className="block text-gray-500 mb-1">Payment amount (₹)</span>
+            <input
+              type="number"
+              min={1}
+              value={creditRupees}
+              onChange={(e) => setCreditRupees(e.target.value)}
+              className="w-28 text-sm border border-gray-200 rounded-lg px-2 py-1.5"
+              placeholder="500"
+            />
+          </label>
+          <label className="text-xs flex-1 min-w-[150px]">
+            <span className="block text-gray-500 mb-1">Payment reference</span>
+            <input
+              value={paymentRef}
+              onChange={(e) => setPaymentRef(e.target.value)}
+              className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5"
+              placeholder="UPI / invoice #"
+            />
+          </label>
+          <ActionBtn
+            disabled={busy}
+            onClick={() =>
+              onAction({
+                userId: u.id,
+                action: 'record_payment',
+                amountPaise: creditRupees ? Math.round(Number(creditRupees) * 100) : 0,
+                reference: paymentRef,
+                plan: 'paid',
+                note: billingNote,
+              })
+            }
+          >
+            Record payment + recharge
+          </ActionBtn>
+        </div>
+        <label className="block text-xs">
+          <span className="text-gray-500">Internal billing note</span>
+          <textarea
+            value={billingNote}
+            onChange={(e) => setBillingNote(e.target.value)}
+            rows={2}
+            className="mt-1 w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5"
+          />
+          <ActionBtn
+            className="mt-2"
+            disabled={busy}
+            onClick={() =>
+              onAction({
+                userId: u.id,
+                action: 'set_subscription',
+                active: u.subscriptionActive,
+                billingNote,
+              })
+            }
+          >
+            Save billing note
+          </ActionBtn>
+        </label>
+      </section>
+
+      <section className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
+        <h3 className="text-sm font-semibold text-gray-900">CRM access & fixes</h3>
+        <div className="flex flex-wrap gap-2">
+          {!u.onboardingComplete && (
+            <ActionBtn disabled={busy} onClick={() => onAction({ userId: u.id, action: 'force_onboarding' })}>
+              Complete onboarding
+            </ActionBtn>
+          )}
+          <ActionBtn disabled={busy} onClick={() => onAction({ userId: u.id, action: 'reset_ai_quota' })}>
+            Reset AI search quota
+          </ActionBtn>
+          <ActionBtn
+            disabled={busy}
+            onClick={() => onAction({ userId: u.id, action: 'set_searches_left', searchesLeft: 100 })}
+          >
+            Set 100 DB searches
+          </ActionBtn>
+          {u.organizationId && (
+            <>
+              <ActionBtn
+                disabled={busy}
+                onClick={() => onAction({ userId: u.id, action: 'set_membership_can_search', canSearch: true })}
+              >
+                Enable search (member)
+              </ActionBtn>
+              <ActionBtn
+                disabled={busy}
+                onClick={() =>
+                  onAction({ userId: u.id, action: 'set_subscription', active: true, plan: 'crm_full' })
+                }
+              >
+                Enable full CRM flag
+              </ActionBtn>
+            </>
+          )}
+          {!u.organizationId && (
+            <ActionBtn
+              disabled={busy}
+              onClick={() => onAction({ userId: u.id, action: 'set_subscription', active: true, plan: 'crm_full' })}
+            >
+              Enable full CRM flag
+            </ActionBtn>
+          )}
+        </div>
+      </section>
+
+      {detail.creditLedger?.length > 0 && (
+        <section className="bg-white rounded-xl border border-gray-200 p-4">
+          <h3 className="text-sm font-semibold text-gray-900 mb-2">Credit ledger</h3>
+          <div className="space-y-1 max-h-40 overflow-y-auto">
+            {detail.creditLedger.map((row) => (
+              <p key={row.id} className="text-xs text-gray-600">
+                {formatDateTime(row.createdAt)} · {row.kind} · ₹{(row.amountPaise / 100).toFixed(2)} · {row.description}
+              </p>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <section className="bg-white rounded-xl border border-gray-200 p-4">
+        <h3 className="text-sm font-semibold text-gray-900 mb-2">Invoices</h3>
+        <p className="text-xs text-gray-500 mb-2">
+          Manual invoice timeline derived from payment records. Use payment reference while recording payment.
+        </p>
+        <InvoiceTable rows={invoiceRows} />
+      </section>
     </div>
   )
 }
 
-function PrimaryBtn({ children, onClick, style }) {
+function OrganizationDetail({ detail, busy, onAction }) {
+  const org = detail.organization
+  const [billingNote, setBillingNote] = useState(org.billingNote || '')
   return (
-    <button onClick={onClick} style={{ padding: '8px 16px', fontSize: 13, borderRadius: 8, border: 'none', background: '#1a202c', color: '#fff', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6, ...style }}>
+    <div className="max-w-3xl space-y-4">
+      <section className="bg-white rounded-xl border border-gray-200 p-4">
+        <h2 className="text-lg font-semibold text-gray-900">{org.name}</h2>
+        <p className="text-sm text-gray-600">{org.domain}</p>
+        <p className="text-xs text-gray-500 mt-2">
+          {detail.members?.length ?? 0} members · {org.pipelineLeads} pipeline leads · Email domain:{' '}
+          {org.emailDomainStatus || 'none'}
+        </p>
+      </section>
+
+      <section className="bg-white rounded-xl border border-gray-200 p-4">
+        <h3 className="text-sm font-semibold text-gray-900 mb-2">Company details</h3>
+        <div className="grid sm:grid-cols-2 gap-2 text-xs text-gray-700">
+          <Field label="Domain" value={org.domain || '—'} />
+          <Field label="Created" value={org.createdAt ? formatDateTime(org.createdAt) : '—'} />
+          <Field label="Email domain" value={org.emailDomainName || 'Not configured'} />
+          <Field label="Email status" value={org.emailDomainStatus || '—'} />
+          <Field label="Subscription" value={org.subscriptionActive ? 'Active' : 'Inactive'} />
+          <Field label="Onboarding" value={org.onboardingComplete ? 'Complete' : 'Pending'} />
+        </div>
+      </section>
+
+      <section className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
+        <h3 className="text-sm font-semibold text-gray-900">Billing & recharge</h3>
+        <div className="grid sm:grid-cols-2 gap-3">
+          <Stat label="Team searches left" value={org.searchesLeft ?? 0} />
+          <Stat label="Org wallet (₹)" value={Number(((org.creditsPaise || 0) / 100).toFixed(2))} />
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <ActionBtn
+            disabled={busy}
+            onClick={() => onAction({ organizationId: org.id, action: 'set_searches_left', searchesLeft: 500 })}
+          >
+            Recharge: set 500 searches
+          </ActionBtn>
+          <ActionBtn
+            disabled={busy}
+            onClick={() => onAction({ organizationId: org.id, action: 'set_searches_left', searchesLeft: 1000 })}
+          >
+            Recharge: set 1000 searches
+          </ActionBtn>
+          <ActionBtn
+            disabled={busy}
+            onClick={() => onAction({ organizationId: org.id, action: 'set_subscription', active: true })}
+          >
+            Activate subscription
+          </ActionBtn>
+        </div>
+        <label className="block text-xs">
+          <span className="text-gray-500">Billing note (company-level)</span>
+          <textarea
+            value={billingNote}
+            onChange={(e) => setBillingNote(e.target.value)}
+            rows={2}
+            className="mt-1 w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5"
+          />
+          <ActionBtn
+            className="mt-2"
+            disabled={busy}
+            onClick={() =>
+              onAction({
+                organizationId: org.id,
+                action: 'set_subscription',
+                active: org.subscriptionActive,
+                billingNote,
+              })
+            }
+          >
+            Save billing note
+          </ActionBtn>
+        </label>
+      </section>
+
+      <div className="flex flex-wrap gap-2">
+        <ActionBtn disabled={busy} onClick={() => onAction({ organizationId: org.id, action: 'force_onboarding' })}>
+          Complete org onboarding
+        </ActionBtn>
+      </div>
+
+      {detail.members?.length > 0 && (
+        <section className="bg-white rounded-xl border border-gray-200 p-4">
+          <h3 className="text-sm font-semibold text-gray-900 mb-2">Team members</h3>
+          <div className="divide-y divide-gray-100">
+            {detail.members.map((m) => (
+              <div key={m.id} className="py-2 flex flex-wrap items-center justify-between gap-2 text-sm">
+                <div>
+                  <p className="font-medium text-gray-900">{m.name}</p>
+                  <p className="text-xs text-gray-500">{m.email}</p>
+                </div>
+                <div className="flex gap-1">
+                  <ActionBtn
+                    disabled={busy}
+                    onClick={() =>
+                      onAction({
+                        organizationId: org.id,
+                        action: 'update_member',
+                        userId: m.id,
+                        canSearch: true,
+                      })
+                    }
+                  >
+                    Enable search
+                  </ActionBtn>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {detail.pendingInvites?.length > 0 && (
+        <section className="bg-white rounded-xl border border-amber-200 p-4">
+          <h3 className="text-sm font-semibold text-amber-900">Pending invites</h3>
+          {detail.pendingInvites.map((i) => (
+            <p key={i.id} className="text-xs text-gray-600 mt-1">
+              {i.email} · expires {formatDateTime(i.expiresAt)}
+            </p>
+          ))}
+        </section>
+      )}
+    </div>
+  )
+}
+
+function Field({ label, value }) {
+  return (
+    <div className="rounded border border-gray-100 bg-gray-50 px-2 py-1.5">
+      <p className="text-[10px] uppercase font-semibold text-gray-400">{label}</p>
+      <p className="text-xs text-gray-900 mt-0.5">{value}</p>
+    </div>
+  )
+}
+
+function buildInvoicesFromLedger(ledger, payment) {
+  const rows = (ledger || [])
+    .filter((row) => row.kind === 'grant' || row.kind === 'adjustment')
+    .filter((row) => /payment|invoice|upi|bank|txn|ref/i.test(String(row.description || '')))
+    .slice(0, 20)
+    .map((row) => ({
+      id: row.id,
+      createdAt: row.createdAt,
+      amountPaise: row.amountPaise || 0,
+      reference: row.description || 'Manual payment',
+      status: 'paid',
+    }))
+  if (!rows.length && payment?.lastCreditGrant) {
+    rows.push({
+      id: 'fallback-last-payment',
+      createdAt: payment.lastCreditGrant.createdAt,
+      amountPaise: payment.lastCreditGrant.amountPaise || 0,
+      reference: payment.lastCreditGrant.description || 'Credit grant',
+      status: 'paid',
+    })
+  }
+  return rows
+}
+
+function InvoiceTable({ rows }) {
+  if (!rows?.length) {
+    return <p className="text-xs text-gray-500">No invoices recorded yet. Record a payment reference to create one.</p>
+  }
+  return (
+    <div className="overflow-x-auto">
+      <table className="min-w-full text-xs">
+        <thead>
+          <tr className="text-left text-gray-500 border-b border-gray-100">
+            <th className="py-1 pr-3">Date</th>
+            <th className="py-1 pr-3">Reference</th>
+            <th className="py-1 pr-3">Amount</th>
+            <th className="py-1">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.id} className="border-b border-gray-50 text-gray-700">
+              <td className="py-1.5 pr-3">{formatDateTime(row.createdAt)}</td>
+              <td className="py-1.5 pr-3">{row.reference}</td>
+              <td className="py-1.5 pr-3">₹{(Number(row.amountPaise || 0) / 100).toFixed(2)}</td>
+              <td className="py-1.5">
+                <span className="inline-flex rounded-full bg-green-100 text-green-800 px-2 py-0.5 font-semibold">
+                  {row.status}
+                </span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
+function Stat({ label, value }) {
+  return (
+    <div className="bg-white rounded-lg border border-gray-200 px-3 py-2">
+      <p className="text-[10px] uppercase font-semibold text-gray-400">{label}</p>
+      <p className="text-base font-bold text-gray-900">{value}</p>
+    </div>
+  )
+}
+
+function Badge({ ok, label }) {
+  return (
+    <span
+      className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
+        ok ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
+      }`}
+    >
+      {label}
+    </span>
+  )
+}
+
+function ActionBtn({ children, disabled, onClick, className = '' }) {
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={onClick}
+      className={`text-xs font-semibold px-3 py-1.5 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50 ${className}`}
+    >
       {children}
     </button>
-  )
-}
-
-function OutlineBtn({ children, onClick }) {
-  return (
-    <button onClick={onClick} style={{ padding: '8px 16px', fontSize: 13, borderRadius: 8, border: '0.5px solid #e2e8f0', background: 'none', color: '#1a202c', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-      {children}
-    </button>
-  )
-}
-
-function SmallBtn({ children, onClick, danger }) {
-  return (
-    <button onClick={onClick} style={{ padding: '5px 10px', fontSize: 12, borderRadius: 6, border: '0.5px solid #e2e8f0', background: 'none', color: danger ? '#e53e3e' : '#718096', cursor: 'pointer' }}>
-      {children}
-    </button>
-  )
-}
-
-function InfoField({ label, value }) {
-  return (
-    <div>
-      <div style={{ fontSize: 12, color: '#718096', marginBottom: 2 }}>{label}</div>
-      <div style={{ fontSize: 13 }}>{value}</div>
-    </div>
   )
 }

@@ -70,16 +70,25 @@ export default function TeamPanel({ onNavigate }) {
             </span>
             <h2 className="text-lg font-semibold text-gray-900">Platform operator</h2>
             <p className="mt-2 text-sm text-gray-500 leading-relaxed">
-              Company team settings are for customer workspaces. Use <strong>Data & imports</strong> for master
-              sheets.
+              Customer team & billing live in their workspaces. Use <strong>Support desk</strong> for tickets and
+              account changes, and <strong>Data & imports</strong> for master sheets.
             </p>
-            <button
-              type="button"
-              onClick={() => onNavigate?.('admin')}
-              className="mt-5 px-4 py-2.5 bg-[#ffcb2b] text-[#242424] text-sm font-semibold rounded-lg hover:bg-[#f0bc00]"
-            >
-              Open Data & imports
-            </button>
+            <div className="mt-5 flex flex-wrap justify-center gap-2">
+              <button
+                type="button"
+                onClick={() => onNavigate?.('admin-customers')}
+                className="px-4 py-2.5 bg-[#ffcb2b] text-[#242424] text-sm font-semibold rounded-lg hover:bg-[#f0bc00]"
+              >
+                Support desk
+              </button>
+              <button
+                type="button"
+                onClick={() => onNavigate?.('admin')}
+                className="px-4 py-2.5 border border-gray-200 text-sm font-semibold rounded-lg hover:bg-gray-50"
+              >
+                Data & imports
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -307,7 +316,7 @@ export default function TeamPanel({ onNavigate }) {
               title="Team & billing"
               description="Company details, recharge, invoices"
               accent="amber"
-              onClick={() => onNavigate?.('admin-customers')}
+              onClick={() => onNavigate?.('org-billing')}
             />
           </div>
 
