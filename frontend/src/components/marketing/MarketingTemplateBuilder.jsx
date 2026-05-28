@@ -582,7 +582,7 @@ export default function MarketingTemplateBuilder({
   const studioBody = (
     <>
       <p className="marketing-studio-mobile-pan-hint md:hidden" aria-hidden>
-        Swipe sideways: tools → email → block editor →
+        Swipe right for blocks, email preview, and block editor — each step is full screen.
       </p>
       <div className="marketing-studio-body">
       <nav className="marketing-studio-rail" aria-label="Builder tools">

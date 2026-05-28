@@ -4,6 +4,10 @@ import FilterDropdown from '../crm/FilterDropdown'
 import MarketingListBuilder from './MarketingListBuilder'
 import MarketingListDetail from './MarketingListDetail'
 import MarketingCreatorBadge from './MarketingCreatorBadge'
+import {
+  scrollMobileSplitToDetail,
+  scrollMobileSplitToList,
+} from '../../lib/mobileSplitPan'
 
 const UNASSIGNED = '__unassigned__'
 
@@ -103,15 +107,15 @@ export default function MarketingListsPanel({
       : CRM_STATUSES.find((s) => s.id === pipelineStage)?.label || pipelineStage
 
   useEffect(() => {
-    if (!selectedListId || typeof window === 'undefined') return
-    if (!window.matchMedia('(max-width: 767px)').matches) return
-    const main = splitRef.current?.querySelector('.crm-split-main')
-    if (!main) return
-    const timer = window.setTimeout(() => {
-      main.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' })
-    }, 80)
+    if (!selectedListId) return
+    const timer = window.setTimeout(() => scrollMobileSplitToDetail(splitRef.current), 80)
     return () => window.clearTimeout(timer)
   }, [selectedListId])
+
+  const closeListDetail = () => {
+    setSelectedListId(null)
+    scrollMobileSplitToList(splitRef.current)
+  }
 
   return (
     <div className="crm-content-card flex flex-col min-h-0 flex-1 overflow-hidden">
@@ -213,7 +217,7 @@ export default function MarketingListsPanel({
 
       <div className="crm-split-shell flex flex-col flex-1 min-h-0">
         <p className="crm-mobile-split-hint" aria-hidden>
-          Swipe right for list details →
+          Select a list, then swipe right for full-screen details. Swipe left to return.
         </p>
         <div
           ref={splitRef}
@@ -254,7 +258,7 @@ export default function MarketingListsPanel({
               setBusy={setBusy}
               setError={setError}
               setNotice={setNotice}
-              onClose={() => setSelectedListId(null)}
+              onClose={closeListDetail}
               onUpdated={(list) => {
                 setLists((prev) => prev.map((x) => (x.id === list.id ? { ...x, ...list } : x)))
               }}

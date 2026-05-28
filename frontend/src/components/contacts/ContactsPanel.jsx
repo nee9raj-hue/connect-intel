@@ -3,6 +3,10 @@ import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import LoadingExperience from '../ui/LoadingExperience'
 import { LOADING_MESSAGES } from '../../lib/loadingQuotes'
+import {
+  scrollMobileSplitToDetail,
+  scrollMobileSplitToList,
+} from '../../lib/mobileSplitPan'
 
 const EMPTY = {
   firstName: '',
@@ -104,16 +108,15 @@ export default function ContactsPanel({ onNavigate }) {
   }, [selectedId, loadOne])
 
   useEffect(() => {
-    if (!selectedId || typeof window === 'undefined') return
-    if (!window.matchMedia('(max-width: 767px)').matches) return
-    const root = splitRef.current
-    const main = root?.querySelector('.crm-split-main')
-    if (!main) return
-    const timer = window.setTimeout(() => {
-      main.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' })
-    }, 80)
+    if (!selectedId) return
+    const timer = window.setTimeout(() => scrollMobileSplitToDetail(splitRef.current), 80)
     return () => window.clearTimeout(timer)
   }, [selectedId])
+
+  const backToContactList = () => {
+    setSelectedId(null)
+    scrollMobileSplitToList(splitRef.current)
+  }
 
   const selected = useMemo(
     () => contacts.find((c) => c.id === selectedId) || null,
@@ -295,7 +298,7 @@ export default function ContactsPanel({ onNavigate }) {
       <div className="crm-page-body">
         <div className="crm-split-shell flex flex-col flex-1 min-h-0">
           <p className="crm-mobile-split-hint" aria-hidden>
-            Swipe right for contact details →
+            Select a contact, then swipe right for full-screen details. Swipe left to return to the list.
           </p>
           <div ref={splitRef} className="crm-content-card crm-split-card flex-1 min-h-0">
           <aside className="crm-split-sidebar">
@@ -356,12 +359,8 @@ export default function ContactsPanel({ onNavigate }) {
             ) : (
               <div className="crm-detail-pane">
                 <div className="crm-detail-card crm-detail-card-wide">
-                  <button
-                    type="button"
-                    className="crm-mobile-back"
-                    onClick={() => setSelectedId(null)}
-                  >
-                    ← Back to list
+                  <button type="button" className="crm-mobile-back" onClick={backToContactList}>
+                    ← Swipe back to list
                   </button>
                   <div className="crm-contact-hero">
                     <div className="crm-contact-avatar">

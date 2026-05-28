@@ -2882,11 +2882,23 @@ details summary::-webkit-details-marker {
 }
 
 @media (max-width: 767px) {
-  /* List + detail: swipe horizontally (list → detail) instead of hiding the list */
+  /*
+   * Master–detail on phone: each pane is full screen width.
+   * Swipe right → detail only (list off-screen left). Swipe left → list.
+   * Vertical scroll happens inside the active pane (full form visible).
+   */
   .crm-page-body:has(.crm-split-shell),
   .crm-page-body:has(> .crm-content-card.crm-split-card) {
     overflow: hidden;
     min-height: 0;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .crm-page-body:has(.crm-split-shell) > .crm-content-card {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
   }
 
   .crm-split-shell {
@@ -2896,7 +2908,14 @@ details summary::-webkit-details-marker {
     flex-direction: column;
   }
 
-  .crm-split-card {
+  .crm-split-card,
+  .mobile-dual-pane-scroll {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    flex: 1 1 0%;
+    min-height: 0;
+    width: 100%;
     overflow-x: auto;
     overflow-y: hidden;
     scroll-snap-type: x mandatory;
@@ -2906,33 +2925,38 @@ details summary::-webkit-details-marker {
   }
 
   .crm-split-sidebar,
-  .crm-split-sidebar.is-hidden-mobile {
-    display: flex !important;
-    width: min(78vw, 300px);
-    max-width: none;
-    flex: 0 0 auto;
-    scroll-snap-align: start;
-    height: 100%;
-    max-height: 100%;
-  }
-
+  .crm-split-sidebar.is-hidden-mobile,
   .crm-split-main,
-  .crm-split-main.is-full-mobile {
-    flex: 0 0 auto;
-    width: min(94vw, 440px);
-    max-width: none;
-    scroll-snap-align: start;
+  .crm-split-main.is-full-mobile,
+  .mobile-dual-pane-scroll > .mobile-dual-pane-scroll__pane {
+    display: flex !important;
+    flex-direction: column;
+    flex: 0 0 100%;
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
     height: 100%;
-    max-height: 100%;
+    min-height: 0;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+  }
+
+  .crm-split-main .crm-detail-pane {
+    flex: 1 1 auto;
+    min-height: min-content;
+    overflow: visible;
+    padding: 0.85rem 1rem 2rem;
   }
 
   .crm-mobile-split-hint {
     display: flex;
     align-items: center;
     gap: 0.35rem;
-    padding: 0.35rem 0.75rem;
+    padding: 0.4rem 0.85rem;
     font-size: 0.625rem;
     font-weight: 600;
     color: #647185;
@@ -2949,6 +2973,10 @@ details summary::-webkit-details-marker {
     font-size: 0.6875rem;
     font-weight: 700;
     color: #0091ae;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
   }
 }
 
@@ -2956,6 +2984,22 @@ details summary::-webkit-details-marker {
   .crm-mobile-split-hint,
   .crm-mobile-back {
     display: none;
+  }
+
+  .mobile-dual-pane-scroll {
+    display: flex;
+    overflow: visible;
+    scroll-snap-type: none;
+  }
+
+  .mobile-dual-pane-scroll > .mobile-dual-pane-scroll__pane {
+    flex: initial;
+    width: auto;
+    min-width: 0;
+    max-width: none;
+    height: auto;
+    overflow: visible;
+    scroll-snap-align: none;
   }
 }
 
@@ -3553,47 +3597,57 @@ details summary::-webkit-details-marker {
     display: inline;
   }
 
-  /* Marketing email studio: rail + blocks + canvas + right editor — pan horizontally on phone */
+  /* Marketing email studio: full-width horizontal steps (blocks → canvas → editor) */
   .marketing-campaigns-shell .marketing-studio--page {
     height: min(78vh, 760px);
     min-height: 360px;
     max-height: min(85vh, 820px);
+    display: flex;
+    flex-direction: column;
   }
 
   .marketing-campaigns-shell .marketing-studio--page .marketing-studio-body,
   .marketing-studio.is-focus .marketing-studio-body {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
     overflow-x: auto;
     overflow-y: hidden;
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
-    max-height: none;
-    min-height: 0;
-    flex: 1 1 auto;
     overscroll-behavior-x: contain;
   }
 
-  .marketing-studio-body > * {
-    flex-shrink: 0;
+  .marketing-studio-body > .marketing-studio-rail {
+    flex: 0 0 3.25rem;
+    min-width: 3.25rem;
+    width: 3.25rem;
     scroll-snap-align: start;
-    max-height: 100%;
+    height: 100%;
+    overflow-y: auto;
   }
 
-  .marketing-studio-body .marketing-studio-panel.hidden {
+  .marketing-studio-body .marketing-studio-panel.hidden,
+  .marketing-studio-body .marketing-studio-panel,
+  .marketing-studio-body .marketing-studio-canvas,
+  .marketing-studio-body .marketing-studio-inspector,
+  .marketing-studio-body .marketing-studio-inspector.is-collapsed {
     display: flex !important;
-    width: min(82vw, 210px);
-  }
-
-  .marketing-studio-canvas {
-    flex: 0 0 auto;
-    min-width: min(94vw, 640px);
-  }
-
-  .marketing-studio-inspector,
-  .marketing-studio-inspector.is-collapsed {
-    width: min(90vw, 300px) !important;
-    min-width: min(90vw, 300px) !important;
+    flex: 0 0 calc(100% - 3.25rem);
+    width: calc(100% - 3.25rem);
+    min-width: calc(100% - 3.25rem);
     max-width: none !important;
+    height: 100%;
+    min-height: 0;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
   }
 
   .marketing-studio-inspector.is-collapsed .marketing-studio-inspector-body {
@@ -3602,13 +3656,19 @@ details summary::-webkit-details-marker {
 
   .marketing-studio-mobile-pan-hint {
     display: block;
-    padding: 0.35rem 0.75rem;
+    padding: 0.4rem 0.85rem;
     font-size: 0.625rem;
     font-weight: 600;
     color: #647185;
     background: #f8fafc;
     border-bottom: 1px solid #e2e8f0;
     flex-shrink: 0;
+  }
+
+  .marketing-campaigns-shell .marketing-studio--page .marketing-studio-canvas-inner {
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
   }
 }
 
