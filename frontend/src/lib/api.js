@@ -320,20 +320,20 @@ export const api = {
   deleteMarketingTemplate: (id) =>
     request('/api/marketing/templates', { method: 'DELETE', body: { id } }),
   createMarketingCampaign: (payload) =>
-    request('/api/marketing/campaigns', { method: 'POST', body: payload }),
+    request('/api/marketing/campaigns', { method: 'POST', body: payload, timeoutMs: 120_000 }),
   updateMarketingCampaign: (payload) =>
-    request('/api/marketing/campaigns', { method: 'PATCH', body: payload }),
+    request('/api/marketing/campaigns', { method: 'PATCH', body: payload, timeoutMs: 120_000 }),
   startMarketingCampaign: (id, opts = {}) =>
     request('/api/marketing/campaigns', {
       method: 'POST',
       body: { action: 'start', id },
-      timeoutMs: opts.timeoutMs ?? 120_000,
+      timeoutMs: opts.timeoutMs ?? 300_000,
     }),
   processMarketingCampaignSends: (id, opts = {}) =>
     request('/api/marketing/campaigns', {
       method: 'POST',
       body: { action: 'process_sends', id, limit: opts.limit ?? 1 },
-      timeoutMs: opts.timeoutMs ?? 120_000,
+      timeoutMs: opts.timeoutMs ?? 300_000,
       silent: opts.silent,
     }),
   logMarketingWhatsAppSent: (enrollmentId) =>

@@ -414,7 +414,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
       try {
         return await api.processMarketingCampaignSends(campaignId, {
           limit: 1,
-          timeoutMs: 120_000,
+          timeoutMs: 300_000,
           silent: true,
         })
       } catch (e) {
@@ -530,7 +530,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
     setBusy(true)
     setError(null)
     try {
-      const data = await api.startMarketingCampaign(id, { timeoutMs: 120_000 })
+      const data = await api.startMarketingCampaign(id, { timeoutMs: 300_000 })
       const isWa = data.campaign?.channel === 'whatsapp'
       const enrolled = data.enrolled || 0
       const initialSent = data.sendResult?.sent || 0
