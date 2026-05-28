@@ -36,6 +36,7 @@ const ROUTES = {
   'crm/notifications': () => import('../lib/server/handlers/crm-notifications.js'),
   'crm/generate-whatsapp': () => import('../lib/server/handlers/crm-generate-whatsapp.js'),
   'crm/calendar': () => import('../lib/server/handlers/crm-calendar.js'),
+  'crm/calendar/google': () => import('../lib/server/handlers/crm-calendar-google.js'),
   'crm/activity-log': () => import('../lib/server/handlers/crm-activity-log.js'),
   'crm/team-dashboard': () => import('../lib/server/handlers/crm-team-dashboard.js'),
   'crm/saved-views': () => import('../lib/server/handlers/crm-saved-views.js'),

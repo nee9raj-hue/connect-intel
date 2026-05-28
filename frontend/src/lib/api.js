@@ -176,6 +176,18 @@ export const api = {
     request('/api/saved-leads', { method: 'PATCH', body: { leadId, assignToUserId } }),
   getCrmCalendar: (query = '', { silent = false } = {}) =>
     request(`/api/crm/calendar${query ? `?${query}` : ''}`, {}, { silent }),
+  getCrmGoogleCalendarStatus: () => request('/api/crm/calendar/google'),
+  connectCrmGoogleCalendar: () =>
+    request('/api/crm/calendar/google', { method: 'POST', body: { action: 'connect' } }),
+  syncCrmGoogleCalendar: () =>
+    request('/api/crm/calendar/google', { method: 'POST', body: { action: 'sync' } }),
+  setCrmGoogleCalendarSync: (enabled) =>
+    request('/api/crm/calendar/google', {
+      method: 'POST',
+      body: { action: enabled ? 'enable' : 'disable' },
+    }),
+  startCrmGmailOAuthWithCalendar: () =>
+    request('/api/crm/email-oauth/start?calendar=1'),
   getCrmActivityLog: () => request('/api/crm/activity-log', { timeoutMs: 60_000 }),
   getCrmNotifications: (since, { silent = false } = {}) =>
     request(

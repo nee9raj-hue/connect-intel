@@ -37,6 +37,9 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
   const [members, setMembers] = useState([])
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState(null)
+  const [googleCal, setGoogleCal] = useState(null)
+  const [googleBusy, setGoogleBusy] = useState(false)
+  const [googleNotice, setGoogleNotice] = useState(null)
 
   useEffect(() => {
     if (panelOptions?.upcomingOnly) {
@@ -95,6 +98,7 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
       const data = await api.getCrmCalendar(q)
       setEvents(data.events || [])
       setMembers(data.members || [])
+      setGoogleCal(data.googleCalendar || null)
     } catch {
       setEvents([])
     } finally {
@@ -111,6 +115,34 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
   useEffect(() => {
     load()
   }, [load])
+
+  const connectGoogleCalendar = async () => {
+    setGoogleBusy(true)
+    setGoogleNotice(null)
+    try {
+      const data = await api.connectCrmGoogleCalendar()
+      if (data.url) window.location.href = data.url
+    } catch (e) {
+      setGoogleNotice(e.message || 'Could not start Google connect')
+    } finally {
+      setGoogleBusy(false)
+    }
+  }
+
+  const syncGoogleCalendar = async () => {
+    setGoogleBusy(true)
+    setGoogleNotice(null)
+    try {
+      await api.setCrmGoogleCalendarSync(true)
+      const data = await api.syncCrmGoogleCalendar()
+      setGoogleNotice(`Synced ${data.imported || 0} Google events`)
+      load()
+    } catch (e) {
+      setGoogleNotice(e.message || 'Sync failed')
+    } finally {
+      setGoogleBusy(false)
+    }
+  }
 
   const shiftAnchor = (delta) => {
     if (view === 'month') {
@@ -161,6 +193,47 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
             Today
           </button>
         </div>
+
+        {!upcomingOnly && (
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50/80 px-3 py-2.5 text-xs text-emerald-950 space-y-2">
+            <p className="font-semibold">Google Calendar sync</p>
+            <p className="text-emerald-900/90 leading-relaxed">
+              {googleCal?.calendarScope
+                ? 'CRM meetings can be added to Google Calendar. Import your Google events here (read-only, green).'
+                : 'Connect the same work Google account to show Gmail Calendar events and push new CRM meetings.'}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {!googleCal?.calendarScope && (
+                <button
+                  type="button"
+                  disabled={googleBusy}
+                  onClick={connectGoogleCalendar}
+                  className="font-semibold px-3 py-1.5 rounded-lg bg-emerald-700 text-white disabled:opacity-50"
+                >
+                  {googleBusy ? 'Connecting…' : 'Connect Google Calendar'}
+                </button>
+              )}
+              {googleCal?.calendarScope && (
+                <>
+                  <button
+                    type="button"
+                    disabled={googleBusy}
+                    onClick={syncGoogleCalendar}
+                    className="font-semibold px-3 py-1.5 rounded-lg bg-white border border-emerald-300 text-emerald-900 disabled:opacity-50"
+                  >
+                    {googleBusy ? 'Syncing…' : 'Sync from Google'}
+                  </button>
+                  {googleCal.lastSyncAt && (
+                    <span className="self-center text-[10px] text-emerald-800">
+                      Last sync {formatDateTime(googleCal.lastSyncAt)}
+                    </span>
+                  )}
+                </>
+              )}
+            </div>
+            {googleNotice && <p className="text-[11px] font-medium">{googleNotice}</p>}
+          </div>
+        )}
 
         <div className="flex flex-wrap items-center gap-2">
           {!upcomingOnly && (
@@ -369,7 +442,11 @@ function EventChip({ event, onClick }) {
         <StatusPill status={event.timeStatus} />
       </div>
       <p className="text-sm font-semibold text-gray-900 mt-1">{event.title}</p>
-      <p className="text-xs text-gray-600">{event.leadName}{event.company ? ` · ${event.company}` : ''}</p>
+      <p className="text-xs text-gray-600">
+        {event.kind === 'google'
+          ? 'From Google Calendar'
+          : `${event.leadName || ''}${event.company ? ` · ${event.company}` : ''}`}
+      </p>
       <p className="text-xs text-gray-500 mt-1">{formatDateTime(event.scheduledAt)}</p>
     </button>
   )
@@ -409,7 +486,12 @@ function EventDetailDrawer({ event, memberName, onClose, onOpenLead }) {
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4 text-sm">
           <DetailRow label="When" value={formatDateTime(event.scheduledAt)} />
           {event.endAt && <DetailRow label="Ends" value={formatDateTime(event.endAt)} />}
-          <DetailRow label="Lead" value={`${event.leadName}${event.company ? ` (${event.company})` : ''}`} />
+          {event.kind !== 'google' && (
+            <DetailRow label="Lead" value={`${event.leadName}${event.company ? ` (${event.company})` : ''}`} />
+          )}
+          {event.kind === 'google' && (
+            <DetailRow label="Source" value="Google Calendar (imported)" />
+          )}
           {event.type && <DetailRow label="Type" value={String(event.type).replace('_', ' ')} />}
           {event.location && <DetailRow label="Location" value={event.location} />}
           {event.notes && <DetailRow label="Notes" value={event.notes} />}
@@ -425,14 +507,26 @@ function EventDetailDrawer({ event, memberName, onClose, onOpenLead }) {
             <DetailRow label="Visit logged" value={formatDateTime(event.visitRecordedAt)} />
           )}
         </div>
-        <div className="shrink-0 p-4 border-t border-gray-100">
-          <button
-            type="button"
-            onClick={onOpenLead}
-            className="w-full py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg"
-          >
-            Open lead in pipeline
-          </button>
+        <div className="shrink-0 p-4 border-t border-gray-100 space-y-2">
+          {event.kind === 'google' && event.htmlLink && (
+            <a
+              href={event.htmlLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full py-2.5 text-center bg-emerald-700 text-white text-sm font-semibold rounded-lg"
+            >
+              Open in Google Calendar
+            </a>
+          )}
+          {event.leadId && (
+            <button
+              type="button"
+              onClick={onOpenLead}
+              className="w-full py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg"
+            >
+              Open lead in pipeline
+            </button>
+          )}
         </div>
       </aside>
     </>
