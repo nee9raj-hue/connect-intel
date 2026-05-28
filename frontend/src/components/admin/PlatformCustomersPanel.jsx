@@ -291,6 +291,7 @@ function CustomerDetail({ detail, busy, onAction }) {
   const [creditRupees, setCreditRupees] = useState('')
   const [paymentRef, setPaymentRef] = useState('')
   const [billingNote, setBillingNote] = useState(u.billingNote || '')
+  const invoiceRows = buildInvoicesFromLedger(detail.creditLedger || [], detail.payment)
 
   return (
     <div className="max-w-3xl space-y-4">
@@ -312,6 +313,18 @@ function CustomerDetail({ detail, busy, onAction }) {
         </div>
       </section>
 
+      <section className="bg-white rounded-xl border border-gray-200 p-4">
+        <h3 className="text-sm font-semibold text-gray-900 mb-2">Company details</h3>
+        <div className="grid sm:grid-cols-2 gap-2 text-xs text-gray-700">
+          <Field label="Company" value={u.organizationName || u.company || '—'} />
+          <Field label="Account type" value={u.accountType} />
+          <Field label="Organization role" value={u.orgRole || 'individual'} />
+          <Field label="Pipeline role" value={u.pipelineRole || '—'} />
+          <Field label="Mobile" value={u.mobile || '—'} />
+          <Field label="Created" value={u.createdAt ? formatDateTime(u.createdAt) : '—'} />
+        </div>
+      </section>
+
       <div className="grid sm:grid-cols-3 gap-3">
         <Stat label="Wallet" value={`₹${u.creditBalanceRupees}`} />
         <Stat label="Pipeline leads" value={detail.usage?.pipelineLeads ?? 0} />
@@ -322,17 +335,49 @@ function CustomerDetail({ detail, busy, onAction }) {
       </div>
 
       <section className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
-        <h3 className="text-sm font-semibold text-gray-900">Credits & payments</h3>
-        <p className="text-xs text-gray-500">{detail.payment?.paymentGateway}</p>
+        <h3 className="text-sm font-semibold text-gray-900">Billing</h3>
+        <p className="text-xs text-gray-500">
+          {detail.payment?.paymentGateway} · Plan: {u.plan || 'free'} · Subscription:{' '}
+          {u.subscriptionActive ? 'Active' : 'Inactive'}
+        </p>
         {detail.payment?.lastCreditGrant && (
           <p className="text-xs text-gray-600">
             Last grant: ₹{(detail.payment.lastCreditGrant.amountPaise / 100).toFixed(0)} —{' '}
             {detail.payment.lastCreditGrant.description} ({formatDateTime(detail.payment.lastCreditGrant.createdAt)})
           </p>
         )}
-        <div className="flex flex-wrap gap-2 items-end">
+        <div className="pt-2 border-t border-gray-100">
+          <h4 className="text-xs font-semibold text-gray-800 mb-2">Recharge wallet</h4>
+          <div className="flex flex-wrap gap-2 items-end">
+            <label className="text-xs">
+              <span className="block text-gray-500 mb-1">Add credits (₹)</span>
+              <input
+                type="number"
+                min={1}
+                value={creditRupees}
+                onChange={(e) => setCreditRupees(e.target.value)}
+                className="w-28 text-sm border border-gray-200 rounded-lg px-2 py-1.5"
+                placeholder="500"
+              />
+            </label>
+            <ActionBtn
+              disabled={busy || !creditRupees}
+              onClick={() =>
+                onAction({
+                  userId: u.id,
+                  action: 'grant_credits',
+                  amountPaise: Math.round(Number(creditRupees) * 100),
+                  reason: 'Platform support credit grant',
+                })
+              }
+            >
+              Grant credits
+            </ActionBtn>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2 items-end pt-2 border-t border-gray-100">
           <label className="text-xs">
-            <span className="block text-gray-500 mb-1">Add credits (₹)</span>
+            <span className="block text-gray-500 mb-1">Payment amount (₹)</span>
             <input
               type="number"
               min={1}
@@ -342,22 +387,7 @@ function CustomerDetail({ detail, busy, onAction }) {
               placeholder="500"
             />
           </label>
-          <ActionBtn
-            disabled={busy || !creditRupees}
-            onClick={() =>
-              onAction({
-                userId: u.id,
-                action: 'grant_credits',
-                amountPaise: Math.round(Number(creditRupees) * 100),
-                reason: 'Platform support credit grant',
-              })
-            }
-          >
-            Grant credits
-          </ActionBtn>
-        </div>
-        <div className="flex flex-wrap gap-2 items-end pt-2 border-t border-gray-100">
-          <label className="text-xs flex-1 min-w-[140px]">
+          <label className="text-xs flex-1 min-w-[150px]">
             <span className="block text-gray-500 mb-1">Payment reference</span>
             <input
               value={paymentRef}
@@ -379,9 +409,32 @@ function CustomerDetail({ detail, busy, onAction }) {
               })
             }
           >
-            Record payment
+            Record payment + recharge
           </ActionBtn>
         </div>
+        <label className="block text-xs">
+          <span className="text-gray-500">Internal billing note</span>
+          <textarea
+            value={billingNote}
+            onChange={(e) => setBillingNote(e.target.value)}
+            rows={2}
+            className="mt-1 w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5"
+          />
+          <ActionBtn
+            className="mt-2"
+            disabled={busy}
+            onClick={() =>
+              onAction({
+                userId: u.id,
+                action: 'set_subscription',
+                active: u.subscriptionActive,
+                billingNote,
+              })
+            }
+          >
+            Save billing note
+          </ActionBtn>
+        </label>
       </section>
 
       <section className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
@@ -428,29 +481,6 @@ function CustomerDetail({ detail, busy, onAction }) {
             </ActionBtn>
           )}
         </div>
-        <label className="block text-xs">
-          <span className="text-gray-500">Internal billing note</span>
-          <textarea
-            value={billingNote}
-            onChange={(e) => setBillingNote(e.target.value)}
-            rows={2}
-            className="mt-1 w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5"
-          />
-          <ActionBtn
-            className="mt-2"
-            disabled={busy}
-            onClick={() =>
-              onAction({
-                userId: u.id,
-                action: 'set_subscription',
-                active: u.subscriptionActive,
-                billingNote,
-              })
-            }
-          >
-            Save note
-          </ActionBtn>
-        </label>
       </section>
 
       {detail.creditLedger?.length > 0 && (
@@ -465,12 +495,21 @@ function CustomerDetail({ detail, busy, onAction }) {
           </div>
         </section>
       )}
+
+      <section className="bg-white rounded-xl border border-gray-200 p-4">
+        <h3 className="text-sm font-semibold text-gray-900 mb-2">Invoices</h3>
+        <p className="text-xs text-gray-500 mb-2">
+          Manual invoice timeline derived from payment records. Use payment reference while recording payment.
+        </p>
+        <InvoiceTable rows={invoiceRows} />
+      </section>
     </div>
   )
 }
 
 function OrganizationDetail({ detail, busy, onAction }) {
   const org = detail.organization
+  const [billingNote, setBillingNote] = useState(org.billingNote || '')
   return (
     <div className="max-w-3xl space-y-4">
       <section className="bg-white rounded-xl border border-gray-200 p-4">
@@ -482,19 +521,70 @@ function OrganizationDetail({ detail, busy, onAction }) {
         </p>
       </section>
 
+      <section className="bg-white rounded-xl border border-gray-200 p-4">
+        <h3 className="text-sm font-semibold text-gray-900 mb-2">Company details</h3>
+        <div className="grid sm:grid-cols-2 gap-2 text-xs text-gray-700">
+          <Field label="Domain" value={org.domain || '—'} />
+          <Field label="Created" value={org.createdAt ? formatDateTime(org.createdAt) : '—'} />
+          <Field label="Email domain" value={org.emailDomainName || 'Not configured'} />
+          <Field label="Email status" value={org.emailDomainStatus || '—'} />
+          <Field label="Subscription" value={org.subscriptionActive ? 'Active' : 'Inactive'} />
+          <Field label="Onboarding" value={org.onboardingComplete ? 'Complete' : 'Pending'} />
+        </div>
+      </section>
+
+      <section className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
+        <h3 className="text-sm font-semibold text-gray-900">Billing & recharge</h3>
+        <div className="grid sm:grid-cols-2 gap-3">
+          <Stat label="Team searches left" value={org.searchesLeft ?? 0} />
+          <Stat label="Org wallet (₹)" value={Number(((org.creditsPaise || 0) / 100).toFixed(2))} />
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <ActionBtn
+            disabled={busy}
+            onClick={() => onAction({ organizationId: org.id, action: 'set_searches_left', searchesLeft: 500 })}
+          >
+            Recharge: set 500 searches
+          </ActionBtn>
+          <ActionBtn
+            disabled={busy}
+            onClick={() => onAction({ organizationId: org.id, action: 'set_searches_left', searchesLeft: 1000 })}
+          >
+            Recharge: set 1000 searches
+          </ActionBtn>
+          <ActionBtn
+            disabled={busy}
+            onClick={() => onAction({ organizationId: org.id, action: 'set_subscription', active: true })}
+          >
+            Activate subscription
+          </ActionBtn>
+        </div>
+        <label className="block text-xs">
+          <span className="text-gray-500">Billing note (company-level)</span>
+          <textarea
+            value={billingNote}
+            onChange={(e) => setBillingNote(e.target.value)}
+            rows={2}
+            className="mt-1 w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5"
+          />
+          <ActionBtn
+            className="mt-2"
+            disabled={busy}
+            onClick={() =>
+              onAction({
+                organizationId: org.id,
+                action: 'set_subscription',
+                active: org.subscriptionActive,
+                billingNote,
+              })
+            }
+          >
+            Save billing note
+          </ActionBtn>
+        </label>
+      </section>
+
       <div className="flex flex-wrap gap-2">
-        <ActionBtn
-          disabled={busy}
-          onClick={() => onAction({ organizationId: org.id, action: 'set_searches_left', searchesLeft: 500 })}
-        >
-          Set 500 team searches
-        </ActionBtn>
-        <ActionBtn
-          disabled={busy}
-          onClick={() => onAction({ organizationId: org.id, action: 'set_subscription', active: true })}
-        >
-          Activate subscription
-        </ActionBtn>
         <ActionBtn disabled={busy} onClick={() => onAction({ organizationId: org.id, action: 'force_onboarding' })}>
           Complete org onboarding
         </ActionBtn>
@@ -541,6 +631,73 @@ function OrganizationDetail({ detail, busy, onAction }) {
           ))}
         </section>
       )}
+    </div>
+  )
+}
+
+function Field({ label, value }) {
+  return (
+    <div className="rounded border border-gray-100 bg-gray-50 px-2 py-1.5">
+      <p className="text-[10px] uppercase font-semibold text-gray-400">{label}</p>
+      <p className="text-xs text-gray-900 mt-0.5">{value}</p>
+    </div>
+  )
+}
+
+function buildInvoicesFromLedger(ledger, payment) {
+  const rows = (ledger || [])
+    .filter((row) => row.kind === 'grant' || row.kind === 'adjustment')
+    .filter((row) => /payment|invoice|upi|bank|txn|ref/i.test(String(row.description || '')))
+    .slice(0, 20)
+    .map((row) => ({
+      id: row.id,
+      createdAt: row.createdAt,
+      amountPaise: row.amountPaise || 0,
+      reference: row.description || 'Manual payment',
+      status: 'paid',
+    }))
+  if (!rows.length && payment?.lastCreditGrant) {
+    rows.push({
+      id: 'fallback-last-payment',
+      createdAt: payment.lastCreditGrant.createdAt,
+      amountPaise: payment.lastCreditGrant.amountPaise || 0,
+      reference: payment.lastCreditGrant.description || 'Credit grant',
+      status: 'paid',
+    })
+  }
+  return rows
+}
+
+function InvoiceTable({ rows }) {
+  if (!rows?.length) {
+    return <p className="text-xs text-gray-500">No invoices recorded yet. Record a payment reference to create one.</p>
+  }
+  return (
+    <div className="overflow-x-auto">
+      <table className="min-w-full text-xs">
+        <thead>
+          <tr className="text-left text-gray-500 border-b border-gray-100">
+            <th className="py-1 pr-3">Date</th>
+            <th className="py-1 pr-3">Reference</th>
+            <th className="py-1 pr-3">Amount</th>
+            <th className="py-1">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.id} className="border-b border-gray-50 text-gray-700">
+              <td className="py-1.5 pr-3">{formatDateTime(row.createdAt)}</td>
+              <td className="py-1.5 pr-3">{row.reference}</td>
+              <td className="py-1.5 pr-3">₹{(Number(row.amountPaise || 0) / 100).toFixed(2)}</td>
+              <td className="py-1.5">
+                <span className="inline-flex rounded-full bg-green-100 text-green-800 px-2 py-0.5 font-semibold">
+                  {row.status}
+                </span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   )
 }
