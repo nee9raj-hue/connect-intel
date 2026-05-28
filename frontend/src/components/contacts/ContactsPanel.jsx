@@ -1,12 +1,9 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import LoadingExperience from '../ui/LoadingExperience'
 import { LOADING_MESSAGES } from '../../lib/loadingQuotes'
-import {
-  scrollMobileSplitToDetail,
-  scrollMobileSplitToList,
-} from '../../lib/mobileSplitPan'
+import useIsMobile from '../../hooks/useIsMobile'
 
 const EMPTY = {
   firstName: '',
@@ -47,7 +44,7 @@ export default function ContactsPanel({ onNavigate }) {
   const [aiMatches, setAiMatches] = useState([])
   const [aiError, setAiError] = useState(null)
   const [aiNotice, setAiNotice] = useState(null)
-  const splitRef = useRef(null)
+  const isMobile = useIsMobile()
 
   const loadList = useCallback(async (q = appliedSearch) => {
     setLoading(true)
@@ -107,16 +104,10 @@ export default function ContactsPanel({ onNavigate }) {
     setAiNotice(null)
   }, [selectedId, loadOne])
 
-  useEffect(() => {
-    if (!selectedId) return
-    const timer = window.setTimeout(() => scrollMobileSplitToDetail(splitRef.current), 80)
-    return () => window.clearTimeout(timer)
-  }, [selectedId])
+  const backToContactList = () => setSelectedId(null)
 
-  const backToContactList = () => {
-    setSelectedId(null)
-    scrollMobileSplitToList(splitRef.current)
-  }
+  const showListPane = !isMobile || !selectedId
+  const showDetailPane = !isMobile || Boolean(selectedId)
 
   const selected = useMemo(
     () => contacts.find((c) => c.id === selectedId) || null,
@@ -242,7 +233,7 @@ export default function ContactsPanel({ onNavigate }) {
   const searchDirty = search.trim() !== appliedSearch
 
   return (
-    <div className="crm-workspace flex h-full min-h-0 w-full overflow-hidden">
+    <div className="crm-workspace crm-workspace--master-detail flex h-full min-h-0 w-full overflow-hidden">
       <header className="crm-page-header">
         <div className="crm-page-header-top">
           <div className="min-w-0">
@@ -297,11 +288,14 @@ export default function ContactsPanel({ onNavigate }) {
 
       <div className="crm-page-body">
         <div className="crm-split-shell flex flex-col flex-1 min-h-0">
-          <p className="crm-mobile-split-hint" aria-hidden>
-            Select a contact, then swipe right for full-screen details. Swipe left to return to the list.
-          </p>
-          <div ref={splitRef} className="crm-content-card crm-split-card flex-1 min-h-0">
-          <aside className="crm-split-sidebar">
+          {isMobile && !selectedId ? (
+            <p className="crm-mobile-split-hint">Tap a contact to view and edit details.</p>
+          ) : null}
+          {isMobile && selectedId ? (
+            <p className="crm-mobile-split-hint">Editing contact — use Back below to return to the list.</p>
+          ) : null}
+          <div className="crm-content-card crm-split-card flex-1 min-h-0">
+          <aside className={`crm-split-sidebar ${showListPane ? '' : 'hidden'}`}>
             <div className="crm-list-header">
               <div className="flex items-center justify-between gap-2">
                 <span>All contacts</span>
@@ -348,8 +342,8 @@ export default function ContactsPanel({ onNavigate }) {
             </div>
           </aside>
 
-          <section className="crm-split-main">
-            {!selectedId ? (
+          <section className={`crm-split-main ${showDetailPane ? '' : 'hidden'}`}>
+            {!selectedId && !isMobile ? (
               <div className="crm-empty-state">
                 <p>Select a contact</p>
                 <p className="crm-empty-hint">
@@ -359,9 +353,11 @@ export default function ContactsPanel({ onNavigate }) {
             ) : (
               <div className="crm-detail-pane">
                 <div className="crm-detail-card crm-detail-card-wide">
-                  <button type="button" className="crm-mobile-back" onClick={backToContactList}>
-                    ← Swipe back to list
-                  </button>
+                  {isMobile ? (
+                    <button type="button" className="crm-mobile-back" onClick={backToContactList}>
+                      ← Back to contacts
+                    </button>
+                  ) : null}
                   <div className="crm-contact-hero">
                     <div className="crm-contact-avatar">
                       {([form.firstName, form.lastName]

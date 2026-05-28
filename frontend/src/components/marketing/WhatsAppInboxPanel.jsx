@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { api } from '../../lib/api'
 import { formatPhoneDisplay } from '../../lib/phoneUtils'
-import { scrollMobileSplitToDetail, scrollMobileSplitToList } from '../../lib/mobileSplitPan'
+import useIsMobile from '../../hooks/useIsMobile'
 
 function MsgTick({ status }) {
   if (status === 'read') return <span className="text-blue-300 ml-1">✓✓</span>
@@ -29,7 +29,7 @@ export default function WhatsAppInboxPanel({ onNavigate }) {
   const [filterTag, setFilterTag] = useState('')
   const messagesEndRef = useRef(null)
   const selectedRef = useRef(null)
-  const panRef = useRef(null)
+  const isMobile = useIsMobile()
 
   useEffect(() => {
     selectedRef.current = selected
@@ -94,14 +94,15 @@ export default function WhatsAppInboxPanel({ onNavigate }) {
     } finally {
       setThreadLoading(false)
     }
-    window.setTimeout(() => scrollMobileSplitToDetail(panRef.current), 80)
   }
 
   const closeThread = () => {
     setSelected(null)
     setThread(null)
-    scrollMobileSplitToList(panRef.current)
   }
+
+  const showThreadList = !isMobile || !selected
+  const showThreadDetail = !isMobile || Boolean(selected)
 
   const sendReply = async () => {
     if (!reply.trim() || !selected) return
@@ -178,15 +179,14 @@ export default function WhatsAppInboxPanel({ onNavigate }) {
         )}
       </div>
 
-      <div className="crm-split-shell flex flex-col flex-1 min-h-[min(70dvh,520px)] md:min-h-0">
-        <p className="crm-mobile-split-hint" aria-hidden>
-          Select a chat, then swipe right for the full conversation. Swipe left to return.
-        </p>
+      <div className="crm-workspace--master-detail crm-split-shell flex flex-col flex-1 min-h-[min(70dvh,520px)] md:min-h-0">
+        {isMobile && !selected ? (
+          <p className="crm-mobile-split-hint">Tap a conversation to open the thread.</p>
+        ) : null}
+        <div className="flex flex-1 min-h-0 flex-col md:flex-row md:gap-4 md:h-[calc(100vh-280px)] md:min-h-[420px]">
         <div
-          ref={panRef}
-          className="mobile-dual-pane-scroll flex-1 min-h-0 md:flex md:gap-4 md:h-[calc(100vh-280px)] md:min-h-[420px]"
+          className={`crm-split-sidebar md:w-72 md:shrink-0 border border-gray-200 rounded-xl overflow-hidden flex flex-col bg-white min-h-0 ${showThreadList ? '' : 'hidden'}`}
         >
-        <div className="mobile-dual-pane-scroll__pane md:w-72 md:shrink-0 border border-gray-200 rounded-xl overflow-hidden flex flex-col bg-white min-h-0">
           <div className="px-3 py-2.5 border-b border-gray-100 flex flex-col gap-1.5">
             <input
               className="w-full text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-green-400"
@@ -267,10 +267,12 @@ export default function WhatsAppInboxPanel({ onNavigate }) {
           </div>
         </div>
 
-        <div className="mobile-dual-pane-scroll__pane flex-1 border border-gray-200 rounded-xl overflow-hidden flex flex-col bg-white min-w-0 min-h-0">
-          {selected ? (
+        <div
+          className={`crm-split-main flex-1 border border-gray-200 rounded-xl overflow-hidden flex flex-col bg-white min-w-0 min-h-0 ${showThreadDetail ? '' : 'hidden'}`}
+        >
+          {isMobile && selected ? (
             <button type="button" className="crm-mobile-back shrink-0 mx-3 mt-2" onClick={closeThread}>
-              ← Swipe back to chats
+              ← Back to chats
             </button>
           ) : null}
           {!selected ? (

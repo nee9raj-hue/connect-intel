@@ -1,13 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import useIsMobile from '../../hooks/useIsMobile'
 import { CRM_STATUSES } from '../../lib/crmConstants'
 import FilterDropdown from '../crm/FilterDropdown'
 import MarketingListBuilder from './MarketingListBuilder'
 import MarketingListDetail from './MarketingListDetail'
 import MarketingCreatorBadge from './MarketingCreatorBadge'
-import {
-  scrollMobileSplitToDetail,
-  scrollMobileSplitToList,
-} from '../../lib/mobileSplitPan'
 
 const UNASSIGNED = '__unassigned__'
 
@@ -27,7 +24,7 @@ export default function MarketingListsPanel({
   const [selectedListId, setSelectedListId] = useState(null)
   const [createOpen, setCreateOpen] = useState(false)
   const [listSearch, setListSearch] = useState('')
-  const splitRef = useRef(null)
+  const isMobile = useIsMobile()
 
   const [listChannel, setListChannel] = useState('email')
   const [assigneeUserId, setAssigneeUserId] = useState('')
@@ -106,19 +103,12 @@ export default function MarketingListsPanel({
       ? 'All stages'
       : CRM_STATUSES.find((s) => s.id === pipelineStage)?.label || pipelineStage
 
-  useEffect(() => {
-    if (!selectedListId) return
-    const timer = window.setTimeout(() => scrollMobileSplitToDetail(splitRef.current), 80)
-    return () => window.clearTimeout(timer)
-  }, [selectedListId])
-
-  const closeListDetail = () => {
-    setSelectedListId(null)
-    scrollMobileSplitToList(splitRef.current)
-  }
+  const closeListDetail = () => setSelectedListId(null)
+  const showListPane = !isMobile || !selectedListId
+  const showDetailPane = !isMobile || Boolean(selectedListId)
 
   return (
-    <div className="crm-content-card flex flex-col min-h-0 flex-1 overflow-hidden">
+    <div className="crm-content-card crm-workspace--master-detail flex flex-col min-h-0 flex-1 overflow-hidden">
       <div className="crm-toolbar crm-toolbar--compact shrink-0 border-b border-[#dfe3eb] px-3 pt-2 pb-1.5 bg-white">
         <div className="crm-toolbar-primary">
           <div className="crm-view-tabs">
@@ -216,14 +206,14 @@ export default function MarketingListsPanel({
       </div>
 
       <div className="crm-split-shell flex flex-col flex-1 min-h-0">
-        <p className="crm-mobile-split-hint" aria-hidden>
-          Select a list, then swipe right for full-screen details. Swipe left to return.
-        </p>
-        <div
-          ref={splitRef}
-          className="crm-split-card flex-1 min-h-0 border-0 rounded-none shadow-none"
-        >
-        <aside className="crm-split-sidebar">
+        {isMobile && !selectedListId ? (
+          <p className="crm-mobile-split-hint">Tap a list to view and edit contacts.</p>
+        ) : null}
+        {isMobile && selectedListId ? (
+          <p className="crm-mobile-split-hint">List details — use Back to return to all lists.</p>
+        ) : null}
+        <div className="crm-split-card flex-1 min-h-0 border-0 rounded-none shadow-none">
+        <aside className={`crm-split-sidebar ${showListPane ? '' : 'hidden'}`}>
           <div className="crm-list-header">Saved lists</div>
           <div className="crm-list-scroll">
             {!filteredLists.length && (
@@ -249,7 +239,7 @@ export default function MarketingListsPanel({
           </div>
         </aside>
 
-        <section className="crm-split-main">
+        <section className={`crm-split-main ${showDetailPane ? '' : 'hidden'}`}>
           {selectedListId ? (
             <MarketingListDetail
               list={selectedList}

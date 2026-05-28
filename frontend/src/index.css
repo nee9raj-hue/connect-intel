@@ -2882,74 +2882,102 @@ details summary::-webkit-details-marker {
 }
 
 @media (max-width: 767px) {
-  /*
-   * Master–detail on phone: each pane is full screen width.
-   * Swipe right → detail only (list off-screen left). Swipe left → list.
-   * Vertical scroll happens inside the active pane (full form visible).
-   */
-  .crm-page-body:has(.crm-split-shell),
-  .crm-page-body:has(> .crm-content-card.crm-split-card) {
-    overflow: hidden;
-    min-height: 0;
-    padding-left: 0;
-    padding-right: 0;
+  /* Page header search: stack so input and button do not overlap */
+  .crm-page-header .crm-toolbar,
+  .crm-page-header .crm-toolbar-row {
+    overflow: visible;
+    flex-wrap: wrap;
   }
 
-  .crm-page-body:has(.crm-split-shell) > .crm-content-card {
+  .crm-page-header .crm-toolbar-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .crm-page-header .crm-toolbar-row .crm-search-wrap {
+    flex: none;
+    max-width: none;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .crm-page-header .crm-toolbar-row .crm-toolbar-count--inline {
+    grid-column: 1 / -1;
+    width: 100%;
+    white-space: normal;
+  }
+
+  /* Master–detail: one full-screen pane at a time (list OR detail) */
+  .crm-workspace--master-detail .crm-page-body,
+  .crm-content-card.crm-workspace--master-detail {
+    flex: 1 1 0%;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .crm-workspace--master-detail .crm-page-body {
+    padding: 0;
+  }
+
+  .crm-content-card.crm-workspace--master-detail {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .crm-workspace--master-detail .crm-split-shell,
+  .crm-content-card.crm-workspace--master-detail .crm-split-shell {
+    flex: 1 1 0%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .crm-workspace--master-detail .crm-split-card,
+  .crm-content-card.crm-workspace--master-detail .crm-split-card {
+    flex: 1 1 0%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
     border-radius: 0;
     border-left: none;
     border-right: none;
   }
 
-  .crm-split-shell {
+  .crm-workspace--master-detail .crm-split-sidebar,
+  .crm-workspace--master-detail .crm-split-main,
+  .crm-content-card.crm-workspace--master-detail .crm-split-sidebar,
+  .crm-content-card.crm-workspace--master-detail .crm-split-main {
     flex: 1 1 0%;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .crm-split-card,
-  .mobile-dual-pane-scroll {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    flex: 1 1 0%;
-    min-height: 0;
     width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-snap-type: x mandatory;
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-x: contain;
-  }
-
-  .crm-split-sidebar,
-  .crm-split-sidebar.is-hidden-mobile,
-  .crm-split-main,
-  .crm-split-main.is-full-mobile,
-  .mobile-dual-pane-scroll > .mobile-dual-pane-scroll__pane {
-    display: flex !important;
-    flex-direction: column;
-    flex: 0 0 100%;
-    width: 100%;
-    min-width: 100%;
-    max-width: 100%;
+    max-width: none;
+    min-width: 0;
+    min-height: 0;
     height: 100%;
-    min-height: 0;
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
     overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    overscroll-behavior-y: contain;
   }
 
-  .crm-split-main .crm-detail-pane {
+  .crm-workspace--master-detail .crm-split-main .crm-detail-pane,
+  .crm-content-card.crm-workspace--master-detail .crm-split-main .crm-detail-pane {
     flex: 1 1 auto;
     min-height: min-content;
     overflow: visible;
-    padding: 0.85rem 1rem 2rem;
+    padding: 0.85rem 1rem 2.5rem;
+  }
+
+  .crm-workspace--master-detail .crm-split-main .crm-detail-card,
+  .crm-workspace--master-detail .crm-split-main .crm-detail-card-wide,
+  .crm-content-card.crm-workspace--master-detail .crm-split-main .crm-detail-card,
+  .crm-content-card.crm-workspace--master-detail .crm-split-main .crm-detail-card-wide {
+    max-width: none;
+    margin: 0;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .crm-mobile-split-hint {
@@ -2970,13 +2998,42 @@ details summary::-webkit-details-marker {
     align-items: center;
     gap: 0.35rem;
     margin-bottom: 0.75rem;
-    font-size: 0.6875rem;
+    font-size: 0.75rem;
     font-weight: 700;
     color: #0091ae;
     background: none;
     border: none;
-    padding: 0;
+    padding: 0.25rem 0;
     cursor: pointer;
+  }
+
+  /* Optional horizontal pan (WhatsApp inbox) */
+  .mobile-dual-pane-scroll {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    flex: 1 1 0%;
+    min-height: 0;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mobile-dual-pane-scroll > .mobile-dual-pane-scroll__pane {
+    display: flex !important;
+    flex-direction: column;
+    flex: 0 0 100%;
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+    height: 100%;
+    min-height: 0;
+    scroll-snap-align: start;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 }
 

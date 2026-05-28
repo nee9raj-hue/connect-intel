@@ -1060,6 +1060,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
             </details>
           </div>
         ) : tab === 'lists' ? (
+          <div className="crm-page-body flex flex-col flex-1 min-h-0 !p-0 min-w-0">
           <MarketingListsPanel
             user={user}
             teamMembers={teamMembers}
@@ -1073,6 +1074,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
             setNotice={setNotice}
             onListsReload={load}
           />
+          </div>
         ) : tab === 'inbox' ? (
           <div className="crm-content-card crm-content-scroll flex-1 min-h-0">
             <WhatsAppInboxPanel onNavigate={onNavigate} />
