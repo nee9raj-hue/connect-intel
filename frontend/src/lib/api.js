@@ -189,6 +189,8 @@ export const api = {
     request('/api/crm/reminders-ack', { method: 'POST', body: { leadId, meetingId } }, { silent }),
   getCrmGmailStatus: () => request('/api/crm/email-gmail-status'),
   startCrmGmailOAuth: () => request('/api/crm/email-oauth/start'),
+  disconnectCrmGmailOAuth: () =>
+    request('/api/crm/email-oauth/start', { method: 'POST', body: { action: 'disconnect' } }),
   getOrgEmailDomain: () => request('/api/org/email-domain'),
   setupOrgEmailDomain: (body) => request('/api/org/email-domain', { method: 'POST', body }),
   getOrgWhatsAppCloud: () => request('/api/org/whatsapp-cloud'),

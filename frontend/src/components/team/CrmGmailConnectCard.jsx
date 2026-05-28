@@ -50,6 +50,20 @@ export default function CrmGmailConnectCard({ compact = false }) {
     }
   }
 
+  const disconnect = async () => {
+    if (!window.confirm('Disconnect Work Gmail from this account? You can reconnect immediately.')) return
+    setConnecting(true)
+    setError(null)
+    try {
+      await api.disconnectCrmGmailOAuth()
+      await load()
+    } catch (e) {
+      setError(e.message || 'Could not disconnect Work Gmail')
+    } finally {
+      setConnecting(false)
+    }
+  }
+
   const pad = compact ? 'px-3 py-3' : 'px-4 py-4'
 
   if (loading) {
@@ -93,16 +107,28 @@ export default function CrmGmailConnectCard({ compact = false }) {
         <p className="text-xs text-green-800 mt-0.5">
           Sends from <strong>{status.mailbox}</strong> · replies sync to CRM
         </p>
-        {status.needsReplySyncReconnect && (
+        <div className="mt-2 flex gap-3 text-xs">
+          <button
+            type="button"
+            onClick={disconnect}
+            disabled={connecting}
+            className="font-semibold text-green-900 underline disabled:opacity-60"
+          >
+            {connecting ? 'Working…' : 'Disconnect'}
+          </button>
           <button
             type="button"
             onClick={connect}
             disabled={connecting}
-            className="mt-2 text-xs font-semibold text-green-900 underline disabled:opacity-60"
+            className="font-semibold text-green-900 underline disabled:opacity-60"
           >
-            {connecting ? 'Connecting…' : 'Enable reply sync'}
+            {connecting
+              ? 'Working…'
+              : status.needsReplySyncReconnect
+                ? 'Reconnect (enable reply sync)'
+                : 'Reconnect'}
           </button>
-        )}
+        </div>
       </div>
     )
   }
