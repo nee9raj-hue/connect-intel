@@ -397,7 +397,7 @@ function NavGroup({
         />
       </button>
       {navExpanded && (
-        <div className="ml-3 mt-0.5 mb-0.5 space-y-0 border-l border-white/10 pl-2">
+        <div className="ml-3 mt-1 mb-1 space-y-1 border-l border-white/10 pl-2">
           {group.children.map((child) => (
             <NavSubBtn
               key={child.id}
@@ -564,7 +564,7 @@ function RailFlyoutAnchor({
             </button>
           </div>
         ) : (
-          <div className="sidebar-rail-flyout__items max-h-[min(65vh,360px)] overflow-y-auto p-1 space-y-0">
+          <div className="sidebar-rail-flyout__items max-h-[min(65vh,360px)] overflow-y-auto p-1.5 space-y-1">
             {children}
           </div>
         )}
@@ -647,7 +647,7 @@ function NavSubBtn({ label, active, badge, onClick, inRailFlyout = false }) {
     <button
       type="button"
       onClick={onClick}
-      className={`sidebar-sub-item w-full flex items-center gap-1.5 px-2 py-1 rounded-lg transition-colors ${
+      className={`sidebar-sub-item w-full flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-colors ${
         active ? 'nav-sub-active' : inactiveClass
       }`}
     >
