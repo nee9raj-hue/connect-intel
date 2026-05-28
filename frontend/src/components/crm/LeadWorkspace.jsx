@@ -602,13 +602,13 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
       <div className="crm-drawer-header">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0 flex-1">
-            <h2 className="text-sm md:text-base font-semibold text-gray-900 truncate">
+            <h2 className="text-[13px] font-semibold tracking-[-0.02em] text-gray-900 truncate">
               {[lead.firstName, lead.lastName].filter(Boolean).join(' ')}
             </h2>
-            <p className="text-[10px] md:text-xs text-gray-500 truncate">
+            <p className="text-xs text-gray-500 truncate">
               {lead.title} · {lead.company}
             </p>
-            <span className={`inline-block mt-1 text-[10px] font-semibold px-2 py-0.5 rounded border ${statusMeta.color}`}>
+            <span className={`inline-block mt-1 text-[11px] font-semibold px-2 py-0.5 rounded border ${statusMeta.color}`}>
               {statusMeta.label}
             </span>
           </div>
@@ -622,7 +622,7 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
               key={t.id}
               type="button"
               onClick={() => setTab(t.id)}
-              className={`shrink-0 text-[10px] md:text-[11px] font-semibold px-2 py-0.5 md:px-2.5 md:py-1 rounded-md ${
+              className={`shrink-0 text-[11px] font-semibold px-2 py-0.5 md:px-2.5 md:py-1 rounded-md ${
                 tab === t.id ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600'
               }`}
             >
@@ -649,7 +649,7 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
           <>
             <section>
               <h3 className="text-[11px] font-semibold uppercase text-gray-400 mb-2">Pipeline status</h3>
-              <select value={status} onChange={(e) => changeStatus(e.target.value)} className="w-full text-sm border rounded-lg px-3 py-2">
+              <select value={status} onChange={(e) => changeStatus(e.target.value)} className="w-full text-xs border rounded-lg px-2.5 py-1.5">
                 {statusOptions.map((s) => (
                   <option key={s.id} value={s.id}>
                     {s.label}
@@ -752,7 +752,7 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
                       setError(err.message)
                     }
                   }}
-                  className="w-full text-sm border rounded-lg px-3 py-2"
+                  className="w-full text-xs border rounded-lg px-2.5 py-1.5"
                   placeholder="0"
                 />
               </label>
@@ -772,7 +772,7 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
                       setError(err.message)
                     }
                   }}
-                  className="w-full text-sm border rounded-lg px-3 py-2"
+                  className="w-full text-xs border rounded-lg px-2.5 py-1.5"
                 />
               </label>
             </section>
@@ -789,7 +789,7 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
                   <select
                     value={enrollSequenceId}
                     onChange={(e) => setEnrollSequenceId(e.target.value)}
-                    className="flex-1 text-sm border rounded-lg px-2 py-2"
+                    className="flex-1 text-xs border rounded-lg px-2 py-1.5"
                     onFocus={async () => {
                       try {
                         const data = await api.listCrmSequences()
@@ -842,7 +842,7 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
                       setError(err.message)
                     }
                   }}
-                  className="w-full text-sm border rounded-lg px-3 py-2"
+                  className="w-full text-xs border rounded-lg px-2.5 py-1.5"
                 >
                   <option value="">Unassigned</option>
                   {teamMembers.map((m) => (
@@ -905,7 +905,7 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
                 value={nextFollowUp}
                 onChange={(e) => setNextFollowUp(e.target.value)}
                 onBlur={saveNextFollowUp}
-                className="w-full text-sm border rounded-lg px-3 py-2"
+                className="w-full text-xs border rounded-lg px-2.5 py-1.5"
               />
             </section>
 
@@ -916,7 +916,7 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
                 onChange={(e) => setLogCallNote(e.target.value)}
                 rows={2}
                 placeholder="Call summary…"
-                className="w-full text-sm border rounded-lg px-3 py-2"
+                className="w-full text-xs border rounded-lg px-2.5 py-1.5"
               />
               <button
                 type="button"
@@ -940,7 +940,7 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
                 onBlur={saveNotes}
                 rows={5}
                 placeholder="Requirements, pricing, decision makers…"
-                className="w-full text-sm border rounded-lg px-3 py-2"
+                className="w-full text-xs border rounded-lg px-2.5 py-1.5"
               />
             </section>
             <section>
@@ -980,18 +980,18 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
                   value={taskTitle}
                   onChange={(e) => setTaskTitle(e.target.value)}
                   placeholder="Task title"
-                  className="w-full text-sm border rounded-lg px-3 py-2"
+                  className="w-full text-xs border rounded-lg px-2.5 py-1.5"
                 />
                 <input
                   type="datetime-local"
                   value={taskDue}
                   onChange={(e) => setTaskDue(e.target.value)}
                   required
-                  className="w-full text-sm border rounded-lg px-3 py-2"
+                  className="w-full text-xs border rounded-lg px-2.5 py-1.5"
                 />
                 <p className="text-[10px] text-gray-400">Due date appears on team calendar</p>
                 {isManager && teamMembers.length > 0 && (
-                  <select value={taskAssignee} onChange={(e) => setTaskAssignee(e.target.value)} className="w-full text-sm border rounded-lg px-3 py-2">
+                  <select value={taskAssignee} onChange={(e) => setTaskAssignee(e.target.value)} className="w-full text-xs border rounded-lg px-2.5 py-1.5">
                     {teamMembers.map((m) => (
                       <option key={m.userId} value={m.userId}>
                         {m.name}
@@ -1038,19 +1038,19 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
             <section>
               <h3 className="text-[11px] font-semibold uppercase text-gray-400 mb-2">Schedule meeting</h3>
               <form onSubmit={addMeeting} className="space-y-2">
-                <input value={meetingTitle} onChange={(e) => setMeetingTitle(e.target.value)} placeholder="Title" className="w-full text-sm border rounded-lg px-3 py-2" />
-                <select value={meetingType} onChange={(e) => setMeetingType(e.target.value)} className="w-full text-sm border rounded-lg px-3 py-2">
+                <input value={meetingTitle} onChange={(e) => setMeetingTitle(e.target.value)} placeholder="Title" className="w-full text-xs border rounded-lg px-2.5 py-1.5" />
+                <select value={meetingType} onChange={(e) => setMeetingType(e.target.value)} className="w-full text-xs border rounded-lg px-2.5 py-1.5">
                   {MEETING_TYPES.map((m) => (
                     <option key={m.id} value={m.id}>
                       {m.label}
                     </option>
                   ))}
                 </select>
-                <input type="datetime-local" value={meetingWhen} onChange={(e) => setMeetingWhen(e.target.value)} className="w-full text-sm border rounded-lg px-3 py-2" />
-                <input value={meetingLocation} onChange={(e) => setMeetingLocation(e.target.value)} placeholder="Location" className="w-full text-sm border rounded-lg px-3 py-2" />
-                <textarea value={meetingNotes} onChange={(e) => setMeetingNotes(e.target.value)} rows={2} placeholder="Agenda" className="w-full text-sm border rounded-lg px-3 py-2" />
+                <input type="datetime-local" value={meetingWhen} onChange={(e) => setMeetingWhen(e.target.value)} className="w-full text-xs border rounded-lg px-2.5 py-1.5" />
+                <input value={meetingLocation} onChange={(e) => setMeetingLocation(e.target.value)} placeholder="Location" className="w-full text-xs border rounded-lg px-2.5 py-1.5" />
+                <textarea value={meetingNotes} onChange={(e) => setMeetingNotes(e.target.value)} rows={2} placeholder="Agenda" className="w-full text-xs border rounded-lg px-2.5 py-1.5" />
                 {isManager && teamMembers.length > 0 && (
-                  <select value={meetingAssignee} onChange={(e) => setMeetingAssignee(e.target.value)} className="w-full text-sm border rounded-lg px-3 py-2">
+                  <select value={meetingAssignee} onChange={(e) => setMeetingAssignee(e.target.value)} className="w-full text-xs border rounded-lg px-2.5 py-1.5">
                     {teamMembers.map((m) => (
                       <option key={m.userId} value={m.userId}>
                         {m.name}
@@ -1076,7 +1076,7 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
             <section>
               <h3 className="text-[11px] font-semibold uppercase text-gray-400 mb-2">Record field visit</h3>
               <form onSubmit={recordVisit} className="space-y-2">
-                <select value={visitMeetingId} onChange={(e) => setVisitMeetingId(e.target.value)} className="w-full text-sm border rounded-lg px-3 py-2">
+                <select value={visitMeetingId} onChange={(e) => setVisitMeetingId(e.target.value)} className="w-full text-xs border rounded-lg px-2.5 py-1.5">
                   <option value="">Select scheduled visit</option>
                   {(crm.meetings || [])
                     .filter((m) => m.type === 'field_visit')
@@ -1086,12 +1086,12 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
                       </option>
                     ))}
                 </select>
-                <select value={visitOutcome} onChange={(e) => setVisitOutcome(e.target.value)} className="w-full text-sm border rounded-lg px-3 py-2">
+                <select value={visitOutcome} onChange={(e) => setVisitOutcome(e.target.value)} className="w-full text-xs border rounded-lg px-2.5 py-1.5">
                   <option value="completed">Completed</option>
                   <option value="rescheduled">Rescheduled</option>
                   <option value="no_show">No show</option>
                 </select>
-                <textarea value={visitNotes} onChange={(e) => setVisitNotes(e.target.value)} rows={3} placeholder="Visit notes, outcomes, next steps…" className="w-full text-sm border rounded-lg px-3 py-2" />
+                <textarea value={visitNotes} onChange={(e) => setVisitNotes(e.target.value)} rows={3} placeholder="Visit notes, outcomes, next steps…" className="w-full text-xs border rounded-lg px-2.5 py-1.5" />
                 <button type="submit" disabled={busy} className="w-full py-2 text-xs font-semibold border-2 border-[#ffcb2b] rounded-lg disabled:opacity-50">
                   {saving ? 'Saving…' : 'Save field visit report'}
                 </button>
@@ -1133,7 +1133,7 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
                   type="button"
                   onClick={connectWorkGmail}
                   disabled={busy || !gmailStatus.gmailConnectAvailable}
-                  className="w-full py-2.5 text-xs font-semibold bg-[#ffcb2b] text-[#242424] rounded-lg disabled:opacity-50"
+                  className="w-full py-2 text-xs font-semibold bg-[#ffcb2b] text-[#242424] rounded-lg disabled:opacity-50"
                 >
                   {connectingGmail ? 'Connecting…' : 'Connect work email'}
                 </button>
@@ -1206,21 +1206,21 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
                 value={senderCompany}
                 onChange={(e) => setSenderCompany(e.target.value)}
                 placeholder="Your company name"
-                className="w-full text-sm border rounded-lg px-3 py-2"
+                className="w-full text-xs border rounded-lg px-2.5 py-1.5"
               />
               <textarea
                 value={emailAgenda}
                 onChange={(e) => setEmailAgenda(e.target.value)}
                 rows={3}
                 placeholder="Agenda (required): e.g. Introduce Alvar Fresh organic snacks to US boutique buyers; ask for 15-min call next week"
-                className="w-full text-sm border rounded-lg px-3 py-2"
+                className="w-full text-xs border rounded-lg px-2.5 py-1.5"
               />
               <textarea
                 value={emailKeyPoints}
                 onChange={(e) => setEmailKeyPoints(e.target.value)}
                 rows={2}
                 placeholder="Key points (optional): pricing, certifications, trade show, etc."
-                className="w-full text-sm border rounded-lg px-3 py-2"
+                className="w-full text-xs border rounded-lg px-2.5 py-1.5"
               />
             </section>
 
@@ -1241,14 +1241,14 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
                 {generating ? 'Drafting…' : '✨ AI draft'}
               </button>
             </div>
-            <input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Subject" className="w-full text-sm border rounded-lg px-3 py-2" />
+            <input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Subject" className="w-full text-xs border rounded-lg px-2.5 py-1.5" />
             <input
               value={emailCc}
               onChange={(e) => setEmailCc(e.target.value)}
               placeholder="Cc (optional): name@company.com, teammate@company.com"
-              className="w-full text-sm border rounded-lg px-3 py-2"
+              className="w-full text-xs border rounded-lg px-2.5 py-1.5"
             />
-            <textarea value={body} onChange={(e) => setBody(e.target.value)} rows={10} className="w-full text-sm border rounded-lg px-3 py-2 font-mono text-[12px]" />
+            <textarea value={body} onChange={(e) => setBody(e.target.value)} rows={10} className="w-full text-xs border rounded-lg px-2.5 py-1.5 font-mono text-[12px]" />
             {includeSignature && emailSignature.trim() && (
               <p className="text-[10px] text-gray-500">
                 Your saved signature will be appended automatically when you send.
@@ -1296,7 +1296,7 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
               type="button"
               onClick={handleSend}
               disabled={busy || !canSendEmail}
-              className="w-full py-2.5 text-sm font-semibold bg-gray-900 text-white rounded-lg disabled:opacity-50"
+              className="w-full py-2 text-xs font-semibold bg-gray-900 text-white rounded-lg disabled:opacity-50"
             >
               {sending ? 'Sending…' : 'Send email & log in CRM'}
             </button>
@@ -1350,7 +1350,7 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
                   }
                   setWaTemplatePick('')
                 }}
-                className="mt-1 w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5"
+                className="mt-1 w-full text-xs border border-gray-200 rounded-lg px-2 py-1.5"
               >
                 <option value="">Choose preset or saved template…</option>
                 <optgroup label="Built-in presets">
@@ -1381,14 +1381,14 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
               onChange={(e) => setWaAgenda(e.target.value)}
               rows={2}
               placeholder="Agenda (required for AI): e.g. follow up on export quote"
-              className="w-full text-sm border rounded-lg px-3 py-2"
+              className="w-full text-xs border rounded-lg px-2.5 py-1.5"
             />
             <textarea
               value={waKeyPoints}
               onChange={(e) => setWaKeyPoints(e.target.value)}
               rows={2}
               placeholder="Key points (optional)"
-              className="w-full text-sm border rounded-lg px-3 py-2"
+              className="w-full text-xs border rounded-lg px-2.5 py-1.5"
             />
             <button
               type="button"
@@ -1403,13 +1403,13 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
               onChange={(e) => setWaMessage(e.target.value)}
               rows={8}
               placeholder="Message to send on WhatsApp"
-              className="w-full text-sm border rounded-lg px-3 py-2"
+              className="w-full text-xs border rounded-lg px-2.5 py-1.5"
             />
             <button
               type="button"
               onClick={openWhatsApp}
               disabled={busy || !hasLeadPhone || !waMessage.trim()}
-              className="w-full py-2.5 text-sm font-semibold bg-[#25D366] text-white rounded-lg disabled:opacity-50"
+              className="w-full py-2 text-xs font-semibold bg-[#25D366] text-white rounded-lg disabled:opacity-50"
             >
               Open in WhatsApp & log
             </button>
