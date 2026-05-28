@@ -1,7 +1,6 @@
 import { useMemo } from 'react'
 import { useApp } from '../../context/AppContext'
 import useIsMobile from '../../hooks/useIsMobile'
-import useMobileNavGenie from '../../hooks/useMobileNavGenie'
 import { isNavTargetActive, MOBILE_NAV_PILL_ITEMS, navTargetToOptions } from '../../lib/navConfig'
 import {
   CalendarIcon,
@@ -36,10 +35,9 @@ function isMoreSectionActive(activePanel, panelOptions) {
   return !MOBILE_NAV_PILL_ITEMS.some((item) => pillItemActive(activePanel, panelOptions, item))
 }
 
-export default function MobileNavPill({ activePanel, panelOptions, onNavigate, onOpenMenu }) {
+export default function MobileNavPill({ activePanel, panelOptions, onNavigate, onOpenMenu, visible = true }) {
   const { user, pipelineLeadId } = useApp()
   const isMobile = useIsMobile()
-  const genieVisible = useMobileNavGenie(isMobile && Boolean(user) && !user?.isPlatformAdmin && !pipelineLeadId)
 
   const moreActive = useMemo(
     () => isMoreSectionActive(activePanel, panelOptions),
@@ -54,9 +52,9 @@ export default function MobileNavPill({ activePanel, panelOptions, onNavigate, o
 
   return (
     <nav
-      className={`mobile-nav-pill fixed z-[65] left-1/2 md:hidden ${genieVisible ? 'is-visible' : 'is-retracted'}`}
+      className={`mobile-nav-pill fixed z-[65] left-1/2 md:hidden ${visible ? 'is-visible' : 'is-retracted'}`}
       aria-label="Quick navigation"
-      aria-hidden={!genieVisible}
+      aria-hidden={!visible}
     >
       <div className="mobile-nav-pill__track">
         <div className="mobile-nav-pill__inner">

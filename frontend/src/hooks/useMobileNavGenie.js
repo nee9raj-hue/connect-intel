@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 const SCROLL_ROOTS =
   '.panel-body-scroll, .crm-content-scroll, .crm-page-body, .crm-drawer-body, .dashboard-page-body'
 const THRESHOLD = 8
-const TOP_ALWAYS_SHOW = 20
+const TOP_SHOW_NAV = 16
 
 function scrollRootFromTarget(target) {
   if (!(target instanceof Element)) return null
@@ -12,7 +12,7 @@ function scrollRootFromTarget(target) {
 }
 
 /**
- * Swiggy-style mobile bottom nav: show when user scrolls down, hide when scrolling up.
+ * Mobile bottom nav: hide while scrolling down (stays hidden), show when user scrolls up.
  */
 export default function useMobileNavGenie(enabled) {
   const [visible, setVisible] = useState(true)
@@ -33,15 +33,15 @@ export default function useMobileNavGenie(enabled) {
       const lastY = lastYByRoot.get(root) ?? y
       lastYByRoot.set(root, y)
 
-      if (y <= TOP_ALWAYS_SHOW) {
+      if (y <= TOP_SHOW_NAV) {
         setVisible(true)
         return
       }
 
       if (y > lastY + THRESHOLD) {
-        setVisible(true)
-      } else if (y < lastY - THRESHOLD) {
         setVisible(false)
+      } else if (y < lastY - THRESHOLD) {
+        setVisible(true)
       }
     }
 

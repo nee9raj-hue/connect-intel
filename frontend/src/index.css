@@ -301,6 +301,13 @@ textarea {
 
 .mobile-main-pad {
   padding-bottom: max(4.75rem, calc(env(safe-area-inset-bottom, 0px) + 4.25rem));
+  transition: padding-bottom 0.38s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@media (max-width: 767px) {
+  .ci-app-main > .flex-1.flex-col {
+    transition: padding-bottom 0.38s cubic-bezier(0.32, 0.72, 0, 1);
+  }
 }
 
 /* Full-height app panels: chrome on top, scrollable body fills remaining space */

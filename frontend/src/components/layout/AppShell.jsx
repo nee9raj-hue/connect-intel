@@ -15,6 +15,7 @@ import GmailSetupModal, { markGmailSetupDone, useGmailSetupNeeded } from '../onb
 import ConnectAssistant from '../assistant/ConnectAssistant'
 import MobileNavPill from './MobileNavPill'
 import useIsMobile from '../../hooks/useIsMobile'
+import useMobileNavGenie from '../../hooks/useMobileNavGenie'
 import { MenuIcon } from '../ui/icons'
 
 export default function AppShell() {
@@ -37,6 +38,7 @@ export default function AppShell() {
   const { needed: needsGmailSetup, setNeeded: setNeedsGmailSetup } = useGmailSetupNeeded(user)
   const showMobileNavPill =
     isMobile && user && !user.isPlatformAdmin && !needsOnboarding && !pipelineLeadId
+  const mobilePillVisible = useMobileNavGenie(showMobileNavPill)
   useWorkspaceSync({
     enabled: Boolean(user?.onboardingComplete || user?.isPlatformAdmin),
     userId: user?.id,
@@ -162,7 +164,9 @@ export default function AppShell() {
           </div>
         )}
         <div
-          className={`flex-1 flex flex-col min-h-0 min-w-0 overflow-hidden ${showMobileNavPill ? 'mobile-main-pad md:pb-0' : ''}`}
+          className={`flex-1 flex flex-col min-h-0 min-w-0 overflow-hidden ${
+            showMobileNavPill && mobilePillVisible ? 'mobile-main-pad' : ''
+          } md:pb-0`}
         >
           <PanelViewport onNavigate={navigate} activePanel={activePanel} panelOptions={panelOptions} />
         </div>
@@ -173,6 +177,7 @@ export default function AppShell() {
           panelOptions={panelOptions}
           onNavigate={navigate}
           onOpenMenu={() => setMobileNavOpen(true)}
+          visible={mobilePillVisible}
         />
       )}
       {needsOnboarding && <OnboardingModal />}
@@ -180,7 +185,10 @@ export default function AppShell() {
         <GmailSetupModal onDone={() => setNeedsGmailSetup(false)} />
       )}
       {user && !needsOnboarding && (
-        <ConnectAssistant onNavigate={navigate} fabAboveMobilePill={showMobileNavPill} />
+        <ConnectAssistant
+          onNavigate={navigate}
+          fabAboveMobilePill={showMobileNavPill && mobilePillVisible}
+        />
       )}
     </div>
   )
