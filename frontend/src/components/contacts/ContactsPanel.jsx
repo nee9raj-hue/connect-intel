@@ -167,7 +167,8 @@ export default function ContactsPanel({ onNavigate }) {
     try {
       const data = await api.searchContactLinkedin(selectedId, payload)
       setAiMatches(data.matches || [])
-      setAiNotice(data.notice || null)
+      const sourceNote = data.provider ? `Sources: ${data.provider}. ` : ''
+      setAiNotice(data.notice ? `${sourceNote}${data.notice}` : sourceNote || null)
       if (data.error && !(data.matches || []).length) {
         setAiError(data.error)
       }
