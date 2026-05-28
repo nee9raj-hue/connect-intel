@@ -507,7 +507,7 @@ export default function ContactsPanel({ onNavigate }) {
                             >
                               <div className="flex flex-wrap items-start justify-between gap-2">
                                 <div className="min-w-0">
-                                  <p className="text-sm font-semibold text-[#33475b]">{label}</p>
+                                  <p className="text-xs font-semibold text-[#33475b]">{label}</p>
                                   <p className="text-xs text-[#516f90] mt-0.5">
                                     {[match.title, match.company].filter(Boolean).join(' · ') ||
                                       '—'}

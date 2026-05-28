@@ -129,7 +129,7 @@ textarea {
 }
 
 .crm-modal-header h2 {
-  font-size: 1.0625rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   color: #33475b;
   margin: 0;
@@ -325,7 +325,7 @@ textarea {
 
 .marketing-flow-title {
   margin: 0.2rem 0 0;
-  font-size: 1rem;
+  font-size: 0.8125rem;
   line-height: 1.2;
   font-weight: 700;
   letter-spacing: -0.03em;
@@ -936,7 +936,7 @@ textarea {
   align-items: center;
   justify-content: center;
   padding: 0.35rem;
-  font-size: 14px;
+  font-size: 12px;
   line-height: 1;
   border: none;
   border-radius: 6px;
@@ -1214,7 +1214,7 @@ details summary::-webkit-details-marker {
   min-height: 0;
   overflow: hidden;
   background: var(--color-ci-page);
-  font-size: 0.78125rem;
+  font-size: inherit;
   font-weight: 460;
   letter-spacing: -0.012em;
   -webkit-font-smoothing: antialiased;
@@ -1245,7 +1245,7 @@ details summary::-webkit-details-marker {
 
 .crm-page-title {
   font-family: var(--font-display);
-  font-size: 1.02rem;
+  font-size: 0.8125rem;
   font-weight: 700;
   letter-spacing: -0.035em;
   color: #17191c;
@@ -1254,7 +1254,7 @@ details summary::-webkit-details-marker {
 }
 
 .crm-page-subtitle {
-  font-size: 0.655rem;
+  font-size: 0.6875rem;
   font-weight: 500;
   color: #647185;
   margin: 0.18rem 0 0;
@@ -1271,7 +1271,7 @@ details summary::-webkit-details-marker {
   overflow: hidden;
   background: #fff;
   font-family: var(--font-sans);
-  font-size: 0.8125rem;
+  font-size: inherit;
   font-weight: 500;
   letter-spacing: -0.015em;
   color: #17191c;
@@ -1300,7 +1300,7 @@ details summary::-webkit-details-marker {
 
 .dashboard-page-title {
   font-family: var(--font-display);
-  font-size: 1.125rem;
+  font-size: 0.8125rem;
   font-weight: 700;
   letter-spacing: -0.035em;
   color: #17191c;
@@ -1309,7 +1309,7 @@ details summary::-webkit-details-marker {
 }
 
 .dashboard-page-subtitle {
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 500;
   color: #647185;
   margin: 0.25rem 0 0;
@@ -1586,7 +1586,7 @@ details summary::-webkit-details-marker {
 
 .dashboard-section-card__title {
   font-family: var(--font-display);
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: -0.025em;
   color: #17191c;
@@ -2007,7 +2007,7 @@ details summary::-webkit-details-marker {
 
 .dashboard-feature-card__title {
   font-family: var(--font-display);
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: #17191c;
   margin: 0 0 0.35rem;
@@ -2911,7 +2911,7 @@ details summary::-webkit-details-marker {
   border-radius: 16px;
   background: linear-gradient(180deg, #f7f9fb 0%, #edf1f5 100%);
   border: 1px solid #dfe3eb;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 800;
   color: #17191c;
 }
@@ -3030,7 +3030,7 @@ details summary::-webkit-details-marker {
 
 .crm-input {
   width: 100%;
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   color: #202938;
   background: #fff;
   border: 1px solid #d7dde5;
@@ -3077,7 +3077,7 @@ details summary::-webkit-details-marker {
   text-align: center;
   padding: 2rem 1.5rem;
   color: #516f90;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
 }
 
 .crm-empty-state p {
@@ -3092,7 +3092,7 @@ details summary::-webkit-details-marker {
 }
 
 .crm-section-title {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: #33475b;
   margin: 0 0 0.75rem;
@@ -3167,6 +3167,78 @@ details summary::-webkit-details-marker {
   flex: 1 1 0%;
   min-height: 0;
   overflow-y: auto;
+}
+
+/* App shell typography — match sidebar nav rhythm (12px body, 13px titles) */
+.ci-app-main {
+  font-size: 0.75rem;
+  line-height: 1.45;
+  letter-spacing: -0.012em;
+  font-weight: 500;
+  -webkit-font-smoothing: antialiased;
+}
+
+.ci-app-main :where(.text-xs) {
+  font-size: 0.6875rem;
+  line-height: 1.4;
+}
+
+.ci-app-main :where(.text-sm) {
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+.ci-app-main :where(.text-base) {
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+.ci-app-main :where(.text-lg) {
+  font-size: 0.8125rem;
+  line-height: 1.3;
+}
+
+.ci-app-main :where(.text-xl) {
+  font-size: 0.875rem;
+  line-height: 1.3;
+}
+
+.ci-app-main :where(.text-2xl) {
+  font-size: 1rem;
+  line-height: 1.25;
+}
+
+@media (min-width: 768px) {
+  .ci-app-main :where(.md\:text-sm) {
+    font-size: 0.75rem;
+  }
+
+  .ci-app-main :where(.md\:text-base) {
+    font-size: 0.8125rem;
+  }
+
+  .ci-app-main :where(.md\:text-lg) {
+    font-size: 0.8125rem;
+  }
+
+  .ci-app-main :where(.md\:text-xl) {
+    font-size: 0.875rem;
+  }
+}
+
+.ci-app-main .panel-shell :is(h1, h2, h3).font-semibold:not([class*='text-']) {
+  font-size: 0.8125rem;
+  letter-spacing: -0.02em;
+}
+
+.ci-app-main .dashboard-kpi-card__value {
+  font-size: 1.0625rem;
+}
+
+@media (min-width: 768px) {
+  .ci-app-main .dashboard-kpi-card__value {
+    font-size: 1.125rem;
+  }
 }
 
 @keyframes loading-bar {

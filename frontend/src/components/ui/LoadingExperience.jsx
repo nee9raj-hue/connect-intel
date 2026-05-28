@@ -43,7 +43,7 @@ export default function LoadingExperience({
           }`}
           aria-hidden
         />
-        <p className={`font-medium text-gray-900 ${compact ? 'text-sm' : 'text-base'}`}>{message}</p>
+        <p className={`font-medium text-gray-900 ${compact ? 'text-xs' : 'text-[13px]'}`}>{message}</p>
         {subtitle && <p className="text-xs text-gray-500 mt-1 max-w-sm">{subtitle}</p>}
         {showQuote && !subtitle && (
           <p className="text-xs text-gray-500 mt-2 max-w-md italic">&ldquo;{quote}&rdquo;</p>
