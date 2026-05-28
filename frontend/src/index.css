@@ -496,9 +496,32 @@ textarea {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
 }
 
-/* Expanded + flyout submenu density */
-aside[class*='bg-[#2b2928]'] .sidebar-rail-flyout__items button,
-aside[class*='bg-[#2b2928]'] [class*='border-l'][class*='border-white/10'] button {
+/* Sidebar submenu — explicit size (buttons use font:inherit and ignore text-* utilities) */
+.ci-sidebar .sidebar-sub-item,
+.ci-sidebar .sidebar-sub-item span,
+.sidebar-rail-flyout .sidebar-sub-item,
+.sidebar-rail-flyout .sidebar-sub-item span {
+  font-size: 9px;
+  line-height: 1.2;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.ci-sidebar .nav-sub-active,
+.ci-sidebar .nav-sub-active span,
+.sidebar-rail-flyout .nav-sub-active,
+.sidebar-rail-flyout .nav-sub-active span {
+  font-weight: 600;
+}
+
+.ci-sidebar .sidebar-sub-badge,
+.sidebar-rail-flyout .sidebar-sub-badge {
+  font-size: 8px;
+  line-height: 1;
+}
+
+.sidebar-rail-flyout__title {
+  font-size: 9px;
   line-height: 1.2;
 }
 

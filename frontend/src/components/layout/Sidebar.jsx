@@ -158,7 +158,7 @@ export default function Sidebar({
         />
       )}
       <aside
-        className={`fixed md:static z-50 shrink-0 h-full bg-[#2b2928] border-r border-[#3a3836] flex flex-col overflow-hidden transition-[width] duration-200 ease-in-out max-md:transition-transform ${
+        className={`ci-sidebar fixed md:static z-50 shrink-0 h-full bg-[#2b2928] border-r border-[#3a3836] flex flex-col overflow-hidden transition-[width] duration-200 ease-in-out max-md:transition-transform text-[12px] ${
           mobileOpen ? 'max-md:translate-x-0' : 'max-md:-translate-x-full'
         } w-[272px] ${railMode ? 'md:w-16' : 'md:w-[248px]'}`}
       >
@@ -531,7 +531,7 @@ function RailFlyoutAnchor({
           if (e.target.closest('button')) closeNow()
         }}
       >
-        <p className="sidebar-rail-flyout__title border-b border-[#3a3836] px-2.5 py-1.5 text-[10px] font-semibold tracking-[-0.02em] text-white">
+        <p className="sidebar-rail-flyout__title border-b border-[#3a3836] px-2.5 py-1.5 font-semibold tracking-[-0.02em] text-white">
           {label}
         </p>
         {leaf ? (
@@ -542,7 +542,7 @@ function RailFlyoutAnchor({
                 onNavigate?.()
                 closeNow()
               }}
-              className={`sidebar-rail-flyout__leaf w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-[11px] font-medium leading-tight tracking-[-0.015em] transition-colors ${
+              className={`sidebar-sub-item sidebar-rail-flyout__leaf w-full flex items-center gap-2 px-2 py-1.5 rounded-lg transition-colors ${
                 itemActive
                   ? 'nav-sub-active'
                   : muted
@@ -554,7 +554,7 @@ function RailFlyoutAnchor({
               <span className="flex-1 text-left truncate">{label}</span>
               {badge != null && (
                 <span
-                  className={`shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-bold tabular-nums ${
+                  className={`sidebar-sub-badge shrink-0 rounded-full px-1 py-0.5 font-bold tabular-nums ${
                     itemActive ? 'bg-[#17191c]/10 text-[#17191c]' : 'bg-white/14 text-white'
                   }`}
                 >
@@ -647,14 +647,14 @@ function NavSubBtn({ label, active, badge, onClick, inRailFlyout = false }) {
     <button
       type="button"
       onClick={onClick}
-      className={`w-full flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-medium leading-tight tracking-[-0.015em] transition-colors ${
+      className={`sidebar-sub-item w-full flex items-center gap-1.5 px-2 py-1 rounded-lg transition-colors ${
         active ? 'nav-sub-active' : inactiveClass
       }`}
     >
       <span className="flex-1 text-left truncate">{label}</span>
       {badge != null && (
         <span
-          className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold tabular-nums ${
+          className={`sidebar-sub-badge rounded-full px-1 py-0.5 font-bold tabular-nums ${
             active
               ? 'bg-[#17191c]/10 text-[#17191c]'
               : inRailFlyout
