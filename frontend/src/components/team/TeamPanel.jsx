@@ -302,6 +302,13 @@ export default function TeamPanel({ onNavigate }) {
               accent="whatsapp"
               onClick={() => onNavigate?.('whatsapp-settings')}
             />
+            <TeamQuickLink
+              icon={WalletIcon}
+              title="Team & billing"
+              description="Company details, recharge, invoices"
+              accent="amber"
+              onClick={() => onNavigate?.('admin-customers')}
+            />
           </div>
 
           <div className="grid lg:grid-cols-2 gap-4 items-start">
@@ -607,6 +614,19 @@ function ChartIcon({ className }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+    </svg>
+  )
+}
+
+function WalletIcon({ className }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M3 7.5A2.5 2.5 0 015.5 5h12A2.5 2.5 0 0120 7.5v9a2.5 2.5 0 01-2.5 2.5h-12A2.5 2.5 0 013 16.5v-9z"
+      />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M20 10h-4a2 2 0 100 4h4" />
     </svg>
   )
 }
