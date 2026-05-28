@@ -36,19 +36,25 @@ export default function WorkEmailOptions({ onNavigate, compact = false }) {
 
   if (orgEmail?.userCanSend) {
     return (
-      <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-900 space-y-1">
-        <p className="font-semibold">Company email is ready</p>
-        <p className="text-xs leading-relaxed">
-          You are signed in as <strong>{user?.email}</strong>. Marketing and CRM will send through your company
-          domain <strong>@{orgEmail.domain}</strong> — no Gmail connection required.
-        </p>
-        <button
-          type="button"
-          onClick={() => onNavigate?.('marketing', { tab: 'campaigns' })}
-          className="mt-2 text-xs font-semibold underline"
-        >
-          Go to Marketing campaigns
-        </button>
+      <div className="space-y-3">
+        <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-900 space-y-1">
+          <p className="font-semibold">Company email is ready</p>
+          <p className="text-xs leading-relaxed">
+            You are signed in as <strong>{user?.email}</strong>. Marketing and CRM will send through your company
+            domain <strong>@{orgEmail.domain}</strong> — no Gmail connection required.
+          </p>
+          <button
+            type="button"
+            onClick={() => onNavigate?.('marketing', { tab: 'campaigns' })}
+            className="mt-2 text-xs font-semibold underline"
+          >
+            Go to Marketing campaigns
+          </button>
+        </div>
+        <div>
+          <p className="text-xs font-medium text-gray-700 mb-1.5">Manage your personal Work Gmail connection</p>
+          <CrmGmailConnectCard compact />
+        </div>
       </div>
     )
   }
