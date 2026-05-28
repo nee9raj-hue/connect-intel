@@ -65,6 +65,7 @@ export default function CrmGmailConnectCard({ compact = false }) {
   }
 
   const pad = compact ? 'px-3 py-3' : 'px-4 py-4'
+  const blockGmailActions = Boolean(status?.googleVerificationPending && !status?.googleAppVerified)
 
   if (loading) {
     return <p className="text-xs text-gray-500">Checking email connection…</p>
@@ -107,28 +108,35 @@ export default function CrmGmailConnectCard({ compact = false }) {
         <p className="text-xs text-green-800 mt-0.5">
           Sends from <strong>{status.mailbox}</strong> · replies sync to CRM
         </p>
-        <div className="mt-2 flex gap-3 text-xs">
-          <button
-            type="button"
-            onClick={disconnect}
-            disabled={connecting}
-            className="font-semibold text-green-900 underline disabled:opacity-60"
-          >
-            {connecting ? 'Working…' : 'Disconnect'}
-          </button>
-          <button
-            type="button"
-            onClick={connect}
-            disabled={connecting}
-            className="font-semibold text-green-900 underline disabled:opacity-60"
-          >
-            {connecting
-              ? 'Working…'
-              : status.needsReplySyncReconnect
-                ? 'Reconnect (enable reply sync)'
-                : 'Reconnect'}
-          </button>
-        </div>
+        {blockGmailActions ? (
+          <div className="mt-2 rounded border border-amber-200 bg-amber-50 px-2.5 py-2 text-[11px] text-amber-900">
+            Google verification is still pending. For now, use company-domain sending in Connect Intel.
+            Reconnect actions are paused until verification is approved.
+          </div>
+        ) : (
+          <div className="mt-2 flex gap-3 text-xs">
+            <button
+              type="button"
+              onClick={disconnect}
+              disabled={connecting}
+              className="font-semibold text-green-900 underline disabled:opacity-60"
+            >
+              {connecting ? 'Working…' : 'Disconnect'}
+            </button>
+            <button
+              type="button"
+              onClick={connect}
+              disabled={connecting}
+              className="font-semibold text-green-900 underline disabled:opacity-60"
+            >
+              {connecting
+                ? 'Working…'
+                : status.needsReplySyncReconnect
+                  ? 'Reconnect (enable reply sync)'
+                  : 'Reconnect'}
+            </button>
+          </div>
+        )}
       </div>
     )
   }
@@ -142,13 +150,10 @@ export default function CrmGmailConnectCard({ compact = false }) {
 
       {status.googleVerificationPending && (
         <div className="text-[11px] text-amber-950 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-2 space-y-1.5 leading-relaxed">
-          <p className="font-semibold">Sign-in may show a security notice</p>
+          <p className="font-semibold">Google verification pending</p>
           <p>
-            {status.googleSetup?.whyUnverifiedWarning ||
-              'This is normal while Connect Intel completes email provider verification.'}
-          </p>
-          <p className="text-[10px] text-amber-800">
-            If connection fails, choose Advanced → Continue to Connect Intel, or contact your administrator.
+            Work Gmail connect is temporarily disabled to avoid repeated login loops.
+            Use company-domain sending for CRM and campaigns for now.
           </p>
         </div>
       )}
@@ -156,14 +161,16 @@ export default function CrmGmailConnectCard({ compact = false }) {
       {error && (
         <p className="text-xs text-red-800 bg-red-50 border border-red-100 rounded px-2 py-1">{error}</p>
       )}
-      <button
-        type="button"
-        onClick={connect}
-        disabled={connecting}
-        className="w-full py-2.5 text-sm font-semibold bg-[#ffcb2b] text-[#242424] rounded-lg disabled:opacity-50"
-      >
-        {connecting ? 'Connecting…' : 'Connect work email'}
-      </button>
+      {!blockGmailActions && (
+        <button
+          type="button"
+          onClick={connect}
+          disabled={connecting}
+          className="w-full py-2.5 text-sm font-semibold bg-[#ffcb2b] text-[#242424] rounded-lg disabled:opacity-50"
+        >
+          {connecting ? 'Connecting…' : 'Connect work email'}
+        </button>
+      )}
       <p className="text-[10px] text-gray-500">
         <a href="https://connectintel.net/privacy.html" className="underline" target="_blank" rel="noreferrer">
           Privacy policy
