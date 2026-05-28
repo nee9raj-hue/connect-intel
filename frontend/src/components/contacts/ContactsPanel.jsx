@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import LoadingExperience from '../ui/LoadingExperience'
@@ -43,6 +43,7 @@ export default function ContactsPanel({ onNavigate }) {
   const [aiMatches, setAiMatches] = useState([])
   const [aiError, setAiError] = useState(null)
   const [aiNotice, setAiNotice] = useState(null)
+  const splitRef = useRef(null)
 
   const loadList = useCallback(async (q = appliedSearch) => {
     setLoading(true)
@@ -101,6 +102,18 @@ export default function ContactsPanel({ onNavigate }) {
     setAiError(null)
     setAiNotice(null)
   }, [selectedId, loadOne])
+
+  useEffect(() => {
+    if (!selectedId || typeof window === 'undefined') return
+    if (!window.matchMedia('(max-width: 767px)').matches) return
+    const root = splitRef.current
+    const main = root?.querySelector('.crm-split-main')
+    if (!main) return
+    const timer = window.setTimeout(() => {
+      main.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' })
+    }, 80)
+    return () => window.clearTimeout(timer)
+  }, [selectedId])
 
   const selected = useMemo(
     () => contacts.find((c) => c.id === selectedId) || null,
@@ -280,7 +293,11 @@ export default function ContactsPanel({ onNavigate }) {
       </header>
 
       <div className="crm-page-body">
-        <div className="crm-content-card crm-split-card">
+        <div className="crm-split-shell flex flex-col flex-1 min-h-0">
+          <p className="crm-mobile-split-hint" aria-hidden>
+            Swipe right for contact details →
+          </p>
+          <div ref={splitRef} className="crm-content-card crm-split-card flex-1 min-h-0">
           <aside className="crm-split-sidebar">
             <div className="crm-list-header">
               <div className="flex items-center justify-between gap-2">
@@ -339,6 +356,13 @@ export default function ContactsPanel({ onNavigate }) {
             ) : (
               <div className="crm-detail-pane">
                 <div className="crm-detail-card crm-detail-card-wide">
+                  <button
+                    type="button"
+                    className="crm-mobile-back"
+                    onClick={() => setSelectedId(null)}
+                  >
+                    ← Back to list
+                  </button>
                   <div className="crm-contact-hero">
                     <div className="crm-contact-avatar">
                       {([form.firstName, form.lastName]
@@ -591,6 +615,7 @@ export default function ContactsPanel({ onNavigate }) {
               </div>
             )}
           </section>
+          </div>
         </div>
       </div>
     </div>

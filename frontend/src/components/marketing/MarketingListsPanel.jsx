@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { CRM_STATUSES } from '../../lib/crmConstants'
 import FilterDropdown from '../crm/FilterDropdown'
 import MarketingListBuilder from './MarketingListBuilder'
@@ -23,6 +23,7 @@ export default function MarketingListsPanel({
   const [selectedListId, setSelectedListId] = useState(null)
   const [createOpen, setCreateOpen] = useState(false)
   const [listSearch, setListSearch] = useState('')
+  const splitRef = useRef(null)
 
   const [listChannel, setListChannel] = useState('email')
   const [assigneeUserId, setAssigneeUserId] = useState('')
@@ -100,6 +101,17 @@ export default function MarketingListsPanel({
     pipelineStage === 'all'
       ? 'All stages'
       : CRM_STATUSES.find((s) => s.id === pipelineStage)?.label || pipelineStage
+
+  useEffect(() => {
+    if (!selectedListId || typeof window === 'undefined') return
+    if (!window.matchMedia('(max-width: 767px)').matches) return
+    const main = splitRef.current?.querySelector('.crm-split-main')
+    if (!main) return
+    const timer = window.setTimeout(() => {
+      main.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' })
+    }, 80)
+    return () => window.clearTimeout(timer)
+  }, [selectedListId])
 
   return (
     <div className="crm-content-card flex flex-col min-h-0 flex-1 overflow-hidden">
@@ -199,8 +211,15 @@ export default function MarketingListsPanel({
         </div>
       </div>
 
-      <div className="crm-split-card flex-1 min-h-0 border-0 rounded-none shadow-none">
-        <aside className={`crm-split-sidebar ${selectedListId ? 'is-hidden-mobile' : ''}`}>
+      <div className="crm-split-shell flex flex-col flex-1 min-h-0">
+        <p className="crm-mobile-split-hint" aria-hidden>
+          Swipe right for list details →
+        </p>
+        <div
+          ref={splitRef}
+          className="crm-split-card flex-1 min-h-0 border-0 rounded-none shadow-none"
+        >
+        <aside className="crm-split-sidebar">
           <div className="crm-list-header">Saved lists</div>
           <div className="crm-list-scroll">
             {!filteredLists.length && (
@@ -226,7 +245,7 @@ export default function MarketingListsPanel({
           </div>
         </aside>
 
-        <section className={`crm-split-main ${selectedListId ? 'is-full-mobile' : ''}`}>
+        <section className="crm-split-main">
           {selectedListId ? (
             <MarketingListDetail
               list={selectedList}
@@ -253,6 +272,7 @@ export default function MarketingListsPanel({
             </div>
           )}
         </section>
+        </div>
       </div>
 
       {createOpen && (

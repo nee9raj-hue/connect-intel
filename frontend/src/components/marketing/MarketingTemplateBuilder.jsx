@@ -580,7 +580,11 @@ export default function MarketingTemplateBuilder({
   )
 
   const studioBody = (
-    <div className="marketing-studio-body">
+    <>
+      <p className="marketing-studio-mobile-pan-hint md:hidden" aria-hidden>
+        Swipe sideways: tools → email → block editor →
+      </p>
+      <div className="marketing-studio-body">
       <nav className="marketing-studio-rail" aria-label="Builder tools">
         {STUDIO_RAIL.map((tab) => (
           <button
@@ -641,6 +645,7 @@ export default function MarketingTemplateBuilder({
         </div>
       </aside>
     </div>
+    </>
   )
 
   const toolbar = (
