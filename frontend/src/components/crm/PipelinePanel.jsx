@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { formatCrmDate, getStatusMeta, getVisiblePipelineColumns } from '../../lib/crmConstants'
+import { PlusIcon, UploadIcon } from '../ui/icons'
 import LeadWorkspace from './LeadWorkspace'
 import PipelineImportModal from './PipelineImportModal'
 import BulkEmailModal from './BulkEmailModal'
@@ -524,11 +525,23 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                   ))}
                 </div>
               )}
-              <button type="button" onClick={() => setImportOpen(true)} className="crm-btn crm-btn-secondary">
-                Import
+              <button
+                type="button"
+                onClick={() => setImportOpen(true)}
+                className="crm-btn crm-btn-secondary ci-mobile-icon-btn"
+                aria-label="Import leads"
+              >
+                <UploadIcon className="ci-mobile-btn-icon w-4 h-4" aria-hidden />
+                <span className="ci-mobile-btn-text">Import</span>
               </button>
-              <button type="button" onClick={() => setAddOpen(true)} className="crm-btn crm-btn-primary">
-                Add lead
+              <button
+                type="button"
+                onClick={() => setAddOpen(true)}
+                className="crm-btn crm-btn-primary ci-mobile-icon-btn"
+                aria-label="Add lead"
+              >
+                <PlusIcon className="ci-mobile-btn-icon w-4 h-4" aria-hidden />
+                <span className="ci-mobile-btn-text">Add lead</span>
               </button>
             </div>
           </div>

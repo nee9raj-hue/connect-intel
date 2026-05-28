@@ -162,7 +162,7 @@ export default function AppShell() {
           </div>
         )}
         <div
-          className={`flex-1 flex flex-col min-h-0 min-w-0 overflow-hidden max-md:h-0 ${showMobileNavPill ? 'mobile-main-pad md:pb-0' : ''}`}
+          className={`flex-1 flex flex-col min-h-0 min-w-0 overflow-hidden ${showMobileNavPill ? 'mobile-main-pad md:pb-0' : ''}`}
         >
           <PanelViewport onNavigate={navigate} activePanel={activePanel} panelOptions={panelOptions} />
         </div>

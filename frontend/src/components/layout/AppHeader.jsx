@@ -17,36 +17,48 @@ export default function AppHeader({ onNavigate, sidebarMode = 'expanded', onTogg
         onToggle={onToggleSidebarCollapsed}
         className="hidden md:inline-flex shrink-0"
       />
-      <div className="flex items-center justify-end gap-2 flex-1 min-w-0">
-      <NotificationBell />
-      <button
-        type="button"
-        onClick={() => onNavigate?.('search')}
-        className="inline-flex items-center gap-1.5 rounded-full border border-[#d9dee5] bg-[#f7f9fb] px-3 py-1.5 text-[11px] font-semibold tracking-[-0.015em] text-[#202938] transition-colors hover:bg-[#eef2f6]"
-        title="Credits are used for AI prospect search and lead unlocks"
-      >
-        <span className="w-1.5 h-1.5 rounded-full bg-[#17191c]" />
-        AI credits: Rs {credits}
-      </button>
-      <button
-        type="button"
-        onClick={() => onNavigate?.('team')}
-        className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-semibold tracking-[-0.015em] transition-colors ${
-          subscriptionActive
-            ? 'border-[#b8e3d2] bg-[#eefaf5] text-[#0f6a4c]'
-            : 'border-[#d9dee5] bg-white text-[#536072] hover:bg-[#f7f9fb]'
-        }`}
-        title={
-          subscriptionActive
-            ? 'Paid subscription — full prospect access'
-            : 'CRM is free. Subscribe to unlock full AI prospect details.'
-        }
-      >
-        <span
-          className={`w-1.5 h-1.5 rounded-full ${subscriptionActive ? 'bg-[#0f6a4c]' : 'bg-[#7f8b99]'}`}
-        />
-        Subscription: {subscriptionActive ? 'Active' : crmFree ? 'CRM free mode' : 'Inactive'}
-      </button>
+      <div className="ci-app-header-chips flex items-center justify-end gap-2 flex-1 min-w-0">
+        <NotificationBell />
+        <button
+          type="button"
+          onClick={() => onNavigate?.('search')}
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#d9dee5] bg-[#f7f9fb] px-2.5 py-1.5 md:px-3 text-[11px] font-semibold tracking-[-0.015em] text-[#202938] transition-colors hover:bg-[#eef2f6]"
+          title={`AI credits: Rs ${credits}`}
+          aria-label={`AI credits: Rs ${credits}`}
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-[#17191c]" />
+          <span className="hidden sm:inline">AI credits: Rs {credits}</span>
+          <span className="sm:hidden tabular-nums">Rs {credits}</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => onNavigate?.('team')}
+          className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1.5 md:px-3 text-[11px] font-semibold tracking-[-0.015em] transition-colors ${
+            subscriptionActive
+              ? 'border-[#b8e3d2] bg-[#eefaf5] text-[#0f6a4c]'
+              : 'border-[#d9dee5] bg-white text-[#536072] hover:bg-[#f7f9fb]'
+          }`}
+          title={
+            subscriptionActive
+              ? 'Paid subscription — full prospect access'
+              : 'CRM is free. Subscribe to unlock full AI prospect details.'
+          }
+          aria-label={
+            subscriptionActive
+              ? 'Subscription active'
+              : crmFree
+                ? 'CRM free mode'
+                : 'Subscription inactive'
+          }
+        >
+          <span
+            className={`w-1.5 h-1.5 rounded-full ${subscriptionActive ? 'bg-[#0f6a4c]' : 'bg-[#7f8b99]'}`}
+          />
+          <span className="hidden sm:inline">
+            Subscription: {subscriptionActive ? 'Active' : crmFree ? 'CRM free mode' : 'Inactive'}
+          </span>
+          <span className="sm:hidden">{subscriptionActive ? 'Pro' : crmFree ? 'Free' : 'Off'}</span>
+        </button>
       </div>
     </header>
   )

@@ -15,12 +15,12 @@ import { LOADING_MESSAGES } from '../../lib/loadingQuotes'
 import { leadHasCallablePhone } from '../../lib/phoneUtils'
 
 const TABS = [
-  { id: 'campaigns', label: 'Campaigns' },
-  { id: 'inbox', label: 'WA Inbox' },
-  { id: 'lists', label: 'Lists' },
-  { id: 'reports', label: 'Reports' },
-  { id: 'templates', label: 'Templates' },
-  { id: 'forms', label: 'Forms' },
+  { id: 'campaigns', label: 'Campaigns', short: 'Camp' },
+  { id: 'inbox', label: 'WA Inbox', short: 'WA' },
+  { id: 'lists', label: 'Lists', short: 'List' },
+  { id: 'reports', label: 'Reports', short: 'Rpt' },
+  { id: 'templates', label: 'Templates', short: 'Tpl' },
+  { id: 'forms', label: 'Forms', short: 'Form' },
 ]
 
 const EMPTY_TEMPLATE = {
@@ -644,15 +644,16 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
                 {marketingTipsOpen ? 'Hide tips' : 'Tips'}
               </button>
             )}
-            <div className="crm-view-tabs">
+            <div className="crm-view-tabs crm-view-tabs--mobile-scroll">
               {TABS.map((t) => (
                 <button
                   key={t.id}
                   type="button"
                   onClick={() => setTab(t.id)}
-                  className={`crm-view-tab ${tab === t.id ? 'is-active' : ''}`}
+                  className={`crm-view-tab crm-view-tab--short ${tab === t.id ? 'is-active' : ''}`}
                 >
-                  {t.label}
+                  <span className="crm-view-tab-long">{t.label}</span>
+                  <span className="crm-view-tab-short">{t.short || t.label.slice(0, 3)}</span>
                 </button>
               ))}
             </div>

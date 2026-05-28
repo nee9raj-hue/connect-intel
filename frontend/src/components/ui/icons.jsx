@@ -221,6 +221,25 @@ export function MoreHorizontalIcon({ className }) {
   )
 }
 
+export function PlusIcon({ className }) {
+  return (
+    <LineIcon className={className}>
+      <path d="M12 5v14" />
+      <path d="M5 12h14" />
+    </LineIcon>
+  )
+}
+
+export function UploadIcon({ className }) {
+  return (
+    <LineIcon className={className}>
+      <path d="M12 16V7" />
+      <path d="m8.5 10.5 3.5-3.5 3.5 3.5" />
+      <path d="M5 18.5h14" />
+    </LineIcon>
+  )
+}
+
 export function MenuIcon({ className }) {
   return (
     <LineIcon className={className}>

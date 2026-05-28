@@ -226,13 +226,81 @@ textarea {
 .mobile-nav-pill {
   bottom: max(0.65rem, env(safe-area-inset-bottom, 0px));
   pointer-events: none;
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+  transition:
+    transform 0.42s cubic-bezier(0.32, 0.72, 0, 1),
+    opacity 0.28s ease;
+  will-change: transform, opacity;
 }
-.mobile-nav-pill > div {
+
+.mobile-nav-pill.is-retracted {
+  transform: translateX(-50%) translateY(calc(100% + 1.75rem));
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mobile-nav-pill__track {
   pointer-events: auto;
+  max-width: min(calc(100vw - 1rem), 26rem);
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  border-radius: 999px;
+}
+
+.mobile-nav-pill__track::-webkit-scrollbar {
+  display: none;
+}
+
+.mobile-nav-pill__inner {
+  display: flex;
+  align-items: center;
+  gap: 0.125rem;
+  width: max-content;
+  min-width: 100%;
+  border-radius: 999px;
+  border: 1px solid #d7dde5;
+  background: rgb(255 255 255 / 0.96);
+  padding: 0.3rem 0.35rem;
+  box-shadow: 0 12px 34px rgb(15 23 42 / 0.16);
+  backdrop-filter: blur(12px);
+}
+
+.mobile-nav-pill__item {
+  display: flex;
+  min-width: 2.85rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  padding: 0.35rem 0.45rem;
+  color: #596577;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.mobile-nav-pill__item.is-active {
+  background: #17191c;
+  color: #fff;
+}
+
+.mobile-nav-pill__label {
+  margin-top: 0.125rem;
+  max-width: 3.25rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 8px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
 }
 
 .mobile-main-pad {
-  padding-bottom: max(4.5rem, calc(env(safe-area-inset-bottom, 0px) + 4rem));
+  padding-bottom: max(4.75rem, calc(env(safe-area-inset-bottom, 0px) + 4.25rem));
 }
 
 /* Full-height app panels: chrome on top, scrollable body fills remaining space */
@@ -2684,6 +2752,10 @@ details summary::-webkit-details-marker {
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
 }
 
+.crm-view-tab-short {
+  display: none;
+}
+
 .crm-lead-card {
   border: 1px solid #dde3ea;
   border-radius: 16px;
@@ -3267,6 +3339,199 @@ details summary::-webkit-details-marker {
 @media (min-width: 768px) {
   .ci-app-main .dashboard-kpi-card__value {
     font-size: 1.125rem;
+  }
+}
+
+/* —— Mobile layout: scroll overflow + compact chrome —— */
+@media (max-width: 767px) {
+  .ci-app-main {
+    min-width: 0;
+    overflow-x: hidden;
+  }
+
+  .crm-page-header-top {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .crm-page-actions {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 0.15rem;
+  }
+
+  .crm-page-actions::-webkit-scrollbar {
+    display: none;
+  }
+
+  .crm-toolbar,
+  .crm-toolbar-primary,
+  .crm-toolbar-row,
+  .crm-toolbar-filters {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .crm-toolbar::-webkit-scrollbar,
+  .crm-toolbar-primary::-webkit-scrollbar {
+    display: none;
+  }
+
+  .panel-body-scroll,
+  .crm-content-scroll,
+  .crm-page-body,
+  .crm-drawer-body,
+  .dashboard-page-body {
+    overflow-x: auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  .crm-content-scroll-board {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .crm-kanban-board {
+    min-width: min-content;
+  }
+
+  .mobile-scroll-x,
+  .crm-marketing-kpis,
+  .marketing-summary-strip {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .mobile-scroll-x::-webkit-scrollbar,
+  .crm-marketing-kpis::-webkit-scrollbar,
+  .marketing-summary-strip::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ci-app-header-chips {
+    flex: 1;
+    min-width: 0;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .ci-app-header-chips::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ci-mobile-icon-btn {
+    min-width: 2.35rem;
+    min-height: 2.35rem;
+    padding: 0.45rem !important;
+  }
+
+  .ci-mobile-icon-btn .ci-mobile-btn-text {
+    display: none;
+  }
+
+  .ci-mobile-icon-btn .ci-mobile-btn-icon {
+    display: block;
+  }
+
+  .crm-view-tabs--mobile-scroll {
+    flex-shrink: 0;
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .crm-view-tabs--mobile-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .crm-view-tab--short .crm-view-tab-long {
+    display: none;
+  }
+
+  .crm-view-tab--short .crm-view-tab-short {
+    display: inline;
+  }
+
+  .pipeline-bulk-mobile {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .pipeline-bulk-mobile::-webkit-scrollbar {
+    display: none;
+  }
+
+  .pipeline-bulk-mobile__row {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.35rem;
+    min-width: max-content;
+  }
+
+  .pipeline-bulk-mobile .pipeline-bulk-label {
+    display: none;
+  }
+
+  .pipeline-bulk-mobile .pipeline-bulk-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.25rem;
+    min-height: 2.25rem;
+    padding: 0.4rem;
+    border-radius: 0.65rem;
+    font-size: 0;
+  }
+
+  .pipeline-bulk-mobile select {
+    max-width: 7.5rem;
+    font-size: 0.6875rem;
+  }
+
+  table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (min-width: 768px) {
+  .ci-mobile-icon-btn .ci-mobile-btn-icon {
+    display: none;
+  }
+
+  .crm-view-tab--short .crm-view-tab-short {
+    display: none;
+  }
+
+  .crm-view-tab--short .crm-view-tab-long {
+    display: inline;
+  }
+
+  .pipeline-bulk-mobile .pipeline-bulk-label {
+    display: inline;
   }
 }
 
