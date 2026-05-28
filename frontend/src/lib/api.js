@@ -234,7 +234,11 @@ export const api = {
   syncWhatsAppInbox: () =>
     request('/api/crm/whatsapp-inbox', { method: 'POST', body: { action: 'sync' } }),
   generateCrmEmail: (leadId, options = {}) =>
-    request('/api/crm-generate-email', { method: 'POST', body: { leadId, ...options } }),
+    request('/api/crm-generate-email', {
+      method: 'POST',
+      body: { leadId, ...options },
+      timeoutMs: 90_000,
+    }),
   sendCrmEmail: (leadId, payload) =>
     request('/api/crm-send-email', { method: 'POST', body: { leadId, ...payload }, timeoutMs: 120_000 }),
   searchLeads: (filters, count = 50, provider = 'free') =>
