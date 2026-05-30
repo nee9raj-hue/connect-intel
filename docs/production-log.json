@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-05-30T14:04:02.804Z",
-  "updatedAtIst": "30/05/2026, 19:34:02",
+  "updatedAt": "2026-05-30T14:26:34.689Z",
+  "updatedAtIst": "30/05/2026, 19:56:34",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "9e237db",
+  "currentProductionCommit": "81b738c",
   "entries": [
+    {
+      "logId": "20260530-1956-81b738c",
+      "commit": "81b738c",
+      "commitFull": "81b738ce474fd791d82ee373fdaf740b6529fabb",
+      "message": "Extend HubSpot premium UI across all CRM surfaces.",
+      "deployedAt": "2026-05-30T14:26:19.132Z",
+      "deployedAtIst": "30/05/2026, 19:56:19",
+      "committedAtIst": "30/05/2026, 19:55:49",
+      "vercelPreviewUrl": "https://connect-intel-7wgjico68-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 81b738c"
+    },
+    {
+      "logId": "20260530-1934-d4c6341",
+      "commit": "d4c6341",
+      "commitFull": "d4c63411ecc581abf886fd08846c7f29610208cf",
+      "message": "Update production log after HubSpot premium UI deploy.",
+      "deployedAt": "2026-05-30T14:04:25.585Z",
+      "deployedAtIst": "30/05/2026, 19:34:25",
+      "committedAtIst": "30/05/2026, 19:34:02",
+      "vercelPreviewUrl": "https://connect-intel-3cgm2xxg9-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- d4c6341"
+    },
     {
       "logId": "20260530-1933-9e237db",
       "commit": "9e237db",
@@ -15,7 +43,7 @@
       "committedAtIst": "30/05/2026, 19:33:24",
       "vercelPreviewUrl": "https://connect-intel-isr7ovqs6-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 9e237db"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 3569af6"
-    },
-    {
-      "logId": "20260530-1822-82ab12b",
-      "commit": "82ab12b",
-      "commitFull": "82ab12bcc971dc459a8a27d1ff38af4537f648b0",
-      "message": "Use Contacts-style filter modals on mobile pipeline and fix duplicate bell.",
-      "deployedAt": "2026-05-30T12:52:41.881Z",
-      "deployedAtIst": "30/05/2026, 18:22:41",
-      "committedAtIst": "30/05/2026, 18:22:09",
-      "vercelPreviewUrl": "https://connect-intel-gyckuojsr-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 82ab12b"
-    },
-    {
-      "logId": "20260530-1817-cd1f6cc",
-      "commit": "cd1f6cc",
-      "commitFull": "cd1f6ccf1845742c29043d5026b2a00ae5c9c406",
-      "message": "Update production log after mobile pipeline alignment deploy.",
-      "deployedAt": "2026-05-30T12:47:32.335Z",
-      "deployedAtIst": "30/05/2026, 18:17:32",
-      "committedAtIst": "30/05/2026, 18:17:05",
-      "vercelPreviewUrl": "https://connect-intel-o5ay6jxn7-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- cd1f6cc"
     }
   ]
 }
