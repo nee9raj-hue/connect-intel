@@ -3,6 +3,8 @@ import { formatCrmDate, getStatusMeta } from '../../lib/crmConstants'
 import { formatDateTime } from '../../lib/crmUiConstants'
 import { getLeadCity, getLeadState } from '../../lib/pipelineFilters'
 import { leadHasSendableEmail } from '../../lib/emailUtils'
+import { leadHasCallablePhone } from '../../lib/phoneUtils'
+import useIsMobile from '../../hooks/useIsMobile'
 import LeadTagDots from './LeadTagDots'
 import LeadPhoneCall from './LeadPhoneCall'
 
@@ -133,6 +135,7 @@ export default function PipelineLeadsTable({
   tagById,
   teamMembers = [],
 }) {
+  const isMobile = useIsMobile()
   const [sortKey, setSortKey] = useState('created')
   const [sortDir, setSortDir] = useState('desc')
 
@@ -255,6 +258,14 @@ export default function PipelineLeadsTable({
                       {(lead.firstName?.[0] || lead.company?.[0] || '?').toUpperCase()}
                     </span>
                     <span className="pipeline-hs-primary-text">{displayName(lead)}</span>
+                    {isMobile && leadHasCallablePhone(lead.phone) ? (
+                      <LeadPhoneCall
+                        phone={lead.phone}
+                        leadId={lead.id}
+                        iconOnly
+                        className="pipeline-hs-name-call"
+                      />
+                    ) : null}
                   </button>
                   {loc && <span className="pipeline-hs-sub">{loc}</span>}
                   <LeadTagDots lead={lead} tagById={tagById} className="pipeline-hs-tags" max={6} />

@@ -1821,6 +1821,11 @@ textarea {
   max-width: 100%;
 }
 
+.pipeline-hs-name-call {
+  flex-shrink: 0;
+  margin-left: 0.15rem;
+}
+
 .pipeline-hs-avatar {
   display: inline-flex;
   align-items: center;
@@ -1924,8 +1929,8 @@ textarea {
 .lead-phone-call__icon {
   width: 1.375rem;
   height: 1.375rem;
-  object-fit: contain;
   display: block;
+  color: #16a34a;
 }
 
 .crm-kanban-card .lead-phone-call__icon {
@@ -7622,24 +7627,28 @@ details summary::-webkit-details-marker {
 
 /* Menu icon: white on dark (sidebar); black on light (nav pill, Chithi header) */
 .ci-chithi-menu-icon {
-  filter: brightness(0) invert(1);
-  opacity: 0.88;
+  flex-shrink: 0;
+  display: block;
 }
 
-.ci-chithi-menu-icon--on-light,
-.nav-item-active .ci-chithi-menu-icon {
-  filter: brightness(0);
-  opacity: 1;
+.ci-chithi-menu-icon--on-dark {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.ci-chithi-menu-icon--on-light {
+  color: #17191c;
+}
+
+.nav-item-active .ci-chithi-menu-icon--on-dark {
+  color: #fff;
 }
 
 .mobile-nav-pill__item:not(.is-active) .ci-chithi-menu-icon {
-  filter: brightness(0);
-  opacity: 0.82;
+  color: #516f90;
 }
 
 .mobile-nav-pill__item.is-active .ci-chithi-menu-icon {
-  filter: brightness(0) invert(1);
-  opacity: 1;
+  color: #fff;
 }
 
 /* Chithi full-screen: main fills width; CRM sidebar hidden on desktop (stays in DOM for stable nav) */

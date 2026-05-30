@@ -1,7 +1,6 @@
 import { useLeadPhoneCall } from '../../hooks/useLeadPhoneCall'
 import { leadHasCallablePhone } from '../../lib/phoneUtils'
-
-const PHONE_ICON_SRC = `${import.meta.env.BASE_URL || '/'}phone-call-icon.png`
+import { PhoneCallIcon } from '../ui/icons'
 
 /**
  * Phone number with click-to-call icon — uses device dialer (`tel:`) and logs activity on the lead.
@@ -57,7 +56,7 @@ export default function LeadPhoneCall({
         title={logging ? 'Logging call…' : `Call ${display}`}
         aria-label={`Call ${display}`}
       >
-        <img src={PHONE_ICON_SRC} alt="" className="lead-phone-call__icon" draggable={false} />
+        <PhoneCallIcon className="lead-phone-call__icon" />
       </button>
     </span>
   )
