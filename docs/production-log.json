@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-05-30T14:50:00.195Z",
-  "updatedAtIst": "30/05/2026, 20:20:00",
+  "updatedAt": "2026-05-30T14:54:00.476Z",
+  "updatedAtIst": "30/05/2026, 20:24:00",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "f65acc0",
+  "currentProductionCommit": "e232928",
   "entries": [
+    {
+      "logId": "20260530-2023-e232928",
+      "commit": "e232928",
+      "commitFull": "e2329287c649445ef145e805ac161d916cf0d94e",
+      "message": "Keep leads action and filter labels visible on all viewports.",
+      "deployedAt": "2026-05-30T14:53:46.033Z",
+      "deployedAtIst": "30/05/2026, 20:23:46",
+      "committedAtIst": "30/05/2026, 20:23:18",
+      "vercelPreviewUrl": "https://connect-intel-pqm5anllm-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- e232928"
+    },
+    {
+      "logId": "20260530-2020-2ba48fe",
+      "commit": "2ba48fe",
+      "commitFull": "2ba48fe446ae4745daabd31827f31d6ab50647bb",
+      "message": "Update production log after leads mobile UI deploy.",
+      "deployedAt": "2026-05-30T14:50:32.410Z",
+      "deployedAtIst": "30/05/2026, 20:20:32",
+      "committedAtIst": "30/05/2026, 20:20:05",
+      "vercelPreviewUrl": "https://connect-intel-77y4cidjl-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 2ba48fe"
+    },
     {
       "logId": "20260530-2019-f65acc0",
       "commit": "f65acc0",
@@ -15,7 +43,7 @@
       "committedAtIst": "30/05/2026, 20:19:18",
       "vercelPreviewUrl": "https://connect-intel-e766efbj0-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- f65acc0"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 5b352c8"
-    },
-    {
-      "logId": "20260530-1907-ba876b1",
-      "commit": "ba876b1",
-      "commitFull": "ba876b17532679035665f4cc53d70f807916e796",
-      "message": "Restore native keyboard shortcuts and selectable text across the CRM.",
-      "deployedAt": "2026-05-30T13:37:21.444Z",
-      "deployedAtIst": "30/05/2026, 19:07:21",
-      "committedAtIst": "30/05/2026, 19:06:50",
-      "vercelPreviewUrl": "https://connect-intel-nkt8tztzz-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- ba876b1"
-    },
-    {
-      "logId": "20260530-1903-39a73d0",
-      "commit": "39a73d0",
-      "commitFull": "39a73d0042deaa32f46b970d20212525052ee68f",
-      "message": "Update production log after browser back navigation deploy.",
-      "deployedAt": "2026-05-30T13:33:06.094Z",
-      "deployedAtIst": "30/05/2026, 19:03:06",
-      "committedAtIst": "30/05/2026, 19:02:39",
-      "vercelPreviewUrl": "https://connect-intel-nppukrvef-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 39a73d0"
     }
   ]
 }
