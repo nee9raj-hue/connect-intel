@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-05-30T13:03:58.403Z",
-  "updatedAtIst": "30/05/2026, 18:33:58",
+  "updatedAt": "2026-05-30T13:23:27.061Z",
+  "updatedAtIst": "30/05/2026, 18:53:27",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "86758c3",
+  "currentProductionCommit": "3a50742",
   "entries": [
+    {
+      "logId": "20260530-1853-3a50742",
+      "commit": "3a50742",
+      "commitFull": "3a50742ec63a019c09bee1863d32921a994549f6",
+      "message": "Scope team metrics to selected rep with drill-down and persistent assignee filter.",
+      "deployedAt": "2026-05-30T13:23:17.842Z",
+      "deployedAtIst": "30/05/2026, 18:53:17",
+      "committedAtIst": "30/05/2026, 18:52:47",
+      "vercelPreviewUrl": "https://connect-intel-ktmmp32ke-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 3a50742"
+    },
+    {
+      "logId": "20260530-1834-ba8fedc",
+      "commit": "ba8fedc",
+      "commitFull": "ba8fedccc0050f6e3cb9c5cd69239dfca9b301b8",
+      "message": "Update production log after mobile leads horizontal scroll deploy.",
+      "deployedAt": "2026-05-30T13:04:31.614Z",
+      "deployedAtIst": "30/05/2026, 18:34:31",
+      "committedAtIst": "30/05/2026, 18:34:02",
+      "vercelPreviewUrl": "https://connect-intel-jafcb6sj0-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- ba8fedc"
+    },
     {
       "logId": "20260530-1833-86758c3",
       "commit": "86758c3",
@@ -15,7 +43,7 @@
       "committedAtIst": "30/05/2026, 18:33:13",
       "vercelPreviewUrl": "https://connect-intel-463sqkpgy-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 86758c3"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 2848646"
-    },
-    {
-      "logId": "20260530-1720-8e02383",
-      "commit": "8e02383",
-      "commitFull": "8e02383582e9fbcee30c4d5eaad50b6e99a73d8e",
-      "message": "Add production safety: CI gate, deploy verify, and rollback log.",
-      "deployedAt": "2026-05-30T11:50:57.355Z",
-      "deployedAtIst": "30/05/2026, 17:20:57",
-      "committedAtIst": "30/05/2026, 17:20:25",
-      "vercelPreviewUrl": "https://connect-intel-4o0oimmtj-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 8e02383"
-    },
-    {
-      "logId": "20260530-1709-3db2f52",
-      "commit": "3db2f52",
-      "commitFull": "3db2f52fc53ee685e697ec14149cd057ae28853d",
-      "message": "Fix marketing Lists filters and simplify Lists tab chrome.",
-      "deployedAt": "2026-05-30T11:39:55.684Z",
-      "deployedAtIst": "30/05/2026, 17:09:55",
-      "committedAtIst": "30/05/2026, 17:09:26",
-      "vercelPreviewUrl": "https://connect-intel-82rrb9bd1-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 3db2f52"
     }
   ]
 }
