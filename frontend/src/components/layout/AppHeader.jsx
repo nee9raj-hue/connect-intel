@@ -14,11 +14,12 @@ export default function AppHeader({ onNavigate, sidebarMode = 'expanded', onTogg
     <header className="shrink-0 flex items-center justify-between gap-2 border-b border-[#e5e9ee] bg-white px-4 py-2.5">
       <SidebarToggleButton mode={sidebarMode} onToggle={onToggleSidebarCollapsed} className="shrink-0" />
       <div className="ci-app-header-chips flex items-center justify-end gap-2 flex-1 min-w-0">
+        <div id="ci-app-header-pipeline-slot" className="ci-app-header-pipeline-slot md:hidden" />
         <NotificationBell />
         <button
           type="button"
           onClick={() => onNavigate?.('search')}
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#d9dee5] bg-[#f7f9fb] px-2.5 py-1.5 md:px-3 text-[11px] font-semibold tracking-[-0.015em] text-[#202938] transition-colors hover:bg-[#eef2f6]"
+          className="ci-app-header-chip ci-app-header-chip--secondary inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#d9dee5] bg-[#f7f9fb] px-2.5 py-1.5 md:px-3 text-[11px] font-semibold tracking-[-0.015em] text-[#202938] transition-colors hover:bg-[#eef2f6]"
           title={`AI credits: Rs ${credits}`}
           aria-label={`AI credits: Rs ${credits}`}
         >
@@ -29,7 +30,7 @@ export default function AppHeader({ onNavigate, sidebarMode = 'expanded', onTogg
         <button
           type="button"
           onClick={() => onNavigate?.('team')}
-          className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1.5 md:px-3 text-[11px] font-semibold tracking-[-0.015em] transition-colors ${
+          className={`ci-app-header-chip ci-app-header-chip--secondary inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1.5 md:px-3 text-[11px] font-semibold tracking-[-0.015em] transition-colors ${
             subscriptionActive
               ? 'border-[#b8e3d2] bg-[#eefaf5] text-[#0f6a4c]'
               : 'border-[#d9dee5] bg-white text-[#536072] hover:bg-[#f7f9fb]'

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { formatCrmDate, getStatusMeta, getVisiblePipelineColumns } from '../../lib/crmConstants'
@@ -15,6 +16,7 @@ import PipelineViewSettings from './PipelineViewSettings'
 import PipelineLeadsTable from './PipelineLeadsTable'
 import LeadTagDots from './LeadTagDots'
 import PipelineFiltersBar, { DEFAULT_PIPELINE_FILTERS } from './PipelineFiltersBar'
+import PipelineMobileHeaderChrome from './PipelineMobileHeaderChrome'
 import BulkWhatsAppModal from './BulkWhatsAppModal'
 import {
   applyPipelineFilters,
@@ -367,6 +369,37 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     pipelineLoad.hasMore ||
     (pipelineLoad.total > pipelineLoad.loaded && pipelineLoad.loaded > 0)
 
+  const mobileHeaderStats = useMemo(() => {
+    if (assigneeName) return `Viewing ${assigneeName}`
+    if (savedLeads.length === 0) return null
+    const parts = []
+    if (stageListMode) parts.push(getStatusMeta(filter).label)
+    parts.push(`${pipelineSummary.total.toLocaleString()} leads`)
+    if (hasMoreLeads) parts.push(`${pipelineLoad.loaded.toLocaleString()} loaded`)
+    return parts.join(' · ')
+  }, [
+    assigneeName,
+    savedLeads.length,
+    stageListMode,
+    filter,
+    pipelineSummary.total,
+    hasMoreLeads,
+    pipelineLoad.loaded,
+  ])
+
+  const [mobileHeaderSlot, setMobileHeaderSlot] = useState(null)
+
+  useEffect(() => {
+    if (!isMobile) {
+      setMobileHeaderSlot(null)
+      document.documentElement.removeAttribute('data-pipeline-mobile')
+      return undefined
+    }
+    document.documentElement.setAttribute('data-pipeline-mobile', '1')
+    setMobileHeaderSlot(document.getElementById('ci-app-header-pipeline-slot'))
+    return () => document.documentElement.removeAttribute('data-pipeline-mobile')
+  }, [isMobile])
+
   const handleLoadMore = useCallback(() => {
     loadMorePipelineLeads(serverFilters)
   }, [loadMorePipelineLeads, serverFilters])
@@ -524,6 +557,20 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   }, [])
 
   return (
+    <>
+      {isMobile && mobileHeaderSlot
+        ? createPortal(
+            <PipelineMobileHeaderChrome
+              statsText={mobileHeaderStats}
+              stageListMode={stageListMode}
+              view={view}
+              onViewChange={setView}
+              onImport={() => setImportOpen(true)}
+              onAdd={() => setAddOpen(true)}
+            />,
+            mobileHeaderSlot
+          )
+        : null}
     <div
       className={`flex h-full min-h-0 w-full overflow-hidden relative bg-[var(--color-hs-canvas)] ${
         selectedLead && useHubSpotList ? 'pipeline-split-record' : ''
@@ -535,7 +582,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
         } ${useHubSpotList ? 'pipeline-list-workspace' : ''}`}
       >
         <header className="crm-page-header pipeline-page-header">
-          <div className="crm-page-header-top pipeline-page-header-top">
+          <div className="crm-page-header-top pipeline-page-header-top hidden md:flex">
             <div className="pipeline-page-heading min-w-0">
               <img
                 src={BRAND_ICON_PIPELINE}
@@ -877,6 +924,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
         }}
       />
     </div>
+    </>
   )
 }
 

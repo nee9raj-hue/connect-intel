@@ -123,8 +123,8 @@ export default function PipelineMobileFilterSheet({ open, title, onClose, onSave
         aria-modal="true"
         aria-label={title}
       >
-        <header className="hs-pipeline-filters-sheet__header">
-          <h2 className="hs-pipeline-filters-sheet__title">{title}</h2>
+        <header className="hs-pipeline-filters-sheet__header hs-pipeline-filter-sheet__header">
+          <h2 className="hs-pipeline-filters-sheet__title crm-filter-menu-header-title">{title}</h2>
           <button type="button" className="crm-filter-menu-sheet-close" onClick={onClose} aria-label="Close">
             ×
           </button>
@@ -132,8 +132,8 @@ export default function PipelineMobileFilterSheet({ open, title, onClose, onSave
 
         <div className="hs-pipeline-filters-sheet__body hs-pipeline-filter-sheet__body">{children}</div>
 
-        <footer className="hs-pipeline-filters-sheet__footer">
-          <button type="button" className="crm-filter-action-btn is-primary" onClick={onSave}>
+        <footer className="hs-pipeline-filters-sheet__footer hs-pipeline-filter-sheet__footer">
+          <button type="button" className="crm-filter-action-btn is-primary hs-pipeline-filter-sheet__save" onClick={onSave}>
             {saveLabel}
           </button>
         </footer>

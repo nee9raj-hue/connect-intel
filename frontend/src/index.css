@@ -8158,6 +8158,100 @@ details summary::-webkit-details-marker {
   justify-content: flex-end;
 }
 
+.hs-pipeline-filter-sheet__header {
+  min-height: 2.75rem;
+}
+
+.hs-pipeline-filter-sheet__save {
+  min-width: 7.5rem;
+  max-width: none;
+  flex: 0 1 auto;
+}
+
+.hs-pipeline-filter-sheet .hs-pipeline-filters-sheet__option {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #33475b;
+  padding: 0.5rem 0.85rem;
+}
+
+.hs-pipeline-filter-sheet .hs-pipeline-filters-sheet__option.is-selected {
+  background: #eaf0f6;
+  font-weight: 600;
+  color: #33475b;
+}
+
+.hs-pipeline-filter-sheet .crm-filter-check-row {
+  padding: 0.5rem 0.85rem;
+  font-size: 0.8125rem;
+}
+
+.hs-pipeline-filter-sheet .crm-filter-option-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #33475b;
+}
+
+.hs-pipeline-filter-sheet .crm-filter-search-input {
+  font-size: 0.8125rem;
+  border-color: #cbd6e2;
+  border-radius: 3px;
+}
+
+.hs-pipeline-filter-sheet .hs-pipeline-filter-sheet__list-wrap {
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(15, 36, 56, 0.06);
+}
+
+/* Mobile pipeline chrome in app header */
+.ci-app-header-pipeline-slot {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  flex: 1 1 auto;
+  justify-content: flex-end;
+}
+
+.ci-pipeline-mobile-header {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.ci-pipeline-mobile-header__stats {
+  margin: 0;
+  font-size: 0.625rem;
+  font-weight: 500;
+  color: #647185;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 5.5rem;
+}
+
+.crm-view-tabs--compact {
+  flex-shrink: 0;
+}
+
+.crm-view-tabs--compact .crm-view-tab {
+  font-size: 0.5625rem;
+  padding: 0.28rem 0.45rem;
+}
+
+.ci-pipeline-mobile-header__btn {
+  min-width: 1.875rem !important;
+  min-height: 1.875rem !important;
+  padding: 0.28rem !important;
+  border-radius: 8px;
+}
+
+html[data-pipeline-mobile="1"] .ci-app-header-chip--secondary {
+  display: none;
+}
+
 @media (max-width: 767px) {
   .crm-toolbar--hubspot,
   .crm-toolbar--hubspot .hs-filter-bar-top,
@@ -8165,10 +8259,69 @@ details summary::-webkit-details-marker {
     overflow: visible;
   }
 
+  .pipeline-page-header {
+    padding-top: 0.2rem;
+    padding-bottom: 0;
+  }
+
+  .pipeline-page-header .crm-toolbar--hubspot {
+    margin-top: 0;
+    padding-top: 0.3rem;
+    padding-bottom: 0.25rem;
+    border-top: none;
+  }
+
+  .crm-toolbar--hubspot .hs-filter-bar-top {
+    flex-wrap: nowrap;
+    gap: 0.25rem;
+    padding-bottom: 0.15rem;
+  }
+
+  .crm-toolbar--hubspot .hs-filter-search {
+    flex: 0 1 5.5rem;
+    max-width: 5.5rem;
+    min-width: 4rem;
+  }
+
+  .crm-toolbar--hubspot .crm-search-wrap--hubspot {
+    max-width: 5.5rem;
+    min-width: 4rem;
+  }
+
+  .crm-toolbar--hubspot .crm-search-input--hubspot {
+    min-height: 1.75rem;
+    height: 1.75rem;
+    font-size: 0.6875rem;
+    padding: 0.2rem 0.35rem 0.2rem 1.45rem;
+  }
+
+  .crm-toolbar--hubspot .crm-search-wrap--hubspot .crm-search-icon {
+    width: 0.7rem;
+    height: 0.7rem;
+    left: 0.4rem;
+  }
+
   .crm-toolbar--hubspot .hs-filter-icon-strip {
-    max-width: min(100%, 100%);
-    flex: 1;
+    max-width: none;
+    flex: 1 1 auto;
     min-width: 0;
+    gap: 0.2rem;
+  }
+
+  .crm-toolbar--hubspot .hs-filter-icon-btn {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+
+  .crm-toolbar--hubspot .hs-filter-icon-btn .ci-ui-icon {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+
+  .crm-toolbar--hubspot .hs-filter-gear-btn {
+    width: 1.75rem;
+    height: 1.75rem;
+    flex-shrink: 0;
   }
 }
 
