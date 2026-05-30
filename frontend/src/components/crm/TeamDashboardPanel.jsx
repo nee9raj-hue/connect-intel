@@ -12,6 +12,7 @@ import {
   DashboardSegmented,
   DashboardEmpty,
 } from '../dashboard/dashboardUi'
+import { hasWorkspaceFeature } from '../../lib/workspaceFeatures'
 
 const KPI = [
   { key: 'totalLeads', label: 'Pipeline leads', nav: 'pipeline', icon: 'pipeline' },
@@ -109,6 +110,24 @@ export default function TeamDashboardPanel({ onNavigate }) {
       ) : null}
     </>
   )
+
+  if (user && !hasWorkspaceFeature(user, 'homeTeamMetrics')) {
+    return (
+      <div className="p-8 text-center text-sm text-[#516f90] max-w-md mx-auto">
+        <h2 className="text-lg font-semibold text-[#33475b] mb-2">Team metrics not enabled</h2>
+        <p className="leading-relaxed">
+          This page is optional. Company admins can enable it under <strong>Team → Workspace modules</strong>.
+        </p>
+        <button
+          type="button"
+          className="mt-4 crm-btn crm-btn-primary"
+          onClick={() => onNavigate?.('team')}
+        >
+          Workspace settings
+        </button>
+      </div>
+    )
+  }
 
   return (
     <DashboardShell

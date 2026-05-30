@@ -1,17 +1,19 @@
 import { useEffect, useState } from 'react'
 
-const QUERY = '(max-width: 767px)'
+/** True when viewport is below `breakpointPx` (default tablet breakpoint). */
+export default function useIsMobile(breakpointPx = 768) {
+  const [mobile, setMobile] = useState(() => {
+    if (typeof window === 'undefined') return false
+    return window.matchMedia(`(max-width: ${breakpointPx - 1}px)`).matches
+  })
 
-export default function useIsMobile() {
-  const [mobile, setMobile] = useState(() =>
-    typeof window !== 'undefined' ? window.matchMedia(QUERY).matches : false
-  )
   useEffect(() => {
-    const mq = window.matchMedia(QUERY)
-    const fn = () => setMobile(mq.matches)
-    fn()
-    mq.addEventListener('change', fn)
-    return () => mq.removeEventListener('change', fn)
-  }, [])
+    const mq = window.matchMedia(`(max-width: ${breakpointPx - 1}px)`)
+    const onChange = () => setMobile(mq.matches)
+    onChange()
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [breakpointPx])
+
   return mobile
 }

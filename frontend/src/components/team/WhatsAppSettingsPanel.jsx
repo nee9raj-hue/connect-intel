@@ -8,7 +8,7 @@ export default function WhatsAppSettingsPanel({ onNavigate }) {
   const canConfigure = isCompanyAdmin || isIndividual
 
   return (
-    <div className="panel-shell bg-[#f6f7f9]">
+    <div className="panel-shell">
       <header className="shrink-0 bg-white border-b border-gray-200 px-5 py-4">
         <h1 className="text-lg font-semibold text-gray-900">WhatsApp Business API</h1>
         <p className="text-xs text-gray-500 mt-0.5 max-w-2xl leading-relaxed">
@@ -37,7 +37,7 @@ export default function WhatsAppSettingsPanel({ onNavigate }) {
               <button
                 type="button"
                 onClick={() => onNavigate('team')}
-                className="mt-3 text-xs font-semibold text-[#5b4a00] underline"
+                className="mt-3 text-xs font-semibold text-[#FF773D] underline"
               >
                 Go to Team settings
               </button>
@@ -52,7 +52,7 @@ export default function WhatsAppSettingsPanel({ onNavigate }) {
                 href="https://developers.facebook.com/docs/whatsapp/cloud-api/get-started"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#5b4a00] underline"
+                className="text-[#FF773D] underline"
               >
                 Meta Business Manager
               </a>

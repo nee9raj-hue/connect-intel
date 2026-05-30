@@ -40,7 +40,7 @@ export function DashboardNavIcon({ name, className = 'dashboard-icon' }) {
 
 export function DashboardShell({ title, subtitle, actions, children }) {
   return (
-    <div className="dashboard-workspace panel-shell panel-scroll-page">
+    <div className="dashboard-workspace panel-shell panel-scroll-page hs-canvas">
       <header className="dashboard-page-header">
         <div className="dashboard-page-header-top">
           <div className="min-w-0">

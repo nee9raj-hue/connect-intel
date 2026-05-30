@@ -132,7 +132,7 @@ export default function RichTextEditor({
             <button
               type="button"
               onClick={applyFormat}
-              className="text-[10px] font-semibold px-2 py-1 rounded bg-[#ffcb2b] text-[#242424]"
+              className="text-[10px] font-semibold px-2 py-1 rounded bg-[#FF773D] text-[#242424]"
             >
               Apply to selection
             </button>
@@ -203,7 +203,7 @@ export default function RichTextEditor({
         onMouseUp={updateSelectionState}
         onKeyUp={updateSelectionState}
         onPaste={handlePaste}
-        className={`rich-text-editor w-full text-sm border border-gray-200 rounded-lg px-3 py-2.5 bg-white focus:ring-2 focus:ring-[#ffcb2b]/40 focus:border-[#ffcb2b] empty:before:content-[attr(data-placeholder)] empty:before:text-gray-400 ${
+        className={`rich-text-editor w-full text-sm border border-gray-200 rounded-lg px-3 py-2.5 bg-white focus:ring-2 focus:ring-[#FF773D]/40 focus:border-[#FF773D] empty:before:content-[attr(data-placeholder)] empty:before:text-gray-400 ${
           singleLine ? 'min-h-[40px] whitespace-nowrap overflow-x-auto' : ''
         }`}
         style={{ minHeight: singleLine ? 40 : minHeight }}

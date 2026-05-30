@@ -4,7 +4,11 @@ import {
   IMAGE_PRESETS,
   SOCIAL_NETWORKS,
 } from '../../lib/marketingEmailTokens'
-import { applyFormBlockUrl, normalizeGoogleFormUrl } from '../../../../lib/marketingFormSchema.js'
+import {
+  applyFormBlockUrl,
+  normalizeGoogleFormUrl,
+  resolveGoogleFormUrl,
+} from '../../../../lib/marketingFormSchema.js'
 import RichTextEditor from './RichTextEditor'
 
 function AlignSelect({ value, onChange }) {
@@ -392,17 +396,23 @@ export default function MarketingBlockEditor({ block, onChange, marketingForms =
         {block.formSource === 'google' ? (
           <>
             <input
-              value={block.googleUrl || ''}
+              value={block.googleUrl || block.url || ''}
               onChange={(e) => {
-                const googleUrl = normalizeGoogleFormUrl(e.target.value) || e.target.value
-                set({ googleUrl, url: normalizeGoogleFormUrl(e.target.value) || undefined })
+                const raw = e.target.value.trim()
+                const resolved = resolveGoogleFormUrl(raw) || normalizeGoogleFormUrl(raw) || raw
+                set({
+                  formSource: 'google',
+                  formId: '',
+                  formSlug: '',
+                  googleUrl: resolved,
+                  url: resolved || undefined,
+                })
               }}
-              placeholder="https://docs.google.com/forms/d/…/viewform"
+              placeholder="https://docs.google.com/forms/… or https://forms.gle/…"
               className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
             />
             <p className="text-[10px] text-slate-500 leading-relaxed">
-              In email, Google Forms appear as a single button (recipients open the form in their browser).
-              Forms cannot be filled inside the email itself.
+              Recipients open the form in their browser (same card layout as Connect Intel forms).
             </p>
           </>
         ) : (
@@ -419,23 +429,19 @@ export default function MarketingBlockEditor({ block, onChange, marketingForms =
             ))}
           </select>
         )}
-        {block.formSource !== 'google' && (
-          <>
-            <input
-              value={block.title || ''}
-              onChange={(e) => set({ title: e.target.value })}
-              placeholder="Card title in email"
-              className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
-            />
-            <textarea
-              value={block.description || ''}
-              onChange={(e) => set({ description: e.target.value })}
-              placeholder="Short description under the title"
-              rows={2}
-              className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
-            />
-          </>
-        )}
+        <input
+          value={block.title || ''}
+          onChange={(e) => set({ title: e.target.value })}
+          placeholder="Card title in email"
+          className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
+        />
+        <textarea
+          value={block.description || ''}
+          onChange={(e) => set({ description: e.target.value })}
+          placeholder="Short description under the title"
+          rows={2}
+          className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
+        />
         <input
           value={block.buttonLabel || ''}
           onChange={(e) => set({ buttonLabel: e.target.value })}

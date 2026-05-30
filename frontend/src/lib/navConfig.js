@@ -1,4 +1,5 @@
 import { CRM_STATUSES, getVisiblePipelineColumns } from './crmConstants'
+import { isChithiPanel } from './chithiNav'
 
 export function countPipelineByStatus(leads = []) {
   const counts = { all: leads.length }
@@ -46,7 +47,17 @@ export function navTargetToOptions(target = {}) {
 }
 
 export function isNavTargetActive(activePanel, panelOptions, target) {
-  if (!target?.panel || activePanel !== target.panel) return false
+  if (!target?.panel) return false
+  if (
+    target.panel === 'chithi' &&
+    (isChithiPanel(activePanel) ||
+      (activePanel === 'team-notes' && (!target.tab || target.tab === 'notes')) ||
+      (activePanel === 'team-tasks' && target.tab === 'tasks'))
+  ) {
+    if (target.tab && panelOptions?.tab !== target.tab) return false
+    return true
+  }
+  if (activePanel !== target.panel) return false
   if (target.tab && panelOptions?.tab !== target.tab) return false
   if (target.status && (panelOptions?.status || 'all') !== target.status) return false
   if (target.panel === 'crm-calendar') {
@@ -133,8 +144,13 @@ export function buildCustomerNavSections(user, { pipelineCounts = {}, upcomingCo
       groups: [
         ...(isCompany
           ? [
-              { id: 'team-notes', label: 'Notes', icon: 'note', panel: 'team-notes' },
-              { id: 'team-tasks', label: 'Tasks', icon: 'task', panel: 'team-tasks' },
+              {
+                id: 'chithi',
+                label: 'Chithi',
+                icon: 'chithi',
+                panel: 'chithi',
+                badgeKey: 'chithi',
+              },
             ]
           : []),
       ],
@@ -197,6 +213,42 @@ export function buildOperatorNavSections() {
       ],
     },
   ]
+}
+
+/** Submenu targets for a desktop floating pill item (pipeline stages, marketing tabs, etc.). */
+export function getDesktopPillSubmenuTargets(pillItem, sections = []) {
+  if (!pillItem?.panel) return []
+
+  const groupChildren = (pred) => {
+    for (const section of sections) {
+      for (const group of section.groups || []) {
+        if (group.children?.length && pred(group)) return group.children
+      }
+    }
+    return []
+  }
+
+  if (pillItem.panel === 'pipeline') {
+    return groupChildren((g) => g.id === 'pipeline')
+  }
+  if (pillItem.panel === 'marketing') {
+    const kids = groupChildren((g) => g.id === 'marketing')
+    if (pillItem.tab) return kids.filter((c) => !c.tab || c.tab === pillItem.tab)
+    return kids
+  }
+  if (pillItem.panel === 'crm-calendar') {
+    return groupChildren((g) => g.id === 'calendar')
+  }
+  if (pillItem.panel === 'overview') {
+    return groupChildren((g) => g.id === 'home')
+  }
+  if (pillItem.panel === 'chithi' || pillItem.panel === 'team-tasks' || pillItem.panel === 'team-notes') {
+    return [
+      { id: 'chithi-chat', label: 'Messages', panel: 'chithi' },
+      { id: 'chithi-tasks', label: 'Tasks', panel: 'chithi', tab: 'tasks' },
+    ]
+  }
+  return []
 }
 
 /** Primary destinations for the mobile floating nav pill (4 shortcuts + More drawer). */

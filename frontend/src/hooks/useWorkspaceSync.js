@@ -63,7 +63,9 @@ export function useWorkspaceSync({
               item.type === 'reply' ||
               item.type === 'meeting' ||
               item.type === 'task' ||
-              item.type === 'follow_up'
+              item.type === 'follow_up' ||
+              item.type === 'team_note' ||
+              item.type === 'team_task'
             ) {
               showBrowserNotification(item)
             }

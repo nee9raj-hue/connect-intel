@@ -81,12 +81,12 @@ export function calendarRangeForView(view, anchor) {
 
 export const KIND_STYLES = {
   task: { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-900', label: 'Task' },
-  meeting: { bg: 'bg-[#fffbeb]', border: 'border-[#fde68a]', text: 'text-[#5b4a00]', label: 'Meeting' },
+  meeting: { bg: 'bg-[#fff4ee]', border: 'border-[#ffd4b8]', text: 'text-[#475569]', label: 'Meeting' },
   follow_up: { bg: 'bg-gray-50', border: 'border-gray-200', text: 'text-gray-800', label: 'Follow-up' },
   google: {
-    bg: 'bg-emerald-50',
-    border: 'border-emerald-200',
-    text: 'text-emerald-900',
+    bg: 'bg-slate-100',
+    border: 'border-slate-200',
+    text: 'text-[#64748B]',
     label: 'Google',
   },
 }

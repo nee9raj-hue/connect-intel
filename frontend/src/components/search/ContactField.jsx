@@ -32,7 +32,7 @@ export default function ContactField({
         type="button"
         onClick={() => onReveal?.(lead, field)}
         disabled={revealing}
-        className="text-[11px] font-semibold text-left text-[#8a6600] bg-[#fffbeb] border border-[#ffe48a] rounded px-2 py-1 hover:bg-[#fff4bf] disabled:opacity-60"
+        className="text-[11px] font-semibold text-left text-[#8a6600] bg-[#fff4ee] border border-[#ffd4b8] rounded px-2 py-1 hover:bg-[#fff4bf] disabled:opacity-60"
       >
         {revealing ? 'Revealing…' : `Reveal ${field} · 1 credit`}
       </button>

@@ -17,6 +17,7 @@ import {
 } from './marketingRichText.js'
 import {
   applyFormBlockUrl,
+  isGoogleFormBlock,
   mergeFormBlocksForLead,
   resolveFormBlockUrl,
 } from '../../../lib/marketingFormSchema.js'
@@ -510,14 +511,31 @@ function resolveFormBlockUrlForRender(block, lead = null) {
   return sanitizeUrl(prepared.url || resolveFormBlockUrl(prepared, { lead, appBase: canvasAppBase() }))
 }
 
-function wrapInteractiveCanvasRow(trHtml, blockIndex, renderOpts) {
-  if (!renderOpts.canvasInteractive || !trHtml?.startsWith('<tr')) return trHtml || ''
+const CANVAS_BLOCK_LABELS = {
+  header: 'Header',
+  hero: 'Hero',
+  text: 'Text',
+  image: 'Image',
+  icon: 'Icon',
+  social: 'Social icons',
+  button: 'Button',
+  form: 'Form / survey',
+  divider: 'Divider',
+  spacer: 'Spacer',
+  footer: 'Footer',
+}
+
+function wrapInteractiveCanvasRow(trHtml, blockIndex, block, renderOpts) {
+  const trimmed = (trHtml || '').trim()
+  if (!renderOpts.canvasInteractive || !/^<tr/i.test(trimmed)) return trHtml || ''
   const selected = renderOpts.selectedBlockIndex === blockIndex
+  const blockLabel = CANVAS_BLOCK_LABELS[block?.type] || block?.type || 'Section'
   const selStyle = selected
-    ? 'outline:2px solid #0d9488;outline-offset:-2px;background-color:rgba(13,148,136,0.06);'
+    ? 'outline:2px solid #0d9488;outline-offset:-2px;background-color:rgba(13,148,136,0.1);'
     : ''
-  const attrs = `data-ci-block-index="${blockIndex}" data-ci-block-selectable="true"`
-  return trHtml.replace(/^<tr>/i, `<tr ${attrs} class="ci-canvas-block-row" style="cursor:pointer;${selStyle}"`)
+  const attrs = `data-ci-block-index="${blockIndex}" data-ci-block-label="${escapeHtml(blockLabel)}" data-ci-block-selectable="true" title="Click to edit ${escapeHtml(blockLabel)}"`
+  const cls = `ci-canvas-block-row${selected ? ' is-selected' : ''}`
+  return trimmed.replace(/^<tr/i, `<tr ${attrs} class="${cls}" style="cursor:pointer;${selStyle}"`)
 }
 
 function renderBlockHtml(block, theme, renderOpts = {}) {
@@ -616,13 +634,7 @@ function renderBlockHtml(block, theme, renderOpts = {}) {
         color: block.buttonTextColor || '#ffffff',
         fontWeight: '600',
       })
-      const isGoogle = block.formSource === 'google'
-      if (isGoogle && url) {
-        const label = btn || title
-        return `<tr><td style="padding:16px 32px;background:${bg};text-align:${align};">
-        <a href="${escapeHtml(url)}" data-ci-canvas-link="1" style="display:inline-block;padding:12px 24px;background:${bgColor};text-decoration:none;border-radius:8px;${btnStyle}">${escapeHtml(label)}</a>
-      </td></tr>`
-      }
+      const isGoogle = isGoogleFormBlock(block)
       const titleStyle = textStyle(block, theme, { fontSize: 17, color: '#111827', fontWeight: '700' })
       const descStyle = textStyle(block, theme, { fontSize: 14, color: '#6b7280' })
       const badge = isGoogle
@@ -677,14 +689,15 @@ function buildEmailPresentation(blocks, design = {}, options = {}) {
   const rows = mergedBlocks
     .map((block, index) => {
       const html = renderBlockHtml(block, theme, renderOpts)
-      return wrapInteractiveCanvasRow(html, index, renderOpts)
+      return wrapInteractiveCanvasRow(html, index, block, renderOpts)
     })
     .join('')
   const preview = options.previewText
     ? `<span style="display:none!important;visibility:hidden;opacity:0;color:transparent;height:0;width:0;">${escapeHtml(options.previewText)}</span>`
     : ''
   const footer = `<tr><td style="padding:0 32px 24px;background:#ffffff;text-align:center;border-top:1px solid #f3f4f6;"><p style="margin:12px 0 0;font-size:11px;line-height:1.5;color:#9ca3af;">Your company · Unsubscribe link added when sent</p></td></tr>`
-  const innerTable = `<table role="presentation" width="${width}" cellspacing="0" cellpadding="0" style="max-width:${width}px;width:100%;background:${theme.contentBackground};border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06);">${rows}${footer}</table>`
+  const tableOverflow = renderOpts.canvasInteractive ? 'overflow:visible;' : 'overflow:hidden;'
+  const innerTable = `<table role="presentation" width="${width}" cellspacing="0" cellpadding="0" style="max-width:${width}px;width:100%;background:${theme.contentBackground};border-radius:12px;${tableOverflow}box-shadow:0 1px 3px rgba(0,0,0,0.06);">${rows}${footer}</table>`
   const outerTable = `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:${theme.backgroundColor};padding:24px 12px;"><tr><td align="center">${innerTable}</td></tr></table>`
   return { theme, width, preview, outerTable }
 }

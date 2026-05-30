@@ -60,7 +60,7 @@ export default function CrmSequencesPanel() {
   }
 
   return (
-    <div className="panel-shell bg-[#f6f7f9]">
+    <div className="panel-shell">
       <header className="shrink-0 bg-white border-b border-gray-200 px-5 py-4">
         <h1 className="text-lg font-semibold text-gray-900">Sales sequences</h1>
         <p className="text-xs text-gray-500 mt-0.5">
@@ -150,7 +150,7 @@ export default function CrmSequencesPanel() {
                     type="button"
                     disabled={busy}
                     onClick={create}
-                    className="text-xs font-semibold px-4 py-1.5 rounded-lg bg-[#ffcb2b] text-[#242424] disabled:opacity-40"
+                    className="text-xs font-semibold px-4 py-1.5 rounded-lg bg-[#FF773D] text-[#242424] disabled:opacity-40"
                   >
                     Save sequence
                   </button>

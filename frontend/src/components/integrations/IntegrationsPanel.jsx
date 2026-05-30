@@ -65,7 +65,7 @@ export default function IntegrationsPanel() {
   if (!isOperator) {
     const isCompanyAdmin = user?.isOrgAdmin && user?.accountType === 'company'
     return (
-      <div className="panel-shell bg-[#f6f7f9]">
+      <div className="panel-shell">
         <div className="panel-body-scroll p-6 max-w-3xl">
         <h1 className="text-lg font-semibold text-gray-900 mb-2">Connected services</h1>
         <p className="text-sm text-gray-600 mb-6 leading-relaxed">
@@ -99,7 +99,7 @@ export default function IntegrationsPanel() {
   const storageLabel = status?.storage === 'supabase' ? 'Cloud database' : 'Local database'
 
   return (
-    <div className="panel-shell bg-[#f6f7f9]">
+    <div className="panel-shell">
       <div className="panel-body-scroll p-6 max-w-3xl">
       <p className="text-sm text-gray-600 mb-6 leading-relaxed">
         <strong>Platform operator view.</strong> Internal service status for Connect Intel operations.
@@ -161,9 +161,9 @@ export default function IntegrationsPanel() {
         </p>
       </section>
 
-      <section className="mb-8 rounded-xl border-2 border-[#ffe48a] bg-[#fffbeb] p-4 space-y-3">
+      <section className="mb-8 rounded-xl border-2 border-[#ffd4b8] bg-[#fff4ee] p-4 space-y-3">
         <h2 className="text-sm font-semibold text-[#242424]">Team invite email (required for Team invites)</h2>
-        <p className="text-xs text-[#5b4a00] leading-relaxed">
+        <p className="text-xs text-[#FF773D] leading-relaxed">
           Production status:{' '}
           <strong>{status?.inviteEmailReady ? 'Connected' : 'Not connected'}</strong>
           {status?.inviteFromAddress ? ` · From ${status.inviteFromAddress}` : ''}

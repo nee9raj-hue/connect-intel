@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import useFullPageFilterMenus from '../../hooks/useFullPageFilterMenus'
+import useIsMobile from '../../hooks/useIsMobile'
 import { api } from '../../lib/api'
 import {
   BRAND_ICON_ADVANCE_FILTER,
@@ -13,7 +13,6 @@ import { CONTACT_FILTER_OPTIONS, DEFAULT_PIPELINE_FILTERS, getFilterCities, getF
 import FilterDropdown, { FilterChipButton } from './FilterDropdown'
 import LeadTag from '../ui/LeadTag'
 import FilterToolbarIcon from '../ui/FilterToolbarIcon'
-import MobileFilterFullPage from '../ui/MobileFilterFullPage'
 import { SettingsIcon } from '../ui/icons'
 
 const SMART_TAG_OPTIONS = [
@@ -54,7 +53,7 @@ export default function PipelineFiltersBar({
   const advancedRef = useRef(null)
   const advancedPanelRef = useRef(null)
   const advancedOpenedAtRef = useRef(0)
-  const fullPageMenus = useFullPageFilterMenus()
+  const isMobile = useIsMobile()
   const set = (patch) => onFiltersChange({ ...filters, ...patch })
 
   const closeAdvanced = useCallback(() => setAdvancedOpen(false), [])
@@ -92,6 +91,15 @@ export default function PipelineFiltersBar({
     }
   }, [advancedOpen, closeAdvanced])
 
+  useEffect(() => {
+    if (!advancedOpen || !isMobile) return undefined
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = prev
+    }
+  }, [advancedOpen, isMobile])
+
   const handleApply = () => onApplyFilters?.()
 
   const cityOptions = cities.map((c) => ({ label: c, value: c }))
@@ -116,26 +124,35 @@ export default function PipelineFiltersBar({
   const activeStageLabel = statusOptions.find((s) => s.id === statusFilter)?.label
   const activeContactLabel = CONTACT_FILTER_OPTIONS.find((o) => o.id === appliedFilters.contact)?.label
 
-  const advancedFooter = (
-    <div className="hs-advanced-filter-footer">
-      <button type="button" className="crm-filter-link-btn" onClick={onClearFilters}>
-        Clear all
-      </button>
-      <button
-        type="button"
-        className="crm-filter-menu-footer-apply"
-        onClick={() => {
-          handleApply()
-          closeAdvanced()
-        }}
-      >
-        Apply
-      </button>
-    </div>
-  )
-
-  const advancedBody = (
-    <>
+  const advancedPanel = advancedOpen ? (
+    <div
+      ref={advancedPanelRef}
+      className={`hs-advanced-filter-panel ${isMobile ? 'hs-advanced-filter-panel--mobile-sheet' : ''}`}
+      role="dialog"
+      aria-label="Advanced filters"
+      style={
+        isMobile
+          ? {
+              position: 'fixed',
+              left: 0,
+              right: 0,
+              bottom: 0,
+              top: 'auto',
+              zIndex: 1200,
+              width: '100%',
+              maxWidth: '100%',
+            }
+          : undefined
+      }
+    >
+      {isMobile && (
+        <div className="crm-filter-menu-header crm-filter-menu-header--sheet">
+          <span className="crm-filter-menu-header-title">Advanced filters</span>
+          <button type="button" className="crm-filter-menu-sheet-close" onClick={closeAdvanced} aria-label="Close">
+            ×
+          </button>
+        </div>
+      )}
       {savedViews.length > 0 && (
         <div className="hs-advanced-filter-section">
           <p className="hs-advanced-filter-label">Saved views</p>
@@ -194,18 +211,22 @@ export default function PipelineFiltersBar({
           emptyLabel="Any"
         />
       </div>
-    </>
-  )
 
-  const advancedPanel = advancedOpen ? (
-    <div
-      ref={advancedPanelRef}
-      className={`hs-advanced-filter-panel ${fullPageMenus ? 'hs-advanced-filter-panel--mobile-fullpage' : ''}`}
-      role="dialog"
-      aria-label="Advanced filters"
-    >
-      {advancedBody}
-      {!fullPageMenus ? advancedFooter : null}
+      <div className="hs-advanced-filter-footer">
+        <button type="button" className="crm-filter-link-btn" onClick={onClearFilters}>
+          Clear all
+        </button>
+        <button
+          type="button"
+          className="crm-filter-menu-footer-apply"
+          onClick={() => {
+            handleApply()
+            closeAdvanced()
+          }}
+        >
+          Apply
+        </button>
+      </div>
     </div>
   ) : null
 
@@ -311,19 +332,20 @@ export default function PipelineFiltersBar({
               }}
             />
 
-            {advancedOpen && !fullPageMenus && advancedPanel}
+            {advancedOpen && !isMobile && advancedPanel}
           </div>
           {advancedOpen &&
-            fullPageMenus &&
+            isMobile &&
             createPortal(
-              <MobileFilterFullPage
-                open
-                onClose={closeAdvanced}
-                title="Advanced filters"
-                footer={advancedFooter}
-              >
+              <>
+                <button
+                  type="button"
+                  className="ci-filter-menu-backdrop"
+                  aria-label="Close advanced filters"
+                  onClick={closeAdvanced}
+                />
                 {advancedPanel}
-              </MobileFilterFullPage>,
+              </>,
               document.body
             )}
         </div>

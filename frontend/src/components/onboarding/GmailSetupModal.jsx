@@ -152,7 +152,7 @@ export default function GmailSetupModal({ onDone }) {
           type="button"
           onClick={connect}
           disabled={connecting}
-          className="w-full py-2.5 text-sm font-semibold bg-[#ffcb2b] text-[#242424] rounded-lg disabled:opacity-50"
+          className="w-full py-2.5 text-sm font-semibold bg-[#FF773D] text-[#242424] rounded-lg disabled:opacity-50"
         >
           {connecting ? 'Connecting…' : needsUpgrade ? 'Allow reply import' : 'Connect work email'}
         </button>

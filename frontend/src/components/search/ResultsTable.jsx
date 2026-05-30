@@ -40,7 +40,7 @@ export default function ResultsTable({
         </thead>
         <tbody>
           {leads.map((lead) => (
-            <tr key={lead.id} className="border-b border-gray-100 hover:bg-[#fffbeb]/40 group">
+            <tr key={lead.id} className="border-b border-gray-100 hover:bg-[#fff4ee]/40 group">
               <td className="py-2.5 pl-4 align-top">
                 <input
                   type="checkbox"
@@ -103,7 +103,7 @@ export default function ResultsTable({
                     <button
                       type="button"
                       onClick={() => onWorkOnLead(lead)}
-                      className="text-[11px] font-semibold px-2 py-1.5 rounded border border-[#8a6600]/30 text-[#8a6600] bg-[#fffbeb] hover:bg-[#fff4bf]"
+                      className="text-[11px] font-semibold px-2 py-1.5 rounded border border-[#8a6600]/30 text-[#8a6600] bg-[#fff4ee] hover:bg-[#fff4bf]"
                     >
                       Pipeline
                     </button>
@@ -136,7 +136,7 @@ function Avatar({ name }) {
     .join('')
     .slice(0, 2)
   return (
-    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-[11px] font-bold text-gray-600 shrink-0">
+    <div className="w-8 h-8 rounded-full bg-[#FF773D] flex items-center justify-center text-[11px] font-bold text-white shrink-0">
       {initials}
     </div>
   )
@@ -159,7 +159,7 @@ function SourceBadge({ source }) {
 function MiniBadge({ children, tone = 'gray' }) {
   const classes = {
     amber: 'bg-amber-50 text-amber-700 border-amber-200',
-    green: 'bg-green-50 text-green-700 border-green-200',
+    green: 'bg-slate-100 text-[#64748B] border-slate-200',
     gray: 'bg-gray-50 text-gray-600 border-gray-200',
   }
 
@@ -169,6 +169,6 @@ function MiniBadge({ children, tone = 'gray' }) {
 function ScoreBadge({ score }) {
   const n = score || 0
   const cls =
-    n >= 85 ? 'bg-green-100 text-green-800' : n >= 70 ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-600'
+    n >= 85 ? 'bg-[#fff4ee] text-[#FF773D]' : n >= 70 ? 'bg-slate-100 text-[#64748B]' : 'bg-gray-100 text-gray-600'
   return <span className={`inline-block px-1.5 py-0.5 rounded text-[11px] font-bold ${cls}`}>{n}</span>
 }

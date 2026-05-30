@@ -70,6 +70,42 @@ export function AppProvider({ children }) {
   })
   const [contactsFocusId, setContactsFocusId] = useState(null)
   const [calendarFocus, setCalendarFocus] = useState(null)
+  const [chithiUnread, setChithiUnread] = useState({ messages: 0, tasks: 0, total: 0 })
+
+  const refreshChithiUnread = useCallback(async () => {
+    if (user?.accountType !== 'company' || !user?.organizationId) {
+      setChithiUnread({ messages: 0, tasks: 0, total: 0 })
+      return
+    }
+    try {
+      const data = await api.getChithiSummary()
+      setChithiUnread(data.unread || { messages: 0, tasks: 0, total: 0 })
+    } catch {
+      // ignore polling errors
+    }
+  }, [user?.accountType, user?.organizationId])
+
+  const markChithiSeen = useCallback(async () => {
+    try {
+      const data = await api.markChithiSeen()
+      if (data.user) {
+        setUser((prev) => {
+          if (!prev) return data.user
+          return {
+            ...prev,
+            ...data.user,
+            isOrgAdmin: data.user.isOrgAdmin ?? prev.isOrgAdmin,
+            isPlatformAdmin: data.user.isPlatformAdmin ?? prev.isPlatformAdmin,
+            accountType: data.user.accountType ?? prev.accountType,
+            orgRole: data.user.orgRole ?? prev.orgRole,
+          }
+        })
+      }
+      setChithiUnread(data.unread || { messages: 0, tasks: 0, total: 0 })
+    } catch {
+      // ignore
+    }
+  }, [])
 
   const refreshSession = useCallback(async () => {
     try {
@@ -104,6 +140,14 @@ export function AppProvider({ children }) {
       return []
     }
   }, [user?.organizationId, user?.accountType])
+
+  useEffect(() => {
+    if (user?.accountType === 'company' && user?.organizationId) {
+      void refreshChithiUnread()
+    } else {
+      setChithiUnread({ messages: 0, tasks: 0, total: 0 })
+    }
+  }, [user?.id, user?.accountType, user?.organizationId, refreshChithiUnread])
 
   const refreshOrgLeadTags = useCallback(async () => {
     if (user?.accountType !== 'company' || !user?.organizationId) {
@@ -681,7 +725,12 @@ export function AppProvider({ children }) {
         return
       }
 
-      if (target.panel === 'team-notes' || target.panel === 'team-tasks') {
+      if (
+        target.panel === 'chithi' ||
+        target.panel === 'team-hub' ||
+        target.panel === 'team-notes' ||
+        target.panel === 'team-tasks'
+      ) {
         if (target.leadId) {
           openPipelineLead(target.leadId, 'overview')
           panelNavigateRef.current?.('pipeline')
@@ -778,6 +827,9 @@ export function AppProvider({ children }) {
         orgLeadTags,
         refreshOrgLeadTags,
         refreshTeam,
+        chithiUnread,
+        refreshChithiUnread,
+        markChithiSeen,
         refreshSavedLeads,
         syncWorkspace,
         notifications,

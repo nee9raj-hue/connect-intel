@@ -270,7 +270,7 @@ export default function PeopleSearch({ onNavigate }) {
 
   if (!canSearch) {
     return (
-      <div className="flex flex-col h-full items-center justify-center p-8 text-center bg-[#f6f7f9]">
+      <div className="flex flex-col h-full items-center justify-center p-8 text-center hs-canvas">
         <h1 className="text-lg font-semibold text-gray-900">Search not enabled</h1>
         <p className="text-sm text-gray-500 mt-2 max-w-md">
           Your company admin can enable lead search for your account from Team settings. You can still work on
@@ -319,7 +319,7 @@ export default function PeopleSearch({ onNavigate }) {
               className={`crm-btn crm-btn-sm hidden sm:inline-flex ${
                 walletPaise < CREDIT_COST_PAISE
                   ? 'crm-btn-secondary !text-red-800 !border-red-200 !bg-red-50'
-                  : 'crm-btn-secondary !text-[#5b4a00] !border-[#ffe48a] !bg-[#fff6d6]'
+                  : 'crm-btn-secondary !text-[#FF773D] !border-[#ffd4b8] !bg-[#fff4ee]'
               }`}
             >
               {walletPaise < CREDIT_COST_PAISE ? 'Recharge wallet' : `${walletRupees} credits left`}
@@ -402,8 +402,8 @@ export default function PeopleSearch({ onNavigate }) {
         {showMetaBlock && (!metaCollapsedOnMobile || searchMetaOpen) && (
           <div className="panel-chrome-scroll px-3 sm:px-5 py-2 space-y-1.5 bg-white border-t border-gray-100">
             {hasSearched && results?.leads?.length > 0 && countTab !== 'saved' && (
-              <div className="flex flex-wrap items-center gap-1.5 text-[10px] sm:text-xs bg-[#fffbeb] border border-[#fde68a] rounded-lg px-2.5 py-1.5 sm:px-3 sm:py-2">
-                <span className="font-semibold text-[#5b4a00]">
+              <div className="flex flex-wrap items-center gap-1.5 text-[10px] sm:text-xs bg-[#fff4ee] border border-[#ffd4b8] rounded-lg px-2.5 py-1.5 sm:px-3 sm:py-2">
+                <span className="font-semibold text-[#FF773D]">
                   {results.usedLiveAi ? PRODUCT.liveAiResults : `${displayLeads.length} prospects`}
                   {results.total >= 50 ? ' · 50+ matched' : ''}
                 </span>

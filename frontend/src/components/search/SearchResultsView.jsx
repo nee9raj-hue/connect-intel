@@ -146,7 +146,7 @@ function CompactResultsList({
                   <button
                     type="button"
                     onClick={() => onWorkOnLead(lead)}
-                    className="text-[11px] font-semibold px-2 py-1 rounded border border-[#8a6600]/30 text-[#8a6600] bg-[#fffbeb]"
+                    className="text-[11px] font-semibold px-2 py-1 rounded border border-[#8a6600]/30 text-[#8a6600] bg-[#fff4ee]"
                   >
                     Pipeline
                   </button>
@@ -174,7 +174,7 @@ function CompactResultsList({
 function ScorePill({ score }) {
   const n = score || 0
   const cls =
-    n >= 85 ? 'bg-green-100 text-green-800' : n >= 70 ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-600'
+    n >= 85 ? 'bg-[#fff4ee] text-[#FF773D]' : n >= 70 ? 'bg-slate-100 text-[#64748B]' : 'bg-gray-100 text-gray-600'
   return (
     <span className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-bold shrink-0 ${cls}`}>{n}</span>
   )

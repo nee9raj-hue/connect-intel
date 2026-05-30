@@ -41,7 +41,7 @@ export default function MobileRequiredModal() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-2.5 bg-[#ffcb2b] text-[#242424] font-semibold rounded-lg disabled:opacity-60"
+          className="w-full py-2.5 bg-[#FF773D] text-[#242424] font-semibold rounded-lg disabled:opacity-60"
         >
           {loading ? 'Saving…' : 'Continue'}
         </button>

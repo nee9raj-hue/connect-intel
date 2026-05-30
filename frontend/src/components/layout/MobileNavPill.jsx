@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { useApp } from '../../context/AppContext'
 import useIsMobile from '../../hooks/useIsMobile'
 import { isNavTargetActive, MOBILE_NAV_PILL_ITEMS, navTargetToOptions } from '../../lib/navConfig'
+import ChithiMenuIcon from '../ui/ChithiMenuIcon'
 import {
   CalendarIcon,
   HomeIcon,
@@ -10,7 +11,6 @@ import {
   PeopleIcon,
   PipelineIcon,
   SparkIcon,
-  TaskIcon,
   WhatsAppIcon,
 } from '../ui/icons'
 
@@ -22,7 +22,7 @@ const ICONS = {
   mail: MailIcon,
   whatsapp: WhatsAppIcon,
   calendar: CalendarIcon,
-  task: TaskIcon,
+  chithi: ChithiMenuIcon,
   more: MoreHorizontalIcon,
 }
 
@@ -36,7 +36,7 @@ function isMoreSectionActive(activePanel, panelOptions) {
 }
 
 export default function MobileNavPill({ activePanel, panelOptions, onNavigate, onOpenMenu, visible = true }) {
-  const { user, pipelineLeadId } = useApp()
+  const { user, pipelineLeadId, chithiUnread } = useApp()
   const isMobile = useIsMobile()
 
   const moreActive = useMemo(
@@ -61,6 +61,7 @@ export default function MobileNavPill({ activePanel, panelOptions, onNavigate, o
           {MOBILE_NAV_PILL_ITEMS.map((item) => {
             const Icon = ICONS[item.icon] || HomeIcon
             const active = pillItemActive(activePanel, panelOptions, item)
+            const badge = item.badgeKey === 'chithi' ? chithiUnread?.total || 0 : 0
             return (
               <button
                 key={item.id}
@@ -71,7 +72,14 @@ export default function MobileNavPill({ activePanel, panelOptions, onNavigate, o
                 title={item.label}
                 className={`mobile-nav-pill__item ${active ? 'is-active' : ''}`}
               >
-                <Icon className="w-4 h-4 shrink-0" />
+                <span className="relative shrink-0">
+                  <Icon className="w-4 h-4 shrink-0" />
+                  {badge > 0 && (
+                    <span className="absolute -top-1 -right-1 min-w-[14px] h-[14px] rounded-full bg-[#ff7a59] text-white text-[8px] font-bold flex items-center justify-center px-0.5">
+                      {badge > 9 ? '9+' : badge}
+                    </span>
+                  )}
+                </span>
                 <span className="mobile-nav-pill__label">{item.label}</span>
               </button>
             )

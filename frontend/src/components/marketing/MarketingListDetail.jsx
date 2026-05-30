@@ -13,6 +13,7 @@ export default function MarketingListDetail({
   setBusy,
   setError,
   setNotice,
+  embeddedInModal = false,
 }) {
   const [search, setSearch] = useState('')
   const [addSearch, setAddSearch] = useState('')
@@ -149,7 +150,7 @@ export default function MarketingListDetail({
     return (
       <div className="crm-empty-state h-full min-h-[200px]">
         <p>List not found</p>
-        {onClose && (
+        {onClose && !embeddedInModal && (
           <button type="button" onClick={onClose} className="crm-btn crm-btn-secondary mt-3">
             ← Back to lists
           </button>
@@ -160,11 +161,11 @@ export default function MarketingListDetail({
 
   return (
     <div className="flex flex-col h-full min-h-0 w-full">
-      <div className="shrink-0 px-4 py-3 border-b border-[#dfe3eb] bg-[#f5f8fa] space-y-3">
+      <div className="shrink-0 px-4 py-3 border-b border-[#dfe3eb] bg-[var(--color-hs-canvas)] space-y-3">
         <div className="flex items-start justify-between gap-3">
           <p className="crm-field-label mb-0">Edit list</p>
           <div className="flex items-center gap-2 shrink-0">
-            {onClose && (
+            {onClose && !embeddedInModal && (
               <button type="button" onClick={onClose} className="crm-btn crm-btn-secondary">
                 ← Back
               </button>
@@ -231,7 +232,7 @@ export default function MarketingListDetail({
             {filteredMembers.map((l) => (
               <div
                 key={l.id}
-                className="flex items-center justify-between gap-2 px-4 py-2.5 text-xs border-b border-[#eaf0f6] hover:bg-[#f5f8fa]"
+                className="flex items-center justify-between gap-2 px-4 py-2.5 text-xs border-b border-[#eaf0f6] hover:bg-[var(--color-hs-surface)]"
               >
                 <div className="min-w-0">
                   <p className="font-medium text-[#33475b] truncate">{leadDisplayName(l)}</p>
@@ -268,7 +269,7 @@ export default function MarketingListDetail({
             {addCandidates.map((l) => (
               <div
                 key={l.id}
-                className="flex items-center justify-between gap-2 px-4 py-2.5 text-xs border-b border-[#eaf0f6] hover:bg-[#f5f8fa]"
+                className="flex items-center justify-between gap-2 px-4 py-2.5 text-xs border-b border-[#eaf0f6] hover:bg-[var(--color-hs-surface)]"
               >
                 <div className="min-w-0">
                   <p className="font-medium text-[#33475b] truncate">{leadDisplayName(l)}</p>

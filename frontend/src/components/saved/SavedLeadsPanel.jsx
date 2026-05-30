@@ -39,7 +39,7 @@ export default function SavedLeadsPanel({ onNavigate }) {
   }
 
   return (
-    <div className="panel-shell bg-[#f6f7f9]">
+    <div className="panel-shell">
       <header className="shrink-0 px-4 sm:px-6 py-4 border-b border-gray-200 bg-white">
       <div className="flex items-center justify-between gap-3">
         <div>
@@ -80,7 +80,7 @@ export default function SavedLeadsPanel({ onNavigate }) {
           <button
             type="button"
             onClick={() => onNavigate?.('search')}
-            className="px-4 py-2 text-sm font-semibold bg-[#ffcb2b] text-[#242424] rounded-lg"
+            className="px-4 py-2 text-sm font-semibold bg-[#FF773D] text-[#242424] rounded-lg"
           >
             Find people
           </button>

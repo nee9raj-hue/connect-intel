@@ -2,6 +2,10 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import LoadingExperience from '../ui/LoadingExperience'
+import FullScreenDetailModal from '../ui/FullScreenDetailModal'
+import ContactDetailEditor from './ContactDetailEditor'
+import PipelineBulkActionsBar from '../crm/PipelineBulkActionsBar'
+import BulkLeadTagsModal from '../crm/BulkLeadTagsModal'
 import { LOADING_MESSAGES } from '../../lib/loadingQuotes'
 import useIsMobile from '../../hooks/useIsMobile'
 
@@ -28,6 +32,8 @@ export default function ContactsPanel({ onNavigate }) {
     savedLeads,
     isSaved,
     toggleSaveLead,
+    orgLeadTags,
+    bulkUpdatePipeline,
   } = useApp()
 
   const [contacts, setContacts] = useState([])
@@ -44,7 +50,36 @@ export default function ContactsPanel({ onNavigate }) {
   const [aiMatches, setAiMatches] = useState([])
   const [aiError, setAiError] = useState(null)
   const [aiNotice, setAiNotice] = useState(null)
+  const [selectedIds, setSelectedIds] = useState(() => new Set())
+  const [bulkTagsOpen, setBulkTagsOpen] = useState(false)
+  const [bulkBusy, setBulkBusy] = useState(false)
+  const [bulkNotice, setBulkNotice] = useState(null)
   const isMobile = useIsMobile()
+
+  const leadByContactId = useMemo(() => {
+    const map = new Map()
+    for (const lead of savedLeads) {
+      if (lead.contactId) map.set(lead.contactId, lead)
+      map.set(lead.id, lead)
+    }
+    return map
+  }, [savedLeads])
+
+  const selectedLeads = useMemo(
+    () =>
+      [...selectedIds]
+        .map((id) => leadByContactId.get(id))
+        .filter(Boolean),
+    [selectedIds, leadByContactId]
+  )
+
+  const selectedLeadIds = useMemo(() => selectedLeads.map((l) => l.id), [selectedLeads])
+
+  useEffect(() => {
+    if (!bulkNotice) return undefined
+    const timer = setTimeout(() => setBulkNotice(null), 5000)
+    return () => clearTimeout(timer)
+  }, [bulkNotice])
 
   const loadList = useCallback(async (q = appliedSearch) => {
     setLoading(true)
@@ -104,10 +139,11 @@ export default function ContactsPanel({ onNavigate }) {
     setAiNotice(null)
   }, [selectedId, loadOne])
 
-  const backToContactList = () => setSelectedId(null)
-
-  const showListPane = !isMobile || !selectedId
-  const showDetailPane = !isMobile || Boolean(selectedId)
+  const closeContact = () => {
+    setSelectedId(null)
+    setError(null)
+    setNotice(null)
+  }
 
   const selected = useMemo(
     () => contacts.find((c) => c.id === selectedId) || null,
@@ -122,6 +158,9 @@ export default function ContactsPanel({ onNavigate }) {
   }, [savedLeads, selectedId])
 
   const setField = (key, value) => setForm((f) => ({ ...f, [key]: value }))
+
+  const contactTitle =
+    [form.firstName, form.lastName].filter(Boolean).join(' ') || 'Contact details'
 
   const buildLinkedinSearchPayload = () => {
     const lead = pipelineLeadForContact?.lead || {}
@@ -156,10 +195,7 @@ export default function ContactsPanel({ onNavigate }) {
     if (!selectedId || aiSearching) return
     const payload = buildLinkedinSearchPayload()
     const hasHint =
-      payload.firstName ||
-      payload.lastName ||
-      payload.company ||
-      payload.email
+      payload.firstName || payload.lastName || payload.company || payload.email
     if (!hasHint) {
       setAiError('Add a name, company, or email first.')
       return
@@ -230,10 +266,91 @@ export default function ContactsPanel({ onNavigate }) {
     onNavigate?.('pipeline')
   }
 
+  const handleToggleSaveLead = async () => {
+    try {
+      await toggleSaveLead({
+        id: selectedId,
+        ...form,
+        contactId: selectedId,
+        companyId: selected?.companyId,
+      })
+      setNotice('Added to pipeline')
+      await refreshSavedLeads?.()
+    } catch (e) {
+      setError(e.message)
+    }
+  }
+
+  const editorProps = {
+    form,
+    setField,
+    selected,
+    pipelineLeadForContact,
+    notice,
+    error,
+    aiSearching,
+    aiMatches,
+    aiError,
+    aiNotice,
+    isSaved,
+    selectedId,
+    onOpenInPipeline: openInPipeline,
+    onToggleSaveLead: handleToggleSaveLead,
+    onLinkedinAiSearch: runLinkedinAiSearch,
+    onApplyLinkedinMatch: applyLinkedinMatch,
+    onSave: save,
+    saving,
+  }
+
   const searchDirty = search.trim() !== appliedSearch
 
+  const toggleContactSelect = (contactId, checked) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (checked) next.add(contactId)
+      else next.delete(contactId)
+      return next
+    })
+  }
+
+  const selectAllVisibleContacts = (checked) => {
+    if (checked) setSelectedIds(new Set(contacts.map((c) => c.id)))
+    else setSelectedIds(new Set())
+  }
+
+  const runBulkTags = async (actions) => {
+    if (!selectedLeadIds.length) {
+      window.alert('Selected contacts are not in your pipeline yet. Add them to pipeline first.')
+      return
+    }
+    const skipped = selectedIds.size - selectedLeadIds.length
+    setBulkBusy(true)
+    setBulkNotice(null)
+    try {
+      await bulkUpdatePipeline(selectedLeadIds, actions)
+      await refreshSavedLeads()
+      const count = selectedLeadIds.length
+      setBulkNotice(
+        skipped > 0
+          ? `Tags updated on ${count} contact${count === 1 ? '' : 's'} (${skipped} skipped — not in pipeline).`
+          : count === 1
+            ? 'Tags updated on 1 contact.'
+            : `Tags updated on ${count} contacts.`
+      )
+      setSelectedIds(new Set())
+      setBulkTagsOpen(false)
+    } catch (e) {
+      window.alert(e.message || 'Bulk tag update failed')
+    } finally {
+      setBulkBusy(false)
+    }
+  }
+
+  const allVisibleSelected =
+    contacts.length > 0 && contacts.every((c) => selectedIds.has(c.id))
+
   return (
-    <div className="crm-workspace crm-workspace--master-detail flex h-full min-h-0 w-full overflow-hidden">
+    <div className="crm-workspace hs-canvas flex h-full min-h-0 w-full overflow-hidden">
       <header className="crm-page-header">
         <div className="crm-page-header-top">
           <div className="min-w-0">
@@ -287,18 +404,55 @@ export default function ContactsPanel({ onNavigate }) {
       </header>
 
       <div className="crm-page-body">
-        <div className="crm-split-shell flex flex-col flex-1 min-h-0">
-          {isMobile && !selectedId ? (
-            <p className="crm-mobile-split-hint">Tap a contact to view and edit details.</p>
-          ) : null}
-          {isMobile && selectedId ? (
-            <p className="crm-mobile-split-hint">Editing contact — use Back below to return to the list.</p>
-          ) : null}
-          <div className="crm-content-card crm-split-card flex-1 min-h-0">
-          <aside className={`crm-split-sidebar ${showListPane ? '' : 'hidden'}`}>
+        <div className="crm-content-card flex-1 min-h-0 flex flex-col">
+          {selectedIds.size > 0 && (
+            <PipelineBulkActionsBar
+              count={selectedIds.size}
+              busy={bulkBusy}
+              recordLabel="contact"
+              showAssign={false}
+              showEdit={false}
+              showEmail={false}
+              showWhatsApp={false}
+              showMore={false}
+              onTags={
+                orgLeadTags?.length
+                  ? () => {
+                      if (!selectedLeadIds.length) {
+                        window.alert(
+                          'None of the selected contacts are in your pipeline yet. Add them to pipeline first, then tag in bulk.'
+                        )
+                        return
+                      }
+                      setBulkTagsOpen(true)
+                    }
+                  : undefined
+              }
+              onClear={() => setSelectedIds(new Set())}
+            />
+          )}
+          {bulkNotice && (
+            <div
+              className="shrink-0 mx-2 md:mx-4 mb-1 text-xs md:text-sm font-medium text-green-900 bg-green-50 border border-green-200 rounded-lg px-2.5 py-1.5 md:px-3 md:py-2"
+              role="status"
+            >
+              {bulkNotice}
+            </div>
+          )}
+          <div className="crm-split-card flex-1 min-h-0">
+          <aside className="crm-split-sidebar">
             <div className="crm-list-header">
               <div className="flex items-center justify-between gap-2">
-                <span>All contacts</span>
+                <label className="crm-list-select-all flex items-center gap-2 min-w-0">
+                  <input
+                    type="checkbox"
+                    checked={allVisibleSelected}
+                    onChange={(e) => selectAllVisibleContacts(e.target.checked)}
+                    aria-label="Select all visible contacts"
+                    className="pipeline-hs-checkbox"
+                  />
+                  <span className="truncate">All contacts</span>
+                </label>
                 <span className="crm-toolbar-count">{total.toLocaleString()}</span>
               </div>
               <p className="mt-1 text-[11px] normal-case tracking-normal font-medium text-[#7a8696]">
@@ -317,17 +471,31 @@ export default function ContactsPanel({ onNavigate }) {
               {contacts.map((c) => {
                 const name =
                   c.fullName || [c.firstName, c.lastName].filter(Boolean).join(' ') || 'Unnamed'
+                const rowSelected = selectedId === c.id
+                const checked = selectedIds.has(c.id)
                 return (
-                  <button
+                  <div
                     key={c.id}
-                    type="button"
-                    onClick={() => setSelectedId(c.id)}
-                    className={`crm-list-item ${selectedId === c.id ? 'is-selected' : ''}`}
+                    className={`crm-list-item-row ${rowSelected ? 'is-selected' : ''} ${checked ? 'is-checked' : ''}`}
                   >
-                    <p className="crm-list-item-name">{name}</p>
-                    <p className="crm-list-item-meta">{c.company || '—'}</p>
-                    {c.email && <p className="crm-list-item-sub">{c.email}</p>}
-                  </button>
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={(e) => toggleContactSelect(c.id, e.target.checked)}
+                      onClick={(e) => e.stopPropagation()}
+                      aria-label={`Select ${name}`}
+                      className="pipeline-hs-checkbox crm-list-item-check"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setSelectedId(c.id)}
+                      className={`crm-list-item crm-list-item--flex ${rowSelected ? 'is-selected' : ''}`}
+                    >
+                      <p className="crm-list-item-name">{name}</p>
+                      <p className="crm-list-item-meta">{c.company || '—'}</p>
+                      {c.email && <p className="crm-list-item-sub">{c.email}</p>}
+                    </button>
+                  </div>
                 )
               })}
               {!loading && !contacts.length && (
@@ -342,277 +510,57 @@ export default function ContactsPanel({ onNavigate }) {
             </div>
           </aside>
 
-          <section className={`crm-split-main ${showDetailPane ? '' : 'hidden'}`}>
-            {!selectedId && !isMobile ? (
-              <div className="crm-empty-state">
-                <p>Select a contact</p>
-                <p className="crm-empty-hint">
-                  View and edit details here, or open one from Pipeline → Edit contact.
-                </p>
-              </div>
-            ) : (
-              <div className="crm-detail-pane">
-                <div className="crm-detail-card crm-detail-card-wide">
-                  {isMobile ? (
-                    <button type="button" className="crm-mobile-back" onClick={backToContactList}>
-                      ← Back to contacts
-                    </button>
-                  ) : null}
-                  <div className="crm-contact-hero">
-                    <div className="crm-contact-avatar">
-                      {([form.firstName, form.lastName]
-                        .filter(Boolean)
-                        .join(' ')
-                        .split(' ')
-                        .map((part) => part[0])
-                        .join('')
-                        .slice(0, 2) || 'C').toUpperCase()}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <h2 className="crm-detail-title">
-                        {[form.firstName, form.lastName].filter(Boolean).join(' ') || 'Contact'}
-                      </h2>
-                      <p className="crm-detail-subtitle">
-                        {[form.title, form.company].filter(Boolean).join(' at ') || 'No company'}
-                      </p>
-                      <div className="crm-contact-meta">
-                        {form.email ? <span className="crm-contact-meta-pill">{form.email}</span> : null}
-                        {form.phone ? <span className="crm-contact-meta-pill">{form.phone}</span> : null}
-                        {selected?.industry ? (
-                          <span className="crm-contact-meta-pill">{selected.industry}</span>
-                        ) : null}
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {pipelineLeadForContact ? (
-                        <button
-                          type="button"
-                          onClick={openInPipeline}
-                          className="crm-btn crm-btn-secondary"
-                        >
-                          Open in pipeline
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={async () => {
-                            try {
-                              await toggleSaveLead({
-                                id: selectedId,
-                                ...form,
-                                contactId: selectedId,
-                                companyId: selected?.companyId,
-                              })
-                              setNotice('Added to pipeline')
-                              await refreshSavedLeads?.()
-                            } catch (e) {
-                              setError(e.message)
-                            }
-                          }}
-                          disabled={isSaved(selectedId)}
-                          className="crm-btn crm-btn-primary"
-                        >
-                          {isSaved(selectedId) ? 'In pipeline' : '+ Add to pipeline'}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  {(notice || error) && (
-                    <p className={`crm-alert ${error ? 'crm-alert-error' : 'crm-alert-success'}`}>
-                      {error || notice}
-                    </p>
-                  )}
-
-                  <div className="crm-contact-section">
-                    <div className="crm-contact-section-head">
-                      <div>
-                        <p className="crm-field-label mb-1">Core details</p>
-                        <p className="text-[11px] text-[#7a8696]">Keep contact and company details clean for campaigns and pipeline.</p>
-                      </div>
-                    </div>
-                  <div className="crm-form-grid crm-form-grid-2">
-                    <input
-                      value={form.firstName}
-                      onChange={(e) => setField('firstName', e.target.value)}
-                      placeholder="First name"
-                      className="crm-input"
-                    />
-                    <input
-                      value={form.lastName}
-                      onChange={(e) => setField('lastName', e.target.value)}
-                      placeholder="Last name"
-                      className="crm-input"
-                    />
-                  </div>
-                  <div className="crm-form-grid mt-2.5">
-                    <input
-                      value={form.company}
-                      onChange={(e) => setField('company', e.target.value)}
-                      placeholder="Company"
-                      className="crm-input"
-                    />
-                    <input
-                      value={form.title}
-                      onChange={(e) => setField('title', e.target.value)}
-                      placeholder="Job title"
-                      className="crm-input"
-                    />
-                    <input
-                      type="email"
-                      value={form.email}
-                      onChange={(e) => setField('email', e.target.value)}
-                      placeholder="Email"
-                      className="crm-input"
-                    />
-                    <input
-                      value={form.phone}
-                      onChange={(e) => setField('phone', e.target.value)}
-                      placeholder="Phone"
-                      className="crm-input"
-                    />
-                    <div className="crm-form-grid crm-form-grid-2">
-                      <input
-                        value={form.city}
-                        onChange={(e) => setField('city', e.target.value)}
-                        placeholder="City"
-                        className="crm-input"
-                      />
-                      <input
-                        value={form.state}
-                        onChange={(e) => setField('state', e.target.value)}
-                        placeholder="State"
-                        className="crm-input"
-                      />
-                    </div>
-                    <input
-                      value={form.industry}
-                      onChange={(e) => setField('industry', e.target.value)}
-                      placeholder="Industry"
-                      className="crm-input"
-                    />
-                    <input
-                      value={form.website}
-                      onChange={(e) => setField('website', e.target.value)}
-                      placeholder="Website"
-                      className="crm-input"
-                    />
-                  </div>
-                  </div>
-
-                  <div className="crm-contact-section mt-4 space-y-2">
-                    <div className="crm-contact-section-head">
-                      <div>
-                        <label className="crm-field-label">LinkedIn</label>
-                        <p className="text-[11px] text-[#7a8696]">Find or confirm the right profile before saving the contact.</p>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <input
-                        value={form.linkedin}
-                        onChange={(e) => {
-                          setField('linkedin', e.target.value)
-                          if (e.target.value.trim()) {
-                            setAiMatches([])
-                            setAiError(null)
-                          }
-                        }}
-                        placeholder="https://linkedin.com/in/…"
-                        className="crm-input flex-1 min-w-0"
-                      />
-                      {!form.linkedin.trim() && (
-                        <button
-                          type="button"
-                          onClick={runLinkedinAiSearch}
-                          disabled={aiSearching}
-                          className="crm-btn crm-btn-secondary shrink-0"
-                        >
-                          {aiSearching ? 'Searching…' : 'Search with AI'}
-                        </button>
-                      )}
-                    </div>
-                    {aiError && <p className="crm-alert crm-alert-error">{aiError}</p>}
-                    {aiNotice && !aiMatches.length && !aiError && (
-                      <p className="text-xs text-[#516f90]">{aiNotice}</p>
-                    )}
-                    {aiMatches.length > 0 && (
-                      <div className="rounded-lg border border-[#dfe3eb] bg-[#f5f8fa] p-3 space-y-2">
-                        <p className="text-xs font-semibold text-[#33475b]">
-                          AI matches — pick the best profile
-                        </p>
-                        {aiMatches.map((match, index) => {
-                          const label =
-                            match.fullName ||
-                            [match.firstName, match.lastName].filter(Boolean).join(' ') ||
-                            'LinkedIn profile'
-                          const confidence = String(match.confidence || '').toLowerCase()
-                          return (
-                            <div
-                              key={match.id || match.linkedin || index}
-                              className="bg-white border border-[#dfe3eb] rounded-lg p-3"
-                            >
-                              <div className="flex flex-wrap items-start justify-between gap-2">
-                                <div className="min-w-0">
-                                  <p className="text-xs font-semibold text-[#33475b]">{label}</p>
-                                  <p className="text-xs text-[#516f90] mt-0.5">
-                                    {[match.title, match.company].filter(Boolean).join(' · ') ||
-                                      '—'}
-                                  </p>
-                                  <p className="text-xs text-[#0091ae] truncate mt-1">
-                                    {match.linkedin}
-                                  </p>
-                                  {match.reason && (
-                                    <p className="text-[11px] text-[#7c98b6] mt-1 leading-snug">
-                                      {match.reason}
-                                    </p>
-                                  )}
-                                </div>
-                                {confidence && (
-                                  <span
-                                    className={`crm-status-pill ${
-                                      confidence === 'high'
-                                        ? 'crm-status-active'
-                                        : confidence === 'low'
-                                          ? 'crm-status-draft'
-                                          : 'crm-status-paused'
-                                    }`}
-                                  >
-                                    {confidence}
-                                  </span>
-                                )}
-                              </div>
-                              <button
-                                type="button"
-                                onClick={() => applyLinkedinMatch(match)}
-                                className="crm-link-btn mt-2 p-0"
-                              >
-                                Use this profile
-                              </button>
-                            </div>
-                          )
-                        })}
-                        {aiNotice && (
-                          <p className="text-[10px] text-[#7c98b6]">{aiNotice}</p>
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={save}
-                    disabled={saving}
-                    className="crm-btn crm-btn-primary w-full mt-5"
-                  >
-                    {saving ? 'Saving…' : 'Save contact'}
-                  </button>
+          {!isMobile && (
+            <section className="crm-split-main">
+              {!selectedId ? (
+                <div className="crm-empty-state">
+                  <p>Select a contact</p>
+                  <p className="crm-empty-hint">
+                    View and edit details here, or open one from Pipeline → Edit contact.
+                  </p>
                 </div>
-              </div>
-            )}
-          </section>
+              ) : (
+                <div className="crm-detail-pane">
+                  <ContactDetailEditor {...editorProps} showInlineSave />
+                </div>
+              )}
+            </section>
+          )}
           </div>
         </div>
       </div>
+
+      <BulkLeadTagsModal
+        open={bulkTagsOpen}
+        count={selectedLeadIds.length || selectedIds.size}
+        leads={selectedLeads}
+        orgLeadTags={orgLeadTags}
+        busy={bulkBusy}
+        recordLabel="contact"
+        onClose={() => setBulkTagsOpen(false)}
+        onSubmit={runBulkTags}
+      />
+
+      {isMobile && selectedId ? (
+        <FullScreenDetailModal
+          open
+          onClose={closeContact}
+          title={contactTitle}
+          subtitle={[form.title, form.company].filter(Boolean).join(' at ') || undefined}
+          footer={
+            <button
+              type="button"
+              onClick={save}
+              disabled={saving}
+              className="crm-btn crm-btn-primary w-full"
+            >
+              {saving ? 'Saving…' : 'Save contact'}
+            </button>
+          }
+        >
+          <ContactDetailEditor {...editorProps} showInlineSave={false} />
+        </FullScreenDetailModal>
+      ) : null}
     </div>
   )
 }

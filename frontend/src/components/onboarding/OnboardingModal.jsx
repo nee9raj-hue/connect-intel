@@ -52,7 +52,7 @@ export default function OnboardingModal() {
               onClick={() => setAccountType(opt.id)}
               className={`text-left p-3 rounded-lg border-2 transition-colors ${
                 accountType === opt.id
-                  ? 'border-[#ffcb2b] bg-[#fffbeb]'
+                  ? 'border-[#FF773D] bg-[#fff4ee]'
                   : 'border-gray-200 hover:border-gray-300'
               }`}
             >
@@ -110,7 +110,7 @@ export default function OnboardingModal() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-2.5 bg-[#ffcb2b] hover:bg-[#f0bc00] text-[#242424] font-semibold rounded-lg text-sm disabled:opacity-60"
+          className="w-full py-2.5 bg-[#FF773D] hover:bg-[#e5652f] text-[#242424] font-semibold rounded-lg text-sm disabled:opacity-60"
         >
           {loading ? 'Setting up…' : 'Continue to workspace'}
         </button>

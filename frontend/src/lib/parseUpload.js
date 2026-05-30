@@ -1,4 +1,6 @@
 import * as XLSX from 'xlsx'
+import { detectLogisticsPivot, flattenLogisticsPivot, parseSheetWithPivotSupport } from './workspacePivotParse'
+import { pickWorkspaceDataSheet, validateWorkspaceRows } from './workspaceImportTemplate'
 
 function splitCsvLine(line) {
   const values = []
@@ -131,6 +133,50 @@ export function parseCsvText(text) {
   })
 }
 
+/** Workspace upload — prefers template Data sheet; optional pivot flatten with warning. */
+export async function parseWorkspaceUploadFile(file) {
+  const lowerName = file.name.toLowerCase()
+  if (lowerName.endsWith('.xlsx') || lowerName.endsWith('.xls')) {
+    const buffer = await file.arrayBuffer()
+    const workbook = XLSX.read(buffer, { type: 'array' })
+    const templateSheet = pickWorkspaceDataSheet(workbook)
+    if (!templateSheet) return { rows: [], format: 'empty', validation: validateWorkspaceRows([]) }
+
+    const matrix = XLSX.utils.sheet_to_json(templateSheet, { header: 1, defval: '' })
+    const headerRow = (matrix[0] || []).map((c) => String(c || '').trim().toLowerCase())
+    const looksLikeTemplate = headerRow.includes('shipment_date') && headerRow.includes('shipper')
+
+    if (looksLikeTemplate) {
+      const raw = XLSX.utils.sheet_to_json(templateSheet, { defval: '' })
+      const rows = raw.map(normalizeImportRow).filter((row) => Object.keys(row).length > 0)
+      const validation = validateWorkspaceRows(rows)
+      return { rows, format: 'template', validation }
+    }
+
+    if (detectLogisticsPivot(matrix)) {
+      const rows = flattenLogisticsPivot(matrix)
+      if (rows.length) {
+        return {
+          rows,
+          format: 'logistics_pivot',
+          validation: {
+            ok: true,
+            pivotWarning:
+              'Pivot layout detected. For reliable reports, use the downloadable workspace template (one row per shipment).',
+          },
+        }
+      }
+    }
+
+    const parsed = parseSheetWithPivotSupport(templateSheet, XLSX)
+    const validation = validateWorkspaceRows(parsed.rows)
+    return { ...parsed, validation }
+  }
+  const rows = await parseUploadFile(file)
+  const validation = validateWorkspaceRows(rows)
+  return { rows, format: 'flat', validation }
+}
+
 export async function parseUploadFile(file) {
   const lowerName = file.name.toLowerCase()
 
@@ -139,8 +185,8 @@ export async function parseUploadFile(file) {
     const workbook = XLSX.read(buffer, { type: 'array' })
     const sheet = pickWorkbookSheet(workbook)
     if (!sheet) return []
-    const raw = XLSX.utils.sheet_to_json(sheet, { defval: '' })
-    return raw.map(normalizeImportRow).filter((row) => Object.keys(row).length > 0)
+    const parsed = parseSheetWithPivotSupport(sheet, XLSX)
+    return parsed.rows
   }
 
   const text = await file.text()

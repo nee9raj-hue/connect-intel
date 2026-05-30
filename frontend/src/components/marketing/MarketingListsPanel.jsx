@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import useIsMobile from '../../hooks/useIsMobile'
+import FullScreenDetailModal from '../ui/FullScreenDetailModal'
 import { CRM_STATUSES } from '../../lib/crmConstants'
 import FilterDropdown from '../crm/FilterDropdown'
 import MarketingListBuilder from './MarketingListBuilder'
@@ -104,11 +105,29 @@ export default function MarketingListsPanel({
       : CRM_STATUSES.find((s) => s.id === pipelineStage)?.label || pipelineStage
 
   const closeListDetail = () => setSelectedListId(null)
-  const showListPane = !isMobile || !selectedListId
-  const showDetailPane = !isMobile || Boolean(selectedListId)
+
+  const listDetail = selectedList ? (
+    <MarketingListDetail
+      list={selectedList}
+      savedLeads={savedLeads}
+      busy={busy}
+      setBusy={setBusy}
+      setError={setError}
+      setNotice={setNotice}
+      onClose={closeListDetail}
+      embeddedInModal={isMobile}
+      onUpdated={(list) => {
+        setLists((prev) => prev.map((x) => (x.id === list.id ? { ...x, ...list } : x)))
+      }}
+      onDeleted={() => {
+        setSelectedListId(null)
+        onListsReload?.()
+      }}
+    />
+  ) : null
 
   return (
-    <div className="crm-content-card crm-workspace--master-detail flex flex-col min-h-0 flex-1 overflow-hidden">
+    <div className="crm-content-card flex flex-col min-h-0 flex-1 overflow-hidden">
       <div className="crm-toolbar crm-toolbar--compact shrink-0 border-b border-[#dfe3eb] px-3 pt-2 pb-1.5 bg-white">
         <div className="crm-toolbar-primary">
           <div className="crm-view-tabs">
@@ -205,15 +224,8 @@ export default function MarketingListsPanel({
         </div>
       </div>
 
-      <div className="crm-split-shell flex flex-col flex-1 min-h-0">
-        {isMobile && !selectedListId ? (
-          <p className="crm-mobile-split-hint">Tap a list to view and edit contacts.</p>
-        ) : null}
-        {isMobile && selectedListId ? (
-          <p className="crm-mobile-split-hint">List details — use Back to return to all lists.</p>
-        ) : null}
-        <div className="crm-split-card flex-1 min-h-0 border-0 rounded-none shadow-none">
-        <aside className={`crm-split-sidebar ${showListPane ? '' : 'hidden'}`}>
+      <div className="crm-split-card flex-1 min-h-0 border-0 rounded-none shadow-none">
+        <aside className="crm-split-sidebar">
           <div className="crm-list-header">Saved lists</div>
           <div className="crm-list-scroll">
             {!filteredLists.length && (
@@ -239,35 +251,32 @@ export default function MarketingListsPanel({
           </div>
         </aside>
 
-        <section className={`crm-split-main ${showDetailPane ? '' : 'hidden'}`}>
-          {selectedListId ? (
-            <MarketingListDetail
-              list={selectedList}
-              savedLeads={savedLeads}
-              busy={busy}
-              setBusy={setBusy}
-              setError={setError}
-              setNotice={setNotice}
-              onClose={closeListDetail}
-              onUpdated={(list) => {
-                setLists((prev) => prev.map((x) => (x.id === list.id ? { ...x, ...list } : x)))
-              }}
-              onDeleted={() => {
-                setSelectedListId(null)
-                onListsReload?.()
-              }}
-            />
-          ) : (
-            <div className="crm-empty-state h-full">
-              <p>Select a list</p>
-              <p className="crm-empty-hint">
-                Choose a saved list to edit name, add or remove contacts.
-              </p>
-            </div>
-          )}
-        </section>
-        </div>
+        {!isMobile && (
+          <section className="crm-split-main">
+            {selectedListId ? (
+              listDetail
+            ) : (
+              <div className="crm-empty-state h-full">
+                <p>Select a list</p>
+                <p className="crm-empty-hint">
+                  Choose a saved list to edit name, add or remove contacts.
+                </p>
+              </div>
+            )}
+          </section>
+        )}
       </div>
+
+      {isMobile && selectedListId && selectedList ? (
+        <FullScreenDetailModal
+          open
+          onClose={closeListDetail}
+          title={selectedList.name}
+          subtitle={`${selectedList.leadIds?.length || 0} contacts · ${listChannel === 'whatsapp' ? 'WhatsApp' : 'Email'}`}
+        >
+          {listDetail}
+        </FullScreenDetailModal>
+      ) : null}
 
       {createOpen && (
         <div

@@ -9,7 +9,7 @@ export const BRAND_SLATE_SOFT = '#f1f5f9'
 export const BRAND_SLATE_BORDER = '#cbd5e1'
 
 /** Connect Intel brand assets (served from /public). Bump ?v= when files change. */
-export const BRAND_LOGO_VERSION = '10'
+export const BRAND_LOGO_VERSION = '9'
 
 /** Icon/mark on black — for dark sidebar and mock previews. */
 export const BRAND_LOGO_ICON = `/connect-intel-logo-icon.png?v=${BRAND_LOGO_VERSION}`

@@ -15,7 +15,7 @@ const DATASET_OPTIONS = [
 ]
 
 const FILE_INPUT_CLASS =
-  'block w-full text-sm text-gray-600 file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#ffcb2b] file:text-[#242424] hover:file:bg-[#f0bc00]'
+  'block w-full text-sm text-gray-600 file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#FF773D] file:text-[#242424] hover:file:bg-[#e5652f]'
 
 export default function PipelineImportModal({ open, onClose, onImported }) {
   const { user, refreshSavedLeads, orgLeadTags, refreshOrgLeadTags } = useApp()
@@ -233,7 +233,7 @@ export default function PipelineImportModal({ open, onClose, onImported }) {
             type="button"
             disabled={loading || !preview.withCompany}
             onClick={handleUpload}
-            className="crm-btn crm-btn-primary w-full sm:w-auto bg-[#ffcb2b] text-[#242424] border-[#ffcb2b] hover:bg-[#f0bc00]"
+            className="crm-btn crm-btn-primary w-full sm:w-auto bg-[#FF773D] text-[#242424] border-[#FF773D] hover:bg-[#e5652f]"
           >
             {loading
               ? 'Importing…'

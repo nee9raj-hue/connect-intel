@@ -44,7 +44,7 @@ export default function TeamSettingsSection({
         className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-gray-50/90 transition-colors"
         aria-expanded={open}
       >
-        <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-gray-900 text-[#ffcb2b] shrink-0 shadow-sm">
+        <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-gray-900 text-[#FF773D] shrink-0 shadow-sm">
           {Icon ? <Icon className="w-[18px] h-[18px]" /> : null}
         </span>
         <span className="flex-1 min-w-0">
@@ -74,8 +74,8 @@ function ChevronDown({ className }) {
 export function TeamStatCard({ icon: Icon, label, value, hint, accent = 'gray' }) {
   const accents = {
     gray: 'bg-gray-50 border-gray-200/80 text-gray-900',
-    amber: 'bg-[#fffbeb] border-[#fde68a]/80 text-[#5b4a00]',
-    green: 'bg-emerald-50 border-emerald-200/80 text-emerald-900',
+    amber: 'bg-[#fff4ee] border-[#ffd4b8]/80 text-[#FF773D]',
+    green: 'bg-slate-100 border-slate-200/80 text-[#64748B]',
     blue: 'bg-blue-50 border-blue-200/80 text-blue-900',
   }
   return (
@@ -110,7 +110,7 @@ export function TeamQuickLink({ icon: Icon, title, description, onClick, accent 
       onClick={onClick}
       className={`flex items-start gap-3 p-3 rounded-xl border text-left transition-all ${styles}`}
     >
-      <span className="flex items-center justify-center w-9 h-9 rounded-lg bg-gray-900 text-[#ffcb2b] shrink-0">
+      <span className="flex items-center justify-center w-9 h-9 rounded-lg bg-gray-900 text-[#FF773D] shrink-0">
         <Icon className="w-4 h-4" />
       </span>
       <span className="min-w-0 flex-1">

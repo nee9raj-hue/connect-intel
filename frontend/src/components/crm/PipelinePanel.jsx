@@ -2,39 +2,35 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { formatCrmDate, getStatusMeta, getVisiblePipelineColumns } from '../../lib/crmConstants'
+import { BRAND_ICON_PIPELINE } from '../../lib/brandAssets'
 import { PlusIcon, UploadIcon } from '../ui/icons'
 import LeadWorkspace from './LeadWorkspace'
 import PipelineImportModal from './PipelineImportModal'
 import BulkEmailModal from './BulkEmailModal'
 import AddLeadModal from './AddLeadModal'
 import PipelineBulkActionsBar from './PipelineBulkActionsBar'
+import { PipelineBulkAssignModal, PipelineBulkEditModal } from './PipelineBulkModals'
+import BulkLeadTagsModal from './BulkLeadTagsModal'
+import PipelineViewSettings from './PipelineViewSettings'
+import PipelineLeadsTable from './PipelineLeadsTable'
+import LeadTagDots from './LeadTagDots'
 import PipelineFiltersBar, { DEFAULT_PIPELINE_FILTERS } from './PipelineFiltersBar'
 import BulkWhatsAppModal from './BulkWhatsAppModal'
 import {
   applyPipelineFilters,
   collectLocationOptions,
   countActiveFilters,
+  getFilterCities,
+  getFilterStates,
   normalizeLocationKey,
 } from '../../lib/pipelineFilters'
 import { tagMapById } from '../../lib/orgLeadTags'
 import { leadHasCallablePhone } from '../../lib/phoneUtils'
+import LeadPhoneCall from './LeadPhoneCall'
 import { leadHasSendableEmail } from '../../lib/emailUtils'
 import { getLeadCity, getLeadState } from '../../lib/pipelineFilters'
 
-function useIsMobile(breakpointPx = 768) {
-  const [mobile, setMobile] = useState(() => {
-    if (typeof window === 'undefined') return false
-    return window.matchMedia(`(max-width: ${breakpointPx - 1}px)`).matches
-  })
-  useEffect(() => {
-    const mq = window.matchMedia(`(max-width: ${breakpointPx - 1}px)`)
-    const onChange = () => setMobile(mq.matches)
-    onChange()
-    mq.addEventListener('change', onChange)
-    return () => mq.removeEventListener('change', onChange)
-  }, [breakpointPx])
-  return mobile
-}
+import useIsMobile from '../../hooks/useIsMobile'
 
 export default function PipelinePanel({ onNavigate, panelOptions }) {
   const {
@@ -59,13 +55,10 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
 
   const columns = useMemo(() => getVisiblePipelineColumns(user), [user])
   const isMobile = useIsMobile()
-  const [view, setView] = useState(() => {
-    if (typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches) {
-      return 'list'
-    }
-    return 'board'
-  })
+  const [view, setView] = useState('list')
   const [filter, setFilter] = useState(panelOptions?.status || 'all')
+  /** Status picked from toolbar on All Leads — does not change sidebar stage navigation. */
+  const [listStatusFilter, setListStatusFilter] = useState('all')
   const [search, setSearch] = useState('')
   const [advancedFilters, setAdvancedFilters] = useState({ ...DEFAULT_PIPELINE_FILTERS })
   const [appliedSearch, setAppliedSearch] = useState('')
@@ -75,6 +68,10 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const [importOpen, setImportOpen] = useState(false)
   const [addOpen, setAddOpen] = useState(false)
   const [bulkOpen, setBulkOpen] = useState(false)
+  const [bulkAssignOpen, setBulkAssignOpen] = useState(false)
+  const [bulkEditOpen, setBulkEditOpen] = useState(false)
+  const [bulkTagsOpen, setBulkTagsOpen] = useState(false)
+  const [viewSettingsOpen, setViewSettingsOpen] = useState(false)
   const [waOpen, setWaOpen] = useState(false)
   const [bulkBusy, setBulkBusy] = useState(false)
   const [bulkNotice, setBulkNotice] = useState(null)
@@ -88,10 +85,12 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   useEffect(() => {
     if (panelOptions?.status) {
       setFilter(panelOptions.status)
-      if (panelOptions.status !== 'all') setView('list')
-      else if (!isMobile) setView('board')
+      if (panelOptions.status !== 'all') {
+        setView('list')
+        setListStatusFilter('all')
+      }
     }
-  }, [panelOptions?.status, isMobile])
+  }, [panelOptions?.status])
 
   const [workspaceLead, setWorkspaceLead] = useState(null)
 
@@ -196,25 +195,27 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
 
   const selectedLead = workspaceLead
   const stageListMode = filter !== 'all'
+  const pipelineStatusFilter = stageListMode ? filter : listStatusFilter
 
   const filtersDirty =
     search.trim() !== appliedSearch ||
-    advancedFilters.city !== appliedAdvanced.city ||
-    advancedFilters.state !== appliedAdvanced.state ||
+    getFilterCities(advancedFilters).join('|') !== getFilterCities(appliedAdvanced).join('|') ||
+    getFilterStates(advancedFilters).join('|') !== getFilterStates(appliedAdvanced).join('|') ||
     advancedFilters.contact !== appliedAdvanced.contact ||
     (advancedFilters.tagIds || []).join(',') !== (appliedAdvanced.tagIds || []).join(',') ||
     (advancedFilters.smartTags || []).join(',') !== (appliedAdvanced.smartTags || []).join(',')
 
   const buildServerFilters = useCallback(
     (adv, q) => ({
-      status: filter !== 'all' ? filter : undefined,
+      status:
+        filter !== 'all' ? filter : listStatusFilter !== 'all' ? listStatusFilter : undefined,
       q: q || undefined,
-      city: adv.city || undefined,
-      state: adv.state || undefined,
+      cities: getFilterCities(adv).length ? getFilterCities(adv) : undefined,
+      states: getFilterStates(adv).length ? getFilterStates(adv) : undefined,
       assigneeUserId: pipelineAssigneeFilter || undefined,
       tagIds: adv.tagIds?.length ? adv.tagIds : undefined,
     }),
-    [filter, pipelineAssigneeFilter]
+    [filter, listStatusFilter, pipelineAssigneeFilter]
   )
 
   const serverFilters = useMemo(
@@ -293,9 +294,9 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const filtered = useMemo(() => {
     const base = serverSidePipeline ? savedLeads : scopedLeads
     return applyPipelineFilters(base, {
-      status: serverSidePipeline ? 'all' : filter,
-      city: serverSidePipeline ? '' : appliedAdvanced.city,
-      state: serverSidePipeline ? '' : appliedAdvanced.state,
+      status: serverSidePipeline ? 'all' : pipelineStatusFilter,
+      cities: serverSidePipeline ? [] : getFilterCities(appliedAdvanced),
+      states: serverSidePipeline ? [] : getFilterStates(appliedAdvanced),
       contact: appliedAdvanced.contact,
       tagIds: serverSidePipeline ? [] : appliedAdvanced.tagIds,
       tagMode: appliedAdvanced.tagMode,
@@ -305,7 +306,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     })
   }, [
     scopedLeads,
-    filter,
+    pipelineStatusFilter,
     appliedAdvanced,
     appliedSearch,
     smartViewFilters,
@@ -328,12 +329,12 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       setAppliedAdvanced((prev) => ({ ...prev, contact: f.contact }))
     }
     if (f.city) {
-      setAdvancedFilters((prev) => ({ ...prev, city: f.city }))
-      setAppliedAdvanced((prev) => ({ ...prev, city: f.city }))
+      setAdvancedFilters((prev) => ({ ...prev, cities: [f.city] }))
+      setAppliedAdvanced((prev) => ({ ...prev, cities: [f.city] }))
     }
     if (f.state) {
-      setAdvancedFilters((prev) => ({ ...prev, state: f.state }))
-      setAppliedAdvanced((prev) => ({ ...prev, state: f.state }))
+      setAdvancedFilters((prev) => ({ ...prev, states: [f.state] }))
+      setAppliedAdvanced((prev) => ({ ...prev, states: [f.state] }))
     }
     if (f.status && f.status !== 'all') setFilter(f.status)
     if (f.search) {
@@ -398,6 +399,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     setAdvancedFilters(empty)
     setAppliedSearch('')
     setAppliedAdvanced(empty)
+    setListStatusFilter('all')
   }, [])
 
   const selectAllFiltered = () => {
@@ -460,8 +462,15 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
             ? 'Contact marked as replied.'
             : `${count} contacts marked as replied.`
         )
+      } else if (actions.addTagIds?.length || actions.removeTagIds?.length) {
+        setBulkNotice(
+          count === 1 ? 'Tags updated on 1 lead.' : `Tags updated on ${count} leads.`
+        )
       }
       setSelectedIds(new Set())
+      setBulkAssignOpen(false)
+      setBulkEditOpen(false)
+      setBulkTagsOpen(false)
     } catch (e) {
       setBulkNotice(null)
       window.alert(e.message || 'Bulk update failed')
@@ -470,22 +479,77 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     }
   }
 
+  const exportVisibleLeads = useCallback(() => {
+    const rows = filtered
+    if (!rows.length) return
+    const headers = ['Name', 'Email', 'Phone', 'Company', 'Status', 'City', 'State']
+    const escape = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`
+    const lines = [
+      headers.join(','),
+      ...rows.map((l) =>
+        [
+          [l.firstName, l.lastName].filter(Boolean).join(' '),
+          l.email,
+          l.phone,
+          l.company,
+          l.crm?.status,
+          getLeadCity(l),
+          getLeadState(l),
+        ]
+          .map(escape)
+          .join(',')
+      ),
+    ]
+    const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'pipeline-leads.csv'
+    a.click()
+    URL.revokeObjectURL(url)
+  }, [filtered])
+
+  const listOrStageView = view === 'list' || stageListMode
+  const useHubSpotList = listOrStageView
+
+  const selectAllVisible = useCallback((checked, ids) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      for (const id of ids) {
+        if (checked) next.add(id)
+        else next.delete(id)
+      }
+      return next
+    })
+  }, [])
+
   return (
-    <div className="flex h-full min-h-0 w-full overflow-hidden relative bg-[var(--color-ci-page)]">
+    <div
+      className={`flex h-full min-h-0 w-full overflow-hidden relative bg-[var(--color-hs-canvas)] ${
+        selectedLead && useHubSpotList ? 'pipeline-split-record' : ''
+      }`}
+    >
       <div
         className={`crm-workspace flex-1 min-w-0 min-h-0 flex flex-col ${
           selectedLead ? 'hidden md:flex' : 'flex'
-        }`}
+        } ${useHubSpotList ? 'pipeline-list-workspace' : ''}`}
       >
-        <header className="crm-page-header">
-          <div className="crm-page-header-top">
-            <div className="min-w-0">
-              <h1 className="crm-page-title">
-                {stageListMode ? getStatusMeta(filter).label : 'Pipeline'}
-              </h1>
-              <p className="crm-page-subtitle">
+        <header className="crm-page-header pipeline-page-header">
+          <div className="crm-page-header-top pipeline-page-header-top">
+            <div className="pipeline-page-heading min-w-0">
+              <img
+                src={BRAND_ICON_PIPELINE}
+                alt=""
+                className="pipeline-page-icon ci-ui-icon"
+                width={24}
+                height={24}
+                draggable={false}
+                aria-hidden
+              />
+              <p className="pipeline-page-stats">
                 {assigneeName ? (
                   <>
+                    <span className="sr-only">Pipeline — </span>
                     Viewing <strong>{assigneeName}</strong>
                     {' · '}
                     <button
@@ -497,17 +561,26 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                     </button>
                   </>
                 ) : savedLeads.length === 0 ? (
-                  'Add or import leads to get started'
+                  <>
+                    <span className="sr-only">Pipeline — </span>
+                    Add or import leads to get started
+                  </>
                 ) : (
                   <>
+                    <span className="sr-only">Pipeline — </span>
+                    {stageListMode && (
+                      <>
+                        <strong>{getStatusMeta(filter).label}</strong>
+                        {' · '}
+                      </>
+                    )}
                     {pipelineSummary.total.toLocaleString()} leads
-                    {hasMoreLeads &&
-                      ` · ${pipelineLoad.loaded.toLocaleString()} loaded`}
+                    {hasMoreLeads && ` · ${pipelineLoad.loaded.toLocaleString()} loaded`}
                   </>
                 )}
               </p>
             </div>
-            <div className="crm-page-actions">
+            <div className="crm-page-actions pipeline-page-actions">
               {!stageListMode && (
                 <div className="crm-view-tabs">
                   {[
@@ -559,21 +632,25 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               applying={filterApplying}
               cities={locationOptions.cities}
               states={locationOptions.states}
-              statusFilter={filter}
-              onStatusFilterChange={setFilter}
+              statusFilter={listStatusFilter}
+              onStatusFilterChange={setListStatusFilter}
               statusOptions={columns}
               resultCount={filtered.length}
               totalCount={
-                serverSidePipeline && (appliedSearch || appliedAdvanced.city || appliedAdvanced.state)
+                serverSidePipeline &&
+                (appliedSearch ||
+                  getFilterCities(appliedAdvanced).length ||
+                  getFilterStates(appliedAdvanced).length)
                   ? pipelineLoad.total || filtered.length
                   : scopedLeads.length
               }
               pipelineTotal={pipelineSummary.total}
               onSelectAllFiltered={selectAllFiltered}
-              hasActiveFilters={activeFilterCount > 0 || filter !== 'all'}
+              hasActiveFilters={activeFilterCount > 0 || filter !== 'all' || listStatusFilter !== 'all'}
               onClearFilters={() => {
                 clearAllFilters()
                 setFilter('all')
+                setListStatusFilter('all')
                 setSmartViewId(null)
                 setSmartViewFilters({})
               }}
@@ -582,28 +659,37 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               orgLeadTags={orgLeadTags}
               stageListMode={stageListMode}
               onRemoveAppliedFilter={removeAppliedFilter}
+              onOpenViewSettings={() => setViewSettingsOpen(true)}
             />
           )}
         </header>
 
         <div className="crm-page-body flex-1 min-h-0">
-          <div className="crm-content-card flex-1 min-h-0">
-            <PipelineBulkActionsBar
-            count={selectedIds.size}
-            statusOptions={columns}
-            teamMembers={teamMembers}
-            canAssign={canAssign}
-            busy={bulkBusy}
-            compact={isMobile}
-            onApplyStatus={(status) => runBulk({ status })}
-            onAssign={(assignToUserId) => runBulk({ assignToUserId })}
-            onMarkReplied={() => runBulk({ markReplied: true })}
-            onEmail={() => setBulkOpen(true)}
-            onWhatsApp={() => setWaOpen(true)}
-            emailCount={selectedEmailCount}
-            phoneCount={selectedPhoneCount}
-            onClear={() => setSelectedIds(new Set())}
-          />
+          <div
+            className={`crm-content-card flex-1 min-h-0 ${
+              useHubSpotList
+                ? 'crm-content-card--pipeline-table'
+                : view === 'board' && !stageListMode
+                  ? 'crm-content-card--pipeline-board'
+                  : ''
+            }`}
+          >
+            {selectedIds.size > 0 && (
+              <PipelineBulkActionsBar
+                count={selectedIds.size}
+                canAssign={canAssign}
+                busy={bulkBusy}
+                onAssign={() => setBulkAssignOpen(true)}
+                onEdit={() => setBulkEditOpen(true)}
+                onTags={orgLeadTags?.length ? () => setBulkTagsOpen(true) : undefined}
+                onMarkReplied={() => runBulk({ markReplied: true })}
+                onEmail={() => setBulkOpen(true)}
+                onWhatsApp={() => setWaOpen(true)}
+                emailCount={selectedEmailCount}
+                phoneCount={selectedPhoneCount}
+                onClear={() => setSelectedIds(new Set())}
+              />
+            )}
 
           {bulkNotice && (
             <div
@@ -640,6 +726,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                 onClick={() => {
                   clearAllFilters()
                   setFilter('all')
+                  setListStatusFilter('all')
                   setSmartViewId(null)
                   setSmartViewFilters({})
                 }}
@@ -676,16 +763,16 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               })}
             </div>
           ) : (
-            <StagePipelineList
+            <PipelineLeadsTable
               leads={filtered}
               selectedId={pipelineLeadId}
               selectedIds={selectedIds}
               onSelect={openPipelineLead}
               onToggleSelect={toggleSelect}
-              onToggleSaveLead={toggleSaveLead}
+              onSelectAllVisible={selectAllVisible}
               showStatus={!stageListMode}
               tagById={tagById}
-              compact={isMobile}
+              teamMembers={teamMembers}
             />
           )}
           </div>
@@ -703,8 +790,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
         </div>
       </div>
 
-      {pipelineLeadId && !selectedLead && (
-        <div className="hidden md:flex w-[min(420px,40%)] shrink-0 border-l border-gray-200 bg-white items-center justify-center text-xs text-gray-500">
+      {pipelineLeadId && !selectedLead && useHubSpotList && (
+        <div className="crm-record-panel crm-record-panel--loading hidden md:flex">
           Loading lead…
         </div>
       )}
@@ -715,6 +802,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
           statusOptions={columns}
           onClose={() => setPipelineLeadId(null)}
           onNavigate={onNavigate}
+          recordPanel={useHubSpotList}
         />
       )}
 
@@ -743,6 +831,51 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
         }}
       />
       <BulkWhatsAppModal open={waOpen} leads={selectedLeads} onClose={() => setWaOpen(false)} />
+
+      <PipelineBulkAssignModal
+        open={bulkAssignOpen}
+        count={selectedIds.size}
+        teamMembers={teamMembers}
+        canAssign={canAssign}
+        busy={bulkBusy}
+        onClose={() => setBulkAssignOpen(false)}
+        onSubmit={(assignToUserId) => runBulk({ assignToUserId })}
+      />
+      <PipelineBulkEditModal
+        open={bulkEditOpen}
+        count={selectedIds.size}
+        statusOptions={columns}
+        teamMembers={teamMembers}
+        canAssign={canAssign}
+        busy={bulkBusy}
+        onClose={() => setBulkEditOpen(false)}
+        onSubmit={(actions) => runBulk(actions)}
+      />
+      <BulkLeadTagsModal
+        open={bulkTagsOpen}
+        count={selectedIds.size}
+        leads={selectedLeads}
+        orgLeadTags={orgLeadTags}
+        busy={bulkBusy}
+        onClose={() => setBulkTagsOpen(false)}
+        onSubmit={(actions) => runBulk(actions)}
+      />
+
+      <PipelineViewSettings
+        open={viewSettingsOpen}
+        onClose={() => setViewSettingsOpen(false)}
+        view={view}
+        onViewChange={setView}
+        stageListMode={stageListMode}
+        onExport={exportVisibleLeads}
+        onResetFilters={() => {
+          clearAllFilters()
+          setFilter('all')
+          setListStatusFilter('all')
+          setSmartViewId(null)
+          setSmartViewFilters({})
+        }}
+      />
     </div>
   )
 }
@@ -763,129 +896,6 @@ function PipelineLoadMoreBar({ loaded, total, loading, onLoadMore }) {
         {loading ? 'Loading…' : 'Load more'}
       </button>
     </>
-  )
-}
-
-function StagePipelineList({
-  leads,
-  selectedId,
-  selectedIds,
-  onSelect,
-  onToggleSelect,
-  onToggleSaveLead,
-  showStatus = true,
-  tagById,
-  compact = false,
-}) {
-  if (!leads.length) return null
-
-  return (
-    <ul className={`space-y-1.5 ${compact ? 'pb-2' : 'pb-3'}`}>
-      {leads.map((lead) => {
-        const meta = getStatusMeta(lead.crm?.status)
-        const loc = [getLeadCity(lead), getLeadState(lead)].filter(Boolean).join(', ')
-        const isSelected = selectedId === lead.id
-        return (
-          <li key={lead.id}>
-            <div
-              className={`crm-lead-card ${isSelected ? 'is-selected' : ''} ${
-                selectedIds.has(lead.id) ? 'ring-1 ring-slate-300' : ''
-              }`}
-            >
-              <div className="flex items-stretch gap-0 min-h-[52px]">
-                <label className="flex items-center pl-2 pr-0.5 shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={selectedIds.has(lead.id)}
-                    onChange={(e) => onToggleSelect(lead.id, e.target.checked)}
-                    aria-label="Select lead"
-                    className="w-3.5 h-3.5"
-                  />
-                </label>
-                <button
-                  type="button"
-                  onClick={() => onSelect(lead.id)}
-                  className="flex-1 min-w-0 text-left py-2 pr-1.5"
-                >
-                  <div className="flex flex-wrap items-start justify-between gap-1.5">
-                    <div className="min-w-0">
-                      <p className="text-[13px] font-medium text-[#1e2f3d] truncate leading-tight tracking-tight">
-                        {lead.firstName} {lead.lastName}
-                      </p>
-                      <p className="text-[11px] text-[#4a6578] truncate mt-0.5 leading-snug">{lead.company || '—'}</p>
-                    </div>
-                    {showStatus && (
-                      <span className={`shrink-0 text-[9px] font-medium px-1.5 py-0.5 rounded border ${meta.color}`}>
-                        {meta.label}
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1 text-[10px] text-[#5f7d94] leading-snug">
-                    {lead.email && <span className="truncate max-w-[200px]">{lead.email}</span>}
-                    {lead.phone && <span>{lead.phone}</span>}
-                    {loc && <span>{loc}</span>}
-                    {lead.title && <span className="text-gray-400">{lead.title}</span>}
-                  </div>
-                  <div className="flex flex-wrap items-center gap-1 mt-1">
-                    {leadHasSendableEmail(lead) && (
-                      <span className="text-[9px] px-1 py-0.5 rounded bg-blue-50 text-blue-800 font-medium">
-                        Email
-                      </span>
-                    )}
-                    {leadHasCallablePhone(lead) && (
-                      <span className="text-[9px] px-1 py-0.5 rounded bg-green-50 text-green-800 font-medium">
-                        Phone
-                      </span>
-                    )}
-                    {lead.crm?.responseReceived && (
-                      <span className="text-[9px] px-1 py-0.5 rounded bg-violet-50 text-violet-800 font-medium">
-                        Replied
-                      </span>
-                    )}
-                    {lead.crm?.lastEmailSentAt && (
-                      <span className="text-[9px] text-[#5f7d94]">
-                        Emailed {formatCrmDate(lead.crm.lastEmailSentAt)}
-                      </span>
-                    )}
-                    {lead.crm?.nextFollowUpAt && (
-                      <span className="text-[9px] text-amber-800">
-                        Follow-up {formatCrmDate(lead.crm.nextFollowUpAt)}
-                      </span>
-                    )}
-                    <LeadTagDots lead={lead} tagById={tagById} />
-                  </div>
-                </button>
-                <div className="flex flex-col justify-center gap-0.5 pr-2 shrink-0 border-l border-slate-100 pl-1.5">
-                  <button
-                    type="button"
-                    onClick={() => onSelect(lead.id, 'overview')}
-                    className="crm-btn crm-btn-sm crm-btn-primary"
-                  >
-                    Open
-                  </button>
-                  {leadHasSendableEmail(lead) && (
-                    <button
-                      type="button"
-                      onClick={() => onSelect(lead.id, 'email')}
-                      className="crm-btn crm-btn-sm crm-btn-secondary"
-                    >
-                      Email
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => onToggleSaveLead(lead)}
-                    className="text-[9px] text-red-600 hover:text-red-700"
-                  >
-                    Remove
-                  </button>
-                </div>
-              </div>
-            </div>
-          </li>
-        )
-      })}
-    </ul>
   )
 }
 
@@ -918,7 +928,7 @@ function KanbanColumn({
             aria-label={`Select all in ${column.label}`}
             className="w-3.5 h-3.5"
           />
-          <span className="text-[10px] font-medium text-[#4a6578] bg-[#eaf0f6] px-1.5 py-0.5 rounded tabular-nums">
+          <span className="text-[10px] font-semibold text-[#516f90] bg-white border border-[#cbd6e2] px-1.5 py-0.5 rounded-sm tabular-nums">
             {leads.length}
             {totalInColumn > leads.length ? ` / ${totalInColumn}` : ''}
           </span>
@@ -928,11 +938,16 @@ function KanbanColumn({
         {leads.length === 0 ? (
           <p className="text-xs text-[#7c98b6] text-center py-6">No leads</p>
         ) : (
-          leads.map((lead) => (
+          leads.map((lead) => {
+            const nameLabel = [lead.firstName, lead.lastName].filter(Boolean).join(' ').trim()
+            const primaryLabel = nameLabel || lead.company || 'Unnamed lead'
+            const showCompanyRow = Boolean(lead.company && nameLabel)
+
+            return (
             <div
               key={lead.id}
               className={`crm-kanban-card ${selectedId === lead.id ? 'is-active' : ''} ${
-                selectedIds.has(lead.id) ? 'ring-1 ring-slate-400' : ''
+                selectedIds.has(lead.id) ? 'is-checked' : ''
               }`}
             >
               <div className="flex items-start gap-1 p-1.5">
@@ -949,10 +964,27 @@ function KanbanColumn({
                   onClick={() => onSelect(lead.id)}
                   className="flex-1 min-w-0 text-left"
                 >
-                  <div className="text-[11px] font-medium text-[#1e2f3d] truncate leading-tight">
-                    {lead.firstName} {lead.lastName}
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <span className="pipeline-hs-avatar pipeline-hs-avatar--sm shrink-0" aria-hidden>
+                      {(lead.firstName?.[0] || lead.company?.[0] || '?').toUpperCase()}
+                    </span>
+                    <span className="text-[11px] font-medium text-[#33475b] truncate leading-tight">
+                      {primaryLabel}
+                    </span>
                   </div>
-                  <div className="text-[10px] text-[#4a6578] truncate mt-0.5 leading-snug">{lead.company}</div>
+                  {showCompanyRow ? (
+                    <div className="flex items-center gap-1.5 min-w-0 mt-1">
+                      <span
+                        className="pipeline-hs-avatar pipeline-hs-avatar--co pipeline-hs-avatar--sm shrink-0"
+                        aria-hidden
+                      >
+                        {lead.company[0]?.toUpperCase() || 'C'}
+                      </span>
+                      <span className="text-[10px] text-[#33475b] font-medium truncate leading-snug">
+                        {lead.company}
+                      </span>
+                    </div>
+                  ) : null}
                   <LeadTagDots lead={lead} tagById={tagById} />
                   {lead.crm?.lastEmailSentAt && (
                     <div className="text-[10px] text-gray-400 mt-1">
@@ -962,10 +994,20 @@ function KanbanColumn({
                   {lead.crm?.responseReceived && (
                     <div className="text-[10px] text-violet-700 mt-0.5 font-medium">Replied</div>
                   )}
+                  {lead.phone ? (
+                    <div className="mt-1.5" onClick={(e) => e.stopPropagation()}>
+                      <LeadPhoneCall
+                        phone={lead.phone}
+                        leadId={lead.id}
+                        numberClassName="text-[10px] text-[#33475b]"
+                      />
+                    </div>
+                  ) : null}
                 </button>
               </div>
             </div>
-          ))
+            )
+          })
         )}
       </div>
       {hasMoreInColumn && onShowMore && (
@@ -975,27 +1017,6 @@ function KanbanColumn({
           </button>
         </div>
       )}
-    </div>
-  )
-}
-
-function LeadTagDots({ lead, tagById }) {
-  if (!tagById?.size) return null
-  const tags = (lead.crm?.tagIds || []).map((id) => tagById.get(id)).filter(Boolean)
-  if (!tags.length) return null
-  return (
-    <div className="flex flex-wrap gap-1 mt-1">
-      {tags.slice(0, 4).map((tag) => (
-        <span
-          key={tag.id}
-          className="text-[9px] font-semibold px-1.5 py-0 rounded text-white max-w-[72px] truncate"
-          style={{ backgroundColor: tag.color }}
-          title={tag.name}
-        >
-          {tag.name}
-        </span>
-      ))}
-      {tags.length > 4 && <span className="text-[9px] text-gray-400">+{tags.length - 4}</span>}
     </div>
   )
 }
@@ -1029,7 +1050,7 @@ function EmptyPipeline({ onNavigate, onImport, onAdd, compact = false }) {
           <button
             type="button"
             onClick={onImport}
-            className="px-5 py-2.5 border-2 border-[#ffcb2b] text-[#242424] text-sm font-semibold rounded-lg"
+            className="px-5 py-2.5 border-2 border-[#FF773D] text-[#242424] text-sm font-semibold rounded-lg"
           >
             Import CSV / Excel
           </button>

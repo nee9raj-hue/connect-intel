@@ -209,7 +209,7 @@ export default function BulkEmailCompose({ leadIds, leads, onDone, compact = fal
                 type="button"
                 onClick={handleGenerate}
                 disabled={generating || !sampleLead || agenda.trim().length < 8}
-                className="text-xs font-semibold px-3 py-1.5 bg-[#fff6d6] border border-[#ffe48a] rounded-lg disabled:opacity-50 whitespace-nowrap"
+                className="text-xs font-semibold px-3 py-1.5 bg-[#fff4ee] border border-[#ffd4b8] rounded-lg disabled:opacity-50 whitespace-nowrap"
               >
                 {generating ? 'Drafting…' : '✨ Generate draft'}
               </button>

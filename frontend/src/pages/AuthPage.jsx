@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useApp } from '../context/AppContext'
 import GoogleSignIn from '../components/auth/GoogleSignIn'
 import InviteBanner from '../components/auth/InviteBanner'
+import { BRAND_LOGO_MARK_TRANSPARENT, BRAND_LOGO_MARK_CLASS } from '../lib/brandAssets'
 
 export default function AuthPage({ inviteToken = null }) {
   const { login, setScreen } = useApp()
@@ -29,9 +30,9 @@ export default function AuthPage({ inviteToken = null }) {
         <div>
           <button onClick={() => setScreen('landing')} className="flex items-center gap-2 mb-20">
             <img
-              src="/connect-intel-logo-mark.png"
+              src={BRAND_LOGO_MARK_TRANSPARENT}
               alt="Connect Intel"
-              className="h-10 w-auto object-contain"
+              className={`h-11 w-auto max-w-[240px] ${BRAND_LOGO_MARK_CLASS}`}
             />
           </button>
           <h2 className="text-3xl font-bold leading-tight mb-4">

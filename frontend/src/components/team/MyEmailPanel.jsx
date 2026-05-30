@@ -12,7 +12,7 @@ function MailIcon({ className }) {
 /** Work email setup for company team members (admins use Team & workspace). */
 export default function MyEmailPanel({ onNavigate }) {
   return (
-    <div className="panel-shell bg-[#f3f4f6]">
+    <div className="panel-shell">
       <header className="shrink-0 bg-white border-b border-gray-200/90 px-5 py-4 md:px-6">
         <div className="max-w-2xl">
           <h1 className="text-lg md:text-xl font-semibold text-gray-900 tracking-tight">Work email</h1>

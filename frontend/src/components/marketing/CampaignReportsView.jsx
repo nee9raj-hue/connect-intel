@@ -1,10 +1,12 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { DEFAULT_THEME } from '../../lib/marketingEmailDesign'
 import { formatDateTime } from '../../lib/crmUiConstants'
 import LoadingExperience from '../ui/LoadingExperience'
 import MarketingCreatorBadge from './MarketingCreatorBadge'
+
+const PAGE_SIZE = 100
 
 const FILTERS = [
   { id: 'all', label: 'All recipients' },
@@ -17,7 +19,7 @@ const FILTERS = [
 ]
 
 const STATUS_STYLES = {
-  delivered: 'bg-emerald-50 text-emerald-800 border-emerald-100',
+  delivered: 'bg-slate-100 text-[#64748B] border-slate-200',
   bounced: 'bg-red-50 text-red-800 border-red-100',
   failed: 'bg-orange-50 text-orange-800 border-orange-100',
   pending: 'bg-gray-100 text-gray-700 border-gray-200',
@@ -49,15 +51,68 @@ export function campaignToForm(campaign) {
   }
 }
 
-function KpiCard({ label, value, sub, active, onClick, accent }) {
-  const base =
-    'text-left rounded-xl border p-4 transition-all cursor-pointer hover:shadow-md ' +
-    (active ? 'ring-2 ring-gray-900 border-gray-300 bg-white shadow-sm' : 'border-gray-200 bg-white')
+function filterRecipients(rows, filter) {
+  if (filter === 'delivered') return rows.filter((r) => r.deliveryStatus === 'delivered')
+  if (filter === 'pending')
+    return rows.filter((r) => r.deliveryStatus === 'pending' || (r.sentCount || 0) === 0)
+  if (filter === 'opened') return rows.filter((r) => r.opens > 0)
+  if (filter === 'clicked') return rows.filter((r) => r.clicks > 0)
+  if (filter === 'bounced') return rows.filter((r) => r.deliveryStatus === 'bounced')
+  if (filter === 'failed')
+    return rows.filter(
+      (r) => r.deliveryStatus === 'failed' || r.deliveryStatus === 'unsubscribed'
+    )
+  if (filter === 'unsubscribed') return rows.filter((r) => r.deliveryStatus === 'unsubscribed')
+  return rows
+}
+
+function ReportOverlay({ title, onClose, children, wide }) {
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onClose])
+
   return (
-    <button type="button" onClick={onClick} className={base}>
-      <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-500">{label}</p>
-      <p className={`text-2xl font-bold mt-1 tabular-nums ${accent || 'text-gray-900'}`}>{value}</p>
-      {sub && <p className="text-[11px] text-gray-500 mt-1">{sub}</p>}
+    <div
+      className="marketing-studio-popup-overlay"
+      role="presentation"
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <div
+        className={`marketing-studio-popup ${wide ? 'marketing-report-popup' : ''}`}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="report-popup-title"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="marketing-studio-popup-head">
+          <h3 id="report-popup-title">{title}</h3>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50"
+          >
+            Close
+          </button>
+        </div>
+        <div className="marketing-studio-popup-body">{children}</div>
+      </div>
+    </div>
+  )
+}
+
+function KpiTile({ label, value, active, onClick, accent }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`marketing-report-kpi-tile ${active ? 'marketing-report-kpi-tile--active' : ''}`}
+    >
+      <span className="marketing-report-kpi-tile__label">{label}</span>
+      <span className={`marketing-report-kpi-tile__value ${accent || ''}`}>{value}</span>
     </button>
   )
 }
@@ -72,7 +127,7 @@ function WhatsAppRecipientRow({ row, busy, onOpenLead, onSent, autoSend }) {
         <button
           type="button"
           onClick={() => onOpenLead(row.leadId)}
-          className="font-medium text-gray-900 hover:text-[#5b4a00] hover:underline text-left"
+          className="font-medium text-gray-900 hover:text-[#FF773D] hover:underline text-left"
         >
           {row.name || '—'}
         </button>
@@ -132,7 +187,7 @@ function RecipientRow({ row, expanded, onToggle, onOpenLead }) {
           <button
             type="button"
             onClick={() => onOpenLead(row.leadId)}
-            className="font-medium text-gray-900 hover:text-[#5b4a00] hover:underline text-left"
+            className="font-medium text-gray-900 hover:text-[#FF773D] hover:underline text-left"
           >
             {row.name || '—'}
           </button>
@@ -150,7 +205,7 @@ function RecipientRow({ row, expanded, onToggle, onOpenLead }) {
             <button
               type="button"
               onClick={onToggle}
-              className="font-semibold text-emerald-700 hover:underline"
+              className="font-semibold text-[#FF773D] hover:underline"
             >
               {row.opens}
             </button>
@@ -205,7 +260,79 @@ function RecipientRow({ row, expanded, onToggle, onOpenLead }) {
   )
 }
 
-function CampaignDetailReport({ campaignId, campaignName, onBack, onNavigate, onDuplicate, busy }) {
+function KpiRecipientsPopup({
+  title,
+  filter,
+  recipients,
+  isWhatsApp,
+  onClose,
+  onShowInTable,
+  onOpenLead,
+}) {
+  const [visible, setVisible] = useState(PAGE_SIZE)
+  const filtered = useMemo(() => filterRecipients(recipients, filter), [recipients, filter])
+  const shown = filtered.slice(0, visible)
+  const hasMore = visible < filtered.length
+
+  return (
+    <ReportOverlay title={title} onClose={onClose}>
+      <p className="text-xs text-gray-500 mb-3">
+        {filtered.length} contact{filtered.length === 1 ? '' : 's'}
+      </p>
+      <ul className="divide-y divide-gray-100 border border-gray-200 rounded-lg overflow-hidden max-h-[min(420px,50vh)] overflow-y-auto">
+        {!shown.length ? (
+          <li className="px-4 py-8 text-center text-sm text-gray-500">No contacts in this group.</li>
+        ) : (
+          shown.map((row) => (
+            <li key={row.enrollmentId} className="px-3 py-2.5 flex items-start justify-between gap-2">
+              <button
+                type="button"
+                onClick={() => onOpenLead(row.leadId)}
+                className="text-left min-w-0 flex-1"
+              >
+                <span className="text-sm font-medium text-gray-900 hover:underline">
+                  {row.name || '—'}
+                </span>
+                <span className="block text-[11px] text-gray-500 truncate">
+                  {isWhatsApp ? row.phone : row.email}
+                  {row.company ? ` · ${row.company}` : ''}
+                </span>
+              </button>
+              <span className="text-[10px] font-semibold uppercase text-gray-500 shrink-0">
+                {row.deliveryStatus}
+              </span>
+            </li>
+          ))
+        )}
+      </ul>
+      {hasMore && (
+        <button
+          type="button"
+          onClick={() => setVisible((n) => n + PAGE_SIZE)}
+          className="mt-3 w-full text-xs font-semibold py-2 border border-gray-200 rounded-lg hover:bg-gray-50"
+        >
+          Load more ({filtered.length - visible} remaining)
+        </button>
+      )}
+      <button
+        type="button"
+        onClick={() => onShowInTable(filter)}
+        className="mt-3 w-full text-xs font-semibold py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800"
+      >
+        Show in recipient table
+      </button>
+    </ReportOverlay>
+  )
+}
+
+function CampaignDetailReport({
+  campaignId,
+  campaignName,
+  onClose,
+  onNavigate,
+  onDuplicate,
+  busy,
+}) {
   const { openPipelineLead, user } = useApp()
   const [report, setReport] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -214,6 +341,9 @@ function CampaignDetailReport({ campaignId, campaignName, onBack, onNavigate, on
   const [expandedId, setExpandedId] = useState(null)
   const [search, setSearch] = useState('')
   const [waBusy, setWaBusy] = useState(false)
+  const [listVisible, setListVisible] = useState(PAGE_SIZE)
+  const [kpiPopup, setKpiPopup] = useState(null)
+  const recipientsRef = useRef(null)
   const isWhatsApp = report?.campaign?.channel === 'whatsapp'
 
   const load = useCallback(async () => {
@@ -233,8 +363,13 @@ function CampaignDetailReport({ campaignId, campaignName, onBack, onNavigate, on
     load()
   }, [load])
 
+  useEffect(() => {
+    setListVisible(PAGE_SIZE)
+  }, [filter, search])
+
   const goToLead = (leadId) => {
     if (!leadId) return
+    onClose?.()
     onNavigate?.('pipeline')
     openPipelineLead(leadId, 'overview')
   }
@@ -252,14 +387,10 @@ function CampaignDetailReport({ campaignId, campaignName, onBack, onNavigate, on
   }
 
   const stats = report?.stats || {}
+  const allRecipients = report?.recipients || []
+
   const recipients = useMemo(() => {
-    let rows = report?.recipients || []
-    if (filter === 'delivered') rows = rows.filter((r) => r.deliveryStatus === 'delivered')
-    else if (filter === 'opened') rows = rows.filter((r) => r.opens > 0)
-    else if (filter === 'clicked') rows = rows.filter((r) => r.clicks > 0)
-    else if (filter === 'bounced') rows = rows.filter((r) => r.deliveryStatus === 'bounced')
-    else if (filter === 'failed') rows = rows.filter((r) => r.deliveryStatus === 'failed')
-    else if (filter === 'unsubscribed') rows = rows.filter((r) => r.deliveryStatus === 'unsubscribed')
+    let rows = filterRecipients(allRecipients, filter)
     const q = search.trim().toLowerCase()
     if (q) {
       rows = rows.filter(
@@ -271,7 +402,22 @@ function CampaignDetailReport({ campaignId, campaignName, onBack, onNavigate, on
       )
     }
     return rows
-  }, [report?.recipients, filter, search])
+  }, [allRecipients, filter, search])
+
+  const shownRecipients = recipients.slice(0, listVisible)
+  const hasMoreRecipients = listVisible < recipients.length
+
+  const showInTable = (nextFilter) => {
+    setFilter(nextFilter)
+    setKpiPopup(null)
+    requestAnimationFrame(() => {
+      recipientsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
+  }
+
+  const openKpi = (nextFilter, label) => {
+    setKpiPopup({ filter: nextFilter, label })
+  }
 
   if (loading) {
     return <LoadingExperience message="Loading campaign report…" fill={false} className="py-16" />
@@ -279,24 +425,40 @@ function CampaignDetailReport({ campaignId, campaignName, onBack, onNavigate, on
 
   if (error) {
     return (
-      <div className="p-6">
+      <div className="p-4">
         <p className="text-sm text-red-700">{error}</p>
-        <button type="button" onClick={onBack} className="mt-3 text-xs font-semibold underline">
-          Back to all campaigns
+        <button type="button" onClick={onClose} className="mt-3 text-xs font-semibold underline">
+          Close
         </button>
       </div>
     )
   }
 
+  const filterLabel =
+    filter === 'pending'
+      ? 'Pending'
+      : FILTERS.find((f) => f.id === filter)?.label || 'All recipients'
+
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
+      {kpiPopup && (
+        <KpiRecipientsPopup
+          title={kpiPopup.label}
+          filter={kpiPopup.filter}
+          recipients={allRecipients}
+          isWhatsApp={isWhatsApp}
+          onClose={() => setKpiPopup(null)}
+          onShowInTable={showInTable}
+          onOpenLead={goToLead}
+        />
+      )}
+
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <button type="button" onClick={onBack} className="text-xs text-gray-500 hover:text-gray-800 underline mb-1">
-            ← All campaigns
-          </button>
+        <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-lg font-semibold text-gray-900">{campaignName || report?.campaign?.name}</h2>
+            <h2 className="text-base font-semibold text-gray-900 truncate">
+              {campaignName || report?.campaign?.name}
+            </h2>
             {report?.campaign?.createdByName && (
               <MarketingCreatorBadge
                 name={report.campaign.createdByName}
@@ -304,32 +466,20 @@ function CampaignDetailReport({ campaignId, campaignName, onBack, onNavigate, on
               />
             )}
           </div>
-          <p className="text-xs text-gray-500 mt-0.5 capitalize">
-            {report?.campaign?.status} ·{' '}
-            {isWhatsApp ? 'WhatsApp' : 'Email'} ·{' '}
+          <p className="text-[11px] text-gray-500 mt-0.5 capitalize">
+            {report?.campaign?.status} · {isWhatsApp ? 'WhatsApp' : 'Email'} ·{' '}
             {report?.campaign?.type === 'sequence' ? 'Sequence' : 'One-shot'}
-            {report?.campaign?.startedAt && ` · Started ${formatDateTime(report.campaign.startedAt)}`}
+            {report?.campaign?.startedAt && ` · ${formatDateTime(report.campaign.startedAt)}`}
           </p>
-          {isWhatsApp && !user?.whatsappAutoSendReady && (
-            <p className="text-[11px] text-amber-900 bg-amber-50 border border-amber-100 rounded-lg px-2.5 py-1.5 mt-2 max-w-xl">
-              Open WhatsApp for each contact (message is pre-filled). Tap Mark sent after you send — activity is
-              logged on the lead. Connect WhatsApp Business API under Team for automatic delivery.
-            </p>
-          )}
-          {isWhatsApp && user?.whatsappAutoSendReady && (
-            <p className="text-[11px] text-emerald-900 bg-emerald-50 border border-emerald-100 rounded-lg px-2.5 py-1.5 mt-2 max-w-xl">
-              Messages are sent automatically via your WhatsApp Business number. Failed rows show the API error.
-            </p>
-          )}
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 shrink-0">
           <button
             type="button"
             disabled={busy}
             onClick={() => onDuplicate?.(campaignId)}
-            className="text-xs font-semibold px-3 py-2 bg-[#ffcb2b] text-[#242424] rounded-lg disabled:opacity-50"
+            className="text-xs font-semibold px-3 py-2 bg-[#FF773D] text-[#242424] rounded-lg disabled:opacity-50"
           >
-            Duplicate & resend
+            Duplicate
           </button>
           <button
             type="button"
@@ -341,129 +491,95 @@ function CampaignDetailReport({ campaignId, campaignName, onBack, onNavigate, on
         </div>
       </div>
 
-      <div className={`grid gap-3 ${isWhatsApp ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-6'}`}>
-        <KpiCard
+      <div
+        className={`grid gap-2 ${isWhatsApp ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3 sm:grid-cols-6'}`}
+      >
+        <KpiTile
           label="Enrolled"
           value={stats.enrolled ?? 0}
-          sub={isWhatsApp ? 'With phone' : `${stats.sent ?? 0} sent`}
-          active={filter === 'all'}
-          onClick={() => setFilter('all')}
+          active={filter === 'all' && !kpiPopup}
+          onClick={() => openKpi('all', 'Enrolled')}
         />
-        <KpiCard
+        <KpiTile
           label="Sent"
           value={stats.sent ?? 0}
-          sub={isWhatsApp ? (user?.whatsappAutoSendReady ? 'Via API' : 'Marked sent') : `${stats.enrolled ?? 0} enrolled`}
+          accent="text-[#FF773D]"
           active={filter === 'delivered'}
-          onClick={() => setFilter('delivered')}
-          accent="text-emerald-700"
+          onClick={() => openKpi('delivered', 'Sent')}
         />
         {!isWhatsApp && (
           <>
-            <KpiCard
+            <KpiTile
               label="Bounced"
               value={stats.bounced ?? 0}
-              sub={stats.sent ? `${stats.bounceRate ?? 0}% bounce` : ''}
-              active={filter === 'bounced'}
-              onClick={() => setFilter('bounced')}
               accent="text-red-700"
+              active={filter === 'bounced'}
+              onClick={() => openKpi('bounced', 'Bounced')}
             />
-            <KpiCard
+            <KpiTile
               label="Opened"
               value={stats.uniqueOpens ?? 0}
-              sub={`${stats.openRate ?? 0}% unique`}
+              accent="text-[#FF773D]"
               active={filter === 'opened'}
-              onClick={() => setFilter('opened')}
-              accent="text-emerald-700"
+              onClick={() => openKpi('opened', 'Opened')}
             />
-            <KpiCard
+            <KpiTile
               label="Clicked"
               value={stats.uniqueClicks ?? 0}
-              sub={`${stats.clickRate ?? 0}% unique`}
-              active={filter === 'clicked'}
-              onClick={() => setFilter('clicked')}
               accent="text-blue-700"
+              active={filter === 'clicked'}
+              onClick={() => openKpi('clicked', 'Clicked')}
             />
-            <KpiCard
+            <KpiTile
               label="Failed"
               value={(stats.failed ?? 0) + (stats.unsubscribed ?? 0)}
-              sub={`${stats.unsubscribed ?? 0} unsubscribed`}
-              active={filter === 'failed'}
-              onClick={() => setFilter('failed')}
               accent="text-orange-700"
+              active={filter === 'failed'}
+              onClick={() => openKpi('failed', 'Failed / unsubscribed')}
             />
           </>
         )}
         {isWhatsApp && (
           <>
-            <KpiCard
+            <KpiTile
               label="Pending"
               value={stats.pending ?? 0}
-              sub="Not sent yet"
-              active={filter === 'all'}
-              onClick={() => setFilter('all')}
+              active={filter === 'pending'}
+              onClick={() => openKpi('pending', 'Pending')}
             />
-            <KpiCard
+            <KpiTile
               label="Failed"
               value={stats.failed ?? 0}
-              sub="Missing phone / error"
-              active={filter === 'failed'}
-              onClick={() => setFilter('failed')}
               accent="text-orange-700"
+              active={filter === 'failed'}
+              onClick={() => openKpi('failed', 'Failed')}
             />
           </>
         )}
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-        <div className="px-4 py-3 border-b border-gray-100 flex flex-wrap items-center justify-between gap-3">
-          {!isWhatsApp && (
-            <div className="flex flex-wrap gap-1">
-              {FILTERS.map((f) => (
-                <button
-                  key={f.id}
-                  type="button"
-                  onClick={() => setFilter(f.id)}
-                  className={`text-[11px] font-semibold px-2.5 py-1 rounded-full border ${
-                    filter === f.id
-                      ? 'bg-gray-900 text-white border-gray-900'
-                      : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
-                  }`}
-                >
-                  {f.label}
-                </button>
-              ))}
-            </div>
-          )}
+      <div
+        ref={recipientsRef}
+        className="bg-white border border-gray-200 rounded-xl overflow-hidden"
+      >
+        <div className="px-4 py-2.5 border-b border-gray-100 flex flex-wrap items-center justify-between gap-2">
+          <span className="text-xs font-semibold text-gray-700">{filterLabel}</span>
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder={isWhatsApp ? 'Search name, phone, company…' : 'Search name, email, company…'}
-            className="text-xs border border-gray-200 rounded-lg px-3 py-1.5 w-48 sm:w-56"
+            placeholder={isWhatsApp ? 'Search…' : 'Search…'}
+            className="text-xs border border-gray-200 rounded-lg px-3 py-1.5 w-40 sm:w-52"
           />
         </div>
 
-        <p className="px-4 py-2 text-[11px] text-gray-500 border-b border-gray-50">
-          {isWhatsApp ? (
-            <>
-              Each row uses your <strong>saved template</strong> merged with lead fields. Open WhatsApp on your
-              phone, then Mark sent.
-            </>
-          ) : (
-            <>
-              Click a <strong>name</strong> to open that lead in Pipeline. Click open/click counts for link
-              details.
-            </>
-          )}
-        </p>
-
-        <div className="overflow-x-auto max-h-[min(520px,60vh)] overflow-y-auto">
+        <div className="overflow-x-auto max-h-[min(440px,52vh)] overflow-y-auto">
           <table className={`w-full text-sm ${isWhatsApp ? 'min-w-[640px]' : 'min-w-[720px]'}`}>
             <thead className="sticky top-0 bg-gray-50 z-10">
               {isWhatsApp ? (
                 <tr className="text-left text-[10px] uppercase tracking-wide text-gray-500 border-b border-gray-200">
                   <th className="px-4 py-2 font-semibold">Contact</th>
                   <th className="px-4 py-2 font-semibold">Phone</th>
-                  <th className="px-4 py-2 font-semibold">Message preview</th>
+                  <th className="px-4 py-2 font-semibold">Message</th>
                   <th className="px-4 py-2 font-semibold">Status</th>
                   <th className="px-4 py-2 font-semibold">Actions</th>
                 </tr>
@@ -480,14 +596,14 @@ function CampaignDetailReport({ campaignId, campaignName, onBack, onNavigate, on
               )}
             </thead>
             <tbody>
-              {!recipients.length ? (
+              {!shownRecipients.length ? (
                 <tr>
                   <td colSpan={isWhatsApp ? 5 : 7} className="px-4 py-10 text-center text-gray-500 text-sm">
-                    No recipients match this filter.
+                    No recipients match.
                   </td>
                 </tr>
               ) : isWhatsApp ? (
-                recipients.map((row) => (
+                shownRecipients.map((row) => (
                   <WhatsAppRecipientRow
                     key={row.enrollmentId}
                     row={row}
@@ -498,7 +614,7 @@ function CampaignDetailReport({ campaignId, campaignName, onBack, onNavigate, on
                   />
                 ))
               ) : (
-                recipients.map((row) => (
+                shownRecipients.map((row) => (
                   <RecipientRow
                     key={row.enrollmentId}
                     row={row}
@@ -513,6 +629,17 @@ function CampaignDetailReport({ campaignId, campaignName, onBack, onNavigate, on
             </tbody>
           </table>
         </div>
+        {hasMoreRecipients && (
+          <div className="px-4 py-2 border-t border-gray-100">
+            <button
+              type="button"
+              onClick={() => setListVisible((n) => n + PAGE_SIZE)}
+              className="w-full text-xs font-semibold py-2 text-[#FF773D] hover:underline"
+            >
+              Load more ({recipients.length - listVisible} remaining)
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )
@@ -520,127 +647,246 @@ function CampaignDetailReport({ campaignId, campaignName, onBack, onNavigate, on
 
 export default function CampaignReportsView({
   campaigns,
-  summary,
   onNavigate,
   onDuplicate,
+  onReload,
   busy,
   initialCampaignId,
   showCreator = false,
 }) {
-  const [selectedId, setSelectedId] = useState(initialCampaignId || null)
+  const [reportCampaignId, setReportCampaignId] = useState(initialCampaignId || null)
+  const [selectedIds, setSelectedIds] = useState(() => new Set())
+  const [listVisible, setListVisible] = useState(PAGE_SIZE)
+  const [deleteBusy, setDeleteBusy] = useState(false)
+  const [deleteError, setDeleteError] = useState(null)
 
   useEffect(() => {
-    if (initialCampaignId) setSelectedId(initialCampaignId)
+    if (initialCampaignId) setReportCampaignId(initialCampaignId)
   }, [initialCampaignId])
-  const rows = [...(campaigns || [])].sort(
-    (a, b) => new Date(b.updatedAt || b.createdAt || 0) - new Date(a.updatedAt || a.createdAt || 0)
+
+  const rows = useMemo(
+    () =>
+      [...(campaigns || [])].sort(
+        (a, b) => new Date(b.updatedAt || b.createdAt || 0) - new Date(a.updatedAt || a.createdAt || 0)
+      ),
+    [campaigns]
   )
 
-  const selected = rows.find((c) => c.id === selectedId)
+  const visibleRows = rows.slice(0, listVisible)
+  const hasMoreList = listVisible < rows.length
+  const reportCampaign = rows.find((c) => c.id === reportCampaignId)
 
-  if (selectedId && selected) {
-    return (
-      <CampaignDetailReport
-        campaignId={selectedId}
-        campaignName={selected.name}
-        onBack={() => setSelectedId(null)}
-        onNavigate={onNavigate}
-        onDuplicate={onDuplicate}
-        busy={busy}
-      />
-    )
+  const allSelected = visibleRows.length > 0 && visibleRows.every((c) => selectedIds.has(c.id))
+  const someSelected = selectedIds.size > 0
+
+  const toggleSelect = (id) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const toggleSelectAll = () => {
+    if (allSelected) {
+      setSelectedIds((prev) => {
+        const next = new Set(prev)
+        visibleRows.forEach((c) => next.delete(c.id))
+        return next
+      })
+    } else {
+      setSelectedIds((prev) => {
+        const next = new Set(prev)
+        visibleRows.forEach((c) => next.add(c.id))
+        return next
+      })
+    }
+  }
+
+  const deleteSelected = async () => {
+    const ids = [...selectedIds]
+    if (!ids.length) return
+    const names = ids
+      .map((id) => rows.find((c) => c.id === id)?.name)
+      .filter(Boolean)
+      .slice(0, 5)
+    const label =
+      ids.length === 1
+        ? `Delete campaign “${names[0] || 'this campaign'}”?`
+        : `Delete ${ids.length} campaigns? This cannot be undone.`
+    if (!window.confirm(label)) return
+
+    setDeleteBusy(true)
+    setDeleteError(null)
+    const failed = []
+    for (const id of ids) {
+      try {
+        await api.deleteMarketingCampaign(id)
+      } catch (e) {
+        failed.push({ id, message: e.message })
+      }
+    }
+    setDeleteBusy(false)
+    if (failed.length) {
+      setDeleteError(
+        failed.length === ids.length
+          ? failed[0].message
+          : `${failed.length} could not be deleted (pause active campaigns first).`
+      )
+    } else {
+      setSelectedIds(new Set())
+      if (ids.includes(reportCampaignId)) setReportCampaignId(null)
+    }
+    await onReload?.()
+  }
+
+  const openReport = (id, e) => {
+    e?.stopPropagation?.()
+    setReportCampaignId(id)
   }
 
   return (
-    <div className="space-y-6 max-w-6xl">
-      <section className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-        {[
-          { label: 'Campaigns', value: summary?.campaigns ?? rows.length },
-          { label: 'Emails sent', value: summary?.sent ?? 0 },
-          { label: 'Unique opens', value: summary?.opens ?? 0 },
-          { label: 'Unique clicks', value: summary?.clicks ?? 0 },
-          { label: 'Enrolled', value: summary?.enrolled ?? 0 },
-        ].map((kpi) => (
-          <div key={kpi.label} className="bg-white border border-gray-200 rounded-xl p-4">
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-500">{kpi.label}</p>
-            <p className="text-2xl font-bold text-gray-900 mt-1 tabular-nums">{kpi.value}</p>
-          </div>
-        ))}
-      </section>
+    <div className="space-y-4 max-w-6xl p-1">
+      {reportCampaignId && reportCampaign && (
+        <ReportOverlay
+          wide
+          title={reportCampaign.name}
+          onClose={() => setReportCampaignId(null)}
+        >
+          <CampaignDetailReport
+            campaignId={reportCampaignId}
+            campaignName={reportCampaign.name}
+            onClose={() => setReportCampaignId(null)}
+            onNavigate={onNavigate}
+            onDuplicate={onDuplicate}
+            busy={busy}
+          />
+        </ReportOverlay>
+      )}
 
       <section className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-        <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between gap-2">
-          <div>
-            <h2 className="text-sm font-semibold text-gray-900">Campaign reports</h2>
-            <p className="text-[11px] text-gray-500 mt-0.5">
-              Select a campaign for delivery, bounces, opens, clicks, and per-contact activity.
-            </p>
+        <div className="px-4 py-3 border-b border-gray-100 flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-sm font-semibold text-gray-900">Campaign reports</h2>
+          <div className="flex flex-wrap items-center gap-2">
+            {someSelected && (
+              <button
+                type="button"
+                disabled={deleteBusy || busy}
+                onClick={deleteSelected}
+                className="text-xs font-semibold px-3 py-1.5 text-red-800 border border-red-200 rounded-lg hover:bg-red-50 disabled:opacity-50"
+              >
+                {deleteBusy ? 'Deleting…' : `Delete (${selectedIds.size})`}
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => onNavigate?.('marketing', { tab: 'campaigns' })}
+              className="text-xs font-semibold text-[#FF773D] hover:underline shrink-0"
+            >
+              Manage campaigns
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={() => onNavigate?.('marketing', { tab: 'campaigns' })}
-            className="text-xs font-semibold text-[#5b4a00] hover:underline shrink-0"
-          >
-            Manage campaigns
-          </button>
         </div>
+
+        {deleteError && (
+          <p className="px-4 py-2 text-xs text-red-700 bg-red-50 border-b border-red-100">{deleteError}</p>
+        )}
+
         {!rows.length ? (
           <p className="text-sm text-gray-500 p-6">No campaigns yet — create one under Campaigns.</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-left text-[10px] uppercase tracking-wide text-gray-500 border-b border-gray-100 bg-gray-50/80">
-                  <th className="px-4 py-2 font-semibold">Campaign</th>
-                  <th className="px-4 py-2 font-semibold">Status</th>
-                  <th className="px-4 py-2 font-semibold">Sent</th>
-                  <th className="px-4 py-2 font-semibold">Bounced</th>
-                  <th className="px-4 py-2 font-semibold">Opens</th>
-                  <th className="px-4 py-2 font-semibold">Clicks</th>
-                  <th className="px-4 py-2 font-semibold" />
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((c) => {
-                  const stats = c.stats || c.analytics || {}
-                  return (
-                    <tr
-                      key={c.id}
-                      className="border-b border-gray-50 hover:bg-[#fffbeb]/40 cursor-pointer"
-                      onClick={() => setSelectedId(c.id)}
-                    >
-                      <td className="px-4 py-3">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className="font-medium text-gray-900">{c.name}</span>
-                          {showCreator && (
-                            <MarketingCreatorBadge name={c.createdByName} isOwn={c.isOwn} />
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 capitalize text-gray-600">{c.status}</td>
-                      <td className="px-4 py-3 tabular-nums">{stats.sent || 0}</td>
-                      <td className="px-4 py-3 tabular-nums text-red-700">{stats.bounced || 0}</td>
-                      <td className="px-4 py-3 tabular-nums">
-                        {stats.uniqueOpens ?? stats.opens ?? 0}
-                        {stats.sent > 0 ? (
-                          <span className="text-gray-400 text-xs"> ({stats.openRate || 0}%)</span>
-                        ) : null}
-                      </td>
-                      <td className="px-4 py-3 tabular-nums">
-                        {stats.uniqueClicks ?? stats.clicks ?? 0}
-                        {stats.sent > 0 ? (
-                          <span className="text-gray-400 text-xs"> ({stats.clickRate || 0}%)</span>
-                        ) : null}
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        <span className="text-xs font-semibold text-[#5b4a00]">View report →</span>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-left text-[10px] uppercase tracking-wide text-gray-500 border-b border-gray-100 bg-gray-50/80">
+                    <th className="px-3 py-2 w-10">
+                      <input
+                        type="checkbox"
+                        checked={allSelected}
+                        onChange={toggleSelectAll}
+                        aria-label="Select all visible campaigns"
+                        className="rounded border-gray-300"
+                      />
+                    </th>
+                    <th className="px-4 py-2 font-semibold">Campaign</th>
+                    <th className="px-4 py-2 font-semibold">Status</th>
+                    <th className="px-4 py-2 font-semibold">Sent</th>
+                    <th className="px-4 py-2 font-semibold">Bounced</th>
+                    <th className="px-4 py-2 font-semibold">Opens</th>
+                    <th className="px-4 py-2 font-semibold">Clicks</th>
+                    <th className="px-4 py-2 font-semibold w-28" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {visibleRows.map((c) => {
+                    const stats = c.stats || c.analytics || {}
+                    const checked = selectedIds.has(c.id)
+                    return (
+                      <tr
+                        key={c.id}
+                        className={`border-b border-gray-50 hover:bg-gray-50/80 ${checked ? 'bg-[#fff4ee]/30' : ''}`}
+                      >
+                        <td className="px-3 py-3">
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={() => toggleSelect(c.id)}
+                            aria-label={`Select ${c.name}`}
+                            className="rounded border-gray-300"
+                          />
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="font-medium text-gray-900">{c.name}</span>
+                            {showCreator && (
+                              <MarketingCreatorBadge name={c.createdByName} isOwn={c.isOwn} />
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 capitalize text-gray-600">{c.status}</td>
+                        <td className="px-4 py-3 tabular-nums">{stats.sent || 0}</td>
+                        <td className="px-4 py-3 tabular-nums text-red-700">{stats.bounced || 0}</td>
+                        <td className="px-4 py-3 tabular-nums">
+                          {stats.uniqueOpens ?? stats.opens ?? 0}
+                          {stats.sent > 0 ? (
+                            <span className="text-gray-400 text-xs"> ({stats.openRate || 0}%)</span>
+                          ) : null}
+                        </td>
+                        <td className="px-4 py-3 tabular-nums">
+                          {stats.uniqueClicks ?? stats.clicks ?? 0}
+                          {stats.sent > 0 ? (
+                            <span className="text-gray-400 text-xs"> ({stats.clickRate || 0}%)</span>
+                          ) : null}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <button
+                            type="button"
+                            onClick={(e) => openReport(c.id, e)}
+                            className="text-xs font-semibold text-[#FF773D] hover:underline"
+                          >
+                            View report
+                          </button>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+            {hasMoreList && (
+              <div className="px-4 py-2 border-t border-gray-100">
+                <button
+                  type="button"
+                  onClick={() => setListVisible((n) => n + PAGE_SIZE)}
+                  className="w-full text-xs font-semibold py-2 text-[#FF773D] hover:underline"
+                >
+                  Load more ({rows.length - listVisible} remaining)
+                </button>
+              </div>
+            )}
+          </>
         )}
       </section>
     </div>

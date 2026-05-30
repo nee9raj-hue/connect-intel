@@ -11,6 +11,13 @@ import {
   RevenueLeakInfographic,
   WhatsAppOneClick,
 } from '../components/landing/LandingVisuals'
+import {
+  BRAND_LOGO_ICON,
+  BRAND_LOGO_ICON_CLASS,
+  BRAND_LOGO_HERO,
+  BRAND_LOGO_HERO_MARK,
+  BRAND_LOGO_MARK_CLASS,
+} from '../lib/brandAssets'
 
 const PILLARS = [
   {
@@ -102,18 +109,29 @@ export default function LandingPage() {
         <div className="max-w-[880px] mx-auto text-center relative z-10">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-gray-200 shadow-sm mb-8">
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF773D]/50 opacity-60" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF773D]" />
             </span>
             <span className="text-[12px] font-semibold text-gray-600">
               CRM + AI prospecting built for Indian B2B teams
             </span>
           </div>
 
+          <div className="flex justify-center mb-5 sm:mb-6 px-2">
+            <img
+              src={BRAND_LOGO_HERO_MARK}
+              alt="Connect Intel — Intelligence Connected"
+              width={280}
+              height={56}
+              decoding="async"
+              className={`h-9 sm:h-10 md:h-11 w-auto max-w-[min(100%,17.5rem)] ${BRAND_LOGO_MARK_CLASS}`}
+            />
+          </div>
+
           <h1 className="font-display text-[2.25rem] sm:text-[3rem] md:text-[3.35rem] font-bold text-[#0f0f0f] tracking-[-0.03em] leading-[1.08] mb-6">
             Never lose a prospect
             <br />
-            in the <span className="text-[#b8860b]">follow-up gap</span>
+            in the <span className="text-[#FF773D]">follow-up gap</span>
           </h1>
 
           <p className="text-lg md:text-xl text-gray-600 leading-relaxed mb-4 max-w-[640px] mx-auto">
@@ -249,7 +267,7 @@ export default function LandingPage() {
               <article
                 key={f.id}
                 id={f.id}
-                className="p-6 rounded-xl border border-gray-200 bg-white hover:border-[#ffcb2b]/50 hover:shadow-md transition-all"
+                className="p-6 rounded-xl border border-gray-200 bg-white hover:border-[#FF773D]/50 hover:shadow-md transition-all"
               >
                 <span className="text-[10px] font-bold uppercase tracking-wider text-[#b8860b]">{f.tag}</span>
                 <h3 className="font-semibold text-gray-900 mt-2 mb-2 text-[15px]">{f.title}</h3>
@@ -361,7 +379,7 @@ function HeroBackground() {
         aria-hidden
       />
       <div
-        className="absolute top-16 left-1/2 -translate-x-1/2 w-[min(100%,720px)] h-[380px] -z-10 rounded-full bg-[#ffcb2b]/12 blur-[90px]"
+        className="absolute top-16 left-1/2 -translate-x-1/2 w-[min(100%,720px)] h-[380px] -z-10 rounded-full bg-[#FF773D]/12 blur-[90px]"
         aria-hidden
       />
     </>
@@ -379,13 +397,15 @@ function StatCard({ value, label }) {
 
 function Logo() {
   return (
-    <div className="flex items-center">
+    <a href="/" className="flex items-center shrink-0" aria-label="Connect Intel home">
       <img
-        src="/connect-intel-logo-mark.png"
-        alt="Connect Intel"
-        className="h-8 w-auto object-contain"
+        src={BRAND_LOGO_HERO}
+        alt=""
+        width={48}
+        height={48}
+        className={`h-10 w-10 sm:h-11 sm:w-11 rounded-lg ${BRAND_LOGO_ICON_CLASS}`}
       />
-    </div>
+    </a>
   )
 }
 
@@ -403,9 +423,11 @@ function ProductPreview() {
         <div className="w-[52px] md:w-[168px] bg-ci-sidebar shrink-0 flex flex-col">
           <div className="p-3 border-b border-white/10 hidden md:block">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded bg-ci-yellow flex items-center justify-center text-[10px] font-bold text-ci-dark">
-                CI
-              </div>
+              <img
+                src={BRAND_LOGO_ICON}
+                alt=""
+                className={`w-7 h-7 shrink-0 ${BRAND_LOGO_ICON_CLASS}`}
+              />
               <span className="text-white text-xs font-bold">Connect Intel</span>
             </div>
           </div>
@@ -426,7 +448,7 @@ function ProductPreview() {
         <div className="flex-1 flex flex-col min-w-0 bg-ci-surface">
           <div className="h-11 bg-white border-b border-gray-200 flex items-center px-4 gap-2">
             <span className="text-sm font-semibold text-ci-dark">Pipeline</span>
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold">
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#fff4ee] text-[#FF773D] font-semibold border border-[#ffd4b8]">
               Follow-up in 28 min
             </span>
           </div>
@@ -445,7 +467,7 @@ function ProductPreview() {
                     <td className="py-2 pl-1 font-medium text-gray-900">{r.name}</td>
                     <td className="py-2 text-gray-600 hidden sm:table-cell">{r.company}</td>
                     <td className="py-2 text-right">
-                      <span className="inline-flex w-7 h-7 items-center justify-center rounded-full bg-green-100 text-green-800 font-bold text-[10px]">
+                      <span className="inline-flex w-7 h-7 items-center justify-center rounded-full bg-[#fff4ee] text-[#FF773D] font-bold text-[10px]">
                         {r.score}
                       </span>
                     </td>

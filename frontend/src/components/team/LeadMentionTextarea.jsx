@@ -1,27 +1,30 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { api } from '../../lib/api'
+import { formatLeadMentionToken } from '../../lib/mentionTokens'
 
-const MENTION_TOKEN_RE = /@\[([^\]]+)\]\(lead:([^)]+)\)/g
-
-export function formatLeadMentionToken(lead) {
-  const name = [lead.firstName, lead.lastName].filter(Boolean).join(' ').trim()
-  const company = String(lead.company || lead.label || '').trim()
-  const label = lead.label || (name && company ? `${name} · ${company}` : name || company || 'Customer')
-  return `@[${label}](lead:${lead.id}) `
+function detectCustomerMention(beforeCursor) {
+  const hash = beforeCursor.lastIndexOf('#')
+  if (hash < 0) return null
+  const query = beforeCursor.slice(hash + 1)
+  if (query.includes(' ') || query.includes('\n')) return null
+  return { trigger: hash, query }
 }
 
 export function MentionBody({ body, onLeadClick, className = '' }) {
   if (!body) return null
   const parts = []
   let last = 0
-  for (const match of String(body).matchAll(MENTION_TOKEN_RE)) {
+  const text = String(body)
+  const combined = /(@|#)\[([^\]]+)\]\((lead|user):([^)]+)\)/g
+  for (const match of text.matchAll(combined)) {
+    if (match[3] !== 'lead') continue
     if (match.index > last) {
-      parts.push({ type: 'text', value: body.slice(last, match.index) })
+      parts.push({ type: 'text', value: text.slice(last, match.index) })
     }
-    parts.push({ type: 'lead', label: match[1], leadId: match[2] })
+    parts.push({ type: 'lead', label: match[2], leadId: match[4] })
     last = match.index + match[0].length
   }
-  if (last < body.length) parts.push({ type: 'text', value: body.slice(last) })
+  if (last < text.length) parts.push({ type: 'text', value: text.slice(last) })
 
   return (
     <p className={`whitespace-pre-wrap ${className}`}>
@@ -33,7 +36,7 @@ export function MentionBody({ body, onLeadClick, className = '' }) {
             onClick={() => onLeadClick?.(part.leadId)}
             className="text-blue-700 font-semibold hover:underline"
           >
-            {part.label}
+            #{part.label}
           </button>
         ) : (
           <span key={i}>{part.value}</span>
@@ -42,6 +45,8 @@ export function MentionBody({ body, onLeadClick, className = '' }) {
     </p>
   )
 }
+
+export { formatLeadMentionToken } from '../../lib/mentionTokens'
 
 export default function LeadMentionTextarea({
   value,
@@ -54,6 +59,7 @@ export default function LeadMentionTextarea({
   const [suggestions, setSuggestions] = useState([])
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [mentionQuery, setMentionQuery] = useState('')
   const textareaRef = useRef(null)
   const mentionStartRef = useRef(-1)
 
@@ -71,19 +77,19 @@ export default function LeadMentionTextarea({
 
   useEffect(() => {
     if (!open) return
-    fetchLeads('')
-  }, [open, fetchLeads])
+    fetchLeads(mentionQuery)
+  }, [open, mentionQuery, fetchLeads])
 
   const handleChange = (e) => {
     const next = e.target.value
     onChange(next)
     const cursor = e.target.selectionStart
     const before = next.slice(0, cursor)
-    const at = before.lastIndexOf('@')
-    if (at >= 0 && !before.slice(at + 1).includes(' ') && !before.slice(at + 1).includes('\n')) {
-      mentionStartRef.current = at
+    const hit = detectCustomerMention(before)
+    if (hit) {
+      mentionStartRef.current = hit.trigger
+      setMentionQuery(hit.query)
       setOpen(true)
-      fetchLeads(before.slice(at + 1))
     } else {
       setOpen(false)
       mentionStartRef.current = -1
@@ -122,7 +128,7 @@ export default function LeadMentionTextarea({
           {loading && suggestions.length === 0 ? (
             <p className="text-xs text-gray-500 px-3 py-2">Loading customers…</p>
           ) : suggestions.length === 0 ? (
-            <p className="text-xs text-gray-500 px-3 py-2">Type @ then search pipeline customers</p>
+            <p className="text-xs text-gray-500 px-3 py-2">Type # then name, company, or mobile</p>
           ) : (
             suggestions.map((lead) => (
               <button
@@ -131,8 +137,11 @@ export default function LeadMentionTextarea({
                 onClick={() => pickLead(lead)}
                 className="w-full text-left px-3 py-2 text-xs hover:bg-gray-50 border-b border-gray-50 last:border-0"
               >
-                <span className="font-medium text-gray-900">{lead.label}</span>
-                {lead.email && <span className="text-gray-500 ml-2">{lead.email}</span>}
+                <span className="font-medium text-blue-700 block truncate">
+                  #{lead.name || lead.label}
+                </span>
+                {lead.company ? <span className="text-gray-600 block truncate">{lead.company}</span> : null}
+                {lead.phone ? <span className="text-gray-500 block tabular-nums">{lead.phone}</span> : null}
               </button>
             ))
           )}

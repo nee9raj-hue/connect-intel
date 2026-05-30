@@ -64,7 +64,7 @@ export default function BulkEmailPanel() {
   const allWithEmailCount = savedLeads.filter(leadHasSendableEmail).length
 
   return (
-    <div className="flex flex-col lg:flex-row h-full min-h-0 bg-[#f6f7f9]">
+    <div className="flex flex-col lg:flex-row h-full min-h-0 hs-canvas">
       <div className="flex-1 flex flex-col min-w-0 min-h-0 border-r border-gray-200">
         <header className="shrink-0 bg-white border-b border-gray-200 px-4 md:px-5 py-4 space-y-3">
           <div>
@@ -172,7 +172,7 @@ export default function BulkEmailPanel() {
                 return (
                   <tr
                     key={lead.id}
-                    className={`border-b border-gray-100 ${checked ? 'bg-[#fffbeb]/60' : 'hover:bg-gray-50'} ${!hasEmail ? 'opacity-50' : ''}`}
+                    className={`border-b border-gray-100 ${checked ? 'bg-[#fff4ee]/60' : 'hover:bg-gray-50'} ${!hasEmail ? 'opacity-50' : ''}`}
                   >
                     <td className="py-2.5 pl-4 align-top">
                       <input

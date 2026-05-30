@@ -175,7 +175,7 @@ export default function OrgPipelineImport({ onImported, embedded = false }) {
           type="file"
           accept=".csv,.xlsx,.xls"
           onChange={handleFileChange}
-          className="block w-full text-sm text-gray-600 file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#ffcb2b] file:text-[#242424] hover:file:bg-[#f0bc00]"
+          className="block w-full text-sm text-gray-600 file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#FF773D] file:text-[#242424] hover:file:bg-[#e5652f]"
         />
         {fileName && <p className="text-xs text-gray-500">{fileName}</p>}
 
@@ -183,7 +183,7 @@ export default function OrgPipelineImport({ onImported, embedded = false }) {
           type="button"
           onClick={handleUpload}
           disabled={!rows.length || loading}
-          className="px-4 py-2 bg-[#ffcb2b] hover:bg-[#f0bc00] text-[#242424] text-sm font-semibold rounded-lg disabled:opacity-50"
+          className="px-4 py-2 bg-[#FF773D] hover:bg-[#e5652f] text-[#242424] text-sm font-semibold rounded-lg disabled:opacity-50"
         >
           {loading ? 'Importing…' : `Import ${rows.length || ''} row${rows.length === 1 ? '' : 's'}`}
         </button>

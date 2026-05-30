@@ -55,7 +55,7 @@ export default function InviteEmailSetup({ onStatusChange }) {
 
   if (diag.gmailOAuthConfigured) {
     return (
-      <div className="rounded-lg border-2 border-[#ffcb2b] bg-[#fffbeb] px-4 py-4 text-sm space-y-3">
+      <div className="rounded-lg border-2 border-[#FF773D] bg-[#fff4ee] px-4 py-4 text-sm space-y-3">
         {diag.lastOAuthError && (
           <div className="rounded-md border border-red-300 bg-red-50 px-3 py-2 text-xs text-red-900">
             <p className="font-semibold">Last connect attempt failed</p>
@@ -63,7 +63,7 @@ export default function InviteEmailSetup({ onStatusChange }) {
           </div>
         )}
         <p className="font-semibold text-[#242424]">One click to enable invite emails</p>
-        <p className="text-xs text-[#5b4a00] leading-relaxed">
+        <p className="text-xs text-[#FF773D] leading-relaxed">
           On the Google screen, pick <strong>{MAILBOX}</strong> only (not personal Gmail). If Google asks again,
           remove Connect Intel at{' '}
           <a
@@ -80,7 +80,7 @@ export default function InviteEmailSetup({ onStatusChange }) {
           type="button"
           onClick={handleConnect}
           disabled={connecting}
-          className="w-full py-3 bg-[#ffcb2b] hover:bg-[#f0bc00] text-[#242424] font-bold rounded-lg text-sm disabled:opacity-60"
+          className="w-full py-3 bg-[#FF773D] hover:bg-[#e5652f] text-[#242424] font-bold rounded-lg text-sm disabled:opacity-60"
         >
           {connecting ? 'Opening Google…' : `Connect ${MAILBOX}`}
         </button>

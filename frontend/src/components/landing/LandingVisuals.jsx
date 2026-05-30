@@ -10,9 +10,9 @@ export function RevenueLeakInfographic() {
           <p className="text-xs text-red-800 mt-1 leading-snug">of deals slip when follow-ups are late or forgotten</p>
         </div>
         <div className="hidden sm:flex items-center text-2xl text-gray-300">→</div>
-        <div className="flex-1 rounded-xl bg-emerald-50 border border-emerald-100 p-4 text-center">
-          <div className="text-3xl font-bold text-emerald-700">CI</div>
-          <p className="text-xs text-emerald-800 mt-1 leading-snug">Connect Intel logs every touch & reminds you 30 min before</p>
+        <div className="flex-1 rounded-xl bg-[#fff4ee] border border-[#ffd4b8] p-4 text-center">
+          <div className="text-3xl font-bold text-[#FF773D]">CI</div>
+          <p className="text-xs text-[#64748B] mt-1 leading-snug">Connect Intel logs every touch & reminds you 30 min before</p>
         </div>
       </div>
       <p className="text-[11px] text-gray-500 mt-4 text-center">
@@ -27,7 +27,7 @@ export function FollowUpTimeline() {
     { time: 'Day 1', label: 'AI finds lead', color: 'bg-amber-100 text-amber-900' },
     { time: 'Day 2', label: 'Email + WhatsApp', color: 'bg-blue-100 text-blue-900' },
     { time: 'Day 5', label: 'Auto reminder', color: 'bg-violet-100 text-violet-900' },
-    { time: '−30 min', label: 'Alert before call', color: 'bg-emerald-100 text-emerald-900' },
+    { time: '−30 min', label: 'Alert before call', color: 'bg-slate-100 text-[#64748B]' },
   ]
   return (
     <div className="rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-amber-50/40 p-6">
@@ -52,7 +52,7 @@ export function IndiaLeadMapVisual() {
     <div className="relative rounded-2xl border border-gray-200 bg-[#0f172a] p-6 overflow-hidden text-white min-h-[220px]">
       <div className="absolute inset-0 opacity-20" aria-hidden>
         <svg viewBox="0 0 400 280" className="w-full h-full" fill="none">
-          <ellipse cx="200" cy="140" rx="160" ry="120" stroke="#ffcb2b" strokeWidth="1" strokeDasharray="4 4" />
+          <ellipse cx="200" cy="140" rx="160" ry="120" stroke="#FF773D" strokeWidth="1" strokeDasharray="4 4" />
           {[
             [120, 80],
             [200, 60],
@@ -62,8 +62,8 @@ export function IndiaLeadMapVisual() {
             [190, 200],
           ].map(([x, y], i) => (
             <g key={i}>
-              <circle cx={x} cy={y} r="6" fill="#ffcb2b" opacity="0.9" />
-              <circle cx={x} cy={y} r="12" fill="#ffcb2b" opacity="0.2" />
+              <circle cx={x} cy={y} r="6" fill="#FF773D" opacity="0.9" />
+              <circle cx={x} cy={y} r="12" fill="#FF773D" opacity="0.2" />
             </g>
           ))}
         </svg>
@@ -115,7 +115,7 @@ export function WhatsAppOneClick() {
         <p className="text-sm text-gray-600 mt-1 leading-relaxed">
           AI drafts your follow-up in one click. Proofread, tap send from your number — activity saved in CRM.
         </p>
-        <p className="text-xs font-semibold text-emerald-800 mt-2">
+        <p className="text-xs font-semibold text-[#64748B] mt-2">
           Sharper follow-ups can lift reply rates significantly*
         </p>
       </div>
@@ -160,10 +160,10 @@ export function ManagerDashboardPreview() {
             <span className="font-semibold text-gray-900 w-16">{m.name}</span>
             <span className="text-gray-500">{m.leads} leads</span>
             <span className="text-blue-600">{m.contacted} touched</span>
-            <span className="text-green-600">{m.won} won</span>
+            <span className="text-[#FF773D]">{m.won} won</span>
             <span
               className={`ml-auto text-[10px] px-2 py-0.5 rounded-full ${
-                m.needs === 'On track' ? 'bg-green-50 text-green-800' : 'bg-amber-50 text-amber-900'
+                m.needs === 'On track' ? 'bg-slate-100 text-[#64748B]' : 'bg-[#fff4ee] text-[#475569]'
               }`}
             >
               {m.needs}
@@ -180,7 +180,7 @@ export function CrmPipelineMini() {
     { name: 'New', count: 12, color: 'border-slate-200' },
     { name: 'Contacted', count: 8, color: 'border-blue-200' },
     { name: 'Follow up', count: 5, color: 'border-amber-200' },
-    { name: 'Won', count: 3, color: 'border-green-200' },
+    { name: 'Won', count: 3, color: 'border-[#cbd5e1]' },
   ]
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">

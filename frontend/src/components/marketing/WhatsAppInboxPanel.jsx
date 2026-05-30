@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { api } from '../../lib/api'
 import { formatPhoneDisplay } from '../../lib/phoneUtils'
 import useIsMobile from '../../hooks/useIsMobile'
+import FullScreenDetailModal from '../ui/FullScreenDetailModal'
 
 function MsgTick({ status }) {
   if (status === 'read') return <span className="text-blue-300 ml-1">✓✓</span>
@@ -101,9 +102,6 @@ export default function WhatsAppInboxPanel({ onNavigate }) {
     setThread(null)
   }
 
-  const showThreadList = !isMobile || !selected
-  const showThreadDetail = !isMobile || Boolean(selected)
-
   const sendReply = async () => {
     if (!reply.trim() || !selected) return
     setSending(true)
@@ -142,6 +140,160 @@ export default function WhatsAppInboxPanel({ onNavigate }) {
     onNavigate?.('pipeline', { leadId: thread.leadId })
   }
 
+  const selectedThreadMeta = threads.find((t) => t.id === selected)
+  const threadTitle =
+    thread?.leadName ||
+    (thread?.leadPhone ? formatPhoneDisplay(thread.leadPhone) : null) ||
+    (selectedThreadMeta?.leadName || formatPhoneDisplay(selectedThreadMeta?.leadPhone)) ||
+    'Conversation'
+  const threadSubtitle = thread?.leadPhone
+    ? formatPhoneDisplay(thread.leadPhone)
+    : selectedThreadMeta?.leadPhone
+      ? formatPhoneDisplay(selectedThreadMeta.leadPhone)
+      : null
+
+  const renderThreadDetail = (embeddedInModal = false) => {
+    if (!selected) {
+      return (
+        <div className="flex-1 flex flex-col items-center justify-center text-sm text-gray-400 gap-2">
+          <span className="text-3xl">💬</span>
+          Select a conversation
+        </div>
+      )
+    }
+    if (threadLoading) {
+      return (
+        <div className="flex-1 flex items-center justify-center text-sm text-gray-400">Loading…</div>
+      )
+    }
+    if (!thread) return null
+
+    return (
+      <div
+        className={`flex flex-col flex-1 min-h-0 min-w-0 ${
+          embeddedInModal ? 'h-full' : 'border border-gray-200 rounded-xl overflow-hidden bg-white'
+        }`}
+      >
+        {!embeddedInModal && (
+          <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-3 flex-wrap shrink-0">
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-gray-800 truncate">
+                {thread.leadName || formatPhoneDisplay(thread.leadPhone)}
+              </p>
+              <p className="text-xs text-gray-400">{formatPhoneDisplay(thread.leadPhone)}</p>
+            </div>
+            {thread.leadId && (
+              <button
+                type="button"
+                onClick={openLead}
+                className="text-xs font-medium px-2.5 py-1 border border-gray-200 rounded-lg hover:bg-gray-50"
+              >
+                Open in Pipeline
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={toggleInterested}
+              disabled={tagging}
+              className={`text-xs font-medium px-2.5 py-1 rounded-lg border ${
+                thread.leadTag === 'interested'
+                  ? 'bg-yellow-50 border-yellow-300 text-yellow-800'
+                  : 'border-gray-200 text-gray-500'
+              }`}
+            >
+              {thread.leadTag === 'interested' ? '⭐ Interested' : '☆ Mark interested'}
+            </button>
+          </div>
+        )}
+
+        {embeddedInModal && (
+          <div className="flex flex-wrap gap-2 pb-2 shrink-0">
+            {thread.leadId && (
+              <button
+                type="button"
+                onClick={openLead}
+                className="text-xs font-medium px-2.5 py-1 border border-gray-200 rounded-lg hover:bg-gray-50"
+              >
+                Open in Pipeline
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={toggleInterested}
+              disabled={tagging}
+              className={`text-xs font-medium px-2.5 py-1 rounded-lg border ${
+                thread.leadTag === 'interested'
+                  ? 'bg-yellow-50 border-yellow-300 text-yellow-800'
+                  : 'border-gray-200 text-gray-500'
+              }`}
+            >
+              {thread.leadTag === 'interested' ? '⭐ Interested' : '☆ Mark interested'}
+            </button>
+          </div>
+        )}
+
+        <div className="flex-1 min-h-0 overflow-y-auto px-1 py-2 space-y-2 bg-gray-50 rounded-lg">
+          {(thread.messages || []).map((msg, i) => (
+            <div
+              key={msg.id || i}
+              className={`flex ${msg.direction === 'outbound' ? 'justify-end' : 'justify-start'}`}
+            >
+              <div
+                className={`max-w-xs lg:max-w-md px-3 py-2 rounded-2xl text-xs shadow-sm ${
+                  msg.direction === 'outbound'
+                    ? 'bg-green-500 text-white rounded-br-sm'
+                    : 'bg-white text-gray-800 border border-gray-100 rounded-bl-sm'
+                }`}
+              >
+                <p className="whitespace-pre-wrap leading-relaxed">{msg.body}</p>
+                <div
+                  className={`flex items-center justify-end gap-1 mt-1 ${
+                    msg.direction === 'outbound' ? 'text-green-100' : 'text-gray-400'
+                  }`}
+                >
+                  <span className="text-[10px]">
+                    {msg.sentAt
+                      ? new Date(msg.sentAt).toLocaleTimeString('en-IN', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })
+                      : ''}
+                  </span>
+                  {msg.direction === 'outbound' && <MsgTick status={msg.status} />}
+                </div>
+              </div>
+            </div>
+          ))}
+          <div ref={messagesEndRef} />
+        </div>
+
+        <div className="pt-3 flex gap-2 bg-white shrink-0">
+          <textarea
+            className="flex-1 text-sm border border-gray-200 rounded-xl px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-green-400"
+            rows={2}
+            placeholder="Reply via WhatsApp API…"
+            value={reply}
+            onChange={(e) => setReply(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault()
+                if (!sending && reply.trim()) sendReply()
+              }
+            }}
+          />
+          <button
+            type="button"
+            onClick={sendReply}
+            disabled={sending || !reply.trim()}
+            className="px-4 py-2 bg-green-500 text-white text-sm font-semibold rounded-xl hover:bg-green-600 disabled:opacity-50 shrink-0 self-end"
+          >
+            {sending ? '…' : 'Send'}
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   if (!configured) {
     return (
       <div className="rounded-xl border border-amber-200 bg-amber-50 p-5 space-y-3 max-w-xl">
@@ -153,7 +305,7 @@ export default function WhatsAppInboxPanel({ onNavigate }) {
         <button
           type="button"
           onClick={() => onNavigate?.('integrations')}
-          className="text-xs font-semibold px-3 py-2 bg-[#ffcb2b] text-[#242424] rounded-lg"
+          className="text-xs font-semibold px-3 py-2 bg-[#FF773D] text-[#242424] rounded-lg"
         >
           Open Integrations
         </button>
@@ -179,14 +331,8 @@ export default function WhatsAppInboxPanel({ onNavigate }) {
         )}
       </div>
 
-      <div className="crm-workspace--master-detail crm-split-shell flex flex-col flex-1 min-h-[min(70dvh,520px)] md:min-h-0">
-        {isMobile && !selected ? (
-          <p className="crm-mobile-split-hint">Tap a conversation to open the thread.</p>
-        ) : null}
-        <div className="flex flex-1 min-h-0 flex-col md:flex-row md:gap-4 md:h-[calc(100vh-280px)] md:min-h-[420px]">
-        <div
-          className={`crm-split-sidebar md:w-72 md:shrink-0 border border-gray-200 rounded-xl overflow-hidden flex flex-col bg-white min-h-0 ${showThreadList ? '' : 'hidden'}`}
-        >
+      <div className="flex flex-1 min-h-[min(70dvh,520px)] md:min-h-0 flex-col md:flex-row md:gap-4 md:h-[calc(100vh-280px)]">
+        <div className="crm-split-sidebar md:w-72 md:shrink-0 border border-gray-200 rounded-xl overflow-hidden flex flex-col bg-white min-h-0">
           <div className="px-3 py-2.5 border-b border-gray-100 flex flex-col gap-1.5">
             <input
               className="w-full text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-green-400"
@@ -267,116 +413,25 @@ export default function WhatsAppInboxPanel({ onNavigate }) {
           </div>
         </div>
 
-        <div
-          className={`crm-split-main flex-1 border border-gray-200 rounded-xl overflow-hidden flex flex-col bg-white min-w-0 min-h-0 ${showThreadDetail ? '' : 'hidden'}`}
-        >
-          {isMobile && selected ? (
-            <button type="button" className="crm-mobile-back shrink-0 mx-3 mt-2" onClick={closeThread}>
-              ← Back to chats
-            </button>
-          ) : null}
-          {!selected ? (
-            <div className="flex-1 flex flex-col items-center justify-center text-sm text-gray-400 gap-2">
-              <span className="text-3xl">💬</span>
-              Select a conversation
-            </div>
-          ) : threadLoading ? (
-            <div className="flex-1 flex items-center justify-center text-sm text-gray-400">Loading…</div>
-          ) : thread ? (
-            <>
-              <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-3 flex-wrap">
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-800 truncate">
-                    {thread.leadName || formatPhoneDisplay(thread.leadPhone)}
-                  </p>
-                  <p className="text-xs text-gray-400">{formatPhoneDisplay(thread.leadPhone)}</p>
-                </div>
-                {thread.leadId && (
-                  <button
-                    type="button"
-                    onClick={openLead}
-                    className="text-xs font-medium px-2.5 py-1 border border-gray-200 rounded-lg hover:bg-gray-50"
-                  >
-                    Open in Pipeline
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={toggleInterested}
-                  disabled={tagging}
-                  className={`text-xs font-medium px-2.5 py-1 rounded-lg border ${
-                    thread.leadTag === 'interested'
-                      ? 'bg-yellow-50 border-yellow-300 text-yellow-800'
-                      : 'border-gray-200 text-gray-500'
-                  }`}
-                >
-                  {thread.leadTag === 'interested' ? '⭐ Interested' : '☆ Mark interested'}
-                </button>
-              </div>
-
-              <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2 bg-gray-50">
-                {(thread.messages || []).map((msg, i) => (
-                  <div
-                    key={msg.id || i}
-                    className={`flex ${msg.direction === 'outbound' ? 'justify-end' : 'justify-start'}`}
-                  >
-                    <div
-                      className={`max-w-xs lg:max-w-md px-3 py-2 rounded-2xl text-xs shadow-sm ${
-                        msg.direction === 'outbound'
-                          ? 'bg-green-500 text-white rounded-br-sm'
-                          : 'bg-white text-gray-800 border border-gray-100 rounded-bl-sm'
-                      }`}
-                    >
-                      <p className="whitespace-pre-wrap leading-relaxed">{msg.body}</p>
-                      <div
-                        className={`flex items-center justify-end gap-1 mt-1 ${
-                          msg.direction === 'outbound' ? 'text-green-100' : 'text-gray-400'
-                        }`}
-                      >
-                        <span className="text-[10px]">
-                          {msg.sentAt
-                            ? new Date(msg.sentAt).toLocaleTimeString('en-IN', {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                              })
-                            : ''}
-                        </span>
-                        {msg.direction === 'outbound' && <MsgTick status={msg.status} />}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                <div ref={messagesEndRef} />
-              </div>
-
-              <div className="px-4 py-3 border-t border-gray-100 flex gap-2 bg-white">
-                <textarea
-                  className="flex-1 text-sm border border-gray-200 rounded-xl px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-green-400"
-                  rows={2}
-                  placeholder="Reply via WhatsApp API…"
-                  value={reply}
-                  onChange={(e) => setReply(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault()
-                      if (!sending && reply.trim()) sendReply()
-                    }
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={sendReply}
-                  disabled={sending || !reply.trim()}
-                  className="px-4 py-2 bg-green-500 text-white text-sm font-semibold rounded-xl hover:bg-green-600 disabled:opacity-50 shrink-0 self-end"
-                >
-                  {sending ? '…' : 'Send'}
-                </button>
-              </div>
-            </>
-          ) : null}
-        </div>
-        </div>
+        {!isMobile && (
+          <div className="crm-split-main flex-1 min-w-0 min-h-0 flex flex-col">
+            {renderThreadDetail(false)}
+          </div>
+        )}
       </div>
+
+      {isMobile && selected ? (
+        <FullScreenDetailModal
+          open
+          onClose={closeThread}
+          title={threadTitle}
+          subtitle={threadSubtitle || undefined}
+        >
+          <div className="flex flex-col min-h-0 h-[min(72dvh,640px)]">
+            {renderThreadDetail(true)}
+          </div>
+        </FullScreenDetailModal>
+      ) : null}
 
       {error && (
         <p className="text-xs text-red-700 bg-red-50 border border-red-100 rounded-lg px-3 py-2">{error}</p>

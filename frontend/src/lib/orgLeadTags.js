@@ -32,3 +32,14 @@ export function toggleTagId(currentIds, tagId) {
   else set.add(tagId)
   return [...set]
 }
+
+/** Union of tag ids across multiple leads/contacts. */
+export function unionTagIdsFromLeads(leads = []) {
+  const set = new Set()
+  for (const lead of leads) {
+    for (const id of lead?.crm?.tagIds || []) {
+      if (id) set.add(id)
+    }
+  }
+  return [...set]
+}

@@ -7,6 +7,8 @@ import OrgLeadTagsPanel from './OrgLeadTagsPanel'
 import InviteEmailSetup from './InviteEmailSetup'
 import CrmGmailConnectCard from './CrmGmailConnectCard'
 import TeamSettingsSection, { TeamQuickLink, TeamStatCard } from './TeamSettingsSection'
+import OrgWorkspaceSettings from './OrgWorkspaceSettings'
+import { hasWorkspaceFeature } from '../../lib/workspaceFeatures'
 
 function memberInitials(name, email) {
   const n = String(name || '').trim()
@@ -62,10 +64,10 @@ export default function TeamPanel({ onNavigate }) {
 
   if (user?.isPlatformAdmin) {
     return (
-      <div className="panel-shell bg-[#f3f4f6]">
+      <div className="panel-shell">
         <div className="flex-1 flex items-center justify-center p-8">
           <div className="max-w-md text-center bg-white rounded-2xl border border-gray-200 shadow-sm p-8">
-            <span className="inline-flex w-12 h-12 items-center justify-center rounded-xl bg-gray-900 text-[#ffcb2b] mb-4">
+            <span className="inline-flex w-12 h-12 items-center justify-center rounded-xl bg-gray-900 text-[#FF773D] mb-4">
               <DatabaseIcon className="w-6 h-6" />
             </span>
             <h2 className="text-lg font-semibold text-gray-900">Platform operator</h2>
@@ -77,7 +79,7 @@ export default function TeamPanel({ onNavigate }) {
               <button
                 type="button"
                 onClick={() => onNavigate?.('admin-customers')}
-                className="px-4 py-2.5 bg-[#ffcb2b] text-[#242424] text-sm font-semibold rounded-lg hover:bg-[#f0bc00]"
+                className="px-4 py-2.5 bg-[#FF773D] text-[#242424] text-sm font-semibold rounded-lg hover:bg-[#e5652f]"
               >
                 Support desk
               </button>
@@ -97,10 +99,10 @@ export default function TeamPanel({ onNavigate }) {
 
   if (!user?.isOrgAdmin || user?.accountType !== 'company') {
     return (
-      <div className="panel-shell bg-[#f3f4f6]">
+      <div className="panel-shell">
         <div className="flex-1 flex items-center justify-center p-8">
           <div className="max-w-md text-center bg-white rounded-2xl border border-gray-200 shadow-sm p-8">
-            <span className="inline-flex w-12 h-12 items-center justify-center rounded-xl bg-gray-900 text-[#ffcb2b] mb-4">
+            <span className="inline-flex w-12 h-12 items-center justify-center rounded-xl bg-gray-900 text-[#FF773D] mb-4">
               <MailIcon className="w-6 h-6" />
             </span>
             <h2 className="text-lg font-semibold text-gray-900">Work email</h2>
@@ -110,7 +112,7 @@ export default function TeamPanel({ onNavigate }) {
             <button
               type="button"
               onClick={() => onNavigate?.('my-email')}
-              className="mt-5 px-4 py-2.5 bg-[#ffcb2b] text-[#242424] text-sm font-semibold rounded-lg hover:bg-[#f0bc00]"
+              className="mt-5 px-4 py-2.5 bg-[#FF773D] text-[#242424] text-sm font-semibold rounded-lg hover:bg-[#e5652f]"
             >
               Open Work email
             </button>
@@ -222,7 +224,7 @@ export default function TeamPanel({ onNavigate }) {
   }
 
   return (
-    <div className="panel-shell bg-[#f3f4f6]">
+    <div className="panel-shell">
       <header className="shrink-0 bg-white border-b border-gray-200/90 px-5 py-4 md:px-6">
         <div className="max-w-6xl mx-auto flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -238,7 +240,7 @@ export default function TeamPanel({ onNavigate }) {
               className="h-9 w-9 rounded-lg object-cover border border-gray-200"
             />
           ) : (
-            <span className="h-9 px-3 rounded-lg bg-gray-900 text-[#ffcb2b] text-xs font-bold flex items-center">
+            <span className="h-9 px-3 rounded-lg bg-gray-900 text-[#FF773D] text-xs font-bold flex items-center">
               {user?.organizationName?.slice(0, 2)?.toUpperCase() || 'CI'}
             </span>
           )}
@@ -296,7 +298,10 @@ export default function TeamPanel({ onNavigate }) {
             />
           </div>
 
+          <OrgWorkspaceSettings user={user} onUserUpdated={updateUser} />
+
           <div className="grid sm:grid-cols-2 gap-2">
+            {hasWorkspaceFeature(user, 'panelActiveCustomers') && (
             <TeamQuickLink
               icon={ChartIcon}
               title="Active trading customers"
@@ -304,6 +309,7 @@ export default function TeamPanel({ onNavigate }) {
               accent="teal"
               onClick={() => onNavigate?.('active-customers')}
             />
+            )}
             <TeamQuickLink
               icon={WhatsAppIcon}
               title="WhatsApp API"
@@ -350,7 +356,7 @@ export default function TeamPanel({ onNavigate }) {
                           <p className="text-sm font-medium text-gray-900 truncate flex items-center gap-1.5">
                             {m.name}
                             {m.role === 'org_admin' && (
-                              <span className="text-[9px] font-bold uppercase tracking-wide text-[#8a6600] bg-[#fffbeb] px-1.5 py-0.5 rounded">
+                              <span className="text-[9px] font-bold uppercase tracking-wide text-[#8a6600] bg-[#fff4ee] px-1.5 py-0.5 rounded">
                                 Admin
                               </span>
                             )}
@@ -406,8 +412,8 @@ export default function TeamPanel({ onNavigate }) {
                     <CrmGmailConnectCard />
                   </div>
 
-                  <div className="rounded-xl border border-[#ffe48a]/60 bg-[#fffbeb]/50 p-4 space-y-3">
-                    <p className="text-xs font-semibold text-[#5b4a00]">Team invite system</p>
+                  <div className="rounded-xl border border-[#ffd4b8]/60 bg-[#fff4ee]/50 p-4 space-y-3">
+                    <p className="text-xs font-semibold text-[#FF773D]">Team invite system</p>
                     <p className="text-[11px] text-[#8a6600] leading-relaxed">
                       Invites send from <strong>invite@connectintel.net</strong> with your name; replies go to{' '}
                       <strong>{user?.email}</strong>.
@@ -466,10 +472,10 @@ export default function TeamPanel({ onNavigate }) {
 
                     {inviteLoading && inviteStatus && (
                       <div
-                        className="flex items-center gap-3 rounded-lg border border-[#ffe48a] bg-[#fffbeb] px-3 py-2.5"
+                        className="flex items-center gap-3 rounded-lg border border-[#ffd4b8] bg-[#fff4ee] px-3 py-2.5"
                         role="status"
                       >
-                        <span className="w-4 h-4 border-2 border-[#ffcb2b]/40 border-t-[#ffcb2b] rounded-full animate-spin shrink-0" />
+                        <span className="w-4 h-4 border-2 border-[#FF773D]/40 border-t-[#FF773D] rounded-full animate-spin shrink-0" />
                         <p className="text-xs text-[#8a6600]">{inviteStatus}</p>
                       </div>
                     )}
@@ -477,7 +483,7 @@ export default function TeamPanel({ onNavigate }) {
                     <button
                       type="submit"
                       disabled={inviteLoading || !inviteEmail.trim() || emailReady === false}
-                      className="inline-flex items-center justify-center gap-2 w-full sm:w-auto text-sm font-semibold px-5 py-2.5 bg-[#ffcb2b] hover:bg-[#f0bc00] text-[#242424] rounded-lg disabled:opacity-50"
+                      className="inline-flex items-center justify-center gap-2 w-full sm:w-auto text-sm font-semibold px-5 py-2.5 bg-[#FF773D] hover:bg-[#e5652f] text-[#242424] rounded-lg disabled:opacity-50"
                     >
                       {inviteLoading ? (
                         <>
@@ -563,6 +569,28 @@ export default function TeamPanel({ onNavigate }) {
                   }}
                 />
               </TeamSettingsSection>
+
+              {hasWorkspaceFeature(user, 'activeTradingImport') && (
+              <TeamSettingsSection
+                id="active-trading-import"
+                icon={ChartIcon}
+                title="Shipment / active customer import"
+                description="Match trading activity to pipeline leads by mobile"
+                defaultOpen={false}
+              >
+                <p className="text-xs text-[#516f90] mb-3 leading-relaxed">
+                  For logistics and trading workspaces. Disable under Workspace modules if your team does not
+                  track shipments.
+                </p>
+                <button
+                  type="button"
+                  className="crm-btn crm-btn-secondary crm-btn-sm"
+                  onClick={() => onNavigate?.('active-customers')}
+                >
+                  Open active customers import
+                </button>
+              </TeamSettingsSection>
+              )}
             </div>
           </div>
         </div>

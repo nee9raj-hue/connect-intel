@@ -170,7 +170,7 @@ export default function PlatformSupportTickets({ onSelectCustomer }) {
                 type="button"
                 onClick={() => setSelectedId(t.id)}
                 className={`w-full text-left px-4 py-3 border-b border-gray-100 hover:bg-gray-50 ${
-                  selectedId === t.id ? 'bg-[#fffbeb] border-l-2 border-l-[#ffcb2b]' : ''
+                  selectedId === t.id ? 'bg-[#fff4ee] border-l-2 border-l-[#FF773D]' : ''
                 }`}
               >
                 <div className="flex items-center justify-between gap-2">
@@ -200,7 +200,7 @@ export default function PlatformSupportTickets({ onSelectCustomer }) {
               <section className="bg-white rounded-xl border border-gray-200 p-4">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <p className="text-xs font-mono font-bold text-[#5b4a00]">{detail.ticketNumber}</p>
+                    <p className="text-xs font-mono font-bold text-[#FF773D]">{detail.ticketNumber}</p>
                     <h2 className="text-lg font-semibold text-gray-900 mt-1">{detail.subject}</h2>
                     <p className="text-sm text-gray-600 mt-1">
                       {detail.userName} · {detail.userEmail}
@@ -294,7 +294,7 @@ export default function PlatformSupportTickets({ onSelectCustomer }) {
                   onClick={() =>
                     runAction({ ticketId: detail.id, action: 'reply', message: reply.trim() })
                   }
-                  className="text-sm font-semibold px-4 py-2 rounded-lg bg-[#ffcb2b] text-[#242424] hover:bg-[#f0bc00] disabled:opacity-40"
+                  className="text-sm font-semibold px-4 py-2 rounded-lg bg-[#FF773D] text-[#242424] hover:bg-[#e5652f] disabled:opacity-40"
                 >
                   Send reply
                 </button>

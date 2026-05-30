@@ -1,6 +1,10 @@
 import { getSessionToken, storeSessionToken } from './sessionAuth'
 import { trackApiLoading } from './apiLoading'
 import { fetchWithTimeout } from './fetchWithTimeout'
+import {
+  prepareWorkspaceUploadRows,
+  WORKSPACE_UPLOAD_CHUNK_ROWS,
+} from './workspaceUploadPrep'
 
 let refreshInFlight = null
 
@@ -107,6 +111,52 @@ export const api = {
   acceptInvite: (token) => request('/api/invite/accept', { method: 'POST', body: { token } }),
   updateTeamBranding: (payload) => request('/api/team/branding', { method: 'PATCH', body: payload }),
   getOrgLeadTags: ({ silent = false } = {}) => request('/api/org/lead-tags', {}, { silent }),
+  getOrgWorkspaceSettings: () => request('/api/org/workspace'),
+  updateOrgWorkspaceSettings: (body) =>
+    request('/api/org/workspace', { method: 'PATCH', body }),
+  getCompanyWorkspace: () =>
+    request('/api/org/company-workspace', { timeoutMs: 60_000 }),
+  uploadCompanyWorkspace: async ({ rows, fileName }) => {
+    const prepared = prepareWorkspaceUploadRows(rows)
+    if (!prepared.rows.length) throw new Error('No rows in file')
+    const uploadId = `ws-up-${Date.now()}`
+    const chunkSize = WORKSPACE_UPLOAD_CHUNK_ROWS
+    for (let i = 0; i < prepared.rows.length; i += chunkSize) {
+      const chunk = prepared.rows.slice(i, i + chunkSize)
+      const chunkIndex = Math.floor(i / chunkSize)
+      const done = i + chunkSize >= prepared.rows.length
+      const payload = {
+        action: 'uploadChunk',
+        uploadId,
+        chunkIndex,
+        done,
+        rows: chunk,
+        ...(chunkIndex === 0
+          ? {
+              fileName,
+              columns: prepared.columns,
+              totalRowsInFile: prepared.total,
+              truncatedInFile: prepared.truncated,
+            }
+          : {}),
+      }
+      const result = await request('/api/org/company-workspace', {
+        method: 'POST',
+        body: payload,
+        timeoutMs: 120_000,
+      })
+      if (done) return result
+    }
+    throw new Error('Upload failed')
+  },
+  analyzeCompanyWorkspace: () =>
+    request('/api/org/company-workspace', {
+      method: 'POST',
+      body: { action: 'analyze' },
+      timeoutMs: 120_000,
+    }),
+  saveCompanyWorkspaceGoals: (body) =>
+    request('/api/org/company-workspace', { method: 'PATCH', body }),
   createOrgLeadTag: (payload) => request('/api/org/lead-tags', { method: 'POST', body: payload }),
   updateOrgLeadTag: (payload) => request('/api/org/lead-tags', { method: 'PATCH', body: payload }),
   deleteOrgLeadTag: (id) => request('/api/org/lead-tags', { method: 'DELETE', body: { id } }),
@@ -119,8 +169,12 @@ export const api = {
     const qs = new URLSearchParams({ view: 'board', light: '1' })
     if (params.status && params.status !== 'all') qs.set('status', params.status)
     if (params.q) qs.set('q', params.q)
-    if (params.city) qs.set('city', params.city)
-    if (params.state) qs.set('state', params.state)
+    for (const c of params.cities || (params.city ? [params.city] : [])) {
+      if (c) qs.append('city', c)
+    }
+    for (const s of params.states || (params.state ? [params.state] : [])) {
+      if (s) qs.append('state', s)
+    }
     if (params.assigneeUserId) qs.set('assigneeUserId', params.assigneeUserId)
     for (const id of params.tagIds || []) qs.append('tagId', id)
     for (const [col, limit] of Object.entries(params.columnLimits || {})) {
@@ -136,6 +190,8 @@ export const api = {
     q,
     city,
     state,
+    cities,
+    states,
     assigneeUserId,
     tagIds,
     silent = false,
@@ -147,8 +203,12 @@ export const api = {
     })
     if (status && status !== 'all') qs.set('status', status)
     if (q) qs.set('q', q)
-    if (city) qs.set('city', city)
-    if (state) qs.set('state', state)
+    for (const c of cities || (city ? [city] : [])) {
+      if (c) qs.append('city', c)
+    }
+    for (const s of states || (state ? [state] : [])) {
+      if (s) qs.append('state', s)
+    }
     if (assigneeUserId) qs.set('assigneeUserId', assigneeUserId)
     for (const id of tagIds || []) qs.append('tagId', id)
     return request(`/api/saved-leads?${qs}`, { timeoutMs: 45_000 }, { silent })
@@ -349,6 +409,34 @@ export const api = {
   createMarketingForm: (payload) => request('/api/marketing/forms', { method: 'POST', body: payload }),
   updateMarketingForm: (payload) => request('/api/marketing/forms', { method: 'PATCH', body: payload }),
   deleteMarketingForm: (id) => request('/api/marketing/forms', { method: 'DELETE', body: { id } }),
+  getChithiSummary: () => request('/api/chithi?resource=summary', { timeoutMs: 25_000 }),
+  markChithiSeen: () =>
+    request('/api/chithi?resource=summary', { method: 'POST', body: { action: 'seen' }, timeoutMs: 25_000 }),
+  getChithiPushConfig: () => request('/api/chithi?resource=push', { timeoutMs: 25_000 }),
+  subscribeChithiPush: (subscription) =>
+    request('/api/chithi?resource=push', { method: 'POST', body: { subscription }, timeoutMs: 25_000 }),
+  unsubscribeChithiPush: (endpoint) =>
+    request('/api/chithi?resource=push', { method: 'DELETE', body: { endpoint }, timeoutMs: 25_000 }),
+  listChithiChannels: () => request('/api/chithi?resource=channels', { timeoutMs: 25_000 }),
+  createChithiChannel: (payload) =>
+    request('/api/chithi?resource=channels', { method: 'POST', body: payload, timeoutMs: 25_000 }),
+  openChithiDm: (peerUserId) =>
+    request('/api/chithi?resource=channels', { method: 'POST', body: { peerUserId }, timeoutMs: 25_000 }),
+  listChithiMessages: (channelId) =>
+    request(`/api/chithi?resource=messages&channelId=${encodeURIComponent(channelId)}`, { timeoutMs: 25_000 }),
+  sendChithiMessage: (channelId, body, threadParentId = null) =>
+    request(`/api/chithi?resource=messages&channelId=${encodeURIComponent(channelId)}`, {
+      method: 'POST',
+      body: { body, threadParentId },
+      timeoutMs: 20_000,
+    }),
+  reactChithiMessage: (messageId, emoji) =>
+    request('/api/chithi?resource=react', { method: 'POST', body: { messageId, emoji }, timeoutMs: 30_000 }),
+  getChithiSettings: () => request('/api/chithi?resource=settings', { timeoutMs: 30_000 }),
+  updateChithiSettings: (payload) =>
+    request('/api/chithi?resource=settings', { method: 'PATCH', body: payload, timeoutMs: 25_000 }),
+  getTeamHubSummary: () => request('/api/team/hub'),
+  markTeamHubSeen: () => request('/api/team/hub', { method: 'POST', body: { action: 'seen' } }),
   listTeamNotes: () => request('/api/team/notes'),
   createTeamNote: (payload) => request('/api/team/notes', { method: 'POST', body: payload }),
   listTeamTasks: () => request('/api/team/tasks'),

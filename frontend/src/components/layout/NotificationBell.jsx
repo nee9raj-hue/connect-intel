@@ -18,8 +18,10 @@ const PANEL_LABELS = {
   pipeline: 'Pipeline',
   'crm-calendar': 'Calendar',
   overview: 'Overview',
-  'team-notes': 'Notes',
-  'team-tasks': 'Tasks',
+  chithi: 'Chithi',
+  'team-hub': 'Chithi',
+  'team-notes': 'Chithi',
+  'team-tasks': 'Chithi',
 }
 
 export default function NotificationBell() {

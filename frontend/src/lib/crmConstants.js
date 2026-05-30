@@ -3,7 +3,7 @@ export const CRM_STATUSES = [
   { id: 'contacted', label: 'Contacted', color: 'bg-blue-50 text-blue-700 border-blue-200' },
   { id: 'follow_up', label: 'Follow up', color: 'bg-amber-50 text-amber-800 border-amber-200' },
   { id: 'replied', label: 'Replied', color: 'bg-violet-50 text-violet-700 border-violet-200' },
-  { id: 'won', label: 'Won', color: 'bg-green-50 text-green-700 border-green-200' },
+  { id: 'won', label: 'Won', color: 'bg-[#fff4ee] text-[#FF773D] border-[#ffd4b8]' },
   {
     id: 'active_trading',
     label: 'Active trading',

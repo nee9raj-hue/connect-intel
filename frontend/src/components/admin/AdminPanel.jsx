@@ -141,10 +141,10 @@ export default function AdminPanel() {
   }
 
   return (
-    <div className="panel-shell bg-[#f6f7f9]">
+    <div className="panel-shell">
       <div className="panel-body-scroll p-6">
       <div className="mb-6 rounded-2xl border border-gray-900 bg-gray-900 text-white px-5 py-4">
-        <p className="text-[11px] font-semibold uppercase tracking-wide text-[#ffcb2b]">Platform operator</p>
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-[#FF773D]">Platform operator</p>
         <h1 className="text-xl font-semibold mt-1">Master data & imports</h1>
         <p className="text-sm text-gray-300 mt-2 max-w-2xl">
           Upload exporter and contact sheets here. All customer searches use this shared database. Customer
@@ -152,7 +152,7 @@ export default function AdminPanel() {
         </p>
       </div>
 
-      <section className="mb-6 bg-white rounded-2xl border border-[#ffe48a] p-5 max-w-xl">
+      <section className="mb-6 bg-white rounded-2xl border border-[#ffd4b8] p-5 max-w-xl">
         <h2 className="text-sm font-semibold text-gray-900">Team invite email (all customers)</h2>
         <p className="text-xs text-gray-500 mt-1 mb-3 leading-relaxed">
           Connect once as <strong>invite@connectintel.net</strong>. Every company admin can then send team invites
@@ -257,7 +257,7 @@ export default function AdminPanel() {
             type="button"
             onClick={handleUpload}
             disabled={!rows.length || loading}
-            className="mt-5 px-4 py-2 bg-[#ffcb2b] hover:bg-[#f0bc00] text-[#242424] text-sm font-semibold rounded-lg disabled:opacity-50"
+            className="mt-5 px-4 py-2 bg-[#FF773D] hover:bg-[#e5652f] text-[#242424] text-sm font-semibold rounded-lg disabled:opacity-50"
           >
             {loading ? 'Importing…' : 'Import dataset'}
           </button>

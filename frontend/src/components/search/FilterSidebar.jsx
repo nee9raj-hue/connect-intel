@@ -87,7 +87,7 @@ export default function FilterSidebar({ filters, onChange, onSearch, loading, co
           type="button"
           onClick={onSearch}
           disabled={loading}
-          className="w-full py-2.5 bg-[#ffcb2b] hover:bg-[#f0bc00] text-[#242424] font-semibold text-sm rounded-md disabled:opacity-60 flex items-center justify-center gap-2"
+          className="w-full py-2.5 bg-[#FF773D] hover:bg-[#e5652f] text-[#242424] font-semibold text-sm rounded-md disabled:opacity-60 flex items-center justify-center gap-2"
         >
           {loading ? (
             <>
@@ -117,7 +117,7 @@ function FilterSection({ icon, label, options, selected, expanded, onToggleExpan
         <span className="text-base opacity-70">{icon}</span>
         <span className="flex-1 text-left">{label}</span>
         {selected.length > 0 && (
-          <span className="text-[10px] font-bold bg-[#ffcb2b] text-[#242424] px-1.5 rounded-full">
+          <span className="text-[10px] font-bold bg-[#FF773D] text-[#242424] px-1.5 rounded-full">
             {selected.length}
           </span>
         )}
@@ -134,7 +134,7 @@ function FilterSection({ icon, label, options, selected, expanded, onToggleExpan
                 type="checkbox"
                 checked={selected.includes(opt)}
                 onChange={() => onToggleOption(opt)}
-                className="mt-0.5 rounded border-gray-300 text-gray-900 focus:ring-[#ffcb2b]"
+                className="mt-0.5 rounded border-gray-300 text-gray-900 focus:ring-[#FF773D]"
               />
               <span className="leading-snug">{opt}</span>
             </label>

@@ -1,4 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
+import useIsMobile from '../../hooks/useIsMobile'
+import useMarketingBuilderHistory from '../../hooks/useMarketingBuilderHistory'
 import MarketingCreatorBadge from './MarketingCreatorBadge'
 import {
   BLOCK_LABELS,
@@ -20,11 +23,18 @@ import {
   BlocksIcon,
   DesktopIcon,
   EyeIcon,
+  PencilIcon,
   LayoutTemplateIcon,
   MobileDeviceIcon,
   PanelLeftIcon,
   PanelRightIcon,
+  ChevronLeftIcon,
+  GripIcon,
+  MailIcon,
+  RedoIcon,
+  SaveIcon,
   SwatchIcon,
+  UndoIcon,
 } from '../ui/icons'
 
 const PALETTE = [
@@ -45,6 +55,29 @@ const STUDIO_RAIL = [
   { id: 'styles', label: 'Styles', icon: SwatchIcon },
   { id: 'presets', label: 'Layouts', icon: LayoutTemplateIcon },
 ]
+
+const IMMERSIVE_RAIL_WIDTH = 216
+const IMMERSIVE_RAIL_POS_KEY = 'ci_marketing_rail_pos'
+
+function loadImmersiveRailPos() {
+  try {
+    const raw = localStorage.getItem(IMMERSIVE_RAIL_POS_KEY)
+    if (!raw) return null
+    const pos = JSON.parse(raw)
+    if (typeof pos?.x === 'number' && typeof pos?.y === 'number') return pos
+  } catch {
+    // ignore
+  }
+  return null
+}
+
+function saveImmersiveRailPos(pos) {
+  try {
+    localStorage.setItem(IMMERSIVE_RAIL_POS_KEY, JSON.stringify(pos))
+  } catch {
+    // ignore
+  }
+}
 
 const FOLLOW_UP_STARTER = {
   subject: 'Following up, {{firstName}}',
@@ -159,6 +192,16 @@ export default function MarketingTemplateBuilder({
   onDelete,
   embedded = false,
   fillHeight = false,
+  compactMode = false,
+  studioMode = false,
+  immersive = false,
+  historyResetKey = '',
+  onBack,
+  onSaveDraft,
+  onSaveAsTemplate,
+  onSend,
+  draftDisabled = false,
+  sendDisabled = false,
   showNameField = true,
   showSavedTemplates = true,
   title,
@@ -166,7 +209,12 @@ export default function MarketingTemplateBuilder({
   starterOptions,
   marketingForms = [],
 }) {
-  const [previewMode, setPreviewMode] = useState('desktop')
+  const isMobile = useIsMobile()
+  const isCompact = compactMode || (embedded && !fillHeight && isMobile && !studioMode)
+  const isStudio = studioMode && !isCompact
+  const isImmersive = isStudio && immersive
+  const isStudioLayout = isCompact || isStudio
+  const [previewMode, setPreviewMode] = useState('mobile')
   const [sideTab, setSideTab] = useState('blocks')
   const [selectedBlockIndex, setSelectedBlockIndex] = useState(0)
   const [dragIndex, setDragIndex] = useState(null)
@@ -175,6 +223,21 @@ export default function MarketingTemplateBuilder({
   const [previewOpen, setPreviewOpen] = useState(false)
   const [panelOpen, setPanelOpen] = useState(true)
   const [inspectorOpen, setInspectorOpen] = useState(true)
+  const [studioPanel, setStudioPanel] = useState(null)
+  const compactCanvasScrollRef = useRef(null)
+  const desktopCanvasScrollRef = useRef(null)
+  const canvasHostRef = useRef(null)
+  const immersiveCanvasRef = useRef(null)
+  const immersiveRailRef = useRef(null)
+  const railDragRef = useRef({ active: false, startX: 0, startY: 0, origX: 0, origY: 0 })
+  const [railPos, setRailPos] = useState(() => loadImmersiveRailPos() ?? { x: -1, y: 20 })
+
+  const { applyChange, undo, redo, canUndo, canRedo } = useMarketingBuilderHistory(
+    value,
+    onChange,
+    isStudioLayout,
+    historyResetKey || value.id || 'draft'
+  )
 
   const blockCount = value.blocks?.length || 0
   useEffect(() => {
@@ -182,6 +245,15 @@ export default function MarketingTemplateBuilder({
       setSelectedBlockIndex(blockCount - 1)
     }
   }, [blockCount, selectedBlockIndex])
+
+  useEffect(() => {
+    if (!isCompact || !blockCount) return
+    const el = compactCanvasScrollRef.current
+    if (!el) return
+    requestAnimationFrame(() => {
+      el.scrollTop = el.scrollHeight
+    })
+  }, [blockCount, isCompact])
 
   const previewHtml = useMemo(
     () =>
@@ -201,49 +273,134 @@ export default function MarketingTemplateBuilder({
     [value.blocks, value.design, value.previewText, selectedBlockIndex]
   )
 
+  const syncCanvasHost = useCallback(
+    (node) => {
+      canvasHostRef.current = node
+      if (node) node.innerHTML = canvasHtml
+    },
+    [canvasHtml]
+  )
+
+  const openBlockEditor = (index) => {
+    if (Number.isNaN(index) || index < 0) return
+    setSelectedBlockIndex(index)
+    setInspectorOpen(true)
+    setStudioPanel('edit')
+  }
+
   const selectCanvasBlock = (index) => {
     if (Number.isNaN(index) || index < 0) return
+    if (isStudioLayout) {
+      openBlockEditor(index)
+      return
+    }
     setSelectedBlockIndex(index)
     setInspectorOpen(true)
   }
 
-  const handleCanvasBlockPointer = (e) => {
-    const hit = e.target.closest('[data-ci-block-index]')
+  useEffect(() => {
+    if (isImmersive) return
+    const el = canvasHostRef.current
+    if (el) el.innerHTML = canvasHtml
+  }, [canvasHtml, isImmersive])
+
+  const handleCanvasAreaClick = (e) => {
+    const hit = e.target.closest?.('[data-ci-block-index]')
     if (!hit) return
     e.preventDefault()
     e.stopPropagation()
-    selectCanvasBlock(Number(hit.getAttribute('data-ci-block-index')))
+    const index = Number(hit.getAttribute('data-ci-block-index'))
+    if (Number.isNaN(index) || index < 0) return
+    openBlockEditor(index)
   }
 
-  const moveBlock = (index, dir) => {
+  const handleCanvasAreaMove = (e) => {
+    const host = canvasHostRef.current
+    if (!host) return
+    host.querySelectorAll('.is-canvas-hover').forEach((row) => row.classList.remove('is-canvas-hover'))
+    const hit = e.target.closest?.('[data-ci-block-index]')
+    if (hit && host.contains(hit)) hit.classList.add('is-canvas-hover')
+  }
+
+  const handleCanvasAreaLeave = () => {
+    canvasHostRef.current
+      ?.querySelectorAll('.is-canvas-hover')
+      .forEach((row) => row.classList.remove('is-canvas-hover'))
+  }
+
+  const openStudioPanel = (tab) => {
+    setSideTab(tab)
+    setStudioPanel(tab)
+  }
+
+  const closeStudioPanel = () => setStudioPanel(null)
+
+  useEffect(() => {
+    if (!isImmersive) return undefined
+    const onKey = (e) => {
+      if (e.key !== 'Escape') return
+      if (previewOpen) {
+        setPreviewOpen(false)
+        return
+      }
+      if (studioPanel) setStudioPanel(null)
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [isImmersive, previewOpen, studioPanel])
+
+  const moveBlockCompact = (index, dir) => {
     const next = index + dir
     if (next < 0 || next >= (value.blocks || []).length) return
-    onChange({ ...value, blocks: reorderBlocks(value.blocks || [], index, next) })
+    applyChange({ ...value, blocks: reorderBlocks(value.blocks || [], index, next) })
+    setSelectedBlockIndex(next)
   }
 
-  const updateBlock = (index, block) => {
-    const blocks = [...(value.blocks || [])]
-    blocks[index] = block
-    onChange({ ...value, blocks })
-  }
-
-  const removeBlock = (index) => {
-    onChange({ ...value, blocks: (value.blocks || []).filter((_, i) => i !== index) })
-  }
-
-  const duplicateBlockAt = (index) => {
-    const blocks = [...(value.blocks || [])]
-    blocks.splice(index + 1, 0, duplicateBlock(blocks[index]))
-    onChange({ ...value, blocks })
-  }
-
-  const addBlock = (type) => {
+  const addBlockAtEnd = (type) => {
     let block = createBlock(type)
     if (type === 'form') {
       block = attachDefaultMarketingForm(block, marketingForms)
     }
     const blocks = [...(value.blocks || []), block]
-    onChange({ ...value, blocks })
+    applyChange({ ...value, blocks })
+    const newIndex = blocks.length - 1
+    setSelectedBlockIndex(newIndex)
+    setStudioPanel(null)
+  }
+
+  const moveBlock = (index, dir) => {
+    const next = index + dir
+    if (next < 0 || next >= (value.blocks || []).length) return
+    applyChange({ ...value, blocks: reorderBlocks(value.blocks || [], index, next) })
+  }
+
+  const updateBlock = (index, block) => {
+    const blocks = [...(value.blocks || [])]
+    blocks[index] = block
+    applyChange({ ...value, blocks })
+  }
+
+  const removeBlock = (index) => {
+    applyChange({ ...value, blocks: (value.blocks || []).filter((_, i) => i !== index) })
+  }
+
+  const duplicateBlockAt = (index) => {
+    const blocks = [...(value.blocks || [])]
+    blocks.splice(index + 1, 0, duplicateBlock(blocks[index]))
+    applyChange({ ...value, blocks })
+  }
+
+  const addBlock = (type) => {
+    if (isStudioLayout) {
+      addBlockAtEnd(type)
+      return
+    }
+    let block = createBlock(type)
+    if (type === 'form') {
+      block = attachDefaultMarketingForm(block, marketingForms)
+    }
+    const blocks = [...(value.blocks || []), block]
+    applyChange({ ...value, blocks })
     setSelectedBlockIndex(blocks.length - 1)
   }
 
@@ -287,7 +444,7 @@ export default function MarketingTemplateBuilder({
       setDropIndex(null)
       return
     }
-    onChange({ ...value, blocks: reorderBlocks(value.blocks || [], from, index) })
+    applyChange({ ...value, blocks: reorderBlocks(value.blocks || [], from, index) })
     setDragIndex(null)
     setDropIndex(null)
   }
@@ -301,13 +458,14 @@ export default function MarketingTemplateBuilder({
     const starter =
       starterOptions?.find((s) => s.id === starterId) || STARTER_TEMPLATES.find((s) => s.id === starterId)
     if (!starter) return
-    onChange({
+    applyChange({
       ...value,
       name: showNameField ? value.name || starter.name : value.name,
       subject: starter.subject,
       blocks: starter.blocks.map((b) => ({ ...b, id: createBlock(b.type).id })),
       design: { ...(starter.design || DEFAULT_THEME) },
     })
+    if (isStudioLayout) setStudioPanel(null)
   }
 
   const isEditing = Boolean(value.id)
@@ -336,7 +494,9 @@ export default function MarketingTemplateBuilder({
           <button
             key={block.id}
             type="button"
-            onClick={() => setSelectedBlockIndex(index)}
+            onClick={() =>
+              isStudioLayout ? openBlockEditor(index) : setSelectedBlockIndex(index)
+            }
             className={`marketing-canvas-block-chip ${selectedBlockIndex === index ? 'is-active' : ''}`}
           >
             <span>{index + 1}</span>
@@ -345,6 +505,59 @@ export default function MarketingTemplateBuilder({
         ))}
       </div>
     ) : null
+
+  const selectedBlock = value.blocks?.[selectedBlockIndex]
+  const selectedBlockLabel = selectedBlock
+    ? BLOCK_LABELS[selectedBlock.type] || selectedBlock.type
+    : null
+
+  const compactBlockEditor = selectedBlock ? (
+    <div className="marketing-compact-block-editor">
+      <MarketingBlockEditor
+        block={selectedBlock}
+        onChange={(next) => updateBlock(selectedBlockIndex, next)}
+        marketingForms={marketingForms}
+      />
+      <div className="marketing-compact-block-actions">
+        <button
+          type="button"
+          disabled={selectedBlockIndex === 0}
+          onClick={() => moveBlockCompact(selectedBlockIndex, -1)}
+          className="marketing-compact-icon-btn"
+          aria-label="Move block up"
+        >
+          ↑ Up
+        </button>
+        <button
+          type="button"
+          disabled={selectedBlockIndex >= (value.blocks?.length || 0) - 1}
+          onClick={() => moveBlockCompact(selectedBlockIndex, 1)}
+          className="marketing-compact-icon-btn"
+          aria-label="Move block down"
+        >
+          ↓ Down
+        </button>
+        <button
+          type="button"
+          onClick={() => duplicateBlockAt(selectedBlockIndex)}
+          className="marketing-compact-icon-btn"
+        >
+          Duplicate
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            removeBlock(selectedBlockIndex)
+            setSelectedBlockIndex(Math.max(0, selectedBlockIndex - 1))
+            if ((value.blocks?.length || 0) <= 1) closeStudioPanel()
+          }}
+          className="marketing-compact-icon-btn marketing-compact-icon-btn--danger"
+        >
+          Remove
+        </button>
+      </div>
+    </div>
+  ) : null
 
   const starterPreview = (starter) =>
     renderEmailHtml(starter.blocks || [], starter.design || DEFAULT_THEME, {
@@ -356,7 +569,21 @@ export default function MarketingTemplateBuilder({
     <>
       {sideTab === 'blocks' && (
         <>
-          <div className="marketing-panel-caption">Drag or click to add</div>
+          {showNameField && (
+            <input
+              value={value.name || ''}
+              onChange={(e) => applyChange({ ...value, name: e.target.value })}
+              placeholder="Template name"
+              className="ci-input w-full mb-2"
+            />
+          )}
+          <div className="marketing-panel-caption">
+            {isImmersive
+              ? 'Adds to the bottom of your email — click any section on the canvas to edit it'
+              : isStudioLayout
+                ? 'Click a block — it is added to the bottom of your email'
+                : 'Drag or click to add'}
+          </div>
           <div className="grid grid-cols-2 gap-2">
             {PALETTE.map((item) => {
               const style = BLOCK_PALETTE_STYLES[item.type] || BLOCK_PALETTE_STYLES.text
@@ -364,10 +591,10 @@ export default function MarketingTemplateBuilder({
                 <button
                   key={item.type}
                   type="button"
-                  draggable
-                  onDragStart={(e) => handlePaletteDragStart(e, item.type)}
-                  onDragEnd={() => setPaletteDragType(null)}
-                  onClick={() => addBlock(item.type)}
+                  draggable={!isStudioLayout}
+                  onDragStart={isStudioLayout ? undefined : (e) => handlePaletteDragStart(e, item.type)}
+                  onDragEnd={isStudioLayout ? undefined : () => setPaletteDragType(null)}
+                  onClick={() => (isStudioLayout ? addBlockAtEnd(item.type) : addBlock(item.type))}
                   className={`marketing-palette-tile ${style.border} ${style.bg} ${style.text}`}
                 >
                   <span className="marketing-palette-glyph">{style.icon}</span>
@@ -399,7 +626,7 @@ export default function MarketingTemplateBuilder({
                       value={FONT_OPTIONS.find((f) => f.stack === value.design?.fontFamily)?.id || 'arial'}
                       onChange={(e) => {
                         const font = FONT_OPTIONS.find((f) => f.id === e.target.value)
-                        onChange({
+                        applyChange({
                           ...value,
                           design: {
                             ...DEFAULT_THEME,
@@ -423,7 +650,7 @@ export default function MarketingTemplateBuilder({
                       type="color"
                       value={value.design?.primaryColor || DEFAULT_THEME.primaryColor}
                       onChange={(e) =>
-                        onChange({
+                        applyChange({
                           ...value,
                           design: { ...DEFAULT_THEME, ...value.design, primaryColor: e.target.value },
                         })
@@ -437,7 +664,7 @@ export default function MarketingTemplateBuilder({
                       type="color"
                       value={value.design?.backgroundColor || DEFAULT_THEME.backgroundColor}
                       onChange={(e) =>
-                        onChange({
+                        applyChange({
                           ...value,
                           design: { ...DEFAULT_THEME, ...value.design, backgroundColor: e.target.value },
                         })
@@ -451,7 +678,7 @@ export default function MarketingTemplateBuilder({
                       type="color"
                       value={value.design?.contentBackground || DEFAULT_THEME.contentBackground}
                       onChange={(e) =>
-                        onChange({
+                        applyChange({
                           ...value,
                           design: { ...DEFAULT_THEME, ...value.design, contentBackground: e.target.value },
                         })
@@ -468,7 +695,10 @@ export default function MarketingTemplateBuilder({
                     <button
                       key={s.id}
                       type="button"
-                      onClick={() => loadStarter(s.id)}
+                      onClick={() => {
+                        loadStarter(s.id)
+                        if (isStudioLayout) closeStudioPanel()
+                      }}
                       className="marketing-layout-card"
                     >
                       <span className="marketing-layout-thumb">
@@ -549,30 +779,93 @@ export default function MarketingTemplateBuilder({
 
   const emailWidth = Math.min(value.design?.contentWidth || 600, 640)
 
+  const previewModal =
+    previewOpen &&
+    createPortal(
+      <div
+        className="marketing-preview-modal marketing-preview-modal--top"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Email preview"
+        onClick={(e) => {
+          if (e.target === e.currentTarget) setPreviewOpen(false)
+        }}
+      >
+        <div className="marketing-preview-dialog" onClick={(e) => e.stopPropagation()}>
+          <header>
+            <div>
+              <p className="text-sm font-semibold text-slate-900">Preview</p>
+              <p className="text-xs text-slate-500 mt-0.5">{value.subject || 'No subject'}</p>
+            </div>
+            <button
+              type="button"
+              className="crm-modal-close"
+              aria-label="Close preview"
+              onClick={() => setPreviewOpen(false)}
+            >
+              ×
+            </button>
+          </header>
+          <main>
+            <iframe
+              title="Full preview"
+              srcDoc={previewHtml}
+              className="bg-white shadow-lg rounded-lg border border-slate-200"
+              style={{
+                width: previewMode === 'mobile' ? 320 : Math.min(value.design?.contentWidth || 600, 640),
+                minHeight: 420,
+                height: 'min(70dvh, 520px)',
+                border: 'none',
+              }}
+            />
+          </main>
+        </div>
+      </div>,
+      document.body
+    )
+
   const canvas = (
     <main
-      className="marketing-studio-canvas relative"
+      className={`marketing-studio-canvas relative ${isCompact ? 'marketing-studio-canvas--compact' : ''}`}
       onDragOver={handleCanvasDragOver}
       onDrop={handleCanvasDrop}
     >
+      {!isCompact && !isImmersive && (
       <div className="marketing-studio-canvas-top">
         <span className="marketing-studio-canvas-label">
           Click any section in the email to edit it
         </span>
         {studio ? blockChipStrip : null}
       </div>
-      <div className="marketing-studio-canvas-inner">
+      )}
+      <div
+        className="marketing-studio-canvas-inner"
+        ref={
+          isCompact
+            ? compactCanvasScrollRef
+            : isStudio
+              ? desktopCanvasScrollRef
+              : undefined
+        }
+        onClick={isStudioLayout && !isImmersive ? handleCanvasAreaClick : undefined}
+        onMouseMove={isStudioLayout && !isImmersive ? handleCanvasAreaMove : undefined}
+        onMouseLeave={isStudioLayout && !isImmersive ? handleCanvasAreaLeave : undefined}
+      >
         <div
           className={`marketing-email-frame-wrap ${previewMode === 'mobile' ? 'is-mobile' : ''}`}
           style={previewMode === 'desktop' ? { maxWidth: emailWidth } : undefined}
         >
           <div
-            className="marketing-canvas-html marketing-canvas-html--interactive bg-white shadow-xl rounded-lg border border-slate-200/80 overflow-hidden"
+            ref={isImmersive ? syncCanvasHost : canvasHostRef}
+            className={`marketing-canvas-html marketing-canvas-html--interactive bg-white shadow-xl rounded-lg border border-slate-200/80 ${
+              isStudio ? 'marketing-canvas-html--studio-white' : ''
+            }`}
             role="document"
-            aria-label="Email canvas"
-            onPointerDown={handleCanvasBlockPointer}
-            dangerouslySetInnerHTML={{ __html: canvasHtml }}
-            style={!pageScroll ? { minHeight: 560 } : undefined}
+            aria-label="Email canvas — click a section to edit"
+            style={!pageScroll && !isCompact ? { minHeight: 560 } : undefined}
+            {...(!isImmersive && canvasHtml
+              ? { dangerouslySetInnerHTML: { __html: canvasHtml } }
+              : {})}
           />
         </div>
       </div>
@@ -747,6 +1040,429 @@ export default function MarketingTemplateBuilder({
     </div>
   )
 
+  const studioPanelTitle =
+    studioPanel === 'edit'
+      ? `Edit ${BLOCK_LABELS[value.blocks?.[selectedBlockIndex]?.type] || 'block'}`
+      : STUDIO_RAIL.find((t) => t.id === studioPanel)?.label || 'Tools'
+
+  const studioPanelSubtitle =
+    studioPanel === 'edit' && selectedBlockLabel
+      ? `Section ${selectedBlockIndex + 1} of ${value.blocks?.length || 0}`
+      : null
+
+  const studioPanelFooter = (
+    <footer className="marketing-studio-compact-drawer-footer">
+      <button type="button" className="crm-btn crm-btn-primary w-full" onClick={closeStudioPanel}>
+        {studioPanel === 'blocks' ? 'Done — back to canvas' : 'OK — back to canvas'}
+      </button>
+    </footer>
+  )
+
+  const studioPanelBody =
+    studioPanel === 'edit' ? compactBlockEditor : studioPanel ? panelContent : null
+
+  if (isCompact) {
+    const drawerTitle = studioPanelTitle
+
+    return (
+      <div className="marketing-studio-compact">
+        <div className="marketing-studio-compact-subject">
+          <input
+            value={value.subject || ''}
+            onChange={(e) => applyChange({ ...value, subject: e.target.value })}
+            placeholder="Subject — {{firstName}}, quick update"
+            className="ci-input w-full !text-sm"
+          />
+        </div>
+
+        <nav className="marketing-studio-compact-nav" aria-label="Email builder tools">
+          {STUDIO_RAIL.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              className={`marketing-studio-compact-nav-btn ${
+                studioPanel === tab.id ? 'is-active' : ''
+              }`}
+              onClick={() => openStudioPanel(tab.id)}
+            >
+              <tab.icon className="h-4 w-4" />
+              <span>{tab.label}</span>
+            </button>
+          ))}
+          <button
+            type="button"
+            className="marketing-studio-compact-nav-btn"
+            onClick={() => setPreviewOpen(true)}
+          >
+            <EyeIcon className="h-4 w-4" />
+            <span>Preview</span>
+          </button>
+        </nav>
+
+        {blockChipStrip ? (
+          <div className="marketing-studio-compact-chips">{blockChipStrip}</div>
+        ) : null}
+
+        {value.blocks?.length > 0 && (
+          <div className="marketing-studio-compact-reorder" aria-label="Reorder selected block">
+            <span className="marketing-studio-compact-reorder-label">
+              {selectedBlockLabel
+                ? `${selectedBlockLabel} · #${selectedBlockIndex + 1} of ${value.blocks.length}`
+                : `Block #${selectedBlockIndex + 1} of ${value.blocks.length}`}
+            </span>
+            <div className="marketing-studio-compact-reorder-btns">
+              <button
+                type="button"
+                className="marketing-compact-icon-btn"
+                disabled={selectedBlockIndex === 0}
+                aria-label="Move up"
+                onClick={() => moveBlockCompact(selectedBlockIndex, -1)}
+              >
+                ↑
+              </button>
+              <button
+                type="button"
+                className="marketing-compact-icon-btn"
+                disabled={selectedBlockIndex >= value.blocks.length - 1}
+                aria-label="Move down"
+                onClick={() => moveBlockCompact(selectedBlockIndex, 1)}
+              >
+                ↓
+              </button>
+              <button
+                type="button"
+                className="marketing-compact-icon-btn marketing-compact-icon-btn--accent"
+                onClick={() => openBlockEditor(selectedBlockIndex)}
+              >
+                Edit
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className="marketing-studio-compact-canvas-wrap">{canvas}</div>
+
+        <p className="marketing-studio-compact-hint">
+          Tap Blocks to add at the bottom · tap a section or chip to edit · ↑↓ to reorder
+        </p>
+
+        {studioPanel && (
+          <>
+            <div
+              className="marketing-studio-compact-backdrop"
+              role="presentation"
+              onClick={closeStudioPanel}
+            />
+            <div className="marketing-studio-compact-drawer" role="dialog" aria-label={drawerTitle}>
+              <header className="marketing-studio-compact-drawer-head">
+                <h3>{drawerTitle}</h3>
+                <button
+                  type="button"
+                  className="crm-modal-close"
+                  aria-label="Close panel"
+                  onClick={closeStudioPanel}
+                >
+                  ×
+                </button>
+              </header>
+              <div
+                className={`marketing-studio-compact-drawer-body ${
+                  studioPanel === 'edit' ? 'marketing-studio-compact-drawer-body--edit' : ''
+                }`}
+              >
+                {studioPanelBody}
+              </div>
+              {studioPanelFooter}
+            </div>
+          </>
+        )}
+
+        {previewModal}
+      </div>
+    )
+  }
+
+  const clampRailPosition = (x, y, box = immersiveCanvasRef.current, railEl = immersiveRailRef.current) => {
+    if (!box) return { x, y }
+    const railW = railEl?.offsetWidth || IMMERSIVE_RAIL_WIDTH
+    const railH = railEl?.offsetHeight || 420
+    const maxX = Math.max(8, box.clientWidth - railW - 8)
+    const maxY = Math.max(8, box.clientHeight - railH - 8)
+    return {
+      x: Math.min(maxX, Math.max(8, x)),
+      y: Math.min(maxY, Math.max(8, y)),
+    }
+  }
+
+  useLayoutEffect(() => {
+    if (!isImmersive) return
+    const box = immersiveCanvasRef.current
+    if (!box) return
+    setRailPos((pos) => {
+      if (pos.x >= 0) return clampRailPosition(pos.x, pos.y, box)
+      return clampRailPosition(box.clientWidth - IMMERSIVE_RAIL_WIDTH - 12, 20, box)
+    })
+  }, [isImmersive])
+
+  useEffect(() => {
+    if (!isImmersive) return undefined
+    const onResize = () => {
+      const box = immersiveCanvasRef.current
+      if (!box) return
+      setRailPos((pos) => clampRailPosition(pos.x, pos.y, box))
+    }
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [isImmersive])
+
+  const onRailGripDown = (e) => {
+    if (e.button !== 0) return
+    e.preventDefault()
+    e.currentTarget.setPointerCapture(e.pointerId)
+    railDragRef.current = {
+      active: true,
+      startX: e.clientX,
+      startY: e.clientY,
+      origX: railPos.x,
+      origY: railPos.y,
+    }
+  }
+
+  const onRailGripMove = (e) => {
+    if (!railDragRef.current.active) return
+    const dx = e.clientX - railDragRef.current.startX
+    const dy = e.clientY - railDragRef.current.startY
+    setRailPos(clampRailPosition(railDragRef.current.origX + dx, railDragRef.current.origY + dy))
+  }
+
+  const onRailGripUp = (e) => {
+    if (!railDragRef.current.active) return
+    railDragRef.current.active = false
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId)
+    } catch {
+      // ignore
+    }
+    setRailPos((pos) => {
+      const next = clampRailPosition(pos.x, pos.y)
+      saveImmersiveRailPos(next)
+      return next
+    })
+  }
+
+  const immersiveRightRail = (
+    <aside
+      ref={immersiveRailRef}
+      className="marketing-immersive-rail marketing-immersive-rail--floating"
+      style={{ left: railPos.x >= 0 ? railPos.x : undefined, top: railPos.y }}
+      aria-label="Email builder tools"
+    >
+      <div
+        className="marketing-immersive-rail__grip"
+        onPointerDown={onRailGripDown}
+        onPointerMove={onRailGripMove}
+        onPointerUp={onRailGripUp}
+        onPointerCancel={onRailGripUp}
+        aria-label="Drag builder menu"
+        title="Drag to move menu"
+      >
+        <GripIcon className="h-4 w-4 shrink-0" />
+        <span className="marketing-immersive-rail__grip-label">Drag menu</span>
+      </div>
+      <div className="marketing-immersive-rail__view">
+        <p className="marketing-immersive-rail__heading">Canvas view</p>
+        <div className="marketing-immersive-rail__view-btns" role="group" aria-label="Desktop or mobile canvas width">
+          <button
+            type="button"
+            className={`marketing-immersive-rail__view-btn ${previewMode === 'desktop' ? 'is-active' : ''}`}
+            onClick={() => setPreviewMode('desktop')}
+          >
+            <DesktopIcon className="h-4 w-4 shrink-0" />
+            <span>Desktop</span>
+          </button>
+          <button
+            type="button"
+            className={`marketing-immersive-rail__view-btn ${previewMode === 'mobile' ? 'is-active' : ''}`}
+            onClick={() => setPreviewMode('mobile')}
+          >
+            <MobileDeviceIcon className="h-4 w-4 shrink-0" />
+            <span>Mobile</span>
+          </button>
+        </div>
+      </div>
+      <div className="marketing-immersive-rail__sections">
+        <p className="marketing-immersive-rail__heading">Sections on canvas</p>
+        <p className="marketing-immersive-rail__hint">Hover to preview · click to edit</p>
+        <div className="marketing-immersive-rail__list" role="list">
+          {(value.blocks || []).map((block, index) => (
+            <button
+              key={block.id || `block-${index}`}
+              type="button"
+              role="listitem"
+              className={`marketing-immersive-section-btn ${
+                selectedBlockIndex === index ? 'is-active' : ''
+              }`}
+              onClick={() => openBlockEditor(index)}
+            >
+              <span className="marketing-immersive-section-btn__n">{index + 1}</span>
+              <span className="marketing-immersive-section-btn__label">
+                {BLOCK_LABELS[block.type] || block.type}
+              </span>
+            </button>
+          ))}
+          {!blockCount ? (
+            <p className="marketing-immersive-rail__empty">
+              No sections yet. Use <strong>Blocks</strong> below to add content.
+            </p>
+          ) : null}
+        </div>
+      </div>
+      <div className="marketing-immersive-rail__tools">
+        <p className="marketing-immersive-rail__heading">Tools</p>
+        {onBack ? (
+          <button type="button" className="marketing-immersive-rail__tool" onClick={onBack}>
+            <ChevronLeftIcon className="h-4 w-4 shrink-0" />
+            <span>Back to setup</span>
+          </button>
+        ) : null}
+        <button
+          type="button"
+          className={`marketing-immersive-rail__tool ${studioPanel === 'edit' ? 'is-active' : ''}`}
+          disabled={!blockCount}
+          onClick={() => {
+            const idx =
+              selectedBlockIndex >= 0 && selectedBlockIndex < blockCount ? selectedBlockIndex : 0
+            openBlockEditor(idx)
+          }}
+        >
+          <PencilIcon className="h-4 w-4 shrink-0" />
+          <span>{selectedBlockLabel ? `Edit ${selectedBlockLabel}` : 'Edit block'}</span>
+        </button>
+        {STUDIO_RAIL.map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            className={`marketing-immersive-rail__tool ${studioPanel === tab.id ? 'is-active' : ''}`}
+            onClick={() => openStudioPanel(tab.id)}
+          >
+            <tab.icon className="h-4 w-4 shrink-0" />
+            <span>{tab.label}</span>
+          </button>
+        ))}
+        <button type="button" className="marketing-immersive-rail__tool" onClick={undo} disabled={!canUndo}>
+          <UndoIcon className="h-4 w-4 shrink-0" />
+          <span>Undo</span>
+        </button>
+        <button type="button" className="marketing-immersive-rail__tool" onClick={redo} disabled={!canRedo}>
+          <RedoIcon className="h-4 w-4 shrink-0" />
+          <span>Redo</span>
+        </button>
+        <button type="button" className="marketing-immersive-rail__tool" onClick={() => setPreviewOpen(true)}>
+          <EyeIcon className="h-4 w-4 shrink-0" />
+          <span>Preview</span>
+        </button>
+        {(onSaveDraft || onSave) && (
+          <button
+            type="button"
+            className="marketing-immersive-rail__tool"
+            disabled={busy || draftDisabled}
+            onClick={() => void (onSaveDraft ? onSaveDraft() : onSave?.())}
+          >
+            <SaveIcon className="h-4 w-4 shrink-0" />
+            <span>{onSave ? 'Save template' : 'Save draft'}</span>
+          </button>
+        )}
+        {onSaveAsTemplate ? (
+          <button
+            type="button"
+            className="marketing-immersive-rail__tool"
+            disabled={busy}
+            onClick={() => void onSaveAsTemplate()}
+          >
+            <LayoutTemplateIcon className="h-4 w-4 shrink-0" />
+            <span>Save as template</span>
+          </button>
+        ) : null}
+        {onSend ? (
+          <button
+            type="button"
+            className="marketing-immersive-rail__tool marketing-immersive-rail__tool--accent"
+            disabled={busy || sendDisabled}
+            onClick={() => void onSend()}
+          >
+            <MailIcon className="h-4 w-4 shrink-0" />
+            <span>Send campaign</span>
+          </button>
+        ) : null}
+      </div>
+    </aside>
+  )
+
+  if (isImmersive) {
+    return (
+      <div className="marketing-immersive-studio flex flex-col flex-1 min-h-0 w-full bg-white">
+        <div className="marketing-immersive-canvas" ref={immersiveCanvasRef}>
+          <div
+            className="marketing-immersive-canvas-main"
+            onClick={handleCanvasAreaClick}
+            onMouseMove={handleCanvasAreaMove}
+            onMouseLeave={handleCanvasAreaLeave}
+          >
+            <p className="marketing-immersive-canvas-hint" aria-hidden>
+              Hover a section to highlight · click to edit
+            </p>
+            <div className="marketing-immersive-canvas-inner">{canvas}</div>
+          </div>
+          {immersiveRightRail}
+        </div>
+
+        {studioPanel &&
+          createPortal(
+            <div
+              className="marketing-studio-popup-overlay"
+              role="presentation"
+              onClick={closeStudioPanel}
+            >
+              <div
+                className="marketing-studio-popup"
+                role="dialog"
+                aria-label={studioPanelTitle}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <header className="marketing-studio-popup-head">
+                  <div>
+                    <h3>{studioPanelTitle}</h3>
+                    {studioPanelSubtitle ? (
+                      <p className="marketing-studio-popup-sub">{studioPanelSubtitle}</p>
+                    ) : null}
+                  </div>
+                  <button
+                    type="button"
+                    className="crm-modal-close"
+                    aria-label="Close (Esc)"
+                    onClick={closeStudioPanel}
+                  >
+                    ×
+                  </button>
+                </header>
+                <div
+                  className={`marketing-studio-popup-body ${
+                    studioPanel === 'edit' ? 'marketing-studio-popup-body--edit' : ''
+                  }`}
+                >
+                  {studioPanelBody}
+                </div>
+                {studioPanelFooter}
+              </div>
+            </div>,
+            document.body
+          )}
+
+        {previewModal}
+      </div>
+    )
+  }
+
   return (
     <div
       className={
@@ -798,34 +1514,7 @@ export default function MarketingTemplateBuilder({
         )}
       </div>
 
-      {previewOpen && (
-        <div className="marketing-preview-modal" role="dialog" aria-modal="true" aria-label="Email preview">
-          <div className="marketing-preview-dialog">
-            <header>
-              <div>
-                <p className="text-sm font-semibold text-slate-900">Preview</p>
-                <p className="text-xs text-slate-500 mt-0.5">{value.subject || 'No subject'}</p>
-              </div>
-              <button type="button" className="ci-btn ci-btn-secondary" onClick={() => setPreviewOpen(false)}>
-                Close
-              </button>
-            </header>
-            <main>
-              <iframe
-                title="Full preview"
-                srcDoc={previewHtml}
-                className="bg-white shadow-lg rounded-lg border border-slate-200"
-                style={{
-                  width: previewMode === 'mobile' ? 320 : Math.min(value.design?.contentWidth || 600, 640),
-                  minHeight: 520,
-                  height: 520,
-                  border: 'none',
-                }}
-              />
-            </main>
-          </div>
-        </div>
-      )}
+      {previewModal}
 
       {showSavedTemplates && templates.length > 0 && (
         <section className="ci-card p-4 mt-3 shrink-0">

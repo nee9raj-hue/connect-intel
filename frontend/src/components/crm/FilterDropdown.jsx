@@ -3,8 +3,6 @@ import { createPortal } from 'react-dom'
 import { BRAND_UI_ICON_CLASS } from '../../lib/brandAssets'
 import { getStatusMeta } from '../../lib/crmConstants'
 import useIsMobile from '../../hooks/useIsMobile'
-import useFullPageFilterMenus from '../../hooks/useFullPageFilterMenus'
-import MobileFilterFullPage from '../ui/MobileFilterFullPage'
 
 function FilterMenuCheck({ className = '' }) {
   return (
@@ -50,7 +48,6 @@ export default function FilterDropdown({
   const menuRef = useRef(null)
   const openedAtRef = useRef(0)
   const isMobile = useIsMobile()
-  const fullPageMenus = useFullPageFilterMenus()
 
   const close = useCallback(() => {
     setOpen(false)
@@ -67,7 +64,6 @@ export default function FilterDropdown({
   const iconButton = iconOnly && iconSrc
   const hubspotStatusMenu = menuVariant === 'hubspot-status' && !multiSelect
   const usePortalMenu = Boolean(iconButton && open)
-  const useFullPage = usePortalMenu && fullPageMenus
 
   useLayoutEffect(() => {
     if (!open || !iconButton || isMobile) return
@@ -98,6 +94,15 @@ export default function FilterDropdown({
       document.removeEventListener('touchstart', onDoc, true)
     }
   }, [open, close])
+
+  useEffect(() => {
+    if (!open || !isMobile || !iconButton) return undefined
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = prev
+    }
+  }, [open, isMobile, iconButton])
 
   useEffect(() => {
     if (open && multiSelect) setDraftMulti([...(values || [])])
@@ -138,17 +143,22 @@ export default function FilterDropdown({
     'crm-filter-menu',
     wide ? 'crm-filter-menu--wide' : '',
     hubspotStatusMenu ? 'crm-filter-menu--hubspot-status' : '',
-    useFullPage ? 'crm-filter-menu--mobile-fullpage' : '',
-    usePortalMenu && !fullPageMenus ? 'crm-filter-menu--portaled' : '',
+    usePortalMenu && isMobile ? 'crm-filter-menu--mobile-sheet' : '',
+    usePortalMenu && !isMobile ? 'crm-filter-menu--portaled' : '',
   ]
     .filter(Boolean)
     .join(' ')
 
   const renderMenuBody = () => (
     <>
-      {hubspotStatusMenu && !useFullPage && (
-        <div className="crm-filter-menu-header">
+      {(hubspotStatusMenu || (usePortalMenu && isMobile)) && (
+        <div className="crm-filter-menu-header crm-filter-menu-header--sheet">
           <span className="crm-filter-menu-header-title">{label}</span>
+          {usePortalMenu && isMobile && (
+            <button type="button" className="crm-filter-menu-sheet-close" onClick={close} aria-label="Close">
+              ×
+            </button>
+          )}
         </div>
       )}
 
@@ -255,9 +265,21 @@ export default function FilterDropdown({
   )
 
   const menuStyle = useMemo(() => {
-    if (!usePortalMenu || useFullPage) return undefined
+    if (!usePortalMenu) return undefined
+    if (isMobile) {
+      return {
+        position: 'fixed',
+        left: 0,
+        right: 0,
+        bottom: 0,
+        top: 'auto',
+        zIndex: 1200,
+        width: '100%',
+        maxWidth: '100%',
+      }
+    }
     return { position: 'fixed', top: anchorPos.top, left: anchorPos.left, zIndex: 1200 }
-  }, [usePortalMenu, useFullPage, anchorPos.top, anchorPos.left])
+  }, [usePortalMenu, isMobile, anchorPos.top, anchorPos.left])
 
   const menuEl = open ? (
     <div ref={menuRef} className={menuClassName} role="listbox" style={menuStyle}>
@@ -282,16 +304,7 @@ export default function FilterDropdown({
           data-tooltip={iconButton && !isMobile ? label : undefined}
         >
           {iconButton ? (
-            <img
-              src={iconSrc}
-              alt=""
-              className={BRAND_UI_ICON_CLASS}
-              draggable={false}
-              aria-hidden
-              onError={(e) => {
-                e.currentTarget.style.visibility = 'hidden'
-              }}
-            />
+            <img src={iconSrc} alt="" className={BRAND_UI_ICON_CLASS} draggable={false} aria-hidden />
           ) : (
             <>
               <span className={`truncate ${compact ? 'max-w-[108px]' : 'max-w-[150px]'}`}>
@@ -313,16 +326,7 @@ export default function FilterDropdown({
         {open && !usePortalMenu && menuEl}
       </div>
 
-      {useFullPage &&
-        createPortal(
-          <MobileFilterFullPage open={open} onClose={close} title={label}>
-            {menuEl}
-          </MobileFilterFullPage>,
-          document.body
-        )}
-
       {usePortalMenu &&
-        !useFullPage &&
         createPortal(
           <>
             <button

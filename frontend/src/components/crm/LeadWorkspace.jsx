@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { buildWhatsAppUrl, leadHasCallablePhone } from '../../lib/phoneUtils'
+import LeadPhoneCall from './LeadPhoneCall'
 import { STARTER_TEMPLATES, blocksToPlainText } from '../../lib/marketingEmailDesign'
 import {
   CRM_STATUSES,
@@ -20,6 +21,7 @@ import TeamParticipantPicker from './TeamParticipantPicker'
 import LeadTagsEditor from './LeadTagsEditor'
 import CrmEmailThread from './CrmEmailThread'
 import { buildUnifiedTimeline, formatDealValue, timelineTypeLabel } from '../../lib/crmTimeline'
+import { hasWorkspaceFeature } from '../../lib/workspaceFeatures'
 
 const MAX_EMAIL_ATTACHMENTS = 5
 const MAX_ATTACHMENT_BYTES = 5 * 1024 * 1024
@@ -50,7 +52,13 @@ const TABS = [
   { id: 'whatsapp', label: 'WhatsApp' },
 ]
 
-export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions = CRM_STATUSES }) {
+export default function LeadWorkspace({
+  lead,
+  onClose,
+  onNavigate,
+  statusOptions = CRM_STATUSES,
+  recordPanel = false,
+}) {
   const {
     user,
     teamMembers,
@@ -598,33 +606,74 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
   }
 
   return (
-    <aside className="crm-drawer fixed inset-0 z-[75] md:static md:inset-auto md:w-full md:max-w-[420px] shrink-0">
-      <div className="crm-drawer-header">
+    <aside
+      className={
+        recordPanel
+          ? 'crm-record-panel fixed inset-0 z-[75] md:static md:inset-auto shrink-0'
+          : 'crm-drawer fixed inset-0 z-[75] md:static md:inset-auto md:w-full md:max-w-[420px] shrink-0'
+      }
+    >
+      <div className={recordPanel ? 'crm-record-panel__header' : 'crm-drawer-header'}>
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0 flex-1">
-            <h2 className="text-[13px] font-semibold tracking-[-0.02em] text-gray-900 truncate">
+            <h2
+              className={
+                recordPanel
+                  ? 'crm-record-panel__title truncate'
+                  : 'text-[13px] font-semibold tracking-[-0.02em] text-gray-900 truncate'
+              }
+            >
               {[lead.firstName, lead.lastName].filter(Boolean).join(' ')}
             </h2>
-            <p className="text-xs text-gray-500 truncate">
+            <p
+              className={
+                recordPanel
+                  ? 'crm-record-panel__subtitle truncate'
+                  : 'text-xs text-gray-500 truncate'
+              }
+            >
               {lead.title} · {lead.company}
             </p>
-            <span className={`inline-block mt-1 text-[11px] font-semibold px-2 py-0.5 rounded border ${statusMeta.color}`}>
+            <span
+              className={`inline-block mt-1 text-[11px] font-semibold px-2 py-0.5 rounded border ${
+                recordPanel ? 'crm-record-panel__status' : statusMeta.color
+              }`}
+            >
               {statusMeta.label}
             </span>
           </div>
-          <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-800 text-2xl leading-none px-1" aria-label="Close">
+          <button
+            type="button"
+            onClick={onClose}
+            className={
+              recordPanel
+                ? 'crm-record-panel__close'
+                : 'text-gray-400 hover:text-gray-800 text-2xl leading-none px-1'
+            }
+            aria-label="Close"
+          >
             ×
           </button>
         </div>
-        <div className="flex gap-0.5 mt-2 md:mt-3 overflow-x-auto no-scrollbar pb-0.5">
+        <div
+          className={
+            recordPanel
+              ? 'crm-record-panel__tabs'
+              : 'flex gap-0.5 mt-2 md:mt-3 overflow-x-auto no-scrollbar pb-0.5'
+          }
+        >
           {TABS.map((t) => (
             <button
               key={t.id}
               type="button"
               onClick={() => setTab(t.id)}
-              className={`shrink-0 text-[11px] font-semibold px-2 py-0.5 md:px-2.5 md:py-1 rounded-md ${
-                tab === t.id ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600'
-              }`}
+              className={
+                recordPanel
+                  ? `crm-record-panel__tab ${tab === t.id ? 'is-active' : ''}`
+                  : `shrink-0 text-[11px] font-semibold px-2 py-0.5 md:px-2.5 md:py-1 rounded-md ${
+                      tab === t.id ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600'
+                    }`
+              }
             >
               {t.label}
             </button>
@@ -644,7 +693,13 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
         )}
       </div>
 
-      <div className="crm-drawer-body space-y-3 md:space-y-4">
+      <div
+        className={
+          recordPanel
+            ? 'crm-record-panel__body space-y-3 md:space-y-4'
+            : 'crm-drawer-body space-y-3 md:space-y-4'
+        }
+      >
         {tab === 'overview' && (
           <>
             <section>
@@ -722,7 +777,7 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
                 {lead.tradingProfile.notes && (
                   <p className="text-[11px] text-gray-600 whitespace-pre-wrap">{lead.tradingProfile.notes}</p>
                 )}
-                {onNavigate && (
+                {onNavigate && hasWorkspaceFeature(user, 'panelActiveCustomers') && (
                   <button
                     type="button"
                     onClick={() => onNavigate('active-customers')}
@@ -818,7 +873,7 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
                         setError(err.message)
                       }
                     }}
-                    className="text-xs font-semibold px-3 py-2 rounded-lg bg-[#ffcb2b] text-[#242424] disabled:opacity-40"
+                    className="text-xs font-semibold px-3 py-2 rounded-lg bg-[#FF773D] text-[#242424] disabled:opacity-40"
                   >
                     Enroll
                   </button>
@@ -869,9 +924,9 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
                   <span className="text-gray-500">Email · </span>
                   {lead.email || '—'}
                 </p>
-                <p>
+                <p className="flex flex-wrap items-center gap-1">
                   <span className="text-gray-500">Phone · </span>
-                  {lead.phone || '—'}
+                  <LeadPhoneCall phone={lead.phone} leadId={lead.id} />
                 </p>
                 <p>
                   <span className="text-gray-500">Location · </span>
@@ -1007,7 +1062,7 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
                     onChange={setTaskParticipants}
                   />
                 )}
-                <button type="submit" disabled={busy} className="w-full py-2 text-xs font-semibold bg-[#ffcb2b] rounded-lg disabled:opacity-50">
+                <button type="submit" disabled={busy} className="w-full py-2 text-xs font-semibold bg-[#FF773D] rounded-lg disabled:opacity-50">
                   {saving ? 'Saving…' : 'Add task'}
                 </button>
               </form>
@@ -1026,7 +1081,7 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
                       </p>
                     )}
                     {!t.completedAt && (
-                      <button type="button" onClick={() => completeTask(t.id)} className="mt-1 text-[#5b4a00] font-semibold underline">
+                      <button type="button" onClick={() => completeTask(t.id)} className="mt-1 text-[#FF773D] font-semibold underline">
                         Mark done
                       </button>
                     )}
@@ -1092,7 +1147,7 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
                   <option value="no_show">No show</option>
                 </select>
                 <textarea value={visitNotes} onChange={(e) => setVisitNotes(e.target.value)} rows={3} placeholder="Visit notes, outcomes, next steps…" className="w-full text-xs border rounded-lg px-2.5 py-1.5" />
-                <button type="submit" disabled={busy} className="w-full py-2 text-xs font-semibold border-2 border-[#ffcb2b] rounded-lg disabled:opacity-50">
+                <button type="submit" disabled={busy} className="w-full py-2 text-xs font-semibold border-2 border-[#FF773D] rounded-lg disabled:opacity-50">
                   {saving ? 'Saving…' : 'Save field visit report'}
                 </button>
               </form>
@@ -1101,7 +1156,7 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
             <ul className="space-y-2">
               <h3 className="text-[11px] font-semibold uppercase text-gray-400">Upcoming</h3>
               {(crm.meetings || []).map((m) => (
-                <li key={m.id} className="text-xs border rounded-lg p-2 bg-[#fffbeb]">
+                <li key={m.id} className="text-xs border rounded-lg p-2 bg-[#fff4ee]">
                   <p className="font-medium">{m.title}</p>
                   <p>{formatDateTime(m.scheduledAt)} · {m.type}</p>
                   {(m.participantUserIds?.length > 1 ||
@@ -1133,7 +1188,7 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
                   type="button"
                   onClick={connectWorkGmail}
                   disabled={busy || !gmailStatus.gmailConnectAvailable}
-                  className="w-full py-2 text-xs font-semibold bg-[#ffcb2b] text-[#242424] rounded-lg disabled:opacity-50"
+                  className="w-full py-2 text-xs font-semibold bg-[#FF773D] text-[#242424] rounded-lg disabled:opacity-50"
                 >
                   {connectingGmail ? 'Connecting…' : 'Connect work email'}
                 </button>
@@ -1236,7 +1291,7 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
                 type="button"
                 onClick={handleGenerate}
                 disabled={busy || emailAgenda.trim().length < 8}
-                className="text-xs font-semibold px-3 py-1.5 bg-[#fff6d6] border border-[#ffe48a] rounded-lg disabled:opacity-50"
+                className="text-xs font-semibold px-3 py-1.5 bg-[#fff4ee] border border-[#ffd4b8] rounded-lg disabled:opacity-50"
               >
                 {generating ? 'Drafting…' : '✨ AI draft'}
               </button>
@@ -1394,7 +1449,7 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
               type="button"
               onClick={handleGenerateWhatsApp}
               disabled={busy || waAgenda.trim().length < 8}
-              className="w-full py-2 text-xs font-semibold bg-[#fff6d6] border border-[#ffe48a] rounded-lg disabled:opacity-50"
+              className="w-full py-2 text-xs font-semibold bg-[#fff4ee] border border-[#ffd4b8] rounded-lg disabled:opacity-50"
             >
               {waGenerating ? 'Drafting…' : '✨ AI WhatsApp draft'}
             </button>
@@ -1428,8 +1483,12 @@ export default function LeadWorkspace({ lead, onClose, onNavigate, statusOptions
         {error && <p className="text-xs text-red-700 bg-red-50 border border-red-100 rounded-lg px-2 py-1.5">{error}</p>}
       </div>
 
-      <div className="shrink-0 px-4 py-2 border-t text-[10px] text-gray-400">
-        {lead.email || 'No email'} · {lead.phone || 'No phone'}
+      <div className="shrink-0 px-4 py-2 border-t text-[10px] text-gray-500 flex flex-wrap items-center gap-x-2 gap-y-1">
+        <span>{lead.email || 'No email'}</span>
+        <span className="text-gray-300" aria-hidden>
+          ·
+        </span>
+        <LeadPhoneCall phone={lead.phone} leadId={lead.id} numberClassName="text-[10px]" />
       </div>
     </aside>
   )

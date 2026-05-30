@@ -90,7 +90,7 @@ export default function SearchFiltersBar({
           <label className="sr-only">What are you looking for?</label>
           <input
             type="text"
-            placeholder="Try: procurement heads in Jaipur, exporters in Gujarat, founders with email"
+            placeholder='Try: "textile exporters in Ludhiana, Punjab" or "food manufacturers in Surat"'
             value={filters.keywords}
             onChange={(e) => onChange({ ...filters, keywords: e.target.value })}
             onKeyDown={(e) => e.key === 'Enter' && onSearch()}

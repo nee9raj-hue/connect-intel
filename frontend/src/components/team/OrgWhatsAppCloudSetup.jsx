@@ -152,7 +152,7 @@ export default function OrgWhatsAppCloudSetup({ compact = false, scope = 'org' }
               href="https://developers.facebook.com/docs/whatsapp/cloud-api/get-started"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#5b4a00] underline"
+              className="text-[#FF773D] underline"
             >
               Meta Business Manager
             </a>

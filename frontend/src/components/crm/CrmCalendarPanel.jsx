@@ -169,7 +169,7 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
   }, [view, anchor, upcomingOnly])
 
   return (
-    <div className="panel-shell bg-[#f6f7f9] relative">
+    <div className="panel-shell relative">
       <header className="shrink-0 bg-white border-b border-gray-200 px-4 md:px-5 py-4 space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -320,7 +320,7 @@ function ListView({ events, onSelect }) {
     <div className="max-w-3xl mx-auto space-y-4">
       {keys.map((key) => (
         <section key={key}>
-          <h2 className="text-xs font-bold uppercase text-gray-400 mb-2 sticky top-0 bg-[#f6f7f9] py-1">
+          <h2 className="text-xs font-bold uppercase text-gray-400 mb-2 sticky top-0 bg-[var(--color-hs-canvas)] py-1">
             {new Date(key).toLocaleDateString(undefined, {
               weekday: 'long',
               month: 'short',
@@ -349,10 +349,10 @@ function WeekView({ days, events, onSelect }) {
           <div
             key={day.toISOString()}
             className={`bg-white border rounded-lg min-h-[120px] flex flex-col ${
-              isToday ? 'border-[#ffcb2b] ring-1 ring-[#ffcb2b]/40' : 'border-gray-200'
+              isToday ? 'border-[#FF773D] ring-1 ring-[#FF773D]/40' : 'border-gray-200'
             }`}
           >
-            <p className={`text-[10px] font-bold px-2 py-1.5 border-b ${isToday ? 'bg-[#fffbeb]' : 'bg-gray-50'}`}>
+            <p className={`text-[10px] font-bold px-2 py-1.5 border-b ${isToday ? 'bg-[#fff4ee]' : 'bg-gray-50'}`}>
               {day.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric' })}
             </p>
             <div className="flex-1 overflow-y-auto p-1 space-y-1">
@@ -403,7 +403,7 @@ function MonthView({ anchor, events, onSelect }) {
               onClick={() => dayEvents[0] && onSelect(dayEvents[0])}
               className={`min-h-[72px] border-t border-r border-gray-100 p-1 text-left hover:bg-gray-50 ${
                 !inMonth ? 'bg-gray-50/80 text-gray-400' : ''
-              } ${isToday ? 'bg-[#fffbeb]/60' : ''}`}
+              } ${isToday ? 'bg-[#fff4ee]/60' : ''}`}
             >
               <span className={`text-xs font-semibold ${isToday ? 'text-[#8a6600]' : ''}`}>
                 {day.getDate()}

@@ -138,7 +138,7 @@ export default function PlatformCustomersPanel() {
   return (
     <div className="h-full flex flex-col bg-[#f0f1f4] overflow-hidden">
       <header className="shrink-0 bg-gray-900 text-white px-5 py-4 border-b border-gray-800">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-[#ffcb2b]">Connect Intel · Support desk</p>
+        <p className="text-[10px] font-bold uppercase tracking-widest text-[#FF773D]">Connect Intel · Support desk</p>
         <h1 className="text-xl font-semibold mt-0.5">Platform support backend</h1>
         <p className="text-sm text-gray-400 mt-1 max-w-2xl">
           Triage customer tickets (24–48h SLA), reply by email, and manage credits, access, and onboarding — no live call
@@ -214,7 +214,7 @@ export default function PlatformCustomersPanel() {
                 type="button"
                 onClick={() => setSelectedUserId(row.id)}
                 className={`w-full text-left px-4 py-3 border-b border-gray-100 hover:bg-gray-50 ${
-                  selectedUserId === row.id ? 'bg-[#fffbeb] border-l-2 border-l-[#ffcb2b]' : ''
+                  selectedUserId === row.id ? 'bg-[#fff4ee] border-l-2 border-l-[#FF773D]' : ''
                 }`}
               >
                 <p className="text-sm font-medium text-gray-900 truncate">{row.name}</p>
@@ -232,7 +232,7 @@ export default function PlatformCustomersPanel() {
                 type="button"
                 onClick={() => setSelectedOrgId(row.id)}
                 className={`w-full text-left px-4 py-3 border-b border-gray-100 hover:bg-gray-50 ${
-                  selectedOrgId === row.id ? 'bg-[#fffbeb] border-l-2 border-l-[#ffcb2b]' : ''
+                  selectedOrgId === row.id ? 'bg-[#fff4ee] border-l-2 border-l-[#FF773D]' : ''
                 }`}
               >
                 <p className="text-sm font-medium text-gray-900 truncate">{row.name}</p>

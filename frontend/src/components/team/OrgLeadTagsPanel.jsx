@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { api } from '../../lib/api'
 import { parseTagNamesInput } from '../../lib/orgLeadTags'
+import LeadTag from '../ui/LeadTag'
 
 const PRESET_COLORS = [
   '#2563eb',
@@ -207,7 +208,7 @@ export default function OrgLeadTagsPanel({ onTagsChange, embedded = false }) {
               key={tag.id}
               className="flex items-center gap-2 px-2 py-1.5 rounded-lg border border-gray-100 bg-gray-50/80"
             >
-              <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: tag.color }} />
+              <LeadTag name={tag.name} className="shrink-0" />
               {editingId === tag.id ? (
                 <>
                   <input
@@ -230,7 +231,7 @@ export default function OrgLeadTagsPanel({ onTagsChange, embedded = false }) {
                 </>
               ) : (
                 <>
-                  <span className="flex-1 text-sm font-medium text-gray-800">{tag.name}</span>
+                  <span className="flex-1" />
                   <button type="button" onClick={() => startEdit(tag)} className="text-xs text-gray-500 hover:text-gray-800">
                     Edit
                   </button>

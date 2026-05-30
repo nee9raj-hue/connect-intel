@@ -9,7 +9,10 @@ import {
   isNavTargetActive,
   navTargetToOptions,
 } from '../../lib/navConfig'
+import { BRAND_LOGO_ICON_TRANSPARENT, BRAND_LOGO_ICON_CLASS } from '../../lib/brandAssets'
+import { isChithiPanel } from '../../lib/chithiNav'
 import SidebarToggleButton from './SidebarToggleButton'
+import ChithiMenuIcon from '../ui/ChithiMenuIcon'
 import {
   BoltIcon,
   CalendarIcon,
@@ -50,6 +53,13 @@ function saveExpanded(state) {
   }
 }
 
+function NavIcon({ icon: Icon, active, className }) {
+  if (Icon === ChithiMenuIcon) {
+    return <ChithiMenuIcon className={className || 'w-4 h-4'} />
+  }
+  return <Icon className={className} />
+}
+
 const ICONS = {
   home: HomeIcon,
   people: PeopleIcon,
@@ -61,6 +71,7 @@ const ICONS = {
   mail: MailIcon,
   chart: ChartIcon,
   note: NoteIcon,
+  chithi: ChithiMenuIcon,
   task: TaskIcon,
   spark: SparkIcon,
   team: TeamIcon,
@@ -77,9 +88,11 @@ export default function Sidebar({
   onMobileClose,
   sidebarMode = 'expanded',
   onToggleSidebarCollapsed,
+  chithiOpen = false,
+  className: classNameProp = '',
 }) {
-  const { user, logout, savedLeads, pipelineSummary } = useApp()
-  const isOperator = Boolean(user?.isPlatformAdmin)
+  const { user, logout, savedLeads, pipelineSummary, chithiUnread } = useApp()
+  const isOperator = Boolean(user?.isPlatformAdmin || user?.role === 'admin')
   const orgName = isOperator ? 'Connect Intel' : user?.organizationName || 'Connect Intel'
   const orgSubtitle = isOperator
     ? 'Platform operator'
@@ -102,6 +115,8 @@ export default function Sidebar({
   }, [isOperator, user, pipelineCounts, upcomingCount])
 
   const [expanded, setExpanded] = useState(() => loadExpanded())
+  const navScrollRef = useRef(null)
+  const wasChithiOpenRef = useRef(false)
 
   const isTargetActive = useCallback(
     (target) => isNavTargetActive(active, panelOptions, target),
@@ -122,6 +137,25 @@ export default function Sidebar({
     })
   }, [active, panelOptions, sections, isTargetActive])
 
+  useEffect(() => {
+    const inChithi = isChithiPanel(active) || chithiOpen
+    if (wasChithiOpenRef.current && !inChithi) {
+      requestAnimationFrame(() => {
+        const nav = navScrollRef.current
+        if (!nav) return
+        if (user?.isOrgAdmin && user?.accountType === 'company') {
+          const teamEl = nav.querySelector('[data-nav-panel="team"]')
+          if (teamEl) {
+            teamEl.scrollIntoView({ block: 'nearest', behavior: 'instant' })
+            return
+          }
+        }
+        nav.scrollTop = 0
+      })
+    }
+    wasChithiOpenRef.current = inChithi
+  }, [active, chithiOpen, user?.isOrgAdmin, user?.accountType])
+
   const toggleGroup = (groupId) => {
     setExpanded((prev) => {
       const next = { ...prev, [groupId]: !prev[groupId] }
@@ -139,6 +173,10 @@ export default function Sidebar({
     if (item.badgeKey === 'saved') {
       const total = pipelineSummary.total || savedLeads.length
       if (total > 0) return total
+    }
+    if (item.badgeKey === 'chithi') {
+      const n = chithiUnread?.total || 0
+      if (n > 0) return n
     }
     if (item.badge != null && item.badge > 0) return item.badge
     return null
@@ -160,7 +198,7 @@ export default function Sidebar({
       <aside
         className={`ci-sidebar fixed md:static z-50 shrink-0 h-full bg-[#2b2928] border-r border-[#3a3836] flex flex-col overflow-hidden transition-[width] duration-200 ease-in-out max-md:transition-transform text-[12px] ${
           mobileOpen ? 'max-md:translate-x-0' : 'max-md:-translate-x-full'
-        } w-[272px] ${railMode ? 'md:w-16' : 'md:w-[248px]'}`}
+        } w-[272px] ${railMode ? 'md:w-16' : 'md:w-[248px]'} ${classNameProp}`.trim()}
       >
         <div
           className={`min-h-[60px] flex items-center border-b border-[#3a3836] shrink-0 ${
@@ -169,9 +207,9 @@ export default function Sidebar({
         >
           {isOperator ? (
             <img
-              src="/connect-intel-logo-icon.png"
+              src={BRAND_LOGO_ICON_TRANSPARENT}
               alt="Connect Intel"
-              className="w-8 h-8 rounded-xl object-cover shrink-0"
+              className={`w-8 h-8 shrink-0 ${BRAND_LOGO_ICON_CLASS}`}
             />
           ) : user?.organizationLogoUrl ? (
             <img
@@ -181,9 +219,9 @@ export default function Sidebar({
             />
           ) : (
             <img
-              src="/connect-intel-logo-icon.png"
+              src={BRAND_LOGO_ICON_TRANSPARENT}
               alt="Connect Intel"
-              className="w-8 h-8 rounded-xl object-cover shrink-0"
+              className={`w-8 h-8 shrink-0 ${BRAND_LOGO_ICON_CLASS}`}
             />
           )}
           {!railMode && (
@@ -199,6 +237,7 @@ export default function Sidebar({
         </div>
 
         <nav
+          ref={navScrollRef}
           className={`flex-1 overflow-y-auto overflow-x-hidden py-3 ${railMode ? 'px-2 md:px-1.5' : 'px-3'}`}
         >
           {sections.map((section, sectionIndex) => (
@@ -237,6 +276,7 @@ export default function Sidebar({
                   onGo={go}
                   resolveBadge={resolveBadge}
                   muted={group.muted}
+                  dismissFlyouts={chithiOpen}
                 />
               ))}
             </div>
@@ -326,6 +366,7 @@ function NavGroup({
   onGo,
   resolveBadge,
   muted = false,
+  dismissFlyouts = false,
 }) {
   const Icon = icons[group.icon] || HomeIcon
   const hasChildren = group.children?.length > 0
@@ -344,6 +385,8 @@ function NavGroup({
           muted={muted}
           badge={badge}
           leaf
+          navPanel={group.panel}
+          dismissFlyouts={dismissFlyouts}
           onNavigate={() => onGo(target)}
         />
       )
@@ -356,6 +399,7 @@ function NavGroup({
         onClick={() => onGo(target)}
         badge={badge}
         muted={muted}
+        navPanel={group.panel}
       />
     )
   }
@@ -390,7 +434,11 @@ function NavGroup({
               : 'text-[#d4d9de] hover:bg-white/6 hover:text-white'
         }`}
       >
-        <Icon className={`w-4 h-4 shrink-0 ${groupActive ? 'text-[#17191c]' : 'text-[#aab3bb]'}`} />
+        <NavIcon
+          icon={Icon}
+          active={groupActive}
+          className={`w-4 h-4 shrink-0 ${groupActive ? 'text-[#17191c]' : 'text-[#aab3bb]'}`}
+        />
         <span className="flex-1 text-left truncate">{group.label}</span>
         <ChevronRightIcon
           className={`w-3.5 h-3.5 shrink-0 transition-transform ${navExpanded ? 'rotate-90' : ''}`}
@@ -422,6 +470,8 @@ function RailFlyoutAnchor({
   children,
   leaf = false,
   onNavigate,
+  dismissFlyouts = false,
+  navPanel,
 }) {
   const [open, setOpen] = useState(false)
   const [flyoutPos, setFlyoutPos] = useState(null)
@@ -478,6 +528,10 @@ function RailFlyoutAnchor({
       if (closeTimerRef.current) window.clearTimeout(closeTimerRef.current)
     }
   }, [])
+
+  useEffect(() => {
+    if (dismissFlyouts) setOpen(false)
+  }, [dismissFlyouts])
 
   const clearCloseTimer = () => {
     if (!closeTimerRef.current) return
@@ -550,7 +604,11 @@ function RailFlyoutAnchor({
                     : 'text-[#e8ecef] hover:bg-white/8 hover:text-white'
               }`}
             >
-              <Icon className={`w-4 h-4 shrink-0 ${itemActive ? 'text-[#17191c]' : 'text-[#aab3bb]'}`} />
+              <NavIcon
+                icon={Icon}
+                active={itemActive}
+                className={`w-4 h-4 shrink-0 ${itemActive ? 'text-[#17191c]' : 'text-[#aab3bb]'}`}
+              />
               <span className="flex-1 text-left truncate">{label}</span>
               {badge != null && (
                 <span
@@ -581,6 +639,7 @@ function RailFlyoutAnchor({
     >
       <button
         type="button"
+        data-nav-panel={leaf && navPanel ? navPanel : undefined}
         aria-expanded={open}
         aria-haspopup={hasMenu ? 'menu' : 'true'}
         onFocus={openNow}
@@ -594,7 +653,11 @@ function RailFlyoutAnchor({
               : 'text-[#d4d9de] hover:bg-white/6 hover:text-white'
         }`}
       >
-        <Icon className={`w-5 h-5 shrink-0 ${itemActive || open ? 'text-[#17191c]' : 'text-[#aab3bb]'}`} />
+        <NavIcon
+          icon={Icon}
+          active={itemActive || open}
+          className={`w-5 h-5 shrink-0 ${itemActive || open ? 'text-[#17191c]' : 'text-[#aab3bb]'}`}
+        />
         {badge != null && (
           <span
             className={`absolute top-1 right-1 flex h-[14px] min-w-[14px] items-center justify-center rounded-full px-0.5 text-[8px] font-bold ${
@@ -610,10 +673,11 @@ function RailFlyoutAnchor({
   )
 }
 
-function NavBtn({ label, icon: Icon, active, onClick, badge, muted = false }) {
+function NavBtn({ label, icon: Icon, active, onClick, badge, muted = false, navPanel }) {
   return (
     <button
       type="button"
+      data-nav-panel={navPanel || undefined}
       onClick={onClick}
       className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-[12px] font-medium tracking-[-0.015em] mb-1 transition-colors ${
         active
@@ -623,7 +687,11 @@ function NavBtn({ label, icon: Icon, active, onClick, badge, muted = false }) {
             : 'text-[#d4d9de] hover:bg-white/6 hover:text-white'
       }`}
     >
-      <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-[#17191c]' : 'text-[#aab3bb]'}`} />
+      <NavIcon
+        icon={Icon}
+        active={active}
+        className={`w-4 h-4 shrink-0 ${active ? 'text-[#17191c]' : 'text-[#aab3bb]'}`}
+      />
       <span className="flex-1 text-left truncate">{label}</span>
       {badge != null && (
         <span

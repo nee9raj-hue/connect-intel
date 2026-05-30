@@ -15,6 +15,7 @@ import AdminPanel from '../admin/AdminPanel'
 import CrmActivityLogPanel from '../crm/CrmActivityLogPanel'
 import CrmCalendarPanel from '../crm/CrmCalendarPanel'
 import MarketingPanel from '../marketing/MarketingPanel'
+import ChithiPanel from '../chithi/ChithiPanel'
 import TeamNotesPanel from '../team/TeamNotesPanel'
 import TeamTasksPanel from '../team/TeamTasksPanel'
 import ContactsPanel from '../contacts/ContactsPanel'
@@ -29,8 +30,10 @@ const PANELS = {
   pipeline: PipelinePanel,
   'active-customers': ActiveCustomersPanel,
   contacts: ContactsPanel,
-  'team-notes': TeamNotesPanel,
-  'team-tasks': TeamTasksPanel,
+  chithi: ChithiPanel,
+  'team-hub': ChithiPanel,
+  'team-notes': ChithiPanel,
+  'team-tasks': ChithiPanel,
   'crm-dashboard': TeamDashboardPanel,
   'crm-log': CrmActivityLogPanel,
   'crm-calendar': CrmCalendarPanel,
@@ -51,7 +54,7 @@ function resolvePanelId(activePanel) {
   return activePanel === 'bulk-email' ? 'marketing' : activePanel
 }
 
-export default function PanelViewport({ activePanel, panelOptions, onNavigate }) {
+export default function PanelViewport({ activePanel, panelOptions, onNavigate, onOpenCrmMenu }) {
   const isMobile = useIsMobile()
   const panelId = resolvePanelId(activePanel)
   const Panel = PANELS[panelId] || PeopleSearch
@@ -65,6 +68,7 @@ export default function PanelViewport({ activePanel, panelOptions, onNavigate })
           activePanel={activePanel}
           panelOptions={panelOptions}
           isActive
+          onOpenCrmMenu={onOpenCrmMenu}
         />
       </div>
     )
@@ -88,6 +92,7 @@ export default function PanelViewport({ activePanel, panelOptions, onNavigate })
               activePanel={activePanel}
               panelOptions={panelOptions}
               isActive={isActive}
+              onOpenCrmMenu={onOpenCrmMenu}
             />
           </div>
         )

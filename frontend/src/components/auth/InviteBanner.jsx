@@ -32,8 +32,8 @@ export default function InviteBanner({ token, onContinue }) {
   }
 
   return (
-    <div className="mb-6 p-4 rounded-lg bg-[#fffbeb] border border-[#fde68a]">
-      <p className="text-sm font-semibold text-[#5b4a00]">
+    <div className="mb-6 p-4 rounded-lg bg-[#fff4ee] border border-[#ffd4b8]">
+      <p className="text-sm font-semibold text-[#FF773D]">
         You&apos;re invited to {preview.organizationName}
       </p>
       <p className="text-xs text-gray-600 mt-1">
@@ -43,7 +43,7 @@ export default function InviteBanner({ token, onContinue }) {
       <button
         type="button"
         onClick={onContinue}
-        className="mt-3 text-xs font-semibold text-[#5b4a00] underline"
+        className="mt-3 text-xs font-semibold text-[#FF773D] underline"
       >
         Continue to sign in
       </button>

@@ -85,7 +85,7 @@ export default function CrmEmailThread({
             type="button"
             disabled={busy || enableReplySyncBusy}
             onClick={() => onEnableReplySync()}
-            className="shrink-0 text-[10px] font-semibold px-2.5 py-1 rounded-md bg-[#ffcb2b] text-[#242424] border border-[#e6b800] disabled:opacity-50"
+            className="shrink-0 text-[10px] font-semibold px-2.5 py-1 rounded-md bg-[#FF773D] text-[#242424] border border-[#ffd4b8] disabled:opacity-50"
           >
             {enableReplySyncBusy ? 'Connecting…' : 'Allow reply import'}
           </button>

@@ -56,7 +56,7 @@ export default function OrgBillingPanel({ onNavigate }) {
 
   if (user?.isPlatformAdmin) {
     return (
-      <div className="panel-shell bg-[#f3f4f6]">
+      <div className="panel-shell">
         <div className="flex-1 flex items-center justify-center p-8">
           <div className="max-w-md text-center bg-white rounded-2xl border border-gray-200 shadow-sm p-8">
             <h2 className="text-lg font-semibold text-gray-900">Platform operator</h2>
@@ -67,7 +67,7 @@ export default function OrgBillingPanel({ onNavigate }) {
             <button
               type="button"
               onClick={() => onNavigate?.('admin-customers')}
-              className="mt-5 px-4 py-2.5 bg-[#ffcb2b] text-[#242424] text-sm font-semibold rounded-lg hover:bg-[#f0bc00]"
+              className="mt-5 px-4 py-2.5 bg-[#FF773D] text-[#242424] text-sm font-semibold rounded-lg hover:bg-[#e5652f]"
             >
               Open Support desk
             </button>
@@ -79,7 +79,7 @@ export default function OrgBillingPanel({ onNavigate }) {
 
   if (!user?.isOrgAdmin || user?.accountType !== 'company') {
     return (
-      <div className="panel-shell bg-[#f3f4f6]">
+      <div className="panel-shell">
         <div className="flex-1 flex items-center justify-center p-8">
           <p className="text-sm text-gray-600">Only your company admin can manage billing and invoices.</p>
         </div>
@@ -88,7 +88,7 @@ export default function OrgBillingPanel({ onNavigate }) {
   }
 
   return (
-    <div className="panel-shell bg-[#f3f4f6]">
+    <div className="panel-shell">
       <div className="panel-body-scroll">
         <div style={{ fontFamily: 'system-ui, sans-serif', maxWidth: 780, margin: '0 auto', padding: '1.5rem 1rem', color: '#1a202c' }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: 12 }}>

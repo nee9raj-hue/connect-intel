@@ -31,7 +31,7 @@ export default function CrmActivityLogPanel({ onNavigate }) {
   }, [])
 
   return (
-    <div className="panel-shell bg-[#f6f7f9]">
+    <div className="panel-shell">
       <header className="shrink-0 bg-white border-b border-gray-200 px-4 md:px-5 py-4">
         <h1 className="text-lg font-semibold text-gray-900">Activity log</h1>
         <p className="text-xs text-gray-500 mt-0.5">Notes, emails, calls, visits, and assignments across your pipeline</p>
@@ -68,7 +68,7 @@ export default function CrmActivityLogPanel({ onNavigate }) {
                     openPipelineLead(act.leadId)
                     onNavigate?.('pipeline')
                   }}
-                  className="shrink-0 text-xs font-semibold text-[#5b4a00] hover:underline"
+                  className="shrink-0 text-xs font-semibold text-[#FF773D] hover:underline"
                 >
                   Open
                 </button>

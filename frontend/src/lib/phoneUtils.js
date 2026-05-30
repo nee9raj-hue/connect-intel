@@ -25,7 +25,14 @@ export function buildWhatsAppUrl(phone, message = '') {
 }
 
 export function leadHasCallablePhone(lead) {
-  const phone = String(lead?.phone || '').trim()
+  const phone = String(lead?.phone ?? lead ?? '').trim()
   if (!phone || phone.includes('•') || /locked/i.test(phone)) return false
   return Boolean(normalizePhoneDigits(phone))
+}
+
+/** `tel:` URL for the device dialer (mobile, softphone, or desktop phone app). */
+export function buildTelUrl(phone) {
+  const digits = normalizePhoneDigits(phone)
+  if (!digits) return null
+  return `tel:+${digits}`
 }

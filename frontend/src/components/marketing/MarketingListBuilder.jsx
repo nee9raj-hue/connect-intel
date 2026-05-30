@@ -470,7 +470,7 @@ export default function MarketingListBuilder({
               type="button"
               disabled={busy || !repLeads.length}
               onClick={createBatchLists}
-              className="text-xs font-semibold px-3 py-2 bg-[#ffcb2b] text-[#242424] rounded-lg disabled:opacity-50"
+              className="text-xs font-semibold px-3 py-2 bg-[#FF773D] text-[#242424] rounded-lg disabled:opacity-50"
             >
               Create batch lists ({MARKETING_SEND_BATCH_SIZE}/each)
             </button>

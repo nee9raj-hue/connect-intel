@@ -9,6 +9,8 @@ import {
 } from '../../lib/activeTradingImportTemplate'
 import LoadingExperience from '../ui/LoadingExperience'
 import { LOADING_MESSAGES } from '../../lib/loadingQuotes'
+import { hasWorkspaceFeature } from '../../lib/workspaceFeatures'
+import LeadPhoneCall from './LeadPhoneCall'
 
 function formatIsoDate(iso) {
   if (!iso) return '—'
@@ -108,8 +110,27 @@ export default function ActiveCustomersPanel({ onNavigate }) {
     )
   }
 
+  if (!hasWorkspaceFeature(user, 'panelActiveCustomers')) {
+    return (
+      <div className="p-8 text-center text-sm text-gray-500 max-w-md mx-auto">
+        <h2 className="text-lg font-semibold text-gray-900 mb-2">Module not enabled</h2>
+        <p className="leading-relaxed">
+          Active customers and shipment tracking are optional. Your admin can turn them on under{' '}
+          <strong>Team → Workspace modules</strong> (e.g. Logistics &amp; trading preset).
+        </p>
+        <button
+          type="button"
+          className="mt-4 crm-btn crm-btn-primary"
+          onClick={() => onNavigate?.('team')}
+        >
+          Open Team settings
+        </button>
+      </div>
+    )
+  }
+
   return (
-    <div className="panel-shell bg-[#f6f7f9]">
+    <div className="panel-shell">
       <header className="shrink-0 bg-white border-b border-gray-200 px-5 py-4">
         <h1 className="text-lg font-semibold text-gray-900">Active customers</h1>
         <p className="text-xs text-gray-500 mt-0.5 max-w-2xl leading-relaxed">
@@ -253,7 +274,13 @@ export default function ActiveCustomersPanel({ onNavigate }) {
                             </p>
                           )}
                         </td>
-                        <td className="px-4 py-3 text-xs text-gray-600">{row.phone || '—'}</td>
+                        <td className="px-4 py-3 text-xs text-gray-600">
+                          {row.phone ? (
+                            <LeadPhoneCall phone={row.phone} leadId={row.id} />
+                          ) : (
+                            '—'
+                          )}
+                        </td>
                         <td className="px-4 py-3 text-xs">{formatIsoDate(row.firstShipmentAt)}</td>
                         <td className="px-4 py-3 text-xs">{formatIsoDate(row.lastShipmentAt)}</td>
                         <td className="px-4 py-3 text-center tabular-nums">{row.shipmentCount || 0}</td>

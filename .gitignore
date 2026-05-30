@@ -17,3 +17,18 @@ Connect Import/
 data/store.json
 data/connect-intel.sqlite
 .vercel
+
+# Android native project (build locally only; not deployed to web)
+android/
+
+# Android release secrets (never commit)
+android/keystore.properties
+*.jks
+*.keystore
+
+# Android build cache (android/ source is committed)
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/captures/

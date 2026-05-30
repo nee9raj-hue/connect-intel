@@ -72,9 +72,7 @@ export default defineConfig({
             },
             workbox: {
               globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff2}'],
-              cleanupOutdatedCaches: true,
-              skipWaiting: true,
-              clientsClaim: true,
+              importScripts: ['chithi-push-sw.js'],
               navigateFallback: '/index.html',
               navigateFallbackDenylist: [/^\/api\//],
               runtimeCaching: [

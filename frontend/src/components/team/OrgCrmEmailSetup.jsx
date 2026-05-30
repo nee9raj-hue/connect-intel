@@ -90,10 +90,10 @@ export default function OrgCrmEmailSetup() {
   }
 
   return (
-    <div className="rounded-lg border-2 border-[#ffcb2b] bg-[#fffbeb] px-4 py-4 text-sm space-y-3">
+    <div className="rounded-lg border-2 border-[#FF773D] bg-[#fff4ee] px-4 py-4 text-sm space-y-3">
       <div>
         <p className="font-semibold text-[#242424]">Optional DNS sending</p>
-        <p className="text-xs text-[#5b4a00] mt-1 leading-relaxed">
+        <p className="text-xs text-[#FF773D] mt-1 leading-relaxed">
           Only if you cannot use work email connect above. We register{' '}
           <strong>{status?.domain || status?.inferredDomain || 'your company domain'}</strong> — add DNS once for all
           reps on <strong>@{status?.domain || 'yourcompany.com'}</strong>.
@@ -135,7 +135,7 @@ export default function OrgCrmEmailSetup() {
             type="button"
             disabled={busy}
             onClick={handleVerify}
-            className="w-full py-2 text-xs font-semibold border-2 border-[#ffcb2b] rounded-lg disabled:opacity-50"
+            className="w-full py-2 text-xs font-semibold border-2 border-[#FF773D] rounded-lg disabled:opacity-50"
           >
             {busy ? 'Checking…' : 'Check DNS verification'}
           </button>
