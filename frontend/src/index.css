@@ -8467,39 +8467,59 @@ html[data-pipeline-mobile="1"] .ci-app-header-chip--secondary {
     height: 0.875rem;
   }
 
-  .pipeline-hs-th--email,
-  .pipeline-hs-td--email,
-  .pipeline-hs-th--owner,
-  .pipeline-hs-td--owner,
-  .pipeline-hs-th--last-email,
-  .pipeline-hs-td--last-email,
-  .pipeline-hs-th--notes,
-  .pipeline-hs-td--notes,
-  .pipeline-hs-th--company,
-  .pipeline-hs-td--company,
-  .pipeline-hs-th--activity,
-  .pipeline-hs-td--activity,
-  .pipeline-hs-th--created,
-  .pipeline-hs-td--created {
-    display: none;
-  }
-
-  .pipeline-hs-table {
-    width: 100%;
-    min-width: 0;
+  .pipeline-list-workspace .crm-content-scroll.pipeline-scroll-area {
+    overflow-x: auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    touch-action: pan-x pan-y;
   }
 
   .pipeline-hs-table-wrap {
-    margin: 0;
-    overflow-x: hidden;
+    margin: 0 0 0.5rem;
+    overflow: visible;
+    width: max-content;
+    min-width: 100%;
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
   }
 
-  .pipeline-hs-td--email {
-    min-width: 0;
+  .pipeline-hs-table {
+    width: max-content;
+    min-width: 100%;
   }
 
-  .pipeline-hs-td--phone {
-    min-width: 5.5rem;
+  .pipeline-hs-th:not(.pipeline-hs-th-check),
+  .pipeline-hs-td:not(.pipeline-hs-td-check) {
+    min-width: 6.5rem;
+  }
+
+  .pipeline-hs-th-check + .pipeline-hs-th,
+  .pipeline-hs-td-check + .pipeline-hs-td {
+    min-width: 9rem;
+  }
+
+  .pipeline-hs-th-check,
+  .pipeline-hs-td-check {
+    position: sticky;
+    left: 0;
+    z-index: 3;
+    background: #fff;
+    box-shadow: 1px 0 0 #eaf0f6;
+  }
+
+  .pipeline-hs-table thead .pipeline-hs-th-check {
+    z-index: 4;
+    background: #f5f8fa;
+  }
+
+  .pipeline-hs-row.is-checked .pipeline-hs-td-check {
+    background: #f0f9fc;
+  }
+
+  .pipeline-hs-row.is-active .pipeline-hs-td-check {
+    background: #e6f4f7;
   }
 }
 
