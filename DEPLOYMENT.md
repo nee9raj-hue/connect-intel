@@ -2,6 +2,10 @@
 
 This guide explains how to publish your app so **anyone with a link** can use it, add a **custom domain** later, and grow toward **enterprise** (API keys, CRM integrations, big-company tools).
 
+**Production rollback:** See [`docs/PRODUCTION_LOG.md`](docs/PRODUCTION_LOG.md) — dated snapshots of every live deploy with one-command rollback (`npm run prod:rollback -- <commit>`).
+
+**Release process:** [`docs/RELEASE_CHECKLIST.md`](docs/RELEASE_CHECKLIST.md) — run `npm run prod:ship` before push, `npm run prod:log` after Vercel is live.
+
 ---
 
 ## What gets deployed

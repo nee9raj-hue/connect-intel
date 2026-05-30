@@ -15,6 +15,12 @@
     "build": "npm run build --prefix frontend",
     "preview": "npm run preview --prefix frontend",
     "deploy:copy": "node scripts/copy-to-root.js",
+    "prod:log": "node scripts/production-log.mjs sync",
+    "prod:log:list": "node scripts/production-log.mjs list",
+    "prod:rollback": "node scripts/production-log.mjs rollback",
+    "prod:tag": "node scripts/production-log.mjs tag",
+    "prod:verify": "node scripts/verify-deploy.mjs",
+    "prod:ship": "node scripts/ship-production.mjs",
     "build:standalone": "cd frontend && STANDALONE=1 npm run build",
     "open": "open index.html 2>/dev/null || xdg-open index.html 2>/dev/null || echo 'Open index.html in your browser'"
   }

@@ -1,0 +1,32 @@
+---
+description: Production deploy logging and rollback — run after every production ship
+alwaysApply: true
+---
+
+# Production deployment safety
+
+Production: **https://connectintel.net** (Vercel `connect-intel`).
+
+## Before pushing to main
+
+1. Run `npm run prod:ship` (build + missing-file checks).
+2. Follow `docs/RELEASE_CHECKLIST.md` for manual smoke items when the change is user-facing.
+
+## After push (Vercel Production Ready)
+
+1. Run `npm run prod:log` — updates `docs/PRODUCTION_LOG.md`.
+2. Confirm new commit shows **← LIVE**.
+3. Optional known-good marker: `npm run prod:tag -- <commit>` then `git push origin --tags`.
+
+## If production breaks
+
+1. `npm run prod:rollback -- <commit>` (from PRODUCTION_LOG.md).
+2. Fix forward on main; do not force-push unless the user explicitly requests it.
+
+## CI
+
+GitHub Actions runs the same build on every push/PR to `main`. Do not merge broken builds.
+
+## Scope
+
+Do not commit Android/Capacitor unless the user explicitly includes them in deploy scope.
