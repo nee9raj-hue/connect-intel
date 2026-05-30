@@ -7,7 +7,8 @@
     "node": "22.x"
   },
   "dependencies": {
-    "nodemailer": "^7.0.3"
+    "nodemailer": "^7.0.3",
+    "web-push": "^3.6.7"
   },
   "scripts": {
     "dev": "npm run dev --prefix frontend",
