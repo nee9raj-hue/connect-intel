@@ -35,8 +35,8 @@ npm run prod:rollback -- 1e99102
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `3e089c7` |
-| Log updated (IST) | 30/05/2026, 20:10:51 |
+| Commit | `56af2c7` |
+| Log updated (IST) | 30/05/2026, 20:14:36 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 1e99102
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 30/05/2026, 20:10:36 | `3e089c7` | Add user display settings with group-wise font and icon scaling. | [preview](https://connect-intel-cj5gwn18d-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3e089c7` | **← LIVE**
+| 30/05/2026, 20:14:21 | `56af2c7` | Fix settings nav icon contrast with currentColor stroke gear. | [preview](https://connect-intel-76l7mi984-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 56af2c7` | **← LIVE**
+| 30/05/2026, 20:11:18 | `f612fc9` | Update production log after display settings deploy. | [preview](https://connect-intel-h4iuk66xd-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f612fc9` |
+| 30/05/2026, 20:10:36 | `3e089c7` | Add user display settings with group-wise font and icon scaling. | [preview](https://connect-intel-cj5gwn18d-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3e089c7` |
 | 30/05/2026, 20:05:41 | `30e9f48` | Update production log after sidebar typography deploy. | [preview](https://connect-intel-aag8o9qeu-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 30e9f48` |
 | 30/05/2026, 20:04:55 | `dc32d9d` | Align left sidebar typography with HubSpot premium font scale. | [preview](https://connect-intel-otwxwoq9e-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- dc32d9d` |
 | 30/05/2026, 20:03:07 | `3ce8b0f` | Update production log after mobile bottom nav deploy. | [preview](https://connect-intel-jvdea68nr-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3ce8b0f` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 1e99102
 | 30/05/2026, 19:03:06 | `39a73d0` | Update production log after browser back navigation deploy. | [preview](https://connect-intel-nppukrvef-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 39a73d0` |
 | 30/05/2026, 19:02:33 | `385aa91` | Enable browser back/forward navigation across in-app panels and leads. | [preview](https://connect-intel-ilzcdmooo-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 385aa91` |
 | 30/05/2026, 18:58:21 | `e8a4bc4` | Update production log after pipeline assignee filter deploy. | [preview](https://connect-intel-myw34rx16-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e8a4bc4` |
-| 30/05/2026, 18:57:43 | `27c0fbb` | Fix pipeline assignee filter for large lead lists on mount. | [preview](https://connect-intel-rmn73g17s-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 27c0fbb` |
-| 30/05/2026, 18:53:59 | `93fe270` | Update production log after team metrics assignee filter deploy. | [preview](https://connect-intel-cle6obl7d-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 93fe270` |
 
 ---
 
