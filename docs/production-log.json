@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-05-30T12:47:02.054Z",
-  "updatedAtIst": "30/05/2026, 18:17:02",
+  "updatedAt": "2026-05-30T12:53:08.199Z",
+  "updatedAtIst": "30/05/2026, 18:23:08",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "3061a9f",
+  "currentProductionCommit": "82ab12b",
   "entries": [
+    {
+      "logId": "20260530-1822-82ab12b",
+      "commit": "82ab12b",
+      "commitFull": "82ab12bcc971dc459a8a27d1ff38af4537f648b0",
+      "message": "Use Contacts-style filter modals on mobile pipeline and fix duplicate bell.",
+      "deployedAt": "2026-05-30T12:52:41.881Z",
+      "deployedAtIst": "30/05/2026, 18:22:41",
+      "committedAtIst": "30/05/2026, 18:22:09",
+      "vercelPreviewUrl": "https://connect-intel-gyckuojsr-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 82ab12b"
+    },
+    {
+      "logId": "20260530-1817-cd1f6cc",
+      "commit": "cd1f6cc",
+      "commitFull": "cd1f6ccf1845742c29043d5026b2a00ae5c9c406",
+      "message": "Update production log after mobile pipeline alignment deploy.",
+      "deployedAt": "2026-05-30T12:47:32.335Z",
+      "deployedAtIst": "30/05/2026, 18:17:32",
+      "committedAtIst": "30/05/2026, 18:17:05",
+      "vercelPreviewUrl": "https://connect-intel-o5ay6jxn7-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- cd1f6cc"
+    },
     {
       "logId": "20260530-1816-3061a9f",
       "commit": "3061a9f",
@@ -15,7 +43,7 @@
       "committedAtIst": "30/05/2026, 18:16:14",
       "vercelPreviewUrl": "https://connect-intel-ljvewv40m-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 3061a9f"
     },
@@ -242,34 +270,6 @@
       "isCurrentProduction": false,
       "notes": "Known-good baseline: full local CRM, marketing studio, Chithi, PWA (2026-05-30).",
       "rollbackCommand": "npm run prod:rollback -- 1e99102"
-    },
-    {
-      "logId": "20260530-1508-53f5c7b",
-      "commit": "53f5c7b",
-      "commitFull": "53f5c7bb3ced1c71f768d6e80c9018ecf986acdf",
-      "message": "Restore full Connect Assistant with escalations on all platforms.",
-      "deployedAt": "2026-05-30T09:38:43.203Z",
-      "deployedAtIst": "30/05/2026, 15:08:43",
-      "committedAtIst": "30/05/2026, 15:08:18",
-      "vercelPreviewUrl": "https://connect-intel-7n1si1ypv-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 53f5c7b"
-    },
-    {
-      "logId": "20260530-1458-320116e",
-      "commit": "320116e",
-      "commitFull": "320116ee6cb93b48365a5783fd11b3446b399b04",
-      "message": "Add VAPID web push support on top of dc93f77 baseline.",
-      "deployedAt": "2026-05-30T09:29:55.559Z",
-      "deployedAtIst": "30/05/2026, 14:59:55",
-      "committedAtIst": "30/05/2026, 14:58:25",
-      "vercelPreviewUrl": "https://connect-intel-qgtt56hyy-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 320116e"
     }
   ]
 }
