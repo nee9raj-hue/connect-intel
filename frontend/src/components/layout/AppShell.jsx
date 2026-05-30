@@ -184,7 +184,12 @@ export default function AppShell() {
       {needsGmailSetup && !needsOnboarding && (
         <GmailSetupModal onDone={() => setNeedsGmailSetup(false)} />
       )}
-      {user && !needsOnboarding && <ConnectAssistant onNavigate={navigate} />}
+      {user && !needsOnboarding && (
+        <ConnectAssistant
+          onNavigate={navigate}
+          fabAboveMobilePill={showMobileNavPill && mobilePillVisible}
+        />
+      )}
     </div>
   )
 }
