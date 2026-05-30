@@ -35,8 +35,8 @@ npm run prod:rollback -- 1e99102
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `77d4925` |
-| Log updated (IST) | 30/05/2026, 19:14:39 |
+| Commit | `d11296b` |
+| Log updated (IST) | 30/05/2026, 19:23:48 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 1e99102
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 30/05/2026, 19:14:34 | `77d4925` | Remove instructional helper copy for a cleaner CRM UI. | [preview](https://connect-intel-8hn1h0bic-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 77d4925` | **← LIVE**
+| 30/05/2026, 19:23:40 | `d11296b` | Fix pipeline crash from missing useIsMobile import and trim mobile helper copy. | [preview](https://connect-intel-o6ika4700-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d11296b` | **← LIVE**
+| 30/05/2026, 19:15:04 | `4772f58` | Update production log after UI copy cleanup deploy. | [preview](https://connect-intel-209jqndz4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4772f58` |
+| 30/05/2026, 19:14:34 | `77d4925` | Remove instructional helper copy for a cleaner CRM UI. | [preview](https://connect-intel-8hn1h0bic-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 77d4925` |
 | 30/05/2026, 19:07:56 | `5b352c8` | Update production log after keyboard shortcuts deploy. | [preview](https://connect-intel-7prra6ksc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5b352c8` |
 | 30/05/2026, 19:07:21 | `ba876b1` | Restore native keyboard shortcuts and selectable text across the CRM. | [preview](https://connect-intel-nkt8tztzz-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ba876b1` |
 | 30/05/2026, 19:03:06 | `39a73d0` | Update production log after browser back navigation deploy. | [preview](https://connect-intel-nppukrvef-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 39a73d0` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 1e99102
 | 30/05/2026, 18:17:32 | `cd1f6cc` | Update production log after mobile pipeline alignment deploy. | [preview](https://connect-intel-o5ay6jxn7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- cd1f6cc` |
 | 30/05/2026, 18:16:45 | `3061a9f` | Align mobile pipeline with desktop filters and merge top bar. | [preview](https://connect-intel-ljvewv40m-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3061a9f` |
 | 30/05/2026, 17:54:43 | `30d5669` | Update production log after duplicate mobile header fix deploy. | [preview](https://connect-intel-f75h1ve1f-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 30d5669` |
-| 30/05/2026, 17:53:55 | `f9f25d8` | Fix duplicate mobile pipeline header and compact filter row. | [preview](https://connect-intel-ed0tl5ua8-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f9f25d8` |
-| 30/05/2026, 17:49:25 | `f5e7404` | Update production log after compact mobile pipeline header deploy. | [preview](https://connect-intel-1iml3jew8-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f5e7404` |
 
 ---
 

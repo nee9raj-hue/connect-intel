@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-05-30T13:44:39.692Z",
-  "updatedAtIst": "30/05/2026, 19:14:39",
+  "updatedAt": "2026-05-30T13:53:48.593Z",
+  "updatedAtIst": "30/05/2026, 19:23:48",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "77d4925",
+  "currentProductionCommit": "d11296b",
   "entries": [
+    {
+      "logId": "20260530-1923-d11296b",
+      "commit": "d11296b",
+      "commitFull": "d11296bd1def0a2229ab439acfd90349717f10e8",
+      "message": "Fix pipeline crash from missing useIsMobile import and trim mobile helper copy.",
+      "deployedAt": "2026-05-30T13:53:40.567Z",
+      "deployedAtIst": "30/05/2026, 19:23:40",
+      "committedAtIst": "30/05/2026, 19:23:12",
+      "vercelPreviewUrl": "https://connect-intel-o6ika4700-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- d11296b"
+    },
+    {
+      "logId": "20260530-1915-4772f58",
+      "commit": "4772f58",
+      "commitFull": "4772f58433e13303f95ec0883d3844f64a148475",
+      "message": "Update production log after UI copy cleanup deploy.",
+      "deployedAt": "2026-05-30T13:45:04.855Z",
+      "deployedAtIst": "30/05/2026, 19:15:04",
+      "committedAtIst": "30/05/2026, 19:14:39",
+      "vercelPreviewUrl": "https://connect-intel-209jqndz4-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 4772f58"
+    },
     {
       "logId": "20260530-1914-77d4925",
       "commit": "77d4925",
@@ -15,7 +43,7 @@
       "committedAtIst": "30/05/2026, 19:14:02",
       "vercelPreviewUrl": "https://connect-intel-8hn1h0bic-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 77d4925"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 30d5669"
-    },
-    {
-      "logId": "20260530-1753-f9f25d8",
-      "commit": "f9f25d8",
-      "commitFull": "f9f25d8b8ea166038b73f51edb2b94f25f0b7a65",
-      "message": "Fix duplicate mobile pipeline header and compact filter row.",
-      "deployedAt": "2026-05-30T12:23:55.309Z",
-      "deployedAtIst": "30/05/2026, 17:53:55",
-      "committedAtIst": "30/05/2026, 17:53:25",
-      "vercelPreviewUrl": "https://connect-intel-ed0tl5ua8-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- f9f25d8"
-    },
-    {
-      "logId": "20260530-1749-f5e7404",
-      "commit": "f5e7404",
-      "commitFull": "f5e7404973661709b9820631906178ff942d2489",
-      "message": "Update production log after compact mobile pipeline header deploy.",
-      "deployedAt": "2026-05-30T12:19:25.490Z",
-      "deployedAtIst": "30/05/2026, 17:49:25",
-      "committedAtIst": "30/05/2026, 17:48:58",
-      "vercelPreviewUrl": "https://connect-intel-1iml3jew8-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- f5e7404"
     }
   ]
 }
