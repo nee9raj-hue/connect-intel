@@ -35,8 +35,8 @@ npm run prod:rollback -- 1e99102
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `3db2f52` |
-| Log updated (IST) | 30/05/2026, 17:15:37 |
+| Commit | `8e02383` |
+| Log updated (IST) | 30/05/2026, 17:21:21 |
 
 ---
 
@@ -44,7 +44,8 @@ npm run prod:rollback -- 1e99102
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 30/05/2026, 17:09:55 | `3db2f52` | Fix marketing Lists filters and simplify Lists tab chrome. | [preview](https://connect-intel-82rrb9bd1-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3db2f52` | **← LIVE**
+| 30/05/2026, 17:20:57 | `8e02383` | Add production safety: CI gate, deploy verify, and rollback log. | [preview](https://connect-intel-4o0oimmtj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8e02383` | **← LIVE**
+| 30/05/2026, 17:09:55 | `3db2f52` | Fix marketing Lists filters and simplify Lists tab chrome. | [preview](https://connect-intel-82rrb9bd1-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3db2f52` |
 | 30/05/2026, 17:00:13 | `1376a3a` | Use branded call icon on pipeline leads for callable numbers only. | [preview](https://connect-intel-f09tsav38-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1376a3a` |
 | 30/05/2026, 16:56:00 | `7f1674a` | Fix Chithi module load, call icon, and Chithi menu contrast. | [preview](https://connect-intel-9foq27t4x-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7f1674a` |
 | 30/05/2026, 15:18:12 | `1e99102` | Ship local CRM, marketing studio, Chithi, and PWA to production. | [preview](https://connect-intel-g4j1spr4n-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1e99102` |
