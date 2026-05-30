@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
-import { createPortal } from 'react-dom'
+import { useMemo, useState } from 'react'
 import { getStatusMeta } from '../../lib/crmConstants'
+import FullScreenDetailModal from '../ui/FullScreenDetailModal'
 
 export function SearchableMultiList({ options, values, onChange, placeholder, emptyLabel }) {
   const [query, setQuery] = useState('')
@@ -18,21 +18,21 @@ export function SearchableMultiList({ options, values, onChange, placeholder, em
   }
 
   return (
-    <div className="hs-pipeline-filters-sheet__list-wrap hs-pipeline-filter-sheet__list-wrap">
+    <div className="crm-filter-mobile-panel">
       {options.length > 6 ? (
         <input
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={placeholder}
-          className="crm-filter-search-input hs-pipeline-filters-sheet__search"
+          className="crm-input crm-filter-mobile-search text-sm"
         />
       ) : null}
-      <ul className="hs-pipeline-filters-sheet__list hs-pipeline-filter-sheet__list">
+      <ul className="crm-filter-mobile-list">
         <li>
           <button
             type="button"
-            className={`hs-pipeline-filters-sheet__option ${!values?.length ? 'is-selected' : ''}`}
+            className={`crm-filter-mobile-option ${!values?.length ? 'is-selected' : ''}`}
             onClick={() => onChange([])}
           >
             {emptyLabel}
@@ -42,20 +42,20 @@ export function SearchableMultiList({ options, values, onChange, placeholder, em
           const checked = (values || []).includes(opt.value)
           return (
             <li key={opt.value}>
-              <label className={`crm-filter-check-row ${checked ? 'is-checked' : ''}`}>
+              <label className={`crm-filter-mobile-check ${checked ? 'is-checked' : ''}`}>
                 <input
                   type="checkbox"
                   checked={checked}
                   onChange={() => toggle(opt.value)}
                   className="crm-filter-check-input"
                 />
-                <span className="crm-filter-option-label">{opt.label}</span>
+                <span>{opt.label}</span>
               </label>
             </li>
           )
         })}
         {!filtered.length ? (
-          <li className="px-3 py-2 text-xs text-[#516f90]">No matches</li>
+          <li className="crm-filter-mobile-empty">No matches</li>
         ) : null}
       </ul>
     </div>
@@ -64,11 +64,11 @@ export function SearchableMultiList({ options, values, onChange, placeholder, em
 
 export function SingleSelectList({ options, value, onChange, emptyLabel, statusStyle = false }) {
   return (
-    <ul className="hs-pipeline-filters-sheet__list hs-pipeline-filter-sheet__list">
+    <ul className="crm-filter-mobile-list">
       <li>
         <button
           type="button"
-          className={`hs-pipeline-filters-sheet__option ${!value || value === 'all' || value === 'any' ? 'is-selected' : ''}`}
+          className={`crm-filter-mobile-option ${!value || value === 'all' || value === 'any' ? 'is-selected' : ''}`}
           onClick={() => onChange('')}
         >
           {emptyLabel}
@@ -80,7 +80,7 @@ export function SingleSelectList({ options, value, onChange, emptyLabel, statusS
           <li key={opt.value}>
             <button
               type="button"
-              className={`hs-pipeline-filters-sheet__option ${selected ? 'is-selected' : ''}`}
+              className={`crm-filter-mobile-option ${selected ? 'is-selected' : ''}`}
               onClick={() => onChange(opt.value)}
             >
               {statusStyle ? (
@@ -96,49 +96,26 @@ export function SingleSelectList({ options, value, onChange, emptyLabel, statusS
   )
 }
 
-/** Full-screen mobile/PWA sheet for a single pipeline filter. */
+/** Full-screen mobile/PWA sheet for a single pipeline filter (Contacts / Marketing lists pattern). */
 export default function PipelineMobileFilterSheet({ open, title, onClose, onSave, children, saveLabel = 'Apply' }) {
-  useEffect(() => {
-    if (!open) return undefined
-    const prev = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    const onKey = (e) => {
-      if (e.key === 'Escape') onClose?.()
-    }
-    window.addEventListener('keydown', onKey)
-    return () => {
-      document.body.style.overflow = prev
-      window.removeEventListener('keydown', onKey)
-    }
-  }, [open, onClose])
-
-  if (!open) return null
-
-  return createPortal(
-    <>
-      <button type="button" className="hs-pipeline-filters-backdrop" aria-label="Close filter" onClick={onClose} />
-      <div
-        className="hs-pipeline-filters-sheet hs-pipeline-filter-sheet"
-        role="dialog"
-        aria-modal="true"
-        aria-label={title}
-      >
-        <header className="hs-pipeline-filters-sheet__header hs-pipeline-filter-sheet__header">
-          <h2 className="hs-pipeline-filters-sheet__title crm-filter-menu-header-title">{title}</h2>
-          <button type="button" className="crm-filter-menu-sheet-close" onClick={onClose} aria-label="Close">
-            ×
+  return (
+    <FullScreenDetailModal
+      open={open}
+      onClose={onClose}
+      title={title}
+      ariaLabel={title}
+      footer={
+        <div className="flex items-center gap-3 w-full">
+          <button type="button" className="crm-btn crm-btn-ghost shrink-0" onClick={onClose}>
+            Cancel
           </button>
-        </header>
-
-        <div className="hs-pipeline-filters-sheet__body hs-pipeline-filter-sheet__body">{children}</div>
-
-        <footer className="hs-pipeline-filters-sheet__footer hs-pipeline-filter-sheet__footer">
-          <button type="button" className="crm-filter-action-btn is-primary hs-pipeline-filter-sheet__save" onClick={onSave}>
+          <button type="button" className="crm-btn crm-btn-primary flex-1 min-h-[2.75rem]" onClick={onSave}>
             {saveLabel}
           </button>
-        </footer>
-      </div>
-    </>,
-    document.body
+        </div>
+      }
+    >
+      <div className="crm-filter-mobile-body">{children}</div>
+    </FullScreenDetailModal>
   )
 }

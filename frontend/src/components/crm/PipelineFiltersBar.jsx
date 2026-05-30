@@ -272,9 +272,9 @@ export default function PipelineFiltersBar({
         )
       case 'advanced':
         return (
-          <div className="hs-pipeline-advanced-mobile">
+          <div className="space-y-4">
             {savedViews.length > 0 ? (
-              <section className="hs-pipeline-advanced-mobile__section">
+              <section>
                 <p className="hs-advanced-filter-label">Saved views</p>
                 <SingleSelectList
                   options={savedViewOptions}
@@ -285,7 +285,7 @@ export default function PipelineFiltersBar({
               </section>
             ) : null}
             {orgLeadTags.length > 0 ? (
-              <section className="hs-pipeline-advanced-mobile__section">
+              <section>
                 <div className="flex items-center justify-between gap-2 mb-2">
                   <p className="hs-advanced-filter-label mb-0">Tags</p>
                   <select
@@ -306,7 +306,7 @@ export default function PipelineFiltersBar({
                 />
               </section>
             ) : null}
-            <section className="hs-pipeline-advanced-mobile__section">
+            <section>
               <p className="hs-advanced-filter-label">Smart</p>
               <SearchableMultiList
                 options={smartOptions}

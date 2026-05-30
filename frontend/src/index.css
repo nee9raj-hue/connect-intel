@@ -336,6 +336,82 @@ textarea {
   min-height: 2.75rem;
 }
 
+/* Pipeline filter sheets inside FullScreenDetailModal (Contacts / Marketing pattern) */
+.crm-filter-mobile-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.crm-filter-mobile-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.crm-filter-mobile-search {
+  width: 100%;
+}
+
+.crm-filter-mobile-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid #dfe3eb;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.crm-filter-mobile-option {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #33475b;
+  background: #fff;
+  border: none;
+  border-bottom: 1px solid #eaf0f6;
+  cursor: pointer;
+}
+
+.crm-filter-mobile-option:last-child {
+  border-bottom: none;
+}
+
+.crm-filter-mobile-option.is-selected {
+  background: #eaf0f6;
+  font-weight: 600;
+  color: #17191c;
+}
+
+.crm-filter-mobile-check {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #33475b;
+  background: #fff;
+  border-bottom: 1px solid #eaf0f6;
+  cursor: pointer;
+}
+
+.crm-filter-mobile-check.is-checked {
+  background: #f5f8fa;
+}
+
+.crm-filter-mobile-empty {
+  padding: 0.65rem 0.85rem;
+  font-size: 0.8125rem;
+  color: #647185;
+}
+
 @media (max-width: 767px) {
   .crm-fullscreen-modal-overlay {
     background: #fff;
@@ -8266,7 +8342,7 @@ html[data-pipeline-mobile="1"] .ci-app-header-chip--secondary {
 
 @media (max-width: 767px) {
   html[data-pipeline-mobile="1"] .ci-app-header {
-    display: none;
+    display: none !important;
   }
 
   html[data-pipeline-mobile="1"] .ci-mobile-top-bar__bell {
