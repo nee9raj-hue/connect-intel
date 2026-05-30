@@ -35,6 +35,16 @@ export function SettingsIcon({ className = '', size, alt = '' }) {
   )
 }
 
+/** Stroke settings gear — adapts to currentColor (sidebar, dark/light UI). */
+export function SettingsGearIcon({ className }) {
+  return (
+    <LineIcon className={className}>
+      <circle cx="12" cy="12" r="3.25" />
+      <path d="M12 3.25v2M12 18.75v2M5.04 5.04l1.41 1.41M17.55 17.55l1.41 1.41M3.25 12h2M18.75 12h2M5.04 18.96l1.41-1.41M17.55 6.45l1.41-1.41" />
+    </LineIcon>
+  )
+}
+
 export function BellIcon({ className }) {
   return (
     <LineIcon className={className}>

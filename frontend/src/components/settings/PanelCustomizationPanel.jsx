@@ -7,7 +7,7 @@ import {
   PANEL_PREF_STEPS,
 } from '../../lib/panelPreferences'
 import TeamSettingsSection from '../team/TeamSettingsSection'
-import { SettingsIcon } from '../ui/icons'
+import { SettingsGearIcon } from '../ui/icons'
 
 function ScaleStepper({ label, hint, value, onChange, disabled = false }) {
   return (
@@ -100,7 +100,7 @@ export default function PanelCustomizationPanel() {
 
           <TeamSettingsSection
             id="panel-text-icons"
-            icon={SettingsIcon}
+            icon={SettingsGearIcon}
             title="Text & icon sizes"
             description="Group-wise controls — default matches our standard HubSpot-style layout"
             defaultOpen
@@ -141,7 +141,7 @@ export default function PanelCustomizationPanel() {
 
           <TeamSettingsSection
             id="panel-more-soon"
-            icon={SettingsIcon}
+            icon={SettingsGearIcon}
             title="More customization"
             description="Additional layout options will appear here"
             defaultOpen={false}

@@ -27,7 +27,7 @@ import {
   PeopleIcon,
   PipelineIcon,
   SignOutIcon,
-  SettingsIcon,
+  SettingsGearIcon,
   SparkIcon,
   SupportIcon,
   TaskIcon,
@@ -79,7 +79,7 @@ const ICONS = {
   whatsapp: WhatsAppIcon,
   support: SupportIcon,
   database: DatabaseIcon,
-  settings: SettingsIcon,
+  settings: SettingsGearIcon,
 }
 
 export default function Sidebar({
