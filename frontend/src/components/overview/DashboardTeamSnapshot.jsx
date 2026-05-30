@@ -47,7 +47,7 @@ export default function DashboardTeamSnapshot({
 
   if (loading && !snap) {
     return (
-      <DashboardSection title="Team & pipeline intelligence" subtitle="Loading team metrics…">
+      <DashboardSection title="Team & pipeline intelligence">
         <DashboardEmpty>Loading…</DashboardEmpty>
       </DashboardSection>
     )
@@ -58,7 +58,6 @@ export default function DashboardTeamSnapshot({
   return (
     <DashboardSection
       title="Team & pipeline intelligence"
-      subtitle="Active customers, trading activity, and team performance — stages are in Pipeline above"
       actionLabel="Full team metrics"
       onAction={() => drill('crm-dashboard')}
       className="dashboard-team-snapshot"

@@ -157,11 +157,6 @@ export default function MarketingCampaignWizardModal({
                   showNameField={false}
                   showSavedTemplates={false}
                   title={isWa ? 'WhatsApp message' : 'Email design'}
-                  subtitle={
-                    isWa
-                      ? 'Use merge tags like {{firstName}}. Designed blocks convert to text for WhatsApp.'
-                      : 'Drag blocks, edit copy, then continue to review.'
-                  }
                   value={{
                     subject: campaignForm.subject,
                     blocks: campaignForm.blocks,
@@ -195,7 +190,6 @@ export default function MarketingCampaignWizardModal({
                   showNameField={false}
                   showSavedTemplates={false}
                   title={isWa ? 'Follow-up WhatsApp' : 'Follow-up email'}
-                  subtitle={`Sent ${campaignForm.step2Delay || 3} days after the first message.`}
                   starterOptions={
                     isWa
                       ? undefined

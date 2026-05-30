@@ -100,13 +100,13 @@ export function DashboardQuickTile({ tile, onClick }) {
       type="button"
       className="dashboard-quick-tile"
       onClick={onClick}
-      title={tile.desc}
+      title={tile.label}
     >
       <span className="dashboard-quick-tile__icon" aria-hidden>
         <DashboardNavIcon name={tile.icon} className="dashboard-icon" />
       </span>
       <span className="dashboard-quick-tile__label">{tile.label}</span>
-      <span className="dashboard-quick-tile__desc">{tile.desc}</span>
+      {tile.desc ? <span className="dashboard-quick-tile__desc">{tile.desc}</span> : null}
     </button>
   )
 }
@@ -172,7 +172,7 @@ export function DashboardFeatureCard({ icon, title, description, actionLabel, on
         </span>
       ) : null}
       <h3 className="dashboard-feature-card__title">{title}</h3>
-      <p className="dashboard-feature-card__desc">{description}</p>
+      {description ? <p className="dashboard-feature-card__desc">{description}</p> : null}
       <button type="button" className="crm-btn crm-btn-primary crm-btn-sm" onClick={onAction}>
         {actionLabel}
       </button>

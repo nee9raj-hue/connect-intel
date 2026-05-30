@@ -153,11 +153,7 @@ export default function TeamDashboardPanel({ onNavigate }) {
   }
 
   return (
-    <DashboardShell
-      title="Team metrics"
-      subtitle="Weekly and monthly performance — click any metric to open pipeline, calendar, or activity log"
-      actions={headerActions}
-    >
+    <DashboardShell title="Team metrics" actions={headerActions}>
       {memberUserId && memberName ? (
         <div className="dashboard-team-filter-banner" role="status">
           <span>
@@ -198,17 +194,13 @@ export default function TeamDashboardPanel({ onNavigate }) {
                     ? formatDealValue(summary[item.key])
                     : (summary[item.key] ?? 0).toLocaleString()
                 }
-                hint="View in CRM"
                 onClick={() => onKpiClick(item)}
               />
             ))}
           </div>
 
           <div className="dashboard-layout-2-1">
-            <DashboardSection
-              title={`Activity (${period === 'week' ? '7 days' : '30 days'})`}
-              subtitle="Emails, calls, WhatsApp, notes, and new pipeline entries"
-            >
+            <DashboardSection title={`Activity (${period === 'week' ? '7 days' : '30 days'})`}>
               <div className="dashboard-chart-bars">
                 {(data?.activityByDay || []).map((day) => (
                   <div key={day.date} className="dashboard-chart-bar" title={`${day.count} activities`}>
@@ -221,13 +213,11 @@ export default function TeamDashboardPanel({ onNavigate }) {
                 ))}
               </div>
               {summary.activitiesInPeriod === 0 && summary.totalLeads > 0 ? (
-                <p className="text-[0.6875rem] font-medium text-amber-900 bg-amber-50 border border-amber-100 rounded-xl px-2.5 py-2 mt-3">
-                  No touchpoints in this period yet — log activity or send email from a lead in Pipeline.
-                </p>
+                <p className="text-[0.6875rem] font-medium text-[#647185] mt-3">No activity</p>
               ) : null}
             </DashboardSection>
 
-            <DashboardSection title="Pipeline funnel" subtitle="Click a stage to open filtered pipeline">
+            <DashboardSection title="Pipeline funnel">
               <ul className="space-y-2.5">
                 {(data?.statusBreakdown || []).map((row) => {
                   const meta = getStatusMeta(row.status)
@@ -259,14 +249,7 @@ export default function TeamDashboardPanel({ onNavigate }) {
           </div>
 
           {data?.members?.length > 0 ? (
-            <DashboardSection
-              title={memberUserId ? `${memberName || 'Member'} performance` : 'Team performance'}
-              subtitle={
-                memberUserId
-                  ? 'Metrics for the selected rep — open pipeline for their leads'
-                  : 'Click a row to filter pipeline by that member'
-              }
-            >
+            <DashboardSection title={memberUserId ? `${memberName || 'Member'} performance` : 'Team performance'}>
               <div className="dashboard-table-wrap -mx-4 -mb-1">
                 <table className="dashboard-table">
                   <thead>
@@ -299,12 +282,6 @@ export default function TeamDashboardPanel({ onNavigate }) {
                 </table>
               </div>
             </DashboardSection>
-          ) : null}
-
-          {data?.personal ? (
-            <p className="dashboard-footnote">
-              Individual account — metrics reflect your assigned pipeline only.
-            </p>
           ) : null}
         </>
       )}

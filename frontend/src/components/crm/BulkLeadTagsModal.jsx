@@ -156,7 +156,6 @@ export default function BulkLeadTagsModal({
 
       <section className="bulk-tags-modal__section">
         <h3 className="bulk-tags-modal__heading">Add tags</h3>
-        <p className="bulk-tags-modal__hint">New tags are merged onto each record; existing tags stay.</p>
         <TagCheckboxGrid
           tags={orgLeadTags}
           selected={addIds}

@@ -631,8 +631,7 @@ export default function ChithiPanel({ onNavigate, activePanel, panelOptions, isA
               className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white"
               disabled={sending || !channelId || channelId.startsWith(PENDING_DM_PREFIX)}
             />
-            <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
-              <p className="text-[10px] text-gray-500">Enter to send · Shift+Enter for new line</p>
+            <div className="mt-2 flex flex-wrap items-center justify-end gap-2">
               <button
                 type="button"
                 disabled={sending || !channelId || !body.trim() || channelId.startsWith(PENDING_DM_PREFIX)}
@@ -644,27 +643,22 @@ export default function ChithiPanel({ onNavigate, activePanel, panelOptions, isA
             </div>
           </footer>
 
-          <details className="shrink-0 mx-4 mb-3 rounded-lg border border-[#e5e9ee] bg-[#f9fafb] text-[11px] text-gray-600" open>
+          <details className="shrink-0 mx-4 mb-3 rounded-lg border border-[#e5e9ee] bg-[#f9fafb] text-[11px] text-gray-600">
             <summary className="cursor-pointer px-3 py-2 font-semibold text-gray-800 select-none">
-              Notifications & push alerts
+              Notifications
             </summary>
-            <div className="px-3 pb-2 space-y-2 leading-relaxed">
-              <div className="rounded-lg border border-[#e5e9ee] bg-white px-2.5 py-2">
-                <p className="font-semibold text-gray-800 mb-1">Phone push (PWA)</p>
-                <ChithiPushToggle />
-              </div>
-              <p>Unread badge and sound while CRM is open. Email when teammates are away.</p>
+            <div className="px-3 pb-2 space-y-2">
+              <ChithiPushToggle />
               {isOrgAdmin && (
                 <div className="pt-2 border-t border-gray-200 space-y-2">
-                  <p className="font-semibold text-gray-800">Slack (off-CRM alerts)</p>
                   {slackSettings?.slackWebhookConfigured && (
-                    <p className="text-gray-500">Connected: {slackSettings.slackWebhookPreview}</p>
+                    <p className="text-gray-500 truncate">{slackSettings.slackWebhookPreview}</p>
                   )}
                   <input
                     type="url"
                     value={slackWebhookInput}
                     onChange={(e) => setSlackWebhookInput(e.target.value)}
-                    placeholder="https://hooks.slack.com/services/…"
+                    placeholder="Slack webhook URL"
                     className="w-full text-[11px] border border-gray-200 rounded px-2 py-1.5"
                   />
                   <button
@@ -673,7 +667,7 @@ export default function ChithiPanel({ onNavigate, activePanel, panelOptions, isA
                     onClick={saveSlackWebhook}
                     className="text-[11px] font-semibold px-2 py-1 bg-gray-900 text-white rounded"
                   >
-                    Save Slack webhook
+                    Save
                   </button>
                 </div>
               )}
@@ -684,7 +678,7 @@ export default function ChithiPanel({ onNavigate, activePanel, panelOptions, isA
                   onChange={(e) => setChithiSoundEnabled(e.target.checked)}
                   className="rounded border-gray-300"
                 />
-                <span>Sound for new Chithi messages</span>
+                <span>Sound</span>
               </label>
             </div>
           </details>

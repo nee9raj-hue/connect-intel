@@ -484,21 +484,10 @@ export default function MarketingTemplateBuilder({
   const isEditing = Boolean(value.id)
   const starters = starterOptions?.length ? starterOptions : STARTER_TEMPLATES
   const headerTitle = title || (isEditing ? 'Edit template' : embedded ? 'Email content' : 'Visual email builder')
-  const headerSubtitle =
-    subtitle ||
-    (embedded
-      ? 'Build with blocks — drag to reorder, duplicate, and preview live.'
-      : 'Drag blocks to reorder — use Insert icon inside text blocks for inline icons.')
+  const headerSubtitle = subtitle || ''
 
   const pageScroll = fillHeight
   const studio = fillHeight
-
-  const sideTabHint =
-    sideTab === 'blocks'
-      ? 'Drag or click blocks to add content'
-      : sideTab === 'styles'
-        ? 'Fonts and brand colors'
-        : 'Start from a full email layout'
 
   const blockChipStrip =
     value.blocks?.length > 0 ? (
@@ -928,7 +917,6 @@ export default function MarketingTemplateBuilder({
       >
         <div className="marketing-studio-panel-head">
           <h3>{STUDIO_RAIL.find((t) => t.id === sideTab)?.label}</h3>
-          <p>{sideTabHint}</p>
         </div>
         <div className="marketing-studio-panel-scroll">{panelContent}</div>
       </aside>
@@ -959,9 +947,9 @@ export default function MarketingTemplateBuilder({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="min-w-0">
           <h2 className="text-sm font-semibold text-slate-900">{headerTitle}</h2>
-          {!embedded && (
+          {!embedded && headerSubtitle ? (
             <p className="text-[11px] text-slate-500 mt-0.5 max-w-xl">{headerSubtitle}</p>
-          )}
+          ) : null}
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex rounded-lg border border-slate-200 bg-slate-50 p-0.5">
@@ -1305,7 +1293,6 @@ export default function MarketingTemplateBuilder({
       </div>
       <div className="marketing-immersive-rail__sections">
         <p className="marketing-immersive-rail__heading">Sections on canvas</p>
-        <p className="marketing-immersive-rail__hint">Hover to preview · click to edit</p>
         <div className="marketing-immersive-rail__list" role="list">
           {(value.blocks || []).map((block, index) => (
             <button
@@ -1488,7 +1475,9 @@ export default function MarketingTemplateBuilder({
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="text-sm font-semibold text-gray-900">{headerTitle}</h2>
-            <p className="text-xs text-gray-500 mt-0.5">{headerSubtitle}</p>
+            {headerSubtitle ? (
+              <p className="text-xs text-gray-500 mt-0.5">{headerSubtitle}</p>
+            ) : null}
           </div>
           {(onSave || onCancel) && (
             <div className="flex gap-2">

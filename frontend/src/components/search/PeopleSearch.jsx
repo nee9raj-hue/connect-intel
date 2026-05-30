@@ -501,7 +501,6 @@ function LoadingState() {
   return (
     <LoadingExperience
       message={LOADING_MESSAGES.search}
-      subtitle="Up to 50 matches · full details on the top 10"
       showQuote={false}
       className="bg-white min-h-[min(70vh,520px)]"
     />

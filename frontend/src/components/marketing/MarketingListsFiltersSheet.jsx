@@ -18,7 +18,6 @@ export default function MarketingListsFiltersSheet({
       open={open}
       onClose={onClose}
       title="List filters"
-      subtitle="Narrow saved lists by owner and pipeline stage."
       footer={
         <div className="flex items-center justify-between gap-3 w-full">
           <button

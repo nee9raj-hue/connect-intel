@@ -172,11 +172,7 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
   return (
     <DashboardShell
       title="Dashboard"
-      subtitle={
-        user?.name
-          ? `Welcome back, ${user.name.split(' ')[0]} — pipeline, marketing, and calendar at a glance`
-          : 'Your CRM at a glance — click any card to jump in'
-      }
+      subtitle={user?.name ? `Welcome back, ${user.name.split(' ')[0]}` : undefined}
       actions={headerActions}
     >
       <div className="dashboard-kpi-grid">
@@ -225,11 +221,6 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
 
       <DashboardSection
         title="Pipeline by stage"
-        subtitle={
-          pipelineTotal > 0
-            ? `${pipelineTotal.toLocaleString()} leads total — click a stage to filter`
-            : 'Add leads from AI search or import'
-        }
         actionLabel="Open pipeline"
         onAction={() => go({ panel: 'pipeline', status: 'all' })}
       >
@@ -273,12 +264,7 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
       )}
 
       <div className="dashboard-layout-2-1">
-        <DashboardSection
-          title="Marketing"
-          subtitle="Campaign performance"
-          actionLabel="Reports"
-          onAction={() => go({ panel: 'marketing', tab: 'reports' })}
-        >
+        <DashboardSection title="Marketing" actionLabel="Reports" onAction={() => go({ panel: 'marketing', tab: 'reports' })}>
           {loadingExtras ? (
             <DashboardEmpty>Loading marketing stats…</DashboardEmpty>
           ) : marketingSummary ? (
@@ -301,7 +287,7 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
               </li>
             </ul>
           ) : (
-            <DashboardEmpty>No campaigns yet — create your first outreach.</DashboardEmpty>
+            <DashboardEmpty>No campaigns</DashboardEmpty>
           )}
           <button
             type="button"
@@ -316,7 +302,7 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
           <DashboardFeatureCard
             icon="chart"
             title="Active customers"
-            description={`${teamDashboard?.teamSnapshot?.activeCustomers?.total?.toLocaleString() ?? '—'} with trading activity · upload shipment files to refresh.`}
+            description={teamDashboard?.teamSnapshot?.activeCustomers?.total?.toLocaleString() ?? '—'}
             actionLabel="Open dashboard"
             accent="teal"
             onAction={() => go({ panel: 'active-customers' })}
@@ -325,16 +311,11 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
       </div>
 
       <div className="dashboard-layout-2">
-        <DashboardSection
-          title="Upcoming meetings & tasks"
-          subtitle="Next 90 days"
-          actionLabel="View calendar"
-          onAction={() => go({ panel: 'crm-calendar', upcomingOnly: true })}
-        >
+        <DashboardSection title="Upcoming meetings & tasks" actionLabel="View calendar" onAction={() => go({ panel: 'crm-calendar', upcomingOnly: true })}>
           {loadingExtras ? (
             <DashboardEmpty>Loading calendar…</DashboardEmpty>
           ) : upcomingEvents.length === 0 ? (
-            <DashboardEmpty>Nothing scheduled — add meetings or tasks from Pipeline.</DashboardEmpty>
+            <DashboardEmpty>Nothing scheduled</DashboardEmpty>
           ) : (
             <ul className="dashboard-list">
               {upcomingEvents.map((ev) => (
@@ -358,10 +339,9 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
               ) : null}
             </>
           }
-          subtitle={unreadNotificationCount ? 'Unread updates' : 'All caught up'}
         >
           {recentNotifs.length === 0 ? (
-            <DashboardEmpty>You are all caught up.</DashboardEmpty>
+            <DashboardEmpty>No notifications</DashboardEmpty>
           ) : (
             <ul className="dashboard-list">
               {recentNotifs.map((n) => (
@@ -383,14 +363,9 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
       </div>
 
       <div className="dashboard-layout-2">
-        <DashboardSection
-          title="Recent AI searches"
-          subtitle="Pick up where you left off"
-          actionLabel="New search"
-          onAction={() => go({ panel: 'search' })}
-        >
+        <DashboardSection title="Recent AI searches" actionLabel="New search" onAction={() => go({ panel: 'search' })}>
           {searchHistory.length === 0 ? (
-            <DashboardEmpty>No searches yet — find prospects with AI.</DashboardEmpty>
+            <DashboardEmpty>No searches</DashboardEmpty>
           ) : (
             <ul className="dashboard-list">
               {searchHistory.slice(0, 4).map((h, i) => (
@@ -407,12 +382,7 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
         </DashboardSection>
 
         {isCompany && teamMembers.length > 0 && (
-          <DashboardSection
-            title="Team settings"
-            subtitle={`${teamMembers.length} member${teamMembers.length === 1 ? '' : 's'}`}
-            actionLabel="Manage team"
-            onAction={() => go({ panel: 'team' })}
-          >
+          <DashboardSection title="Team settings" actionLabel="Manage team" onAction={() => go({ panel: 'team' })}>
             <ul className="dashboard-list">
               {teamMembers.slice(0, 4).map((m) => (
                 <DashboardListRow
@@ -435,7 +405,6 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
             <DashboardFeatureCard
               icon="chart"
               title="Active customers"
-              description="Track first shipment and repeat loads. Import ERP or shipment files by mobile number."
               actionLabel="Open dashboard"
               accent="teal"
               onAction={() => go({ panel: 'active-customers' })}
@@ -445,12 +414,7 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
             <DashboardFeatureCard
               icon="whatsapp"
               title="WhatsApp Business API"
-              description={
-                user?.whatsappAutoSendReady
-                  ? 'Bulk WhatsApp is connected for your company workspace.'
-                  : 'Connect Meta API credentials to send marketing and pipeline WhatsApp automatically.'
-              }
-              actionLabel={user?.whatsappAutoSendReady ? 'API settings' : 'Set up WhatsApp API'}
+              actionLabel={user?.whatsappAutoSendReady ? 'API settings' : 'Set up'}
               accent="whatsapp"
               onAction={() => go({ panel: 'whatsapp-settings' })}
             />

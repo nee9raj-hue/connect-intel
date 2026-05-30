@@ -941,10 +941,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
             <div className="marketing-campaign-setup-page flex-1 flex flex-col items-center justify-center p-6 sm:p-10 bg-white">
               <div className="w-full max-w-lg">
                 <h2 className="text-xl font-bold text-[#17191c] tracking-tight">New campaign</h2>
-                <p className="text-sm text-[#5f6d80] mt-1 mb-6">
-                  Choose type, audience, and optional starter template. You will design the message on
-                  the next screen.
-                </p>
+                <div className="mt-6">
                 <MarketingCampaignSetupFields
                   campaignForm={campaignForm}
                   setCampaignForm={setCampaignForm}
@@ -954,6 +951,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
                   user={user}
                   onNavigate={onNavigate}
                 />
+                </div>
                 {campaignForm.useSequence && (
                   <div className="flex flex-wrap gap-2 mt-4">
                     {[

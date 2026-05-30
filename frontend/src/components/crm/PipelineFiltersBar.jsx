@@ -30,13 +30,7 @@ const MOBILE_FILTER_TITLES = {
   advanced: 'Advanced filters',
 }
 
-const MOBILE_FILTER_SUBTITLES = {
-  status: 'Show leads in a single pipeline stage.',
-  city: 'Include leads from selected cities.',
-  state: 'Include leads from selected states.',
-  contact: 'Filter by email or phone availability.',
-  advanced: 'Saved views, tags, and smart filters.',
-}
+const MOBILE_FILTER_SUBTITLES = {}
 
 export default function PipelineFiltersBar({
   search,
