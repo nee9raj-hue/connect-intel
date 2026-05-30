@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-05-30T12:05:00.244Z",
-  "updatedAtIst": "30/05/2026, 17:35:00",
+  "updatedAt": "2026-05-30T12:12:07.489Z",
+  "updatedAtIst": "30/05/2026, 17:42:07",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "760df41",
+  "currentProductionCommit": "d05ae11",
   "entries": [
+    {
+      "logId": "20260530-1741-d05ae11",
+      "commit": "d05ae11",
+      "commitFull": "d05ae115d0ec22271ecb35a5c9387a34e57aca09",
+      "message": "Add per-icon full-screen filter popups on mobile and PWA.",
+      "deployedAt": "2026-05-30T12:11:54.302Z",
+      "deployedAtIst": "30/05/2026, 17:41:54",
+      "committedAtIst": "30/05/2026, 17:41:22",
+      "vercelPreviewUrl": "https://connect-intel-pm93hvm53-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- d05ae11"
+    },
+    {
+      "logId": "20260530-1735-359ed5b",
+      "commit": "359ed5b",
+      "commitFull": "359ed5b295c41b6e98988f137b0c57342180ee1f",
+      "message": "Update production log after mobile/PWA leads fixes deploy.",
+      "deployedAt": "2026-05-30T12:05:33.788Z",
+      "deployedAtIst": "30/05/2026, 17:35:33",
+      "committedAtIst": "30/05/2026, 17:35:06",
+      "vercelPreviewUrl": "https://connect-intel-39i8jbqe7-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 359ed5b"
+    },
     {
       "logId": "20260530-1734-760df41",
       "commit": "760df41",
@@ -15,7 +43,7 @@
       "committedAtIst": "30/05/2026, 17:34:07",
       "vercelPreviewUrl": "https://connect-intel-dgy6ilxrp-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 760df41"
     },
@@ -200,20 +228,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 265ed58"
-    },
-    {
-      "logId": "20260530-1416-0b0084f",
-      "commit": "0b0084f",
-      "commitFull": "0b0084ffe2e837e227304c349907577fcd400359",
-      "message": "Add VAPID web push server support; revert recent pipeline/PWA UI changes.",
-      "deployedAt": "2026-05-30T08:46:41.755Z",
-      "deployedAtIst": "30/05/2026, 14:16:41",
-      "committedAtIst": "30/05/2026, 14:15:57",
-      "vercelPreviewUrl": "https://connect-intel-5a6cxgrr9-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 0b0084f"
     }
   ]
 }
