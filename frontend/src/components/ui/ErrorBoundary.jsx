@@ -23,11 +23,8 @@ export default class ErrorBoundary extends Component {
             onClick={() => window.location.reload()}
             className="mt-5 rounded-xl bg-[#17191c] px-4 py-2.5 text-sm font-semibold text-white"
           >
-            Refresh page
+            Refresh
           </button>
-          <p className="mt-3 text-xs text-[#7a8696]">
-            If this keeps happening, try a hard refresh (Ctrl+Shift+R or Cmd+Shift+R).
-          </p>
         </div>
       )
     }

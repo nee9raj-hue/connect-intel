@@ -282,18 +282,6 @@ export default function Sidebar({
             </div>
           ))}
 
-          {!railMode && (
-            <div className="mx-2 mt-2 rounded-2xl border border-white/8 bg-white/[0.04] p-3 text-white">
-              <p className={`text-[11px] font-semibold tracking-[-0.02em] ${isOperator ? 'text-[#ffcb2b]' : 'text-white'}`}>
-                {isOperator ? 'Master database' : 'CRM first, then AI'}
-              </p>
-              <p className={`mt-1 text-[10px] leading-snug ${isOperator ? 'text-[#b6bec7]' : 'text-[#a2abb4]'}`}>
-                {isOperator
-                  ? 'Upload sheets here. All customers search this shared data.'
-                  : 'Build your pipeline first. Use AI prospect search when you need new leads.'}
-              </p>
-            </div>
-          )}
         </nav>
 
         <div className={`shrink-0 border-t border-[#3a3836] ${railMode ? 'p-2.5' : 'p-3'}`}>

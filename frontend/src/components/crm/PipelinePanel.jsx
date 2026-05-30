@@ -34,6 +34,7 @@ import { leadHasSendableEmail } from '../../lib/emailUtils'
 import { getLeadCity, getLeadState } from '../../lib/pipelineFilters'
 
 import { hasActiveTextSelection } from '../../lib/keyboardShortcuts'
+import useIsMobile from '../../hooks/useIsMobile'
 import usePipelineFilterMobile from '../../hooks/usePipelineFilterMobile'
 
 export default function PipelinePanel({ onNavigate, panelOptions }) {

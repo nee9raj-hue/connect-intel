@@ -589,7 +589,7 @@ export default function PipelineFiltersBar({
                 handleApply()
               }
             }}
-            placeholder={useMobileFilterSheet ? 'Search' : 'Type / to search'}
+            placeholder="Search"
             className="crm-search-input crm-search-input--hubspot"
             aria-label="Search pipeline"
           />
