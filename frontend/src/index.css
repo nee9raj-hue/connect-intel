@@ -1930,7 +1930,10 @@ textarea {
   width: 1.375rem;
   height: 1.375rem;
   display: block;
-  color: #16a34a;
+}
+
+.lead-phone-call__icon--brand {
+  object-fit: contain;
 }
 
 .crm-kanban-card .lead-phone-call__icon {

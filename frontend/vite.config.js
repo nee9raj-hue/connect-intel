@@ -33,6 +33,7 @@ export default defineConfig({
             includeAssets: [
               'connect-intel-hero-logo.png',
               'connect-intel-logo-icon-light.png',
+              'phone-call-icon.png',
               'apple-touch-icon.png',
               'pwa-192.png',
               'pwa-512.png',

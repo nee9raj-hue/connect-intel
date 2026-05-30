@@ -994,14 +994,17 @@ function KanbanColumn({
                   {lead.crm?.responseReceived && (
                     <div className="text-[10px] text-violet-700 mt-0.5 font-medium">Replied</div>
                   )}
-                  {lead.phone ? (
+                  {lead.phone && leadHasCallablePhone(lead.phone) ? (
                     <div className="mt-1.5" onClick={(e) => e.stopPropagation()}>
                       <LeadPhoneCall
                         phone={lead.phone}
                         leadId={lead.id}
                         numberClassName="text-[10px] text-[#33475b]"
+                        pipelineCallIcon
                       />
                     </div>
+                  ) : lead.phone ? (
+                    <div className="mt-1.5 text-[10px] text-[#33475b]">{lead.phone}</div>
                   ) : null}
                 </button>
               </div>

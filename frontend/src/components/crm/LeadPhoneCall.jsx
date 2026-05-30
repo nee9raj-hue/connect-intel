@@ -1,9 +1,11 @@
 import { useLeadPhoneCall } from '../../hooks/useLeadPhoneCall'
 import { leadHasCallablePhone } from '../../lib/phoneUtils'
-import { PhoneCallIcon } from '../ui/icons'
+
+const PIPELINE_CALL_ICON = `${import.meta.env.BASE_URL || '/'}phone-call-icon.png`
 
 /**
- * Phone number with click-to-call icon — uses device dialer (`tel:`) and logs activity on the lead.
+ * Phone number with optional pipeline call icon — uses device dialer (`tel:`) and logs activity on the lead.
+ * Pass pipelineCallIcon on the leads table/kanban only (callable numbers).
  */
 export default function LeadPhoneCall({
   phone,
@@ -11,6 +13,7 @@ export default function LeadPhoneCall({
   className = '',
   showNumber = true,
   iconOnly = false,
+  pipelineCallIcon = false,
   numberClassName = '',
   onClick,
 }) {
@@ -23,6 +26,14 @@ export default function LeadPhoneCall({
   }
 
   if (!callable) {
+    return showNumber ? (
+      <span className={`lead-phone-call__number ${numberClassName}`.trim()} title={display}>
+        {display}
+      </span>
+    ) : null
+  }
+
+  if (!pipelineCallIcon) {
     return showNumber ? (
       <span className={`lead-phone-call__number ${numberClassName}`.trim()} title={display}>
         {display}
@@ -56,7 +67,12 @@ export default function LeadPhoneCall({
         title={logging ? 'Logging call…' : `Call ${display}`}
         aria-label={`Call ${display}`}
       >
-        <PhoneCallIcon className="lead-phone-call__icon" />
+        <img
+          src={PIPELINE_CALL_ICON}
+          alt=""
+          className="lead-phone-call__icon lead-phone-call__icon--brand"
+          draggable={false}
+        />
       </button>
     </span>
   )

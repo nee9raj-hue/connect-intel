@@ -263,6 +263,7 @@ export default function PipelineLeadsTable({
                         phone={lead.phone}
                         leadId={lead.id}
                         iconOnly
+                        pipelineCallIcon
                         className="pipeline-hs-name-call"
                       />
                     ) : null}
@@ -293,6 +294,7 @@ export default function PipelineLeadsTable({
                       phone={lead.phone}
                       leadId={lead.id}
                       numberClassName="pipeline-hs-cell-text"
+                      pipelineCallIcon
                     />
                   ) : (
                     <span className="pipeline-hs-muted">--</span>
