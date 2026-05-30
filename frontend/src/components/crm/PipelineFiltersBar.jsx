@@ -29,6 +29,14 @@ const MOBILE_FILTER_TITLES = {
   advanced: 'Advanced filters',
 }
 
+const MOBILE_FILTER_SUBTITLES = {
+  status: 'Show leads in a single pipeline stage.',
+  city: 'Include leads from selected cities.',
+  state: 'Include leads from selected states.',
+  contact: 'Filter by email or phone availability.',
+  advanced: 'Saved views, tags, and smart filters.',
+}
+
 export default function PipelineFiltersBar({
   search,
   onSearchChange,
@@ -591,16 +599,21 @@ export default function PipelineFiltersBar({
           />
         </div>
 
-        <div className="hs-filter-icon-strip" role="toolbar" aria-label="Lead filters">
+        <div
+          className={`hs-filter-icon-strip ${useMobileFilterSheet ? 'hs-filter-icon-strip--mobile-fill' : ''}`}
+          role="toolbar"
+          aria-label="Lead filters"
+        >
           {useMobileFilterSheet ? mobileFilterIcons : desktopFilterIcons}
         </div>
 
         <PipelineMobileFilterSheet
           open={Boolean(useMobileFilterSheet && mobileSheet)}
           title={mobileSheet ? MOBILE_FILTER_TITLES[mobileSheet.type] || 'Filter' : 'Filter'}
+          subtitle={mobileSheet ? MOBILE_FILTER_SUBTITLES[mobileSheet.type] : undefined}
           onClose={closeMobileFilter}
           onSave={applyMobileFilter}
-          saveLabel="Apply"
+          saveLabel="Apply filters"
         >
           {renderMobileFilterContent()}
         </PipelineMobileFilterSheet>

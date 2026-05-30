@@ -266,7 +266,7 @@ textarea {
 .crm-fullscreen-modal-overlay {
   position: fixed;
   inset: 0;
-  z-index: 100;
+  z-index: 300;
   display: flex;
   flex-direction: column;
   background: rgb(15 23 42 / 0.45);
@@ -8302,14 +8302,14 @@ details summary::-webkit-details-marker {
 
 .ci-pipeline-mobile-header__stats {
   margin: 0;
-  font-size: 0.5625rem;
   font-weight: 500;
   color: #647185;
   line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 4.75rem;
+  max-width: clamp(4rem, 22vw, 6.5rem);
+  font-size: clamp(0.5625rem, 2.6vw, 0.6875rem);
 }
 
 .crm-view-tabs--compact {
@@ -8317,14 +8317,14 @@ details summary::-webkit-details-marker {
 }
 
 .crm-view-tabs--compact .crm-view-tab {
-  font-size: 0.5625rem;
-  padding: 0.28rem 0.45rem;
+  font-size: clamp(0.5625rem, 2.8vw, 0.6875rem);
+  padding: 0.32rem clamp(0.4rem, 2vw, 0.55rem);
 }
 
 .ci-pipeline-mobile-header__btn {
-  min-width: 1.875rem !important;
-  min-height: 1.875rem !important;
-  padding: 0.28rem !important;
+  min-width: clamp(2rem, 10vw, 2.25rem) !important;
+  min-height: clamp(2rem, 10vw, 2.25rem) !important;
+  padding: 0.35rem !important;
   border-radius: 8px;
 }
 
@@ -8392,29 +8392,30 @@ html[data-pipeline-mobile="1"] .ci-app-header-chip--secondary {
   }
 
   .crm-toolbar--hubspot .hs-filter-search.hs-filter-search--compact {
-    flex: 0 0 2rem;
-    max-width: 2rem;
-    min-width: 2rem;
+    flex: 0 0 clamp(2.125rem, 11vw, 2.375rem);
+    max-width: clamp(2.125rem, 11vw, 2.375rem);
+    min-width: clamp(2.125rem, 11vw, 2.375rem);
     transition: flex 0.2s ease, max-width 0.2s ease;
   }
 
   .crm-toolbar--hubspot .hs-filter-search.hs-filter-search--compact:focus-within {
-    flex: 1 1 5.5rem;
-    max-width: 6.5rem;
-    min-width: 4.5rem;
-  }
-
-  .crm-toolbar--hubspot .hs-filter-search.hs-filter-search--compact .crm-search-wrap--hubspot {
-    max-width: 100%;
-    min-width: 0;
+    flex: 1 1 6.5rem;
+    max-width: 7.5rem;
+    min-width: 5rem;
   }
 
   .crm-toolbar--hubspot .hs-filter-search.hs-filter-search--compact .crm-search-input--hubspot {
-    min-height: 1.75rem;
-    height: 1.75rem;
-    font-size: 0.6875rem;
-    padding: 0.2rem 0.35rem 0.2rem 1.45rem;
+    min-height: clamp(2.125rem, 10vw, 2.375rem);
+    height: clamp(2.125rem, 10vw, 2.375rem);
+    font-size: 0.75rem;
+    padding: 0.25rem 0.4rem 0.25rem 1.55rem;
     width: 100%;
+  }
+
+  .crm-toolbar--hubspot .hs-filter-search.hs-filter-search--compact .crm-search-wrap--hubspot .crm-search-icon {
+    width: 0.85rem;
+    height: 0.85rem;
+    left: 0.45rem;
   }
 
   .crm-toolbar--hubspot .hs-filter-search.hs-filter-search--compact:not(:focus-within) .crm-search-input--hubspot {
@@ -8426,28 +8427,27 @@ html[data-pipeline-mobile="1"] .ci-app-header-chip--secondary {
     color: transparent;
   }
 
-  .crm-toolbar--hubspot .hs-filter-search {
-    flex: 0 1 5.5rem;
-    max-width: 5.5rem;
-    min-width: 4rem;
+  .crm-toolbar--hubspot .hs-filter-icon-strip--mobile-fill {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: clamp(0.2rem, 1.4vw, 0.45rem);
   }
 
-  .crm-toolbar--hubspot .crm-search-wrap--hubspot {
-    max-width: 5.5rem;
-    min-width: 4rem;
+  .crm-toolbar--hubspot .hs-filter-icon-strip--mobile-fill .hs-filter-icon-btn {
+    flex: 1 1 0;
+    min-width: clamp(2rem, 14vw, 2.625rem);
+    max-width: clamp(2.25rem, 16vw, 2.75rem);
+    width: auto;
+    height: clamp(2.125rem, 10vw, 2.5rem);
+    padding: 0;
   }
 
-  .crm-toolbar--hubspot .crm-search-input--hubspot {
-    min-height: 1.75rem;
-    height: 1.75rem;
-    font-size: 0.6875rem;
-    padding: 0.2rem 0.35rem 0.2rem 1.45rem;
-  }
-
-  .crm-toolbar--hubspot .crm-search-wrap--hubspot .crm-search-icon {
-    width: 0.7rem;
-    height: 0.7rem;
-    left: 0.4rem;
+  .crm-toolbar--hubspot .hs-filter-icon-strip--mobile-fill .hs-filter-icon-btn .ci-ui-icon {
+    width: clamp(1.05rem, 5vw, 1.25rem);
+    height: clamp(1.05rem, 5vw, 1.25rem);
   }
 
   .crm-toolbar--hubspot .hs-filter-icon-strip {

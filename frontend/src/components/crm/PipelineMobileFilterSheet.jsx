@@ -97,15 +97,24 @@ export function SingleSelectList({ options, value, onChange, emptyLabel, statusS
 }
 
 /** Full-screen mobile/PWA sheet for a single pipeline filter (Contacts / Marketing lists pattern). */
-export default function PipelineMobileFilterSheet({ open, title, onClose, onSave, children, saveLabel = 'Apply' }) {
+export default function PipelineMobileFilterSheet({
+  open,
+  title,
+  subtitle = null,
+  onClose,
+  onSave,
+  children,
+  saveLabel = 'Apply filters',
+}) {
   return (
     <FullScreenDetailModal
       open={open}
       onClose={onClose}
       title={title}
+      subtitle={subtitle}
       ariaLabel={title}
       footer={
-        <div className="flex items-center gap-3 w-full">
+        <div className="flex items-center justify-between gap-3 w-full">
           <button type="button" className="crm-btn crm-btn-ghost shrink-0" onClick={onClose}>
             Cancel
           </button>
