@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-05-30T11:51:21.826Z",
-  "updatedAtIst": "30/05/2026, 17:21:21",
+  "updatedAt": "2026-05-30T11:56:48.569Z",
+  "updatedAtIst": "30/05/2026, 17:26:48",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "8e02383",
+  "currentProductionCommit": "c32e770",
   "entries": [
+    {
+      "logId": "20260530-1726-c32e770",
+      "commit": "c32e770",
+      "commitFull": "c32e770c3b413bbbab1c2f2c2cddef654ec14670",
+      "message": "Add full-screen HubSpot-style lead filters on mobile.",
+      "deployedAt": "2026-05-30T11:56:31.517Z",
+      "deployedAtIst": "30/05/2026, 17:26:31",
+      "committedAtIst": "30/05/2026, 17:26:04",
+      "vercelPreviewUrl": "https://connect-intel-aw0to2vns-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- c32e770"
+    },
+    {
+      "logId": "20260530-1721-2848646",
+      "commit": "2848646",
+      "commitFull": "284864609828d44fda65cde9a3c16500379ba614",
+      "message": "Update production log after safety tooling deploy.",
+      "deployedAt": "2026-05-30T11:51:59.098Z",
+      "deployedAtIst": "30/05/2026, 17:21:59",
+      "committedAtIst": "30/05/2026, 17:21:29",
+      "vercelPreviewUrl": "https://connect-intel-h84wkqgtd-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 2848646"
+    },
     {
       "logId": "20260530-1720-8e02383",
       "commit": "8e02383",
@@ -15,7 +43,7 @@
       "committedAtIst": "30/05/2026, 17:20:25",
       "vercelPreviewUrl": "https://connect-intel-4o0oimmtj-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 8e02383"
     },
@@ -172,20 +200,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- ff2f4f7"
-    },
-    {
-      "logId": "20260530-1406-b840330",
-      "commit": "b840330",
-      "commitFull": "b8403305a95bb3f1113c842ee5a321c930510b31",
-      "message": "Export pipeline helpers used by bulk modals and phone call UI.",
-      "deployedAt": "2026-05-30T08:37:33.069Z",
-      "deployedAtIst": "30/05/2026, 14:07:33",
-      "committedAtIst": "30/05/2026, 14:05:36",
-      "vercelPreviewUrl": "https://connect-intel-c3m2fa2cj-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- b840330"
     }
   ]
 }

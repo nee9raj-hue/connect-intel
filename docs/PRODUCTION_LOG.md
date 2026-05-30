@@ -35,8 +35,8 @@ npm run prod:rollback -- 1e99102
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `8e02383` |
-| Log updated (IST) | 30/05/2026, 17:21:21 |
+| Commit | `c32e770` |
+| Log updated (IST) | 30/05/2026, 17:26:48 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 1e99102
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 30/05/2026, 17:20:57 | `8e02383` | Add production safety: CI gate, deploy verify, and rollback log. | [preview](https://connect-intel-4o0oimmtj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8e02383` | **← LIVE**
+| 30/05/2026, 17:26:31 | `c32e770` | Add full-screen HubSpot-style lead filters on mobile. | [preview](https://connect-intel-aw0to2vns-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c32e770` | **← LIVE**
+| 30/05/2026, 17:21:59 | `2848646` | Update production log after safety tooling deploy. | [preview](https://connect-intel-h84wkqgtd-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2848646` |
+| 30/05/2026, 17:20:57 | `8e02383` | Add production safety: CI gate, deploy verify, and rollback log. | [preview](https://connect-intel-4o0oimmtj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8e02383` |
 | 30/05/2026, 17:09:55 | `3db2f52` | Fix marketing Lists filters and simplify Lists tab chrome. | [preview](https://connect-intel-82rrb9bd1-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3db2f52` |
 | 30/05/2026, 17:00:13 | `1376a3a` | Use branded call icon on pipeline leads for callable numbers only. | [preview](https://connect-intel-f09tsav38-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1376a3a` |
 | 30/05/2026, 16:56:00 | `7f1674a` | Fix Chithi module load, call icon, and Chithi menu contrast. | [preview](https://connect-intel-9foq27t4x-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7f1674a` |
@@ -57,7 +59,6 @@ npm run prod:rollback -- 1e99102
 | 30/05/2026, 14:23:40 | `265ed58` | Restore morning pipeline UI and keep VAPID; bust icon cache. | [preview](https://connect-intel-96g4d04m3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 265ed58` |
 | 30/05/2026, 14:16:41 | `0b0084f` | Add VAPID web push server support; revert recent pipeline/PWA UI changes. | [preview](https://connect-intel-5a6cxgrr9-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0b0084f` |
 | 30/05/2026, 14:11:45 | `ff2f4f7` | Trigger production deploy with pipeline build fixes on main. | [preview](https://connect-intel-obk13rzqo-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ff2f4f7` |
-| 30/05/2026, 14:07:33 | `b840330` | Export pipeline helpers used by bulk modals and phone call UI. | [preview](https://connect-intel-c3m2fa2cj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b840330` |
 
 ---
 
