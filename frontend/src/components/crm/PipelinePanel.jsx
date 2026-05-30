@@ -379,6 +379,18 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     [appliedAdvanced, appliedSearch]
   )
 
+  const pipelineHasLeads = pipelineSummary.total > 0
+  const hasPipelineFiltersActive =
+    hasActiveServerFilters ||
+    activeFilterCount > 0 ||
+    filter !== 'all' ||
+    listStatusFilter !== 'all' ||
+    Boolean(smartViewId)
+  const showPipelineOnboarding = !pipelineHasLeads && !filterApplying
+  const showNoFilterMatches =
+    pipelineHasLeads && filtered.length === 0 && !filterApplying
+  const showPipelineFilters = pipelineHasLeads || hasPipelineFiltersActive
+
   const selectedLeads = useMemo(
     () => savedLeads.filter((l) => selectedIds.has(l.id)),
     [savedLeads, selectedIds]
@@ -400,18 +412,25 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
 
   const mobileHeaderStats = useMemo(() => {
     if (assigneeName) return `Viewing ${assigneeName}`
-    if (savedLeads.length === 0) return null
+    if (pipelineSummary.total === 0) return null
     const parts = []
     if (stageListMode) parts.push(getStatusMeta(filter).label)
-    parts.push(`${pipelineSummary.total.toLocaleString()} leads`)
+    if (hasPipelineFiltersActive && savedLeads.length === 0) {
+      parts.push('0 matches')
+    } else {
+      parts.push(`${(pipelineLoad.total || filtered.length || pipelineSummary.total).toLocaleString()} leads`)
+    }
     if (hasMoreLeads) parts.push(`${pipelineLoad.loaded.toLocaleString()} loaded`)
     return parts.join(' · ')
   }, [
     assigneeName,
+    pipelineSummary.total,
     savedLeads.length,
+    filtered.length,
+    hasPipelineFiltersActive,
     stageListMode,
     filter,
-    pipelineSummary.total,
+    pipelineLoad.total,
     hasMoreLeads,
     pipelineLoad.loaded,
   ])
@@ -463,6 +482,13 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     setAppliedAdvanced(empty)
     setListStatusFilter('all')
   }, [])
+
+  const resetAllPipelineFilters = useCallback(() => {
+    clearAllFilters()
+    setFilter('all')
+    setSmartViewId(null)
+    setSmartViewFilters({})
+  }, [clearAllFilters])
 
   const selectAllFiltered = () => {
     setSelectedIds(new Set(filtered.map((l) => l.id)))
@@ -638,10 +664,17 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                       Clear assignee
                     </button>
                   </>
-                ) : savedLeads.length === 0 ? (
+                ) : pipelineSummary.total === 0 ? (
                   <>
                     <span className="sr-only">Pipeline — </span>
                     Add or import leads to get started
+                  </>
+                ) : showNoFilterMatches ? (
+                  <>
+                    <span className="sr-only">Pipeline — </span>
+                    <strong>0 matches</strong>
+                    {' · '}
+                    {pipelineSummary.total.toLocaleString()} leads in pipeline
                   </>
                 ) : (
                   <>
@@ -698,7 +731,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
             </div>
           </div>
 
-          {savedLeads.length > 0 && (
+          {showPipelineFilters && (
             <PipelineFiltersBar
               search={search}
               onSearchChange={setSearch}
@@ -726,13 +759,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               pipelineTotal={pipelineSummary.total}
               onSelectAllFiltered={selectAllFiltered}
               hasActiveFilters={activeFilterCount > 0 || filter !== 'all' || listStatusFilter !== 'all'}
-              onClearFilters={() => {
-                clearAllFilters()
-                setFilter('all')
-                setListStatusFilter('all')
-                setSmartViewId(null)
-                setSmartViewFilters({})
-              }}
+              onClearFilters={resetAllPipelineFilters}
               onApplySmartView={applySmartView}
               activeSmartViewId={smartViewId}
               orgLeadTags={orgLeadTags}
@@ -784,36 +811,19 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               view === 'board' && !stageListMode ? 'crm-content-scroll-board' : ''
             }`}
           >
-          {savedLeads.length === 0 ? (
+          {filterApplying ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center px-4">
+              <p className="text-sm font-medium text-[#516f90]">Updating leads…</p>
+            </div>
+          ) : showPipelineOnboarding ? (
             <EmptyPipeline
               onNavigate={onNavigate}
               onImport={() => setImportOpen(true)}
               onAdd={() => setAddOpen(true)}
               compact={isMobile}
             />
-          ) : filtered.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-center max-w-md mx-auto px-4">
-              <div className="w-16 h-16 rounded-full bg-[#eaf0f6] flex items-center justify-center mb-4 text-2xl text-[#7c98b6]">
-                ⌕
-              </div>
-              <p className="text-sm font-semibold text-[#33475b]">No leads match your filters</p>
-              <p className="text-xs text-[#516f90] mt-2">
-                Try adjusting search or filters, or clear all to see your full pipeline.
-              </p>
-              <button
-                type="button"
-                onClick={() => {
-                  clearAllFilters()
-                  setFilter('all')
-                  setListStatusFilter('all')
-                  setSmartViewId(null)
-                  setSmartViewFilters({})
-                }}
-                className="crm-btn crm-btn-secondary mt-6"
-              >
-                Clear all filters
-              </button>
-            </div>
+          ) : showNoFilterMatches ? (
+            <PipelineNoMatches onClearFilters={resetAllPipelineFilters} onNavigate={onNavigate} />
           ) : view === 'board' && !stageListMode ? (
             <div className="crm-kanban-board min-w-0">
               {columns.map((col) => {
@@ -1103,6 +1113,33 @@ function KanbanColumn({
           </button>
         </div>
       )}
+    </div>
+  )
+}
+
+function PipelineNoMatches({ onClearFilters, onNavigate }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-16 text-center max-w-md mx-auto px-4">
+      <div className="w-16 h-16 rounded-full bg-[#eaf0f6] flex items-center justify-center mb-4 text-2xl text-[#7c98b6]">
+        ⌕
+      </div>
+      <p className="text-sm font-semibold text-[#33475b]">No leads match your filters</p>
+      <p className="text-sm text-[#516f90] mt-2 leading-relaxed">
+        No data available for this selection. Clear filters to see your full pipeline, or try AI search to
+        find new prospects.
+      </p>
+      <div className="flex flex-col sm:flex-row gap-2 mt-6 w-full sm:w-auto">
+        <button type="button" onClick={onClearFilters} className="crm-btn crm-btn-secondary">
+          Clear all filters
+        </button>
+        <button
+          type="button"
+          onClick={() => onNavigate?.('search')}
+          className="crm-btn crm-btn-primary"
+        >
+          Search with AI
+        </button>
+      </div>
     </div>
   )
 }
