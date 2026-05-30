@@ -35,8 +35,8 @@ npm run prod:rollback -- 1e99102
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `dc32d9d` |
-| Log updated (IST) | 30/05/2026, 20:05:11 |
+| Commit | `3e089c7` |
+| Log updated (IST) | 30/05/2026, 20:10:51 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 1e99102
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 30/05/2026, 20:04:55 | `dc32d9d` | Align left sidebar typography with HubSpot premium font scale. | [preview](https://connect-intel-otwxwoq9e-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- dc32d9d` | **← LIVE**
+| 30/05/2026, 20:10:36 | `3e089c7` | Add user display settings with group-wise font and icon scaling. | [preview](https://connect-intel-cj5gwn18d-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3e089c7` | **← LIVE**
+| 30/05/2026, 20:05:41 | `30e9f48` | Update production log after sidebar typography deploy. | [preview](https://connect-intel-aag8o9qeu-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 30e9f48` |
+| 30/05/2026, 20:04:55 | `dc32d9d` | Align left sidebar typography with HubSpot premium font scale. | [preview](https://connect-intel-otwxwoq9e-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- dc32d9d` |
 | 30/05/2026, 20:03:07 | `3ce8b0f` | Update production log after mobile bottom nav deploy. | [preview](https://connect-intel-jvdea68nr-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3ce8b0f` |
 | 30/05/2026, 20:02:20 | `63f2652` | Improve mobile bottom nav with larger icons and scrollable shortcuts. | [preview](https://connect-intel-5p4jbtuxh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 63f2652` |
 | 30/05/2026, 19:57:08 | `2ce0201` | Update production log after full HubSpot UI deploy. | [preview](https://connect-intel-adoyfiioc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2ce0201` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 1e99102
 | 30/05/2026, 18:58:21 | `e8a4bc4` | Update production log after pipeline assignee filter deploy. | [preview](https://connect-intel-myw34rx16-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e8a4bc4` |
 | 30/05/2026, 18:57:43 | `27c0fbb` | Fix pipeline assignee filter for large lead lists on mount. | [preview](https://connect-intel-rmn73g17s-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 27c0fbb` |
 | 30/05/2026, 18:53:59 | `93fe270` | Update production log after team metrics assignee filter deploy. | [preview](https://connect-intel-cle6obl7d-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 93fe270` |
-| 30/05/2026, 18:53:17 | `3a50742` | Scope team metrics to selected rep with drill-down and persistent assignee filter. | [preview](https://connect-intel-ktmmp32ke-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3a50742` |
-| 30/05/2026, 18:34:31 | `ba8fedc` | Update production log after mobile leads horizontal scroll deploy. | [preview](https://connect-intel-jafcb6sj0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ba8fedc` |
 
 ---
 
