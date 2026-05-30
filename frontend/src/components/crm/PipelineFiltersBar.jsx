@@ -116,6 +116,21 @@ export default function PipelineFiltersBar({
 
   const handleApply = () => onApplyFilters?.()
 
+  const commitFilters = useCallback(
+    (nextFilters) => {
+      onFiltersChange(nextFilters)
+      onApplyFilters?.({ advanced: nextFilters })
+    },
+    [onFiltersChange, onApplyFilters]
+  )
+
+  const applyFilterPatch = useCallback(
+    (patch) => {
+      commitFilters({ ...filters, ...patch })
+    },
+    [commitFilters, filters]
+  )
+
   const cityOptions = cities.map((c) => ({ label: c, value: c }))
   const stateOptions = states.map((s) => ({ label: s, value: s }))
   const stageOptions = statusOptions.map((s) => ({ label: s.label, value: s.id }))
@@ -199,18 +214,19 @@ export default function PipelineFiltersBar({
     switch (type) {
       case 'status':
         onStatusFilterChange?.(draft.statusFilter || 'all')
+        onApplyFilters?.()
         break
       case 'city':
-        onFiltersChange({ ...filters, cities: draft.filters.cities || [] })
+        commitFilters({ ...filters, cities: draft.filters.cities || [] })
         break
       case 'state':
-        onFiltersChange({ ...filters, states: draft.filters.states || [] })
+        commitFilters({ ...filters, states: draft.filters.states || [] })
         break
       case 'contact':
-        onFiltersChange({ ...filters, contact: draft.filters.contact || 'any' })
+        commitFilters({ ...filters, contact: draft.filters.contact || 'any' })
         break
       case 'advanced': {
-        onFiltersChange({
+        commitFilters({
           ...filters,
           tagIds: draft.filters.tagIds || [],
           tagMode: draft.filters.tagMode || 'any',
@@ -224,7 +240,6 @@ export default function PipelineFiltersBar({
         break
     }
 
-    handleApply()
     closeMobileFilter()
   }
 
@@ -425,7 +440,7 @@ export default function PipelineFiltersBar({
           type="button"
           className="crm-filter-menu-footer-apply"
           onClick={() => {
-            handleApply()
+            commitFilters(filters)
             closeAdvanced()
           }}
         >
@@ -511,7 +526,10 @@ export default function PipelineFiltersBar({
           value={statusFilter !== 'all' ? statusFilter : ''}
           displayValue={statusOptions.find((s) => s.id === statusFilter)?.label}
           options={stageOptions}
-          onChange={(v) => onStatusFilterChange?.(v || 'all')}
+          onChange={(v) => {
+            onStatusFilterChange?.(v || 'all')
+            onApplyFilters?.()
+          }}
           emptyLabel="All statuses"
         />
       )}
@@ -523,7 +541,7 @@ export default function PipelineFiltersBar({
         label="City"
         multiSelect
         values={filters.cities || []}
-        onMultiChange={(v) => set({ cities: v })}
+        onMultiChange={(v) => applyFilterPatch({ cities: v })}
         options={cityOptions}
         searchable
         placeholder="Search cities…"
@@ -537,7 +555,7 @@ export default function PipelineFiltersBar({
         label="State"
         multiSelect
         values={filters.states || []}
-        onMultiChange={(v) => set({ states: v })}
+        onMultiChange={(v) => applyFilterPatch({ states: v })}
         options={stateOptions}
         searchable
         placeholder="Search states…"
@@ -552,7 +570,7 @@ export default function PipelineFiltersBar({
         value={filters.contact !== 'any' ? filters.contact : ''}
         displayValue={CONTACT_FILTER_OPTIONS.find((o) => o.id === filters.contact)?.label}
         options={contactOptions}
-        onChange={(v) => set({ contact: v || 'any' })}
+        onChange={(v) => applyFilterPatch({ contact: v || 'any' })}
         emptyLabel="All contacts"
       />
 
@@ -619,21 +637,10 @@ export default function PipelineFiltersBar({
           subtitle={mobileSheet ? MOBILE_FILTER_SUBTITLES[mobileSheet.type] : undefined}
           onClose={closeMobileFilter}
           onSave={applyMobileFilter}
-          saveLabel="Apply filters"
+          saveLabel="Apply"
         >
           {renderMobileFilterContent()}
         </PipelineMobileFilterSheet>
-
-        {!useMobileFilterSheet && (
-          <button
-            type="button"
-            onClick={handleApply}
-            disabled={applying}
-            className={`crm-filter-action-btn shrink-0 ${filtersDirty ? 'is-primary' : ''}`}
-          >
-            {applying ? '…' : 'Search'}
-          </button>
-        )}
 
         <span className="hs-filter-bar-spacer hidden sm:block" aria-hidden />
 

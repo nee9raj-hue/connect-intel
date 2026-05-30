@@ -242,9 +242,14 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     [serverFilters]
   )
 
-  const applyFilters = useCallback(() => {
-    setAppliedSearch(search.trim())
-    setAppliedAdvanced({ ...advancedFilters })
+  const applyFilters = useCallback((opts) => {
+    const nextAdv = opts?.advanced ? { ...opts.advanced } : { ...advancedFilters }
+    const nextSearch =
+      opts?.search !== undefined ? String(opts.search).trim() : search.trim()
+    if (opts?.advanced) setAdvancedFilters(nextAdv)
+    if (opts?.search !== undefined) setSearch(String(opts.search))
+    setAppliedSearch(nextSearch)
+    setAppliedAdvanced(nextAdv)
   }, [search, advancedFilters])
 
   const removeAppliedFilter = useCallback(
