@@ -190,6 +190,11 @@ export function buildCustomerNavSections(user, { pipelineCounts = {}, upcomingCo
     })
   }
 
+  sections.push({
+    title: 'Settings',
+    groups: [{ id: 'app-settings', label: 'Display & layout', icon: 'settings', panel: 'app-settings' }],
+  })
+
   return sections.filter((s) => s.groups.length > 0)
 }
 
@@ -211,6 +216,10 @@ export function buildOperatorNavSections() {
         { id: 'marketing', label: 'Marketing', icon: 'mail', panel: 'marketing', muted: true },
         { id: 'search', label: 'AI search', icon: 'spark', panel: 'search', muted: true },
       ],
+    },
+    {
+      title: 'Settings',
+      groups: [{ id: 'app-settings', label: 'Display & layout', icon: 'settings', panel: 'app-settings' }],
     },
   ]
 }

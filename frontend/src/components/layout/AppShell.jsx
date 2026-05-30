@@ -26,6 +26,7 @@ import DesktopNavPill from './DesktopNavPill'
 import NotificationBell from './NotificationBell'
 import useIsMobile from '../../hooks/useIsMobile'
 import useMobileNavGenie from '../../hooks/useMobileNavGenie'
+import usePanelPreferences from '../../hooks/usePanelPreferences'
 import useChithiAlerts from '../../hooks/useChithiAlerts'
 import useAppKeyboardShortcuts from '../../hooks/useAppKeyboardShortcuts'
 import PwaInstallBanner from './PwaInstallBanner'
@@ -73,6 +74,7 @@ export default function AppShell() {
     !pipelineLeadId &&
     !chithiFocus
   const mobilePillVisible = useMobileNavGenie(showMobileNavPill)
+  usePanelPreferences(user?.id)
   useChithiAlerts({
     enabled: Boolean(user?.accountType === 'company' && user?.organizationId),
     activePanel,

@@ -22,6 +22,7 @@ import ContactsPanel from '../contacts/ContactsPanel'
 import CrmSequencesPanel from '../crm/CrmSequencesPanel'
 import CrmAutomationPanel from '../crm/CrmAutomationPanel'
 import ActiveCustomersPanel from '../crm/ActiveCustomersPanel'
+import PanelCustomizationPanel from '../settings/PanelCustomizationPanel'
 
 const PANELS = {
   overview: OverviewPanel,
@@ -48,6 +49,7 @@ const PANELS = {
   integrations: IntegrationsPanel,
   admin: AdminPanel,
   'admin-customers': PlatformCustomersPanel,
+  'app-settings': PanelCustomizationPanel,
 }
 
 function resolvePanelId(activePanel) {
