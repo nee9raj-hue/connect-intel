@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-05-30T14:44:36.669Z",
-  "updatedAtIst": "30/05/2026, 20:14:36",
+  "updatedAt": "2026-05-30T14:50:00.195Z",
+  "updatedAtIst": "30/05/2026, 20:20:00",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "56af2c7",
+  "currentProductionCommit": "f65acc0",
   "entries": [
+    {
+      "logId": "20260530-2019-f65acc0",
+      "commit": "f65acc0",
+      "commitFull": "f65acc0409c44ac8774f98c819b57588822ea129",
+      "message": "Restore leads mobile labels, SVG filter icons, and display settings access.",
+      "deployedAt": "2026-05-30T14:49:43.878Z",
+      "deployedAtIst": "30/05/2026, 20:19:43",
+      "committedAtIst": "30/05/2026, 20:19:18",
+      "vercelPreviewUrl": "https://connect-intel-e766efbj0-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- f65acc0"
+    },
+    {
+      "logId": "20260530-2015-8a45175",
+      "commit": "8a45175",
+      "commitFull": "8a45175243e060f0a37810711a821155674597f9",
+      "message": "Update production log after settings icon contrast deploy.",
+      "deployedAt": "2026-05-30T14:45:09.404Z",
+      "deployedAtIst": "30/05/2026, 20:15:09",
+      "committedAtIst": "30/05/2026, 20:14:42",
+      "vercelPreviewUrl": "https://connect-intel-6theck939-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 8a45175"
+    },
     {
       "logId": "20260530-2014-56af2c7",
       "commit": "56af2c7",
@@ -15,7 +43,7 @@
       "committedAtIst": "30/05/2026, 20:13:55",
       "vercelPreviewUrl": "https://connect-intel-76l7mi984-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 56af2c7"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 39a73d0"
-    },
-    {
-      "logId": "20260530-1902-385aa91",
-      "commit": "385aa91",
-      "commitFull": "385aa91de0dc6fd781b9703c894b54d6de3d1a46",
-      "message": "Enable browser back/forward navigation across in-app panels and leads.",
-      "deployedAt": "2026-05-30T13:32:33.013Z",
-      "deployedAtIst": "30/05/2026, 19:02:33",
-      "committedAtIst": "30/05/2026, 19:02:01",
-      "vercelPreviewUrl": "https://connect-intel-ilzcdmooo-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 385aa91"
-    },
-    {
-      "logId": "20260530-1858-e8a4bc4",
-      "commit": "e8a4bc4",
-      "commitFull": "e8a4bc4fa6ab828216b4fd22e82a0a4c76378776",
-      "message": "Update production log after pipeline assignee filter deploy.",
-      "deployedAt": "2026-05-30T13:28:21.223Z",
-      "deployedAtIst": "30/05/2026, 18:58:21",
-      "committedAtIst": "30/05/2026, 18:57:54",
-      "vercelPreviewUrl": "https://connect-intel-myw34rx16-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- e8a4bc4"
     }
   ]
 }

@@ -35,8 +35,8 @@ npm run prod:rollback -- 1e99102
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `56af2c7` |
-| Log updated (IST) | 30/05/2026, 20:14:36 |
+| Commit | `f65acc0` |
+| Log updated (IST) | 30/05/2026, 20:20:00 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 1e99102
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 30/05/2026, 20:14:21 | `56af2c7` | Fix settings nav icon contrast with currentColor stroke gear. | [preview](https://connect-intel-76l7mi984-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 56af2c7` | **← LIVE**
+| 30/05/2026, 20:19:43 | `f65acc0` | Restore leads mobile labels, SVG filter icons, and display settings access. | [preview](https://connect-intel-e766efbj0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f65acc0` | **← LIVE**
+| 30/05/2026, 20:15:09 | `8a45175` | Update production log after settings icon contrast deploy. | [preview](https://connect-intel-6theck939-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8a45175` |
+| 30/05/2026, 20:14:21 | `56af2c7` | Fix settings nav icon contrast with currentColor stroke gear. | [preview](https://connect-intel-76l7mi984-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 56af2c7` |
 | 30/05/2026, 20:11:18 | `f612fc9` | Update production log after display settings deploy. | [preview](https://connect-intel-h4iuk66xd-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f612fc9` |
 | 30/05/2026, 20:10:36 | `3e089c7` | Add user display settings with group-wise font and icon scaling. | [preview](https://connect-intel-cj5gwn18d-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3e089c7` |
 | 30/05/2026, 20:05:41 | `30e9f48` | Update production log after sidebar typography deploy. | [preview](https://connect-intel-aag8o9qeu-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 30e9f48` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 1e99102
 | 30/05/2026, 19:07:56 | `5b352c8` | Update production log after keyboard shortcuts deploy. | [preview](https://connect-intel-7prra6ksc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5b352c8` |
 | 30/05/2026, 19:07:21 | `ba876b1` | Restore native keyboard shortcuts and selectable text across the CRM. | [preview](https://connect-intel-nkt8tztzz-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ba876b1` |
 | 30/05/2026, 19:03:06 | `39a73d0` | Update production log after browser back navigation deploy. | [preview](https://connect-intel-nppukrvef-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 39a73d0` |
-| 30/05/2026, 19:02:33 | `385aa91` | Enable browser back/forward navigation across in-app panels and leads. | [preview](https://connect-intel-ilzcdmooo-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 385aa91` |
-| 30/05/2026, 18:58:21 | `e8a4bc4` | Update production log after pipeline assignee filter deploy. | [preview](https://connect-intel-myw34rx16-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e8a4bc4` |
 
 ---
 
