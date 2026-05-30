@@ -35,8 +35,8 @@ npm run prod:rollback -- 1e99102
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `8e8b79f` |
-| Log updated (IST) | 30/05/2026, 17:48:55 |
+| Commit | `f9f25d8` |
+| Log updated (IST) | 30/05/2026, 17:54:11 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 1e99102
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 30/05/2026, 17:48:41 | `8e8b79f` | Compact mobile pipeline header and HubSpot filter sheets. | [preview](https://connect-intel-8ut8osdgc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8e8b79f` | **← LIVE**
+| 30/05/2026, 17:53:55 | `f9f25d8` | Fix duplicate mobile pipeline header and compact filter row. | [preview](https://connect-intel-ed0tl5ua8-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f9f25d8` | **← LIVE**
+| 30/05/2026, 17:49:25 | `f5e7404` | Update production log after compact mobile pipeline header deploy. | [preview](https://connect-intel-1iml3jew8-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f5e7404` |
+| 30/05/2026, 17:48:41 | `8e8b79f` | Compact mobile pipeline header and HubSpot filter sheets. | [preview](https://connect-intel-8ut8osdgc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8e8b79f` |
 | 30/05/2026, 17:42:38 | `6e53d5b` | Update production log after per-icon mobile filter popups deploy. | [preview](https://connect-intel-qpnboa89l-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6e53d5b` |
 | 30/05/2026, 17:41:54 | `d05ae11` | Add per-icon full-screen filter popups on mobile and PWA. | [preview](https://connect-intel-pm93hvm53-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d05ae11` |
 | 30/05/2026, 17:35:33 | `359ed5b` | Update production log after mobile/PWA leads fixes deploy. | [preview](https://connect-intel-39i8jbqe7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 359ed5b` |
@@ -61,7 +63,6 @@ npm run prod:rollback -- 1e99102
 | 30/05/2026, 15:08:43 | `53f5c7b` | Restore full Connect Assistant with escalations on all platforms. | [preview](https://connect-intel-7n1si1ypv-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 53f5c7b` |
 | 30/05/2026, 14:59:55 | `320116e` | Add VAPID web push support on top of dc93f77 baseline. | [preview](https://connect-intel-qgtt56hyy-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 320116e` |
 | 30/05/2026, 14:44:11 | `09320cc` | Restore pre-platform-prompt UI from ff2f4f7 plus recovered editor history. | [preview](https://connect-intel-1v2gid8el-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 09320cc` |
-| 30/05/2026, 14:34:23 | `5751735` | Restore yesterday UI from editor history after accidental file loss. | [preview](https://connect-intel-gyt4896bp-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5751735` |
 
 ---
 

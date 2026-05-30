@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-05-30T12:18:55.821Z",
-  "updatedAtIst": "30/05/2026, 17:48:55",
+  "updatedAt": "2026-05-30T12:24:11.549Z",
+  "updatedAtIst": "30/05/2026, 17:54:11",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "8e8b79f",
+  "currentProductionCommit": "f9f25d8",
   "entries": [
+    {
+      "logId": "20260530-1753-f9f25d8",
+      "commit": "f9f25d8",
+      "commitFull": "f9f25d8b8ea166038b73f51edb2b94f25f0b7a65",
+      "message": "Fix duplicate mobile pipeline header and compact filter row.",
+      "deployedAt": "2026-05-30T12:23:55.309Z",
+      "deployedAtIst": "30/05/2026, 17:53:55",
+      "committedAtIst": "30/05/2026, 17:53:25",
+      "vercelPreviewUrl": "https://connect-intel-ed0tl5ua8-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- f9f25d8"
+    },
+    {
+      "logId": "20260530-1749-f5e7404",
+      "commit": "f5e7404",
+      "commitFull": "f5e7404973661709b9820631906178ff942d2489",
+      "message": "Update production log after compact mobile pipeline header deploy.",
+      "deployedAt": "2026-05-30T12:19:25.490Z",
+      "deployedAtIst": "30/05/2026, 17:49:25",
+      "committedAtIst": "30/05/2026, 17:48:58",
+      "vercelPreviewUrl": "https://connect-intel-1iml3jew8-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- f5e7404"
+    },
     {
       "logId": "20260530-1748-8e8b79f",
       "commit": "8e8b79f",
@@ -15,7 +43,7 @@
       "committedAtIst": "30/05/2026, 17:48:09",
       "vercelPreviewUrl": "https://connect-intel-8ut8osdgc-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 8e8b79f"
     },
@@ -228,20 +256,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 09320cc"
-    },
-    {
-      "logId": "20260530-1433-5751735",
-      "commit": "5751735",
-      "commitFull": "5751735d5f4cfb0a1ca03a4b4210998e31c64689",
-      "message": "Restore yesterday UI from editor history after accidental file loss.",
-      "deployedAt": "2026-05-30T09:04:23.524Z",
-      "deployedAtIst": "30/05/2026, 14:34:23",
-      "committedAtIst": "30/05/2026, 14:33:33",
-      "vercelPreviewUrl": "https://connect-intel-gyt4896bp-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 5751735"
     }
   ]
 }
