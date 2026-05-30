@@ -35,8 +35,8 @@ npm run prod:rollback -- 1e99102
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `81b738c` |
-| Log updated (IST) | 30/05/2026, 19:56:34 |
+| Commit | `63f2652` |
+| Log updated (IST) | 30/05/2026, 20:02:36 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 1e99102
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 30/05/2026, 19:56:19 | `81b738c` | Extend HubSpot premium UI across all CRM surfaces. | [preview](https://connect-intel-7wgjico68-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 81b738c` | **← LIVE**
+| 30/05/2026, 20:02:20 | `63f2652` | Improve mobile bottom nav with larger icons and scrollable shortcuts. | [preview](https://connect-intel-5p4jbtuxh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 63f2652` | **← LIVE**
+| 30/05/2026, 19:57:08 | `2ce0201` | Update production log after full HubSpot UI deploy. | [preview](https://connect-intel-adoyfiioc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2ce0201` |
+| 30/05/2026, 19:56:19 | `81b738c` | Extend HubSpot premium UI across all CRM surfaces. | [preview](https://connect-intel-7wgjico68-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 81b738c` |
 | 30/05/2026, 19:34:25 | `d4c6341` | Update production log after HubSpot premium UI deploy. | [preview](https://connect-intel-3cgm2xxg9-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d4c6341` |
 | 30/05/2026, 19:33:55 | `9e237db` | Apply HubSpot-style premium UI theme across CRM surfaces. | [preview](https://connect-intel-isr7ovqs6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9e237db` |
 | 30/05/2026, 19:24:16 | `aad438b` | Update production log after pipeline PWA crash fix deploy. | [preview](https://connect-intel-jf7wxh3zn-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- aad438b` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 1e99102
 | 30/05/2026, 18:34:31 | `ba8fedc` | Update production log after mobile leads horizontal scroll deploy. | [preview](https://connect-intel-jafcb6sj0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ba8fedc` |
 | 30/05/2026, 18:33:44 | `86758c3` | Restore horizontal scroll for mobile pipeline leads table. | [preview](https://connect-intel-463sqkpgy-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 86758c3` |
 | 30/05/2026, 18:30:45 | `f04bee4` | Update production log after mobile filter modal and icon sizing deploy. | [preview](https://connect-intel-ju04325y5-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f04bee4` |
-| 30/05/2026, 18:29:55 | `f592c7e` | Improve mobile pipeline filter modals and scale toolbar icons. | [preview](https://connect-intel-1pqukdhvr-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f592c7e` |
-| 30/05/2026, 18:23:48 | `3569af6` | Update production log after Contacts-style pipeline filter modals deploy. | [preview](https://connect-intel-4e88hiw02-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3569af6` |
 
 ---
 

@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-05-30T14:26:34.689Z",
-  "updatedAtIst": "30/05/2026, 19:56:34",
+  "updatedAt": "2026-05-30T14:32:36.714Z",
+  "updatedAtIst": "30/05/2026, 20:02:36",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "81b738c",
+  "currentProductionCommit": "63f2652",
   "entries": [
+    {
+      "logId": "20260530-2002-63f2652",
+      "commit": "63f2652",
+      "commitFull": "63f2652ada696ee134637af8202605f92805dd77",
+      "message": "Improve mobile bottom nav with larger icons and scrollable shortcuts.",
+      "deployedAt": "2026-05-30T14:32:20.156Z",
+      "deployedAtIst": "30/05/2026, 20:02:20",
+      "committedAtIst": "30/05/2026, 20:01:53",
+      "vercelPreviewUrl": "https://connect-intel-5p4jbtuxh-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 63f2652"
+    },
+    {
+      "logId": "20260530-1957-2ce0201",
+      "commit": "2ce0201",
+      "commitFull": "2ce0201625495dad020b428f65a66579a1fb2e28",
+      "message": "Update production log after full HubSpot UI deploy.",
+      "deployedAt": "2026-05-30T14:27:08.149Z",
+      "deployedAtIst": "30/05/2026, 19:57:08",
+      "committedAtIst": "30/05/2026, 19:56:40",
+      "vercelPreviewUrl": "https://connect-intel-adoyfiioc-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 2ce0201"
+    },
     {
       "logId": "20260530-1956-81b738c",
       "commit": "81b738c",
@@ -15,7 +43,7 @@
       "committedAtIst": "30/05/2026, 19:55:49",
       "vercelPreviewUrl": "https://connect-intel-7wgjico68-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 81b738c"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- f04bee4"
-    },
-    {
-      "logId": "20260530-1829-f592c7e",
-      "commit": "f592c7e",
-      "commitFull": "f592c7e20868e4991403b408420e43b2c2f3a1ee",
-      "message": "Improve mobile pipeline filter modals and scale toolbar icons.",
-      "deployedAt": "2026-05-30T12:59:55.329Z",
-      "deployedAtIst": "30/05/2026, 18:29:55",
-      "committedAtIst": "30/05/2026, 18:29:27",
-      "vercelPreviewUrl": "https://connect-intel-1pqukdhvr-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- f592c7e"
-    },
-    {
-      "logId": "20260530-1823-3569af6",
-      "commit": "3569af6",
-      "commitFull": "3569af6decd7df96e3e3e7fad9d98fbdbdf028fe",
-      "message": "Update production log after Contacts-style pipeline filter modals deploy.",
-      "deployedAt": "2026-05-30T12:53:48.264Z",
-      "deployedAtIst": "30/05/2026, 18:23:48",
-      "committedAtIst": "30/05/2026, 18:23:21",
-      "vercelPreviewUrl": "https://connect-intel-4e88hiw02-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 3569af6"
     }
   ]
 }
