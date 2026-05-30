@@ -1,3 +1,5 @@
+import { BRAND_SETTINGS_ICON, BRAND_SETTINGS_ICON_CLASS } from '../../lib/brandAssets'
+
 function LineIcon({ className, children, viewBox = '0 0 24 24' }) {
   return (
     <svg
@@ -16,6 +18,23 @@ function LineIcon({ className, children, viewBox = '0 0 24 24' }) {
   )
 }
 
+/** Brand settings gear — use for view settings and configuration affordances. */
+export function SettingsIcon({ className = '', size, alt = '' }) {
+  const dim = size != null ? { width: size, height: size } : undefined
+  return (
+    <img
+      src={BRAND_SETTINGS_ICON}
+      alt={alt}
+      className={[BRAND_SETTINGS_ICON_CLASS, className].filter(Boolean).join(' ')}
+      style={dim}
+      width={size}
+      height={size}
+      draggable={false}
+      aria-hidden={alt ? undefined : true}
+    />
+  )
+}
+
 export function BellIcon({ className }) {
   return (
     <LineIcon className={className}>
@@ -29,6 +48,37 @@ export function ChevronRightIcon({ className }) {
   return (
     <LineIcon className={className}>
       <path d="m9 6 6 6-6 6" />
+    </LineIcon>
+  )
+}
+
+export function ChevronLeftIcon({ className }) {
+  return (
+    <LineIcon className={className}>
+      <path d="m15 6-6 6 6 6" />
+    </LineIcon>
+  )
+}
+
+export function SaveIcon({ className }) {
+  return (
+    <LineIcon className={className}>
+      <path d="M5 5h11v14H5z" />
+      <path d="M8 5V3h8v2" />
+      <path d="M8 13h8v6H8z" />
+    </LineIcon>
+  )
+}
+
+export function GripIcon({ className }) {
+  return (
+    <LineIcon className={className} viewBox="0 0 24 24">
+      <circle cx="9" cy="7" r="1.25" fill="currentColor" stroke="none" />
+      <circle cx="15" cy="7" r="1.25" fill="currentColor" stroke="none" />
+      <circle cx="9" cy="12" r="1.25" fill="currentColor" stroke="none" />
+      <circle cx="15" cy="12" r="1.25" fill="currentColor" stroke="none" />
+      <circle cx="9" cy="17" r="1.25" fill="currentColor" stroke="none" />
+      <circle cx="15" cy="17" r="1.25" fill="currentColor" stroke="none" />
     </LineIcon>
   )
 }
@@ -164,6 +214,17 @@ export function NoteIcon({ className }) {
       <path d="M14.5 4.75v3h3" />
       <path d="M9 11h6" />
       <path d="M9 15h4.5" />
+    </LineIcon>
+  )
+}
+
+/** Team hub — chat, mentions, shared work. */
+export function TeamHubIcon({ className }) {
+  return (
+    <LineIcon className={className}>
+      <path d="M5.5 6.5h11a2.5 2.5 0 0 1 2.5 2.5v5.5a2.5 2.5 0 0 1-2.5 2.5H11l-3.5 2.5V16.5H5.5A2.5 2.5 0 0 1 3 14V9a2.5 2.5 0 0 1 2.5-2.5Z" />
+      <path d="M8.25 11h3.5" />
+      <path d="M8.25 13.25h5.5" />
     </LineIcon>
   )
 }
@@ -316,6 +377,33 @@ export function BlocksIcon({ className }) {
       <rect x="13.5" y="5" width="6.5" height="6.5" rx="1.25" />
       <rect x="4" y="14.5" width="6.5" height="4.5" rx="1.25" />
       <rect x="13.5" y="14.5" width="6.5" height="4.5" rx="1.25" />
+    </LineIcon>
+  )
+}
+
+export function PencilIcon({ className }) {
+  return (
+    <LineIcon className={className}>
+      <path d="M14.5 5.5 18.5 9.5 8 20H4v-4L14.5 5.5Z" />
+      <path d="M12.5 7.5l2 2" />
+    </LineIcon>
+  )
+}
+
+export function UndoIcon({ className }) {
+  return (
+    <LineIcon className={className}>
+      <path d="M8 7.5H5.5v-2.5" />
+      <path d="M5.5 7.5a6.5 6.5 0 1 0 2.2 4.85" />
+    </LineIcon>
+  )
+}
+
+export function RedoIcon({ className }) {
+  return (
+    <LineIcon className={className}>
+      <path d="M16 7.5h2.5v-2.5" />
+      <path d="M18.5 7.5a6.5 6.5 0 1 1-2.2 4.85" />
     </LineIcon>
   )
 }

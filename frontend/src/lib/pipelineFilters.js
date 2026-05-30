@@ -12,12 +12,34 @@ export const CONTACT_FILTER_OPTIONS = [
 ]
 
 export const DEFAULT_PIPELINE_FILTERS = {
-  city: '',
-  state: '',
+  cities: [],
+  states: [],
   contact: 'any',
   tagIds: [],
   tagMode: 'any',
   smartTags: [],
+}
+
+/** @deprecated use cities[] — kept for saved views migration */
+export function normalizeLocationFilterList(filters, keyPlural, keySingular) {
+  const plural = filters?.[keyPlural]
+  if (Array.isArray(plural) && plural.length) return plural.filter(Boolean)
+  const single = String(filters?.[keySingular] || '').trim()
+  return single ? [single] : []
+}
+
+export function getFilterCities(filters) {
+  return normalizeLocationFilterList(filters, 'cities', 'city')
+}
+
+export function getFilterStates(filters) {
+  return normalizeLocationFilterList(filters, 'states', 'state')
+}
+
+function matchesAnyLocationField(value, filterList) {
+  const list = Array.isArray(filterList) ? filterList.filter(Boolean) : []
+  if (!list.length) return true
+  return list.some((f) => locationMatchesField(value, f))
 }
 
 export function getLeadCity(lead) {
@@ -98,6 +120,8 @@ export function applyPipelineFilters(
     status = 'all',
     city = '',
     state = '',
+    cities = null,
+    states = null,
     contact = 'any',
     search = '',
     minLeadScore = null,
@@ -172,14 +196,14 @@ export function applyPipelineFilters(
     }
   }
 
-  const cityQ = String(city || '').trim()
-  if (cityQ) {
-    list = list.filter((l) => locationMatchesField(getLeadCity(l), cityQ))
+  const cityFilters = Array.isArray(cities) ? cities : getFilterCities({ city })
+  if (cityFilters.length) {
+    list = list.filter((l) => matchesAnyLocationField(getLeadCity(l), cityFilters))
   }
 
-  const stateQ = String(state || '').trim()
-  if (stateQ) {
-    list = list.filter((l) => locationMatchesField(getLeadState(l), stateQ))
+  const stateFilters = Array.isArray(states) ? states : getFilterStates({ state })
+  if (stateFilters.length) {
+    list = list.filter((l) => matchesAnyLocationField(getLeadState(l), stateFilters))
   }
 
   if (contact && contact !== 'any') {
@@ -217,8 +241,8 @@ export function collectLocationOptions(leads) {
 
 export function countActiveFilters(filters, search) {
   let n = 0
-  if (filters.city) n += 1
-  if (filters.state) n += 1
+  if (getFilterCities(filters).length) n += 1
+  if (getFilterStates(filters).length) n += 1
   if (filters.contact && filters.contact !== 'any') n += 1
   if (filters.tagIds?.length) n += 1
   if (filters.smartTags?.length) n += 1
