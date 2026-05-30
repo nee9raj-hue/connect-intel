@@ -46,7 +46,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     loadMorePipelineLeads,
     toggleSaveLead,
     pipelineLeadId,
-    setPipelineLeadId,
+    closePipelineLead,
     openPipelineLead,
     refreshSavedLeads,
     pipelineAssigneeFilter,
@@ -879,7 +879,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
         <LeadWorkspace
           lead={selectedLead}
           statusOptions={columns}
-          onClose={() => setPipelineLeadId(null)}
+          onClose={() => closePipelineLead()}
           onNavigate={onNavigate}
           recordPanel={useHubSpotList}
         />

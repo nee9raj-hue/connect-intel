@@ -77,6 +77,7 @@ export function AppProvider({ children }) {
   const [notificationTick, setNotificationTick] = useState(0)
   const [sessionError, setSessionError] = useState(null)
   const panelNavigateRef = useRef(null)
+  const closePipelineLeadRef = useRef(null)
   const pendingLeadOpenRef = useRef({ leadId: null, tab: null })
   const workspaceLoadedAtRef = useRef(0)
   const workspaceLoadInFlightRef = useRef(null)
@@ -697,6 +698,15 @@ export function AppProvider({ children }) {
     panelNavigateRef.current = fn
   }, [])
 
+  const setClosePipelineLead = useCallback((fn) => {
+    closePipelineLeadRef.current = fn
+  }, [])
+
+  const closePipelineLead = useCallback(() => {
+    if (closePipelineLeadRef.current) closePipelineLeadRef.current()
+    else setPipelineLeadId(null)
+  }, [])
+
   const openPipelineLead = useCallback((leadId, tab = null) => {
     if (tab) pendingLeadOpenRef.current = { leadId, tab }
     setPipelineLeadId(leadId)
@@ -830,6 +840,7 @@ export function AppProvider({ children }) {
         updateMobile,
         saveEmailSignature,
         openPipelineLead,
+        closePipelineLead,
         consumePendingLeadTab,
         openContact,
         contactsFocusId,
@@ -837,6 +848,7 @@ export function AppProvider({ children }) {
         pipelineLeadId,
         setPipelineLeadId,
         setPanelNavigate,
+        setClosePipelineLead,
         navigateToNotification,
         markNotificationsPanelOpened,
         calendarFocus,

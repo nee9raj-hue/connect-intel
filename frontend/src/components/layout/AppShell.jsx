@@ -1,6 +1,12 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { cycleSidebarMode, loadSidebarMode, saveSidebarMode } from '../../lib/sidebarLayout'
 import { isChithiPanel } from '../../lib/chithiNav'
+import {
+  appLocationKey,
+  parseAppLocation,
+  pushAppLocation,
+  stripEphemeralQueryParams,
+} from '../../lib/appHistory'
 import { useApp } from '../../context/AppContext'
 import OnboardingModal from '../onboarding/OnboardingModal'
 import Sidebar from './Sidebar'
@@ -26,13 +32,26 @@ import ChithiPushBanner from './ChithiPushBanner'
 import { MenuIcon } from '../ui/icons'
 
 export default function AppShell() {
-  const { user, syncWorkspace, setPanelNavigate, openPipelineLead, pipelineLeadId, chithiUnread, refreshChithiUnread } =
-    useApp()
+  const {
+    user,
+    syncWorkspace,
+    setPanelNavigate,
+    openPipelineLead,
+    pipelineLeadId,
+    setPipelineLeadId,
+    chithiUnread,
+    refreshChithiUnread,
+    setClosePipelineLead,
+  } = useApp()
   const isMobile = useIsMobile()
   const [activePanel, setActivePanel] = useState('overview')
   const [panelOptions, setPanelOptions] = useState({})
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [sidebarMode, setSidebarMode] = useState(() => loadSidebarMode())
+  const historyReadyRef = useRef(false)
+  const applyingHistoryRef = useRef(false)
+  const lastHistoryKeyRef = useRef('')
+  const lastLeadIdRef = useRef(null)
 
   const toggleSidebarCollapsed = useCallback(() => {
     setSidebarMode((prev) => {
@@ -82,51 +101,71 @@ export default function AppShell() {
     return () => clearTimeout(t)
   }, [liveToast])
 
+  const applyLocation = useCallback(
+    (location) => {
+      const { panel, panelOptions: opts = {}, leadId } = location || {}
+      setActivePanel(panel || 'overview')
+      setPanelOptions(opts)
+      setMobileNavOpen(false)
+      if (leadId) openPipelineLead(leadId)
+      else setPipelineLeadId(null)
+    },
+    [openPipelineLead, setPipelineLeadId]
+  )
+
+  const commitHistory = useCallback((location, { replace = false } = {}) => {
+    const key = appLocationKey(location)
+    if (!replace && lastHistoryKeyRef.current === key) return
+    pushAppLocation(location, { replace })
+    lastHistoryKeyRef.current = key
+    lastLeadIdRef.current = location?.leadId || null
+  }, [])
+
   useEffect(() => {
-    if (user?.isPlatformAdmin) {
-      setActivePanel('admin-customers')
+    if (!user) return undefined
+
+    applyingHistoryRef.current = true
+
+    const fromUrl = parseAppLocation(window.location.search)
+    let initial = fromUrl
+    if (user.isPlatformAdmin && !new URLSearchParams(window.location.search).get('panel')) {
+      initial = { panel: 'admin-customers', panelOptions: {}, leadId: null }
     }
-  }, [user?.isPlatformAdmin, user?.id])
+
+    applyLocation(initial)
+    commitHistory(initial, { replace: true })
+    stripEphemeralQueryParams()
+    historyReadyRef.current = true
+
+    applyingHistoryRef.current = false
+
+    return undefined
+  }, [user?.id, user?.isPlatformAdmin, applyLocation, commitHistory])
+
+  useEffect(() => {
+    const onPopState = () => {
+      applyingHistoryRef.current = true
+      const loc = parseAppLocation(window.location.search)
+      applyLocation(loc)
+      lastHistoryKeyRef.current = appLocationKey(loc)
+      lastLeadIdRef.current = loc.leadId
+      applyingHistoryRef.current = false
+    }
+    window.addEventListener('popstate', onPopState)
+    return () => window.removeEventListener('popstate', onPopState)
+  }, [applyLocation])
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const oauth = params.get('email_oauth')
     if (!oauth) return
     if (oauth === 'connected' || oauth === 'error') {
-      setActivePanel(user?.isPlatformAdmin ? 'integrations' : 'team')
+      const panel = user?.isPlatformAdmin ? 'integrations' : 'team'
+      applyLocation({ panel, panelOptions: {}, leadId: null })
+      commitHistory({ panel, panelOptions: {}, leadId: null }, { replace: true })
+      stripEphemeralQueryParams()
     }
-  }, [user?.isPlatformAdmin])
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const panel = params.get('panel')
-    const lead = params.get('lead')
-    const tab = params.get('tab')
-    if (panel === 'team-notes' || panel === 'team-hub') {
-      setActivePanel('chithi')
-      setPanelOptions(tab ? { tab } : {})
-    } else if (panel === 'team-tasks') {
-      setActivePanel('chithi')
-      setPanelOptions({ tab: 'tasks' })
-    } else if (panel) {
-      setActivePanel(panel)
-      const channel = params.get('channel')
-      const opts = {}
-      if (tab) opts.tab = tab
-      if (channel) opts.channel = channel
-      if (Object.keys(opts).length) setPanelOptions(opts)
-    }
-    if (lead && user) openPipelineLead(lead, 'overview')
-    if (panel || lead) {
-      params.delete('panel')
-      params.delete('tab')
-      params.delete('channel')
-      params.delete('lead')
-      const qs = params.toString()
-      const next = `${window.location.pathname}${qs ? `?${qs}` : ''}`
-      window.history.replaceState({}, '', next)
-    }
-  }, [user?.id, openPipelineLead])
+  }, [user?.isPlatformAdmin, applyLocation, commitHistory])
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -136,18 +175,59 @@ export default function AppShell() {
   }, [])
 
   const navigate = useCallback(
-    (id, options = {}) => {
+    (id, options = {}, navOpts = {}) => {
+      const replace = Boolean(navOpts.replace)
       const leavingChithi = isChithiPanel(activePanel) && !isChithiPanel(id)
       if (leavingChithi && sidebarMode === 'rail') {
         setSidebarMode('expanded')
         saveSidebarMode('expanded')
       }
+
+      const loc = { panel: id, panelOptions: options || {}, leadId: null }
+
+      if (pipelineLeadId) setPipelineLeadId(null)
       setActivePanel(id)
       setPanelOptions(options || {})
       setMobileNavOpen(false)
+
+      if (!applyingHistoryRef.current && historyReadyRef.current) {
+        commitHistory(loc, { replace })
+      }
     },
-    [activePanel, sidebarMode]
+    [activePanel, sidebarMode, pipelineLeadId, setPipelineLeadId, commitHistory]
   )
+
+  useEffect(() => {
+    if (!historyReadyRef.current || applyingHistoryRef.current) return undefined
+    if (lastLeadIdRef.current === pipelineLeadId) return undefined
+
+    const hadLead = Boolean(lastLeadIdRef.current)
+    const hasLead = Boolean(pipelineLeadId)
+    lastLeadIdRef.current = pipelineLeadId
+
+    const loc = { panel: activePanel, panelOptions, leadId: pipelineLeadId }
+    if (hasLead && !hadLead) commitHistory(loc)
+    else if (!hasLead && hadLead) commitHistory(loc, { replace: true })
+
+    return undefined
+  }, [pipelineLeadId, activePanel, panelOptions, commitHistory])
+
+  const closePipelineLead = useCallback(() => {
+    const state = window.history.state
+    if (state?.ciApp && state?.leadId && window.history.length > 1) {
+      window.history.back()
+      return
+    }
+    setPipelineLeadId(null)
+    if (historyReadyRef.current) {
+      commitHistory({ panel: activePanel, panelOptions, leadId: null }, { replace: true })
+    }
+  }, [activePanel, panelOptions, setPipelineLeadId, commitHistory])
+
+  useEffect(() => {
+    setClosePipelineLead(closePipelineLead)
+    return () => setClosePipelineLead(null)
+  }, [closePipelineLead, setClosePipelineLead])
 
   useEffect(() => {
     setPanelNavigate(navigate)
