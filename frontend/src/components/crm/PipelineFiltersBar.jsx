@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import useIsMobile from '../../hooks/useIsMobile'
+import usePipelineFilterMobile from '../../hooks/usePipelineFilterMobile'
 import { api } from '../../lib/api'
 import {
   BRAND_ICON_ADVANCE_FILTER,
@@ -50,12 +51,12 @@ export default function PipelineFiltersBar({
 }) {
   const [savedViews, setSavedViews] = useState([])
   const [advancedOpen, setAdvancedOpen] = useState(false)
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
-  const [mobileDraft, setMobileDraft] = useState(null)
+  const [mobileSheet, setMobileSheet] = useState(null)
   const advancedRef = useRef(null)
   const advancedPanelRef = useRef(null)
   const advancedOpenedAtRef = useRef(0)
   const isMobile = useIsMobile()
+  const useMobileFilterSheet = usePipelineFilterMobile()
   const set = (patch) => onFiltersChange({ ...filters, ...patch })
 
   const closeAdvanced = useCallback(() => setAdvancedOpen(false), [])
@@ -103,13 +104,13 @@ export default function PipelineFiltersBar({
   }, [advancedOpen, isMobile])
 
   useEffect(() => {
-    if (!mobileFiltersOpen || !isMobile) return undefined
+    if (!mobileSheet || !useMobileFilterSheet) return undefined
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     return () => {
       document.body.style.overflow = prev
     }
-  }, [mobileFiltersOpen, isMobile])
+  }, [mobileSheet, useMobileFilterSheet])
 
   const handleApply = () => onApplyFilters?.()
 
@@ -142,22 +143,22 @@ export default function PipelineFiltersBar({
     (activeSmartViewId ? 1 : 0)
 
   const openMobileFilters = () => {
-    setMobileDraft({
-      filters: { ...filters },
-      statusFilter,
+    setMobileSheet({
+      draft: {
+        filters: { ...filters },
+        statusFilter,
+      },
     })
-    setMobileFiltersOpen(true)
   }
 
   const closeMobileFilters = () => {
-    setMobileFiltersOpen(false)
-    setMobileDraft(null)
+    setMobileSheet(null)
   }
 
   const applyMobileFilters = () => {
-    if (!mobileDraft) return
-    onFiltersChange(mobileDraft.filters)
-    onStatusFilterChange?.(mobileDraft.statusFilter || 'all')
+    if (!mobileSheet?.draft) return
+    onFiltersChange(mobileSheet.draft.filters)
+    onStatusFilterChange?.(mobileSheet.draft.statusFilter || 'all')
     handleApply()
     closeMobileFilters()
   }
@@ -165,6 +166,10 @@ export default function PipelineFiltersBar({
   const clearMobileFilters = () => {
     onClearFilters?.()
     closeMobileFilters()
+  }
+
+  const updateMobileDraft = (nextDraft) => {
+    setMobileSheet((prev) => (prev ? { ...prev, draft: nextDraft } : prev))
   }
 
   const activeStageLabel = statusOptions.find((s) => s.id === statusFilter)?.label
@@ -313,13 +318,13 @@ export default function PipelineFiltersBar({
         </div>
 
         <div className="hs-filter-icon-strip" role="toolbar" aria-label="Lead filters">
-          {isMobile ? (
+          {useMobileFilterSheet ? (
             <FilterToolbarIcon
               src={BRAND_ICON_ADVANCE_FILTER}
               label="Filters"
-              active={mobileFiltersOpen || mobileFiltersActiveCount > 0}
+              active={Boolean(mobileSheet) || mobileFiltersActiveCount > 0}
               badge={mobileFiltersActiveCount > 0}
-              aria-expanded={mobileFiltersOpen}
+              aria-expanded={Boolean(mobileSheet)}
               onClick={openMobileFilters}
             />
           ) : (
@@ -396,12 +401,11 @@ export default function PipelineFiltersBar({
         </div>
 
         <PipelineMobileFiltersSheet
-          open={isMobile && mobileFiltersOpen}
+          sheet={useMobileFilterSheet ? mobileSheet : null}
           onClose={closeMobileFilters}
           onApply={applyMobileFilters}
           onClear={clearMobileFilters}
-          draft={mobileDraft}
-          onDraftChange={setMobileDraft}
+          onDraftChange={updateMobileDraft}
           stageListMode={stageListMode}
           statusOptions={statusOptions}
           cities={cities}

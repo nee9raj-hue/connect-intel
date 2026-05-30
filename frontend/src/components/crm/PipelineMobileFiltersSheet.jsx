@@ -110,11 +110,10 @@ function SingleSelectList({ options, value, onChange, emptyLabel, statusStyle = 
 }
 
 export default function PipelineMobileFiltersSheet({
-  open,
+  sheet,
   onClose,
   onApply,
   onClear,
-  draft,
   onDraftChange,
   stageListMode = false,
   statusOptions = [],
@@ -127,7 +126,7 @@ export default function PipelineMobileFiltersSheet({
   smartOptions = [],
 }) {
   useEffect(() => {
-    if (!open) return undefined
+    if (!sheet) return undefined
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     const onKey = (e) => {
@@ -138,9 +137,12 @@ export default function PipelineMobileFiltersSheet({
       document.body.style.overflow = prev
       window.removeEventListener('keydown', onKey)
     }
-  }, [open, onClose])
+  }, [sheet, onClose])
+
+  const draft = sheet?.draft
 
   const setFilters = (patch) => {
+    if (!draft) return
     onDraftChange?.({
       ...draft,
       filters: { ...draft.filters, ...patch },
@@ -148,13 +150,14 @@ export default function PipelineMobileFiltersSheet({
   }
 
   const setStatus = (statusId) => {
+    if (!draft) return
     onDraftChange?.({
       ...draft,
       statusFilter: statusId || 'all',
     })
   }
 
-  if (!open || !draft) return null
+  if (!sheet || !draft) return null
 
   const cityOptions = cities.map((c) => ({ label: c, value: c }))
   const stateOptions = states.map((s) => ({ label: s, value: s }))
@@ -167,7 +170,7 @@ export default function PipelineMobileFiltersSheet({
 
   return createPortal(
     <>
-      <button type="button" className="ci-filter-menu-backdrop" aria-label="Close filters" onClick={onClose} />
+      <button type="button" className="hs-pipeline-filters-backdrop" aria-label="Close filters" onClick={onClose} />
       <div className="hs-pipeline-filters-sheet" role="dialog" aria-modal="true" aria-label="Lead filters">
         <header className="hs-pipeline-filters-sheet__header">
           <h2 className="hs-pipeline-filters-sheet__title">Filters</h2>

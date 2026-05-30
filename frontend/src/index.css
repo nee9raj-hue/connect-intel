@@ -8004,10 +8004,22 @@ details summary::-webkit-details-marker {
   opacity: 0.5;
 }
 
+.hs-pipeline-filters-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1299;
+  border: none;
+  padding: 0;
+  margin: 0;
+  background: rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
 .hs-pipeline-filters-sheet {
   position: fixed;
   inset: 0;
-  z-index: 1200;
+  z-index: 1300;
   display: flex;
   flex-direction: column;
   background: var(--color-hs-canvas, #f5f8fa);
@@ -8130,9 +8142,11 @@ details summary::-webkit-details-marker {
   min-height: 2.5rem;
 }
 
-@media (min-width: 768px) {
-  .hs-pipeline-filters-sheet {
-    display: none;
+@media (max-width: 767px) {
+  .crm-toolbar--hubspot,
+  .crm-toolbar--hubspot .hs-filter-bar-top,
+  .crm-toolbar--hubspot .hs-filter-icon-strip {
+    overflow: visible;
   }
 }
 
