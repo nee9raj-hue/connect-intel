@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-05-30T11:56:48.569Z",
-  "updatedAtIst": "30/05/2026, 17:26:48",
+  "updatedAt": "2026-05-30T12:05:00.244Z",
+  "updatedAtIst": "30/05/2026, 17:35:00",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "c32e770",
+  "currentProductionCommit": "760df41",
   "entries": [
+    {
+      "logId": "20260530-1734-760df41",
+      "commit": "760df41",
+      "commitFull": "760df412cf5aaffdb6eaf37158559b776b89c2e9",
+      "message": "Fix mobile leads call icon placement and PWA filter sheet.",
+      "deployedAt": "2026-05-30T12:04:41.066Z",
+      "deployedAtIst": "30/05/2026, 17:34:41",
+      "committedAtIst": "30/05/2026, 17:34:07",
+      "vercelPreviewUrl": "https://connect-intel-dgy6ilxrp-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 760df41"
+    },
+    {
+      "logId": "20260530-1727-08b9487",
+      "commit": "08b9487",
+      "commitFull": "08b9487905231ab7516c57d41b08b7c7ec5e0799",
+      "message": "Update production log after mobile pipeline filters deploy.",
+      "deployedAt": "2026-05-30T11:57:18.889Z",
+      "deployedAtIst": "30/05/2026, 17:27:18",
+      "committedAtIst": "30/05/2026, 17:26:53",
+      "vercelPreviewUrl": "https://connect-intel-iejkg3y45-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 08b9487"
+    },
     {
       "logId": "20260530-1726-c32e770",
       "commit": "c32e770",
@@ -15,7 +43,7 @@
       "committedAtIst": "30/05/2026, 17:26:04",
       "vercelPreviewUrl": "https://connect-intel-aw0to2vns-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- c32e770"
     },
@@ -186,20 +214,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 0b0084f"
-    },
-    {
-      "logId": "20260530-1409-ff2f4f7",
-      "commit": "ff2f4f7",
-      "commitFull": "ff2f4f7f06d392100e5acf403b416a4056a14281",
-      "message": "Trigger production deploy with pipeline build fixes on main.",
-      "deployedAt": "2026-05-30T08:41:45.876Z",
-      "deployedAtIst": "30/05/2026, 14:11:45",
-      "committedAtIst": "30/05/2026, 14:09:30",
-      "vercelPreviewUrl": "https://connect-intel-obk13rzqo-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- ff2f4f7"
     }
   ]
 }
