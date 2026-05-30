@@ -67,6 +67,7 @@ export default function FilterDropdown({
   const iconButton = iconOnly && iconSrc
   const hubspotStatusMenu = menuVariant === 'hubspot-status' && !multiSelect
   const usePortalMenu = Boolean(iconButton && open)
+  const useFullPage = usePortalMenu && fullPageMenus
 
   useLayoutEffect(() => {
     if (!open || !iconButton || isMobile) return
@@ -281,7 +282,16 @@ export default function FilterDropdown({
           data-tooltip={iconButton && !isMobile ? label : undefined}
         >
           {iconButton ? (
-            <img src={iconSrc} alt="" className={BRAND_UI_ICON_CLASS} draggable={false} aria-hidden />
+            <img
+              src={iconSrc}
+              alt=""
+              className={BRAND_UI_ICON_CLASS}
+              draggable={false}
+              aria-hidden
+              onError={(e) => {
+                e.currentTarget.style.visibility = 'hidden'
+              }}
+            />
           ) : (
             <>
               <span className={`truncate ${compact ? 'max-w-[108px]' : 'max-w-[150px]'}`}>

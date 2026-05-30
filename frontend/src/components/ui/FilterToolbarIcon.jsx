@@ -23,7 +23,16 @@ export default function FilterToolbarIcon({
       aria-expanded={ariaExpanded}
       data-tooltip={label}
     >
-      <img src={src} alt="" className={BRAND_UI_ICON_CLASS} draggable={false} aria-hidden />
+      <img
+        src={src}
+        alt=""
+        className={BRAND_UI_ICON_CLASS}
+        draggable={false}
+        aria-hidden
+        onError={(e) => {
+          e.currentTarget.style.visibility = 'hidden'
+        }}
+      />
       {badge ? <span className="hs-filter-icon-btn__dot" aria-hidden /> : null}
     </Tag>
   )
