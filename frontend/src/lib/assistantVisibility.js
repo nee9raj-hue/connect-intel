@@ -5,7 +5,7 @@ function isNativeAppShell() {
   return Boolean(window.Capacitor?.isNativePlatform?.())
 }
 
-/** Desktop browser only — hidden on mobile, installed PWA, and native app shells. */
+/** @deprecated use useShouldShowConnectAssistant — sync check for tests */
 export function shouldShowConnectAssistant(isMobile) {
   if (typeof window === 'undefined') return false
   if (isMobile) return false

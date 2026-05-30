@@ -2,8 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { api } from '../../lib/api'
 import { ASSISTANT_QUICK_PROMPTS } from '../../lib/assistantQuickPrompts'
 import { applyAssistantAction } from '../../lib/assistantNavigation'
-import { shouldShowConnectAssistant } from '../../lib/assistantVisibility'
-import useIsMobile from '../../hooks/useIsMobile'
+import useShouldShowConnectAssistant from '../../hooks/useShouldShowConnectAssistant'
 import { useApp } from '../../context/AppContext'
 import { SparkIcon } from '../ui/icons'
 
@@ -32,7 +31,7 @@ function MessageBubble({ message, onAction }) {
 
 export default function ConnectAssistant({ onNavigate }) {
   const { user, openPipelineLead } = useApp()
-  const isMobile = useIsMobile()
+  const showAssistant = useShouldShowConnectAssistant()
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [sending, setSending] = useState(false)
@@ -114,7 +113,7 @@ export default function ConnectAssistant({ onNavigate }) {
     [sending, threadId]
   )
 
-  if (!user || user.isPlatformAdmin || !shouldShowConnectAssistant(isMobile)) {
+  if (!user || user.isPlatformAdmin || !showAssistant) {
     return null
   }
 
@@ -128,7 +127,7 @@ export default function ConnectAssistant({ onNavigate }) {
         aria-label={open ? 'Close CRM assistant' : 'Open CRM assistant'}
         title="CRM help"
       >
-        {open ? <IconClose size={22} /> : <IconSparkles size={22} />}
+        {open ? <span aria-hidden>×</span> : <SparkIcon className="w-5 h-5" />}
       </button>
 
       {open && (
