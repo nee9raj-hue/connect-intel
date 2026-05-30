@@ -34,7 +34,7 @@ import { getLeadCity, getLeadState } from '../../lib/pipelineFilters'
 
 import { hasActiveTextSelection } from '../../lib/keyboardShortcuts'
 import useIsMobile from '../../hooks/useIsMobile'
-import usePipelineFilterMobile from '../../hooks/usePipelineFilterMobile'
+import usePipelineFilterMobile, { usePipelineNarrowViewport } from '../../hooks/usePipelineFilterMobile'
 
 export default function PipelinePanel({ onNavigate, panelOptions }) {
   const {
@@ -59,7 +59,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
 
   const columns = useMemo(() => getVisiblePipelineColumns(user), [user])
   const isMobile = useIsMobile()
-  const useCompactPipelineChrome = usePipelineFilterMobile()
+  const useMobileFilterSheet = usePipelineFilterMobile()
+  const usePipelineNarrow = usePipelineNarrowViewport()
   const [view, setView] = useState('list')
   const [filter, setFilter] = useState(panelOptions?.status || 'all')
   /** Status picked from toolbar on All Leads — does not change sidebar stage navigation. */
@@ -413,7 +414,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const [mobileHeaderSlot, setMobileHeaderSlot] = useState(null)
 
   useEffect(() => {
-    if (!useCompactPipelineChrome) {
+    if (!usePipelineNarrow) {
       setMobileHeaderSlot(null)
       document.documentElement.removeAttribute('data-pipeline-mobile')
       return undefined
@@ -421,7 +422,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     document.documentElement.setAttribute('data-pipeline-mobile', '1')
     setMobileHeaderSlot(document.getElementById('ci-mobile-top-bar-slot'))
     return () => document.documentElement.removeAttribute('data-pipeline-mobile')
-  }, [useCompactPipelineChrome])
+  }, [usePipelineNarrow])
 
   const handleLoadMore = useCallback(() => {
     loadMorePipelineLeads(serverFilters)
@@ -581,15 +582,13 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
 
   return (
     <>
-      {useCompactPipelineChrome && mobileHeaderSlot
+      {usePipelineNarrow && mobileHeaderSlot
         ? createPortal(
             <PipelineMobileHeaderChrome
               statsText={mobileHeaderStats}
               stageListMode={stageListMode}
               view={view}
               onViewChange={setView}
-              onImport={() => setImportOpen(true)}
-              onAdd={() => setAddOpen(true)}
             />,
             mobileHeaderSlot
           )
@@ -605,8 +604,12 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
         } ${useHubSpotList ? 'pipeline-list-workspace' : ''}`}
       >
         <header className="crm-page-header pipeline-page-header">
-          {!useCompactPipelineChrome ? (
-          <div className="crm-page-header-top pipeline-page-header-top">
+          <div
+            className={`crm-page-header-top pipeline-page-header-top ${
+              usePipelineNarrow ? 'pipeline-page-header-top--compact' : ''
+            }`}
+          >
+            {!usePipelineNarrow ? (
             <div className="pipeline-page-heading min-w-0">
               <PipelineIcon className="pipeline-page-icon w-6 h-6 shrink-0 text-[#516f90]" aria-hidden />
               <p className="pipeline-page-stats">
@@ -650,8 +653,9 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                 )}
               </p>
             </div>
+            ) : null}
             <div className="crm-page-actions pipeline-page-actions">
-              {!stageListMode && (
+              {!stageListMode && !usePipelineNarrow ? (
                 <div className="crm-view-tabs">
                   {[
                     { id: 'board', label: 'Board' },
@@ -667,28 +671,27 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                     </button>
                   ))}
                 </div>
-              )}
+              ) : null}
               <button
                 type="button"
                 onClick={() => setImportOpen(true)}
-                className="crm-btn crm-btn-secondary ci-mobile-icon-btn"
+                className="crm-btn crm-btn-secondary pipeline-action-btn"
                 aria-label="Import leads"
               >
-                <UploadIcon className="ci-mobile-btn-icon w-4 h-4" aria-hidden />
-                <span className="ci-mobile-btn-text">Import</span>
+                <UploadIcon className="pipeline-action-btn__icon" aria-hidden />
+                <span className="pipeline-action-btn__text">Import</span>
               </button>
               <button
                 type="button"
                 onClick={() => setAddOpen(true)}
-                className="crm-btn crm-btn-primary ci-mobile-icon-btn"
+                className="crm-btn crm-btn-primary pipeline-action-btn"
                 aria-label="Add lead"
               >
-                <PlusIcon className="ci-mobile-btn-icon w-4 h-4" aria-hidden />
-                <span className="ci-mobile-btn-text">Add lead</span>
+                <PlusIcon className="pipeline-action-btn__icon" aria-hidden />
+                <span className="pipeline-action-btn__text">Add lead</span>
               </button>
             </div>
           </div>
-          ) : null}
 
           {savedLeads.length > 0 && (
             <PipelineFiltersBar

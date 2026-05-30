@@ -4297,6 +4297,42 @@ details summary::-webkit-details-marker {
   flex-shrink: 0;
 }
 
+.pipeline-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  min-width: auto;
+  white-space: nowrap;
+}
+
+.pipeline-action-btn__icon {
+  display: block;
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+.pipeline-action-btn__text {
+  display: inline;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.pipeline-page-header-top--compact {
+  justify-content: flex-end;
+}
+
+.pipeline-page-header-top--compact .pipeline-page-actions {
+  width: 100%;
+  justify-content: flex-end;
+}
+
+.crm-toolbar--hubspot .hs-filter-icon-strip .hs-filter-icon-btn--labeled {
+  min-width: 3rem;
+}
+
 .crm-page-title {
   font-family: var(--font-display);
   font-size: 1.125rem;
@@ -7884,7 +7920,7 @@ details summary::-webkit-details-marker {
 }
 
 @media (min-width: 768px) {
-  .ci-mobile-icon-btn .ci-mobile-btn-icon {
+  .ci-mobile-icon-btn:not(.pipeline-action-btn) .ci-mobile-btn-icon {
     display: none;
   }
 

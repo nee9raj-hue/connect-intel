@@ -39,6 +39,7 @@ export default function FilterDropdown({
   iconOnly = false,
   iconSrc = null,
   icon: Icon = null,
+  showLabel = false,
   menuVariant = 'default',
 }) {
   const [open, setOpen] = useState(false)
@@ -297,19 +298,22 @@ export default function FilterDropdown({
           onPointerDown={(e) => e.stopPropagation()}
           className={
             iconButton
-              ? `hs-filter-icon-btn ${active ? 'is-active' : ''}`
+              ? `hs-filter-icon-btn ${showLabel ? 'hs-filter-icon-btn--labeled' : ''} ${active ? 'is-active' : ''}`
               : `crm-filter-btn ${compact ? 'crm-filter-btn--compact' : ''} ${active ? 'crm-filter-btn-active' : ''}`
           }
           aria-expanded={open}
           aria-label={iconButton ? (active && shown ? `${label}: ${shown}` : label) : undefined}
-          data-tooltip={iconButton && !isMobile ? label : undefined}
+          data-tooltip={iconButton && !showLabel && !isMobile ? label : undefined}
         >
           {iconButton ? (
-            Icon ? (
-              <Icon className="hs-filter-icon-btn__svg shrink-0" aria-hidden />
-            ) : (
-              <img src={iconSrc} alt="" className={BRAND_UI_ICON_CLASS} draggable={false} aria-hidden />
-            )
+            <>
+              {Icon ? (
+                <Icon className="hs-filter-icon-btn__svg shrink-0" aria-hidden />
+              ) : (
+                <img src={iconSrc} alt="" className={BRAND_UI_ICON_CLASS} draggable={false} aria-hidden />
+              )}
+              {showLabel && label ? <span className="hs-filter-icon-btn__label">{label}</span> : null}
+            </>
           ) : (
             <>
               <span className={`truncate ${compact ? 'max-w-[108px]' : 'max-w-[150px]'}`}>

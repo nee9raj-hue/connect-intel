@@ -2,7 +2,12 @@ import { useEffect, useState } from 'react'
 import useIsMobile from './useIsMobile'
 import { isPwaStandalone } from '../lib/pwaInstall'
 
-/** Mobile list filter sheet + compact pipeline chrome (viewport or installed PWA). */
+/** Narrow viewport (mobile breakpoint). */
+export function usePipelineNarrowViewport(breakpointPx = 768) {
+  return useIsMobile(breakpointPx)
+}
+
+/** Mobile list filter sheet (narrow viewport or installed PWA). */
 export default function usePipelineFilterMobile(breakpointPx = 768) {
   const narrowViewport = useIsMobile(breakpointPx)
   const [standalone, setStandalone] = useState(false)

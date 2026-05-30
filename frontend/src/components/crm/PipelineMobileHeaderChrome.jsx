@@ -1,16 +1,12 @@
-import { PlusIcon, UploadIcon } from '../ui/icons'
-
-/** Compact pipeline controls for mobile app header (stats, view, import, add). */
+/** Compact pipeline stats + view toggle for the mobile top bar slot. */
 export default function PipelineMobileHeaderChrome({
   statsText,
   stageListMode = false,
   view,
   onViewChange,
-  onImport,
-  onAdd,
 }) {
   return (
-    <div className="ci-pipeline-mobile-header" role="group" aria-label="Pipeline actions">
+    <div className="ci-pipeline-mobile-header" role="group" aria-label="Pipeline summary">
       {statsText ? (
         <p className="ci-pipeline-mobile-header__stats" title={statsText}>
           {statsText}
@@ -33,24 +29,6 @@ export default function PipelineMobileHeaderChrome({
           ))}
         </div>
       ) : null}
-      <button
-        type="button"
-        onClick={onImport}
-        className="crm-btn crm-btn-secondary ci-mobile-icon-btn ci-pipeline-mobile-header__btn"
-        aria-label="Import leads"
-      >
-        <UploadIcon className="ci-mobile-btn-icon shrink-0" aria-hidden />
-        <span className="ci-mobile-btn-text">Import</span>
-      </button>
-      <button
-        type="button"
-        onClick={onAdd}
-        className="crm-btn crm-btn-primary ci-mobile-icon-btn ci-pipeline-mobile-header__btn"
-        aria-label="Add lead"
-      >
-        <PlusIcon className="ci-mobile-btn-icon shrink-0" aria-hidden />
-        <span className="ci-mobile-btn-text">Add lead</span>
-      </button>
     </div>
   )
 }

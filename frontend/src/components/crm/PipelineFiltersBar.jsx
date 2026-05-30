@@ -506,7 +506,8 @@ export default function PipelineFiltersBar({
         <FilterDropdown
           iconOnly
           icon={ListIcon}
-          label="Lead status"
+          showLabel
+          label="Status"
           value={statusFilter !== 'all' ? statusFilter : ''}
           displayValue={statusOptions.find((s) => s.id === statusFilter)?.label}
           options={stageOptions}
@@ -518,6 +519,7 @@ export default function PipelineFiltersBar({
       <FilterDropdown
         iconOnly
         icon={MapPinIcon}
+        showLabel
         label="City"
         multiSelect
         values={filters.cities || []}
@@ -531,6 +533,7 @@ export default function PipelineFiltersBar({
       <FilterDropdown
         iconOnly
         icon={MapIcon}
+        showLabel
         label="State"
         multiSelect
         values={filters.states || []}
@@ -544,6 +547,7 @@ export default function PipelineFiltersBar({
       <FilterDropdown
         iconOnly
         icon={PeopleIcon}
+        showLabel
         label="Contact"
         value={filters.contact !== 'any' ? filters.contact : ''}
         displayValue={CONTACT_FILTER_OPTIONS.find((o) => o.id === filters.contact)?.label}
@@ -555,7 +559,8 @@ export default function PipelineFiltersBar({
       <div className="hs-advanced-filter-wrap hs-filter-icon-wrap" ref={advancedRef}>
         <FilterToolbarIcon
           icon={SlidersIcon}
-          label="Advanced filters"
+          label="More"
+          showLabel
           active={advancedOpen || advancedActiveCount > 0}
           badge={advancedActiveCount > 0}
           aria-expanded={advancedOpen}
