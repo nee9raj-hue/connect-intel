@@ -2718,42 +2718,63 @@ button.ci-lead-tag:disabled {
 
 .mobile-nav-pill__track {
   pointer-events: auto;
-  max-width: min(calc(100vw - 1rem), 26rem);
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
+  width: min(calc(100vw - 1rem), 24rem);
+  max-width: min(calc(100vw - 1rem), 24rem);
   border-radius: 999px;
-}
-
-.mobile-nav-pill__track::-webkit-scrollbar {
-  display: none;
 }
 
 .mobile-nav-pill__inner {
   display: flex;
-  align-items: center;
-  gap: 0.125rem;
-  width: max-content;
-  min-width: 100%;
+  align-items: stretch;
+  width: 100%;
+  min-height: 3.35rem;
   border-radius: 999px;
   border: 1px solid #d7dde5;
   background: rgb(255 255 255 / 0.96);
-  padding: 0.3rem 0.35rem;
+  padding: 0.35rem 0.4rem;
   box-shadow: 0 12px 34px rgb(15 23 42 / 0.16);
   backdrop-filter: blur(12px);
 }
 
+.mobile-nav-pill__primary {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.125rem;
+  padding-right: 0.3rem;
+  margin-right: 0.15rem;
+  border-right: 1px solid #e3e8ee;
+}
+
+.mobile-nav-pill__scroll {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 0.125rem;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-right: 0.1rem;
+  mask-image: linear-gradient(to right, #000 88%, transparent 100%);
+}
+
+.mobile-nav-pill__scroll::-webkit-scrollbar {
+  display: none;
+}
+
 .mobile-nav-pill__item {
   display: flex;
-  min-width: 2.85rem;
+  min-width: 3.35rem;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   border-radius: 999px;
   border: none;
   background: transparent;
-  padding: 0.35rem 0.45rem;
+  padding: 0.4rem 0.5rem;
   color: #596577;
   transition: background 0.12s ease, color 0.12s ease;
 }
@@ -2763,20 +2784,49 @@ button.ci-lead-tag:disabled {
   color: #fff;
 }
 
+.mobile-nav-pill__icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-nav-pill__icon {
+  width: 1.375rem;
+  height: 1.375rem;
+}
+
+.mobile-nav-pill__badge {
+  position: absolute;
+  top: -0.2rem;
+  right: -0.35rem;
+  display: flex;
+  min-width: 1rem;
+  height: 1rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #ff7a59;
+  padding: 0 0.2rem;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+}
+
 .mobile-nav-pill__label {
-  margin-top: 0.125rem;
-  max-width: 3.25rem;
+  margin-top: 0.2rem;
+  max-width: 3.5rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 8px;
+  font-size: 0.625rem;
   font-weight: 600;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
 }
 
 .mobile-main-pad {
-  padding-bottom: max(4.75rem, calc(env(safe-area-inset-bottom, 0px) + 4.25rem));
+  padding-bottom: max(5.15rem, calc(env(safe-area-inset-bottom, 0px) + 4.65rem));
   transition: padding-bottom 0.38s cubic-bezier(0.32, 0.72, 0, 1);
 }
 

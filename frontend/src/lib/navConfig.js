@@ -251,16 +251,26 @@ export function getDesktopPillSubmenuTargets(pillItem, sections = []) {
   return []
 }
 
-/** Primary destinations for the mobile floating nav pill (4 shortcuts + More drawer). */
-export const MOBILE_NAV_PILL_ITEMS = [
+/** Always-visible mobile nav shortcuts (fit on screen without scrolling). */
+export const MOBILE_NAV_PILL_PRIMARY_ITEMS = [
   { id: 'home', label: 'Home', panel: 'overview', icon: 'home' },
   { id: 'pipeline', label: 'Leads', panel: 'pipeline', icon: 'pipeline', matchPanelOnly: true },
   { id: 'contacts', label: 'Contacts', panel: 'contacts', icon: 'people' },
   { id: 'search', label: 'Search', panel: 'search', icon: 'spark' },
+]
+
+/** Secondary mobile nav shortcuts — horizontal scroll beside primary row. */
+export const MOBILE_NAV_PILL_MORE_ITEMS = [
   { id: 'marketing', label: 'Mail', panel: 'marketing', tab: 'campaigns', icon: 'mail' },
   { id: 'whatsapp', label: 'WA', panel: 'marketing', tab: 'inbox', icon: 'whatsapp' },
   { id: 'calendar', label: 'Meetings', panel: 'crm-calendar', upcomingOnly: true, icon: 'calendar' },
   { id: 'tasks', label: 'Tasks', panel: 'team-tasks', icon: 'task' },
+]
+
+/** Primary destinations for the mobile floating nav pill (shortcuts + More drawer). */
+export const MOBILE_NAV_PILL_ITEMS = [
+  ...MOBILE_NAV_PILL_PRIMARY_ITEMS,
+  ...MOBILE_NAV_PILL_MORE_ITEMS,
 ]
 
 export const QUICK_NAV_TILES = [
