@@ -23,6 +23,8 @@ import LeadTagsEditor from './LeadTagsEditor'
 import CrmEmailThread from './CrmEmailThread'
 import { buildUnifiedTimeline, formatDealValue, timelineTypeLabel } from '../../lib/crmTimeline'
 import { hasWorkspaceFeature } from '../../lib/workspaceFeatures'
+import FieldVisitRecordForm from './FieldVisitRecordForm'
+import { DEFAULT_FIELD_VISIT_EXPENSE_SETTINGS } from '../../lib/fieldVisitExpenses'
 
 const MAX_EMAIL_ATTACHMENTS = 5
 const MAX_ATTACHMENT_BYTES = 5 * 1024 * 1024
@@ -136,8 +138,10 @@ export default function LeadWorkspace({
   )
   const [sequences, setSequences] = useState([])
   const [enrollSequenceId, setEnrollSequenceId] = useState('')
+  const [fieldVisitSettings, setFieldVisitSettings] = useState(DEFAULT_FIELD_VISIT_EXPENSE_SETTINGS)
 
   const isManager = user?.isOrgAdmin || user?.orgRole === 'org_admin'
+  const fieldVisitExpensesEnabled = hasWorkspaceFeature(user, 'fieldVisitExpenses')
   const crm = lead.crm || {}
   const timeline = buildUnifiedTimeline(crm)
   const statusMeta = getStatusMeta(status)
@@ -169,6 +173,14 @@ export default function LeadWorkspace({
       refreshTeam()
     }
   }, [tab, user?.accountType, refreshTeam])
+
+  useEffect(() => {
+    if (tab !== 'schedule' || !fieldVisitExpensesEnabled) return
+    api
+      .getFieldVisitExpenses('', { silent: true })
+      .then((data) => setFieldVisitSettings({ ...DEFAULT_FIELD_VISIT_EXPENSE_SETTINGS, ...(data.settings || {}) }))
+      .catch(() => {})
+  }, [tab, fieldVisitExpensesEnabled])
 
   useEffect(() => {
     if (tab !== 'whatsapp') return
@@ -337,26 +349,33 @@ export default function LeadWorkspace({
     }
   }
 
-  const recordVisit = async (e) => {
-    e.preventDefault()
+  const recordVisit = async (payload) => {
     if (saving) return
-    const mid = visitMeetingId || crm.meetings?.find((m) => m.type === 'field_visit' && !m.visitRecordedAt)?.id
-    if (!mid) {
+    const mid =
+      payload?.meetingId ||
+      visitMeetingId ||
+      crm.meetings?.find((m) => m.type === 'field_visit' && !m.visitRecordedAt)?.id
+    if (!fieldVisitExpensesEnabled && !mid) {
       setError('Select a field visit meeting')
       return
     }
     const ok = await runPatch(
       {
-        fieldVisit: {
-          meetingId: mid,
-          outcome: visitOutcome,
-          notes: visitNotes,
-          location: meetingLocation,
-        },
+        fieldVisit: fieldVisitExpensesEnabled
+          ? {
+              ...payload,
+              meetingId: payload?.quickLog ? undefined : mid,
+            }
+          : {
+              meetingId: mid,
+              outcome: visitOutcome,
+              notes: visitNotes,
+              location: meetingLocation,
+            },
       },
-      'Field visit recorded'
+      fieldVisitExpensesEnabled ? 'Field visit & claim saved' : 'Field visit recorded'
     )
-    if (ok) setVisitNotes('')
+    if (ok && !fieldVisitExpensesEnabled) setVisitNotes('')
   }
 
   const completeTask = async (taskId) => {
@@ -1131,28 +1150,64 @@ export default function LeadWorkspace({
             </section>
 
             <section>
-              <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Record field visit</h3>
-              <form onSubmit={recordVisit} className="space-y-2">
-                <select value={visitMeetingId} onChange={(e) => setVisitMeetingId(e.target.value)} className="w-full text-xs border rounded-lg px-2.5 py-1.5">
-                  <option value="">Select scheduled visit</option>
-                  {(crm.meetings || [])
-                    .filter((m) => m.type === 'field_visit')
-                    .map((m) => (
-                      <option key={m.id} value={m.id}>
-                        {m.title} · {formatDateTime(m.scheduledAt)}
-                      </option>
-                    ))}
-                </select>
-                <select value={visitOutcome} onChange={(e) => setVisitOutcome(e.target.value)} className="w-full text-xs border rounded-lg px-2.5 py-1.5">
-                  <option value="completed">Completed</option>
-                  <option value="rescheduled">Rescheduled</option>
-                  <option value="no_show">No show</option>
-                </select>
-                <textarea value={visitNotes} onChange={(e) => setVisitNotes(e.target.value)} rows={3} placeholder="Visit notes, outcomes, next steps…" className="w-full text-xs border rounded-lg px-2.5 py-1.5" />
-                <button type="submit" disabled={busy} className="w-full py-2 text-xs font-semibold border-2 border-[#FF773D] rounded-lg disabled:opacity-50">
-                  {saving ? 'Saving…' : 'Save field visit report'}
-                </button>
-              </form>
+              <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">
+                {fieldVisitExpensesEnabled ? 'Record field visit & travel' : 'Record field visit'}
+              </h3>
+              {fieldVisitExpensesEnabled ? (
+                <FieldVisitRecordForm
+                  lead={lead}
+                  meetings={crm.meetings || []}
+                  settings={fieldVisitSettings}
+                  busy={busy}
+                  onSubmit={recordVisit}
+                />
+              ) : (
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault()
+                    recordVisit()
+                  }}
+                  className="space-y-2"
+                >
+                  <select
+                    value={visitMeetingId}
+                    onChange={(e) => setVisitMeetingId(e.target.value)}
+                    className="w-full text-xs border rounded-lg px-2.5 py-1.5"
+                  >
+                    <option value="">Select scheduled visit</option>
+                    {(crm.meetings || [])
+                      .filter((m) => m.type === 'field_visit')
+                      .map((m) => (
+                        <option key={m.id} value={m.id}>
+                          {m.title} · {formatDateTime(m.scheduledAt)}
+                        </option>
+                      ))}
+                  </select>
+                  <select
+                    value={visitOutcome}
+                    onChange={(e) => setVisitOutcome(e.target.value)}
+                    className="w-full text-xs border rounded-lg px-2.5 py-1.5"
+                  >
+                    <option value="completed">Completed</option>
+                    <option value="rescheduled">Rescheduled</option>
+                    <option value="no_show">No show</option>
+                  </select>
+                  <textarea
+                    value={visitNotes}
+                    onChange={(e) => setVisitNotes(e.target.value)}
+                    rows={3}
+                    placeholder="Visit notes, outcomes, next steps…"
+                    className="w-full text-xs border rounded-lg px-2.5 py-1.5"
+                  />
+                  <button
+                    type="submit"
+                    disabled={busy}
+                    className="w-full py-2 text-xs font-semibold border-2 border-[#FF773D] rounded-lg disabled:opacity-50"
+                  >
+                    {saving ? 'Saving…' : 'Save field visit report'}
+                  </button>
+                </form>
+              )}
             </section>
 
             <ul className="space-y-2">

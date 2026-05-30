@@ -250,6 +250,10 @@ export const api = {
     request('/api/crm/email-oauth/start?calendar=1'),
   getCrmActivityLog: (query = '') =>
     request(`/api/crm/activity-log${query ? `?${query}` : ''}`, { timeoutMs: 60_000 }),
+  getFieldVisitExpenses: (query = '', { silent = false } = {}) =>
+    request(`/api/crm/field-expenses${query ? `?${query}` : ''}`, { timeoutMs: 60_000 }, { silent }),
+  updateFieldVisitExpenseSettings: (body) =>
+    request('/api/crm/field-expenses', { method: 'PATCH', body }),
   getCrmNotifications: (since, { silent = false } = {}) =>
     request(
       `/api/crm/notifications${since ? `?since=${encodeURIComponent(since)}` : ''}`,

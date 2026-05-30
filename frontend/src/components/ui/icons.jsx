@@ -515,3 +515,16 @@ export function EmailUncertainIcon({ className }) {
     </LineIcon>
   )
 }
+
+export function RouteIcon({ className }) {
+  return (
+    <LineIcon className={className}>
+      <path d="M14 6h-4" />
+      <path d="M6 18H4a2 2 0 0 1-2-2v-5" />
+      <path d="M18 12h-4" />
+      <path d="m10 6-4 4 4 4" />
+      <circle cx="6" cy="18" r="2" />
+      <circle cx="18" cy="6" r="2" />
+    </LineIcon>
+  )
+}

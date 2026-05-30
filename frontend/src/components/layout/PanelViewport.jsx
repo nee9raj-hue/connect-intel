@@ -22,6 +22,7 @@ import ContactsPanel from '../contacts/ContactsPanel'
 import CrmSequencesPanel from '../crm/CrmSequencesPanel'
 import CrmAutomationPanel from '../crm/CrmAutomationPanel'
 import ActiveCustomersPanel from '../crm/ActiveCustomersPanel'
+import FieldExpensesPanel from '../crm/FieldExpensesPanel'
 import PanelCustomizationPanel from '../settings/PanelCustomizationPanel'
 
 const PANELS = {
@@ -30,6 +31,7 @@ const PANELS = {
   saved: SavedLeadsPanel,
   pipeline: PipelinePanel,
   'active-customers': ActiveCustomersPanel,
+  'field-expenses': FieldExpensesPanel,
   contacts: ContactsPanel,
   chithi: ChithiPanel,
   'team-hub': ChithiPanel,

@@ -1,5 +1,6 @@
 import { CRM_STATUSES, getVisiblePipelineColumns } from './crmConstants'
 import { isChithiPanel } from './chithiNav'
+import { hasWorkspaceFeature } from './workspaceFeatures'
 
 export function countPipelineByStatus(leads = []) {
   const counts = { all: leads.length }
@@ -136,6 +137,9 @@ export function buildCustomerNavSections(user, { pipelineCounts = {}, upcomingCo
         { id: 'calendar', label: 'Calendar', icon: 'calendar', children: calendarChildren },
         ...(automationChildren.length
           ? [{ id: 'automation', label: 'Automation', icon: 'bolt', children: automationChildren }]
+          : []),
+        ...(isCompany && hasWorkspaceFeature(user, 'fieldVisitExpenses')
+          ? [{ id: 'field-expenses', label: 'Field expenses', icon: 'route', panel: 'field-expenses' }]
           : []),
       ],
     },

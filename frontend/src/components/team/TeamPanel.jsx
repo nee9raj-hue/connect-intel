@@ -8,6 +8,7 @@ import InviteEmailSetup from './InviteEmailSetup'
 import CrmGmailConnectCard from './CrmGmailConnectCard'
 import TeamSettingsSection, { TeamQuickLink, TeamStatCard } from './TeamSettingsSection'
 import OrgWorkspaceSettings from './OrgWorkspaceSettings'
+import FieldVisitExpenseSettings from './FieldVisitExpenseSettings'
 import { hasWorkspaceFeature } from '../../lib/workspaceFeatures'
 
 function memberInitials(name, email) {
@@ -299,6 +300,10 @@ export default function TeamPanel({ onNavigate }) {
           </div>
 
           <OrgWorkspaceSettings user={user} onUserUpdated={updateUser} />
+          <FieldVisitExpenseSettings
+            user={user}
+            featureEnabled={hasWorkspaceFeature(user, 'fieldVisitExpenses')}
+          />
 
           <div className="grid sm:grid-cols-2 gap-2">
             {hasWorkspaceFeature(user, 'panelActiveCustomers') && (

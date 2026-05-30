@@ -33,6 +33,7 @@ import {
   TaskIcon,
   TeamIcon,
   WhatsAppIcon,
+  RouteIcon,
 } from '../ui/icons'
 
 const EXPAND_KEY = 'ci_nav_expanded'
@@ -80,6 +81,7 @@ const ICONS = {
   support: SupportIcon,
   database: DatabaseIcon,
   settings: SettingsGearIcon,
+  route: RouteIcon,
 }
 
 export default function Sidebar({
