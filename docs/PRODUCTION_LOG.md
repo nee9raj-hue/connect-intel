@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 1e99102
+npm run prod:rollback -- cb243f6
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 1e99102
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `19f05f9` |
-| Log updated (IST) | 30/05/2026, 20:30:37 |
+| Commit | `59e7741` |
+| Log updated (IST) | 30/05/2026, 22:12:47 |
 
 ---
 
@@ -44,7 +44,15 @@ npm run prod:rollback -- 1e99102
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 30/05/2026, 20:30:21 | `19f05f9` | Apply pipeline filters immediately without a separate Search step. | [preview](https://connect-intel-fhzt2thxc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 19f05f9` | **← LIVE**
+| 30/05/2026, 22:12:24 | `59e7741` | Use free OSRM/Nominatim for field visit distance suggestions. | [preview](https://connect-intel-60y8n500c-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 59e7741` | **← LIVE**
+| 30/05/2026, 22:08:15 | `cb243f6` | Add field visit edit and Google distance suggestions. | [preview](https://connect-intel-blu484925-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- cb243f6` |
+| 30/05/2026, 21:53:21 | `e3e18b0` | Add field visit travel claims with expenses page (Phase 1+2). | [preview](https://connect-intel-5filgp18r-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e3e18b0` |
+| 30/05/2026, 21:37:44 | `50f7167` | Fix assignee showing as unassigned in lead side panel. | [preview](https://connect-intel-mi6yvpg2q-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 50f7167` |
+| 30/05/2026, 21:31:55 | `d47ce0c` | Reject placeholder and reserved domains in email validation. | [preview](https://connect-intel-1qrvtif0d-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d47ce0c` |
+| 30/05/2026, 21:27:14 | `2e51325` | Add pipeline email validation icons (Phase 1). | [preview](https://connect-intel-apqo7rr6n-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2e51325` |
+| 30/05/2026, 20:36:37 | `a56f9c9` | Fix pipeline empty state when filters return no matches. | [preview](https://connect-intel-7fumqcebo-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a56f9c9` |
+| 30/05/2026, 20:31:07 | `27346e0` | Update production log after pipeline filter apply deploy. | [preview](https://connect-intel-oczc1kbyq-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 27346e0` |
+| 30/05/2026, 20:30:21 | `19f05f9` | Apply pipeline filters immediately without a separate Search step. | [preview](https://connect-intel-fhzt2thxc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 19f05f9` |
 | 30/05/2026, 20:24:31 | `0f2a5a3` | Update production log after leads label visibility deploy. | [preview](https://connect-intel-1jles3l5e-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0f2a5a3` |
 | 30/05/2026, 20:23:46 | `e232928` | Keep leads action and filter labels visible on all viewports. | [preview](https://connect-intel-pqm5anllm-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e232928` |
 | 30/05/2026, 20:20:32 | `2ba48fe` | Update production log after leads mobile UI deploy. | [preview](https://connect-intel-77y4cidjl-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2ba48fe` |
@@ -56,14 +64,6 @@ npm run prod:rollback -- 1e99102
 | 30/05/2026, 20:05:41 | `30e9f48` | Update production log after sidebar typography deploy. | [preview](https://connect-intel-aag8o9qeu-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 30e9f48` |
 | 30/05/2026, 20:04:55 | `dc32d9d` | Align left sidebar typography with HubSpot premium font scale. | [preview](https://connect-intel-otwxwoq9e-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- dc32d9d` |
 | 30/05/2026, 20:03:07 | `3ce8b0f` | Update production log after mobile bottom nav deploy. | [preview](https://connect-intel-jvdea68nr-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3ce8b0f` |
-| 30/05/2026, 20:02:20 | `63f2652` | Improve mobile bottom nav with larger icons and scrollable shortcuts. | [preview](https://connect-intel-5p4jbtuxh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 63f2652` |
-| 30/05/2026, 19:57:08 | `2ce0201` | Update production log after full HubSpot UI deploy. | [preview](https://connect-intel-adoyfiioc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2ce0201` |
-| 30/05/2026, 19:56:19 | `81b738c` | Extend HubSpot premium UI across all CRM surfaces. | [preview](https://connect-intel-7wgjico68-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 81b738c` |
-| 30/05/2026, 19:34:25 | `d4c6341` | Update production log after HubSpot premium UI deploy. | [preview](https://connect-intel-3cgm2xxg9-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d4c6341` |
-| 30/05/2026, 19:33:55 | `9e237db` | Apply HubSpot-style premium UI theme across CRM surfaces. | [preview](https://connect-intel-isr7ovqs6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9e237db` |
-| 30/05/2026, 19:24:16 | `aad438b` | Update production log after pipeline PWA crash fix deploy. | [preview](https://connect-intel-jf7wxh3zn-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- aad438b` |
-| 30/05/2026, 19:23:40 | `d11296b` | Fix pipeline crash from missing useIsMobile import and trim mobile helper copy. | [preview](https://connect-intel-o6ika4700-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d11296b` |
-| 30/05/2026, 19:15:04 | `4772f58` | Update production log after UI copy cleanup deploy. | [preview](https://connect-intel-209jqndz4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4772f58` |
 
 ---
 

@@ -150,6 +150,11 @@ function syncLog() {
 }
 
 function writeMarkdown(data) {
+  const rollbackExample =
+    (data.entries || []).find((e) => !e.isCurrentProduction)?.commit ||
+    (data.entries || [])[1]?.commit ||
+    'abc1234'
+
   const rows = (data.entries || [])
     .map((e) => {
       const current = e.isCurrentProduction ? ' **← LIVE**' : ''
@@ -178,7 +183,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 \`\`\`bash
-npm run prod:rollback -- 1e99102
+npm run prod:rollback -- ${rollbackExample}
 \`\`\`
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
