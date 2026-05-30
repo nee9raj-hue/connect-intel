@@ -35,8 +35,8 @@ npm run prod:rollback -- 1e99102
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `f9f25d8` |
-| Log updated (IST) | 30/05/2026, 17:54:11 |
+| Commit | `3061a9f` |
+| Log updated (IST) | 30/05/2026, 18:17:02 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 1e99102
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 30/05/2026, 17:53:55 | `f9f25d8` | Fix duplicate mobile pipeline header and compact filter row. | [preview](https://connect-intel-ed0tl5ua8-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f9f25d8` | **← LIVE**
+| 30/05/2026, 18:16:45 | `3061a9f` | Align mobile pipeline with desktop filters and merge top bar. | [preview](https://connect-intel-ljvewv40m-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3061a9f` | **← LIVE**
+| 30/05/2026, 17:54:43 | `30d5669` | Update production log after duplicate mobile header fix deploy. | [preview](https://connect-intel-f75h1ve1f-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 30d5669` |
+| 30/05/2026, 17:53:55 | `f9f25d8` | Fix duplicate mobile pipeline header and compact filter row. | [preview](https://connect-intel-ed0tl5ua8-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f9f25d8` |
 | 30/05/2026, 17:49:25 | `f5e7404` | Update production log after compact mobile pipeline header deploy. | [preview](https://connect-intel-1iml3jew8-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f5e7404` |
 | 30/05/2026, 17:48:41 | `8e8b79f` | Compact mobile pipeline header and HubSpot filter sheets. | [preview](https://connect-intel-8ut8osdgc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8e8b79f` |
 | 30/05/2026, 17:42:38 | `6e53d5b` | Update production log after per-icon mobile filter popups deploy. | [preview](https://connect-intel-qpnboa89l-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6e53d5b` |
@@ -62,7 +64,6 @@ npm run prod:rollback -- 1e99102
   - Notes: Known-good baseline: full local CRM, marketing studio, Chithi, PWA (2026-05-30).
 | 30/05/2026, 15:08:43 | `53f5c7b` | Restore full Connect Assistant with escalations on all platforms. | [preview](https://connect-intel-7n1si1ypv-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 53f5c7b` |
 | 30/05/2026, 14:59:55 | `320116e` | Add VAPID web push support on top of dc93f77 baseline. | [preview](https://connect-intel-qgtt56hyy-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 320116e` |
-| 30/05/2026, 14:44:11 | `09320cc` | Restore pre-platform-prompt UI from ff2f4f7 plus recovered editor history. | [preview](https://connect-intel-1v2gid8el-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 09320cc` |
 
 ---
 

@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-05-30T12:24:11.549Z",
-  "updatedAtIst": "30/05/2026, 17:54:11",
+  "updatedAt": "2026-05-30T12:47:02.054Z",
+  "updatedAtIst": "30/05/2026, 18:17:02",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "f9f25d8",
+  "currentProductionCommit": "3061a9f",
   "entries": [
+    {
+      "logId": "20260530-1816-3061a9f",
+      "commit": "3061a9f",
+      "commitFull": "3061a9f8e7703bb74d28dbc90f87ce892b76d792",
+      "message": "Align mobile pipeline with desktop filters and merge top bar.",
+      "deployedAt": "2026-05-30T12:46:45.152Z",
+      "deployedAtIst": "30/05/2026, 18:16:45",
+      "committedAtIst": "30/05/2026, 18:16:14",
+      "vercelPreviewUrl": "https://connect-intel-ljvewv40m-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 3061a9f"
+    },
+    {
+      "logId": "20260530-1754-30d5669",
+      "commit": "30d5669",
+      "commitFull": "30d56691b85c1981f870290d4b68f776d40a8375",
+      "message": "Update production log after duplicate mobile header fix deploy.",
+      "deployedAt": "2026-05-30T12:24:43.259Z",
+      "deployedAtIst": "30/05/2026, 17:54:43",
+      "committedAtIst": "30/05/2026, 17:54:15",
+      "vercelPreviewUrl": "https://connect-intel-f75h1ve1f-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 30d5669"
+    },
     {
       "logId": "20260530-1753-f9f25d8",
       "commit": "f9f25d8",
@@ -15,7 +43,7 @@
       "committedAtIst": "30/05/2026, 17:53:25",
       "vercelPreviewUrl": "https://connect-intel-ed0tl5ua8-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- f9f25d8"
     },
@@ -242,20 +270,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 320116e"
-    },
-    {
-      "logId": "20260530-1443-09320cc",
-      "commit": "09320cc",
-      "commitFull": "09320cc7f738154645a3d32b76817957432629bd",
-      "message": "Restore pre-platform-prompt UI from ff2f4f7 plus recovered editor history.",
-      "deployedAt": "2026-05-30T09:14:11.613Z",
-      "deployedAtIst": "30/05/2026, 14:44:11",
-      "committedAtIst": "30/05/2026, 14:43:08",
-      "vercelPreviewUrl": "https://connect-intel-1v2gid8el-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 09320cc"
     }
   ]
 }
