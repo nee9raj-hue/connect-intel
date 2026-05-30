@@ -29,8 +29,9 @@ import {
 import { tagMapById } from '../../lib/orgLeadTags'
 import { leadHasCallablePhone } from '../../lib/phoneUtils'
 import LeadPhoneCall from './LeadPhoneCall'
-import { leadHasSendableEmail } from '../../lib/emailUtils'
+import { leadHasSendableEmail, getLeadEmail } from '../../lib/emailUtils'
 import { getLeadCity, getLeadState } from '../../lib/pipelineFilters'
+import EmailValidationIcon from './EmailValidationIcon'
 
 import { hasActiveTextSelection } from '../../lib/keyboardShortcuts'
 import useIsMobile from '../../hooks/useIsMobile'
@@ -1087,6 +1088,12 @@ function KanbanColumn({
                   {lead.crm?.responseReceived && (
                     <div className="text-sm text-violet-700 mt-0.5 font-medium">Replied</div>
                   )}
+                  {getLeadEmail(lead) ? (
+                    <div className="mt-1 flex items-center gap-1 min-w-0">
+                      <EmailValidationIcon lead={lead} />
+                      <span className="text-sm text-[#33475b] truncate">{getLeadEmail(lead)}</span>
+                    </div>
+                  ) : null}
                   {lead.phone && leadHasCallablePhone(lead.phone) ? (
                     <div className="mt-1.5" onClick={(e) => e.stopPropagation()}>
                       <LeadPhoneCall

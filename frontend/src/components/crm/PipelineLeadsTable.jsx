@@ -3,9 +3,10 @@ import { formatCrmDate, getStatusMeta } from '../../lib/crmConstants'
 import { formatDateTime } from '../../lib/crmUiConstants'
 import { getLeadCity, getLeadState } from '../../lib/pipelineFilters'
 import { hasActiveTextSelection } from '../../lib/keyboardShortcuts'
-import { leadHasSendableEmail } from '../../lib/emailUtils'
+import { getLeadEmail, leadHasSendableEmail } from '../../lib/emailUtils'
 import LeadTagDots from './LeadTagDots'
 import LeadPhoneCall from './LeadPhoneCall'
+import EmailValidationIcon from './EmailValidationIcon'
 
 function displayName(lead) {
   const n = [lead.firstName, lead.lastName].filter(Boolean).join(' ').trim()
@@ -226,7 +227,8 @@ export default function PipelineLeadsTable({
             const meta = getStatusMeta(lead.crm?.status)
             const isActive = selectedId === lead.id
             const isChecked = selectedIds.has(lead.id)
-            const email = leadHasSendableEmail(lead) ? lead.email : null
+            const email = getLeadEmail(lead)
+            const emailSendable = leadHasSendableEmail(lead)
             const loc = [getLeadCity(lead), getLeadState(lead)].filter(Boolean).join(', ')
             const lastEmail = lastEmailPreview(lead)
             const notesText = oneLine(lead.crm?.notes)
@@ -276,17 +278,26 @@ export default function PipelineLeadsTable({
                 </td>
                 <td className="pipeline-hs-td pipeline-hs-td--email">
                   {email ? (
-                    <a
-                      href={`mailto:${encodeURIComponent(email)}`}
-                      className="pipeline-hs-primary-text pipeline-hs-cell-text"
-                      onClick={(e) => e.stopPropagation()}
-                      title={email}
-                    >
-                      {email}
-                      <span className="pipeline-hs-ext" aria-hidden>
-                        ↗
-                      </span>
-                    </a>
+                    <span className="pipeline-hs-email-cell">
+                      <EmailValidationIcon lead={lead} />
+                      {emailSendable ? (
+                        <a
+                          href={`mailto:${encodeURIComponent(email)}`}
+                          className="pipeline-hs-primary-text pipeline-hs-cell-text"
+                          onClick={(e) => e.stopPropagation()}
+                          title={email}
+                        >
+                          {email}
+                          <span className="pipeline-hs-ext" aria-hidden>
+                            ↗
+                          </span>
+                        </a>
+                      ) : (
+                        <span className="pipeline-hs-cell-text" title={email}>
+                          {email}
+                        </span>
+                      )}
+                    </span>
                   ) : (
                     <span className="pipeline-hs-muted">--</span>
                   )}

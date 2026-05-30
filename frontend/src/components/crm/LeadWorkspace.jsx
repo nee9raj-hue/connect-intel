@@ -3,6 +3,7 @@ import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { buildWhatsAppUrl, leadHasCallablePhone } from '../../lib/phoneUtils'
 import LeadPhoneCall from './LeadPhoneCall'
+import EmailValidationIcon from './EmailValidationIcon'
 import { STARTER_TEMPLATES, blocksToPlainText } from '../../lib/marketingEmailDesign'
 import {
   CRM_STATUSES,
@@ -920,9 +921,10 @@ export default function LeadWorkspace({
                   <span className="text-gray-500">Company · </span>
                   {lead.company || '—'}
                 </p>
-                <p>
+                <p className="flex flex-wrap items-center gap-1">
                   <span className="text-gray-500">Email · </span>
-                  {lead.email || '—'}
+                  <EmailValidationIcon lead={lead} />
+                  <span>{lead.email || '—'}</span>
                 </p>
                 <p className="flex flex-wrap items-center gap-1">
                   <span className="text-gray-500">Phone · </span>
@@ -1484,7 +1486,10 @@ export default function LeadWorkspace({
       </div>
 
       <div className="shrink-0 px-4 py-2 border-t text-xs text-gray-500 flex flex-wrap items-center gap-x-2 gap-y-1">
-        <span>{lead.email || 'No email'}</span>
+        <span className="inline-flex items-center gap-1">
+          <EmailValidationIcon lead={lead} />
+          {lead.email || 'No email'}
+        </span>
         <span className="text-gray-300" aria-hidden>
           ·
         </span>

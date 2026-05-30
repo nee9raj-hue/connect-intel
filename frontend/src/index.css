@@ -2086,6 +2086,38 @@ textarea {
   opacity: 0.85;
 }
 
+.pipeline-hs-email-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.pipeline-email-status {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  line-height: 0;
+}
+
+.pipeline-email-status__icon {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.pipeline-email-status--valid {
+  color: #00875a;
+}
+
+.pipeline-email-status--invalid {
+  color: #a5adb8;
+}
+
+.pipeline-email-status--uncertain {
+  color: #d97706;
+}
+
 .pipeline-hs-muted {
   color: #7c98b6;
 }

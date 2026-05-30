@@ -486,3 +486,32 @@ export function SidebarCollapseIcon({ className }) {
     </LineIcon>
   )
 }
+
+/** Small pipeline email validation icons (HubSpot-style, currentColor). */
+export function EmailValidIcon({ className }) {
+  return (
+    <LineIcon className={className} viewBox="0 0 16 16">
+      <circle cx="8" cy="8" r="6.25" />
+      <path d="m5.25 8 1.75 1.75L10.75 6.5" />
+    </LineIcon>
+  )
+}
+
+export function EmailInvalidIcon({ className }) {
+  return (
+    <LineIcon className={className} viewBox="0 0 16 16">
+      <circle cx="8" cy="8" r="6.25" />
+      <path d="m5.75 5.75 4.5 4.5M10.25 5.75l-4.5 4.5" />
+    </LineIcon>
+  )
+}
+
+export function EmailUncertainIcon({ className }) {
+  return (
+    <LineIcon className={className} viewBox="0 0 16 16">
+      <path d="M8 4.75v.5" />
+      <path d="M8 11.25h.01" />
+      <path d="M8 1.75a6.25 6.25 0 1 1 0 12.5 6.25 6.25 0 0 1 0-12.5Z" />
+    </LineIcon>
+  )
+}
