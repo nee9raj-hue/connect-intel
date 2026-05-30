@@ -46,7 +46,6 @@ export default function FieldVisitRecordForm({
   const [distanceHint, setDistanceHint] = useState(null)
   const [suggesting, setSuggesting] = useState(false)
   const [suggestError, setSuggestError] = useState(null)
-  const [mapsConfigured, setMapsConfigured] = useState(true)
 
   useEffect(() => {
     if (!isEdit) {
@@ -82,13 +81,6 @@ export default function FieldVisitRecordForm({
     }
   }, [pendingVisits, visitMeetingId, isEdit])
 
-  useEffect(() => {
-    api
-      .getFieldVisitDistanceStatus()
-      .then((data) => setMapsConfigured(Boolean(data.configured)))
-      .catch(() => setMapsConfigured(false))
-  }, [])
-
   const claimPreview = useMemo(() => {
     const travel = {
       mode: travelMode,
@@ -114,6 +106,7 @@ export default function FieldVisitRecordForm({
         minutes: data.durationMinutes,
         startResolved: data.startResolved,
         endResolved: data.endResolved,
+        approximate: data.distanceSource === 'estimated',
       })
     } catch (err) {
       setSuggestError(err.message || 'Could not estimate distance')
@@ -125,7 +118,7 @@ export default function FieldVisitRecordForm({
   const acceptSuggestion = () => {
     if (distanceHint?.km != null) {
       setDistanceKm(String(distanceHint.km))
-      setDistanceSource('google')
+      setDistanceSource(distanceHint.approximate ? 'estimated' : 'osrm')
     }
   }
 
@@ -259,9 +252,9 @@ export default function FieldVisitRecordForm({
           >
             {suggesting ? 'Calculating route…' : 'Get suggested distance'}
           </button>
-          {!mapsConfigured ? (
+          {!startLabel.trim() || !endLabel.trim() ? (
             <p className="text-[10px] text-[#7c98b6] mt-1 leading-relaxed">
-              Auto distance needs GOOGLE_MAPS_API_KEY on Vercel. You can still enter km manually.
+              Uses free OpenStreetMap routing — no API key. Include area + city or pincode for best results.
             </p>
           ) : null}
           {suggestError ? (
@@ -272,6 +265,7 @@ export default function FieldVisitRecordForm({
               <p className="font-semibold">
                 Suggested: {distanceHint.km} km
                 {distanceHint.minutes ? ` · ~${distanceHint.minutes} min` : ''}
+                {distanceHint.approximate ? ' · approximate' : ''}
               </p>
               {distanceHint.startResolved && distanceHint.endResolved ? (
                 <p className="text-[#516f90] mt-1 leading-relaxed">
@@ -314,7 +308,9 @@ export default function FieldVisitRecordForm({
             {travelMode === 'bike'
               ? ` · ₹${settings?.bikeRatePerKm ?? 4}/km`
               : ` · ₹${settings?.carRatePerKm ?? 10}/km`}
-            {distanceSource === 'google' ? ' · from route estimate' : ''}
+            {distanceSource === 'osrm' || distanceSource === 'google' || distanceSource === 'estimated'
+              ? ' · from route estimate'
+              : ''}
           </span>
           <input
             type="number"
