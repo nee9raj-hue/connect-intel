@@ -35,8 +35,8 @@ npm run prod:rollback -- 1e99102
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `27c0fbb` |
-| Log updated (IST) | 30/05/2026, 18:57:44 |
+| Commit | `385aa91` |
+| Log updated (IST) | 30/05/2026, 19:02:37 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 1e99102
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 30/05/2026, 18:57:43 | `27c0fbb` | Fix pipeline assignee filter for large lead lists on mount. | [preview](https://connect-intel-rmn73g17s-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 27c0fbb` | **← LIVE**
+| 30/05/2026, 19:02:33 | `385aa91` | Enable browser back/forward navigation across in-app panels and leads. | [preview](https://connect-intel-ilzcdmooo-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 385aa91` | **← LIVE**
+| 30/05/2026, 18:58:21 | `e8a4bc4` | Update production log after pipeline assignee filter deploy. | [preview](https://connect-intel-myw34rx16-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e8a4bc4` |
+| 30/05/2026, 18:57:43 | `27c0fbb` | Fix pipeline assignee filter for large lead lists on mount. | [preview](https://connect-intel-rmn73g17s-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 27c0fbb` |
 | 30/05/2026, 18:53:59 | `93fe270` | Update production log after team metrics assignee filter deploy. | [preview](https://connect-intel-cle6obl7d-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 93fe270` |
 | 30/05/2026, 18:53:17 | `3a50742` | Scope team metrics to selected rep with drill-down and persistent assignee filter. | [preview](https://connect-intel-ktmmp32ke-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3a50742` |
 | 30/05/2026, 18:34:31 | `ba8fedc` | Update production log after mobile leads horizontal scroll deploy. | [preview](https://connect-intel-jafcb6sj0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ba8fedc` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 1e99102
 | 30/05/2026, 17:42:38 | `6e53d5b` | Update production log after per-icon mobile filter popups deploy. | [preview](https://connect-intel-qpnboa89l-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6e53d5b` |
 | 30/05/2026, 17:41:54 | `d05ae11` | Add per-icon full-screen filter popups on mobile and PWA. | [preview](https://connect-intel-pm93hvm53-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d05ae11` |
 | 30/05/2026, 17:35:33 | `359ed5b` | Update production log after mobile/PWA leads fixes deploy. | [preview](https://connect-intel-39i8jbqe7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 359ed5b` |
-| 30/05/2026, 17:34:41 | `760df41` | Fix mobile leads call icon placement and PWA filter sheet. | [preview](https://connect-intel-dgy6ilxrp-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 760df41` |
-| 30/05/2026, 17:27:18 | `08b9487` | Update production log after mobile pipeline filters deploy. | [preview](https://connect-intel-iejkg3y45-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 08b9487` |
 
 ---
 
