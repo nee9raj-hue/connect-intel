@@ -1,9 +1,10 @@
-/** Client-side email format check (mirrors lib/server/leadQuality.js). */
-export function hasValidEmail(email) {
-  const value = String(email || '').trim()
-  if (!value || value.includes('•')) return false
-  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test(value)
-}
+import {
+  hasValidEmail,
+  hasValidEmailFormat,
+  isNonDeliverableEmail,
+} from '../../../lib/emailValidation.js'
+
+export { hasValidEmail, hasValidEmailFormat, isNonDeliverableEmail }
 
 export function getLeadEmail(lead) {
   let email = String(lead?.email || lead?.work_email || lead?.workEmail || '').trim().toLowerCase()
@@ -15,14 +16,15 @@ export function getLeadEmail(lead) {
 export function getEmailValidationState(lead) {
   const email = getLeadEmail(lead)
   if (!email) return 'none'
-  if (!hasValidEmail(email)) return 'invalid'
+  if (!hasValidEmailFormat(email)) return 'invalid'
+  if (isNonDeliverableEmail(email)) return 'invalid'
 
   const status = String(lead?.emailStatus || '').trim().toLowerCase()
   if (status === 'likely' || status === 'unverified') return 'uncertain'
   return 'valid'
 }
 
-/** Bulk send / mailto: valid format only — includes verified and unverified/likely, not invalid. */
+/** Bulk send / mailto: verified format only — not invalid placeholders. */
 export function leadHasSendableEmail(lead) {
   const state = getEmailValidationState(lead)
   return state === 'valid' || state === 'uncertain'
@@ -34,6 +36,6 @@ export function leadDisplayName(lead) {
 
 export const EMAIL_VALIDATION_TOOLTIPS = {
   valid: 'Valid email format',
-  invalid: 'Invalid or missing email',
+  invalid: 'Invalid, placeholder, or undeliverable email',
   uncertain: 'Email present but not verified',
 }
