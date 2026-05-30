@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-05-30T12:53:08.199Z",
-  "updatedAtIst": "30/05/2026, 18:23:08",
+  "updatedAt": "2026-05-30T13:00:13.303Z",
+  "updatedAtIst": "30/05/2026, 18:30:13",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "82ab12b",
+  "currentProductionCommit": "f592c7e",
   "entries": [
+    {
+      "logId": "20260530-1829-f592c7e",
+      "commit": "f592c7e",
+      "commitFull": "f592c7e20868e4991403b408420e43b2c2f3a1ee",
+      "message": "Improve mobile pipeline filter modals and scale toolbar icons.",
+      "deployedAt": "2026-05-30T12:59:55.329Z",
+      "deployedAtIst": "30/05/2026, 18:29:55",
+      "committedAtIst": "30/05/2026, 18:29:27",
+      "vercelPreviewUrl": "https://connect-intel-1pqukdhvr-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- f592c7e"
+    },
+    {
+      "logId": "20260530-1823-3569af6",
+      "commit": "3569af6",
+      "commitFull": "3569af6decd7df96e3e3e7fad9d98fbdbdf028fe",
+      "message": "Update production log after Contacts-style pipeline filter modals deploy.",
+      "deployedAt": "2026-05-30T12:53:48.264Z",
+      "deployedAtIst": "30/05/2026, 18:23:48",
+      "committedAtIst": "30/05/2026, 18:23:21",
+      "vercelPreviewUrl": "https://connect-intel-4e88hiw02-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 3569af6"
+    },
     {
       "logId": "20260530-1822-82ab12b",
       "commit": "82ab12b",
@@ -15,7 +43,7 @@
       "committedAtIst": "30/05/2026, 18:22:09",
       "vercelPreviewUrl": "https://connect-intel-gyckuojsr-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 82ab12b"
     },
@@ -256,20 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 7f1674a"
-    },
-    {
-      "logId": "20260530-1518-1e99102",
-      "commit": "1e99102",
-      "commitFull": "1e99102d47b1fef3abe18471c23d17be9339eb24",
-      "message": "Ship local CRM, marketing studio, Chithi, and PWA to production.",
-      "deployedAt": "2026-05-30T09:48:12.965Z",
-      "deployedAtIst": "30/05/2026, 15:18:12",
-      "committedAtIst": "30/05/2026, 15:17:45",
-      "vercelPreviewUrl": "https://connect-intel-g4j1spr4n-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "Known-good baseline: full local CRM, marketing studio, Chithi, PWA (2026-05-30).",
-      "rollbackCommand": "npm run prod:rollback -- 1e99102"
     }
   ]
 }
