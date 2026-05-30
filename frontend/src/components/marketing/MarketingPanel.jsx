@@ -83,7 +83,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
   const isMobile = useIsMobile()
 
   const isBuilderTab = tab === 'campaigns' || tab === 'templates'
-  const hideMarketingKpis = isBuilderTab || tab === 'reports'
+  const hideMarketingKpis = isBuilderTab || tab === 'reports' || tab === 'lists'
   const hideMarketingHeader =
     !isMobile &&
     (tab === 'templates' || (tab === 'campaigns' && campaignDesktopPhase === 'editor'))
@@ -688,7 +688,11 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
                 <>
                   {tab === 'campaigns'
                     ? 'Build and send campaigns — view stats under Reports.'
-                    : 'Design reusable email templates for your team.'}
+                    : tab === 'lists'
+                      ? 'Build audience lists from your pipeline for email and WhatsApp.'
+                      : tab === 'inbox'
+                        ? 'WhatsApp replies from campaigns and pipeline outreach.'
+                        : 'Design reusable email templates for your team.'}
                   {needsWorkEmail && tab === 'campaigns' && (
                     <>
                       {' '}

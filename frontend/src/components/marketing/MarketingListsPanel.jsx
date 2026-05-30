@@ -5,9 +5,27 @@ import { CRM_STATUSES } from '../../lib/crmConstants'
 import FilterDropdown from '../crm/FilterDropdown'
 import MarketingListBuilder from './MarketingListBuilder'
 import MarketingListDetail from './MarketingListDetail'
+import MarketingListsFiltersSheet from './MarketingListsFiltersSheet'
 import MarketingCreatorBadge from './MarketingCreatorBadge'
 
 const UNASSIGNED = '__unassigned__'
+
+const DEFAULT_LIST_FILTERS = {
+  assigneeUserId: '',
+  pipelineStage: 'all',
+}
+
+function listMatchesAssignee(list, assigneeUserId) {
+  if (!assigneeUserId) return true
+  if (assigneeUserId === UNASSIGNED) return !list.assigneeUserId
+  return list.assigneeUserId === assigneeUserId || list.createdByUserId === assigneeUserId
+}
+
+function listMatchesStage(list, pipelineStage) {
+  if (!pipelineStage || pipelineStage === 'all') return true
+  if (list.pipelineStatus) return list.pipelineStatus === pipelineStage
+  return false
+}
 
 export default function MarketingListsPanel({
   user,
@@ -25,11 +43,11 @@ export default function MarketingListsPanel({
   const [selectedListId, setSelectedListId] = useState(null)
   const [createOpen, setCreateOpen] = useState(false)
   const [listSearch, setListSearch] = useState('')
-  const isMobile = useIsMobile()
-
   const [listChannel, setListChannel] = useState('email')
-  const [assigneeUserId, setAssigneeUserId] = useState('')
-  const [pipelineStage, setPipelineStage] = useState('all')
+  const [appliedFilters, setAppliedFilters] = useState(DEFAULT_LIST_FILTERS)
+  const [draftFilters, setDraftFilters] = useState(DEFAULT_LIST_FILTERS)
+  const [filtersOpen, setFiltersOpen] = useState(false)
+  const isMobile = useIsMobile()
 
   const isCompany = Boolean(user?.accountType === 'company' && user?.organizationId)
   const isCompanyAdmin = Boolean(
@@ -42,7 +60,7 @@ export default function MarketingListsPanel({
 
   useEffect(() => {
     if (!isCompany || isCompanyAdmin || !user?.id) return
-    setAssigneeUserId(user.id)
+    setAppliedFilters((prev) => ({ ...prev, assigneeUserId: user.id }))
   }, [isCompany, isCompanyAdmin, user?.id])
 
   const repOptions = useMemo(() => {
@@ -66,15 +84,19 @@ export default function MarketingListsPanel({
     [repOptions]
   )
 
+  const { assigneeUserId, pipelineStage } = appliedFilters
+
   const filteredLists = useMemo(() => {
     const q = listSearch.trim().toLowerCase()
     return (lists || [])
       .filter((l) => (l.channel || 'email') === listChannel)
+      .filter((l) => listMatchesAssignee(l, assigneeUserId))
+      .filter((l) => listMatchesStage(l, pipelineStage))
       .filter((l) => {
         if (!q) return true
         return String(l.name || '').toLowerCase().includes(q)
       })
-  }, [lists, listChannel, listSearch])
+  }, [lists, listChannel, listSearch, assigneeUserId, pipelineStage])
 
   const selectedList = useMemo(
     () => (lists || []).find((l) => l.id === selectedListId) || null,
@@ -85,6 +107,9 @@ export default function MarketingListsPanel({
     () => filteredLists.reduce((sum, l) => sum + (l.leadIds?.length || 0), 0),
     [filteredLists]
   )
+
+  const filtersActive =
+    Boolean(assigneeUserId) || (pipelineStage && pipelineStage !== 'all')
 
   const handleListsCreated = async (result) => {
     await onListsReload?.()
@@ -97,12 +122,24 @@ export default function MarketingListsPanel({
 
   const assigneeLabel =
     repOptions.find((r) => r.userId === assigneeUserId)?.name ||
-    (isCompanyAdmin ? 'Select member' : '')
+    (isCompanyAdmin ? 'All members' : '')
 
   const stageLabel =
     pipelineStage === 'all'
       ? 'All stages'
       : CRM_STATUSES.find((s) => s.id === pipelineStage)?.label || pipelineStage
+
+  const openFilters = () => {
+    setDraftFilters({ ...appliedFilters })
+    setFiltersOpen(true)
+  }
+
+  const closeFilters = () => setFiltersOpen(false)
+
+  const applyFilters = () => {
+    setAppliedFilters({ ...draftFilters })
+    setFiltersOpen(false)
+  }
 
   const closeListDetail = () => setSelectedListId(null)
 
@@ -128,7 +165,7 @@ export default function MarketingListsPanel({
 
   return (
     <div className="crm-content-card flex flex-col min-h-0 flex-1 overflow-hidden">
-      <div className="crm-toolbar crm-toolbar--compact shrink-0 border-b border-[#dfe3eb] px-3 pt-2 pb-1.5 bg-white">
+      <div className="crm-toolbar crm-toolbar--compact marketing-lists-toolbar shrink-0 border-b border-[#dfe3eb] px-3 pt-2 pb-1.5 bg-white">
         <div className="crm-toolbar-primary">
           <div className="crm-view-tabs">
             {[
@@ -149,26 +186,6 @@ export default function MarketingListsPanel({
             ))}
           </div>
 
-          {isCompany && (
-            <FilterDropdown
-              label="Team member"
-              value={assigneeUserId}
-              displayValue={assigneeLabel}
-              options={repOptionsForDropdown}
-              onChange={(v) => setAssigneeUserId(v || '')}
-              emptyLabel="Select member…"
-            />
-          )}
-
-          <FilterDropdown
-            label="Stage"
-            value={pipelineStage !== 'all' ? pipelineStage : ''}
-            displayValue={stageLabel}
-            options={stageOptions}
-            onChange={(v) => setPipelineStage(v || 'all')}
-            emptyLabel="All stages"
-          />
-
           <div className="crm-search-wrap flex-1 min-w-[140px] max-w-[240px]">
             <svg className="crm-search-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
               <path
@@ -187,27 +204,41 @@ export default function MarketingListsPanel({
             />
           </div>
 
-          {isCompany && (
-            <FilterDropdown
-              compact
-              label="Member"
-              value={assigneeUserId}
-              displayValue={assigneeLabel}
-              options={repOptionsForDropdown}
-              onChange={(v) => setAssigneeUserId(v || '')}
-              emptyLabel="All"
-            />
-          )}
+          {isMobile ? (
+            <button
+              type="button"
+              onClick={openFilters}
+              className={`crm-btn crm-btn-sm crm-btn-secondary marketing-lists-filter-btn ${filtersActive ? 'is-active' : ''}`}
+            >
+              Filters{filtersActive ? ' · on' : ''}
+            </button>
+          ) : (
+            <div className="marketing-lists-toolbar-filters flex flex-wrap items-center gap-2">
+              {isCompany && (
+                <FilterDropdown
+                  label="Team member"
+                  value={assigneeUserId}
+                  displayValue={assigneeLabel}
+                  options={repOptionsForDropdown}
+                  onChange={(v) =>
+                    setAppliedFilters((prev) => ({ ...prev, assigneeUserId: v || '' }))
+                  }
+                  emptyLabel="All members"
+                />
+              )}
 
-          <FilterDropdown
-            compact
-            label="Stage"
-            value={pipelineStage !== 'all' ? pipelineStage : ''}
-            displayValue={stageLabel}
-            options={stageOptions}
-            onChange={(v) => setPipelineStage(v || 'all')}
-            emptyLabel="All"
-          />
+              <FilterDropdown
+                label="Stage"
+                value={pipelineStage !== 'all' ? pipelineStage : ''}
+                displayValue={stageLabel}
+                options={stageOptions}
+                onChange={(v) =>
+                  setAppliedFilters((prev) => ({ ...prev, pipelineStage: v || 'all' }))
+                }
+                emptyLabel="All stages"
+              />
+            </div>
+          )}
 
           <button
             type="button"
@@ -230,8 +261,10 @@ export default function MarketingListsPanel({
           <div className="crm-list-scroll">
             {!filteredLists.length && (
               <div className="crm-empty-state py-8">
-                <p>No {listChannel} lists yet</p>
-                <p className="crm-empty-hint">Use Create list above.</p>
+                <p>No {listChannel} lists match</p>
+                <p className="crm-empty-hint">
+                  {filtersActive ? 'Try changing filters or create a new list.' : 'Use Create list above.'}
+                </p>
               </div>
             )}
             {filteredLists.map((l) => (
@@ -278,6 +311,17 @@ export default function MarketingListsPanel({
         </FullScreenDetailModal>
       ) : null}
 
+      <MarketingListsFiltersSheet
+        open={isMobile && filtersOpen}
+        onClose={closeFilters}
+        onApply={applyFilters}
+        draft={draftFilters}
+        onDraftChange={setDraftFilters}
+        isCompany={isCompany}
+        isCompanyAdmin={isCompanyAdmin}
+        repOptions={repOptions}
+      />
+
       {createOpen && (
         <div
           className="crm-modal-overlay"
@@ -321,9 +365,13 @@ export default function MarketingListsPanel({
                 listChannel={listChannel}
                 onListChannelChange={setListChannel}
                 assigneeUserId={assigneeUserId}
-                onAssigneeChange={setAssigneeUserId}
+                onAssigneeChange={(v) =>
+                  setAppliedFilters((prev) => ({ ...prev, assigneeUserId: v || '' }))
+                }
                 pipelineStage={pipelineStage}
-                onPipelineStageChange={setPipelineStage}
+                onPipelineStageChange={(v) =>
+                  setAppliedFilters((prev) => ({ ...prev, pipelineStage: v || 'all' }))
+                }
               />
             </div>
             <footer className="crm-modal-footer">

@@ -8003,3 +8003,46 @@ details summary::-webkit-details-marker {
 .chithi-quick-dm__chip:disabled {
   opacity: 0.5;
 }
+
+/* Marketing — saved lists toolbar */
+.marketing-lists-toolbar .crm-toolbar-primary {
+  row-gap: 0.5rem;
+}
+
+.marketing-lists-filter-btn.is-active {
+  border-color: #17191c;
+  color: #17191c;
+  background: #f5f8fa;
+}
+
+@media (max-width: 767px) {
+  .marketing-lists-toolbar,
+  .marketing-lists-toolbar .crm-toolbar-primary {
+    overflow: visible;
+    flex-wrap: wrap;
+  }
+
+  .marketing-lists-toolbar .crm-search-wrap {
+    flex: 1 1 100%;
+    max-width: none;
+    order: 2;
+  }
+
+  .marketing-lists-toolbar .crm-view-tabs {
+    order: 1;
+  }
+
+  .marketing-lists-filter-btn {
+    order: 3;
+  }
+
+  .marketing-lists-toolbar .crm-btn-primary {
+    order: 4;
+  }
+
+  .marketing-lists-toolbar .crm-toolbar-count--inline {
+    order: 5;
+    width: 100%;
+    margin-left: 0;
+  }
+}
