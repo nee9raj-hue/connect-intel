@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { buildWhatsAppUrl, leadHasCallablePhone } from '../../lib/phoneUtils'
@@ -139,6 +139,7 @@ export default function LeadWorkspace({
   const [sequences, setSequences] = useState([])
   const [enrollSequenceId, setEnrollSequenceId] = useState('')
   const [fieldVisitSettings, setFieldVisitSettings] = useState(DEFAULT_FIELD_VISIT_EXPENSE_SETTINGS)
+  const [editingVisitMeetingId, setEditingVisitMeetingId] = useState(null)
 
   const isManager = user?.isOrgAdmin || user?.orgRole === 'org_admin'
   const fieldVisitExpensesEnabled = hasWorkspaceFeature(user, 'fieldVisitExpenses')
@@ -351,6 +352,7 @@ export default function LeadWorkspace({
 
   const recordVisit = async (payload) => {
     if (saving) return
+    const isUpdate = payload?.action === 'update'
     const mid =
       payload?.meetingId ||
       visitMeetingId ||
@@ -364,7 +366,7 @@ export default function LeadWorkspace({
         fieldVisit: fieldVisitExpensesEnabled
           ? {
               ...payload,
-              meetingId: payload?.quickLog ? undefined : mid,
+              meetingId: isUpdate ? payload.meetingId : payload?.quickLog ? undefined : mid,
             }
           : {
               meetingId: mid,
@@ -373,10 +375,28 @@ export default function LeadWorkspace({
               location: meetingLocation,
             },
       },
-      fieldVisitExpensesEnabled ? 'Field visit & claim saved' : 'Field visit recorded'
+      fieldVisitExpensesEnabled
+        ? isUpdate
+          ? 'Field visit updated'
+          : 'Field visit & claim saved'
+        : 'Field visit recorded'
     )
-    if (ok && !fieldVisitExpensesEnabled) setVisitNotes('')
+    if (ok) {
+      if (!fieldVisitExpensesEnabled) setVisitNotes('')
+      if (isUpdate) setEditingVisitMeetingId(null)
+    }
   }
+
+  const editingVisitMeeting = useMemo(() => {
+    if (!editingVisitMeetingId) return null
+    return (crm.meetings || []).find((m) => m.id === editingVisitMeetingId) || null
+  }, [editingVisitMeetingId, crm.meetings])
+
+  const recordedFieldVisits = useMemo(
+    () =>
+      (crm.meetings || []).filter((m) => m.type === 'field_visit' && m.visitRecordedAt),
+    [crm.meetings]
+  )
 
   const completeTask = async (taskId) => {
     if (saving) return
@@ -1153,7 +1173,17 @@ export default function LeadWorkspace({
               <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">
                 {fieldVisitExpensesEnabled ? 'Record field visit & travel' : 'Record field visit'}
               </h3>
-              {fieldVisitExpensesEnabled ? (
+              {fieldVisitExpensesEnabled && editingVisitMeeting ? (
+                <FieldVisitRecordForm
+                  lead={lead}
+                  meetings={crm.meetings || []}
+                  settings={fieldVisitSettings}
+                  busy={busy}
+                  editMeeting={editingVisitMeeting}
+                  onCancel={() => setEditingVisitMeetingId(null)}
+                  onSubmit={recordVisit}
+                />
+              ) : fieldVisitExpensesEnabled ? (
                 <FieldVisitRecordForm
                   lead={lead}
                   meetings={crm.meetings || []}
@@ -1209,6 +1239,38 @@ export default function LeadWorkspace({
                 </form>
               )}
             </section>
+
+            {fieldVisitExpensesEnabled && recordedFieldVisits.length > 0 && !editingVisitMeeting ? (
+              <section>
+                <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Recorded visits</h3>
+                <ul className="space-y-2">
+                  {recordedFieldVisits.map((m) => (
+                    <li key={m.id} className="text-xs border rounded-lg p-2 bg-white">
+                      <p className="font-medium">{m.title}</p>
+                      <p className="text-[#516f90]">
+                        {formatDateTime(m.actualVisitAt || m.visitRecordedAt)} · {m.visitOutcome}
+                      </p>
+                      {m.visitTravel ? (
+                        <p className="text-[#516f90] mt-0.5">
+                          {m.visitTravel.startLabel ? `${m.visitTravel.startLabel} → ` : ''}
+                          {m.visitTravel.endLabel || m.location}
+                          {m.visitTravel.claimAmount > 0
+                            ? ` · ₹${m.visitTravel.claimAmount}`
+                            : ''}
+                        </p>
+                      ) : null}
+                      <button
+                        type="button"
+                        onClick={() => setEditingVisitMeetingId(m.id)}
+                        className="mt-1 text-[#0091ae] font-semibold hover:underline"
+                      >
+                        Edit visit & travel
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ) : null}
 
             <ul className="space-y-2">
               <h3 className="text-xs font-semibold uppercase text-gray-400">Upcoming</h3>

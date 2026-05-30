@@ -254,6 +254,9 @@ export const api = {
     request(`/api/crm/field-expenses${query ? `?${query}` : ''}`, { timeoutMs: 60_000 }, { silent }),
   updateFieldVisitExpenseSettings: (body) =>
     request('/api/crm/field-expenses', { method: 'PATCH', body }),
+  suggestFieldVisitDistance: (body) =>
+    request('/api/crm/field-visit/distance', { method: 'POST', body }),
+  getFieldVisitDistanceStatus: () => request('/api/crm/field-visit/distance'),
   getCrmNotifications: (since, { silent = false } = {}) =>
     request(
       `/api/crm/notifications${since ? `?since=${encodeURIComponent(since)}` : ''}`,

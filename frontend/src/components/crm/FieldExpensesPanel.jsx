@@ -7,10 +7,12 @@ import {
   exportFieldVisitsCsv,
   formatInr,
   monthLabel,
+  DEFAULT_FIELD_VISIT_EXPENSE_SETTINGS,
 } from '../../lib/fieldVisitExpenses'
 import { formatDateTime } from '../../lib/crmUiConstants'
 import LoadingExperience from '../ui/LoadingExperience'
 import { LOADING_MESSAGES } from '../../lib/loadingQuotes'
+import FieldVisitRecordForm from './FieldVisitRecordForm'
 
 export default function FieldExpensesPanel({ onNavigate }) {
   const { user, teamMembers, openPipelineLead, refreshTeam } = useApp()
@@ -21,6 +23,13 @@ export default function FieldExpensesPanel({ onNavigate }) {
   const [totals, setTotals] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [settings, setSettings] = useState(DEFAULT_FIELD_VISIT_EXPENSE_SETTINGS)
+  const [editingVisit, setEditingVisit] = useState(null)
+  const [editLead, setEditLead] = useState(null)
+  const [editMeeting, setEditMeeting] = useState(null)
+  const [editLoading, setEditLoading] = useState(false)
+  const [editSaving, setEditSaving] = useState(false)
+  const [editError, setEditError] = useState(null)
 
   const canViewTeam = Boolean(user?.isOrgAdmin)
 
@@ -34,6 +43,7 @@ export default function FieldExpensesPanel({ onNavigate }) {
       const data = await api.getFieldVisitExpenses(q.toString())
       setVisits(data.visits || [])
       setTotals(data.totals || null)
+      setSettings({ ...DEFAULT_FIELD_VISIT_EXPENSE_SETTINGS, ...(data.settings || {}) })
     } catch (err) {
       setError(err.message)
       setVisits([])
@@ -55,6 +65,47 @@ export default function FieldExpensesPanel({ onNavigate }) {
     if (!userId) return null
     return teamMembers.find((m) => String(m.userId) === String(userId))?.name || 'Team member'
   }, [userId, teamMembers])
+
+  const openEdit = async (visit) => {
+    setEditingVisit(visit)
+    setEditLoading(true)
+    setEditError(null)
+    setEditLead(null)
+    setEditMeeting(null)
+    try {
+      const data = await api.getPipelineLead(visit.leadId, { silent: true })
+      const meeting = (data.lead?.crm?.meetings || []).find((m) => m.id === visit.meetingId)
+      if (!meeting) throw new Error('Visit not found on lead')
+      setEditLead(data.lead)
+      setEditMeeting(meeting)
+    } catch (err) {
+      setEditError(err.message)
+    } finally {
+      setEditLoading(false)
+    }
+  }
+
+  const closeEdit = () => {
+    setEditingVisit(null)
+    setEditLead(null)
+    setEditMeeting(null)
+    setEditError(null)
+  }
+
+  const saveEdit = async (payload) => {
+    if (!editingVisit?.leadId) return
+    setEditSaving(true)
+    setEditError(null)
+    try {
+      await api.updateSavedLead(editingVisit.leadId, { fieldVisit: payload })
+      closeEdit()
+      load()
+    } catch (err) {
+      setEditError(err.message)
+    } finally {
+      setEditSaving(false)
+    }
+  }
 
   if (!enabled) {
     return (
@@ -164,6 +215,7 @@ export default function FieldExpensesPanel({ onNavigate }) {
                   <th>Route</th>
                   <th>Travel</th>
                   <th className="text-right">Claim</th>
+                  <th />
                 </tr>
               </thead>
               <tbody>
@@ -193,6 +245,15 @@ export default function FieldExpensesPanel({ onNavigate }) {
                     <td className="text-right font-medium tabular-nums">
                       {v.claimAmount > 0 ? formatInr(v.claimAmount) : '—'}
                     </td>
+                    <td className="text-right">
+                      <button
+                        type="button"
+                        className="text-xs font-semibold text-[#0091ae] hover:underline"
+                        onClick={() => openEdit(v)}
+                      >
+                        Edit
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -200,6 +261,43 @@ export default function FieldExpensesPanel({ onNavigate }) {
           </div>
         )}
       </div>
+
+      {editingVisit ? (
+        <div className="field-expenses-edit-overlay" role="dialog" aria-modal="true">
+          <div className="field-expenses-edit-modal crm-content-card">
+            <div className="flex items-start justify-between gap-3 mb-3">
+              <div>
+                <h2 className="text-sm font-semibold text-[#33475b]">Edit field visit</h2>
+                <p className="text-xs text-[#516f90] mt-0.5">
+                  {editingVisit.leadName}
+                  {editingVisit.company ? ` · ${editingVisit.company}` : ''}
+                </p>
+              </div>
+              <button type="button" onClick={closeEdit} className="text-[#516f90] hover:text-[#33475b] text-lg leading-none">
+                ×
+              </button>
+            </div>
+            {editError ? (
+              <p className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2 mb-3">
+                {editError}
+              </p>
+            ) : null}
+            {editLoading ? (
+              <p className="text-sm text-[#516f90]">Loading visit…</p>
+            ) : editLead && editMeeting ? (
+              <FieldVisitRecordForm
+                lead={editLead}
+                meetings={editLead.crm?.meetings || []}
+                settings={settings}
+                busy={editSaving}
+                editMeeting={editMeeting}
+                onCancel={closeEdit}
+                onSubmit={saveEdit}
+              />
+            ) : null}
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }

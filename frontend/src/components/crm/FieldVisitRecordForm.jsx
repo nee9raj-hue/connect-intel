@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
+import { api } from '../../lib/api'
 import {
   TRAVEL_MODES,
   buildLeadDestinationLabel,
   computeTravelClaimAmount,
+  fieldVisitMeetingToFormState,
   formatInr,
 } from '../../lib/fieldVisitExpenses'
 import { fromDatetimeLocalValue, toDatetimeLocalValue } from '../../lib/crmUiConstants'
@@ -13,12 +15,20 @@ export default function FieldVisitRecordForm({
   settings,
   busy = false,
   onSubmit,
+  onCancel,
+  editMeeting = null,
 }) {
+  const isEdit = Boolean(editMeeting?.id)
   const destinationDefault = useMemo(() => buildLeadDestinationLabel(lead), [lead])
   const pendingVisits = useMemo(
     () => meetings.filter((m) => m.type === 'field_visit' && !m.visitRecordedAt),
     [meetings]
   )
+
+  const initial = useMemo(() => {
+    if (isEdit) return fieldVisitMeetingToFormState(editMeeting, settings)
+    return null
+  }, [isEdit, editMeeting, settings])
 
   const [visitMeetingId, setVisitMeetingId] = useState('')
   const [quickLog, setQuickLog] = useState(pendingVisits.length === 0)
@@ -31,21 +41,53 @@ export default function FieldVisitRecordForm({
   const [travelMode, setTravelMode] = useState('car')
   const [distanceKm, setDistanceKm] = useState('')
   const [cabAmount, setCabAmount] = useState('')
+  const [distanceSource, setDistanceSource] = useState('manual')
+  const [suggestedDistanceKm, setSuggestedDistanceKm] = useState(null)
+  const [distanceHint, setDistanceHint] = useState(null)
+  const [suggesting, setSuggesting] = useState(false)
+  const [suggestError, setSuggestError] = useState(null)
+  const [mapsConfigured, setMapsConfigured] = useState(true)
 
   useEffect(() => {
-    setEndLabel(destinationDefault)
-  }, [destinationDefault])
+    if (!isEdit) {
+      setEndLabel(destinationDefault)
+      return
+    }
+    setVisitMeetingId(initial.meetingId)
+    setVisitAt(toDatetimeLocalValue(initial.visitAt))
+    setVisitTitle(initial.title)
+    setVisitOutcome(initial.outcome)
+    setVisitNotes(initial.notes)
+    setStartLabel(initial.startLabel)
+    setEndLabel(initial.endLabel)
+    setTravelMode(initial.travelMode)
+    setDistanceKm(initial.distanceKm)
+    setCabAmount(initial.cabAmount)
+    setDistanceSource(initial.distanceSource)
+    setSuggestedDistanceKm(initial.suggestedDistanceKm)
+    setDistanceHint(null)
+    setSuggestError(null)
+  }, [isEdit, initial, destinationDefault])
 
   useEffect(() => {
+    if (isEdit) return
     setStartLabel(settings?.defaultStartLocation || '')
-  }, [settings?.defaultStartLocation])
+  }, [settings?.defaultStartLocation, isEdit])
 
   useEffect(() => {
+    if (isEdit) return
     if (pendingVisits.length === 1 && !visitMeetingId) {
       setVisitMeetingId(pendingVisits[0].id)
       setQuickLog(false)
     }
-  }, [pendingVisits, visitMeetingId])
+  }, [pendingVisits, visitMeetingId, isEdit])
+
+  useEffect(() => {
+    api
+      .getFieldVisitDistanceStatus()
+      .then((data) => setMapsConfigured(Boolean(data.configured)))
+      .catch(() => setMapsConfigured(false))
+  }, [])
 
   const claimPreview = useMemo(() => {
     const travel = {
@@ -56,11 +98,43 @@ export default function FieldVisitRecordForm({
     return computeTravelClaimAmount(travel, settings)
   }, [travelMode, distanceKm, cabAmount, settings])
 
+  const requestDistanceSuggest = async () => {
+    setSuggesting(true)
+    setSuggestError(null)
+    setDistanceHint(null)
+    try {
+      const data = await api.suggestFieldVisitDistance({
+        startLabel,
+        endLabel,
+        travelMode,
+      })
+      setSuggestedDistanceKm(data.distanceKm)
+      setDistanceHint({
+        km: data.distanceKm,
+        minutes: data.durationMinutes,
+        startResolved: data.startResolved,
+        endResolved: data.endResolved,
+      })
+    } catch (err) {
+      setSuggestError(err.message || 'Could not estimate distance')
+    } finally {
+      setSuggesting(false)
+    }
+  }
+
+  const acceptSuggestion = () => {
+    if (distanceHint?.km != null) {
+      setDistanceKm(String(distanceHint.km))
+      setDistanceSource('google')
+    }
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault()
     onSubmit?.({
-      meetingId: quickLog ? null : visitMeetingId || null,
-      quickLog,
+      action: isEdit ? 'update' : undefined,
+      meetingId: isEdit ? editMeeting.id : quickLog ? null : visitMeetingId || null,
+      quickLog: isEdit ? false : quickLog,
       visitAt: fromDatetimeLocalValue(visitAt),
       title: visitTitle.trim() || `Visit — ${lead?.company || 'Lead'}`,
       outcome: visitOutcome,
@@ -72,14 +146,23 @@ export default function FieldVisitRecordForm({
         mode: travelMode,
         distanceKm: Number(distanceKm) || 0,
         cabAmount: Number(cabAmount) || 0,
-        distanceSource: 'manual',
+        distanceSource,
+        suggestedDistanceKm: suggestedDistanceKm ?? distanceHint?.km ?? null,
       },
     })
   }
 
+  const showDistanceSuggest = travelMode === 'bike' || travelMode === 'car'
+
   return (
     <form onSubmit={handleSubmit} className="space-y-2 field-visit-record-form">
-      {pendingVisits.length > 0 ? (
+      {isEdit ? (
+        <p className="text-xs text-[#516f90] bg-[#f5f8fa] border border-[#dfe3eb] rounded-lg px-2.5 py-2">
+          Editing recorded visit — changes update your expense totals.
+        </p>
+      ) : null}
+
+      {!isEdit && pendingVisits.length > 0 ? (
         <label className="block">
           <span className="text-[10px] font-semibold uppercase text-gray-400">Scheduled visit</span>
           <select
@@ -116,7 +199,7 @@ export default function FieldVisitRecordForm({
         />
       </label>
 
-      {quickLog ? (
+      {!isEdit && quickLog ? (
         <input
           value={visitTitle}
           onChange={(e) => setVisitTitle(e.target.value)}
@@ -129,8 +212,11 @@ export default function FieldVisitRecordForm({
         <span className="text-[10px] font-semibold uppercase text-gray-400">Start location</span>
         <input
           value={startLabel}
-          onChange={(e) => setStartLabel(e.target.value)}
-          placeholder="Office / home / starting point"
+          onChange={(e) => {
+            setStartLabel(e.target.value)
+            setDistanceHint(null)
+          }}
+          placeholder="Office / home / pincode / area"
           className="mt-0.5 w-full text-xs border rounded-lg px-2.5 py-1.5"
         />
       </label>
@@ -139,8 +225,11 @@ export default function FieldVisitRecordForm({
         <span className="text-[10px] font-semibold uppercase text-gray-400">Destination</span>
         <input
           value={endLabel}
-          onChange={(e) => setEndLabel(e.target.value)}
-          placeholder="Customer address or area"
+          onChange={(e) => {
+            setEndLabel(e.target.value)
+            setDistanceHint(null)
+          }}
+          placeholder="Customer address, area, or pincode"
           className="mt-0.5 w-full text-xs border rounded-lg px-2.5 py-1.5"
         />
       </label>
@@ -159,6 +248,52 @@ export default function FieldVisitRecordForm({
           ))}
         </select>
       </label>
+
+      {showDistanceSuggest ? (
+        <div className="field-visit-distance-suggest">
+          <button
+            type="button"
+            disabled={suggesting || !startLabel.trim() || !endLabel.trim()}
+            onClick={requestDistanceSuggest}
+            className="crm-btn crm-btn-secondary w-full text-xs py-2"
+          >
+            {suggesting ? 'Calculating route…' : 'Get suggested distance'}
+          </button>
+          {!mapsConfigured ? (
+            <p className="text-[10px] text-[#7c98b6] mt-1 leading-relaxed">
+              Auto distance needs GOOGLE_MAPS_API_KEY on Vercel. You can still enter km manually.
+            </p>
+          ) : null}
+          {suggestError ? (
+            <p className="text-[10px] text-red-700 mt-1">{suggestError}</p>
+          ) : null}
+          {distanceHint ? (
+            <div className="mt-2 rounded-lg border border-[#cbd6e2] bg-[#f5f8fa] px-2.5 py-2 text-xs text-[#33475b]">
+              <p className="font-semibold">
+                Suggested: {distanceHint.km} km
+                {distanceHint.minutes ? ` · ~${distanceHint.minutes} min` : ''}
+              </p>
+              {distanceHint.startResolved && distanceHint.endResolved ? (
+                <p className="text-[#516f90] mt-1 leading-relaxed">
+                  {distanceHint.startResolved} → {distanceHint.endResolved}
+                </p>
+              ) : null}
+              <div className="flex gap-2 mt-2">
+                <button type="button" onClick={acceptSuggestion} className="crm-btn crm-btn-primary text-[10px] py-1 px-2">
+                  Use this distance
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDistanceHint(null)}
+                  className="text-[10px] font-semibold text-[#0091ae] hover:underline"
+                >
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
 
       {travelMode === 'cab' ? (
         <label className="block">
@@ -179,13 +314,17 @@ export default function FieldVisitRecordForm({
             {travelMode === 'bike'
               ? ` · ₹${settings?.bikeRatePerKm ?? 4}/km`
               : ` · ₹${settings?.carRatePerKm ?? 10}/km`}
+            {distanceSource === 'google' ? ' · from route estimate' : ''}
           </span>
           <input
             type="number"
             min="0"
             step="0.1"
             value={distanceKm}
-            onChange={(e) => setDistanceKm(e.target.value)}
+            onChange={(e) => {
+              setDistanceKm(e.target.value)
+              setDistanceSource('manual')
+            }}
             className="mt-0.5 w-full text-xs border rounded-lg px-2.5 py-1.5"
           />
         </label>
@@ -215,13 +354,20 @@ export default function FieldVisitRecordForm({
         className="w-full text-xs border rounded-lg px-2.5 py-1.5"
       />
 
-      <button
-        type="submit"
-        disabled={busy || (!quickLog && !visitMeetingId && pendingVisits.length > 0)}
-        className="w-full py-2 text-xs font-semibold border-2 border-[#FF773D] rounded-lg disabled:opacity-50"
-      >
-        {busy ? 'Saving…' : 'Save visit & travel claim'}
-      </button>
+      <div className="flex flex-col gap-2">
+        <button
+          type="submit"
+          disabled={busy || (!isEdit && !quickLog && !visitMeetingId && pendingVisits.length > 0)}
+          className="w-full py-2 text-xs font-semibold border-2 border-[#FF773D] rounded-lg disabled:opacity-50"
+        >
+          {busy ? 'Saving…' : isEdit ? 'Save changes' : 'Save visit & travel claim'}
+        </button>
+        {isEdit && onCancel ? (
+          <button type="button" onClick={onCancel} className="w-full py-2 text-xs font-semibold text-[#516f90]">
+            Cancel
+          </button>
+        ) : null}
+      </div>
     </form>
   )
 }

@@ -8933,3 +8933,22 @@ html[data-pipeline-mobile="1"] .ci-app-header-chip--secondary {
 .field-visit-record-form textarea {
   background: #fff;
 }
+
+.field-expenses-edit-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(33, 51, 71, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.field-expenses-edit-modal {
+  width: 100%;
+  max-width: 28rem;
+  max-height: min(90vh, 720px);
+  overflow-y: auto;
+  padding: 1rem;
+}
