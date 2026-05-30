@@ -8142,11 +8142,33 @@ details summary::-webkit-details-marker {
   min-height: 2.5rem;
 }
 
+.hs-pipeline-filter-sheet__body {
+  padding-top: 0.5rem;
+}
+
+.hs-pipeline-filter-sheet__list {
+  max-height: none;
+}
+
+.hs-pipeline-filter-sheet__list-wrap .hs-pipeline-filter-sheet__list {
+  max-height: min(70vh, 32rem);
+}
+
+.hs-pipeline-filter-sheet .hs-pipeline-filters-sheet__footer {
+  justify-content: flex-end;
+}
+
 @media (max-width: 767px) {
   .crm-toolbar--hubspot,
   .crm-toolbar--hubspot .hs-filter-bar-top,
   .crm-toolbar--hubspot .hs-filter-icon-strip {
     overflow: visible;
+  }
+
+  .crm-toolbar--hubspot .hs-filter-icon-strip {
+    max-width: min(100%, 100%);
+    flex: 1;
+    min-width: 0;
   }
 }
 

@@ -4,13 +4,14 @@ import { BRAND_UI_ICON_CLASS } from '../../lib/brandAssets'
  * Icon-only toolbar control with hover tooltip (desktop) and accessible label.
  */
 export default function FilterToolbarIcon({
-  src,
+  src = null,
   label,
   active = false,
   onClick,
   className = '',
   type = 'button',
   badge = false,
+  children = null,
   'aria-expanded': ariaExpanded,
 }) {
   const Tag = type === 'button' ? 'button' : 'div'
@@ -23,7 +24,9 @@ export default function FilterToolbarIcon({
       aria-expanded={ariaExpanded}
       data-tooltip={label}
     >
-      <img src={src} alt="" className={BRAND_UI_ICON_CLASS} draggable={false} aria-hidden />
+      {children || (
+        <img src={src} alt="" className={BRAND_UI_ICON_CLASS} draggable={false} aria-hidden />
+      )}
       {badge ? <span className="hs-filter-icon-btn__dot" aria-hidden /> : null}
     </Tag>
   )

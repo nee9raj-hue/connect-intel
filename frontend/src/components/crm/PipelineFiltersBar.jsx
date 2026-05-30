@@ -6,6 +6,7 @@ import {
   BRAND_ICON_ADVANCE_FILTER,
   BRAND_ICON_CITY,
   BRAND_ICON_CONTACT,
+  BRAND_ICON_FILTER,
   BRAND_ICON_LEAD_STATUS,
   BRAND_ICON_STATE,
 } from '../../lib/brandAssets'
@@ -13,13 +14,31 @@ import { CONTACT_FILTER_OPTIONS, DEFAULT_PIPELINE_FILTERS, getFilterCities, getF
 import FilterDropdown, { FilterChipButton } from './FilterDropdown'
 import LeadTag from '../ui/LeadTag'
 import FilterToolbarIcon from '../ui/FilterToolbarIcon'
-import PipelineMobileFiltersSheet from './PipelineMobileFiltersSheet'
+import PipelineMobileFilterSheet, { SearchableMultiList, SingleSelectList } from './PipelineMobileFilterSheet'
 import { SettingsIcon } from '../ui/icons'
 
 const SMART_TAG_OPTIONS = [
   { id: 'not_touched', label: 'Not touched' },
   { id: 'hot_score', label: 'Hot (Score 70+)' },
 ]
+
+const MOBILE_FILTER_TITLES = {
+  status: 'Lead status',
+  city: 'City',
+  state: 'State',
+  contact: 'Contact',
+  tags: 'Tags',
+  smart: 'Smart',
+  advanced: 'Advanced filters',
+}
+
+function SmartFilterIcon({ className = 'w-4 h-4 text-[#516f90]' }) {
+  return (
+    <svg className={className} viewBox="0 0 20 20" fill="currentColor" aria-hidden>
+      <path d="M9.813 1.667a.75.75 0 01.374 0l1.667.444a.75.75 0 01.556.556l.444 1.667a.75.75 0 01.374.556l1.444 1.111a.75.75 0 010 1.188l-1.444 1.111a.75.75 0 01-.374.556l-.444 1.667a.75.75 0 01-.556.556l-1.667.444a.75.75 0 01-.374 0l-1.667-.444a.75.75 0 01-.556-.556l-.444-1.667a.75.75 0 01-.374-.556L5.48 7.188a.75.75 0 010-1.188l1.444-1.111a.75.75 0 01.374-.556l.444-1.667a.75.75 0 01.556-.556l1.667-.444zM10 6.5a.5.5 0 100 1 .5.5 0 000-1z" />
+    </svg>
+  )
+}
 
 export default function PipelineFiltersBar({
   search,
@@ -95,22 +114,13 @@ export default function PipelineFiltersBar({
   }, [advancedOpen, closeAdvanced])
 
   useEffect(() => {
-    if (!advancedOpen || !isMobile) return undefined
+    if (!advancedOpen || !isMobile || useMobileFilterSheet) return undefined
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     return () => {
       document.body.style.overflow = prev
     }
-  }, [advancedOpen, isMobile])
-
-  useEffect(() => {
-    if (!mobileSheet || !useMobileFilterSheet) return undefined
-    const prev = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.body.style.overflow = prev
-    }
-  }, [mobileSheet, useMobileFilterSheet])
+  }, [advancedOpen, isMobile, useMobileFilterSheet])
 
   const handleApply = () => onApplyFilters?.()
 
@@ -133,43 +143,195 @@ export default function PipelineFiltersBar({
     (appliedFilters.smartTags?.length || 0) +
     (activeSmartViewId ? 1 : 0)
 
-  const mobileFiltersActiveCount =
-    (appliedFilters.tagIds?.length || 0) +
-    (appliedFilters.smartTags?.length || 0) +
-    getFilterCities(appliedFilters).length +
-    getFilterStates(appliedFilters).length +
-    (appliedFilters.contact && appliedFilters.contact !== 'any' ? 1 : 0) +
-    (!stageListMode && statusFilter !== 'all' ? 1 : 0) +
-    (activeSmartViewId ? 1 : 0)
-
-  const openMobileFilters = () => {
+  const openMobileFilter = (type) => {
     setMobileSheet({
+      type,
       draft: {
         filters: { ...filters },
         statusFilter,
+        smartViewId: activeSmartViewId || '',
       },
     })
   }
 
-  const closeMobileFilters = () => {
+  const closeMobileFilter = () => {
     setMobileSheet(null)
   }
 
-  const applyMobileFilters = () => {
+  const updateMobileDraftFilters = (patch) => {
+    setMobileSheet((prev) =>
+      prev
+        ? {
+            ...prev,
+            draft: {
+              ...prev.draft,
+              filters: { ...prev.draft.filters, ...patch },
+            },
+          }
+        : prev
+    )
+  }
+
+  const updateMobileDraftStatus = (statusId) => {
+    setMobileSheet((prev) =>
+      prev
+        ? {
+            ...prev,
+            draft: {
+              ...prev.draft,
+              statusFilter: statusId || 'all',
+            },
+          }
+        : prev
+    )
+  }
+
+  const updateMobileDraftSmartView = (viewId) => {
+    setMobileSheet((prev) =>
+      prev
+        ? {
+            ...prev,
+            draft: {
+              ...prev.draft,
+              smartViewId: viewId || '',
+            },
+          }
+        : prev
+    )
+  }
+
+  const applyMobileFilter = () => {
     if (!mobileSheet?.draft) return
-    onFiltersChange(mobileSheet.draft.filters)
-    onStatusFilterChange?.(mobileSheet.draft.statusFilter || 'all')
+    const { type, draft } = mobileSheet
+
+    switch (type) {
+      case 'status':
+        onStatusFilterChange?.(draft.statusFilter || 'all')
+        break
+      case 'city':
+        onFiltersChange({ ...filters, cities: draft.filters.cities || [] })
+        break
+      case 'state':
+        onFiltersChange({ ...filters, states: draft.filters.states || [] })
+        break
+      case 'contact':
+        onFiltersChange({ ...filters, contact: draft.filters.contact || 'any' })
+        break
+      case 'tags':
+        onFiltersChange({
+          ...filters,
+          tagIds: draft.filters.tagIds || [],
+          tagMode: draft.filters.tagMode || 'any',
+        })
+        break
+      case 'smart':
+        onFiltersChange({ ...filters, smartTags: draft.filters.smartTags || [] })
+        break
+      case 'advanced': {
+        const view = savedViews.find((v) => v.id === draft.smartViewId)
+        if (view) onApplySmartView?.(view)
+        break
+      }
+      default:
+        break
+    }
+
     handleApply()
-    closeMobileFilters()
+    closeMobileFilter()
   }
 
-  const clearMobileFilters = () => {
-    onClearFilters?.()
-    closeMobileFilters()
-  }
+  const mobileDraft = mobileSheet?.draft
 
-  const updateMobileDraft = (nextDraft) => {
-    setMobileSheet((prev) => (prev ? { ...prev, draft: nextDraft } : prev))
+  const renderMobileFilterContent = () => {
+    if (!mobileSheet || !mobileDraft) return null
+
+    switch (mobileSheet.type) {
+      case 'status':
+        return (
+          <SingleSelectList
+            statusStyle
+            options={stageOptions}
+            value={mobileDraft.statusFilter !== 'all' ? mobileDraft.statusFilter : ''}
+            emptyLabel="All statuses"
+            onChange={updateMobileDraftStatus}
+          />
+        )
+      case 'city':
+        return (
+          <SearchableMultiList
+            options={cityOptions}
+            values={mobileDraft.filters.cities || []}
+            onChange={(v) => updateMobileDraftFilters({ cities: v })}
+            placeholder="Search cities…"
+            emptyLabel="All cities"
+          />
+        )
+      case 'state':
+        return (
+          <SearchableMultiList
+            options={stateOptions}
+            values={mobileDraft.filters.states || []}
+            onChange={(v) => updateMobileDraftFilters({ states: v })}
+            placeholder="Search states…"
+            emptyLabel="All states"
+          />
+        )
+      case 'contact':
+        return (
+          <SingleSelectList
+            options={contactOptions}
+            value={mobileDraft.filters.contact !== 'any' ? mobileDraft.filters.contact : ''}
+            emptyLabel="All contacts"
+            onChange={(v) => updateMobileDraftFilters({ contact: v || 'any' })}
+          />
+        )
+      case 'tags':
+        return (
+          <>
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <p className="hs-advanced-filter-label mb-0">Match</p>
+              <select
+                value={mobileDraft.filters.tagMode || 'any'}
+                onChange={(e) => updateMobileDraftFilters({ tagMode: e.target.value })}
+                className="crm-select-sm crm-select-sm--hubspot"
+              >
+                <option value="any">Any tag</option>
+                <option value="all">All tags</option>
+              </select>
+            </div>
+            <SearchableMultiList
+              options={tagOptions}
+              values={mobileDraft.filters.tagIds || []}
+              onChange={(v) => updateMobileDraftFilters({ tagIds: v })}
+              placeholder="Search tags…"
+              emptyLabel="Any tag"
+            />
+          </>
+        )
+      case 'smart':
+        return (
+          <SearchableMultiList
+            options={smartOptions}
+            values={mobileDraft.filters.smartTags || []}
+            onChange={(v) => updateMobileDraftFilters({ smartTags: v })}
+            placeholder="Search…"
+            emptyLabel="Any"
+          />
+        )
+      case 'advanced':
+        return savedViews.length > 0 ? (
+          <SingleSelectList
+            options={savedViewOptions}
+            value={mobileDraft.smartViewId || ''}
+            emptyLabel="None"
+            onChange={updateMobileDraftSmartView}
+          />
+        ) : (
+          <p className="text-sm text-[#516f90]">No saved views yet.</p>
+        )
+      default:
+        return null
+    }
   }
 
   const activeStageLabel = statusOptions.find((s) => s.id === statusFilter)?.label
@@ -290,6 +452,150 @@ export default function PipelineFiltersBar({
     (!stageListMode && statusFilter !== 'all') ||
     (appliedFilters.contact && appliedFilters.contact !== 'any')
 
+  const mobileFilterIcons = (
+    <>
+      {!stageListMode && (
+        <FilterToolbarIcon
+          src={BRAND_ICON_LEAD_STATUS}
+          label="Lead status"
+          active={mobileSheet?.type === 'status' || statusFilter !== 'all'}
+          badge={statusFilter !== 'all'}
+          aria-expanded={mobileSheet?.type === 'status'}
+          onClick={() => openMobileFilter('status')}
+        />
+      )}
+
+      <FilterToolbarIcon
+        src={BRAND_ICON_CITY}
+        label="City"
+        active={mobileSheet?.type === 'city' || (filters.cities?.length || 0) > 0}
+        badge={(filters.cities?.length || 0) > 0}
+        aria-expanded={mobileSheet?.type === 'city'}
+        onClick={() => openMobileFilter('city')}
+      />
+
+      <FilterToolbarIcon
+        src={BRAND_ICON_STATE}
+        label="State"
+        active={mobileSheet?.type === 'state' || (filters.states?.length || 0) > 0}
+        badge={(filters.states?.length || 0) > 0}
+        aria-expanded={mobileSheet?.type === 'state'}
+        onClick={() => openMobileFilter('state')}
+      />
+
+      <FilterToolbarIcon
+        src={BRAND_ICON_CONTACT}
+        label="Contact"
+        active={mobileSheet?.type === 'contact' || (filters.contact && filters.contact !== 'any')}
+        badge={Boolean(filters.contact && filters.contact !== 'any')}
+        aria-expanded={mobileSheet?.type === 'contact'}
+        onClick={() => openMobileFilter('contact')}
+      />
+
+      {orgLeadTags.length > 0 && (
+        <FilterToolbarIcon
+          src={BRAND_ICON_FILTER}
+          label="Tags"
+          active={mobileSheet?.type === 'tags' || (filters.tagIds?.length || 0) > 0}
+          badge={(filters.tagIds?.length || 0) > 0}
+          aria-expanded={mobileSheet?.type === 'tags'}
+          onClick={() => openMobileFilter('tags')}
+        />
+      )}
+
+      <FilterToolbarIcon
+        label="Smart"
+        active={mobileSheet?.type === 'smart' || (filters.smartTags?.length || 0) > 0}
+        badge={(filters.smartTags?.length || 0) > 0}
+        aria-expanded={mobileSheet?.type === 'smart'}
+        onClick={() => openMobileFilter('smart')}
+      >
+        <SmartFilterIcon />
+      </FilterToolbarIcon>
+
+      <FilterToolbarIcon
+        src={BRAND_ICON_ADVANCE_FILTER}
+        label="Advanced filters"
+        active={mobileSheet?.type === 'advanced' || Boolean(activeSmartViewId)}
+        badge={Boolean(activeSmartViewId)}
+        aria-expanded={mobileSheet?.type === 'advanced'}
+        onClick={() => openMobileFilter('advanced')}
+      />
+    </>
+  )
+
+  const desktopFilterIcons = (
+    <>
+      {!stageListMode && (
+        <FilterDropdown
+          iconOnly
+          iconSrc={BRAND_ICON_LEAD_STATUS}
+          label="Lead status"
+          value={statusFilter !== 'all' ? statusFilter : ''}
+          displayValue={statusOptions.find((s) => s.id === statusFilter)?.label}
+          options={stageOptions}
+          onChange={(v) => onStatusFilterChange?.(v || 'all')}
+          emptyLabel="All statuses"
+        />
+      )}
+
+      <FilterDropdown
+        iconOnly
+        iconSrc={BRAND_ICON_CITY}
+        label="City"
+        multiSelect
+        values={filters.cities || []}
+        onMultiChange={(v) => set({ cities: v })}
+        options={cityOptions}
+        searchable
+        placeholder="Search cities…"
+        emptyLabel="All cities"
+      />
+
+      <FilterDropdown
+        iconOnly
+        iconSrc={BRAND_ICON_STATE}
+        label="State"
+        multiSelect
+        values={filters.states || []}
+        onMultiChange={(v) => set({ states: v })}
+        options={stateOptions}
+        searchable
+        placeholder="Search states…"
+        emptyLabel="All states"
+      />
+
+      <FilterDropdown
+        iconOnly
+        iconSrc={BRAND_ICON_CONTACT}
+        label="Contact"
+        value={filters.contact !== 'any' ? filters.contact : ''}
+        displayValue={CONTACT_FILTER_OPTIONS.find((o) => o.id === filters.contact)?.label}
+        options={contactOptions}
+        onChange={(v) => set({ contact: v || 'any' })}
+        emptyLabel="All contacts"
+      />
+
+      <div className="hs-advanced-filter-wrap hs-filter-icon-wrap" ref={advancedRef}>
+        <FilterToolbarIcon
+          src={BRAND_ICON_ADVANCE_FILTER}
+          label="Advanced filters"
+          active={advancedOpen || advancedActiveCount > 0}
+          badge={advancedActiveCount > 0}
+          aria-expanded={advancedOpen}
+          onClick={() => {
+            setAdvancedOpen((v) => {
+              if (!v) advancedOpenedAtRef.current = Date.now()
+              return !v
+            })
+          }}
+        />
+
+        {advancedOpen && advancedPanel}
+      </div>
+    </>
+  )
+
   return (
     <div className="crm-toolbar crm-toolbar--hubspot">
       <div className="hs-filter-bar-top">
@@ -318,113 +624,29 @@ export default function PipelineFiltersBar({
         </div>
 
         <div className="hs-filter-icon-strip" role="toolbar" aria-label="Lead filters">
-          {useMobileFilterSheet ? (
-            <FilterToolbarIcon
-              src={BRAND_ICON_ADVANCE_FILTER}
-              label="Filters"
-              active={Boolean(mobileSheet) || mobileFiltersActiveCount > 0}
-              badge={mobileFiltersActiveCount > 0}
-              aria-expanded={Boolean(mobileSheet)}
-              onClick={openMobileFilters}
-            />
-          ) : (
-            <>
-              {!stageListMode && (
-                <FilterDropdown
-                  iconOnly
-                  iconSrc={BRAND_ICON_LEAD_STATUS}
-                  label="Lead status"
-                  value={statusFilter !== 'all' ? statusFilter : ''}
-                  displayValue={statusOptions.find((s) => s.id === statusFilter)?.label}
-                  options={stageOptions}
-                  onChange={(v) => onStatusFilterChange?.(v || 'all')}
-                  emptyLabel="All statuses"
-                />
-              )}
-
-              <FilterDropdown
-                iconOnly
-                iconSrc={BRAND_ICON_CITY}
-                label="City"
-                multiSelect
-                values={filters.cities || []}
-                onMultiChange={(v) => set({ cities: v })}
-                options={cityOptions}
-                searchable
-                placeholder="Search cities…"
-                emptyLabel="All cities"
-              />
-
-              <FilterDropdown
-                iconOnly
-                iconSrc={BRAND_ICON_STATE}
-                label="State"
-                multiSelect
-                values={filters.states || []}
-                onMultiChange={(v) => set({ states: v })}
-                options={stateOptions}
-                searchable
-                placeholder="Search states…"
-                emptyLabel="All states"
-              />
-
-              <FilterDropdown
-                iconOnly
-                iconSrc={BRAND_ICON_CONTACT}
-                label="Contact"
-                value={filters.contact !== 'any' ? filters.contact : ''}
-                displayValue={CONTACT_FILTER_OPTIONS.find((o) => o.id === filters.contact)?.label}
-                options={contactOptions}
-                onChange={(v) => set({ contact: v || 'any' })}
-                emptyLabel="All contacts"
-              />
-
-              <div className="hs-advanced-filter-wrap hs-filter-icon-wrap" ref={advancedRef}>
-                <FilterToolbarIcon
-                  src={BRAND_ICON_ADVANCE_FILTER}
-                  label="Advanced filters"
-                  active={advancedOpen || advancedActiveCount > 0}
-                  badge={advancedActiveCount > 0}
-                  aria-expanded={advancedOpen}
-                  onClick={() => {
-                    setAdvancedOpen((v) => {
-                      if (!v) advancedOpenedAtRef.current = Date.now()
-                      return !v
-                    })
-                  }}
-                />
-
-                {advancedOpen && advancedPanel}
-              </div>
-            </>
-          )}
+          {useMobileFilterSheet ? mobileFilterIcons : desktopFilterIcons}
         </div>
 
-        <PipelineMobileFiltersSheet
-          sheet={useMobileFilterSheet ? mobileSheet : null}
-          onClose={closeMobileFilters}
-          onApply={applyMobileFilters}
-          onClear={clearMobileFilters}
-          onDraftChange={updateMobileDraft}
-          stageListMode={stageListMode}
-          statusOptions={statusOptions}
-          cities={cities}
-          states={states}
-          orgLeadTags={orgLeadTags}
-          savedViews={savedViews}
-          onApplySmartView={onApplySmartView}
-          activeSmartViewId={activeSmartViewId}
-          smartOptions={smartOptions}
-        />
-
-        <button
-          type="button"
-          onClick={handleApply}
-          disabled={applying}
-          className={`crm-filter-action-btn shrink-0 ${filtersDirty ? 'is-primary' : ''}`}
+        <PipelineMobileFilterSheet
+          open={Boolean(useMobileFilterSheet && mobileSheet)}
+          title={mobileSheet ? MOBILE_FILTER_TITLES[mobileSheet.type] || 'Filter' : 'Filter'}
+          onClose={closeMobileFilter}
+          onSave={applyMobileFilter}
+          saveLabel="Apply"
         >
-          {applying ? '…' : 'Search'}
-        </button>
+          {renderMobileFilterContent()}
+        </PipelineMobileFilterSheet>
+
+        {!useMobileFilterSheet && (
+          <button
+            type="button"
+            onClick={handleApply}
+            disabled={applying}
+            className={`crm-filter-action-btn shrink-0 ${filtersDirty ? 'is-primary' : ''}`}
+          >
+            {applying ? '…' : 'Search'}
+          </button>
+        )}
 
         <span className="hs-filter-bar-spacer hidden sm:block" aria-hidden />
 
