@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-05-30T12:12:07.489Z",
-  "updatedAtIst": "30/05/2026, 17:42:07",
+  "updatedAt": "2026-05-30T12:18:55.821Z",
+  "updatedAtIst": "30/05/2026, 17:48:55",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "d05ae11",
+  "currentProductionCommit": "8e8b79f",
   "entries": [
+    {
+      "logId": "20260530-1748-8e8b79f",
+      "commit": "8e8b79f",
+      "commitFull": "8e8b79f392659ef4e332771f441af045144fdbd2",
+      "message": "Compact mobile pipeline header and HubSpot filter sheets.",
+      "deployedAt": "2026-05-30T12:18:41.237Z",
+      "deployedAtIst": "30/05/2026, 17:48:41",
+      "committedAtIst": "30/05/2026, 17:48:09",
+      "vercelPreviewUrl": "https://connect-intel-8ut8osdgc-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 8e8b79f"
+    },
+    {
+      "logId": "20260530-1742-6e53d5b",
+      "commit": "6e53d5b",
+      "commitFull": "6e53d5bcd795a7fd87d90a6c3616451b17d738b1",
+      "message": "Update production log after per-icon mobile filter popups deploy.",
+      "deployedAt": "2026-05-30T12:12:38.575Z",
+      "deployedAtIst": "30/05/2026, 17:42:38",
+      "committedAtIst": "30/05/2026, 17:42:09",
+      "vercelPreviewUrl": "https://connect-intel-qpnboa89l-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 6e53d5b"
+    },
     {
       "logId": "20260530-1741-d05ae11",
       "commit": "d05ae11",
@@ -15,7 +43,7 @@
       "committedAtIst": "30/05/2026, 17:41:22",
       "vercelPreviewUrl": "https://connect-intel-pm93hvm53-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- d05ae11"
     },
@@ -214,20 +242,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 5751735"
-    },
-    {
-      "logId": "20260530-1423-265ed58",
-      "commit": "265ed58",
-      "commitFull": "265ed589485ce25fa27266622d4fef69761f7ef6",
-      "message": "Restore morning pipeline UI and keep VAPID; bust icon cache.",
-      "deployedAt": "2026-05-30T08:53:40.523Z",
-      "deployedAtIst": "30/05/2026, 14:23:40",
-      "committedAtIst": "30/05/2026, 14:22:40",
-      "vercelPreviewUrl": "https://connect-intel-96g4d04m3-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 265ed58"
     }
   ]
 }

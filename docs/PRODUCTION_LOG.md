@@ -35,8 +35,8 @@ npm run prod:rollback -- 1e99102
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `d05ae11` |
-| Log updated (IST) | 30/05/2026, 17:42:07 |
+| Commit | `8e8b79f` |
+| Log updated (IST) | 30/05/2026, 17:48:55 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 1e99102
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 30/05/2026, 17:41:54 | `d05ae11` | Add per-icon full-screen filter popups on mobile and PWA. | [preview](https://connect-intel-pm93hvm53-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d05ae11` | **← LIVE**
+| 30/05/2026, 17:48:41 | `8e8b79f` | Compact mobile pipeline header and HubSpot filter sheets. | [preview](https://connect-intel-8ut8osdgc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8e8b79f` | **← LIVE**
+| 30/05/2026, 17:42:38 | `6e53d5b` | Update production log after per-icon mobile filter popups deploy. | [preview](https://connect-intel-qpnboa89l-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6e53d5b` |
+| 30/05/2026, 17:41:54 | `d05ae11` | Add per-icon full-screen filter popups on mobile and PWA. | [preview](https://connect-intel-pm93hvm53-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d05ae11` |
 | 30/05/2026, 17:35:33 | `359ed5b` | Update production log after mobile/PWA leads fixes deploy. | [preview](https://connect-intel-39i8jbqe7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 359ed5b` |
 | 30/05/2026, 17:34:41 | `760df41` | Fix mobile leads call icon placement and PWA filter sheet. | [preview](https://connect-intel-dgy6ilxrp-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 760df41` |
 | 30/05/2026, 17:27:18 | `08b9487` | Update production log after mobile pipeline filters deploy. | [preview](https://connect-intel-iejkg3y45-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 08b9487` |
@@ -60,7 +62,6 @@ npm run prod:rollback -- 1e99102
 | 30/05/2026, 14:59:55 | `320116e` | Add VAPID web push support on top of dc93f77 baseline. | [preview](https://connect-intel-qgtt56hyy-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 320116e` |
 | 30/05/2026, 14:44:11 | `09320cc` | Restore pre-platform-prompt UI from ff2f4f7 plus recovered editor history. | [preview](https://connect-intel-1v2gid8el-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 09320cc` |
 | 30/05/2026, 14:34:23 | `5751735` | Restore yesterday UI from editor history after accidental file loss. | [preview](https://connect-intel-gyt4896bp-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5751735` |
-| 30/05/2026, 14:23:40 | `265ed58` | Restore morning pipeline UI and keep VAPID; bust icon cache. | [preview](https://connect-intel-96g4d04m3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 265ed58` |
 
 ---
 
