@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-05-30T14:32:36.714Z",
-  "updatedAtIst": "30/05/2026, 20:02:36",
+  "updatedAt": "2026-05-30T14:35:11.775Z",
+  "updatedAtIst": "30/05/2026, 20:05:11",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "63f2652",
+  "currentProductionCommit": "dc32d9d",
   "entries": [
+    {
+      "logId": "20260530-2004-dc32d9d",
+      "commit": "dc32d9d",
+      "commitFull": "dc32d9df774c0a9e61afaa0fa3d6a6a341c5e848",
+      "message": "Align left sidebar typography with HubSpot premium font scale.",
+      "deployedAt": "2026-05-30T14:34:55.984Z",
+      "deployedAtIst": "30/05/2026, 20:04:55",
+      "committedAtIst": "30/05/2026, 20:04:29",
+      "vercelPreviewUrl": "https://connect-intel-otwxwoq9e-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- dc32d9d"
+    },
+    {
+      "logId": "20260530-2003-3ce8b0f",
+      "commit": "3ce8b0f",
+      "commitFull": "3ce8b0f35465cf0ae92734343f206e40abcdb736",
+      "message": "Update production log after mobile bottom nav deploy.",
+      "deployedAt": "2026-05-30T14:33:07.711Z",
+      "deployedAtIst": "30/05/2026, 20:03:07",
+      "committedAtIst": "30/05/2026, 20:02:39",
+      "vercelPreviewUrl": "https://connect-intel-jvdea68nr-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 3ce8b0f"
+    },
     {
       "logId": "20260530-2002-63f2652",
       "commit": "63f2652",
@@ -15,7 +43,7 @@
       "committedAtIst": "30/05/2026, 20:01:53",
       "vercelPreviewUrl": "https://connect-intel-5p4jbtuxh-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 63f2652"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- ba8fedc"
-    },
-    {
-      "logId": "20260530-1833-86758c3",
-      "commit": "86758c3",
-      "commitFull": "86758c3672c7c09d4fa6c84458b3ed04206f5319",
-      "message": "Restore horizontal scroll for mobile pipeline leads table.",
-      "deployedAt": "2026-05-30T13:03:44.761Z",
-      "deployedAtIst": "30/05/2026, 18:33:44",
-      "committedAtIst": "30/05/2026, 18:33:13",
-      "vercelPreviewUrl": "https://connect-intel-463sqkpgy-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 86758c3"
-    },
-    {
-      "logId": "20260530-1830-f04bee4",
-      "commit": "f04bee4",
-      "commitFull": "f04bee4f3838df51abe06828e3130784f5876f4a",
-      "message": "Update production log after mobile filter modal and icon sizing deploy.",
-      "deployedAt": "2026-05-30T13:00:45.095Z",
-      "deployedAtIst": "30/05/2026, 18:30:45",
-      "committedAtIst": "30/05/2026, 18:30:16",
-      "vercelPreviewUrl": "https://connect-intel-ju04325y5-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- f04bee4"
     }
   ]
 }
