@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { formatCrmDate, getStatusMeta } from '../../lib/crmConstants'
 import { formatDateTime } from '../../lib/crmUiConstants'
 import { getLeadCity, getLeadState } from '../../lib/pipelineFilters'
+import { hasActiveTextSelection } from '../../lib/keyboardShortcuts'
 import { leadHasSendableEmail } from '../../lib/emailUtils'
 import LeadTagDots from './LeadTagDots'
 import LeadPhoneCall from './LeadPhoneCall'
@@ -248,16 +249,28 @@ export default function PipelineLeadsTable({
                   />
                 </td>
                 <td className="pipeline-hs-td">
-                  <button
-                    type="button"
-                    className="pipeline-hs-name-btn"
-                    onClick={() => onSelect(lead.id)}
-                  >
+                  <div className="pipeline-hs-name-cell">
                     <span className="pipeline-hs-avatar" aria-hidden>
                       {(lead.firstName?.[0] || lead.company?.[0] || '?').toUpperCase()}
                     </span>
-                    <span className="pipeline-hs-primary-text">{displayName(lead)}</span>
-                  </button>
+                    <span
+                      role="button"
+                      tabIndex={0}
+                      className="pipeline-hs-primary-text ci-selectable-text pipeline-hs-name-link"
+                      onClick={() => {
+                        if (hasActiveTextSelection()) return
+                        onSelect(lead.id)
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault()
+                          onSelect(lead.id)
+                        }
+                      }}
+                    >
+                      {displayName(lead)}
+                    </span>
+                  </div>
                   {loc && <span className="pipeline-hs-sub">{loc}</span>}
                   <LeadTagDots lead={lead} tagById={tagById} className="pipeline-hs-tags" max={6} />
                 </td>
@@ -326,16 +339,28 @@ export default function PipelineLeadsTable({
                 </td>
                 <td className="pipeline-hs-td pipeline-hs-td--company">
                   {lead.company ? (
-                    <button
-                      type="button"
-                      className="pipeline-hs-company-btn"
-                      onClick={() => onSelect(lead.id)}
-                    >
+                    <div className="pipeline-hs-name-cell">
                       <span className="pipeline-hs-avatar pipeline-hs-avatar--co" aria-hidden>
                         {lead.company[0]?.toUpperCase() || 'C'}
                       </span>
-                      <span className="pipeline-hs-primary-text">{lead.company}</span>
-                    </button>
+                      <span
+                        role="button"
+                        tabIndex={0}
+                        className="pipeline-hs-primary-text ci-selectable-text pipeline-hs-name-link"
+                        onClick={() => {
+                          if (hasActiveTextSelection()) return
+                          onSelect(lead.id)
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault()
+                            onSelect(lead.id)
+                          }
+                        }}
+                      >
+                        {lead.company}
+                      </span>
+                    </div>
                   ) : (
                     <span className="pipeline-hs-muted">--</span>
                   )}

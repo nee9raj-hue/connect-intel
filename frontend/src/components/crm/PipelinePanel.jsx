@@ -33,7 +33,7 @@ import LeadPhoneCall from './LeadPhoneCall'
 import { leadHasSendableEmail } from '../../lib/emailUtils'
 import { getLeadCity, getLeadState } from '../../lib/pipelineFilters'
 
-import useIsMobile from '../../hooks/useIsMobile'
+import { hasActiveTextSelection } from '../../lib/keyboardShortcuts'
 import usePipelineFilterMobile from '../../hooks/usePipelineFilterMobile'
 
 export default function PipelinePanel({ onNavigate, panelOptions }) {
@@ -1041,14 +1041,17 @@ function KanbanColumn({
                 />
                 <button
                   type="button"
-                  onClick={() => onSelect(lead.id)}
+                  onClick={() => {
+                    if (hasActiveTextSelection()) return
+                    onSelect(lead.id)
+                  }}
                   className="flex-1 min-w-0 text-left"
                 >
                   <div className="flex items-center gap-1.5 min-w-0">
                     <span className="pipeline-hs-avatar pipeline-hs-avatar--sm shrink-0" aria-hidden>
                       {(lead.firstName?.[0] || lead.company?.[0] || '?').toUpperCase()}
                     </span>
-                    <span className="text-[11px] font-medium text-[#33475b] truncate leading-tight">
+                    <span className="text-[11px] font-medium text-[#33475b] truncate leading-tight ci-selectable-text">
                       {primaryLabel}
                     </span>
                   </div>

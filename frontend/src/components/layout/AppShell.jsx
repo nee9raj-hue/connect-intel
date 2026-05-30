@@ -27,6 +27,7 @@ import NotificationBell from './NotificationBell'
 import useIsMobile from '../../hooks/useIsMobile'
 import useMobileNavGenie from '../../hooks/useMobileNavGenie'
 import useChithiAlerts from '../../hooks/useChithiAlerts'
+import useAppKeyboardShortcuts from '../../hooks/useAppKeyboardShortcuts'
 import PwaInstallBanner from './PwaInstallBanner'
 import ChithiPushBanner from './ChithiPushBanner'
 import { MenuIcon } from '../ui/icons'
@@ -77,6 +78,11 @@ export default function AppShell() {
     activePanel,
     chithiUnread,
     refreshChithiUnread,
+  })
+
+  useAppKeyboardShortcuts({
+    enabled: Boolean(user && !needsOnboarding),
+    activePanel,
   })
 
   useWorkspaceSync({

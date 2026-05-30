@@ -52,7 +52,6 @@ export default function LeadPhoneCall({
     <span
       className={`lead-phone-call ${iconOnly ? 'lead-phone-call--icon-only' : ''} ${className}`.trim()}
       onClick={(e) => e.stopPropagation()}
-      onKeyDown={(e) => e.stopPropagation()}
     >
       {showNumber && !iconOnly ? (
         <span className={`lead-phone-call__number ${numberClassName}`.trim()} title={display}>

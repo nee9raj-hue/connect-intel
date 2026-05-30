@@ -2,6 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import { createPortal } from 'react-dom'
 import useIsMobile from '../../hooks/useIsMobile'
 import useMarketingBuilderHistory from '../../hooks/useMarketingBuilderHistory'
+import { isEditableTarget, isModKey } from '../../lib/keyboardShortcuts'
 import MarketingCreatorBadge from './MarketingCreatorBadge'
 import {
   BLOCK_LABELS,
@@ -338,16 +339,28 @@ export default function MarketingTemplateBuilder({
   useEffect(() => {
     if (!isImmersive) return undefined
     const onKey = (e) => {
-      if (e.key !== 'Escape') return
-      if (previewOpen) {
-        setPreviewOpen(false)
+      if (e.key === 'Escape') {
+        if (previewOpen) {
+          setPreviewOpen(false)
+          return
+        }
+        if (studioPanel) setStudioPanel(null)
         return
       }
-      if (studioPanel) setStudioPanel(null)
+
+      if (!isModKey(e) || isEditableTarget(e.target)) return
+      const key = e.key.toLowerCase()
+      if (key === 'z' && !e.shiftKey) {
+        e.preventDefault()
+        undo()
+      } else if ((key === 'z' && e.shiftKey) || key === 'y') {
+        e.preventDefault()
+        redo()
+      }
     }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
-  }, [isImmersive, previewOpen, studioPanel])
+  }, [isImmersive, previewOpen, studioPanel, undo, redo])
 
   const moveBlockCompact = (index, dir) => {
     const next = index + dir

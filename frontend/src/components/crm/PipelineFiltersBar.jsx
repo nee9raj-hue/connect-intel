@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import useIsMobile from '../../hooks/useIsMobile'
 import usePipelineFilterMobile from '../../hooks/usePipelineFilterMobile'
+import { PIPELINE_SEARCH_ID } from '../../hooks/useAppKeyboardShortcuts'
 import { api } from '../../lib/api'
 import {
   BRAND_ICON_ADVANCE_FILTER,
@@ -584,6 +585,7 @@ export default function PipelineFiltersBar({
             />
           </svg>
           <input
+            id={PIPELINE_SEARCH_ID}
             type="search"
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}

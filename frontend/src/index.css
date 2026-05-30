@@ -49,6 +49,47 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Native text selection + copy/paste in CRM tables and form fields */
+.ci-selectable-text,
+.pipeline-hs-cell-text,
+.pipeline-hs-sub,
+.pipeline-hs-last-email-text,
+.pipeline-hs-notes {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.ci-app-main input:not([type='checkbox']):not([type='radio']):not([type='button']):not([type='submit']):not([type='reset']),
+.ci-app-main textarea,
+.ci-app-main select,
+.ci-app-main [contenteditable='true'],
+.rich-text-editor {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.pipeline-hs-name-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  max-width: 100%;
+}
+
+.pipeline-hs-name-link {
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  max-width: 100%;
+}
+
+.pipeline-hs-name-link:hover {
+  color: #1e2f3d;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 /* Brand logos — PNG with transparency; do not add fill/background behind icon */
 .ci-brand-logo-icon {
   display: block;
