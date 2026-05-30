@@ -24,6 +24,7 @@ import {
   countActiveFilters,
   getFilterCities,
   getFilterStates,
+  leadMatchesAssignee,
   normalizeLocationKey,
 } from '../../lib/pipelineFilters'
 import { tagMapById } from '../../lib/orgLeadTags'
@@ -106,13 +107,13 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
 
   const assigneeName = useMemo(() => {
     if (!pipelineAssigneeFilter) return null
-    const m = teamMembers.find((t) => t.userId === pipelineAssigneeFilter)
+    const m = teamMembers.find((t) => String(t.userId) === String(pipelineAssigneeFilter))
     return m?.name || 'Team member'
   }, [pipelineAssigneeFilter, teamMembers])
 
   const scopedLeads = useMemo(() => {
     if (!pipelineAssigneeFilter) return savedLeads
-    return savedLeads.filter((l) => (l.assignedToUserId || l.savedByUserId) === pipelineAssigneeFilter)
+    return savedLeads.filter((l) => leadMatchesAssignee(l, pipelineAssigneeFilter))
   }, [savedLeads, pipelineAssigneeFilter])
 
   const locationOptions = useMemo(() => {
@@ -227,6 +228,19 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     [buildServerFilters, appliedAdvanced, appliedSearch]
   )
 
+  const hasActiveServerFilters = useMemo(
+    () =>
+      Boolean(
+        serverFilters.assigneeUserId ||
+          serverFilters.status ||
+          serverFilters.q ||
+          serverFilters.cities?.length ||
+          serverFilters.states?.length ||
+          serverFilters.tagIds?.length
+      ),
+    [serverFilters]
+  )
+
   const applyFilters = useCallback(() => {
     setAppliedSearch(search.trim())
     setAppliedAdvanced({ ...advancedFilters })
@@ -256,19 +270,24 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   useEffect(() => {
     if (!serverSidePipeline) return undefined
     const key = JSON.stringify(serverFilters)
-    if (!pipelineFiltersBootRef.current) {
-      pipelineFiltersBootRef.current = true
+    if (lastServerFiltersRef.current === key) return undefined
+
+    const isInitialMount = !pipelineFiltersBootRef.current
+    pipelineFiltersBootRef.current = true
+
+    // Workspace bootstrap loads unfiltered leads; only skip the first fetch when no filters apply.
+    if (isInitialMount && !hasActiveServerFilters) {
       lastServerFiltersRef.current = key
       return undefined
     }
-    if (lastServerFiltersRef.current === key) return undefined
+
     lastServerFiltersRef.current = key
     setBoardColumnLimits({})
     setFilterApplying(true)
     loadPipelineList(serverFilters, { append: false, silent: false })
       .catch(() => {})
       .finally(() => setFilterApplying(false))
-  }, [serverSidePipeline, serverFilters, loadPipelineList])
+  }, [serverSidePipeline, serverFilters, loadPipelineList, hasActiveServerFilters])
 
   useEffect(() => {
     if (!serverSidePipeline || view !== 'board' || stageListMode) {
@@ -296,7 +315,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   }, [serverSidePipeline, view, stageListMode, serverFilters, boardColumnLimits])
 
   const filtered = useMemo(() => {
-    const base = serverSidePipeline ? savedLeads : scopedLeads
+    const base =
+      serverSidePipeline && pipelineAssigneeFilter ? scopedLeads : serverSidePipeline ? savedLeads : scopedLeads
     return applyPipelineFilters(base, {
       status: serverSidePipeline ? 'all' : pipelineStatusFilter,
       cities: serverSidePipeline ? [] : getFilterCities(appliedAdvanced),
@@ -316,6 +336,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     smartViewFilters,
     serverSidePipeline,
     savedLeads,
+    pipelineAssigneeFilter,
   ])
 
   const applySmartView = useCallback((view) => {
@@ -601,6 +622,13 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                   <>
                     <span className="sr-only">Pipeline — </span>
                     Viewing <strong>{assigneeName}</strong>
+                    {pipelineLoad.total > 0 && (
+                      <>
+                        {' · '}
+                        {(pipelineLoad.total || filtered.length).toLocaleString()} leads
+                        {hasMoreLeads && ` · ${pipelineLoad.loaded.toLocaleString()} loaded`}
+                      </>
+                    )}
                     {' · '}
                     <button
                       type="button"

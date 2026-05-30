@@ -36,6 +36,15 @@ export function getFilterStates(filters) {
   return normalizeLocationFilterList(filters, 'states', 'state')
 }
 
+/** Match lead owner/assignee to a team member id (string-safe). */
+export function leadMatchesAssignee(lead, assigneeUserId) {
+  if (!assigneeUserId) return true
+  const id = String(assigneeUserId)
+  return [lead?.assignedToUserId, lead?.savedByUserId, lead?.userId]
+    .filter(Boolean)
+    .some((v) => String(v) === id)
+}
+
 function matchesAnyLocationField(value, filterList) {
   const list = Array.isArray(filterList) ? filterList.filter(Boolean) : []
   if (!list.length) return true
