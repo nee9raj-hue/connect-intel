@@ -886,7 +886,7 @@ export default function LeadWorkspace({
               <section>
                 <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Transfer / assign lead</h3>
                 <select
-                  value={lead.assignedToUserId || ''}
+                  value={String(lead.assignedToUserId || '')}
                   onChange={async (e) => {
                     setError(null)
                     try {
@@ -902,7 +902,7 @@ export default function LeadWorkspace({
                 >
                   <option value="">Unassigned</option>
                   {teamMembers.map((m) => (
-                    <option key={m.userId} value={m.userId}>
+                    <option key={m.userId} value={String(m.userId)}>
                       {m.name}
                     </option>
                   ))}

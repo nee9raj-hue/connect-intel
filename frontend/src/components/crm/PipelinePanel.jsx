@@ -179,7 +179,15 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       api
         .getPipelineLead(pipelineLeadId, { silent: true })
         .then((data) => {
-          if (!cancelled && data?.lead) setWorkspaceLead(data.lead)
+          if (!cancelled && data?.lead) {
+            setWorkspaceLead((prev) => ({
+              ...data.lead,
+              assignedToUserId:
+                data.lead.assignedToUserId ?? prev?.assignedToUserId ?? listLead?.assignedToUserId ?? null,
+              savedByUserId:
+                data.lead.savedByUserId ?? prev?.savedByUserId ?? listLead?.savedByUserId ?? null,
+            }))
+          }
         })
         .catch(() => {})
       return () => {
