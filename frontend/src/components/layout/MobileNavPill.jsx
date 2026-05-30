@@ -19,6 +19,7 @@ import {
   SparkIcon,
   TaskIcon,
   WhatsAppIcon,
+  SettingsGearIcon,
 } from '../ui/icons'
 
 const ICONS = {
@@ -31,6 +32,7 @@ const ICONS = {
   calendar: CalendarIcon,
   chithi: ChithiMenuIcon,
   task: TaskIcon,
+  settings: SettingsGearIcon,
   more: MoreHorizontalIcon,
 }
 

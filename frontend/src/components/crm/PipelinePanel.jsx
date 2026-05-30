@@ -3,8 +3,7 @@ import { createPortal } from 'react-dom'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { formatCrmDate, getStatusMeta, getVisiblePipelineColumns } from '../../lib/crmConstants'
-import { BRAND_ICON_PIPELINE } from '../../lib/brandAssets'
-import { PlusIcon, UploadIcon } from '../ui/icons'
+import { PipelineIcon, PlusIcon, UploadIcon } from '../ui/icons'
 import LeadWorkspace from './LeadWorkspace'
 import PipelineImportModal from './PipelineImportModal'
 import BulkEmailModal from './BulkEmailModal'
@@ -609,15 +608,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
           {!useCompactPipelineChrome ? (
           <div className="crm-page-header-top pipeline-page-header-top">
             <div className="pipeline-page-heading min-w-0">
-              <img
-                src={BRAND_ICON_PIPELINE}
-                alt=""
-                className="pipeline-page-icon ci-ui-icon"
-                width={24}
-                height={24}
-                draggable={false}
-                aria-hidden
-              />
+              <PipelineIcon className="pipeline-page-icon w-6 h-6 shrink-0 text-[#516f90]" aria-hidden />
               <p className="pipeline-page-stats">
                 {assigneeName ? (
                   <>

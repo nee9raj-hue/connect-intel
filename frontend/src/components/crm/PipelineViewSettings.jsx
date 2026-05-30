@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { SettingsIcon } from '../ui/icons'
+import { SettingsGearIcon } from '../ui/icons'
 import { createPortal } from 'react-dom'
 
 export default function PipelineViewSettings({
@@ -37,7 +37,7 @@ export default function PipelineViewSettings({
       <aside className="hs-view-settings" aria-label="View settings">
         <header className="hs-view-settings__header">
           <h2 className="hs-view-settings__title">
-            <SettingsIcon className="hs-view-settings__title-icon" size={18} />
+            <SettingsGearIcon className="hs-view-settings__title-icon w-[18px] h-[18px]" />
             View settings
           </h2>
           <button type="button" className="hs-view-settings__close" onClick={onClose} aria-label="Close">

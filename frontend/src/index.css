@@ -5668,6 +5668,54 @@ details summary::-webkit-details-marker {
   box-shadow: inset 0 0 0 1px rgba(0, 145, 174, 0.15);
 }
 
+.hs-filter-icon-btn__svg {
+  width: 0.875rem;
+  height: 0.875rem;
+  color: #516f90;
+}
+
+.hs-filter-icon-btn.is-active .hs-filter-icon-btn__svg {
+  color: #0091ae;
+}
+
+.hs-filter-icon-btn--labeled {
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.15rem;
+  width: auto;
+  min-width: clamp(2.5rem, 14vw, 3rem);
+  height: auto;
+  min-height: clamp(2.5rem, 12vw, 2.875rem);
+  padding: 0.25rem 0.15rem 0.2rem;
+}
+
+.hs-filter-icon-btn--labeled .hs-filter-icon-btn__svg {
+  width: clamp(0.875rem, 4vw, 1rem);
+  height: clamp(0.875rem, 4vw, 1rem);
+}
+
+.hs-filter-icon-btn__label {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: clamp(0.5rem, 2.2vw, 0.625rem);
+  font-weight: 600;
+  line-height: 1.1;
+  color: #516f90;
+}
+
+.hs-filter-icon-btn--labeled.is-active .hs-filter-icon-btn__label {
+  color: #0091ae;
+}
+
+.hs-filter-gear-btn .hs-filter-icon-btn__svg,
+.hs-filter-gear-btn svg {
+  width: 1rem;
+  height: 1rem;
+  color: #516f90;
+}
+
 .hs-filter-icon-btn__dot {
   position: absolute;
   top: 0.2rem;
@@ -7667,6 +7715,25 @@ details summary::-webkit-details-marker {
     display: none;
   }
 
+  .pipeline-page-actions .ci-mobile-icon-btn .ci-mobile-btn-text,
+  .ci-pipeline-mobile-header__btn .ci-mobile-btn-text {
+    display: inline;
+    font-size: 0.625rem;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .pipeline-page-actions .ci-mobile-icon-btn,
+  .ci-pipeline-mobile-header__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    min-width: auto !important;
+    width: auto;
+    padding: 0.35rem 0.5rem !important;
+  }
+
   .ci-mobile-icon-btn .ci-mobile-btn-icon {
     display: block;
   }
@@ -8476,10 +8543,26 @@ details summary::-webkit-details-marker {
 }
 
 .ci-pipeline-mobile-header__btn {
-  min-width: clamp(2rem, 10vw, 2.25rem) !important;
+  min-width: auto !important;
   min-height: clamp(2rem, 10vw, 2.25rem) !important;
-  padding: 0.35rem !important;
+  padding: 0.35rem 0.5rem !important;
   border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.ci-pipeline-mobile-header__btn .ci-mobile-btn-text {
+  display: inline;
+  font-size: clamp(0.5625rem, 2.6vw, 0.6875rem);
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.ci-pipeline-mobile-header__btn .ci-mobile-btn-icon {
+  width: 0.875rem;
+  height: 0.875rem;
 }
 
 html[data-pipeline-mobile="1"] .ci-app-header-chip--secondary {
@@ -8592,16 +8675,20 @@ html[data-pipeline-mobile="1"] .ci-app-header-chip--secondary {
 
   .crm-toolbar--hubspot .hs-filter-icon-strip--mobile-fill .hs-filter-icon-btn {
     flex: 1 1 0;
-    min-width: clamp(2rem, 14vw, 2.625rem);
-    max-width: clamp(2.25rem, 16vw, 2.75rem);
+    min-width: 0;
+    max-width: none;
     width: auto;
-    height: clamp(2.125rem, 10vw, 2.5rem);
-    padding: 0;
   }
 
-  .crm-toolbar--hubspot .hs-filter-icon-strip--mobile-fill .hs-filter-icon-btn .ci-ui-icon {
-    width: clamp(1.05rem, 5vw, 1.25rem);
-    height: clamp(1.05rem, 5vw, 1.25rem);
+  .crm-toolbar--hubspot .hs-filter-icon-strip--mobile-fill .hs-filter-icon-btn--labeled {
+    min-height: clamp(2.75rem, 12vw, 3.125rem);
+    padding: 0.2rem 0.1rem;
+  }
+
+  .crm-toolbar--hubspot .hs-filter-icon-strip--mobile-fill .hs-filter-icon-btn .ci-ui-icon,
+  .crm-toolbar--hubspot .hs-filter-icon-strip--mobile-fill .hs-filter-icon-btn .hs-filter-icon-btn__svg {
+    width: clamp(0.875rem, 4vw, 1rem);
+    height: clamp(0.875rem, 4vw, 1rem);
   }
 
   .crm-toolbar--hubspot .hs-filter-icon-strip {

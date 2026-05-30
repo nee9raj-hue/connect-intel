@@ -39,7 +39,8 @@ export default function PipelineMobileHeaderChrome({
         className="crm-btn crm-btn-secondary ci-mobile-icon-btn ci-pipeline-mobile-header__btn"
         aria-label="Import leads"
       >
-        <UploadIcon className="ci-mobile-btn-icon w-4 h-4" aria-hidden />
+        <UploadIcon className="ci-mobile-btn-icon shrink-0" aria-hidden />
+        <span className="ci-mobile-btn-text">Import</span>
       </button>
       <button
         type="button"
@@ -47,7 +48,8 @@ export default function PipelineMobileHeaderChrome({
         className="crm-btn crm-btn-primary ci-mobile-icon-btn ci-pipeline-mobile-header__btn"
         aria-label="Add lead"
       >
-        <PlusIcon className="ci-mobile-btn-icon w-4 h-4" aria-hidden />
+        <PlusIcon className="ci-mobile-btn-icon shrink-0" aria-hidden />
+        <span className="ci-mobile-btn-text">Add lead</span>
       </button>
     </div>
   )

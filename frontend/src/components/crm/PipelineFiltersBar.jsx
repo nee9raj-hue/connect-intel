@@ -3,19 +3,19 @@ import useIsMobile from '../../hooks/useIsMobile'
 import usePipelineFilterMobile from '../../hooks/usePipelineFilterMobile'
 import { PIPELINE_SEARCH_ID } from '../../hooks/useAppKeyboardShortcuts'
 import { api } from '../../lib/api'
-import {
-  BRAND_ICON_ADVANCE_FILTER,
-  BRAND_ICON_CITY,
-  BRAND_ICON_CONTACT,
-  BRAND_ICON_LEAD_STATUS,
-  BRAND_ICON_STATE,
-} from '../../lib/brandAssets'
 import { CONTACT_FILTER_OPTIONS, DEFAULT_PIPELINE_FILTERS, getFilterCities, getFilterStates } from '../../lib/pipelineFilters'
 import FilterDropdown, { FilterChipButton } from './FilterDropdown'
 import LeadTag from '../ui/LeadTag'
 import FilterToolbarIcon from '../ui/FilterToolbarIcon'
 import PipelineMobileFilterSheet, { SearchableMultiList, SingleSelectList } from './PipelineMobileFilterSheet'
-import { SettingsIcon } from '../ui/icons'
+import {
+  ListIcon,
+  MapIcon,
+  MapPinIcon,
+  PeopleIcon,
+  SettingsGearIcon,
+  SlidersIcon,
+} from '../ui/icons'
 
 const SMART_TAG_OPTIONS = [
   { id: 'not_touched', label: 'Not touched' },
@@ -448,8 +448,9 @@ export default function PipelineFiltersBar({
     <>
       {!stageListMode && (
         <FilterToolbarIcon
-          src={BRAND_ICON_LEAD_STATUS}
-          label="Lead status"
+          icon={ListIcon}
+          label="Status"
+          showLabel
           active={mobileSheet?.type === 'status' || statusFilter !== 'all'}
           badge={statusFilter !== 'all'}
           aria-expanded={mobileSheet?.type === 'status'}
@@ -458,8 +459,9 @@ export default function PipelineFiltersBar({
       )}
 
       <FilterToolbarIcon
-        src={BRAND_ICON_CITY}
+        icon={MapPinIcon}
         label="City"
+        showLabel
         active={mobileSheet?.type === 'city' || (filters.cities?.length || 0) > 0}
         badge={(filters.cities?.length || 0) > 0}
         aria-expanded={mobileSheet?.type === 'city'}
@@ -467,8 +469,9 @@ export default function PipelineFiltersBar({
       />
 
       <FilterToolbarIcon
-        src={BRAND_ICON_STATE}
+        icon={MapIcon}
         label="State"
+        showLabel
         active={mobileSheet?.type === 'state' || (filters.states?.length || 0) > 0}
         badge={(filters.states?.length || 0) > 0}
         aria-expanded={mobileSheet?.type === 'state'}
@@ -476,8 +479,9 @@ export default function PipelineFiltersBar({
       />
 
       <FilterToolbarIcon
-        src={BRAND_ICON_CONTACT}
+        icon={PeopleIcon}
         label="Contact"
+        showLabel
         active={mobileSheet?.type === 'contact' || (filters.contact && filters.contact !== 'any')}
         badge={Boolean(filters.contact && filters.contact !== 'any')}
         aria-expanded={mobileSheet?.type === 'contact'}
@@ -485,8 +489,9 @@ export default function PipelineFiltersBar({
       />
 
       <FilterToolbarIcon
-        src={BRAND_ICON_ADVANCE_FILTER}
-        label="Advanced filters"
+        icon={SlidersIcon}
+        label="More"
+        showLabel
         active={mobileSheet?.type === 'advanced' || advancedActiveCount > 0}
         badge={advancedActiveCount > 0}
         aria-expanded={mobileSheet?.type === 'advanced'}
@@ -500,7 +505,7 @@ export default function PipelineFiltersBar({
       {!stageListMode && (
         <FilterDropdown
           iconOnly
-          iconSrc={BRAND_ICON_LEAD_STATUS}
+          icon={ListIcon}
           label="Lead status"
           value={statusFilter !== 'all' ? statusFilter : ''}
           displayValue={statusOptions.find((s) => s.id === statusFilter)?.label}
@@ -512,7 +517,7 @@ export default function PipelineFiltersBar({
 
       <FilterDropdown
         iconOnly
-        iconSrc={BRAND_ICON_CITY}
+        icon={MapPinIcon}
         label="City"
         multiSelect
         values={filters.cities || []}
@@ -525,7 +530,7 @@ export default function PipelineFiltersBar({
 
       <FilterDropdown
         iconOnly
-        iconSrc={BRAND_ICON_STATE}
+        icon={MapIcon}
         label="State"
         multiSelect
         values={filters.states || []}
@@ -538,7 +543,7 @@ export default function PipelineFiltersBar({
 
       <FilterDropdown
         iconOnly
-        iconSrc={BRAND_ICON_CONTACT}
+        icon={PeopleIcon}
         label="Contact"
         value={filters.contact !== 'any' ? filters.contact : ''}
         displayValue={CONTACT_FILTER_OPTIONS.find((o) => o.id === filters.contact)?.label}
@@ -549,7 +554,7 @@ export default function PipelineFiltersBar({
 
       <div className="hs-advanced-filter-wrap hs-filter-icon-wrap" ref={advancedRef}>
         <FilterToolbarIcon
-          src={BRAND_ICON_ADVANCE_FILTER}
+          icon={SlidersIcon}
           label="Advanced filters"
           active={advancedOpen || advancedActiveCount > 0}
           badge={advancedActiveCount > 0}
@@ -627,11 +632,9 @@ export default function PipelineFiltersBar({
 
         <span className="hs-filter-bar-spacer hidden sm:block" aria-hidden />
 
-        {!useMobileFilterSheet ? (
         <button type="button" className="hs-filter-gear-btn shrink-0" onClick={onOpenViewSettings} aria-label="View settings">
-          <SettingsIcon className="w-4 h-4" />
+          <SettingsGearIcon className="w-4 h-4" />
         </button>
-        ) : null}
       </div>
 
       <div className="hs-filter-bar-meta flex flex-wrap items-center gap-2 px-0 pt-0.5 pb-0.5 lg:hidden">

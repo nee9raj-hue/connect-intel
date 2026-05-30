@@ -45,6 +45,33 @@ export function SettingsGearIcon({ className }) {
   )
 }
 
+export function MapPinIcon({ className }) {
+  return (
+    <LineIcon className={className}>
+      <path d="M12 11.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" />
+      <path d="M12 21s-6.5-6.12-6.5-10.5a6.5 6.5 0 1 1 13 0C18.5 14.88 12 21 12 21Z" />
+    </LineIcon>
+  )
+}
+
+export function MapIcon({ className }) {
+  return (
+    <LineIcon className={className}>
+      <path d="M3 6.5 9 4l6 2.5 6-2.5v13l-6 2.5-6-2.5-6 2.5V6.5Z" />
+      <path d="M9 4v13M15 6.5v13" />
+    </LineIcon>
+  )
+}
+
+export function SlidersIcon({ className }) {
+  return (
+    <LineIcon className={className}>
+      <path d="M4 7h16M4 12h16M4 17h16" />
+      <path d="M8 5.25v3.5M14 10.25v3.5M10 15.25v3.5" />
+    </LineIcon>
+  )
+}
+
 export function BellIcon({ className }) {
   return (
     <LineIcon className={className}>

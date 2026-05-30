@@ -274,6 +274,7 @@ export const MOBILE_NAV_PILL_MORE_ITEMS = [
   { id: 'whatsapp', label: 'WA', panel: 'marketing', tab: 'inbox', icon: 'whatsapp' },
   { id: 'calendar', label: 'Meetings', panel: 'crm-calendar', upcomingOnly: true, icon: 'calendar' },
   { id: 'tasks', label: 'Tasks', panel: 'team-tasks', icon: 'task' },
+  { id: 'app-settings', label: 'Display', panel: 'app-settings', icon: 'settings' },
 ]
 
 /** Primary destinations for the mobile floating nav pill (shortcuts + More drawer). */

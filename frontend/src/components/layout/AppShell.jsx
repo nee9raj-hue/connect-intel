@@ -31,7 +31,7 @@ import useChithiAlerts from '../../hooks/useChithiAlerts'
 import useAppKeyboardShortcuts from '../../hooks/useAppKeyboardShortcuts'
 import PwaInstallBanner from './PwaInstallBanner'
 import ChithiPushBanner from './ChithiPushBanner'
-import { MenuIcon } from '../ui/icons'
+import { MenuIcon, SettingsGearIcon } from '../ui/icons'
 
 export default function AppShell() {
   const {
@@ -279,6 +279,21 @@ export default function AppShell() {
             className={`ci-mobile-top-bar__logo h-6 w-auto max-w-[120px] shrink-0 ${BRAND_LOGO_MARK_CLASS}`}
           />
           <div id="ci-mobile-top-bar-slot" className="ci-mobile-top-bar-slot min-w-0 flex-1" />
+          {!user?.isPlatformAdmin && (
+            <button
+              type="button"
+              onClick={() => navigate('app-settings')}
+              className={`ci-mobile-top-bar__settings rounded-xl border p-1.5 shrink-0 ${
+                activePanel === 'app-settings'
+                  ? 'border-[#17191c] bg-[#17191c] text-white'
+                  : 'border-[#d7dde5] bg-white text-[#536072]'
+              }`}
+              aria-label="Display settings"
+              title="Display & layout"
+            >
+              <SettingsGearIcon className="w-5 h-5" />
+            </button>
+          )}
           <div className="ci-mobile-top-bar__bell shrink-0">
             <NotificationBell />
           </div>
