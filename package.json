@@ -20,6 +20,7 @@
     "prod:rollback": "node scripts/production-log.mjs rollback",
     "prod:tag": "node scripts/production-log.mjs tag",
     "prod:verify": "node scripts/verify-deploy.mjs",
+    "prod:preview": "node scripts/verify-deploy.mjs && npm run preview --prefix frontend -- --host 127.0.0.1 --port 4173",
     "prod:ship": "node scripts/ship-production.mjs",
     "build:standalone": "cd frontend && STANDALONE=1 npm run build",
     "open": "open index.html 2>/dev/null || xdg-open index.html 2>/dev/null || echo 'Open index.html in your browser'"

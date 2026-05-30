@@ -17,6 +17,7 @@ import GmailSetupModal, { markGmailSetupDone, useGmailSetupNeeded } from '../onb
 import ConnectAssistant from '../assistant/ConnectAssistant'
 import MobileNavPill from './MobileNavPill'
 import DesktopNavPill from './DesktopNavPill'
+import NotificationBell from './NotificationBell'
 import useIsMobile from '../../hooks/useIsMobile'
 import useMobileNavGenie from '../../hooks/useMobileNavGenie'
 import useChithiAlerts from '../../hooks/useChithiAlerts'
@@ -172,14 +173,14 @@ export default function AppShell() {
       />
       <main className="ci-app-main flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden">
         <div
-          className={`md:hidden shrink-0 flex items-center gap-2 border-b border-[#e5e9ee] bg-white px-3 py-2.5 ${
+          className={`ci-mobile-top-bar md:hidden shrink-0 flex items-center gap-1.5 border-b border-[#e5e9ee] bg-white px-2.5 py-2 ${
             chithiFocus ? 'hidden' : ''
           }`}
         >
           <button
             type="button"
             onClick={() => setMobileNavOpen(true)}
-            className="rounded-xl border border-[#d7dde5] bg-white p-2 text-[#536072]"
+            className="ci-mobile-top-bar__menu rounded-xl border border-[#d7dde5] bg-white p-1.5 text-[#536072] shrink-0"
             aria-label="Open menu"
           >
             <MenuIcon className="w-5 h-5" />
@@ -187,8 +188,12 @@ export default function AppShell() {
           <img
             src={BRAND_LOGO_MARK_LIGHT}
             alt="Connect Intel"
-            className={`h-7 w-auto max-w-[200px] ${BRAND_LOGO_MARK_CLASS}`}
+            className={`ci-mobile-top-bar__logo h-6 w-auto max-w-[120px] shrink-0 ${BRAND_LOGO_MARK_CLASS}`}
           />
+          <div id="ci-mobile-top-bar-slot" className="ci-mobile-top-bar-slot min-w-0 flex-1" />
+          <div className="ci-mobile-top-bar__bell shrink-0">
+            <NotificationBell />
+          </div>
         </div>
         {user?.isPlatformAdmin && (
           <EmailOAuthNotice onOpenSystemStatus={() => navigate('integrations')} />

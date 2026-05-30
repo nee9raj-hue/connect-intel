@@ -57,12 +57,15 @@ if (blocking.length) {
 const head = git('rev-parse --short HEAD')
 console.log(`
 Next steps:
-  1. Commit anything that should ship (if not already).
-  2. git push origin main
-  3. Wait for GitHub CI ✓ and Vercel Production Ready (~30s).
-  4. Open the Vercel preview URL from the deploy (optional smoke test).
-  5. npm run prod:log
-  6. Optional known-good tag: npm run prod:tag -- ${head}
+  1. Preview locally first (desktop + mobile):
+       npm run dev          → http://localhost:5173  (+ npx vercel dev for API)
+       npm run prod:preview → http://127.0.0.1:4173  (production build)
+  2. Commit anything that should ship (if not already).
+  3. git push origin main
+  4. Wait for GitHub CI ✓ and Vercel Production Ready (~30s).
+  5. Open the Vercel preview URL from the deploy (optional smoke test).
+  6. npm run prod:log
+  7. Optional known-good tag: npm run prod:tag -- ${head}
 
 Rollback: docs/PRODUCTION_LOG.md or npm run prod:rollback -- <commit>
 Checklist: docs/RELEASE_CHECKLIST.md

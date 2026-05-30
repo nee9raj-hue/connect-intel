@@ -398,7 +398,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       return undefined
     }
     document.documentElement.setAttribute('data-pipeline-mobile', '1')
-    setMobileHeaderSlot(document.getElementById('ci-app-header-pipeline-slot'))
+    setMobileHeaderSlot(document.getElementById('ci-mobile-top-bar-slot'))
     return () => document.documentElement.removeAttribute('data-pipeline-mobile')
   }, [useCompactPipelineChrome])
 

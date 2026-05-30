@@ -6,6 +6,52 @@ Use this before every **production** push to `main`. Production auto-deploys on 
 
 ---
 
+## Local preview (do this before every deploy)
+
+Review UI on your machine first. **Do not push to `main` until desktop and mobile look right.**
+
+### Option A — Fast iteration (hot reload)
+
+Terminal 1 — frontend with live edits:
+
+```bash
+npm run dev
+```
+
+Terminal 2 — API routes (same as production handlers):
+
+```bash
+npx vercel dev
+```
+
+Open **http://localhost:5173** (Vercel dev proxies `/api` to your local serverless functions).
+
+| View | How |
+|------|-----|
+| **Desktop** | Full-width browser window |
+| **Mobile** | Chrome DevTools → toggle device toolbar → iPhone / Pixel preset, or narrow window to &lt;768px |
+
+Sign in with Google (add `http://localhost:5173` in Google Cloud OAuth origins if needed — see `GOOGLE-LOGIN-SETUP.md`).
+
+### Option B — Production build preview (closest to what ships)
+
+Builds the exact bundle Vercel deploys, then serves it locally:
+
+```bash
+npm run prod:preview
+```
+
+Open **http://127.0.0.1:4173** and repeat desktop + mobile checks above.
+
+When satisfied:
+
+```bash
+npm run prod:ship
+git push origin main
+```
+
+---
+
 ## Before you push
 
 Run from repo root:
@@ -16,9 +62,9 @@ npm run prod:ship
 
 This runs build + missing-file checks (e.g. `slackOAuth.js`, `phone-call-icon.png`).
 
-Manual smoke (2–5 min):
+Manual smoke (2–5 min) — on **local preview** (`5173` or `4173`), not only production:
 
-- [ ] **Pipeline** — leads load; call icon on callable numbers (mobile + desktop)
+- [ ] **Pipeline** — leads load; **5 filter icons** on mobile (same as desktop); merged top bar; call icon on phone column only
 - [ ] **Chithi** — opens without API errors; menu icon visible
 - [ ] **Marketing** — Lists tab filters work on mobile (Filters sheet → Apply)
 - [ ] **Auth** — sign-in still works

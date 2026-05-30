@@ -12,9 +12,8 @@ export default function AppHeader({ onNavigate, sidebarMode = 'expanded', onTogg
 
   return (
     <header className="shrink-0 flex items-center justify-between gap-2 border-b border-[#e5e9ee] bg-white px-4 py-2.5">
-      <SidebarToggleButton mode={sidebarMode} onToggle={onToggleSidebarCollapsed} className="shrink-0" />
+      <SidebarToggleButton mode={sidebarMode} onToggle={onToggleSidebarCollapsed} className="shrink-0 hidden md:inline-flex" />
       <div className="ci-app-header-chips flex items-center justify-end gap-2 flex-1 min-w-0">
-        <div id="ci-app-header-pipeline-slot" className="ci-app-header-pipeline-slot md:hidden" />
         <NotificationBell />
         <button
           type="button"

@@ -6,7 +6,6 @@ import {
   BRAND_ICON_ADVANCE_FILTER,
   BRAND_ICON_CITY,
   BRAND_ICON_CONTACT,
-  BRAND_ICON_FILTER,
   BRAND_ICON_LEAD_STATUS,
   BRAND_ICON_STATE,
 } from '../../lib/brandAssets'
@@ -27,17 +26,7 @@ const MOBILE_FILTER_TITLES = {
   city: 'City',
   state: 'State',
   contact: 'Contact',
-  tags: 'Tags',
-  smart: 'Smart',
   advanced: 'Advanced filters',
-}
-
-function SmartFilterIcon({ className = 'w-4 h-4 text-[#516f90]' }) {
-  return (
-    <svg className={className} viewBox="0 0 20 20" fill="currentColor" aria-hidden>
-      <path d="M9.813 1.667a.75.75 0 01.374 0l1.667.444a.75.75 0 01.556.556l.444 1.667a.75.75 0 01.374.556l1.444 1.111a.75.75 0 010 1.188l-1.444 1.111a.75.75 0 01-.374.556l-.444 1.667a.75.75 0 01-.556.556l-1.667.444a.75.75 0 01-.374 0l-1.667-.444a.75.75 0 01-.556-.556l-.444-1.667a.75.75 0 01-.374-.556L5.48 7.188a.75.75 0 010-1.188l1.444-1.111a.75.75 0 01.374-.556l.444-1.667a.75.75 0 01.556-.556l1.667-.444zM10 6.5a.5.5 0 100 1 .5.5 0 000-1z" />
-    </svg>
-  )
 }
 
 export default function PipelineFiltersBar({
@@ -217,17 +206,13 @@ export default function PipelineFiltersBar({
       case 'contact':
         onFiltersChange({ ...filters, contact: draft.filters.contact || 'any' })
         break
-      case 'tags':
+      case 'advanced': {
         onFiltersChange({
           ...filters,
           tagIds: draft.filters.tagIds || [],
           tagMode: draft.filters.tagMode || 'any',
+          smartTags: draft.filters.smartTags || [],
         })
-        break
-      case 'smart':
-        onFiltersChange({ ...filters, smartTags: draft.filters.smartTags || [] })
-        break
-      case 'advanced': {
         const view = savedViews.find((v) => v.id === draft.smartViewId)
         if (view) onApplySmartView?.(view)
         break
@@ -285,49 +270,53 @@ export default function PipelineFiltersBar({
             onChange={(v) => updateMobileDraftFilters({ contact: v || 'any' })}
           />
         )
-      case 'tags':
-        return (
-          <>
-            <div className="flex items-center justify-between gap-2 mb-2">
-              <p className="hs-advanced-filter-label mb-0">Match</p>
-              <select
-                value={mobileDraft.filters.tagMode || 'any'}
-                onChange={(e) => updateMobileDraftFilters({ tagMode: e.target.value })}
-                className="crm-select-sm crm-select-sm--hubspot"
-              >
-                <option value="any">Any tag</option>
-                <option value="all">All tags</option>
-              </select>
-            </div>
-            <SearchableMultiList
-              options={tagOptions}
-              values={mobileDraft.filters.tagIds || []}
-              onChange={(v) => updateMobileDraftFilters({ tagIds: v })}
-              placeholder="Search tags…"
-              emptyLabel="Any tag"
-            />
-          </>
-        )
-      case 'smart':
-        return (
-          <SearchableMultiList
-            options={smartOptions}
-            values={mobileDraft.filters.smartTags || []}
-            onChange={(v) => updateMobileDraftFilters({ smartTags: v })}
-            placeholder="Search…"
-            emptyLabel="Any"
-          />
-        )
       case 'advanced':
-        return savedViews.length > 0 ? (
-          <SingleSelectList
-            options={savedViewOptions}
-            value={mobileDraft.smartViewId || ''}
-            emptyLabel="None"
-            onChange={updateMobileDraftSmartView}
-          />
-        ) : (
-          <p className="text-sm text-[#516f90]">No saved views yet.</p>
+        return (
+          <div className="hs-pipeline-advanced-mobile">
+            {savedViews.length > 0 ? (
+              <section className="hs-pipeline-advanced-mobile__section">
+                <p className="hs-advanced-filter-label">Saved views</p>
+                <SingleSelectList
+                  options={savedViewOptions}
+                  value={mobileDraft.smartViewId || ''}
+                  emptyLabel="None"
+                  onChange={updateMobileDraftSmartView}
+                />
+              </section>
+            ) : null}
+            {orgLeadTags.length > 0 ? (
+              <section className="hs-pipeline-advanced-mobile__section">
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <p className="hs-advanced-filter-label mb-0">Tags</p>
+                  <select
+                    value={mobileDraft.filters.tagMode || 'any'}
+                    onChange={(e) => updateMobileDraftFilters({ tagMode: e.target.value })}
+                    className="crm-select-sm crm-select-sm--hubspot"
+                  >
+                    <option value="any">Any</option>
+                    <option value="all">All</option>
+                  </select>
+                </div>
+                <SearchableMultiList
+                  options={tagOptions}
+                  values={mobileDraft.filters.tagIds || []}
+                  onChange={(v) => updateMobileDraftFilters({ tagIds: v })}
+                  placeholder="Search tags…"
+                  emptyLabel="Any tag"
+                />
+              </section>
+            ) : null}
+            <section className="hs-pipeline-advanced-mobile__section">
+              <p className="hs-advanced-filter-label">Smart</p>
+              <SearchableMultiList
+                options={smartOptions}
+                values={mobileDraft.filters.smartTags || []}
+                onChange={(v) => updateMobileDraftFilters({ smartTags: v })}
+                placeholder="Search…"
+                emptyLabel="Any"
+              />
+            </section>
+          </div>
         )
       default:
         return null
@@ -492,32 +481,11 @@ export default function PipelineFiltersBar({
         onClick={() => openMobileFilter('contact')}
       />
 
-      {orgLeadTags.length > 0 && (
-        <FilterToolbarIcon
-          src={BRAND_ICON_FILTER}
-          label="Tags"
-          active={mobileSheet?.type === 'tags' || (filters.tagIds?.length || 0) > 0}
-          badge={(filters.tagIds?.length || 0) > 0}
-          aria-expanded={mobileSheet?.type === 'tags'}
-          onClick={() => openMobileFilter('tags')}
-        />
-      )}
-
-      <FilterToolbarIcon
-        label="Smart"
-        active={mobileSheet?.type === 'smart' || (filters.smartTags?.length || 0) > 0}
-        badge={(filters.smartTags?.length || 0) > 0}
-        aria-expanded={mobileSheet?.type === 'smart'}
-        onClick={() => openMobileFilter('smart')}
-      >
-        <SmartFilterIcon />
-      </FilterToolbarIcon>
-
       <FilterToolbarIcon
         src={BRAND_ICON_ADVANCE_FILTER}
         label="Advanced filters"
-        active={mobileSheet?.type === 'advanced' || Boolean(activeSmartViewId)}
-        badge={Boolean(activeSmartViewId)}
+        active={mobileSheet?.type === 'advanced' || advancedActiveCount > 0}
+        badge={advancedActiveCount > 0}
         aria-expanded={mobileSheet?.type === 'advanced'}
         onClick={() => openMobileFilter('advanced')}
       />
