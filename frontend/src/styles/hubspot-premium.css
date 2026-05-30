@@ -450,19 +450,71 @@ a.crm-link,
   color: var(--hs-text);
 }
 
-/* Sidebar: CSS-only font bump — nav structure/workflow unchanged */
-.ci-sidebar :is(
-  [class*='text-[9px]'],
-  [class*='text-[10px]'],
-  [class*='text-[11px]']
-) {
-  font-size: 0.75rem;
-  line-height: 1.4;
+/* —— Left sidebar (dark) — typography aligned with HubSpot premium scale —— */
+.ci-sidebar {
+  font-size: var(--hs-font-base);
+  line-height: 1.5;
 }
 
-.ci-sidebar :is([class*='text-[12px]'], [class*='text-[13px]']) {
-  font-size: 0.8125rem;
+.ci-sidebar [class*='text-[12px]'],
+.ci-sidebar [class*='text-[13px]'] {
+  font-size: var(--hs-font-base) !important;
+  line-height: 1.5;
+}
+
+.ci-sidebar [class*='text-[10px]']:not([class*='uppercase']),
+.ci-sidebar [class*='text-[11px]'] {
+  font-size: var(--hs-font-secondary) !important;
   line-height: 1.45;
+}
+
+.ci-sidebar [class*='uppercase'][class*='text-[10px]'] {
+  font-size: 0.6875rem !important;
+  line-height: 1.35;
+  letter-spacing: 0.1em;
+}
+
+.ci-sidebar .text-xs {
+  font-size: var(--hs-font-secondary);
+  line-height: 1.45;
+}
+
+.ci-sidebar .text-sm {
+  font-size: var(--hs-font-base);
+  line-height: 1.5;
+}
+
+.ci-sidebar .sidebar-sub-item,
+.ci-sidebar .sidebar-sub-item span,
+.sidebar-rail-flyout .sidebar-sub-item,
+.sidebar-rail-flyout .sidebar-sub-item span {
+  font-size: var(--hs-font-secondary) !important;
+  line-height: 1.45;
+  font-weight: 500;
+}
+
+.ci-sidebar .nav-sub-active,
+.ci-sidebar .nav-sub-active span,
+.sidebar-rail-flyout .nav-sub-active,
+.sidebar-rail-flyout .nav-sub-active span {
+  font-weight: 600;
+}
+
+.ci-sidebar .sidebar-sub-badge,
+.sidebar-rail-flyout .sidebar-sub-badge {
+  font-size: 0.6875rem !important;
+  line-height: 1.15;
+}
+
+.sidebar-rail-flyout__title {
+  font-size: var(--hs-font-secondary) !important;
+  line-height: 1.45;
+}
+
+.ci-sidebar [class*='text-[8px]'],
+.ci-sidebar [class*='text-[9px]'] {
+  font-size: 0.6875rem !important;
+  line-height: 1.15;
 }
 
 /* —— Lead workspace / record panel —— */
