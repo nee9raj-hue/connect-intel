@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { getStatusMeta } from '../../lib/crmConstants'
@@ -35,12 +35,21 @@ const KPI = [
 ]
 
 export default function TeamDashboardPanel({ onNavigate }) {
-  const { user, setPipelineAssigneeFilter } = useApp()
+  const { user, teamMembers, pipelineAssigneeFilter, setPipelineAssigneeFilter } = useApp()
   const [period, setPeriod] = useState('week')
-  const [memberUserId, setMemberUserId] = useState('')
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+
+  const memberUserId = pipelineAssigneeFilter || ''
+
+  const memberName = useMemo(() => {
+    if (!memberUserId) return null
+    const fromOptions = data?.memberOptions?.find((m) => String(m.userId) === String(memberUserId))
+    if (fromOptions?.name) return fromOptions.name
+    const fromTeam = teamMembers.find((m) => String(m.userId) === String(memberUserId))
+    return fromTeam?.name || 'Team member'
+  }, [memberUserId, data?.memberOptions, teamMembers])
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -58,11 +67,16 @@ export default function TeamDashboardPanel({ onNavigate }) {
   }, [period, memberUserId])
 
   useEffect(() => {
+    setData(null)
     load()
   }, [load])
 
-  const onKpiClick = (item) => {
+  const preserveAssignee = () => {
     if (memberUserId) setPipelineAssigneeFilter?.(memberUserId)
+  }
+
+  const onKpiClick = (item) => {
+    preserveAssignee()
     if (item.nav === 'crm-calendar') {
       onNavigate?.('crm-calendar', { upcomingOnly: true })
       return
@@ -74,10 +88,19 @@ export default function TeamDashboardPanel({ onNavigate }) {
     onNavigate?.(item.nav)
   }
 
+  const onFunnelClick = (status) => {
+    preserveAssignee()
+    onNavigate?.('pipeline', { status })
+  }
+
   const onMemberRow = (m) => {
-    setMemberUserId(m.userId)
     setPipelineAssigneeFilter?.(m.userId)
     onNavigate?.('pipeline')
+  }
+
+  const onMemberSelect = (e) => {
+    const v = e.target.value
+    setPipelineAssigneeFilter?.(v || null)
   }
 
   const summary = data?.summary || {}
@@ -96,7 +119,7 @@ export default function TeamDashboardPanel({ onNavigate }) {
       {data?.isAdmin && data?.memberOptions?.length > 0 ? (
         <select
           value={memberUserId}
-          onChange={(e) => setMemberUserId(e.target.value)}
+          onChange={onMemberSelect}
           className="dashboard-select"
           aria-label="Filter by team member"
         >
@@ -135,6 +158,21 @@ export default function TeamDashboardPanel({ onNavigate }) {
       subtitle="Weekly and monthly performance — click any metric to open pipeline, calendar, or activity log"
       actions={headerActions}
     >
+      {memberUserId && memberName ? (
+        <div className="dashboard-team-filter-banner" role="status">
+          <span>
+            Viewing <strong>{memberName}</strong>&apos;s metrics
+          </span>
+          <button
+            type="button"
+            className="dashboard-team-filter-banner__clear"
+            onClick={() => setPipelineAssigneeFilter?.(null)}
+          >
+            View all team
+          </button>
+        </div>
+      ) : null}
+
       {error ? (
         <p className="text-sm text-red-800 bg-red-50 border border-red-200 rounded-xl px-3 py-2 font-medium">
           {error}
@@ -189,7 +227,7 @@ export default function TeamDashboardPanel({ onNavigate }) {
               ) : null}
             </DashboardSection>
 
-            <DashboardSection title="Pipeline funnel" subtitle="Share of leads by stage">
+            <DashboardSection title="Pipeline funnel" subtitle="Click a stage to open filtered pipeline">
               <ul className="space-y-2.5">
                 {(data?.statusBreakdown || []).map((row) => {
                   const meta = getStatusMeta(row.status)
@@ -197,13 +235,19 @@ export default function TeamDashboardPanel({ onNavigate }) {
                   const pct = Math.min(100, Math.round((row.count / total) * 100))
                   return (
                     <li key={row.status}>
-                      <div className="dashboard-funnel-row__head">
-                        <span>{meta?.label || row.status}</span>
-                        <span>{row.count}</span>
-                      </div>
-                      <div className="dashboard-funnel-row__track">
-                        <div className="dashboard-funnel-row__fill" style={{ width: `${pct}%` }} />
-                      </div>
+                      <button
+                        type="button"
+                        className="dashboard-funnel-row dashboard-funnel-row--clickable w-full text-left"
+                        onClick={() => onFunnelClick(row.status)}
+                      >
+                        <div className="dashboard-funnel-row__head">
+                          <span>{meta?.label || row.status}</span>
+                          <span>{row.count}</span>
+                        </div>
+                        <div className="dashboard-funnel-row__track">
+                          <div className="dashboard-funnel-row__fill" style={{ width: `${pct}%` }} />
+                        </div>
+                      </button>
                     </li>
                   )
                 })}
@@ -216,8 +260,12 @@ export default function TeamDashboardPanel({ onNavigate }) {
 
           {data?.members?.length > 0 ? (
             <DashboardSection
-              title="Team performance"
-              subtitle="Click a row to filter pipeline by that member"
+              title={memberUserId ? `${memberName || 'Member'} performance` : 'Team performance'}
+              subtitle={
+                memberUserId
+                  ? 'Metrics for the selected rep — open pipeline for their leads'
+                  : 'Click a row to filter pipeline by that member'
+              }
             >
               <div className="dashboard-table-wrap -mx-4 -mb-1">
                 <table className="dashboard-table">

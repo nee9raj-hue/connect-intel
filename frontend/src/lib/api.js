@@ -248,7 +248,8 @@ export const api = {
     }),
   startCrmGmailOAuthWithCalendar: () =>
     request('/api/crm/email-oauth/start?calendar=1'),
-  getCrmActivityLog: () => request('/api/crm/activity-log', { timeoutMs: 60_000 }),
+  getCrmActivityLog: (query = '') =>
+    request(`/api/crm/activity-log${query ? `?${query}` : ''}`, { timeoutMs: 60_000 }),
   getCrmNotifications: (since, { silent = false } = {}) =>
     request(
       `/api/crm/notifications${since ? `?since=${encodeURIComponent(since)}` : ''}`,

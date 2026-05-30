@@ -33,6 +33,7 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
     unreadNotificationCount,
     notifications,
     teamMembers,
+    pipelineAssigneeFilter,
     setPipelineAssigneeFilter,
     openPipelineLead,
   } = useApp()
@@ -98,18 +99,27 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
       return
     }
     try {
-      const q = new URLSearchParams({ period: teamPeriod }).toString()
-      const res = await api.getCrmTeamDashboard(q)
+      const q = new URLSearchParams({ period: teamPeriod })
+      if (pipelineAssigneeFilter) q.set('userId', pipelineAssigneeFilter)
+      const res = await api.getCrmTeamDashboard(q.toString())
       setTeamDashboard(res)
     } catch {
       // keep previous snapshot
     }
-  }, [teamPeriod, user])
+  }, [teamPeriod, user, pipelineAssigneeFilter])
 
   useEffect(() => {
     if (!isActive) return undefined
     reloadTeamDashboard()
-  }, [isActive, teamPeriod, reloadTeamDashboard])
+  }, [isActive, teamPeriod, pipelineAssigneeFilter, reloadTeamDashboard])
+
+  const assigneeFilterName = useMemo(() => {
+    if (!pipelineAssigneeFilter) return null
+    const m = teamMembers.find((t) => String(t.userId) === String(pipelineAssigneeFilter))
+    return m?.name || teamDashboard?.memberOptions?.find(
+      (o) => String(o.userId) === String(pipelineAssigneeFilter)
+    )?.name || 'Team member'
+  }, [pipelineAssigneeFilter, teamMembers, teamDashboard?.memberOptions])
 
   const go = (target) => onNavigate?.(target.panel, navTargetToOptions(target))
 
@@ -243,6 +253,9 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
           period={teamPeriod}
           onPeriodChange={setTeamPeriod}
           members={isCompany ? teamDashboard?.members || [] : []}
+          assigneeFilter={pipelineAssigneeFilter}
+          assigneeName={assigneeFilterName}
+          onClearAssignee={() => setPipelineAssigneeFilter?.(null)}
           onNavigate={(panel, options) => {
             if (panel === 'pipeline' && options?.leadId) {
               openPipelineLead?.(options.leadId)
@@ -253,8 +266,9 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
           }}
           onMemberClick={(m) => {
             setPipelineAssigneeFilter?.(m.userId)
-            go({ panel: 'pipeline' })
+            onNavigate?.('crm-dashboard')
           }}
+          setPipelineAssigneeFilter={setPipelineAssigneeFilter}
         />
       )}
 

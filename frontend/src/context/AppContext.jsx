@@ -10,6 +10,25 @@ import { withTimeout } from '../lib/fetchWithTimeout'
 const AppContext = createContext(null)
 
 const INVITE_TOKEN_KEY = 'connect_intel_invite_token'
+const PIPELINE_ASSIGNEE_KEY = 'ci-pipeline-assignee'
+
+function loadPipelineAssigneeFilter() {
+  try {
+    const v = sessionStorage.getItem(PIPELINE_ASSIGNEE_KEY)
+    return v || null
+  } catch {
+    return null
+  }
+}
+
+function persistPipelineAssigneeFilter(userId) {
+  try {
+    if (userId) sessionStorage.setItem(PIPELINE_ASSIGNEE_KEY, String(userId))
+    else sessionStorage.removeItem(PIPELINE_ASSIGNEE_KEY)
+  } catch {
+    // ignore
+  }
+}
 
 export function getStoredInviteToken() {
   try {
@@ -47,7 +66,12 @@ export function AppProvider({ children }) {
   const [ready, setReady] = useState(false)
   const [authBusy, setAuthBusy] = useState(false)
   const [pipelineLeadId, setPipelineLeadId] = useState(null)
-  const [pipelineAssigneeFilter, setPipelineAssigneeFilter] = useState(null)
+  const [pipelineAssigneeFilter, setPipelineAssigneeFilterState] = useState(loadPipelineAssigneeFilter)
+  const setPipelineAssigneeFilter = useCallback((userId) => {
+    const next = userId ? String(userId) : null
+    setPipelineAssigneeFilterState(next)
+    persistPipelineAssigneeFilter(next)
+  }, [])
   const [notifications, setNotifications] = useState([])
   const readNotificationIdsRef = useRef(loadReadNotificationIds())
   const [notificationTick, setNotificationTick] = useState(0)

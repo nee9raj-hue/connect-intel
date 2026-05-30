@@ -24,6 +24,10 @@ export default function DashboardTeamSnapshot({
   period = 'week',
   onPeriodChange,
   members = [],
+  assigneeFilter = null,
+  assigneeName = null,
+  onClearAssignee,
+  setPipelineAssigneeFilter,
   onNavigate,
   onMemberClick,
 }) {
@@ -35,6 +39,11 @@ export default function DashboardTeamSnapshot({
   const revenue = snap?.revenue || {}
 
   const go = (target) => onNavigate?.(target.panel, target.options || {})
+
+  const drill = (panel, options = {}) => {
+    if (assigneeFilter) setPipelineAssigneeFilter?.(assigneeFilter)
+    go({ panel, options })
+  }
 
   if (loading && !snap) {
     return (
@@ -51,9 +60,20 @@ export default function DashboardTeamSnapshot({
       title="Team & pipeline intelligence"
       subtitle="Active customers, trading activity, and team performance — stages are in Pipeline above"
       actionLabel="Full team metrics"
-      onAction={() => go({ panel: 'crm-dashboard' })}
+      onAction={() => drill('crm-dashboard')}
       className="dashboard-team-snapshot"
     >
+      {assigneeFilter && assigneeName ? (
+        <div className="dashboard-team-filter-banner dashboard-team-filter-banner--compact" role="status">
+          <span>
+            Viewing <strong>{assigneeName}</strong>&apos;s metrics
+          </span>
+          <button type="button" className="dashboard-team-filter-banner__clear" onClick={onClearAssignee}>
+            View all team
+          </button>
+        </div>
+      ) : null}
+
       <div className="dashboard-team-snapshot__toolbar">
         <DashboardSegmented
           value={period}
@@ -70,7 +90,7 @@ export default function DashboardTeamSnapshot({
         <button
           type="button"
           className="dashboard-team-snapshot__kpi"
-          onClick={() => go({ panel: 'pipeline', options: { status: 'all' } })}
+          onClick={() => drill('pipeline', { status: 'all' })}
         >
           <span className="dashboard-team-snapshot__kpi-label">Pipeline leads</span>
           <span className="dashboard-team-snapshot__kpi-value">{totalLeads.toLocaleString()}</span>
@@ -78,7 +98,7 @@ export default function DashboardTeamSnapshot({
         <button
           type="button"
           className="dashboard-team-snapshot__kpi"
-          onClick={() => go({ panel: 'active-customers' })}
+          onClick={() => drill('active-customers')}
         >
           <span className="dashboard-team-snapshot__kpi-label">Active customers</span>
           <span className="dashboard-team-snapshot__kpi-value">{active.total?.toLocaleString() ?? '0'}</span>
@@ -89,7 +109,7 @@ export default function DashboardTeamSnapshot({
         <button
           type="button"
           className="dashboard-team-snapshot__kpi"
-          onClick={() => go({ panel: 'pipeline', options: { status: 'won' } })}
+          onClick={() => drill('pipeline', { status: 'won' })}
         >
           <span className="dashboard-team-snapshot__kpi-label">Won</span>
           <span className="dashboard-team-snapshot__kpi-value">{(summary.won ?? 0).toLocaleString()}</span>
@@ -100,7 +120,7 @@ export default function DashboardTeamSnapshot({
         <button
           type="button"
           className="dashboard-team-snapshot__kpi"
-          onClick={() => go({ panel: 'pipeline', options: { status: 'follow_up' } })}
+          onClick={() => drill('pipeline', { status: 'follow_up' })}
         >
           <span className="dashboard-team-snapshot__kpi-label">Follow-up</span>
           <span className="dashboard-team-snapshot__kpi-value">
@@ -159,14 +179,14 @@ export default function DashboardTeamSnapshot({
             <button
               type="button"
               className="crm-btn crm-btn-secondary crm-btn-sm"
-              onClick={() => go({ panel: 'active-customers' })}
+              onClick={() => drill('active-customers')}
             >
               Active customers
             </button>
             <button
               type="button"
               className="crm-btn crm-btn-secondary crm-btn-sm"
-              onClick={() => go({ panel: 'pipeline', options: { status: 'active_trading' } })}
+              onClick={() => drill('pipeline', { status: 'active_trading' })}
             >
               Active trading in pipeline
             </button>
@@ -180,19 +200,43 @@ export default function DashboardTeamSnapshot({
           <ul className="dashboard-stat-list dashboard-team-snapshot__stat-grid">
             <li>
               <span>Touchpoints logged</span>
-              <span>{summary.activitiesInPeriod?.toLocaleString() ?? 0}</span>
+              <button
+                type="button"
+                className="dashboard-team-snapshot__stat-link"
+                onClick={() => drill('crm-log')}
+              >
+                {summary.activitiesInPeriod?.toLocaleString() ?? 0}
+              </button>
             </li>
             <li>
               <span>Emails sent</span>
-              <span>{summary.emailsSent?.toLocaleString() ?? 0}</span>
+              <button
+                type="button"
+                className="dashboard-team-snapshot__stat-link"
+                onClick={() => drill('crm-log')}
+              >
+                {summary.emailsSent?.toLocaleString() ?? 0}
+              </button>
             </li>
             <li>
               <span>Upcoming meetings</span>
-              <span>{summary.meetingsUpcoming?.toLocaleString() ?? 0}</span>
+              <button
+                type="button"
+                className="dashboard-team-snapshot__stat-link"
+                onClick={() => drill('crm-calendar', { upcomingOnly: true })}
+              >
+                {summary.meetingsUpcoming?.toLocaleString() ?? 0}
+              </button>
             </li>
             <li>
               <span>Stale leads (7d+ quiet)</span>
-              <span>{summary.staleLeads?.toLocaleString() ?? 0}</span>
+              <button
+                type="button"
+                className="dashboard-team-snapshot__stat-link"
+                onClick={() => drill('pipeline')}
+              >
+                {summary.staleLeads?.toLocaleString() ?? 0}
+              </button>
             </li>
             <li>
               <span>Weighted forecast</span>

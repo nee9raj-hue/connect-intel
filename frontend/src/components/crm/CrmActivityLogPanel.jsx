@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { ACTIVITY_LABELS, formatDateTime } from '../../lib/crmUiConstants'
@@ -6,29 +6,36 @@ import LoadingExperience from '../ui/LoadingExperience'
 import { LOADING_MESSAGES } from '../../lib/loadingQuotes'
 
 export default function CrmActivityLogPanel({ onNavigate }) {
-  const { openPipelineLead } = useApp()
+  const { openPipelineLead, pipelineAssigneeFilter, setPipelineAssigneeFilter, teamMembers } = useApp()
   const [activities, setActivities] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  useEffect(() => {
-    let cancelled = false
+  const assigneeName = useMemo(() => {
+    if (!pipelineAssigneeFilter) return null
+    const m = teamMembers.find((t) => String(t.userId) === String(pipelineAssigneeFilter))
+    return m?.name || 'Team member'
+  }, [pipelineAssigneeFilter, teamMembers])
+
+  const load = useCallback(async () => {
     setLoading(true)
-    api
-      .getCrmActivityLog()
-      .then((data) => {
-        if (!cancelled) setActivities(data.activities || [])
-      })
-      .catch((err) => {
-        if (!cancelled) setError(err.message)
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false)
-      })
-    return () => {
-      cancelled = true
+    setError(null)
+    try {
+      const q = new URLSearchParams()
+      if (pipelineAssigneeFilter) q.set('userId', pipelineAssigneeFilter)
+      const data = await api.getCrmActivityLog(q.toString())
+      setActivities(data.activities || [])
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
     }
-  }, [])
+  }, [pipelineAssigneeFilter])
+
+  useEffect(() => {
+    setActivities([])
+    load()
+  }, [load])
 
   return (
     <div className="panel-shell">
@@ -38,6 +45,21 @@ export default function CrmActivityLogPanel({ onNavigate }) {
       </header>
 
       <div className="panel-body-scroll p-4 md:p-5 max-w-3xl">
+        {pipelineAssigneeFilter && assigneeName ? (
+          <div className="dashboard-team-filter-banner mb-4" role="status">
+            <span>
+              Viewing <strong>{assigneeName}</strong>&apos;s activity
+            </span>
+            <button
+              type="button"
+              className="dashboard-team-filter-banner__clear"
+              onClick={() => setPipelineAssigneeFilter?.(null)}
+            >
+              View all team
+            </button>
+          </div>
+        ) : null}
+
         {loading ? (
           <LoadingExperience message={LOADING_MESSAGES.activity} fill={false} className="rounded-xl border border-gray-200 min-h-[200px]" />
         ) : null}
