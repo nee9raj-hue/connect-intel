@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-05-30T13:00:13.303Z",
-  "updatedAtIst": "30/05/2026, 18:30:13",
+  "updatedAt": "2026-05-30T13:03:58.403Z",
+  "updatedAtIst": "30/05/2026, 18:33:58",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "f592c7e",
+  "currentProductionCommit": "86758c3",
   "entries": [
+    {
+      "logId": "20260530-1833-86758c3",
+      "commit": "86758c3",
+      "commitFull": "86758c3672c7c09d4fa6c84458b3ed04206f5319",
+      "message": "Restore horizontal scroll for mobile pipeline leads table.",
+      "deployedAt": "2026-05-30T13:03:44.761Z",
+      "deployedAtIst": "30/05/2026, 18:33:44",
+      "committedAtIst": "30/05/2026, 18:33:13",
+      "vercelPreviewUrl": "https://connect-intel-463sqkpgy-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 86758c3"
+    },
+    {
+      "logId": "20260530-1830-f04bee4",
+      "commit": "f04bee4",
+      "commitFull": "f04bee4f3838df51abe06828e3130784f5876f4a",
+      "message": "Update production log after mobile filter modal and icon sizing deploy.",
+      "deployedAt": "2026-05-30T13:00:45.095Z",
+      "deployedAtIst": "30/05/2026, 18:30:45",
+      "committedAtIst": "30/05/2026, 18:30:16",
+      "vercelPreviewUrl": "https://connect-intel-ju04325y5-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- f04bee4"
+    },
     {
       "logId": "20260530-1829-f592c7e",
       "commit": "f592c7e",
@@ -15,7 +43,7 @@
       "committedAtIst": "30/05/2026, 18:29:27",
       "vercelPreviewUrl": "https://connect-intel-1pqukdhvr-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- f592c7e"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 3db2f52"
-    },
-    {
-      "logId": "20260530-1700-1376a3a",
-      "commit": "1376a3a",
-      "commitFull": "1376a3af24af107bddbb77c18a66f2bc19a5f99b",
-      "message": "Use branded call icon on pipeline leads for callable numbers only.",
-      "deployedAt": "2026-05-30T11:30:13.555Z",
-      "deployedAtIst": "30/05/2026, 17:00:13",
-      "committedAtIst": "30/05/2026, 16:59:45",
-      "vercelPreviewUrl": "https://connect-intel-f09tsav38-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 1376a3a"
-    },
-    {
-      "logId": "20260530-1656-7f1674a",
-      "commit": "7f1674a",
-      "commitFull": "7f1674ae82074be989674de7910237d8a11d6d0a",
-      "message": "Fix Chithi module load, call icon, and Chithi menu contrast.",
-      "deployedAt": "2026-05-30T11:26:00.971Z",
-      "deployedAtIst": "30/05/2026, 16:56:00",
-      "committedAtIst": "30/05/2026, 16:55:33",
-      "vercelPreviewUrl": "https://connect-intel-9foq27t4x-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 7f1674a"
     }
   ]
 }

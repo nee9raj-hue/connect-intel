@@ -35,8 +35,8 @@ npm run prod:rollback -- 1e99102
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `f592c7e` |
-| Log updated (IST) | 30/05/2026, 18:30:13 |
+| Commit | `86758c3` |
+| Log updated (IST) | 30/05/2026, 18:33:58 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 1e99102
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 30/05/2026, 18:29:55 | `f592c7e` | Improve mobile pipeline filter modals and scale toolbar icons. | [preview](https://connect-intel-1pqukdhvr-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f592c7e` | **← LIVE**
+| 30/05/2026, 18:33:44 | `86758c3` | Restore horizontal scroll for mobile pipeline leads table. | [preview](https://connect-intel-463sqkpgy-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 86758c3` | **← LIVE**
+| 30/05/2026, 18:30:45 | `f04bee4` | Update production log after mobile filter modal and icon sizing deploy. | [preview](https://connect-intel-ju04325y5-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f04bee4` |
+| 30/05/2026, 18:29:55 | `f592c7e` | Improve mobile pipeline filter modals and scale toolbar icons. | [preview](https://connect-intel-1pqukdhvr-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f592c7e` |
 | 30/05/2026, 18:23:48 | `3569af6` | Update production log after Contacts-style pipeline filter modals deploy. | [preview](https://connect-intel-4e88hiw02-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3569af6` |
 | 30/05/2026, 18:22:41 | `82ab12b` | Use Contacts-style filter modals on mobile pipeline and fix duplicate bell. | [preview](https://connect-intel-gyckuojsr-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 82ab12b` |
 | 30/05/2026, 18:17:32 | `cd1f6cc` | Update production log after mobile pipeline alignment deploy. | [preview](https://connect-intel-o5ay6jxn7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- cd1f6cc` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 1e99102
 | 30/05/2026, 17:21:59 | `2848646` | Update production log after safety tooling deploy. | [preview](https://connect-intel-h84wkqgtd-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2848646` |
 | 30/05/2026, 17:20:57 | `8e02383` | Add production safety: CI gate, deploy verify, and rollback log. | [preview](https://connect-intel-4o0oimmtj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8e02383` |
 | 30/05/2026, 17:09:55 | `3db2f52` | Fix marketing Lists filters and simplify Lists tab chrome. | [preview](https://connect-intel-82rrb9bd1-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3db2f52` |
-| 30/05/2026, 17:00:13 | `1376a3a` | Use branded call icon on pipeline leads for callable numbers only. | [preview](https://connect-intel-f09tsav38-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1376a3a` |
-| 30/05/2026, 16:56:00 | `7f1674a` | Fix Chithi module load, call icon, and Chithi menu contrast. | [preview](https://connect-intel-9foq27t4x-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7f1674a` |
 
 ---
 
