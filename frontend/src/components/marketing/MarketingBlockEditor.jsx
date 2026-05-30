@@ -30,7 +30,7 @@ function TypographyRow({ block, onChange, fields = ['fontSize', 'color', 'fontFa
   return (
     <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2 pt-2 border-t border-gray-100">
       {fields.includes('fontFamily') && (
-        <label className="text-[10px] text-gray-500">
+        <label className="text-xs text-gray-500">
           Block font
           <select
             value={block.fontFamily || ''}
@@ -47,7 +47,7 @@ function TypographyRow({ block, onChange, fields = ['fontSize', 'color', 'fontFa
         </label>
       )}
       {fields.includes('fontSize') && (
-        <label className="text-[10px] text-gray-500">
+        <label className="text-xs text-gray-500">
           Default size
           <select
             value={block.fontSize || 15}
@@ -63,7 +63,7 @@ function TypographyRow({ block, onChange, fields = ['fontSize', 'color', 'fontFa
         </label>
       )}
       {fields.includes('color') && (
-        <label className="text-[10px] text-gray-500">
+        <label className="text-xs text-gray-500">
           Default color
           <input
             type="color"
@@ -74,7 +74,7 @@ function TypographyRow({ block, onChange, fields = ['fontSize', 'color', 'fontFa
         </label>
       )}
       {fields.includes('fontWeight') && (
-        <label className="text-[10px] text-gray-500">
+        <label className="text-xs text-gray-500">
           Weight
           <select
             value={block.fontWeight || 'normal'}
@@ -112,7 +112,7 @@ export default function MarketingBlockEditor({ block, onChange, marketingForms =
   if (block.type === 'hero') {
     return (
       <div className="space-y-2">
-        <label className="text-[10px] text-gray-500 uppercase tracking-wide">Headline</label>
+        <label className="text-xs text-gray-500 uppercase tracking-wide">Headline</label>
         <RichTextEditor
           value={block.heading || ''}
           onChange={(heading) => set({ heading })}
@@ -120,7 +120,7 @@ export default function MarketingBlockEditor({ block, onChange, marketingForms =
           minHeight={48}
         />
         <div className="grid grid-cols-2 gap-2">
-          <label className="text-[10px] text-gray-500">
+          <label className="text-xs text-gray-500">
             Headline size
             <select
               value={block.headingSize || 28}
@@ -134,7 +134,7 @@ export default function MarketingBlockEditor({ block, onChange, marketingForms =
               ))}
             </select>
           </label>
-          <label className="text-[10px] text-gray-500">
+          <label className="text-xs text-gray-500">
             Headline color
             <input
               type="color"
@@ -144,7 +144,7 @@ export default function MarketingBlockEditor({ block, onChange, marketingForms =
             />
           </label>
         </div>
-        <label className="text-[10px] text-gray-500 uppercase tracking-wide">Subtext</label>
+        <label className="text-xs text-gray-500 uppercase tracking-wide">Subtext</label>
         <RichTextEditor
           value={block.subtext || ''}
           onChange={(subtext) => set({ subtext })}
@@ -152,7 +152,7 @@ export default function MarketingBlockEditor({ block, onChange, marketingForms =
           minHeight={56}
         />
         <div className="grid grid-cols-2 gap-2">
-          <label className="text-[10px] text-gray-500">
+          <label className="text-xs text-gray-500">
             Subtext size
             <select
               value={block.subtextSize || 16}
@@ -166,7 +166,7 @@ export default function MarketingBlockEditor({ block, onChange, marketingForms =
               ))}
             </select>
           </label>
-          <label className="text-[10px] text-gray-500">
+          <label className="text-xs text-gray-500">
             Subtext color
             <input
               type="color"
@@ -199,7 +199,7 @@ export default function MarketingBlockEditor({ block, onChange, marketingForms =
   if (block.type === 'image') {
     return (
       <div className="space-y-2">
-        <p className="text-[10px] text-gray-500 uppercase tracking-wide">Stock images</p>
+        <p className="text-xs text-gray-500 uppercase tracking-wide">Stock images</p>
         <div className="grid grid-cols-3 gap-1.5">
           {IMAGE_PRESETS.map((preset) => (
             <button
@@ -209,7 +209,7 @@ export default function MarketingBlockEditor({ block, onChange, marketingForms =
               className="text-left rounded-lg border border-gray-100 overflow-hidden hover:border-gray-300"
             >
               <img src={preset.url} alt="" className="w-full h-14 object-cover" />
-              <span className="block text-[9px] px-1 py-0.5 truncate text-gray-600">{preset.label}</span>
+              <span className="block text-xs px-1 py-0.5 truncate text-gray-600">{preset.label}</span>
             </button>
           ))}
         </div>
@@ -231,7 +231,7 @@ export default function MarketingBlockEditor({ block, onChange, marketingForms =
           placeholder="Optional link URL when clicked"
           className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
         />
-        <label className="text-[10px] text-gray-500 block">
+        <label className="text-xs text-gray-500 block">
           Width ({block.width || 100}%)
           <input
             type="range"
@@ -272,7 +272,7 @@ export default function MarketingBlockEditor({ block, onChange, marketingForms =
     }
     return (
       <div className="space-y-2">
-        <p className="text-[10px] text-gray-500 uppercase tracking-wide">Social networks</p>
+        <p className="text-xs text-gray-500 uppercase tracking-wide">Social networks</p>
         <div className="flex flex-wrap gap-1.5">
           {SOCIAL_NETWORKS.map((net) => {
             const active = links.some((l) => l.network === net.id)
@@ -281,7 +281,7 @@ export default function MarketingBlockEditor({ block, onChange, marketingForms =
                 key={net.id}
                 type="button"
                 onClick={() => toggleNetwork(net.id)}
-                className={`text-[10px] px-2 py-1 rounded-full border ${
+                className={`text-xs px-2 py-1 rounded-full border ${
                   active ? 'bg-gray-900 text-white border-gray-900' : 'border-gray-200 text-gray-600'
                 }`}
               >
@@ -305,7 +305,7 @@ export default function MarketingBlockEditor({ block, onChange, marketingForms =
             />
           </div>
         ))}
-        <label className="text-[10px] text-gray-500">
+        <label className="text-xs text-gray-500">
           Icon size (px)
           <input
             type="number"
@@ -337,7 +337,7 @@ export default function MarketingBlockEditor({ block, onChange, marketingForms =
           className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
         />
         <div className="grid grid-cols-2 gap-2">
-          <label className="text-[10px] text-gray-500">
+          <label className="text-xs text-gray-500">
             Button color
             <input
               type="color"
@@ -346,7 +346,7 @@ export default function MarketingBlockEditor({ block, onChange, marketingForms =
               className="mt-0.5 block h-8 w-full rounded border border-gray-200"
             />
           </label>
-          <label className="text-[10px] text-gray-500">
+          <label className="text-xs text-gray-500">
             Text color
             <input
               type="color"
@@ -382,7 +382,7 @@ export default function MarketingBlockEditor({ block, onChange, marketingForms =
     }
     return (
       <div className="space-y-2">
-        <label className="text-[10px] text-gray-500 block">
+        <label className="text-xs text-gray-500 block">
           Form type
           <select
             value={block.formSource || 'native'}
@@ -411,7 +411,7 @@ export default function MarketingBlockEditor({ block, onChange, marketingForms =
               placeholder="https://docs.google.com/forms/… or https://forms.gle/…"
               className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
             />
-            <p className="text-[10px] text-slate-500 leading-relaxed">
+            <p className="text-xs text-slate-500 leading-relaxed">
               Recipients open the form in their browser (same card layout as Connect Intel forms).
             </p>
           </>
@@ -449,7 +449,7 @@ export default function MarketingBlockEditor({ block, onChange, marketingForms =
           className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2"
         />
         <div className="grid grid-cols-2 gap-2">
-          <label className="text-[10px] text-gray-500">
+          <label className="text-xs text-gray-500">
             Button color
             <input
               type="color"
@@ -458,7 +458,7 @@ export default function MarketingBlockEditor({ block, onChange, marketingForms =
               className="mt-0.5 block h-8 w-full rounded border border-gray-200"
             />
           </label>
-          <label className="text-[10px] text-gray-500">
+          <label className="text-xs text-gray-500">
             Text color
             <input
               type="color"
@@ -469,7 +469,7 @@ export default function MarketingBlockEditor({ block, onChange, marketingForms =
           </label>
         </div>
         <AlignSelect value={block.align} onChange={(align) => set({ align })} />
-        <p className="text-[10px] text-gray-400 leading-relaxed">
+        <p className="text-xs text-gray-400 leading-relaxed">
           Email clients cannot show live forms inside the message. Recipients tap the button to open your form in the
           browser — same as Google Forms in newsletters.
         </p>

@@ -332,7 +332,7 @@ export default function MarketingCampaignWizardModal({
               {stepError && !error && <p className="crm-alert crm-alert-error mb-0">{stepError}</p>}
               {notice && <p className="crm-alert crm-alert-success mb-0">{notice}</p>}
               {page === pageCount - 1 && saveHint && !canSaveCampaignDraft && !error && (
-                <p className="text-[11px] text-amber-900 bg-amber-50 border border-amber-100 rounded-lg px-2.5 py-2 mb-0">
+                <p className="text-xs text-amber-900 bg-amber-50 border border-amber-100 rounded-lg px-2.5 py-2 mb-0">
                   {saveHint}
                 </p>
               )}

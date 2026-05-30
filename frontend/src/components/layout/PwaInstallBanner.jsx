@@ -18,13 +18,13 @@ export default function PwaInstallBanner({ enabled = true }) {
       <div className="flex items-center gap-2.5">
         <img src="/pwa-192.png" alt="" className="w-10 h-10 rounded-xl shrink-0" aria-hidden />
         <div className="min-w-0 flex-1 flex flex-wrap items-center gap-2">
-          <p className="text-[12px] font-semibold text-[#17191c]">Install app</p>
+          <p className="text-xs font-semibold text-[#17191c]">Install app</p>
           {canNativeInstall && (
             <button
               type="button"
               disabled={installing}
               onClick={() => void install()}
-              className="text-[11px] font-semibold px-3 py-1.5 rounded-lg bg-[#17191c] text-white disabled:opacity-60"
+              className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-[#17191c] text-white disabled:opacity-60"
             >
               {installing ? '…' : 'Install'}
             </button>
@@ -32,7 +32,7 @@ export default function PwaInstallBanner({ enabled = true }) {
           <button
             type="button"
             onClick={dismiss}
-            className="text-[11px] font-semibold px-2 py-1.5 rounded-lg text-[#536072] hover:text-[#17191c]"
+            className="text-xs font-semibold px-2 py-1.5 rounded-lg text-[#536072] hover:text-[#17191c]"
           >
             Dismiss
           </button>

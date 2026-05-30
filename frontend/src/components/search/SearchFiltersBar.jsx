@@ -194,7 +194,7 @@ export default function SearchFiltersBar({
       ) : null}
 
       {!filtersExpanded && activeCount > 0 && (
-        <p className="text-[11px] text-[#647185]">
+        <p className="text-xs text-[#647185]">
           {stateHint} · {cityHint}
           {filters.industries?.length ? ` · ${filters.industries.length} industries` : ''}
         </p>
@@ -253,7 +253,7 @@ function MultiSelectField({
         </div>
         <div className="crm-filter-card-options">
           {filteredOptions.length === 0 ? (
-            <p className="px-2 py-3 text-[12px] text-gray-500 text-center">No matches</p>
+            <p className="px-2 py-3 text-xs text-gray-500 text-center">No matches</p>
           ) : (
             filteredOptions.map((option) => (
               <label key={option} className={`crm-filter-check ${selected.includes(option) ? 'is-checked' : ''}`}>

@@ -251,7 +251,7 @@ export default function WhatsAppInboxPanel({ onNavigate }) {
                     msg.direction === 'outbound' ? 'text-green-100' : 'text-gray-400'
                   }`}
                 >
-                  <span className="text-[10px]">
+                  <span className="text-xs">
                     {msg.sentAt
                       ? new Date(msg.sentAt).toLocaleTimeString('en-IN', {
                           hour: '2-digit',
@@ -404,7 +404,7 @@ export default function WhatsAppInboxPanel({ onNavigate }) {
                         {t.unread && <span className="w-2 h-2 bg-green-500 rounded-full shrink-0 mt-1" />}
                       </div>
                       <p className="text-xs text-gray-400 truncate mt-0.5">{t.lastSnippet || '—'}</p>
-                      <p className="text-[10px] text-gray-300 mt-0.5">{formatPhoneDisplay(t.leadPhone)}</p>
+                      <p className="text-xs text-gray-300 mt-0.5">{formatPhoneDisplay(t.leadPhone)}</p>
                     </div>
                   </div>
                 </button>

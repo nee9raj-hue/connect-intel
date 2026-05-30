@@ -152,7 +152,7 @@ export default function OrgLeadTagsPanel({ onTagsChange, embedded = false }) {
 
       <form onSubmit={handleCreate} className="space-y-2">
         <div>
-          <label className="block text-[10px] font-semibold uppercase text-gray-400 mb-1">
+          <label className="block text-xs font-semibold uppercase text-gray-400 mb-1">
             New tag{isBulk ? 's' : ''}
           </label>
           <input
@@ -162,7 +162,7 @@ export default function OrgLeadTagsPanel({ onTagsChange, embedded = false }) {
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
           />
           {pendingNames.length > 0 && (
-            <p className="text-[10px] text-gray-500 mt-1">
+            <p className="text-xs text-gray-500 mt-1">
               {isBulk
                 ? `Will create ${pendingNames.length} tags with different colors`
                 : 'One tag — pick a color below (optional)'}
@@ -172,7 +172,7 @@ export default function OrgLeadTagsPanel({ onTagsChange, embedded = false }) {
 
         {!isBulk && (
           <div>
-            <label className="block text-[10px] font-semibold uppercase text-gray-400 mb-1">Color</label>
+            <label className="block text-xs font-semibold uppercase text-gray-400 mb-1">Color</label>
             <div className="flex gap-1 flex-wrap">
               {PRESET_COLORS.map((c) => (
                 <button

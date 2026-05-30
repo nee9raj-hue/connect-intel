@@ -44,8 +44,8 @@ export default function CrmEmailThread({
     <section className="rounded-xl border border-gray-200 bg-white overflow-hidden">
       <div className="px-3 py-2.5 border-b border-gray-100 flex flex-wrap items-center justify-between gap-2">
         <div>
-          <h3 className="text-[11px] font-semibold uppercase text-gray-500">Email thread</h3>
-          <p className="text-[10px] text-gray-400 mt-0.5">
+          <h3 className="text-xs font-semibold uppercase text-gray-500">Email thread</h3>
+          <p className="text-xs text-gray-400 mt-0.5">
             Email thread — outbound sends and replies in one place
           </p>
         </div>
@@ -55,7 +55,7 @@ export default function CrmEmailThread({
               type="button"
               disabled={busy}
               onClick={() => onSync?.()}
-              className="text-[10px] font-semibold px-2 py-1 rounded-md border border-gray-200 hover:bg-gray-50 disabled:opacity-50"
+              className="text-xs font-semibold px-2 py-1 rounded-md border border-gray-200 hover:bg-gray-50 disabled:opacity-50"
               title={
                 replySyncEnabled
                   ? 'Pull recent messages from your inbox'
@@ -69,7 +69,7 @@ export default function CrmEmailThread({
             type="button"
             disabled={busy}
             onClick={() => setShowReplyForm((v) => !v)}
-            className="text-[10px] font-semibold px-2 py-1 rounded-md bg-violet-50 text-violet-800 border border-violet-200"
+            className="text-xs font-semibold px-2 py-1 rounded-md bg-violet-50 text-violet-800 border border-violet-200"
           >
             + Log reply
           </button>
@@ -77,7 +77,7 @@ export default function CrmEmailThread({
       </div>
 
       {showReplySyncUpgrade && gmailConnected && !replySyncEnabled && onEnableReplySync && (
-        <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] text-amber-950 bg-amber-50 border-b border-amber-100 px-3 py-2">
+        <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-amber-950 bg-amber-50 border-b border-amber-100 px-3 py-2">
           <p className="leading-relaxed">
             Allow email import (one-time). If sign-in is blocked, contact your Connect Intel administrator.
           </p>
@@ -85,7 +85,7 @@ export default function CrmEmailThread({
             type="button"
             disabled={busy || enableReplySyncBusy}
             onClick={() => onEnableReplySync()}
-            className="shrink-0 text-[10px] font-semibold px-2.5 py-1 rounded-md bg-[#FF773D] text-[#242424] border border-[#ffd4b8] disabled:opacity-50"
+            className="shrink-0 text-xs font-semibold px-2.5 py-1 rounded-md bg-[#FF773D] text-[#242424] border border-[#ffd4b8] disabled:opacity-50"
           >
             {enableReplySyncBusy ? 'Connecting…' : 'Allow reply import'}
           </button>
@@ -152,19 +152,19 @@ export default function CrmEmailThread({
                 >
                   <div className="flex items-start justify-between gap-2">
                     <span
-                      className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${
+                      className={`text-xs font-bold uppercase px-1.5 py-0.5 rounded ${
                         inbound ? 'bg-violet-200 text-violet-900' : 'bg-gray-200 text-gray-700'
                       }`}
                     >
                       {inbound ? 'Reply' : 'Sent'}
                     </span>
-                    <span className="text-[10px] text-gray-500 shrink-0">
+                    <span className="text-xs text-gray-500 shrink-0">
                       {formatDateTime(msg.sentAt) || formatCrmDate(msg.sentAt)}
                     </span>
                   </div>
                   <p className="font-semibold text-gray-900 mt-1 truncate">{msg.subject || '(No subject)'}</p>
                   {msg.fromMailbox && (
-                    <p className="text-[10px] text-gray-500 mt-0.5 truncate">{msg.fromMailbox}</p>
+                    <p className="text-xs text-gray-500 mt-0.5 truncate">{msg.fromMailbox}</p>
                   )}
                   {!open && (
                     <p className="text-gray-600 mt-1 line-clamp-2 whitespace-pre-wrap">
@@ -172,14 +172,14 @@ export default function CrmEmailThread({
                     </p>
                   )}
                   {!open && msg.attachments?.length > 0 && (
-                    <p className="text-[10px] text-gray-500 mt-1">
+                    <p className="text-xs text-gray-500 mt-1">
                       📎 {msg.attachments.length} attachment{msg.attachments.length === 1 ? '' : 's'}
                     </p>
                   )}
                 </button>
                 {open && (
                   <div className="px-3 pb-3 border-t border-gray-200/60">
-                    <pre className="text-[11px] text-gray-700 whitespace-pre-wrap font-sans leading-relaxed mt-2">
+                    <pre className="text-xs text-gray-700 whitespace-pre-wrap font-sans leading-relaxed mt-2">
                       {msg.body || msg.bodyPreview || ''}
                     </pre>
                     {msg.attachments?.length > 0 && (
@@ -187,7 +187,7 @@ export default function CrmEmailThread({
                         {msg.attachments.map((file, index) => (
                           <span
                             key={`${file.filename}-${index}`}
-                            className="text-[10px] px-2 py-0.5 rounded-md bg-gray-200 text-gray-800"
+                            className="text-xs px-2 py-0.5 rounded-md bg-gray-200 text-gray-800"
                           >
                             📎 {file.filename}
                             {file.sizeBytes ? ` (${formatAttachmentSize(file.sizeBytes)})` : ''}

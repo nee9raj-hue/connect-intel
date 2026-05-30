@@ -71,7 +71,7 @@ export default function OnboardingModal() {
             placeholder="+91 98765 43210"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
           />
-          <p className="text-[11px] text-gray-500 mt-1">Same number you use on WhatsApp — for customer outreach from CRM.</p>
+          <p className="text-xs text-gray-500 mt-1">Same number you use on WhatsApp — for customer outreach from CRM.</p>
         </div>
 
         {accountType === 'company' && (
@@ -97,7 +97,7 @@ export default function OnboardingModal() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
               />
             </div>
-            <p className="text-[11px] text-gray-500">
+            <p className="text-xs text-gray-500">
               You are the company admin. Invite teammates later from Team — searches and credits use your company pool.
             </p>
           </div>

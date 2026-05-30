@@ -22,9 +22,9 @@ export default function ResultsTable({
 
   return (
     <div className={wrapperClass}>
-      <table className="w-full text-[13px]">
+      <table className="w-full text-sm">
         <thead className="sticky top-0 bg-gray-50 border-b border-gray-200 z-10 shadow-sm">
-          <tr className="text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wide">
+          <tr className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
             <th className="w-10 py-2.5 pl-4">
               <input type="checkbox" checked={allSelected} onChange={onSelectAll} className="rounded" />
             </th>
@@ -69,7 +69,7 @@ export default function ResultsTable({
               <td className="py-2.5 pr-2 align-top">
                 <div className="font-medium text-gray-900">{lead.company}</div>
                 {lead.companyDomain && (
-                  <div className="text-[11px] text-gray-400">{lead.companyDomain}</div>
+                  <div className="text-xs text-gray-400">{lead.companyDomain}</div>
                 )}
               </td>
               <td className="py-2.5 pr-2 align-top">
@@ -103,7 +103,7 @@ export default function ResultsTable({
                     <button
                       type="button"
                       onClick={() => onWorkOnLead(lead)}
-                      className="text-[11px] font-semibold px-2 py-1.5 rounded border border-[#8a6600]/30 text-[#8a6600] bg-[#fff4ee] hover:bg-[#fff4bf]"
+                      className="text-xs font-semibold px-2 py-1.5 rounded border border-[#8a6600]/30 text-[#8a6600] bg-[#fff4ee] hover:bg-[#fff4bf]"
                     >
                       Pipeline
                     </button>
@@ -111,7 +111,7 @@ export default function ResultsTable({
                   <button
                     type="button"
                     onClick={() => onSave(lead)}
-                    className={`text-[11px] font-semibold px-2 py-1.5 rounded border ${
+                    className={`text-xs font-semibold px-2 py-1.5 rounded border ${
                       isSaved(lead.id)
                         ? 'border-green-500 text-green-700 bg-green-50'
                         : 'border-gray-200 text-gray-600 opacity-0 group-hover:opacity-100 hover:border-gray-400'
@@ -136,7 +136,7 @@ function Avatar({ name }) {
     .join('')
     .slice(0, 2)
   return (
-    <div className="w-8 h-8 rounded-full bg-[#FF773D] flex items-center justify-center text-[11px] font-bold text-white shrink-0">
+    <div className="w-8 h-8 rounded-full bg-[#FF773D] flex items-center justify-center text-xs font-bold text-white shrink-0">
       {initials}
     </div>
   )
@@ -152,7 +152,7 @@ function SourceBadge({ source }) {
         : 'bg-gray-50 text-gray-600 border-gray-200'
 
   return (
-    <span className={`text-[10px] px-1.5 py-0.5 rounded border ${tone}`}>{label}</span>
+    <span className={`text-xs px-1.5 py-0.5 rounded border ${tone}`}>{label}</span>
   )
 }
 
@@ -163,12 +163,12 @@ function MiniBadge({ children, tone = 'gray' }) {
     gray: 'bg-gray-50 text-gray-600 border-gray-200',
   }
 
-  return <span className={`text-[10px] px-1.5 py-0.5 rounded border ${classes[tone]}`}>{children}</span>
+  return <span className={`text-xs px-1.5 py-0.5 rounded border ${classes[tone]}`}>{children}</span>
 }
 
 function ScoreBadge({ score }) {
   const n = score || 0
   const cls =
     n >= 85 ? 'bg-[#fff4ee] text-[#FF773D]' : n >= 70 ? 'bg-slate-100 text-[#64748B]' : 'bg-gray-100 text-gray-600'
-  return <span className={`inline-block px-1.5 py-0.5 rounded text-[11px] font-bold ${cls}`}>{n}</span>
+  return <span className={`inline-block px-1.5 py-0.5 rounded text-xs font-bold ${cls}`}>{n}</span>
 }

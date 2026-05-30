@@ -188,7 +188,7 @@ export default function OrgPipelineImport({ onImported, embedded = false }) {
           {loading ? 'Importing…' : `Import ${rows.length || ''} row${rows.length === 1 ? '' : 's'}`}
         </button>
 
-        <p className="text-[11px] text-gray-500">
+        <p className="text-xs text-gray-500">
           Template columns include optional <code className="text-gray-700">assignee_email</code>,{' '}
           <code className="text-gray-700">team_leader</code>, <code className="text-gray-700">lead_tags</code>,{' '}
           <code className="text-gray-700">pipeline_status</code>, <code className="text-gray-700">notes</code>.

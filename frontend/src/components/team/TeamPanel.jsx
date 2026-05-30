@@ -334,7 +334,7 @@ export default function TeamPanel({ onNavigate }) {
                 title="Team members"
                 description="Roles, search access, and pipeline permissions"
                 badge={
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 tabular-nums">
+                  <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 tabular-nums">
                     {teamMembers.length}
                   </span>
                 }
@@ -356,7 +356,7 @@ export default function TeamPanel({ onNavigate }) {
                           <p className="text-sm font-medium text-gray-900 truncate flex items-center gap-1.5">
                             {m.name}
                             {m.role === 'org_admin' && (
-                              <span className="text-[9px] font-bold uppercase tracking-wide text-[#8a6600] bg-[#fff4ee] px-1.5 py-0.5 rounded">
+                              <span className="text-xs font-bold uppercase tracking-wide text-[#8a6600] bg-[#fff4ee] px-1.5 py-0.5 rounded">
                                 Admin
                               </span>
                             )}
@@ -414,7 +414,7 @@ export default function TeamPanel({ onNavigate }) {
 
                   <div className="rounded-xl border border-[#ffd4b8]/60 bg-[#fff4ee]/50 p-4 space-y-3">
                     <p className="text-xs font-semibold text-[#FF773D]">Team invite system</p>
-                    <p className="text-[11px] text-[#8a6600] leading-relaxed">
+                    <p className="text-xs text-[#8a6600] leading-relaxed">
                       Invites send from <strong>invite@connectintel.net</strong> with your name; replies go to{' '}
                       <strong>{user?.email}</strong>.
                     </p>
@@ -442,7 +442,7 @@ export default function TeamPanel({ onNavigate }) {
                     />
                     <div className="grid sm:grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-[10px] font-semibold uppercase text-gray-400 mb-1">
+                        <label className="block text-xs font-semibold uppercase text-gray-400 mb-1">
                           Pipeline role
                         </label>
                         <select
@@ -505,7 +505,7 @@ export default function TeamPanel({ onNavigate }) {
                       <input
                         readOnly
                         value={lastInviteUrl}
-                        className="w-full text-[11px] bg-white border border-gray-200 rounded-lg px-2 py-1.5 font-mono"
+                        className="w-full text-xs bg-white border border-gray-200 rounded-lg px-2 py-1.5 font-mono"
                         onFocus={(e) => e.target.select()}
                       />
                     </div>

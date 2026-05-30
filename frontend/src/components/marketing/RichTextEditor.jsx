@@ -93,7 +93,7 @@ export default function RichTextEditor({
         <button
           type="button"
           onClick={() => setShowIcons((v) => !v)}
-          className={`text-[10px] font-semibold px-2 py-1 rounded border ${
+          className={`text-xs font-semibold px-2 py-1 rounded border ${
             showIcons ? 'bg-gray-900 text-white border-gray-900' : 'border-gray-200 text-gray-700 bg-white'
           }`}
         >
@@ -103,7 +103,7 @@ export default function RichTextEditor({
           type="button"
           onClick={applyBold}
           disabled={!hasSelection}
-          className="text-[10px] font-bold px-2 py-1 rounded border border-gray-200 bg-white disabled:opacity-40"
+          className="text-xs font-bold px-2 py-1 rounded border border-gray-200 bg-white disabled:opacity-40"
           title="Bold selection"
         >
           B
@@ -113,7 +113,7 @@ export default function RichTextEditor({
             <select
               value={fmtSize}
               onChange={(e) => setFmtSize(Number(e.target.value))}
-              className="text-[10px] border border-gray-200 rounded px-1.5 py-1 bg-white"
+              className="text-xs border border-gray-200 rounded px-1.5 py-1 bg-white"
               title="Font size for selection"
             >
               {FONT_SIZE_OPTIONS.filter((s) => s >= 11 && s <= 36).map((s) => (
@@ -132,14 +132,14 @@ export default function RichTextEditor({
             <button
               type="button"
               onClick={applyFormat}
-              className="text-[10px] font-semibold px-2 py-1 rounded bg-[#FF773D] text-[#242424]"
+              className="text-xs font-semibold px-2 py-1 rounded bg-[#FF773D] text-[#242424]"
             >
               Apply to selection
             </button>
           </>
         )}
         {!hasSelection && (
-          <span className="text-[10px] text-gray-400">Select text to change size or color</span>
+          <span className="text-xs text-gray-400">Select text to change size or color</span>
         )}
       </div>
 
@@ -164,7 +164,7 @@ export default function RichTextEditor({
             ))}
           </div>
           <div className="grid grid-cols-2 gap-2">
-            <label className="text-[10px] text-gray-500">
+            <label className="text-xs text-gray-500">
               Icon color
               <input
                 type="color"
@@ -173,7 +173,7 @@ export default function RichTextEditor({
                 className="mt-0.5 block h-7 w-full rounded border border-gray-200"
               />
             </label>
-            <label className="text-[10px] text-gray-500">
+            <label className="text-xs text-gray-500">
               Icon size
               <select
                 value={iconSize}

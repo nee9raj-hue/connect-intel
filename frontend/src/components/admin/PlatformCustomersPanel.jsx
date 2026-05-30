@@ -138,7 +138,7 @@ export default function PlatformCustomersPanel() {
   return (
     <div className="h-full flex flex-col bg-[#f0f1f4] overflow-hidden">
       <header className="shrink-0 bg-gray-900 text-white px-5 py-4 border-b border-gray-800">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-[#FF773D]">Connect Intel · Support desk</p>
+        <p className="text-xs font-bold uppercase tracking-widest text-[#FF773D]">Connect Intel · Support desk</p>
         <h1 className="text-xl font-semibold mt-0.5">Platform support backend</h1>
         <p className="text-sm text-gray-400 mt-1 max-w-2xl">
           Triage customer tickets (24–48h SLA), reply by email, and manage credits, access, and onboarding — no live call
@@ -219,7 +219,7 @@ export default function PlatformCustomersPanel() {
               >
                 <p className="text-sm font-medium text-gray-900 truncate">{row.name}</p>
                 <p className="text-xs text-gray-500 truncate">{row.email}</p>
-                <p className="text-[10px] text-gray-400 mt-1 truncate">
+                <p className="text-xs text-gray-400 mt-1 truncate">
                   {row.organizationName || row.accountType} · ₹{row.creditBalanceRupees} ·{' '}
                   {row.onboardingComplete ? 'Active' : 'Onboarding'}
                 </p>
@@ -237,7 +237,7 @@ export default function PlatformCustomersPanel() {
               >
                 <p className="text-sm font-medium text-gray-900 truncate">{row.name}</p>
                 <p className="text-xs text-gray-500 truncate">{row.ownerEmail || row.domain}</p>
-                <p className="text-[10px] text-gray-400 mt-1">
+                <p className="text-xs text-gray-400 mt-1">
                   {row.memberCount} members · {row.pipelineLeads} leads
                 </p>
               </button>
@@ -263,8 +263,8 @@ export default function PlatformCustomersPanel() {
 
       {overview?.recentAudit?.length > 0 && tab !== 'tickets' && (
         <footer className="shrink-0 border-t border-gray-200 bg-white px-5 py-2 max-h-24 overflow-y-auto">
-          <p className="text-[10px] font-semibold uppercase text-gray-400 mb-1">Recent support actions</p>
-          <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-gray-600">
+          <p className="text-xs font-semibold uppercase text-gray-400 mb-1">Recent support actions</p>
+          <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-600">
             {overview.recentAudit.map((a) => (
               <span key={a.id}>
                 {a.action} · {a.targetType} {a.targetId?.slice(0, 8)}… · {formatDateTime(a.createdAt)}
@@ -280,7 +280,7 @@ export default function PlatformCustomersPanel() {
 function Metric({ label, value, warn = false }) {
   return (
     <div className={`rounded-lg border px-2 py-1.5 ${warn ? 'border-amber-200 bg-amber-50' : 'border-gray-100 bg-gray-50'}`}>
-      <p className="text-[10px] text-gray-500 uppercase font-semibold">{label}</p>
+      <p className="text-xs text-gray-500 uppercase font-semibold">{label}</p>
       <p className={`text-lg font-bold ${warn ? 'text-amber-900' : 'text-gray-900'}`}>{value ?? '—'}</p>
     </div>
   )
@@ -638,7 +638,7 @@ function OrganizationDetail({ detail, busy, onAction }) {
 function Field({ label, value }) {
   return (
     <div className="rounded border border-gray-100 bg-gray-50 px-2 py-1.5">
-      <p className="text-[10px] uppercase font-semibold text-gray-400">{label}</p>
+      <p className="text-xs uppercase font-semibold text-gray-400">{label}</p>
       <p className="text-xs text-gray-900 mt-0.5">{value}</p>
     </div>
   )
@@ -705,7 +705,7 @@ function InvoiceTable({ rows }) {
 function Stat({ label, value }) {
   return (
     <div className="bg-white rounded-lg border border-gray-200 px-3 py-2">
-      <p className="text-[10px] uppercase font-semibold text-gray-400">{label}</p>
+      <p className="text-xs uppercase font-semibold text-gray-400">{label}</p>
       <p className="text-base font-bold text-gray-900">{value}</p>
     </div>
   )
@@ -714,7 +714,7 @@ function Stat({ label, value }) {
 function Badge({ ok, label }) {
   return (
     <span
-      className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
+      className={`text-xs font-bold uppercase px-2 py-0.5 rounded-full ${
         ok ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
       }`}
     >

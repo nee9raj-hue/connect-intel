@@ -66,7 +66,7 @@ export default function LandingPage() {
       <nav className="fixed top-0 inset-x-0 z-50 h-[60px] border-b border-gray-200/80 bg-white/95 backdrop-blur-sm">
         <div className="max-w-[1200px] mx-auto h-full px-6 flex items-center justify-between">
           <Logo />
-          <div className="hidden lg:flex items-center gap-6 text-[13px] font-medium text-gray-600">
+          <div className="hidden lg:flex items-center gap-6 text-sm font-medium text-gray-600">
             <a href="#problem" className="hover:text-gray-900 transition-colors">
               Why CRM
             </a>
@@ -88,14 +88,14 @@ export default function LandingPage() {
             <button
               type="button"
               onClick={() => setScreen('auth')}
-              className="hidden sm:inline-flex px-4 py-2 text-[13px] font-semibold text-gray-700 hover:text-gray-900"
+              className="hidden sm:inline-flex px-4 py-2 text-sm font-semibold text-gray-700 hover:text-gray-900"
             >
               Log in
             </button>
             <button
               type="button"
               onClick={() => setScreen('auth')}
-              className="px-4 py-2 text-[13px] font-bold bg-ci-yellow text-ci-dark rounded-md hover:bg-ci-yellow-hover transition-colors"
+              className="px-4 py-2 text-sm font-bold bg-ci-yellow text-ci-dark rounded-md hover:bg-ci-yellow-hover transition-colors"
             >
               Start free
             </button>
@@ -112,7 +112,7 @@ export default function LandingPage() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF773D]/50 opacity-60" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF773D]" />
             </span>
-            <span className="text-[12px] font-semibold text-gray-600">
+            <span className="text-xs font-semibold text-gray-600">
               CRM + AI prospecting built for Indian B2B teams
             </span>
           </div>
@@ -246,7 +246,7 @@ export default function LandingPage() {
       <section className="py-16 px-6 bg-gray-50">
         <div className="max-w-[1100px] mx-auto">
           <WhatsAppOneClick />
-          <p className="text-[10px] text-gray-400 text-center mt-4 max-w-lg mx-auto">
+          <p className="text-xs text-gray-400 text-center mt-4 max-w-lg mx-auto">
             *Results vary by team discipline; structured follow-ups and timed reminders improve reply and meeting
             rates for most B2B sales teams.
           </p>
@@ -269,9 +269,9 @@ export default function LandingPage() {
                 id={f.id}
                 className="p-6 rounded-xl border border-gray-200 bg-white hover:border-[#FF773D]/50 hover:shadow-md transition-all"
               >
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#b8860b]">{f.tag}</span>
+                <span className="text-xs font-bold uppercase tracking-wider text-[#b8860b]">{f.tag}</span>
                 <h3 className="font-semibold text-gray-900 mt-2 mb-2 text-[15px]">{f.title}</h3>
-                <p className="text-[13px] text-gray-600 leading-relaxed">{f.desc}</p>
+                <p className="text-sm text-gray-600 leading-relaxed">{f.desc}</p>
               </article>
             ))}
           </div>
@@ -282,7 +282,7 @@ export default function LandingPage() {
       <section id="managers" className="py-20 px-6 bg-[#0f0f0f] text-white">
         <div className="max-w-[1100px] mx-auto grid lg:grid-cols-2 gap-10 items-center">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-wider text-amber-300 mb-3">For managers & admins</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-amber-300 mb-3">For managers & admins</p>
             <h2 className="font-display text-2xl md:text-3xl font-bold mb-4">
               See how your team is working—and where to help them win
             </h2>
@@ -324,7 +324,7 @@ export default function LandingPage() {
                   {s.step}
                 </div>
                 <p className="font-semibold text-sm">{s.title}</p>
-                <p className="text-[11px] text-gray-500 mt-1">{s.sub}</p>
+                <p className="text-xs text-gray-500 mt-1">{s.sub}</p>
               </div>
             ))}
           </div>
@@ -354,7 +354,7 @@ export default function LandingPage() {
       </section>
 
       <footer className="py-10 px-6 border-t border-gray-200 bg-white">
-        <div className="max-w-[1100px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-[13px] text-gray-500">
+        <div className="max-w-[1100px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-500">
           <Logo />
           <p>© {new Date().getFullYear()} Connect Intel · B2B CRM & AI prospecting for India</p>
           <a href="https://connectintel.net/privacy.html" className="hover:text-gray-800">
@@ -435,7 +435,7 @@ function ProductPreview() {
             {['Pipeline', 'People search', 'Activity log', 'Calendar', 'Team'].map((item, i) => (
               <div
                 key={item}
-                className={`px-2 py-1.5 rounded text-[11px] font-medium ${
+                className={`px-2 py-1.5 rounded text-xs font-medium ${
                   i === 0 ? 'bg-white/15 text-white' : 'text-gray-500'
                 }`}
               >
@@ -448,14 +448,14 @@ function ProductPreview() {
         <div className="flex-1 flex flex-col min-w-0 bg-ci-surface">
           <div className="h-11 bg-white border-b border-gray-200 flex items-center px-4 gap-2">
             <span className="text-sm font-semibold text-ci-dark">Pipeline</span>
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#fff4ee] text-[#FF773D] font-semibold border border-[#ffd4b8]">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-[#fff4ee] text-[#FF773D] font-semibold border border-[#ffd4b8]">
               Follow-up in 28 min
             </span>
           </div>
           <div className="flex-1 bg-white overflow-hidden p-2">
-            <table className="w-full text-left text-[11px]">
+            <table className="w-full text-left text-xs">
               <thead>
-                <tr className="text-gray-500 font-semibold uppercase text-[9px]">
+                <tr className="text-gray-500 font-semibold uppercase text-xs">
                   <th className="py-1 pl-1">Lead</th>
                   <th className="py-1 hidden sm:table-cell">Company</th>
                   <th className="py-1 text-right">Score</th>
@@ -467,7 +467,7 @@ function ProductPreview() {
                     <td className="py-2 pl-1 font-medium text-gray-900">{r.name}</td>
                     <td className="py-2 text-gray-600 hidden sm:table-cell">{r.company}</td>
                     <td className="py-2 text-right">
-                      <span className="inline-flex w-7 h-7 items-center justify-center rounded-full bg-[#fff4ee] text-[#FF773D] font-bold text-[10px]">
+                      <span className="inline-flex w-7 h-7 items-center justify-center rounded-full bg-[#fff4ee] text-[#FF773D] font-bold text-xs">
                         {r.score}
                       </span>
                     </td>

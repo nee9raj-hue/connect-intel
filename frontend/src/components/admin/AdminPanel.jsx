@@ -144,7 +144,7 @@ export default function AdminPanel() {
     <div className="panel-shell">
       <div className="panel-body-scroll p-6">
       <div className="mb-6 rounded-2xl border border-gray-900 bg-gray-900 text-white px-5 py-4">
-        <p className="text-[11px] font-semibold uppercase tracking-wide text-[#FF773D]">Platform operator</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-[#FF773D]">Platform operator</p>
         <h1 className="text-xl font-semibold mt-1">Master data & imports</h1>
         <p className="text-sm text-gray-300 mt-2 max-w-2xl">
           Upload exporter and contact sheets here. All customer searches use this shared database. Customer
@@ -273,14 +273,14 @@ export default function AdminPanel() {
                 <div key={item.id} className="rounded-xl border border-gray-200 p-3">
                   <div className="flex items-center justify-between gap-3">
                     <div className="text-sm font-semibold text-gray-900">{item.datasetType}</div>
-                    <span className="text-[11px] font-medium px-2 py-1 rounded-full bg-green-100 text-green-700">
+                    <span className="text-xs font-medium px-2 py-1 rounded-full bg-green-100 text-green-700">
                       {item.status}
                     </span>
                   </div>
                   <div className="mt-2 text-xs text-gray-500">
                     {item.rowCount} rows · {item.companiesCreated} companies · {item.contactsCreated} contacts
                   </div>
-                  <div className="mt-1 text-[11px] text-gray-400">
+                  <div className="mt-1 text-xs text-gray-400">
                     {new Date(item.createdAt).toLocaleString()}
                   </div>
                 </div>

@@ -224,14 +224,14 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
                     {googleBusy ? 'Syncing…' : 'Sync from Google'}
                   </button>
                   {googleCal.lastSyncAt && (
-                    <span className="self-center text-[10px] text-emerald-800">
+                    <span className="self-center text-xs text-emerald-800">
                       Last sync {formatDateTime(googleCal.lastSyncAt)}
                     </span>
                   )}
                 </>
               )}
             </div>
-            {googleNotice && <p className="text-[11px] font-medium">{googleNotice}</p>}
+            {googleNotice && <p className="text-xs font-medium">{googleNotice}</p>}
           </div>
         )}
 
@@ -352,7 +352,7 @@ function WeekView({ days, events, onSelect }) {
               isToday ? 'border-[#FF773D] ring-1 ring-[#FF773D]/40' : 'border-gray-200'
             }`}
           >
-            <p className={`text-[10px] font-bold px-2 py-1.5 border-b ${isToday ? 'bg-[#fff4ee]' : 'bg-gray-50'}`}>
+            <p className={`text-xs font-bold px-2 py-1.5 border-b ${isToday ? 'bg-[#fff4ee]' : 'bg-gray-50'}`}>
               {day.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric' })}
             </p>
             <div className="flex-1 overflow-y-auto p-1 space-y-1">
@@ -361,7 +361,7 @@ function WeekView({ days, events, onSelect }) {
                   key={ev.id}
                   type="button"
                   onClick={() => onSelect(ev)}
-                  className={`w-full text-left text-[10px] px-1.5 py-1 rounded border truncate ${KIND_STYLES[ev.kind]?.bg} ${KIND_STYLES[ev.kind]?.border}`}
+                  className={`w-full text-left text-xs px-1.5 py-1 rounded border truncate ${KIND_STYLES[ev.kind]?.bg} ${KIND_STYLES[ev.kind]?.border}`}
                 >
                   {new Date(ev.scheduledAt).toLocaleTimeString(undefined, {
                     hour: 'numeric',
@@ -384,7 +384,7 @@ function MonthView({ anchor, events, onSelect }) {
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-      <div className="grid grid-cols-7 border-b border-gray-100 bg-gray-50 text-[10px] font-bold text-gray-500 uppercase">
+      <div className="grid grid-cols-7 border-b border-gray-100 bg-gray-50 text-xs font-bold text-gray-500 uppercase">
         {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((d) => (
           <div key={d} className="px-2 py-2 text-center">
             {d}
@@ -412,13 +412,13 @@ function MonthView({ anchor, events, onSelect }) {
                 {dayEvents.slice(0, 3).map((ev) => (
                   <span
                     key={ev.id}
-                    className={`block text-[9px] truncate px-1 rounded ${KIND_STYLES[ev.kind]?.bg}`}
+                    className={`block text-xs truncate px-1 rounded ${KIND_STYLES[ev.kind]?.bg}`}
                   >
                     {ev.title}
                   </span>
                 ))}
                 {dayEvents.length > 3 && (
-                  <span className="text-[9px] text-gray-500">+{dayEvents.length - 3} more</span>
+                  <span className="text-xs text-gray-500">+{dayEvents.length - 3} more</span>
                 )}
               </div>
             </button>
@@ -438,7 +438,7 @@ function EventChip({ event, onClick }) {
       className={`w-full text-left rounded-xl border p-3 hover:shadow-sm transition-shadow ${style.bg} ${style.border}`}
     >
       <div className="flex items-center gap-2">
-        <span className={`text-[10px] font-bold uppercase ${style.text}`}>{style.label}</span>
+        <span className={`text-xs font-bold uppercase ${style.text}`}>{style.label}</span>
         <StatusPill status={event.timeStatus} />
       </div>
       <p className="text-sm font-semibold text-gray-900 mt-1">{event.title}</p>
@@ -459,7 +459,7 @@ function StatusPill({ status }) {
     completed: 'bg-blue-100 text-blue-800',
   }
   return (
-    <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded-full ${map[status] || map.past}`}>
+    <span className={`text-xs font-bold uppercase px-1.5 py-0.5 rounded-full ${map[status] || map.past}`}>
       {status || 'past'}
     </span>
   )
@@ -475,7 +475,7 @@ function EventDetailDrawer({ event, memberName, onClose, onOpenLead }) {
       <aside className="fixed right-0 top-0 bottom-0 z-50 w-full max-w-md bg-white shadow-xl border-l border-gray-200 flex flex-col">
         <div className="px-5 py-4 border-b border-gray-100 flex items-start justify-between gap-3">
           <div>
-            <span className={`text-[10px] font-bold uppercase ${style.text}`}>{style.label}</span>
+            <span className={`text-xs font-bold uppercase ${style.text}`}>{style.label}</span>
             <h2 className="text-lg font-semibold text-gray-900 mt-1">{event.title}</h2>
             <StatusPill status={event.timeStatus} />
           </div>
@@ -536,7 +536,7 @@ function EventDetailDrawer({ event, memberName, onClose, onOpenLead }) {
 function DetailRow({ label, value }) {
   return (
     <div>
-      <p className="text-[10px] font-bold uppercase text-gray-400">{label}</p>
+      <p className="text-xs font-bold uppercase text-gray-400">{label}</p>
       <p className="text-gray-800 mt-0.5 whitespace-pre-wrap">{value}</p>
     </div>
   )

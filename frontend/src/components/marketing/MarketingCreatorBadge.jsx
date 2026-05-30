@@ -6,7 +6,7 @@ export default function MarketingCreatorBadge({ name, isOwn, className = '' }) {
     : 'bg-violet-50 text-violet-800 border-violet-100'
   return (
     <span
-      className={`inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-full border ${styles} ${className}`}
+      className={`inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-full border ${styles} ${className}`}
       title={isOwn ? 'Your marketing asset' : `Created by ${name}`}
     >
       {label}

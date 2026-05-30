@@ -12,7 +12,7 @@ function FieldRow({ field, index, total, onChange, onRemove, onMove }) {
   return (
     <div className="border border-gray-200 rounded-lg p-3 space-y-2 bg-gray-50/50">
       <div className="flex items-center justify-between gap-2">
-        <span className="text-[10px] font-bold uppercase text-gray-500">
+        <span className="text-xs font-bold uppercase text-gray-500">
           {FIELD_TYPES.find((t) => t.id === field.type)?.label || field.type}
         </span>
         <div className="flex gap-1">
@@ -20,7 +20,7 @@ function FieldRow({ field, index, total, onChange, onRemove, onMove }) {
             type="button"
             disabled={index === 0}
             onClick={() => onMove(index, -1)}
-            className="text-[10px] px-1.5 py-0.5 border rounded disabled:opacity-30"
+            className="text-xs px-1.5 py-0.5 border rounded disabled:opacity-30"
           >
             ↑
           </button>
@@ -28,21 +28,21 @@ function FieldRow({ field, index, total, onChange, onRemove, onMove }) {
             type="button"
             disabled={index === total - 1}
             onClick={() => onMove(index, 1)}
-            className="text-[10px] px-1.5 py-0.5 border rounded disabled:opacity-30"
+            className="text-xs px-1.5 py-0.5 border rounded disabled:opacity-30"
           >
             ↓
           </button>
           <button
             type="button"
             onClick={() => onRemove(index)}
-            className="text-[10px] px-1.5 py-0.5 border border-red-100 text-red-700 rounded"
+            className="text-xs px-1.5 py-0.5 border border-red-100 text-red-700 rounded"
           >
             Remove
           </button>
         </div>
       </div>
       <div className="grid sm:grid-cols-2 gap-2">
-        <label className="text-[10px] text-gray-500 sm:col-span-2">
+        <label className="text-xs text-gray-500 sm:col-span-2">
           Field type
           <select
             value={field.type}
@@ -58,7 +58,7 @@ function FieldRow({ field, index, total, onChange, onRemove, onMove }) {
         </label>
         {field.type !== 'section' && (
           <>
-            <label className="text-[10px] text-gray-500">
+            <label className="text-xs text-gray-500">
               Label
               <input
                 value={field.label}
@@ -66,7 +66,7 @@ function FieldRow({ field, index, total, onChange, onRemove, onMove }) {
                 className="mt-0.5 w-full text-xs border border-gray-200 rounded-lg px-2 py-1.5 bg-white"
               />
             </label>
-            <label className="text-[10px] text-gray-500 flex items-end gap-2 pb-1">
+            <label className="text-xs text-gray-500 flex items-end gap-2 pb-1">
               <input
                 type="checkbox"
                 checked={Boolean(field.required)}
@@ -74,7 +74,7 @@ function FieldRow({ field, index, total, onChange, onRemove, onMove }) {
               />
               Required
             </label>
-            <label className="text-[10px] text-gray-500 sm:col-span-2">
+            <label className="text-xs text-gray-500 sm:col-span-2">
               Placeholder
               <input
                 value={field.placeholder || ''}
@@ -85,7 +85,7 @@ function FieldRow({ field, index, total, onChange, onRemove, onMove }) {
           </>
         )}
         {field.type === 'section' && (
-          <label className="text-[10px] text-gray-500 sm:col-span-2">
+          <label className="text-xs text-gray-500 sm:col-span-2">
             Section title
             <input
               value={field.label}
@@ -95,7 +95,7 @@ function FieldRow({ field, index, total, onChange, onRemove, onMove }) {
           </label>
         )}
         {needsOptions && (
-          <label className="text-[10px] text-gray-500 sm:col-span-2">
+          <label className="text-xs text-gray-500 sm:col-span-2">
             Choices (one per line)
             <textarea
               value={(field.options || []).join('\n')}
@@ -105,7 +105,7 @@ function FieldRow({ field, index, total, onChange, onRemove, onMove }) {
             />
           </label>
         )}
-        <label className="text-[10px] text-gray-500 sm:col-span-2">
+        <label className="text-xs text-gray-500 sm:col-span-2">
           Help text (optional)
           <input
             value={field.helpText || ''}
@@ -143,7 +143,7 @@ export default function MarketingFormBuilder({ value, onChange }) {
   return (
     <div className="space-y-4">
       <div className="grid sm:grid-cols-3 gap-2">
-        <label className="text-[10px] text-gray-500">
+        <label className="text-xs text-gray-500">
           Accent color
           <input
             type="color"
@@ -152,7 +152,7 @@ export default function MarketingFormBuilder({ value, onChange }) {
             className="mt-0.5 block h-8 w-full rounded border border-gray-200"
           />
         </label>
-        <label className="text-[10px] text-gray-500">
+        <label className="text-xs text-gray-500">
           Page background
           <input
             type="color"
@@ -161,7 +161,7 @@ export default function MarketingFormBuilder({ value, onChange }) {
             className="mt-0.5 block h-8 w-full rounded border border-gray-200"
           />
         </label>
-        <label className="text-[10px] text-gray-500">
+        <label className="text-xs text-gray-500">
           Card background
           <input
             type="color"

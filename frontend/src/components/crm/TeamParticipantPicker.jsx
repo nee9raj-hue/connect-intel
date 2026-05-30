@@ -13,7 +13,7 @@ export default function TeamParticipantPicker({ members, primaryUserId, value, o
 
   return (
     <div>
-      <p className="text-[10px] font-semibold uppercase text-gray-400 mb-1.5">{label}</p>
+      <p className="text-xs font-semibold uppercase text-gray-400 mb-1.5">{label}</p>
       <div className="flex flex-wrap gap-2">
         {members.map((m) => {
           const isPrimary = m.userId === primaryUserId

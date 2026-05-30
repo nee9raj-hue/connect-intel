@@ -204,7 +204,7 @@ export default function ActiveCustomersPanel({ onNavigate }) {
             </details>
           )}
           {imports[0] && (
-            <p className="text-[10px] text-gray-400">
+            <p className="text-xs text-gray-400">
               Last import: {formatIsoDate(imports[0].uploadedAt)} · {imports[0].updatedLeads} leads updated ·{' '}
               {imports[0].unmatchedCount} unmatched
             </p>
@@ -240,7 +240,7 @@ export default function ActiveCustomersPanel({ onNavigate }) {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50 text-left text-[11px] uppercase text-gray-500">
+                <thead className="bg-gray-50 text-left text-xs uppercase text-gray-500">
                   <tr>
                     <th className="px-4 py-2 font-semibold">Customer</th>
                     <th className="px-4 py-2 font-semibold">Mobile</th>
@@ -267,9 +267,9 @@ export default function ActiveCustomersPanel({ onNavigate }) {
                           >
                             {row.name}
                           </button>
-                          <p className="text-[11px] text-gray-500">{row.company}</p>
+                          <p className="text-xs text-gray-500">{row.company}</p>
                           {row.tradingProfile?.customerCode && (
-                            <p className="text-[10px] text-gray-400 font-mono">
+                            <p className="text-xs text-gray-400 font-mono">
                               {row.tradingProfile.customerCode}
                             </p>
                           )}
@@ -286,7 +286,7 @@ export default function ActiveCustomersPanel({ onNavigate }) {
                         <td className="px-4 py-3 text-center tabular-nums">{row.shipmentCount || 0}</td>
                         <td className="px-4 py-3">
                           <span
-                            className={`text-[10px] font-semibold uppercase px-2 py-0.5 rounded border ${meta.color}`}
+                            className={`text-xs font-semibold uppercase px-2 py-0.5 rounded border ${meta.color}`}
                           >
                             {meta.label}
                           </span>
@@ -302,7 +302,7 @@ export default function ActiveCustomersPanel({ onNavigate }) {
             </div>
           )}
           {filtered.some((r) => r.tradingProfile?.shipments?.length > 1) && (
-            <p className="text-[10px] text-gray-400 px-4 py-2 border-t">
+            <p className="text-xs text-gray-400 px-4 py-2 border-t">
               Open a lead in Pipeline → Overview for full shipment history and notes.
             </p>
           )}
@@ -315,7 +315,7 @@ export default function ActiveCustomersPanel({ onNavigate }) {
 function StatCard({ label, value, accent }) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-4">
-      <p className="text-[10px] font-semibold uppercase text-gray-500">{label}</p>
+      <p className="text-xs font-semibold uppercase text-gray-500">{label}</p>
       <p className={`text-2xl font-bold mt-1 tabular-nums ${accent || 'text-gray-900'}`}>{value}</p>
     </div>
   )

@@ -797,7 +797,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               <div className="w-16 h-16 rounded-full bg-[#eaf0f6] flex items-center justify-center mb-4 text-2xl text-[#7c98b6]">
                 ⌕
               </div>
-              <p className="text-[13px] font-semibold text-[#33475b]">No leads match your filters</p>
+              <p className="text-sm font-semibold text-[#33475b]">No leads match your filters</p>
               <p className="text-xs text-[#516f90] mt-2">
                 Try adjusting search or filters, or clear all to see your full pipeline.
               </p>
@@ -1121,7 +1121,7 @@ function EmptyPipeline({ onNavigate, onImport, onAdd, compact = false }) {
         }`}
       >
         <p className="text-xs font-semibold uppercase tracking-wider text-[#8a6600] mb-2">Step 1 — CRM</p>
-        <h3 className="text-[13px] font-semibold text-gray-900 mb-2">Build your pipeline first</h3>
+        <h3 className="text-sm font-semibold text-gray-900 mb-2">Build your pipeline first</h3>
         <p className="text-sm text-gray-500 leading-relaxed">
           Connect Intel is your team CRM. Add or import the leads you are already working, assign owners, and
           track follow-ups. When your pipeline is ready, use AI prospect search to find new opportunities.

@@ -73,7 +73,7 @@ export default function WhatsAppSettingsPanel({ onNavigate }) {
             <button
               type="button"
               onClick={() => onNavigate('team')}
-              className="text-[11px] font-semibold text-gray-700 underline pt-1"
+              className="text-xs font-semibold text-gray-700 underline pt-1"
             >
               Team & email (invites, Gmail, branding)
             </button>

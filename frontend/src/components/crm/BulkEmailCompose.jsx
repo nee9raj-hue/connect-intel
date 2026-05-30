@@ -157,20 +157,20 @@ export default function BulkEmailCompose({ leadIds, leads, onDone, compact = fal
         </div>
 
         <div>
-          <label className="text-[10px] font-semibold uppercase text-gray-400">Cc (optional)</label>
+          <label className="text-xs font-semibold uppercase text-gray-400">Cc (optional)</label>
           <input
             value={cc}
             onChange={(e) => setCc(e.target.value)}
             placeholder="manager@company.com, colleague@company.com"
             className="w-full mt-1 border border-gray-200 rounded-lg px-3 py-2 text-sm"
           />
-          <p className="text-[10px] text-gray-400 mt-0.5">Same Cc on every email in this batch</p>
+          <p className="text-xs text-gray-400 mt-0.5">Same Cc on every email in this batch</p>
         </div>
 
         {composeTab === 'ai' ? (
           <>
             <section className="space-y-2">
-              <h3 className="text-[11px] font-semibold uppercase text-gray-400">What should these emails say?</h3>
+              <h3 className="text-xs font-semibold uppercase text-gray-400">What should these emails say?</h3>
               <input
                 value={senderCompany}
                 onChange={(e) => setSenderCompany(e.target.value)}
@@ -244,7 +244,7 @@ export default function BulkEmailCompose({ leadIds, leads, onDone, compact = fal
                   ? 'Generate a sample draft above, or leave blank to let AI write each email at send'
                   : 'Message body (same for all recipients)'
               }
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono text-[12px]"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono text-xs"
             />
           </>
         ) : (
@@ -263,7 +263,7 @@ export default function BulkEmailCompose({ leadIds, leads, onDone, compact = fal
               onChange={(e) => setBody(e.target.value)}
               rows={10}
               placeholder="Message body (same for all)"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono text-[12px]"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono text-xs"
             />
           </>
         )}

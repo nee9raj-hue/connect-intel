@@ -314,7 +314,7 @@ export default function MarketingListBuilder({
                 </button>
               ))}
             </div>
-            <p className="text-[11px] text-gray-500 mt-1.5 leading-relaxed">
+            <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">
               {listChannel === 'whatsapp'
                 ? 'Only pipeline leads with a valid phone number appear. Use this list for WhatsApp campaigns.'
                 : 'Only pipeline leads with a valid email appear. Use this list for email campaigns.'}
@@ -361,7 +361,7 @@ export default function MarketingListBuilder({
           )}
 
           {showSetup && stageCounts.length > 0 && (
-            <p className="text-[11px] text-gray-500 leading-relaxed">
+            <p className="text-xs text-gray-500 leading-relaxed">
               {stageCounts.map((row) => (
                 <span key={row.id} className="inline-block mr-2">
                   {row.label}: {row.count}

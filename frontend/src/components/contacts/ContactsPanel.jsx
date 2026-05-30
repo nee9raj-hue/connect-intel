@@ -455,7 +455,7 @@ export default function ContactsPanel({ onNavigate }) {
                 </label>
                 <span className="crm-toolbar-count">{total.toLocaleString()}</span>
               </div>
-              <p className="mt-1 text-[11px] normal-case tracking-normal font-medium text-[#7a8696]">
+              <p className="mt-1 text-xs normal-case tracking-normal font-medium text-[#7a8696]">
                 Saved leads and pipeline contacts
               </p>
             </div>

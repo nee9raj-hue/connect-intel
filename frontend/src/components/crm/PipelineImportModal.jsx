@@ -158,7 +158,7 @@ export default function PipelineImportModal({ open, onClose, onImported }) {
             </button>
           </div>
 
-          <p className="text-[10px] text-gray-400 font-mono break-all">{IMPORT_TEMPLATE_COLUMNS.join(', ')}</p>
+          <p className="text-xs text-gray-400 font-mono break-all">{IMPORT_TEMPLATE_COLUMNS.join(', ')}</p>
 
           <div>
             <label className="block text-xs font-semibold text-gray-700 mb-1">2. Dataset type</label>
@@ -192,7 +192,7 @@ export default function PipelineImportModal({ open, onClose, onImported }) {
                   </option>
                 ))}
               </select>
-              <p className="text-[10px] text-gray-500 mt-1">Cmd/Ctrl-click to select multiple. Merged with sheet column lead_tags.</p>
+              <p className="text-xs text-gray-500 mt-1">Cmd/Ctrl-click to select multiple. Merged with sheet column lead_tags.</p>
             </div>
           )}
 
@@ -212,7 +212,7 @@ export default function PipelineImportModal({ open, onClose, onImported }) {
             Add imported contacts to CRM pipeline
           </label>
           {!addToPipeline && (
-            <p className="text-[11px] text-amber-800 bg-amber-50 border border-amber-100 rounded px-2 py-1">
+            <p className="text-xs text-amber-800 bg-amber-50 border border-amber-100 rounded px-2 py-1">
               Unchecked: contacts are saved for search only — they will not appear in Pipeline until you add them
               manually.
             </p>

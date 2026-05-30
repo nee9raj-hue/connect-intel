@@ -109,7 +109,7 @@ export default function CrmGmailConnectCard({ compact = false }) {
           Sends from <strong>{status.mailbox}</strong> · replies sync to CRM
         </p>
         {blockGmailActions ? (
-          <div className="mt-2 rounded border border-amber-200 bg-amber-50 px-2.5 py-2 text-[11px] text-amber-900">
+          <div className="mt-2 rounded border border-amber-200 bg-amber-50 px-2.5 py-2 text-xs text-amber-900">
             Google verification is still pending. For now, use company-domain sending in Connect Intel.
             Reconnect actions are paused until verification is approved.
           </div>
@@ -149,7 +149,7 @@ export default function CrmGmailConnectCard({ compact = false }) {
       </p>
 
       {status.googleVerificationPending && (
-        <div className="text-[11px] text-amber-950 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-2 space-y-1.5 leading-relaxed">
+        <div className="text-xs text-amber-950 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-2 space-y-1.5 leading-relaxed">
           <p className="font-semibold">Google verification pending</p>
           <p>
             Work Gmail connect is temporarily disabled to avoid repeated login loops.
@@ -171,7 +171,7 @@ export default function CrmGmailConnectCard({ compact = false }) {
           {connecting ? 'Connecting…' : 'Connect work email'}
         </button>
       )}
-      <p className="text-[10px] text-gray-500">
+      <p className="text-xs text-gray-500">
         <a href="https://connectintel.net/privacy.html" className="underline" target="_blank" rel="noreferrer">
           Privacy policy
         </a>

@@ -57,7 +57,7 @@ function MissingGoogleConfig({ label, compact = false }) {
       }
     >
       <p className="font-semibold">{label || 'Google sign-in unavailable'}</p>
-      <p className="text-[12px] mt-1 text-amber-800/90 leading-relaxed">
+      <p className="text-xs mt-1 text-amber-800/90 leading-relaxed">
         {IS_PROD
           ? 'Add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET on Vercel, then redeploy. In Google Cloud Console, authorize https://connectintel.net as a JavaScript origin.'
           : 'Set VITE_GOOGLE_CLIENT_ID in frontend/.env.local for local Google login.'}
@@ -140,7 +140,7 @@ export default function GoogleSignIn({
         >
           <GoogleIcon />
           {displayLabel}
-          <span className="text-[10px] font-normal text-gray-500">(demo)</span>
+          <span className="text-xs font-normal text-gray-500">(demo)</span>
         </button>
       </div>
     )
@@ -213,7 +213,7 @@ export function GoogleSignInCompact({ onBeforeLogin }) {
         <button
           type="button"
           onClick={() => setScreen('auth')}
-          className="px-4 py-2 text-[13px] font-semibold text-amber-800 bg-amber-50 border border-amber-200 rounded-md"
+          className="px-4 py-2 text-sm font-semibold text-amber-800 bg-amber-50 border border-amber-200 rounded-md"
         >
           Log in
         </button>

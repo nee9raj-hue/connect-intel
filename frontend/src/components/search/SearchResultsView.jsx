@@ -26,11 +26,11 @@ export default function SearchResultsView({
           <div className="crm-results-head sticky top-0 z-20">
             <div>
               <h2 className="text-sm font-semibold text-gray-900">Top matches</h2>
-              <p className="text-[11px] text-gray-500 mt-0.5">
+              <p className="text-xs text-gray-500 mt-0.5">
                 Full email &amp; phone on these rows (no credit)
               </p>
             </div>
-            <span className="text-[11px] font-semibold text-gray-600 bg-gray-100 px-2.5 py-1 rounded-full border border-gray-200">
+            <span className="text-xs font-semibold text-gray-600 bg-gray-100 px-2.5 py-1 rounded-full border border-gray-200">
               {detailed.length} leads
             </span>
           </div>
@@ -54,11 +54,11 @@ export default function SearchResultsView({
           <div className="crm-results-head crm-results-head-secondary sticky top-0 z-20">
             <div>
               <h2 className="text-sm font-semibold text-gray-900">More matches</h2>
-              <p className="text-[11px] text-gray-500 mt-0.5">
+              <p className="text-xs text-gray-500 mt-0.5">
                 Company and role visible · reveal email/phone with 1 credit each
               </p>
             </div>
-            <span className="text-[11px] font-medium text-gray-600 bg-white px-2.5 py-1 rounded-full border border-gray-200">
+            <span className="text-xs font-medium text-gray-600 bg-white px-2.5 py-1 rounded-full border border-gray-200">
               {compact.length} summarized
             </span>
           </div>
@@ -113,10 +113,10 @@ function CompactResultsList({
             <div className="flex-1 min-w-0 grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-x-4 gap-y-1.5">
               <div className="min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">{name}</p>
-                <p className="text-[12px] text-gray-600 truncate">{lead.title || '—'}</p>
-                <p className="text-[12px] font-medium text-gray-800 truncate mt-0.5">{lead.company}</p>
+                <p className="text-xs text-gray-600 truncate">{lead.title || '—'}</p>
+                <p className="text-xs font-medium text-gray-800 truncate mt-0.5">{lead.company}</p>
               </div>
-              <div className="min-w-0 text-[12px] text-gray-500 space-y-1">
+              <div className="min-w-0 text-xs text-gray-500 space-y-1">
                 <p className="truncate">{lead.location || [lead.city, lead.state].filter(Boolean).join(', ') || '—'}</p>
                 {lead.industry && <p className="truncate text-gray-400">{lead.industry}</p>}
                 <div className="flex flex-wrap gap-2">
@@ -146,7 +146,7 @@ function CompactResultsList({
                   <button
                     type="button"
                     onClick={() => onWorkOnLead(lead)}
-                    className="text-[11px] font-semibold px-2 py-1 rounded border border-[#8a6600]/30 text-[#8a6600] bg-[#fff4ee]"
+                    className="text-xs font-semibold px-2 py-1 rounded border border-[#8a6600]/30 text-[#8a6600] bg-[#fff4ee]"
                   >
                     Pipeline
                   </button>
@@ -154,7 +154,7 @@ function CompactResultsList({
                 <button
                   type="button"
                   onClick={() => onSave(lead)}
-                  className={`text-[11px] font-semibold px-2 py-1 rounded border ${
+                  className={`text-xs font-semibold px-2 py-1 rounded border ${
                     isSaved(lead.id)
                       ? 'border-green-500 text-green-700 bg-green-50'
                       : 'border-gray-200 text-gray-600 opacity-0 group-hover:opacity-100 hover:border-gray-400'
@@ -176,6 +176,6 @@ function ScorePill({ score }) {
   const cls =
     n >= 85 ? 'bg-[#fff4ee] text-[#FF773D]' : n >= 70 ? 'bg-slate-100 text-[#64748B]' : 'bg-gray-100 text-gray-600'
   return (
-    <span className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-bold shrink-0 ${cls}`}>{n}</span>
+    <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold shrink-0 ${cls}`}>{n}</span>
   )
 }

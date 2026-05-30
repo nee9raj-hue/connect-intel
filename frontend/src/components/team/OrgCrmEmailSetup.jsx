@@ -120,10 +120,10 @@ export default function OrgCrmEmailSetup() {
 
       {status?.records?.length > 0 && (
         <div className="space-y-2">
-          <p className="text-[11px] font-semibold uppercase text-gray-500">DNS records (add at your domain host)</p>
+          <p className="text-xs font-semibold uppercase text-gray-500">DNS records (add at your domain host)</p>
           <ul className="space-y-2 max-h-48 overflow-y-auto">
             {status.records.map((r, i) => (
-              <li key={`${r.host}-${i}`} className="text-[11px] bg-white border rounded p-2 font-mono break-all">
+              <li key={`${r.host}-${i}`} className="text-xs bg-white border rounded p-2 font-mono break-all">
                 <div className="text-gray-500">{r.purpose} · {r.type}</div>
                 <div className="font-semibold text-gray-800">{r.host}</div>
                 <div className="text-gray-700">{r.value}</div>
@@ -142,7 +142,7 @@ export default function OrgCrmEmailSetup() {
         </div>
       )}
 
-      <p className="text-[10px] text-gray-500 leading-relaxed">
+      <p className="text-xs text-gray-500 leading-relaxed">
         Most teams should use <strong>Connect work email</strong> above instead of DNS.
       </p>
     </div>

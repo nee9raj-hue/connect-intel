@@ -406,6 +406,258 @@ a.crm-link,
   border-radius: var(--hs-radius-md);
 }
 
+/* —— Arbitrary micro-font normalization (Tailwind text-[Npx]) —— */
+.ci-app-main:not(.chithi-app):not(.marketing-immersive-shell) :is(
+  [class*='text-[9px]'],
+  [class*='text-[10px]'],
+  [class*='text-[11px]']
+) {
+  font-size: var(--hs-font-secondary) !important;
+  line-height: 1.45;
+}
+
+.ci-app-main:not(.chithi-app):not(.marketing-immersive-shell) :is(
+  [class*='text-[12px]'],
+  [class*='text-[13px]']
+) {
+  font-size: var(--hs-font-base) !important;
+  line-height: 1.5;
+}
+
+/* Contrast-safe muted labels (was gray-400 / slate-400 — too light on canvas) */
+.ci-app-main:not(.chithi-app):not(.marketing-immersive-shell) :is(
+  .text-gray-400,
+  .text-slate-400
+) {
+  color: var(--hs-text-muted);
+}
+
+.ci-app-main:not(.chithi-app):not(.marketing-immersive-shell) :is(
+  .text-gray-500,
+  .text-slate-500,
+  .text-[#7a8696],
+  .text-[#7c98b6],
+  .text-[#98a1ac],
+  .text-[#9aa3ad]
+) {
+  color: var(--hs-text-muted);
+}
+
+.ci-app-main:not(.chithi-app):not(.marketing-immersive-shell) :is(
+  .text-gray-600,
+  .text-slate-600
+) {
+  color: var(--hs-text);
+}
+
+/* Sidebar: CSS-only font bump — nav structure/workflow unchanged */
+.ci-sidebar :is(
+  [class*='text-[9px]'],
+  [class*='text-[10px]'],
+  [class*='text-[11px]']
+) {
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.ci-sidebar :is([class*='text-[12px]'], [class*='text-[13px]']) {
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+/* —— Lead workspace / record panel —— */
+.crm-drawer,
+.crm-record-panel {
+  background: var(--hs-surface);
+  border-color: var(--hs-border);
+  color: var(--hs-text);
+}
+
+.crm-drawer-header,
+.crm-record-panel__header {
+  background: var(--hs-surface);
+  border-bottom-color: var(--hs-border);
+}
+
+.crm-record-panel__title {
+  font-size: var(--hs-font-title);
+  font-weight: var(--hs-font-weight-bold);
+  color: #17191c;
+}
+
+.crm-record-panel__subtitle {
+  font-size: var(--hs-font-secondary);
+  color: var(--hs-text-muted);
+}
+
+.crm-record-panel__tab {
+  font-size: var(--hs-font-secondary);
+  border-radius: var(--hs-radius-md);
+}
+
+.crm-record-panel__tab.is-active {
+  color: var(--hs-link);
+  border-color: var(--hs-link);
+}
+
+.crm-drawer-body,
+.crm-record-panel__body {
+  font-size: var(--hs-font-base);
+  background: var(--hs-canvas);
+}
+
+.crm-drawer-body h3,
+.crm-record-panel__body h3 {
+  font-size: var(--hs-font-secondary);
+  font-weight: var(--hs-font-weight-semibold);
+  letter-spacing: 0.04em;
+  color: var(--hs-text-muted);
+}
+
+/* —— Search & contacts —— */
+.search-workspace,
+.contacts-workspace,
+.crm-search-layout {
+  background: var(--hs-canvas);
+  color: var(--hs-text);
+}
+
+.search-workspace table,
+.contacts-workspace table,
+.crm-results-table {
+  font-size: var(--hs-font-base);
+}
+
+.search-workspace th,
+.contacts-workspace th,
+.crm-results-table th {
+  font-size: var(--hs-font-secondary);
+  font-weight: var(--hs-font-weight-semibold);
+  color: var(--hs-text-muted);
+  border-color: var(--hs-border);
+}
+
+.search-workspace td,
+.contacts-workspace td,
+.crm-results-table td {
+  border-color: var(--hs-border-subtle);
+  color: var(--hs-text);
+}
+
+/* —— Marketing (non-immersive) —— */
+.marketing-workspace:not(.marketing-immersive-shell),
+.marketing-panel-shell:not(.marketing-immersive-shell) {
+  background: var(--hs-canvas);
+  color: var(--hs-text);
+}
+
+.marketing-workspace:not(.marketing-immersive-shell) .marketing-block-card,
+.marketing-panel-shell:not(.marketing-immersive-shell) .marketing-block-card {
+  font-size: var(--hs-font-secondary);
+  border-color: var(--hs-border);
+  border-radius: var(--hs-radius-md);
+}
+
+/* —— Team & settings —— */
+.team-workspace,
+.org-settings-panel,
+.crm-settings-card {
+  background: var(--hs-surface);
+  border-color: var(--hs-border);
+  border-radius: var(--hs-radius-lg);
+  box-shadow: var(--hs-shadow-card);
+  color: var(--hs-text);
+}
+
+.team-workspace h2,
+.org-settings-panel h2 {
+  font-size: var(--hs-font-title);
+  font-weight: var(--hs-font-weight-bold);
+  color: #17191c;
+}
+
+.team-workspace h3,
+.org-settings-panel h3 {
+  font-size: var(--hs-font-base);
+  font-weight: var(--hs-font-weight-semibold);
+  color: var(--hs-text);
+}
+
+/* —— Calendar, activity, customers —— */
+.panel-shell:not(.marketing-immersive-shell),
+.crm-calendar-panel,
+.crm-activity-log,
+.active-customers-panel {
+  font-size: var(--hs-font-base);
+  color: var(--hs-text);
+}
+
+.panel-shell:not(.marketing-immersive-shell) > header,
+.panel-shell:not(.marketing-immersive-shell) .crm-page-header {
+  background: var(--hs-surface);
+  border-bottom-color: var(--hs-border);
+}
+
+.panel-shell:not(.marketing-immersive-shell) h1 {
+  font-size: var(--hs-font-title);
+  font-weight: var(--hs-font-weight-bold);
+  color: #17191c;
+}
+
+.crm-calendar-panel th,
+.crm-activity-log th {
+  font-size: var(--hs-font-secondary);
+  color: var(--hs-text-muted);
+}
+
+/* —— Overlays: assistant, onboarding, notifications —— */
+.connect-assistant-panel,
+.onboarding-modal-dialog,
+.notification-dropdown {
+  font-size: var(--hs-font-base);
+  color: var(--hs-text);
+}
+
+.notification-dropdown {
+  border-color: var(--hs-border);
+  border-radius: var(--hs-radius-lg);
+  box-shadow: var(--hs-shadow-modal);
+}
+
+/* —— Badges & pills —— */
+.ci-app-main:not(.chithi-app):not(.marketing-immersive-shell) :is(
+  [class*='rounded-full'][class*='text-['],
+  [class*='uppercase'][class*='tracking-']
+) {
+  letter-spacing: 0.05em;
+}
+
+/* —— Landing page (outside app shell) —— */
+.min-h-screen.bg-white :is(
+  [class*='text-[9px]'],
+  [class*='text-[10px]'],
+  [class*='text-[11px]']
+) {
+  font-size: var(--hs-font-secondary);
+  line-height: 1.45;
+}
+
+.min-h-screen.bg-white :is([class*='text-[12px]'], [class*='text-[13px]']) {
+  font-size: var(--hs-font-base);
+  line-height: 1.5;
+}
+
+.min-h-screen.bg-white h1,
+.min-h-screen.bg-white h2 {
+  color: #17191c;
+}
+
+.min-h-screen.bg-white h3 {
+  font-size: var(--hs-font-base);
+  font-weight: var(--hs-font-weight-semibold);
+  color: var(--hs-text);
+}
+
 /* Preserve intentional exceptions */
 .ci-sidebar,
 .ci-sidebar *,

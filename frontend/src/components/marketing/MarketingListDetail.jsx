@@ -217,7 +217,7 @@ export default function MarketingListDetail({
         <section className="flex flex-col min-h-0">
           <div className="shrink-0 px-4 py-2.5 border-b border-[#eaf0f6] bg-white">
             <p className="text-xs font-semibold text-[#33475b]">On this list</p>
-            <p className="text-[11px] text-[#7c98b6]">Remove contacts you no longer want to target</p>
+            <p className="text-xs text-[#7c98b6]">Remove contacts you no longer want to target</p>
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -254,7 +254,7 @@ export default function MarketingListDetail({
         <section className="flex flex-col min-h-0">
           <div className="shrink-0 px-4 py-2.5 border-b border-[#eaf0f6] bg-white">
             <p className="text-xs font-semibold text-[#33475b]">Add from pipeline</p>
-            <p className="text-[11px] text-[#7c98b6]">Search and add leads to this list</p>
+            <p className="text-xs text-[#7c98b6]">Search and add leads to this list</p>
             <input
               value={addSearch}
               onChange={(e) => setAddSearch(e.target.value)}

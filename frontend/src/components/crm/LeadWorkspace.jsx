@@ -620,7 +620,7 @@ export default function LeadWorkspace({
               className={
                 recordPanel
                   ? 'crm-record-panel__title truncate'
-                  : 'text-[13px] font-semibold tracking-[-0.02em] text-gray-900 truncate'
+                  : 'text-sm font-semibold tracking-[-0.02em] text-gray-900 truncate'
               }
             >
               {[lead.firstName, lead.lastName].filter(Boolean).join(' ')}
@@ -635,7 +635,7 @@ export default function LeadWorkspace({
               {lead.title} · {lead.company}
             </p>
             <span
-              className={`inline-block mt-1 text-[11px] font-semibold px-2 py-0.5 rounded border ${
+              className={`inline-block mt-1 text-xs font-semibold px-2 py-0.5 rounded border ${
                 recordPanel ? 'crm-record-panel__status' : statusMeta.color
               }`}
             >
@@ -670,7 +670,7 @@ export default function LeadWorkspace({
               className={
                 recordPanel
                   ? `crm-record-panel__tab ${tab === t.id ? 'is-active' : ''}`
-                  : `shrink-0 text-[11px] font-semibold px-2 py-0.5 md:px-2.5 md:py-1 rounded-md ${
+                  : `shrink-0 text-xs font-semibold px-2 py-0.5 md:px-2.5 md:py-1 rounded-md ${
                       tab === t.id ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600'
                     }`
               }
@@ -703,7 +703,7 @@ export default function LeadWorkspace({
         {tab === 'overview' && (
           <>
             <section>
-              <h3 className="text-[11px] font-semibold uppercase text-gray-400 mb-2">Pipeline status</h3>
+              <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Pipeline status</h3>
               <select value={status} onChange={(e) => changeStatus(e.target.value)} className="w-full text-xs border rounded-lg px-2.5 py-1.5">
                 {statusOptions.map((s) => (
                   <option key={s.id} value={s.id}>
@@ -720,7 +720,7 @@ export default function LeadWorkspace({
 
             {user?.accountType === 'company' && (
               <section>
-                <h3 className="text-[11px] font-semibold uppercase text-gray-400 mb-2">Tags</h3>
+                <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Tags</h3>
                 <LeadTagsEditor
                   lead={lead}
                   orgLeadTags={orgLeadTags}
@@ -734,7 +734,7 @@ export default function LeadWorkspace({
 
             {lead.tradingProfile?.firstShipmentAt || lead.tradingProfile?.active ? (
               <section className="rounded-xl border border-teal-100 bg-teal-50/50 p-3 space-y-2">
-                <h3 className="text-[11px] font-semibold uppercase text-teal-800">Active trading</h3>
+                <h3 className="text-xs font-semibold uppercase text-teal-800">Active trading</h3>
                 <div className="grid grid-cols-2 gap-2 text-xs text-gray-700">
                   <div>
                     <span className="text-gray-500 block">First shipment</span>
@@ -759,12 +759,12 @@ export default function LeadWorkspace({
                   {lead.tradingProfile.customerCode && (
                     <div>
                       <span className="text-gray-500 block">Customer code</span>
-                      <strong className="font-mono text-[11px]">{lead.tradingProfile.customerCode}</strong>
+                      <strong className="font-mono text-xs">{lead.tradingProfile.customerCode}</strong>
                     </div>
                   )}
                 </div>
                 {(lead.tradingProfile.shipments?.length ?? 0) > 0 && (
-                  <p className="text-[11px] text-gray-600">
+                  <p className="text-xs text-gray-600">
                     Dates:{' '}
                     {lead.tradingProfile.shipments
                       .map((s) =>
@@ -775,13 +775,13 @@ export default function LeadWorkspace({
                   </p>
                 )}
                 {lead.tradingProfile.notes && (
-                  <p className="text-[11px] text-gray-600 whitespace-pre-wrap">{lead.tradingProfile.notes}</p>
+                  <p className="text-xs text-gray-600 whitespace-pre-wrap">{lead.tradingProfile.notes}</p>
                 )}
                 {onNavigate && hasWorkspaceFeature(user, 'panelActiveCustomers') && (
                   <button
                     type="button"
                     onClick={() => onNavigate('active-customers')}
-                    className="text-[11px] font-semibold text-teal-800 underline"
+                    className="text-xs font-semibold text-teal-800 underline"
                   >
                     Active customers dashboard
                   </button>
@@ -791,7 +791,7 @@ export default function LeadWorkspace({
 
             <section className="grid grid-cols-2 gap-2">
               <label className="block">
-                <span className="text-[11px] font-semibold uppercase text-gray-400 mb-1 block">Deal value (₹)</span>
+                <span className="text-xs font-semibold uppercase text-gray-400 mb-1 block">Deal value (₹)</span>
                 <input
                   type="number"
                   min={0}
@@ -812,7 +812,7 @@ export default function LeadWorkspace({
                 />
               </label>
               <label className="block">
-                <span className="text-[11px] font-semibold uppercase text-gray-400 mb-1 block">Expected close</span>
+                <span className="text-xs font-semibold uppercase text-gray-400 mb-1 block">Expected close</span>
                 <input
                   type="date"
                   value={expectedCloseDate}
@@ -839,7 +839,7 @@ export default function LeadWorkspace({
 
             {user?.accountType === 'company' && (
               <section>
-                <h3 className="text-[11px] font-semibold uppercase text-gray-400 mb-2">Sales sequence</h3>
+                <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Sales sequence</h3>
                 <div className="flex gap-2">
                   <select
                     value={enrollSequenceId}
@@ -883,7 +883,7 @@ export default function LeadWorkspace({
 
             {isManager && user?.accountType === 'company' && teamMembers.length > 0 && (
               <section>
-                <h3 className="text-[11px] font-semibold uppercase text-gray-400 mb-2">Transfer / assign lead</h3>
+                <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Transfer / assign lead</h3>
                 <select
                   value={lead.assignedToUserId || ''}
                   onChange={async (e) => {
@@ -910,7 +910,7 @@ export default function LeadWorkspace({
             )}
 
             <section>
-              <h3 className="text-[11px] font-semibold uppercase text-gray-400 mb-2">Contact record</h3>
+              <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Contact record</h3>
               <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 space-y-1.5 text-xs text-gray-700">
                 <p>
                   <span className="text-gray-500">Name · </span>
@@ -940,7 +940,7 @@ export default function LeadWorkspace({
               >
                 Edit contact details →
               </button>
-              <p className="text-[10px] text-gray-400 mt-1.5 leading-relaxed">
+              <p className="text-xs text-gray-400 mt-1.5 leading-relaxed">
                 Pipeline tracks deal activity. Contact info is edited on the Contacts page.
               </p>
             </section>
@@ -954,7 +954,7 @@ export default function LeadWorkspace({
             </section>
 
             <section>
-              <h3 className="text-[11px] font-semibold uppercase text-gray-400 mb-2">Next call / follow-up time</h3>
+              <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Next call / follow-up time</h3>
               <input
                 type="datetime-local"
                 value={nextFollowUp}
@@ -965,7 +965,7 @@ export default function LeadWorkspace({
             </section>
 
             <section>
-              <h3 className="text-[11px] font-semibold uppercase text-gray-400 mb-2">Log a call</h3>
+              <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Log a call</h3>
               <textarea
                 value={logCallNote}
                 onChange={(e) => setLogCallNote(e.target.value)}
@@ -988,7 +988,7 @@ export default function LeadWorkspace({
         {tab === 'notes' && (
           <>
             <section>
-              <h3 className="text-[11px] font-semibold uppercase text-gray-400 mb-2">Customer notes</h3>
+              <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Customer notes</h3>
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
@@ -999,8 +999,8 @@ export default function LeadWorkspace({
               />
             </section>
             <section>
-              <h3 className="text-[11px] font-semibold uppercase text-gray-400 mb-2">Unified timeline</h3>
-              <p className="text-[10px] text-gray-400 mb-2">Emails, calls, tasks, meetings, and notes in one place.</p>
+              <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Unified timeline</h3>
+              <p className="text-xs text-gray-400 mb-2">Emails, calls, tasks, meetings, and notes in one place.</p>
               <ul className="space-y-2 max-h-[50vh] overflow-y-auto">
                 {timeline.map((item) => (
                   <li key={item.id} className="text-xs border rounded-lg p-2.5 bg-gray-50">
@@ -1029,7 +1029,7 @@ export default function LeadWorkspace({
         {tab === 'schedule' && (
           <>
             <section>
-              <h3 className="text-[11px] font-semibold uppercase text-gray-400 mb-2">Tasks</h3>
+              <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Tasks</h3>
               <form onSubmit={addTask} className="space-y-2 mb-3">
                 <input
                   value={taskTitle}
@@ -1044,7 +1044,7 @@ export default function LeadWorkspace({
                   required
                   className="w-full text-xs border rounded-lg px-2.5 py-1.5"
                 />
-                <p className="text-[10px] text-gray-400">Due date appears on team calendar</p>
+                <p className="text-xs text-gray-400">Due date appears on team calendar</p>
                 {isManager && teamMembers.length > 0 && (
                   <select value={taskAssignee} onChange={(e) => setTaskAssignee(e.target.value)} className="w-full text-xs border rounded-lg px-2.5 py-1.5">
                     {teamMembers.map((m) => (
@@ -1091,7 +1091,7 @@ export default function LeadWorkspace({
             </section>
 
             <section>
-              <h3 className="text-[11px] font-semibold uppercase text-gray-400 mb-2">Schedule meeting</h3>
+              <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Schedule meeting</h3>
               <form onSubmit={addMeeting} className="space-y-2">
                 <input value={meetingTitle} onChange={(e) => setMeetingTitle(e.target.value)} placeholder="Title" className="w-full text-xs border rounded-lg px-2.5 py-1.5" />
                 <select value={meetingType} onChange={(e) => setMeetingType(e.target.value)} className="w-full text-xs border rounded-lg px-2.5 py-1.5">
@@ -1129,7 +1129,7 @@ export default function LeadWorkspace({
             </section>
 
             <section>
-              <h3 className="text-[11px] font-semibold uppercase text-gray-400 mb-2">Record field visit</h3>
+              <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Record field visit</h3>
               <form onSubmit={recordVisit} className="space-y-2">
                 <select value={visitMeetingId} onChange={(e) => setVisitMeetingId(e.target.value)} className="w-full text-xs border rounded-lg px-2.5 py-1.5">
                   <option value="">Select scheduled visit</option>
@@ -1154,7 +1154,7 @@ export default function LeadWorkspace({
             </section>
 
             <ul className="space-y-2">
-              <h3 className="text-[11px] font-semibold uppercase text-gray-400">Upcoming</h3>
+              <h3 className="text-xs font-semibold uppercase text-gray-400">Upcoming</h3>
               {(crm.meetings || []).map((m) => (
                 <li key={m.id} className="text-xs border rounded-lg p-2 bg-[#fff4ee]">
                   <p className="font-medium">{m.title}</p>
@@ -1180,7 +1180,7 @@ export default function LeadWorkspace({
           <>
             {!canSendEmail && (
               <section className="rounded-lg border border-amber-200 bg-amber-50 p-3 space-y-2">
-                <h3 className="text-[11px] font-semibold uppercase text-amber-900">Connect email to send</h3>
+                <h3 className="text-xs font-semibold uppercase text-amber-900">Connect email to send</h3>
                 <p className="text-xs text-amber-900 leading-relaxed">
                   Sign in once with your work email account. No DNS or domain setup needed.
                 </p>
@@ -1205,18 +1205,18 @@ export default function LeadWorkspace({
             )}
 
             {canSendEmail && gmailStatus.connected && (
-              <p className="text-[10px] text-emerald-800 bg-emerald-50 border border-emerald-100 rounded-lg px-2 py-1.5">
+              <p className="text-xs text-emerald-800 bg-emerald-50 border border-emerald-100 rounded-lg px-2 py-1.5">
                 Sending via <strong>{gmailStatus.mailbox}</strong> · use Sync replies below to pull inbound mail
               </p>
             )}
 
             <section className="rounded-lg border border-gray-200 bg-gray-50 p-3 space-y-2">
               <div className="flex items-center justify-between gap-2">
-                <h3 className="text-[11px] font-semibold uppercase text-gray-500">Email signature</h3>
+                <h3 className="text-xs font-semibold uppercase text-gray-500">Email signature</h3>
                 <button
                   type="button"
                   onClick={() => setShowSignatureEditor((v) => !v)}
-                  className="text-[10px] font-semibold text-gray-600 underline"
+                  className="text-xs font-semibold text-gray-600 underline"
                 >
                   {showSignatureEditor ? 'Hide' : emailSignature ? 'Edit signature' : 'Add signature'}
                 </button>
@@ -1256,7 +1256,7 @@ export default function LeadWorkspace({
             </section>
 
             <section className="space-y-2">
-              <h3 className="text-[11px] font-semibold uppercase text-gray-400">What should this email say?</h3>
+              <h3 className="text-xs font-semibold uppercase text-gray-400">What should this email say?</h3>
               <input
                 value={senderCompany}
                 onChange={(e) => setSenderCompany(e.target.value)}
@@ -1303,9 +1303,9 @@ export default function LeadWorkspace({
               placeholder="Cc (optional): name@company.com, teammate@company.com"
               className="w-full text-xs border rounded-lg px-2.5 py-1.5"
             />
-            <textarea value={body} onChange={(e) => setBody(e.target.value)} rows={10} className="w-full text-xs border rounded-lg px-2.5 py-1.5 font-mono text-[12px]" />
+            <textarea value={body} onChange={(e) => setBody(e.target.value)} rows={10} className="w-full text-xs border rounded-lg px-2.5 py-1.5 font-mono text-xs" />
             {includeSignature && emailSignature.trim() && (
-              <p className="text-[10px] text-gray-500">
+              <p className="text-xs text-gray-500">
                 Your saved signature will be appended automatically when you send.
               </p>
             )}
@@ -1321,7 +1321,7 @@ export default function LeadWorkspace({
                     disabled={busy || emailAttachments.length >= MAX_EMAIL_ATTACHMENTS}
                   />
                 </label>
-                <span className="text-[10px] text-gray-500">
+                <span className="text-xs text-gray-500">
                   Up to {MAX_EMAIL_ATTACHMENTS} files, 5MB each
                 </span>
               </div>
@@ -1338,7 +1338,7 @@ export default function LeadWorkspace({
                       <button
                         type="button"
                         onClick={() => removeAttachment(index)}
-                        className="shrink-0 text-red-600 text-[10px] font-semibold"
+                        className="shrink-0 text-red-600 text-xs font-semibold"
                       >
                         Remove
                       </button>
@@ -1483,12 +1483,12 @@ export default function LeadWorkspace({
         {error && <p className="text-xs text-red-700 bg-red-50 border border-red-100 rounded-lg px-2 py-1.5">{error}</p>}
       </div>
 
-      <div className="shrink-0 px-4 py-2 border-t text-[10px] text-gray-500 flex flex-wrap items-center gap-x-2 gap-y-1">
+      <div className="shrink-0 px-4 py-2 border-t text-xs text-gray-500 flex flex-wrap items-center gap-x-2 gap-y-1">
         <span>{lead.email || 'No email'}</span>
         <span className="text-gray-300" aria-hidden>
           ·
         </span>
-        <LeadPhoneCall phone={lead.phone} leadId={lead.id} numberClassName="text-[10px]" />
+        <LeadPhoneCall phone={lead.phone} leadId={lead.id} numberClassName="text-xs" />
       </div>
     </aside>
   )

@@ -311,7 +311,7 @@ export default function AppShell() {
         )}
         {liveToast && (
           <div
-            className="shrink-0 mx-3 mt-2 rounded-2xl border border-[#d7dde5] bg-white px-3 py-2 text-[11px] font-medium tracking-[-0.015em] text-[#202938]"
+            className="shrink-0 mx-3 mt-2 rounded-2xl border border-[#d7dde5] bg-white px-3 py-2 text-xs font-medium tracking-[-0.015em] text-[#202938]"
             role="status"
           >
             {liveToast} · pipeline updated automatically

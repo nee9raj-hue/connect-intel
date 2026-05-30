@@ -393,7 +393,7 @@ export default function PeopleSearch({ onNavigate }) {
           <button
             type="button"
             onClick={() => setSearchMetaOpen((v) => !v)}
-            className="w-full text-left text-[10px] font-semibold text-gray-600 px-3 py-1.5 border-t border-gray-100 hover:bg-gray-50"
+            className="w-full text-left text-xs font-semibold text-gray-600 px-3 py-1.5 border-t border-gray-100 hover:bg-gray-50"
           >
             {searchMetaOpen ? 'Hide' : 'Show'} search notes &amp; tips
           </button>
@@ -402,7 +402,7 @@ export default function PeopleSearch({ onNavigate }) {
         {showMetaBlock && (!metaCollapsedOnMobile || searchMetaOpen) && (
           <div className="panel-chrome-scroll px-3 sm:px-5 py-2 space-y-1.5 bg-white border-t border-gray-100">
             {hasSearched && results?.leads?.length > 0 && countTab !== 'saved' && (
-              <div className="flex flex-wrap items-center gap-1.5 text-[10px] sm:text-xs bg-[#fff4ee] border border-[#ffd4b8] rounded-lg px-2.5 py-1.5 sm:px-3 sm:py-2">
+              <div className="flex flex-wrap items-center gap-1.5 text-xs sm:text-xs bg-[#fff4ee] border border-[#ffd4b8] rounded-lg px-2.5 py-1.5 sm:px-3 sm:py-2">
                 <span className="font-semibold text-[#FF773D]">
                   {results.usedLiveAi ? PRODUCT.liveAiResults : `${displayLeads.length} prospects`}
                   {results.total >= 50 ? ' · 50+ matched' : ''}
@@ -416,25 +416,25 @@ export default function PeopleSearch({ onNavigate }) {
               </div>
             )}
             {results?.parsedSearch?.summary && hasSearched && countTab !== 'saved' && (
-              <p className="text-[10px] sm:text-xs text-emerald-900 bg-emerald-50 border border-emerald-100 rounded-lg px-2.5 py-1.5">
+              <p className="text-xs sm:text-xs text-emerald-900 bg-emerald-50 border border-emerald-100 rounded-lg px-2.5 py-1.5">
                 Understood as: <span className="font-medium">{results.parsedSearch.summary}</span>
               </p>
             )}
             {filterSummary && hasSearched && countTab !== 'saved' && (
-              <p className="text-[10px] sm:text-xs text-gray-600">
+              <p className="text-xs sm:text-xs text-gray-600">
                 Active filters: <span className="font-medium">{filterSummary}</span>
               </p>
             )}
             {friendlyNotice && countTab !== 'saved' && (
-              <p className="text-[10px] sm:text-xs text-gray-600">{friendlyNotice}</p>
+              <p className="text-xs sm:text-xs text-gray-600">{friendlyNotice}</p>
             )}
             {friendlyDiscoveryError && countTab !== 'saved' && (
-              <p className="text-[10px] sm:text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1.5">
+              <p className="text-xs sm:text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1.5">
                 {friendlyDiscoveryError}
               </p>
             )}
             {searchError && (
-              <p className="text-[10px] sm:text-xs text-red-700 bg-red-50 border border-red-100 rounded px-2 py-1.5">
+              <p className="text-xs sm:text-xs text-red-700 bg-red-50 border border-red-100 rounded px-2 py-1.5">
                 {searchError}
               </p>
             )}

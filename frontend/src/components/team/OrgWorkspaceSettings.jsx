@@ -162,7 +162,7 @@ export default function OrgWorkspaceSettings({ user, onUserUpdated }) {
                     <span className="text-sm font-semibold text-[#33475b]">
                       {def.label}
                       {customized ? (
-                        <span className="ml-2 text-[10px] font-medium text-[#0091ae] uppercase">
+                        <span className="ml-2 text-xs font-medium text-[#0091ae] uppercase">
                           Custom
                         </span>
                       ) : null}

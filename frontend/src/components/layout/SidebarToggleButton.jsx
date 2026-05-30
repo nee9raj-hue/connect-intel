@@ -10,7 +10,7 @@ export default function SidebarToggleButton({ mode = 'expanded', onToggle, showL
       onClick={onToggle}
       className={
         showLabel
-          ? `hidden md:flex w-full items-center gap-2 rounded-xl px-2.5 py-2 text-[11px] font-medium tracking-[-0.015em] text-[#a9b2ba] hover:bg-white/8 hover:text-white transition-colors mb-2 ${className}`
+          ? `hidden md:flex w-full items-center gap-2 rounded-xl px-2.5 py-2 text-xs font-medium tracking-[-0.015em] text-[#a9b2ba] hover:bg-white/8 hover:text-white transition-colors mb-2 ${className}`
           : `max-md:hidden md:inline-flex items-center justify-center rounded-xl border border-[#d7dde5] bg-white px-2.5 py-2 text-[#536072] hover:bg-[#f5f7fa] hover:text-[#17191c] transition-colors ${className}`
       }
       title={label}

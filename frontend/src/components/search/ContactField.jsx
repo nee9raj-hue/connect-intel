@@ -13,12 +13,12 @@ export default function ContactField({
   const hasHidden = field === 'email' ? access.hasEmail && !unlocked : access.hasPhone && !unlocked
 
   if (!hasHidden && !value && !locked) {
-    return <span className="text-[11px] text-red-600 font-medium">{missingLabel}</span>
+    return <span className="text-xs text-red-600 font-medium">{missingLabel}</span>
   }
 
   if (unlocked && value && !String(value).includes('•')) {
     const href = field === 'email' ? `mailto:${value}` : `tel:${value}`
-    const className = `text-[12px] text-gray-800 break-all hover:text-[#8a6600] hover:underline ${mono ? 'font-mono' : ''}`
+    const className = `text-xs text-gray-800 break-all hover:text-[#8a6600] hover:underline ${mono ? 'font-mono' : ''}`
     return (
       <a href={href} className={className}>
         {value}
@@ -32,12 +32,12 @@ export default function ContactField({
         type="button"
         onClick={() => onReveal?.(lead, field)}
         disabled={revealing}
-        className="text-[11px] font-semibold text-left text-[#8a6600] bg-[#fff4ee] border border-[#ffd4b8] rounded px-2 py-1 hover:bg-[#fff4bf] disabled:opacity-60"
+        className="text-xs font-semibold text-left text-[#8a6600] bg-[#fff4ee] border border-[#ffd4b8] rounded px-2 py-1 hover:bg-[#fff4bf] disabled:opacity-60"
       >
         {revealing ? 'Revealing…' : `Reveal ${field} · 1 credit`}
       </button>
     )
   }
 
-  return <span className={`text-[12px] text-gray-800 break-all ${mono ? 'font-mono' : ''}`}>{value}</span>
+  return <span className={`text-xs text-gray-800 break-all ${mono ? 'font-mono' : ''}`}>{value}</span>
 }

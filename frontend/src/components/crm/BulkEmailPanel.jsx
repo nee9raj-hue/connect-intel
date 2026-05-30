@@ -143,7 +143,7 @@ export default function BulkEmailPanel() {
         <div className="flex-1 overflow-auto bg-white">
           <table className="w-full text-sm">
             <thead className="sticky top-0 bg-gray-50 border-b border-gray-200 z-10">
-              <tr className="text-left text-[11px] font-semibold text-gray-500 uppercase">
+              <tr className="text-left text-xs font-semibold text-gray-500 uppercase">
                 <th className="w-10 py-2.5 pl-4">
                   <input
                     type="checkbox"
@@ -192,7 +192,7 @@ export default function BulkEmailPanel() {
                     </td>
                     <td className="py-2.5 pr-4 align-top">
                       <span
-                        className={`inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full border ${st?.color || ''}`}
+                        className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full border ${st?.color || ''}`}
                       >
                         {st?.label || lead.crm?.status}
                       </span>

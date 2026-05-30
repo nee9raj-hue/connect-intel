@@ -73,7 +73,7 @@ export default function MarketingCampaignSetupFields({
       </select>
 
       {!channelLists.length && (
-        <p className="text-[11px] text-amber-800 leading-relaxed">
+        <p className="text-xs text-amber-800 leading-relaxed">
           No {campaignForm.channel === 'whatsapp' ? 'WhatsApp' : 'email'} lists yet — create one under
           Lists.
         </p>
@@ -154,7 +154,7 @@ export default function MarketingCampaignSetupFields({
           {campaignForm.channel === 'whatsapp' &&
             !user?.whatsappAutoSendReady &&
             user?.isOrgAdmin && (
-              <p className="text-[11px] text-amber-950 leading-relaxed rounded-lg border border-amber-100 bg-amber-50/80 p-2.5">
+              <p className="text-xs text-amber-950 leading-relaxed rounded-lg border border-amber-100 bg-amber-50/80 p-2.5">
                 Connect WhatsApp Business API for auto-send.{' '}
                 <button
                   type="button"

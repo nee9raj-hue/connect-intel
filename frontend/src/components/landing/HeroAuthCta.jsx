@@ -25,7 +25,7 @@ export default function HeroAuthCta({ id }) {
 
       <div className="flex items-center gap-3 w-full" aria-hidden>
         <div className="flex-1 h-px bg-gray-200" />
-        <span className="text-[11px] font-medium text-gray-400 uppercase tracking-wide">or</span>
+        <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">or</span>
         <div className="flex-1 h-px bg-gray-200" />
       </div>
 

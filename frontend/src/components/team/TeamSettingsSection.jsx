@@ -82,9 +82,9 @@ export function TeamStatCard({ icon: Icon, label, value, hint, accent = 'gray' }
     <div className={`rounded-xl border p-3.5 ${accents[accent] || accents.gray}`}>
       <div className="flex items-start justify-between gap-2">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-wide opacity-70">{label}</p>
+          <p className="text-xs font-semibold uppercase tracking-wide opacity-70">{label}</p>
           <p className="text-xl font-bold mt-0.5 tabular-nums">{value}</p>
-          {hint ? <p className="text-[10px] mt-1 opacity-80 leading-snug">{hint}</p> : null}
+          {hint ? <p className="text-xs mt-1 opacity-80 leading-snug">{hint}</p> : null}
         </div>
         {Icon ? (
           <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-white/70 border border-black/5 shrink-0">
@@ -115,7 +115,7 @@ export function TeamQuickLink({ icon: Icon, title, description, onClick, accent 
       </span>
       <span className="min-w-0 flex-1">
         <span className="text-xs font-semibold text-gray-900 block">{title}</span>
-        <span className="text-[10px] text-gray-500 mt-0.5 block leading-snug">{description}</span>
+        <span className="text-xs text-gray-500 mt-0.5 block leading-snug">{description}</span>
       </span>
       <ArrowRight className="w-4 h-4 text-gray-300 shrink-0 mt-0.5" />
     </button>

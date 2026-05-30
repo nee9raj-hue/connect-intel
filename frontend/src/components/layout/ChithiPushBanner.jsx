@@ -14,20 +14,20 @@ export default function ChithiPushBanner({ enabled = true }) {
       aria-label="Chithi push notifications"
     >
       <div className="flex flex-wrap items-center gap-2">
-        <p className="text-[12px] font-semibold text-[#17191c]">Chithi alerts</p>
-        {error && <span className="text-[11px] text-red-700">{error}</span>}
+        <p className="text-xs font-semibold text-[#17191c]">Chithi alerts</p>
+        {error && <span className="text-xs text-red-700">{error}</span>}
         <button
           type="button"
           disabled={busy || permission === 'denied'}
           onClick={() => void subscribe()}
-          className="text-[11px] font-semibold px-3 py-1.5 rounded-lg bg-[#17191c] text-white disabled:opacity-50"
+          className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-[#17191c] text-white disabled:opacity-50"
         >
           {busy ? '…' : 'Enable'}
         </button>
         <button
           type="button"
           onClick={dismiss}
-          className="text-[11px] font-semibold px-2 py-1.5 rounded-lg text-[#536072] hover:text-[#17191c]"
+          className="text-xs font-semibold px-2 py-1.5 rounded-lg text-[#536072] hover:text-[#17191c]"
         >
           Dismiss
         </button>

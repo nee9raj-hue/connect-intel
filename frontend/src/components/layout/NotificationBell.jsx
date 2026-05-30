@@ -65,7 +65,7 @@ export default function NotificationBell() {
       >
         <BellIcon className="w-4 h-4" />
         {unreadNotificationCount > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#17191c] px-1 text-[10px] font-bold text-white">
+          <span className="absolute -top-0.5 -right-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#17191c] px-1 text-xs font-bold text-white">
             {unreadNotificationCount > 9 ? '9+' : unreadNotificationCount}
           </span>
         )}
@@ -81,12 +81,12 @@ export default function NotificationBell() {
           />
           <div className="absolute right-0 top-full z-50 mt-2 flex max-h-[min(70vh,420px)] w-[min(100vw-2rem,360px)] flex-col overflow-hidden rounded-[20px] border border-[#d7dde5] bg-white shadow-[0_18px_44px_rgba(15,23,42,0.16)]">
             <div className="flex items-center justify-between border-b border-[#eef1f4] px-3.5 py-3">
-              <p className="text-[13px] font-semibold tracking-[-0.02em] text-[#17191c]">Notifications</p>
+              <p className="text-sm font-semibold tracking-[-0.02em] text-[#17191c]">Notifications</p>
               {sorted.some((n) => n.unread) && (
                 <button
                   type="button"
                   onClick={() => markAllNotificationsRead()}
-                  className="text-[11px] font-medium text-[#536072] hover:text-[#17191c] hover:underline"
+                  className="text-xs font-medium text-[#536072] hover:text-[#17191c] hover:underline"
                 >
                   Mark all read
                 </button>
@@ -94,7 +94,7 @@ export default function NotificationBell() {
             </div>
             <div className="overflow-y-auto flex-1">
               {sorted.length === 0 ? (
-                <p className="px-3 py-6 text-center text-[12px] text-[#6d7785]">
+                <p className="px-3 py-6 text-center text-xs text-[#6d7785]">
                   You&apos;re up to date. Updates appear here when leads are assigned, replies arrive, or
                   meetings are due.
                 </p>
@@ -116,19 +116,19 @@ export default function NotificationBell() {
                           }`}
                         >
                           <div className="flex items-center gap-2 mb-0.5">
-                            <span className="text-[9px] font-bold uppercase tracking-[0.14em] text-[#5f6d80]">
+                            <span className="text-xs font-bold uppercase tracking-[0.14em] text-[#5f6d80]">
                               {TYPE_LABELS[item.type] || item.type}
                             </span>
                             {item.unread && (
                               <span className="w-1.5 h-1.5 rounded-full bg-[#17191c]" aria-hidden />
                             )}
                           </div>
-                          <p className="text-[12px] font-semibold tracking-[-0.02em] text-[#17191c]">
+                          <p className="text-xs font-semibold tracking-[-0.02em] text-[#17191c]">
                             {item.title}
                           </p>
-                          <p className="mt-0.5 line-clamp-2 text-[11px] text-[#5f6d80]">{item.body}</p>
-                          <p className="mt-1 text-[10px] font-medium text-[#202938]">Open in {where} →</p>
-                          <p className="mt-0.5 text-[10px] text-[#9aa3ad]">{formatDateTime(item.createdAt)}</p>
+                          <p className="mt-0.5 line-clamp-2 text-xs text-[#5f6d80]">{item.body}</p>
+                          <p className="mt-1 text-xs font-medium text-[#202938]">Open in {where} →</p>
+                          <p className="mt-0.5 text-xs text-[#9aa3ad]">{formatDateTime(item.createdAt)}</p>
                         </button>
                       </li>
                     )
@@ -136,7 +136,7 @@ export default function NotificationBell() {
                 </ul>
               )}
             </div>
-            <p className="border-t border-[#eef1f4] px-3.5 py-2 text-[10px] text-[#98a1ac]">
+            <p className="border-t border-[#eef1f4] px-3.5 py-2 text-xs text-[#98a1ac]">
               Opens mark as read · click to jump to the item
             </p>
           </div>

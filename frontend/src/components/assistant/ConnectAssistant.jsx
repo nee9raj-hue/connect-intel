@@ -243,7 +243,7 @@ export default function ConnectAssistant({ onNavigate, fabAboveMobilePill = fals
         <header className="shrink-0 flex items-center justify-between gap-2 px-4 py-3 border-b border-gray-100 bg-[#242424] text-white rounded-t-2xl md:rounded-t-2xl">
           <div className="min-w-0">
             <p className="text-sm font-semibold truncate">Connect Intel Assistant</p>
-            <p className="text-[11px] text-gray-300 truncate">Help · tickets · 24–48h support SLA</p>
+            <p className="text-xs text-gray-300 truncate">Help · tickets · 24–48h support SLA</p>
           </div>
           <button
             type="button"
@@ -258,12 +258,12 @@ export default function ConnectAssistant({ onNavigate, fabAboveMobilePill = fals
         <div className="flex-1 min-h-0 overflow-y-auto px-3 py-3 space-y-3 bg-[#f6f7f9]">
           {activeTickets.length > 0 && (
             <div className="rounded-xl bg-white border border-gray-200 px-3 py-2 shadow-sm">
-              <p className="text-[10px] font-semibold uppercase text-gray-500">Your open tickets</p>
+              <p className="text-xs font-semibold uppercase text-gray-500">Your open tickets</p>
               <ul className="mt-1 space-y-1">
                 {activeTickets.slice(0, 3).map((t) => (
                   <li key={t.id} className="text-xs flex items-center justify-between gap-2">
                     <span className="font-mono font-semibold text-gray-900">{t.ticketNumber}</span>
-                    <span className={`px-1.5 py-0.5 rounded border text-[10px] ${ticketStatusClass(t.status)}`}>
+                    <span className={`px-1.5 py-0.5 rounded border text-xs ${ticketStatusClass(t.status)}`}>
                       {t.status.replace('_', ' ')}
                     </span>
                   </li>
@@ -296,7 +296,7 @@ export default function ConnectAssistant({ onNavigate, fabAboveMobilePill = fals
           {showRaiseForm && (
             <div className="rounded-xl bg-amber-50 border border-amber-200 p-3 space-y-2">
               <p className="text-xs font-semibold text-amber-950">Raise a support concern</p>
-              <p className="text-[11px] text-amber-900">
+              <p className="text-xs text-amber-900">
                 Describe the issue. We respond within 24–48 business hours at {user.email}. No live phone support.
               </p>
               <textarea
@@ -337,7 +337,7 @@ export default function ConnectAssistant({ onNavigate, fabAboveMobilePill = fals
                 type="button"
                 disabled={loading}
                 onClick={() => sendMessage(s)}
-                className="shrink-0 text-[11px] px-2.5 py-1 rounded-full border border-gray-200 bg-white text-gray-600 hover:border-[#ffcb2b] hover:text-gray-900 disabled:opacity-50"
+                className="shrink-0 text-xs px-2.5 py-1 rounded-full border border-gray-200 bg-white text-gray-600 hover:border-[#ffcb2b] hover:text-gray-900 disabled:opacity-50"
               >
                 {s}
               </button>
@@ -406,7 +406,7 @@ export default function ConnectAssistant({ onNavigate, fabAboveMobilePill = fals
           <>
             <AssistantIcon className="w-7 h-7" />
             {activeTickets.length > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
+              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center">
                 {activeTickets.length}
               </span>
             )}

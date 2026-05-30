@@ -72,7 +72,7 @@ export default function CrmActivityLogPanel({ onNavigate }) {
             <li key={act.id} className="bg-white border border-gray-200 rounded-xl p-3">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
-                  <span className="text-[10px] font-bold uppercase tracking-wide text-[#8a6600]">
+                  <span className="text-xs font-bold uppercase tracking-wide text-[#8a6600]">
                     {ACTIVITY_LABELS[act.type] || act.type}
                   </span>
                   <p className="text-sm font-semibold text-gray-900 mt-0.5 truncate">
@@ -80,7 +80,7 @@ export default function CrmActivityLogPanel({ onNavigate }) {
                     {act.company ? ` · ${act.company}` : ''}
                   </p>
                   <p className="text-xs text-gray-600 mt-1 leading-relaxed">{act.summary}</p>
-                  <p className="text-[10px] text-gray-400 mt-1">
+                  <p className="text-xs text-gray-400 mt-1">
                     {act.createdByName} · {formatDateTime(act.createdAt)}
                   </p>
                 </div>

@@ -142,7 +142,7 @@ export default function IntegrationsPanel() {
         <p className="text-xs text-blue-950 leading-relaxed">
           Phase: <strong>{status?.googleOAuthPhase || 'unknown'}</strong>
           {status?.crmGmailOAuthRedirectUri && (
-            <span className="block mt-1 font-mono text-[10px] break-all">{status.crmGmailOAuthRedirectUri}</span>
+            <span className="block mt-1 font-mono text-xs break-all">{status.crmGmailOAuthRedirectUri}</span>
           )}
         </p>
         <ul className="text-xs text-blue-950 space-y-1 list-disc pl-4">
@@ -220,7 +220,7 @@ function PartnerCard({ partner }) {
           <div className="flex items-center gap-2">
             <h3 className="font-semibold text-gray-900">{partner.label}</h3>
             <span
-              className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${
+              className={`text-xs font-bold uppercase px-1.5 py-0.5 rounded ${
                 isActive ? 'bg-green-100 text-green-800' : 'bg-gray-200 text-gray-600'
               }`}
             >

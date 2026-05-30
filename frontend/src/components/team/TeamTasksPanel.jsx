@@ -209,7 +209,7 @@ function TaskCard({ task, user, busy, onComplete, onLeadClick, done = false }) {
           </p>
         </div>
         {done && (
-          <span className="text-[10px] font-bold uppercase text-green-700 bg-green-50 px-2 py-0.5 rounded">Done</span>
+          <span className="text-xs font-bold uppercase text-green-700 bg-green-50 px-2 py-0.5 rounded">Done</span>
         )}
       </div>
       {task.body && <MentionBody body={task.body} onLeadClick={onLeadClick} className="text-gray-700 mt-2 text-sm" />}

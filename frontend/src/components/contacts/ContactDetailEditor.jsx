@@ -91,7 +91,7 @@ export default function ContactDetailEditor({
         <div className="crm-contact-section-head">
           <div>
             <p className="crm-field-label mb-1">Core details</p>
-            <p className="text-[11px] text-[#7a8696]">
+            <p className="text-xs text-[#7a8696]">
               Keep contact and company details clean for campaigns and pipeline.
             </p>
           </div>
@@ -174,7 +174,7 @@ export default function ContactDetailEditor({
         <div className="crm-contact-section-head">
           <div>
             <label className="crm-field-label">LinkedIn</label>
-            <p className="text-[11px] text-[#7a8696]">
+            <p className="text-xs text-[#7a8696]">
               Find or confirm the right profile before saving the contact.
             </p>
           </div>
@@ -223,7 +223,7 @@ export default function ContactDetailEditor({
                       </p>
                       <p className="text-xs text-[#0091ae] truncate mt-1">{match.linkedin}</p>
                       {match.reason && (
-                        <p className="text-[11px] text-[#7c98b6] mt-1 leading-snug">{match.reason}</p>
+                        <p className="text-xs text-[#7c98b6] mt-1 leading-snug">{match.reason}</p>
                       )}
                     </div>
                     {confidence && (
@@ -250,7 +250,7 @@ export default function ContactDetailEditor({
                 </div>
               )
             })}
-            {aiNotice && <p className="text-[10px] text-[#7c98b6]">{aiNotice}</p>}
+            {aiNotice && <p className="text-xs text-[#7c98b6]">{aiNotice}</p>}
           </div>
         )}
       </div>

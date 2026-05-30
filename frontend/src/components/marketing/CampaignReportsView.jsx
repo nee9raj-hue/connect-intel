@@ -131,7 +131,7 @@ function WhatsAppRecipientRow({ row, busy, onOpenLead, onSent, autoSend }) {
         >
           {row.name || '—'}
         </button>
-        {row.company && <p className="text-[11px] text-gray-500">{row.company}</p>}
+        {row.company && <p className="text-xs text-gray-500">{row.company}</p>}
       </td>
       <td className="px-4 py-3 text-xs text-gray-600">{row.phone || '—'}</td>
       <td className="px-4 py-3">
@@ -140,7 +140,7 @@ function WhatsAppRecipientRow({ row, busy, onOpenLead, onSent, autoSend }) {
         </p>
       </td>
       <td className="px-4 py-3">
-        <span className={`text-[10px] font-semibold uppercase px-2 py-0.5 rounded border ${statusClass}`}>
+        <span className={`text-xs font-semibold uppercase px-2 py-0.5 rounded border ${statusClass}`}>
           {row.deliveryStatus === 'delivered' ? 'sent' : row.deliveryStatus}
         </span>
       </td>
@@ -167,10 +167,10 @@ function WhatsAppRecipientRow({ row, busy, onOpenLead, onSent, autoSend }) {
             </button>
           )}
           {autoSend && row.lastError && (
-            <span className="text-[10px] text-red-700 line-clamp-2">{row.lastError}</span>
+            <span className="text-xs text-red-700 line-clamp-2">{row.lastError}</span>
           )}
           {autoSend && row.lastSentAt && (
-            <span className="text-[10px] text-gray-500">Sent {formatDateTime(row.lastSentAt)}</span>
+            <span className="text-xs text-gray-500">Sent {formatDateTime(row.lastSentAt)}</span>
           )}
         </div>
       </td>
@@ -191,12 +191,12 @@ function RecipientRow({ row, expanded, onToggle, onOpenLead }) {
           >
             {row.name || '—'}
           </button>
-          {row.title && <p className="text-[11px] text-gray-500">{row.title}</p>}
+          {row.title && <p className="text-xs text-gray-500">{row.title}</p>}
         </td>
         <td className="px-4 py-3 text-gray-600">{row.company || '—'}</td>
         <td className="px-4 py-3 text-gray-600 text-xs">{row.email}</td>
         <td className="px-4 py-3">
-          <span className={`text-[10px] font-semibold uppercase px-2 py-0.5 rounded border ${statusClass}`}>
+          <span className={`text-xs font-semibold uppercase px-2 py-0.5 rounded border ${statusClass}`}>
             {row.deliveryStatus}
           </span>
         </td>
@@ -293,12 +293,12 @@ function KpiRecipientsPopup({
                 <span className="text-sm font-medium text-gray-900 hover:underline">
                   {row.name || '—'}
                 </span>
-                <span className="block text-[11px] text-gray-500 truncate">
+                <span className="block text-xs text-gray-500 truncate">
                   {isWhatsApp ? row.phone : row.email}
                   {row.company ? ` · ${row.company}` : ''}
                 </span>
               </button>
-              <span className="text-[10px] font-semibold uppercase text-gray-500 shrink-0">
+              <span className="text-xs font-semibold uppercase text-gray-500 shrink-0">
                 {row.deliveryStatus}
               </span>
             </li>
@@ -466,7 +466,7 @@ function CampaignDetailReport({
               />
             )}
           </div>
-          <p className="text-[11px] text-gray-500 mt-0.5 capitalize">
+          <p className="text-xs text-gray-500 mt-0.5 capitalize">
             {report?.campaign?.status} · {isWhatsApp ? 'WhatsApp' : 'Email'} ·{' '}
             {report?.campaign?.type === 'sequence' ? 'Sequence' : 'One-shot'}
             {report?.campaign?.startedAt && ` · ${formatDateTime(report.campaign.startedAt)}`}
@@ -576,7 +576,7 @@ function CampaignDetailReport({
           <table className={`w-full text-sm ${isWhatsApp ? 'min-w-[640px]' : 'min-w-[720px]'}`}>
             <thead className="sticky top-0 bg-gray-50 z-10">
               {isWhatsApp ? (
-                <tr className="text-left text-[10px] uppercase tracking-wide text-gray-500 border-b border-gray-200">
+                <tr className="text-left text-xs uppercase tracking-wide text-gray-500 border-b border-gray-200">
                   <th className="px-4 py-2 font-semibold">Contact</th>
                   <th className="px-4 py-2 font-semibold">Phone</th>
                   <th className="px-4 py-2 font-semibold">Message</th>
@@ -584,7 +584,7 @@ function CampaignDetailReport({
                   <th className="px-4 py-2 font-semibold">Actions</th>
                 </tr>
               ) : (
-                <tr className="text-left text-[10px] uppercase tracking-wide text-gray-500 border-b border-gray-200">
+                <tr className="text-left text-xs uppercase tracking-wide text-gray-500 border-b border-gray-200">
                   <th className="px-4 py-2 font-semibold">Contact</th>
                   <th className="px-4 py-2 font-semibold">Company</th>
                   <th className="px-4 py-2 font-semibold">Email</th>
@@ -800,7 +800,7 @@ export default function CampaignReportsView({
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left text-[10px] uppercase tracking-wide text-gray-500 border-b border-gray-100 bg-gray-50/80">
+                  <tr className="text-left text-xs uppercase tracking-wide text-gray-500 border-b border-gray-100 bg-gray-50/80">
                     <th className="px-3 py-2 w-10">
                       <input
                         type="checkbox"

@@ -98,7 +98,7 @@ export default function FilterSidebar({ filters, onChange, onSearch, loading, co
             <>Search leads</>
           )}
         </button>
-        <p className="text-[10px] text-center text-gray-400 leading-snug">
+        <p className="text-xs text-center text-gray-400 leading-snug">
           Powered by AI · India & global B2B data
         </p>
       </div>
@@ -112,23 +112,23 @@ function FilterSection({ icon, label, options, selected, expanded, onToggleExpan
       <button
         type="button"
         onClick={onToggleExpand}
-        className="w-full flex items-center gap-2 px-4 py-2.5 text-[13px] font-medium text-gray-800 hover:bg-gray-50"
+        className="w-full flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-800 hover:bg-gray-50"
       >
         <span className="text-base opacity-70">{icon}</span>
         <span className="flex-1 text-left">{label}</span>
         {selected.length > 0 && (
-          <span className="text-[10px] font-bold bg-[#FF773D] text-[#242424] px-1.5 rounded-full">
+          <span className="text-xs font-bold bg-[#FF773D] text-[#242424] px-1.5 rounded-full">
             {selected.length}
           </span>
         )}
-        <span className="text-gray-400 text-[10px]">{expanded ? '▲' : '▼'}</span>
+        <span className="text-gray-400 text-xs">{expanded ? '▲' : '▼'}</span>
       </button>
       {expanded && (
         <div className="px-3 pb-3 max-h-44 overflow-y-auto">
           {options.map((opt) => (
             <label
               key={opt}
-              className="flex items-start gap-2 py-1.5 px-1 rounded hover:bg-gray-50 cursor-pointer text-[13px] text-gray-700"
+              className="flex items-start gap-2 py-1.5 px-1 rounded hover:bg-gray-50 cursor-pointer text-sm text-gray-700"
             >
               <input
                 type="checkbox"

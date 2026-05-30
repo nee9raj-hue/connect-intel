@@ -91,10 +91,10 @@ export default function OrgWhatsAppCloudSetup({ compact = false, scope = 'org' }
   return (
     <div className={compact ? 'space-y-2' : 'space-y-3'}>
       {isPlatform && (
-        <p className="text-[11px] text-gray-600 leading-relaxed">
+        <p className="text-xs text-gray-600 leading-relaxed">
           Applies to <strong>all customer workspaces</strong> unless a company connects its own number under{' '}
-          <strong>Team</strong>. You can also set <code className="text-[10px] bg-gray-100 px-1 rounded">WHATSAPP_CLOUD_ACCESS_TOKEN</code>{' '}
-          and <code className="text-[10px] bg-gray-100 px-1 rounded">WHATSAPP_CLOUD_PHONE_NUMBER_ID</code> on Vercel instead.
+          <strong>Team</strong>. You can also set <code className="text-xs bg-gray-100 px-1 rounded">WHATSAPP_CLOUD_ACCESS_TOKEN</code>{' '}
+          and <code className="text-xs bg-gray-100 px-1 rounded">WHATSAPP_CLOUD_PHONE_NUMBER_ID</code> on Vercel instead.
         </p>
       )}
 
@@ -118,7 +118,7 @@ export default function OrgWhatsAppCloudSetup({ compact = false, scope = 'org' }
             type="button"
             disabled={saving}
             onClick={handleDisconnect}
-            className="mt-2 text-[11px] font-semibold text-emerald-900 underline disabled:opacity-50"
+            className="mt-2 text-xs font-semibold text-emerald-900 underline disabled:opacity-50"
           >
             Disconnect
           </button>
@@ -146,7 +146,7 @@ export default function OrgWhatsAppCloudSetup({ compact = false, scope = 'org' }
 
       {(showForm || configured) && showForm && (
         <form onSubmit={handleConnect} className="space-y-2 border border-gray-100 rounded-lg p-3 bg-gray-50/80">
-          <p className="text-[11px] text-gray-600 leading-relaxed">
+          <p className="text-xs text-gray-600 leading-relaxed">
             From{' '}
             <a
               href="https://developers.facebook.com/docs/whatsapp/cloud-api/get-started"
@@ -159,7 +159,7 @@ export default function OrgWhatsAppCloudSetup({ compact = false, scope = 'org' }
             : create a WhatsApp app, add a phone number, and copy the <strong>Phone number ID</strong> and{' '}
             <strong>Permanent access token</strong>.
           </p>
-          <label className="block text-[11px] text-gray-600">
+          <label className="block text-xs text-gray-600">
             Phone number ID
             <input
               required
@@ -169,7 +169,7 @@ export default function OrgWhatsAppCloudSetup({ compact = false, scope = 'org' }
               placeholder="123456789012345"
             />
           </label>
-          <label className="block text-[11px] text-gray-600">
+          <label className="block text-xs text-gray-600">
             Permanent access token
             <input
               required
@@ -180,7 +180,7 @@ export default function OrgWhatsAppCloudSetup({ compact = false, scope = 'org' }
               className="mt-0.5 w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 font-mono"
             />
           </label>
-          <label className="block text-[11px] text-gray-600">
+          <label className="block text-xs text-gray-600">
             Display label (optional)
             <input
               value={displayPhone}
@@ -189,7 +189,7 @@ export default function OrgWhatsAppCloudSetup({ compact = false, scope = 'org' }
               placeholder="+91 98765 43210"
             />
           </label>
-          <label className="block text-[11px] text-gray-600">
+          <label className="block text-xs text-gray-600">
             Default Meta template name (recommended for cold outreach)
             <input
               value={defaultTemplateName}
@@ -198,7 +198,7 @@ export default function OrgWhatsAppCloudSetup({ compact = false, scope = 'org' }
               placeholder="hello_world"
             />
           </label>
-          <label className="block text-[11px] text-gray-600">
+          <label className="block text-xs text-gray-600">
             Template language code
             <input
               value={defaultTemplateLanguage}
@@ -230,7 +230,7 @@ export default function OrgWhatsAppCloudSetup({ compact = false, scope = 'org' }
         <button
           type="button"
           onClick={() => setShowForm(true)}
-          className="text-[11px] font-semibold text-gray-600 underline"
+          className="text-xs font-semibold text-gray-600 underline"
         >
           Update credentials
         </button>
@@ -238,17 +238,17 @@ export default function OrgWhatsAppCloudSetup({ compact = false, scope = 'org' }
 
       {configured && (
         <div className="mt-3 rounded-lg border border-green-100 bg-green-50/80 px-3 py-2.5 space-y-1.5">
-          <p className="text-[11px] font-semibold text-green-900">Inbox webhook (Meta App Dashboard)</p>
-          <p className="text-[10px] text-green-900/90 leading-relaxed">
+          <p className="text-xs font-semibold text-green-900">Inbox webhook (Meta App Dashboard)</p>
+          <p className="text-xs text-green-900/90 leading-relaxed">
             To receive replies in <strong>Marketing → WA Inbox</strong>, add this callback URL in Meta → WhatsApp →
             Configuration → Webhook:
           </p>
-          <code className="block text-[10px] break-all bg-white/80 border border-green-100 rounded px-2 py-1">
+          <code className="block text-xs break-all bg-white/80 border border-green-100 rounded px-2 py-1">
             {typeof window !== 'undefined'
               ? `${window.location.origin}/api/whatsapp/webhook`
               : 'https://connectintel.net/api/whatsapp/webhook'}
           </code>
-          <p className="text-[10px] text-green-900/80">
+          <p className="text-xs text-green-900/80">
             Set the same verify token in Meta and as <code className="text-green-950">WHATSAPP_WEBHOOK_VERIFY_TOKEN</code>{' '}
             on Vercel. Subscribe to <strong>messages</strong>.
           </p>

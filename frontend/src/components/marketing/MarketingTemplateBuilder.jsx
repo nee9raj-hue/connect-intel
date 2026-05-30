@@ -146,7 +146,7 @@ function DraggableBlockCard({
             type="button"
             disabled={index === 0}
             onClick={() => onMoveUp(index)}
-            className="text-[10px] px-2 py-1 border border-gray-200 rounded disabled:opacity-30"
+            className="text-xs px-2 py-1 border border-gray-200 rounded disabled:opacity-30"
             title="Move up"
           >
             ↑
@@ -155,7 +155,7 @@ function DraggableBlockCard({
             type="button"
             disabled={index === total - 1}
             onClick={() => onMoveDown(index)}
-            className="text-[10px] px-2 py-1 border border-gray-200 rounded disabled:opacity-30"
+            className="text-xs px-2 py-1 border border-gray-200 rounded disabled:opacity-30"
             title="Move down"
           >
             ↓
@@ -163,7 +163,7 @@ function DraggableBlockCard({
           <button
             type="button"
             onClick={() => onDuplicate(index)}
-            className="text-[10px] px-2 py-1 border border-gray-200 rounded"
+            className="text-xs px-2 py-1 border border-gray-200 rounded"
             title="Duplicate block"
           >
             Duplicate
@@ -171,7 +171,7 @@ function DraggableBlockCard({
           <button
             type="button"
             onClick={() => onRemove(index)}
-            className="text-[10px] px-2 py-1 border border-red-100 text-red-700 rounded"
+            className="text-xs px-2 py-1 border border-red-100 text-red-700 rounded"
           >
             Remove
           </button>
@@ -607,7 +607,7 @@ export default function MarketingTemplateBuilder({
             })}
           </div>
           <div className="mt-4 border-t border-slate-100 pt-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500 mb-2">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500 mb-2">
               Personalization
             </p>
             <div className="flex flex-wrap gap-1.5">
@@ -707,7 +707,7 @@ export default function MarketingTemplateBuilder({
                         <iframe title={s.name} srcDoc={starterPreview(s)} tabIndex={-1} />
                       </span>
                       <span className="block text-xs font-semibold text-slate-900">{s.name}</span>
-                      <span className="block text-[10px] text-slate-500 truncate">{s.subject}</span>
+                      <span className="block text-xs text-slate-500 truncate">{s.subject}</span>
                     </button>
                   ))}
                 </div>
@@ -719,7 +719,7 @@ export default function MarketingTemplateBuilder({
     <>
       <div className="shrink-0 p-2.5 border-b border-slate-200/80 flex gap-1.5 overflow-x-auto no-scrollbar bg-white">
         {!value.blocks?.length ? (
-          <p className="text-[10px] text-slate-400 px-1 py-1">Add blocks from the left</p>
+          <p className="text-xs text-slate-400 px-1 py-1">Add blocks from the left</p>
         ) : (
           value.blocks.map((block, index) => {
             const style = BLOCK_PALETTE_STYLES[block.type] || BLOCK_PALETTE_STYLES.text
@@ -729,7 +729,7 @@ export default function MarketingTemplateBuilder({
                 key={block.id}
                 type="button"
                 onClick={() => setSelectedBlockIndex(index)}
-                className={`shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-[10px] font-semibold marketing-block-card ${
+                className={`shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs font-semibold marketing-block-card ${
                   selected
                     ? `marketing-block-selected ${style.border} ${style.bg} ${style.text}`
                     : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
@@ -948,7 +948,7 @@ export default function MarketingTemplateBuilder({
         <div className="min-w-0">
           <h2 className="text-sm font-semibold text-slate-900">{headerTitle}</h2>
           {!embedded && headerSubtitle ? (
-            <p className="text-[11px] text-slate-500 mt-0.5 max-w-xl">{headerSubtitle}</p>
+            <p className="text-xs text-slate-500 mt-0.5 max-w-xl">{headerSubtitle}</p>
           ) : null}
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -958,7 +958,7 @@ export default function MarketingTemplateBuilder({
                 key={mode}
                 type="button"
                 onClick={() => setPreviewMode(mode)}
-                className={`ci-btn !py-1 !px-2.5 !text-[10px] capitalize !rounded-md !border-0 ${
+                className={`ci-btn !py-1 !px-2.5 !text-xs capitalize !rounded-md !border-0 ${
                   previewMode === mode
                     ? '!bg-white !text-[#0f766e] shadow-sm'
                     : '!bg-transparent !text-slate-500'
@@ -995,7 +995,7 @@ export default function MarketingTemplateBuilder({
         <span className="marketing-toolbar-status">
           {isEditing ? 'Editing template' : embedded ? 'Campaign content' : 'Template draft'}
         </span>
-        <span className="text-[11px] text-slate-500">
+        <span className="text-xs text-slate-500">
           Click the email canvas to edit blocks, or switch to Layouts for full sections.
         </span>
       </div>
@@ -1027,7 +1027,7 @@ export default function MarketingTemplateBuilder({
             key={tab.id}
             type="button"
             onClick={() => setSideTab(tab.id)}
-            className={`ci-btn !py-1 !text-[10px] shrink-0 ${
+            className={`ci-btn !py-1 !text-xs shrink-0 ${
               sideTab === tab.id ? 'ci-btn-accent' : 'ci-btn-secondary'
             }`}
           >
@@ -1523,7 +1523,7 @@ export default function MarketingTemplateBuilder({
           <div className="flex items-center justify-between gap-3 mb-3">
             <div>
               <h3 className="text-sm font-semibold text-slate-900">Your saved templates</h3>
-              <p className="text-[11px] text-slate-500 mt-0.5">
+              <p className="text-xs text-slate-500 mt-0.5">
                 Reuse layouts quickly the same way teams browse templates in Mailchimp.
               </p>
             </div>
@@ -1549,16 +1549,16 @@ export default function MarketingTemplateBuilder({
                   )}
                 </div>
                 <p className="text-xs text-slate-500 truncate mt-1">{t.subject}</p>
-                <p className="text-[10px] text-slate-400 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   {t.blocks?.length ? `${t.blocks.length} blocks` : 'Plain text'}
                 </p>
                 <div className="flex gap-2 mt-3">
-                  <button type="button" className="ci-btn ci-btn-secondary !py-1 !text-[10px]" onClick={() => onEdit?.(t)}>
+                  <button type="button" className="ci-btn ci-btn-secondary !py-1 !text-xs" onClick={() => onEdit?.(t)}>
                     Edit
                   </button>
                   <button
                     type="button"
-                    className="ci-btn ci-btn-secondary !py-1 !text-[10px] !text-red-700 !border-red-100"
+                    className="ci-btn ci-btn-secondary !py-1 !text-xs !text-red-700 !border-red-100"
                     onClick={() => onDelete?.(t.id)}
                   >
                     Delete

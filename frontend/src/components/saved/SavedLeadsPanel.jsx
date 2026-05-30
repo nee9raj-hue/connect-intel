@@ -108,7 +108,7 @@ export default function SavedLeadsPanel({ onNavigate }) {
                     </td>
                     <td className="px-4 py-3">{lead.company}</td>
                     <td className="px-4 py-3">
-                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded border ${meta.color}`}>
+                      <span className={`text-xs font-semibold px-2 py-0.5 rounded border ${meta.color}`}>
                         {meta.label}
                       </span>
                     </td>

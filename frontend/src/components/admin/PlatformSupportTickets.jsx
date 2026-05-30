@@ -111,7 +111,7 @@ export default function PlatformSupportTickets({ onSelectCustomer }) {
           <strong>24–48 business hours</strong>.
         </p>
         {metrics && (
-          <div className="mt-2 flex flex-wrap gap-2 text-[11px]">
+          <div className="mt-2 flex flex-wrap gap-2 text-xs">
             <span className="px-2 py-0.5 rounded-full bg-white border border-amber-200 text-amber-900">
               Active: {metrics.active}
             </span>
@@ -175,13 +175,13 @@ export default function PlatformSupportTickets({ onSelectCustomer }) {
               >
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-xs font-mono font-bold text-gray-900">{t.ticketNumber}</span>
-                  <span className={`text-[10px] px-1.5 py-0.5 rounded border ${statusBadge(t.status)}`}>
+                  <span className={`text-xs px-1.5 py-0.5 rounded border ${statusBadge(t.status)}`}>
                     {t.status.replace('_', ' ')}
                   </span>
                 </div>
                 <p className="text-sm font-medium text-gray-900 truncate mt-1">{t.subject}</p>
                 <p className="text-xs text-gray-500 truncate">{t.userEmail}</p>
-                <p className="text-[10px] text-gray-400 mt-1">
+                <p className="text-xs text-gray-400 mt-1">
                   {formatDateTime(t.createdAt)}
                   {t.overdue ? ' · overdue' : ''}
                 </p>
