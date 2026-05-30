@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-05-30T13:53:48.593Z",
-  "updatedAtIst": "30/05/2026, 19:23:48",
+  "updatedAt": "2026-05-30T14:04:02.804Z",
+  "updatedAtIst": "30/05/2026, 19:34:02",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "d11296b",
+  "currentProductionCommit": "9e237db",
   "entries": [
+    {
+      "logId": "20260530-1933-9e237db",
+      "commit": "9e237db",
+      "commitFull": "9e237db3a02449ad646031339dc2437e8f5efc5e",
+      "message": "Apply HubSpot-style premium UI theme across CRM surfaces.",
+      "deployedAt": "2026-05-30T14:03:55.126Z",
+      "deployedAtIst": "30/05/2026, 19:33:55",
+      "committedAtIst": "30/05/2026, 19:33:24",
+      "vercelPreviewUrl": "https://connect-intel-isr7ovqs6-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 9e237db"
+    },
+    {
+      "logId": "20260530-1924-aad438b",
+      "commit": "aad438b",
+      "commitFull": "aad438b7d8e7031afa7f3089f9b82a142c8c9273",
+      "message": "Update production log after pipeline PWA crash fix deploy.",
+      "deployedAt": "2026-05-30T13:54:16.931Z",
+      "deployedAtIst": "30/05/2026, 19:24:16",
+      "committedAtIst": "30/05/2026, 19:23:48",
+      "vercelPreviewUrl": "https://connect-intel-jf7wxh3zn-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- aad438b"
+    },
     {
       "logId": "20260530-1923-d11296b",
       "commit": "d11296b",
@@ -15,7 +43,7 @@
       "committedAtIst": "30/05/2026, 19:23:12",
       "vercelPreviewUrl": "https://connect-intel-o6ika4700-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- d11296b"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- cd1f6cc"
-    },
-    {
-      "logId": "20260530-1816-3061a9f",
-      "commit": "3061a9f",
-      "commitFull": "3061a9f8e7703bb74d28dbc90f87ce892b76d792",
-      "message": "Align mobile pipeline with desktop filters and merge top bar.",
-      "deployedAt": "2026-05-30T12:46:45.152Z",
-      "deployedAtIst": "30/05/2026, 18:16:45",
-      "committedAtIst": "30/05/2026, 18:16:14",
-      "vercelPreviewUrl": "https://connect-intel-ljvewv40m-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 3061a9f"
-    },
-    {
-      "logId": "20260530-1754-30d5669",
-      "commit": "30d5669",
-      "commitFull": "30d56691b85c1981f870290d4b68f776d40a8375",
-      "message": "Update production log after duplicate mobile header fix deploy.",
-      "deployedAt": "2026-05-30T12:24:43.259Z",
-      "deployedAtIst": "30/05/2026, 17:54:43",
-      "committedAtIst": "30/05/2026, 17:54:15",
-      "vercelPreviewUrl": "https://connect-intel-f75h1ve1f-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 30d5669"
     }
   ]
 }
