@@ -120,7 +120,7 @@ export default function AuthPage({ inviteToken = null }) {
             </form>
           )}
 
-          <p className="mt-8 text-[11px] text-gray-400 text-center leading-relaxed">
+          <p className="mt-8 text-sm text-gray-400 text-center leading-relaxed">
             By continuing, you agree to our Terms of Service and Privacy Policy.
           </p>
         </div>

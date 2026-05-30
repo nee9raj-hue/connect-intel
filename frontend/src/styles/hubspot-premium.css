@@ -1,0 +1,422 @@
+/**
+ * HubSpot-style premium UI layer for Connect Intel.
+ * Visual-only overrides — no logic/flow changes.
+ * Exceptions: dark sidebar, Chithi immersive shell, marketing immersive builder.
+ */
+
+:root {
+  /* Typography */
+  --hs-font-base: 0.875rem; /* 14px */
+  --hs-font-secondary: 0.8125rem; /* 13px */
+  --hs-font-title: 1.125rem; /* 18px */
+  --hs-font-weight-medium: 500;
+  --hs-font-weight-semibold: 600;
+  --hs-font-weight-bold: 700;
+
+  /* Surfaces & borders */
+  --hs-canvas: #f5f8fa;
+  --hs-surface: #ffffff;
+  --hs-border: #cbd6e2;
+  --hs-border-subtle: #dfe3eb;
+  --hs-text: #33475b;
+  --hs-text-muted: #516f90;
+  --hs-text-secondary: #64748b;
+  --hs-link: #0091ae;
+  --hs-link-hover: #007a8c;
+
+  /* Brand */
+  --hs-brand: #ff773d;
+  --hs-brand-hover: #e5652f;
+  --hs-brand-soft: #fff4ee;
+  --hs-brand-border: #ffd4b8;
+
+  /* Radii */
+  --hs-radius-sm: 3px;
+  --hs-radius-md: 6px;
+  --hs-radius-lg: 8px;
+
+  /* Shadows */
+  --hs-shadow-card: 0 1px 3px rgba(15, 36, 56, 0.08);
+  --hs-shadow-modal: 0 12px 40px rgba(15, 36, 56, 0.18);
+}
+
+/* —— App shell typography (unified 14px base) —— */
+.ci-app-main:not(.chithi-app):not(.marketing-immersive-shell) {
+  font-size: var(--hs-font-base);
+  line-height: 1.5;
+  color: var(--hs-text);
+}
+
+.ci-app-main:not(.chithi-app):not(.marketing-immersive-shell) :where(.text-xs) {
+  font-size: var(--hs-font-secondary);
+  line-height: 1.45;
+}
+
+.ci-app-main:not(.chithi-app):not(.marketing-immersive-shell) :where(.text-sm) {
+  font-size: var(--hs-font-base);
+  line-height: 1.5;
+}
+
+.ci-app-main:not(.chithi-app):not(.marketing-immersive-shell) :where(.text-base) {
+  font-size: var(--hs-font-base);
+  line-height: 1.5;
+}
+
+.ci-app-main:not(.chithi-app):not(.marketing-immersive-shell) :where(.text-lg) {
+  font-size: var(--hs-font-title);
+  line-height: 1.35;
+}
+
+.ci-app-main:not(.chithi-app):not(.marketing-immersive-shell) :where(.text-xl) {
+  font-size: 1.25rem;
+  line-height: 1.3;
+}
+
+@media (min-width: 768px) {
+  .ci-app-main:not(.chithi-app):not(.marketing-immersive-shell) :where(.md\:text-sm) {
+    font-size: var(--hs-font-base);
+  }
+
+  .ci-app-main:not(.chithi-app):not(.marketing-immersive-shell) :where(.md\:text-base) {
+    font-size: var(--hs-font-base);
+  }
+
+  .ci-app-main:not(.chithi-app):not(.marketing-immersive-shell) :where(.md\:text-lg) {
+    font-size: var(--hs-font-title);
+  }
+}
+
+/* —— Canvas & page chrome —— */
+body,
+.crm-workspace,
+.dashboard-workspace,
+.panel-shell.hs-canvas,
+.crm-page-body,
+.panel-body-scroll {
+  background-color: var(--hs-canvas);
+}
+
+.crm-page-header,
+.dashboard-page-header,
+.ci-app-header {
+  background-color: var(--hs-surface);
+  border-bottom-color: var(--hs-border);
+}
+
+.crm-page-title,
+.dashboard-page-title {
+  font-size: var(--hs-font-title);
+  font-weight: var(--hs-font-weight-bold);
+  color: #17191c;
+  letter-spacing: -0.025em;
+}
+
+.crm-page-subtitle,
+.dashboard-page-subtitle,
+.pipeline-page-stats {
+  font-size: var(--hs-font-secondary);
+  color: var(--hs-text-secondary);
+}
+
+/* —— Buttons (HubSpot structure, brand orange primary) —— */
+.crm-btn {
+  font-size: var(--hs-font-secondary);
+  border-radius: var(--hs-radius-md);
+  padding: 0.5rem 1rem;
+  min-height: 2rem;
+}
+
+.crm-btn-sm {
+  font-size: var(--hs-font-secondary);
+  border-radius: var(--hs-radius-md);
+  padding: 0.35rem 0.75rem;
+}
+
+.crm-btn-primary {
+  background: var(--hs-brand);
+  border-color: var(--hs-brand);
+  color: #fff;
+}
+
+.crm-btn-primary:hover:not(:disabled) {
+  background: var(--hs-brand-hover);
+  border-color: var(--hs-brand-hover);
+}
+
+.crm-btn-secondary {
+  border-color: var(--hs-border);
+  color: var(--hs-text);
+}
+
+.crm-btn-secondary:hover:not(:disabled) {
+  background: var(--hs-canvas);
+  border-color: #99acc2;
+}
+
+.crm-link-btn,
+a.crm-link,
+.crm-workspace a:not([class*='btn']):not([class*='rounded']) {
+  color: var(--hs-link);
+}
+
+.crm-link-btn:hover,
+.crm-workspace a:not([class*='btn']):hover {
+  color: var(--hs-link-hover);
+}
+
+/* —— Cards —— */
+.crm-content-card,
+.dashboard-kpi-card,
+.dashboard-section-card,
+.crm-campaign-card,
+.crm-detail-card,
+.crm-split-card {
+  background: var(--hs-surface);
+  border-color: var(--hs-border);
+  border-radius: var(--hs-radius-lg);
+  box-shadow: var(--hs-shadow-card);
+}
+
+.dashboard-kpi-card {
+  border-radius: var(--hs-radius-lg);
+}
+
+.dashboard-kpi-card__label {
+  font-size: var(--hs-font-secondary);
+}
+
+.dashboard-kpi-card__hint {
+  font-size: var(--hs-font-secondary);
+}
+
+/* —— Tables —— */
+.pipeline-hs-table,
+.crm-table,
+.crm-data-table {
+  font-size: var(--hs-font-base);
+}
+
+.pipeline-hs-table th,
+.crm-table th,
+.crm-data-table th {
+  font-size: var(--hs-font-secondary);
+  font-weight: var(--hs-font-weight-semibold);
+  color: var(--hs-text-muted);
+  border-color: var(--hs-border);
+}
+
+.pipeline-hs-table td,
+.crm-table td,
+.crm-data-table td {
+  border-color: var(--hs-border-subtle);
+  color: var(--hs-text);
+}
+
+.pipeline-hs-table tbody tr:hover,
+.crm-table tbody tr:hover {
+  background: #f5f8fa;
+}
+
+/* —— Inputs —— */
+.crm-input,
+.crm-select,
+.crm-search-input,
+.ci-app-main input:not([type='checkbox']):not([type='radio']):not([type='button']):not([type='submit']):not([type='reset']):not(.chithi-app input),
+.ci-app-main textarea:not(.chithi-app textarea),
+.ci-app-main select:not(.chithi-app select) {
+  font-size: var(--hs-font-base);
+  border-color: var(--hs-border);
+  border-radius: var(--hs-radius-md);
+}
+
+.crm-input:focus,
+.crm-search-input:focus {
+  border-color: var(--hs-link);
+  box-shadow: 0 0 0 3px rgba(0, 145, 174, 0.12);
+}
+
+.crm-label,
+.crm-field-label {
+  font-size: var(--hs-font-secondary);
+  font-weight: var(--hs-font-weight-semibold);
+  color: var(--hs-text-muted);
+}
+
+/* —— Modals —— */
+.crm-modal-dialog {
+  border-color: var(--hs-border);
+  border-radius: var(--hs-radius-lg);
+  box-shadow: var(--hs-shadow-modal);
+}
+
+.crm-modal-header {
+  border-bottom: 1px solid var(--hs-border-subtle);
+}
+
+.crm-modal-header h2 {
+  font-size: var(--hs-font-title);
+  font-weight: var(--hs-font-weight-bold);
+  color: #17191c;
+}
+
+.crm-modal-footer {
+  border-top: 1px solid var(--hs-border-subtle);
+  background: var(--hs-canvas);
+}
+
+.crm-modal-body {
+  font-size: var(--hs-font-base);
+}
+
+/* —— Dashboard —— */
+.dashboard-section-title {
+  font-size: var(--hs-font-secondary);
+  font-weight: var(--hs-font-weight-semibold);
+  color: var(--hs-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.dashboard-quick-link {
+  font-size: var(--hs-font-base);
+  border-color: var(--hs-border);
+  border-radius: var(--hs-radius-lg);
+}
+
+/* —— Pipeline —— */
+.crm-kanban-column-header {
+  font-size: var(--hs-font-secondary);
+  font-weight: var(--hs-font-weight-semibold);
+  color: var(--hs-text);
+}
+
+.crm-kanban-card {
+  border-color: var(--hs-border);
+  border-radius: var(--hs-radius-md);
+  font-size: var(--hs-font-secondary);
+}
+
+.crm-kanban-card.is-active {
+  border-color: var(--hs-link);
+  box-shadow: 0 0 0 1px var(--hs-link);
+}
+
+.crm-toolbar,
+.hs-filter-bar-top {
+  font-size: var(--hs-font-secondary);
+}
+
+.crm-toolbar-count,
+.crm-empty-state {
+  font-size: var(--hs-font-base);
+}
+
+.crm-empty-state .crm-empty-hint {
+  font-size: var(--hs-font-secondary);
+}
+
+/* —— Mobile top bar —— */
+.ci-mobile-top-bar {
+  background: var(--hs-surface);
+  border-bottom: 1px solid var(--hs-border);
+}
+
+.ci-pipeline-mobile-header__stats {
+  font-size: var(--hs-font-secondary);
+}
+
+.ci-app-header-chip {
+  font-size: var(--hs-font-secondary);
+  border-color: var(--hs-border);
+  border-radius: var(--hs-radius-md);
+}
+
+.crm-view-tabs--compact .crm-view-tab {
+  font-size: var(--hs-font-secondary);
+  border-radius: var(--hs-radius-md);
+}
+
+/* —— Auth & loading screens —— */
+.min-h-screen.flex.bg-white:not(.chithi-app) {
+  background: var(--hs-surface);
+}
+
+.min-h-screen.flex.bg-white .bg-ci-surface {
+  background: var(--hs-canvas);
+}
+
+.min-h-screen.flex.bg-white h1 {
+  font-size: var(--hs-font-title);
+}
+
+.min-h-screen.flex.bg-white .text-sm {
+  font-size: var(--hs-font-base);
+}
+
+.min-h-screen.flex.bg-white .text-xs {
+  font-size: var(--hs-font-secondary);
+}
+
+/* LoadingExperience polish */
+[role='status'][aria-busy='true'] {
+  background: var(--hs-canvas) !important;
+}
+
+[role='status'][aria-busy='true'] p {
+  font-size: var(--hs-font-base);
+}
+
+[role='status'][aria-busy='true'] .text-xs {
+  font-size: var(--hs-font-secondary);
+}
+
+/* —— Landing page (CSS-only polish) —— */
+.min-h-screen.bg-white {
+  background: #ffffff;
+}
+
+.min-h-screen.bg-white nav {
+  border-bottom-color: var(--hs-border);
+}
+
+.min-h-screen.bg-white section {
+  color: var(--hs-text);
+}
+
+.min-h-screen.bg-white .text-gray-500,
+.min-h-screen.bg-white .text-gray-600 {
+  color: var(--hs-text-muted);
+}
+
+.min-h-screen.bg-white a:not([class*='bg-']):not([class*='btn']) {
+  color: var(--hs-link);
+}
+
+.min-h-screen.bg-white a:not([class*='bg-']):not([class*='btn']):hover {
+  color: var(--hs-link-hover);
+}
+
+/* —— Section titles & alerts —— */
+.crm-section-title {
+  font-size: var(--hs-font-base);
+}
+
+.crm-alert {
+  font-size: var(--hs-font-secondary);
+  border-radius: var(--hs-radius-md);
+}
+
+/* Preserve intentional exceptions */
+.ci-sidebar,
+.ci-sidebar *,
+.marketing-immersive-shell,
+.marketing-immersive-shell *,
+.marketing-immersive-body,
+.marketing-immersive-editor,
+.marketing-immersive-studio,
+.marketing-immersive-canvas,
+.marketing-immersive-rail,
+.chithi-app,
+.chithi-app * {
+  /* Scoped resets handled by existing index.css — no canvas override here */
+}

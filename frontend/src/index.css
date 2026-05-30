@@ -2,7 +2,7 @@
 
 @theme {
   --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
-  --font-display: 'Manrope', 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-display: 'Plus Jakarta Sans', system-ui, sans-serif;
   --color-ci-brand: #ff773d;
   --color-ci-brand-hover: #e5652f;
   --color-ci-brand-soft: #fff4ee;
@@ -4249,7 +4249,7 @@ details summary::-webkit-details-marker {
 
 .crm-page-title {
   font-family: var(--font-display);
-  font-size: 0.8125rem;
+  font-size: 1.125rem;
   font-weight: 700;
   letter-spacing: -0.035em;
   color: #17191c;
@@ -4304,7 +4304,7 @@ details summary::-webkit-details-marker {
 
 .dashboard-page-title {
   font-family: var(--font-display);
-  font-size: 0.8125rem;
+  font-size: 1.125rem;
   font-weight: 700;
   letter-spacing: -0.035em;
   color: #17191c;
@@ -5340,8 +5340,8 @@ details summary::-webkit-details-marker {
   display: flex;
   flex-direction: column;
   background: #fff;
-  border: 1px solid #dde3ea;
-  border-radius: 18px;
+  border: 1px solid #cbd6e2;
+  border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
 }
@@ -5375,19 +5375,19 @@ details summary::-webkit-details-marker {
   align-items: center;
   justify-content: center;
   gap: 0.35rem;
-  font-size: 0.71875rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   letter-spacing: -0.015em;
-  border-radius: 999px;
-  padding: 0.45rem 0.8rem;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
   white-space: nowrap;
   transition: background 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
 }
 
 .crm-btn-sm {
-  font-size: 0.65625rem;
-  padding: 0.35rem 0.65rem;
-  border-radius: 999px;
+  font-size: 0.8125rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
 }
 
 .crm-btn-ghost.is-active {
@@ -5396,13 +5396,14 @@ details summary::-webkit-details-marker {
 }
 
 .crm-btn-primary {
-  background: #17191c;
+  background: #ff773d;
   color: #fff;
-  border: 1px solid #17191c;
+  border: 1px solid #ff773d;
 }
 
 .crm-btn-primary:hover:not(:disabled) {
-  background: #0f1114;
+  background: #e5652f;
+  border-color: #e5652f;
 }
 
 .crm-btn-secondary {

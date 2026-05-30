@@ -882,7 +882,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
                   </button>
                 </div>
                 {!canOpenCampaignWizard && (
-                  <p className="text-[11px] text-slate-500 mt-2">
+                  <p className="text-sm text-slate-500 mt-2">
                     Enter a campaign name and choose a list to continue.
                   </p>
                 )}
@@ -1208,7 +1208,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
                           {f.submissions || 0} submissions · slug {f.slug}
                         </p>
                         {(f.responses || []).slice(0, 2).map((r) => (
-                          <p key={r.id} className="text-[11px] text-[#7c98b6] mt-1 line-clamp-2">
+                          <p key={r.id} className="text-sm text-[#7c98b6] mt-1 line-clamp-2">
                             {r.email || 'Anonymous'} ·{' '}
                             {r.answers?.slice(0, 2).map((a) => `${a.label}: ${a.value}`).join(' · ') ||
                               'Submitted'}

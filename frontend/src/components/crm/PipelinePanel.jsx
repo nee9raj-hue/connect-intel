@@ -1009,7 +1009,7 @@ function KanbanColumn({
             aria-label={`Select all in ${column.label}`}
             className="w-3.5 h-3.5"
           />
-          <span className="text-[10px] font-semibold text-[#516f90] bg-white border border-[#cbd6e2] px-1.5 py-0.5 rounded-sm tabular-nums">
+          <span className="text-sm font-semibold text-[#516f90] bg-white border border-[#cbd6e2] px-1.5 py-0.5 rounded-sm tabular-nums">
             {leads.length}
             {totalInColumn > leads.length ? ` / ${totalInColumn}` : ''}
           </span>
@@ -1052,7 +1052,7 @@ function KanbanColumn({
                     <span className="pipeline-hs-avatar pipeline-hs-avatar--sm shrink-0" aria-hidden>
                       {(lead.firstName?.[0] || lead.company?.[0] || '?').toUpperCase()}
                     </span>
-                    <span className="text-[11px] font-medium text-[#33475b] truncate leading-tight ci-selectable-text">
+                    <span className="text-sm font-medium text-[#33475b] truncate leading-tight ci-selectable-text">
                       {primaryLabel}
                     </span>
                   </div>
@@ -1064,31 +1064,31 @@ function KanbanColumn({
                       >
                         {lead.company[0]?.toUpperCase() || 'C'}
                       </span>
-                      <span className="text-[10px] text-[#33475b] font-medium truncate leading-snug">
+                      <span className="text-sm text-[#33475b] font-medium truncate leading-snug">
                         {lead.company}
                       </span>
                     </div>
                   ) : null}
                   <LeadTagDots lead={lead} tagById={tagById} />
                   {lead.crm?.lastEmailSentAt && (
-                    <div className="text-[10px] text-gray-400 mt-1">
+                    <div className="text-sm text-gray-400 mt-1">
                       Emailed {formatCrmDate(lead.crm.lastEmailSentAt)}
                     </div>
                   )}
                   {lead.crm?.responseReceived && (
-                    <div className="text-[10px] text-violet-700 mt-0.5 font-medium">Replied</div>
+                    <div className="text-sm text-violet-700 mt-0.5 font-medium">Replied</div>
                   )}
                   {lead.phone && leadHasCallablePhone(lead.phone) ? (
                     <div className="mt-1.5" onClick={(e) => e.stopPropagation()}>
                       <LeadPhoneCall
                         phone={lead.phone}
                         leadId={lead.id}
-                        numberClassName="text-[10px] text-[#33475b]"
+                        numberClassName="text-sm text-[#33475b]"
                         pipelineCallIcon
                       />
                     </div>
                   ) : lead.phone ? (
-                    <div className="mt-1.5 text-[10px] text-[#33475b]">{lead.phone}</div>
+                    <div className="mt-1.5 text-sm text-[#33475b]">{lead.phone}</div>
                   ) : null}
                 </button>
               </div>
@@ -1151,7 +1151,7 @@ function EmptyPipeline({ onNavigate, onImport, onAdd, compact = false }) {
           >
             Search prospects with AI
           </button>
-          <p className="text-[11px] text-gray-400 mt-2">50+ matches · 10 full previews · unlock with credits</p>
+          <p className="text-sm text-gray-400 mt-2">50+ matches · 10 full previews · unlock with credits</p>
         </div>
       </div>
     </div>

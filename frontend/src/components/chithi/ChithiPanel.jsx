@@ -548,9 +548,9 @@ export default function ChithiPanel({ onNavigate, activePanel, panelOptions, isA
               {activeChannel?.type === 'dm' ? activeChannel?.label : `#${channelTitle}`}
             </p>
             {channelMeta?.topic ? (
-              <p className="text-[11px] text-[#6b7785] truncate">{channelMeta.topic}</p>
+              <p className="text-sm text-[#6b7785] truncate">{channelMeta.topic}</p>
             ) : (
-              <p className="text-[11px] text-[#6b7785]">
+              <p className="text-sm text-[#6b7785]">
                 {activeChannel?.type === 'dm'
                   ? 'Direct message · @ teammate · # customer'
                   : '@ teammate · # customer · threads · reactions'}
@@ -607,7 +607,7 @@ export default function ChithiPanel({ onNavigate, activePanel, panelOptions, isA
 
           <footer className="shrink-0 border-t border-[#e5e9ee] px-4 py-3 bg-[#fafbfc]">
             {threadParentId && (
-              <div className="mb-2 flex items-center justify-between text-[11px] text-gray-600 bg-gray-100 rounded-lg px-2 py-1.5">
+              <div className="mb-2 flex items-center justify-between text-sm text-gray-600 bg-gray-100 rounded-lg px-2 py-1.5">
                 <span>Replying in thread</span>
                 <button type="button" className="font-semibold underline" onClick={() => setThreadParentId(null)}>
                   Cancel
@@ -643,7 +643,7 @@ export default function ChithiPanel({ onNavigate, activePanel, panelOptions, isA
             </div>
           </footer>
 
-          <details className="shrink-0 mx-4 mb-3 rounded-lg border border-[#e5e9ee] bg-[#f9fafb] text-[11px] text-gray-600">
+          <details className="shrink-0 mx-4 mb-3 rounded-lg border border-[#e5e9ee] bg-[#f9fafb] text-sm text-gray-600">
             <summary className="cursor-pointer px-3 py-2 font-semibold text-gray-800 select-none">
               Notifications
             </summary>
@@ -659,13 +659,13 @@ export default function ChithiPanel({ onNavigate, activePanel, panelOptions, isA
                     value={slackWebhookInput}
                     onChange={(e) => setSlackWebhookInput(e.target.value)}
                     placeholder="Slack webhook URL"
-                    className="w-full text-[11px] border border-gray-200 rounded px-2 py-1.5"
+                    className="w-full text-sm border border-gray-200 rounded px-2 py-1.5"
                   />
                   <button
                     type="button"
                     disabled={busy}
                     onClick={saveSlackWebhook}
-                    className="text-[11px] font-semibold px-2 py-1 bg-gray-900 text-white rounded"
+                    className="text-sm font-semibold px-2 py-1 bg-gray-900 text-white rounded"
                   >
                     Save
                   </button>
@@ -726,7 +726,7 @@ function ChithiMessageBlock({
         msg.pending ? 'chithi-msg--pending' : ''
       }`}
     >
-      <p className="text-[11px] text-gray-500 mb-0.5">
+      <p className="text-sm text-gray-500 mb-0.5">
         {msg.isMine ? 'You' : msg.authorName} · {msg.pending ? 'Sending…' : formatDateTime(msg.createdAt)}
       </p>
       <div
@@ -750,7 +750,7 @@ function ChithiMessageBlock({
                 key={emoji}
                 type="button"
                 onClick={() => onReact(msg.id, emoji)}
-                className={`text-[11px] px-1.5 py-0.5 rounded-full border ${
+                className={`text-sm px-1.5 py-0.5 rounded-full border ${
                   active ? 'bg-[#fff4ee] border-[#ffd4b8]' : 'bg-white border-gray-200 hover:border-gray-300'
                 }`}
               >
@@ -759,11 +759,11 @@ function ChithiMessageBlock({
               </button>
             )
           })}
-          <button type="button" onClick={onReply} className="text-[11px] text-gray-500 hover:text-gray-800 px-1">
+          <button type="button" onClick={onReply} className="text-sm text-gray-500 hover:text-gray-800 px-1">
             Reply
           </button>
           {(msg.threadReplyCount > 0 || replyList.length > 0) && (
-            <button type="button" onClick={onToggleThread} className="text-[11px] font-semibold text-gray-700 px-1">
+            <button type="button" onClick={onToggleThread} className="text-sm font-semibold text-gray-700 px-1">
               {showReplies ? 'Hide' : 'View'} {msg.threadReplyCount || replyList.length} repl
               {(msg.threadReplyCount || replyList.length) === 1 ? 'y' : 'ies'}
             </button>
@@ -774,7 +774,7 @@ function ChithiMessageBlock({
         <div className="mt-2 ml-3 pl-3 border-l-2 border-gray-200 space-y-2">
           {replyList.map((r) => (
             <div key={r.id} className="text-sm">
-              <p className="text-[10px] text-gray-500">
+              <p className="text-sm text-gray-500">
                 {r.isMine ? 'You' : r.authorName} · {formatDateTime(r.createdAt)}
               </p>
               <div className="rounded-lg px-2 py-1.5 bg-gray-50 text-gray-900">

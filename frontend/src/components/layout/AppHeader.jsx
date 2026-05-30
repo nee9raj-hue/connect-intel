@@ -18,7 +18,7 @@ export default function AppHeader({ onNavigate, sidebarMode = 'expanded', onTogg
         <button
           type="button"
           onClick={() => onNavigate?.('search')}
-          className="ci-app-header-chip ci-app-header-chip--secondary inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#d9dee5] bg-[#f7f9fb] px-2.5 py-1.5 md:px-3 text-[11px] font-semibold tracking-[-0.015em] text-[#202938] transition-colors hover:bg-[#eef2f6]"
+          className="ci-app-header-chip ci-app-header-chip--secondary inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#d9dee5] bg-[#f7f9fb] px-2.5 py-1.5 md:px-3 text-sm font-semibold tracking-[-0.015em] text-[#202938] transition-colors hover:bg-[#eef2f6]"
           title={`AI credits: Rs ${credits}`}
           aria-label={`AI credits: Rs ${credits}`}
         >
@@ -29,7 +29,7 @@ export default function AppHeader({ onNavigate, sidebarMode = 'expanded', onTogg
         <button
           type="button"
           onClick={() => onNavigate?.('team')}
-          className={`ci-app-header-chip ci-app-header-chip--secondary inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1.5 md:px-3 text-[11px] font-semibold tracking-[-0.015em] transition-colors ${
+          className={`ci-app-header-chip ci-app-header-chip--secondary inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1.5 md:px-3 text-sm font-semibold tracking-[-0.015em] transition-colors ${
             subscriptionActive
               ? 'border-[#b8e3d2] bg-[#eefaf5] text-[#0f6a4c]'
               : 'border-[#d9dee5] bg-white text-[#536072] hover:bg-[#f7f9fb]'
