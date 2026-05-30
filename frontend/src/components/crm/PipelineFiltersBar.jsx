@@ -1,7 +1,20 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
+import useFullPageFilterMenus from '../../hooks/useFullPageFilterMenus'
 import { api } from '../../lib/api'
-import { CONTACT_FILTER_OPTIONS, DEFAULT_PIPELINE_FILTERS } from '../../lib/pipelineFilters'
+import {
+  BRAND_ICON_ADVANCE_FILTER,
+  BRAND_ICON_CITY,
+  BRAND_ICON_CONTACT,
+  BRAND_ICON_LEAD_STATUS,
+  BRAND_ICON_STATE,
+} from '../../lib/brandAssets'
+import { CONTACT_FILTER_OPTIONS, DEFAULT_PIPELINE_FILTERS, getFilterCities, getFilterStates } from '../../lib/pipelineFilters'
 import FilterDropdown, { FilterChipButton } from './FilterDropdown'
+import LeadTag from '../ui/LeadTag'
+import FilterToolbarIcon from '../ui/FilterToolbarIcon'
+import MobileFilterFullPage from '../ui/MobileFilterFullPage'
+import { SettingsIcon } from '../ui/icons'
 
 const SMART_TAG_OPTIONS = [
   { id: 'not_touched', label: 'Not touched' },
@@ -34,10 +47,17 @@ export default function PipelineFiltersBar({
   orgLeadTags = [],
   stageListMode = false,
   onRemoveAppliedFilter,
+  onOpenViewSettings,
 }) {
-  const [advancedOpen, setAdvancedOpen] = useState(false)
   const [savedViews, setSavedViews] = useState([])
+  const [advancedOpen, setAdvancedOpen] = useState(false)
+  const advancedRef = useRef(null)
+  const advancedPanelRef = useRef(null)
+  const advancedOpenedAtRef = useRef(0)
+  const fullPageMenus = useFullPageFilterMenus()
   const set = (patch) => onFiltersChange({ ...filters, ...patch })
+
+  const closeAdvanced = useCallback(() => setAdvancedOpen(false), [])
 
   const loadViews = useCallback(async () => {
     try {
@@ -52,11 +72,25 @@ export default function PipelineFiltersBar({
     loadViews()
   }, [loadViews])
 
-  const toggleTagFilter = (tagId) => {
-    const current = filters.tagIds || []
-    const next = current.includes(tagId) ? current.filter((id) => id !== tagId) : [...current, tagId]
-    set({ tagIds: next })
-  }
+  useEffect(() => {
+    if (!advancedOpen) return undefined
+    const onDoc = (e) => {
+      if (Date.now() - advancedOpenedAtRef.current < 320) return
+      const t = e.target
+      if (advancedRef.current?.contains(t)) return
+      if (advancedPanelRef.current?.contains(t)) return
+      closeAdvanced()
+    }
+    const timer = window.setTimeout(() => {
+      document.addEventListener('mousedown', onDoc, true)
+      document.addEventListener('touchstart', onDoc, { capture: true, passive: true })
+    }, 280)
+    return () => {
+      window.clearTimeout(timer)
+      document.removeEventListener('mousedown', onDoc, true)
+      document.removeEventListener('touchstart', onDoc, true)
+    }
+  }, [advancedOpen, closeAdvanced])
 
   const handleApply = () => onApplyFilters?.()
 
@@ -67,25 +101,127 @@ export default function PipelineFiltersBar({
     label: o.label,
     value: o.id,
   }))
+  const tagOptions = orgLeadTags.map((t) => ({ label: t.name, value: t.id }))
+  const smartOptions = SMART_TAG_OPTIONS.map((o) => ({ label: o.label, value: o.id }))
+  const savedViewOptions = savedViews.map((v) => ({ label: v.name, value: v.id }))
 
-  const advancedFilterCount =
-    (appliedFilters.tagIds?.length ? 1 : 0) + (appliedFilters.smartTags?.length ? 1 : 0)
+  const appliedCities = getFilterCities(appliedFilters)
+  const appliedStates = getFilterStates(appliedFilters)
 
-  const countLabel =
-    pipelineTotal > totalCount
-      ? `${resultCount.toLocaleString()} of ${totalCount.toLocaleString()} · ${pipelineTotal.toLocaleString()} total`
-      : `${resultCount.toLocaleString()} lead${resultCount !== 1 ? 's' : ''}`
-
-  const hasSecondaryFilters =
-    savedViews.length > 0 || orgLeadTags.length > 0 || SMART_TAG_OPTIONS.length > 0
+  const advancedActiveCount =
+    (appliedFilters.tagIds?.length || 0) +
+    (appliedFilters.smartTags?.length || 0) +
+    (activeSmartViewId ? 1 : 0)
 
   const activeStageLabel = statusOptions.find((s) => s.id === statusFilter)?.label
   const activeContactLabel = CONTACT_FILTER_OPTIONS.find((o) => o.id === appliedFilters.contact)?.label
 
+  const advancedFooter = (
+    <div className="hs-advanced-filter-footer">
+      <button type="button" className="crm-filter-link-btn" onClick={onClearFilters}>
+        Clear all
+      </button>
+      <button
+        type="button"
+        className="crm-filter-menu-footer-apply"
+        onClick={() => {
+          handleApply()
+          closeAdvanced()
+        }}
+      >
+        Apply
+      </button>
+    </div>
+  )
+
+  const advancedBody = (
+    <>
+      {savedViews.length > 0 && (
+        <div className="hs-advanced-filter-section">
+          <p className="hs-advanced-filter-label">Saved views</p>
+          <FilterDropdown
+            compact
+            label="Saved view"
+            value={activeSmartViewId || ''}
+            displayValue={savedViews.find((v) => v.id === activeSmartViewId)?.name}
+            options={savedViewOptions}
+            onChange={(viewId) => {
+              const view = savedViews.find((v) => v.id === viewId)
+              if (view) onApplySmartView?.(view)
+            }}
+            emptyLabel="None"
+          />
+        </div>
+      )}
+
+      {orgLeadTags.length > 0 && (
+        <div className="hs-advanced-filter-section">
+          <div className="flex items-center justify-between gap-2 mb-1.5">
+            <p className="hs-advanced-filter-label mb-0">Tags</p>
+            <select
+              value={filters.tagMode || 'any'}
+              onChange={(e) => set({ tagMode: e.target.value })}
+              className="crm-select-sm crm-select-sm--hubspot"
+            >
+              <option value="any">Any</option>
+              <option value="all">All</option>
+            </select>
+          </div>
+          <FilterDropdown
+            compact
+            label="Tags"
+            multiSelect
+            wide
+            values={filters.tagIds || []}
+            onMultiChange={(v) => set({ tagIds: v })}
+            options={tagOptions}
+            searchable
+            placeholder="Search tags…"
+            emptyLabel="Any tag"
+          />
+        </div>
+      )}
+
+      <div className="hs-advanced-filter-section">
+        <p className="hs-advanced-filter-label">Smart</p>
+        <FilterDropdown
+          compact
+          label="Smart"
+          multiSelect
+          values={filters.smartTags || []}
+          onMultiChange={(v) => set({ smartTags: v })}
+          options={smartOptions}
+          emptyLabel="Any"
+        />
+      </div>
+    </>
+  )
+
+  const advancedPanel = advancedOpen ? (
+    <div
+      ref={advancedPanelRef}
+      className={`hs-advanced-filter-panel ${fullPageMenus ? 'hs-advanced-filter-panel--mobile-fullpage' : ''}`}
+      role="dialog"
+      aria-label="Advanced filters"
+    >
+      {advancedBody}
+      {!fullPageMenus ? advancedFooter : null}
+    </div>
+  ) : null
+
+  const showActiveChips =
+    appliedSearch ||
+    appliedCities.length ||
+    appliedStates.length ||
+    (appliedFilters.tagIds?.length || 0) > 0 ||
+    (appliedFilters.smartTags?.length || 0) > 0 ||
+    (!stageListMode && statusFilter !== 'all') ||
+    (appliedFilters.contact && appliedFilters.contact !== 'any')
+
   return (
-    <div className="crm-toolbar crm-toolbar--compact">
-      <div className="crm-toolbar-primary">
-        <div className="crm-search-wrap crm-search-wrap--compact">
+    <div className="crm-toolbar crm-toolbar--hubspot">
+      <div className="hs-filter-bar-top">
+        <div className="crm-search-wrap crm-search-wrap--hubspot hs-filter-search">
           <svg className="crm-search-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
             <path
               fillRule="evenodd"
@@ -103,112 +239,154 @@ export default function PipelineFiltersBar({
                 handleApply()
               }
             }}
-            placeholder="Search leads…"
-            className="crm-search-input"
+            placeholder="Type / to search"
+            className="crm-search-input crm-search-input--hubspot"
             aria-label="Search pipeline"
           />
         </div>
 
-        {!stageListMode && (
+        <div className="hs-filter-icon-strip" role="toolbar" aria-label="Lead filters">
+          {!stageListMode && (
+            <FilterDropdown
+              iconOnly
+              iconSrc={BRAND_ICON_LEAD_STATUS}
+              label="Lead status"
+              value={statusFilter !== 'all' ? statusFilter : ''}
+              displayValue={statusOptions.find((s) => s.id === statusFilter)?.label}
+              options={stageOptions}
+              onChange={(v) => onStatusFilterChange?.(v || 'all')}
+              emptyLabel="All statuses"
+            />
+          )}
+
           <FilterDropdown
-            compact
-            label="Stage"
-            value={statusFilter !== 'all' ? statusFilter : ''}
-            displayValue={statusOptions.find((s) => s.id === statusFilter)?.label}
-            options={stageOptions}
-            onChange={(v) => onStatusFilterChange?.(v || 'all')}
-            emptyLabel="All"
+            iconOnly
+            iconSrc={BRAND_ICON_CITY}
+            label="City"
+            multiSelect
+            values={filters.cities || []}
+            onMultiChange={(v) => set({ cities: v })}
+            options={cityOptions}
+            searchable
+            placeholder="Search cities…"
+            emptyLabel="All cities"
           />
-        )}
-        <FilterDropdown
-          compact
-          label="City"
-          value={filters.city}
-          options={cityOptions}
-          onChange={(v) => set({ city: v })}
-          searchable
-          placeholder="City…"
-          emptyLabel="All"
-        />
-        <FilterDropdown
-          compact
-          label="State"
-          value={filters.state}
-          options={stateOptions}
-          onChange={(v) => set({ state: v })}
-          searchable
-          placeholder="State…"
-          emptyLabel="All"
-        />
-        <FilterDropdown
-          compact
-          label="Contact"
-          value={filters.contact !== 'any' ? filters.contact : ''}
-          displayValue={CONTACT_FILTER_OPTIONS.find((o) => o.id === filters.contact)?.label}
-          options={contactOptions}
-          onChange={(v) => set({ contact: v || 'any' })}
-          emptyLabel="All"
-        />
+
+          <FilterDropdown
+            iconOnly
+            iconSrc={BRAND_ICON_STATE}
+            label="State"
+            multiSelect
+            values={filters.states || []}
+            onMultiChange={(v) => set({ states: v })}
+            options={stateOptions}
+            searchable
+            placeholder="Search states…"
+            emptyLabel="All states"
+          />
+
+          <FilterDropdown
+            iconOnly
+            iconSrc={BRAND_ICON_CONTACT}
+            label="Contact"
+            value={filters.contact !== 'any' ? filters.contact : ''}
+            displayValue={CONTACT_FILTER_OPTIONS.find((o) => o.id === filters.contact)?.label}
+            options={contactOptions}
+            onChange={(v) => set({ contact: v || 'any' })}
+            emptyLabel="All contacts"
+          />
+
+          <div className="hs-advanced-filter-wrap hs-filter-icon-wrap" ref={advancedRef}>
+            <FilterToolbarIcon
+              src={BRAND_ICON_ADVANCE_FILTER}
+              label="Advanced filters"
+              active={advancedOpen || advancedActiveCount > 0}
+              badge={advancedActiveCount > 0}
+              aria-expanded={advancedOpen}
+              onClick={() => {
+                setAdvancedOpen((v) => {
+                  if (!v) advancedOpenedAtRef.current = Date.now()
+                  return !v
+                })
+              }}
+            />
+
+            {advancedOpen && !fullPageMenus && advancedPanel}
+          </div>
+          {advancedOpen &&
+            fullPageMenus &&
+            createPortal(
+              <MobileFilterFullPage
+                open
+                onClose={closeAdvanced}
+                title="Advanced filters"
+                footer={advancedFooter}
+              >
+                {advancedPanel}
+              </MobileFilterFullPage>,
+              document.body
+            )}
+        </div>
 
         <button
           type="button"
           onClick={handleApply}
           disabled={applying}
-          className={`crm-btn crm-btn-sm ${filtersDirty ? 'crm-btn-primary' : 'crm-btn-secondary'}`}
+          className={`crm-filter-action-btn shrink-0 ${filtersDirty ? 'is-primary' : ''}`}
         >
           {applying ? '…' : 'Search'}
         </button>
 
-        {hasSecondaryFilters && (
-          <button
-            type="button"
-            onClick={() => setAdvancedOpen((v) => !v)}
-            className={`crm-btn crm-btn-sm crm-btn-ghost ${advancedOpen ? 'is-active' : ''}`}
-          >
-            {advancedOpen ? 'Less' : 'Advanced'}
-            {advancedFilterCount > 0 ? ` (${advancedFilterCount})` : ''}
+        <span className="hs-filter-bar-spacer hidden sm:block" aria-hidden />
+
+        <button type="button" className="hs-filter-gear-btn shrink-0" onClick={onOpenViewSettings} aria-label="View settings">
+          <SettingsIcon className="w-4 h-4" />
+        </button>
+      </div>
+
+      <div className="hs-filter-bar-meta flex flex-wrap items-center gap-2 px-0 pt-0.5 pb-0.5 lg:hidden">
+        {(appliedSearch || hasActiveFilters) && (
+          <button type="button" onClick={onClearFilters} className="crm-filter-link-btn text-xs">
+            Clear all
           </button>
         )}
-
-        {(appliedSearch || appliedFilters.city || appliedFilters.state || hasActiveFilters) && (
-          <button type="button" onClick={onClearFilters} className="crm-link-btn crm-link-btn--sm">
-            Clear
-          </button>
-        )}
-
         {resultCount > 0 && (
-          <button
-            type="button"
-            onClick={onSelectAllFiltered}
-            className="crm-link-btn crm-link-btn--sm hidden lg:inline-flex"
-          >
+          <button type="button" onClick={onSelectAllFiltered} className="crm-filter-link-btn text-xs">
             Select all
           </button>
         )}
-
-        <span className="crm-toolbar-count crm-toolbar-count--inline">{countLabel}</span>
       </div>
 
-      {(appliedSearch || appliedFilters.city || appliedFilters.state) && (
-        <div className="crm-active-filters">
+      {showActiveChips && (
+        <div className="crm-active-filters crm-active-filters--hubspot">
           {appliedSearch && (
             <FilterChipButton
-              label={`“${appliedSearch}”`}
+              label={`Search: “${appliedSearch}”`}
               onRemove={() => onRemoveAppliedFilter?.({ search: '' })}
             />
           )}
-          {appliedFilters.city && (
+          {appliedCities.map((c) => (
             <FilterChipButton
-              label={appliedFilters.city}
-              onRemove={() => onRemoveAppliedFilter?.({ city: '' })}
+              key={`city-${c}`}
+              label={`City: ${c}`}
+              onRemove={() =>
+                onRemoveAppliedFilter?.({
+                  cities: appliedCities.filter((x) => x !== c),
+                })
+              }
             />
-          )}
-          {appliedFilters.state && (
+          ))}
+          {appliedStates.map((s) => (
             <FilterChipButton
-              label={appliedFilters.state}
-              onRemove={() => onRemoveAppliedFilter?.({ state: '' })}
+              key={`state-${s}`}
+              label={`State: ${s}`}
+              onRemove={() =>
+                onRemoveAppliedFilter?.({
+                  states: appliedStates.filter((x) => x !== s),
+                })
+              }
             />
-          )}
+          ))}
           {!stageListMode && statusFilter !== 'all' && activeStageLabel && (
             <FilterChipButton label={activeStageLabel} onRemove={() => onStatusFilterChange?.('all')} />
           )}
@@ -218,91 +396,42 @@ export default function PipelineFiltersBar({
               onRemove={() => onRemoveAppliedFilter?.({ contact: 'any' })}
             />
           )}
-        </div>
-      )}
-
-      {advancedOpen && hasSecondaryFilters && (
-        <div className="crm-advanced-panel crm-advanced-panel--compact">
-          {savedViews.length > 0 && (
-            <div>
-              <p className="crm-advanced-label">Saved views</p>
-              <div className="flex flex-wrap gap-1.5 mt-1">
-                {savedViews.map((v) => (
-                  <button
-                    key={v.id}
-                    type="button"
-                    onClick={() => onApplySmartView?.(v)}
-                    className={`crm-pill crm-pill--sm ${activeSmartViewId === v.id ? 'crm-pill-active' : ''}`}
-                  >
-                    {v.name}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {orgLeadTags.length > 0 && (
-            <div>
-              <div className="flex items-center justify-between gap-2 mb-1.5">
-                <p className="crm-advanced-label">Tags</p>
-                <select
-                  value={filters.tagMode || 'any'}
-                  onChange={(e) => set({ tagMode: e.target.value })}
-                  className="crm-select-sm"
+          {(appliedFilters.tagIds || []).map((tagId) => {
+            const tag = orgLeadTags.find((t) => t.id === tagId)
+            if (!tag) return null
+            return (
+              <span key={tagId} className="crm-filter-chip crm-filter-chip--tag">
+                <LeadTag name={tag.name} />
+                <button
+                  type="button"
+                  onClick={() =>
+                    onRemoveAppliedFilter?.({
+                      tagIds: (appliedFilters.tagIds || []).filter((id) => id !== tagId),
+                    })
+                  }
+                  className="crm-filter-chip-x"
+                  aria-label="Remove tag filter"
                 >
-                  <option value="any">Any</option>
-                  <option value="all">All</option>
-                </select>
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                {orgLeadTags.map((tag) => {
-                  const active = (filters.tagIds || []).includes(tag.id)
-                  return (
-                    <button
-                      key={tag.id}
-                      type="button"
-                      onClick={() => toggleTagFilter(tag.id)}
-                      className={`crm-pill crm-pill--sm ${active ? 'crm-pill-active' : ''}`}
-                      style={
-                        active ? { backgroundColor: tag.color, borderColor: tag.color, color: '#fff' } : undefined
-                      }
-                    >
-                      {tag.name}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-          )}
-
-          <div>
-            <p className="crm-advanced-label">Smart</p>
-            <div className="flex flex-wrap gap-1.5 mt-1">
-              {SMART_TAG_OPTIONS.map((opt) => {
-                const active = (filters.smartTags || []).includes(opt.id)
-                return (
-                  <button
-                    key={opt.id}
-                    type="button"
-                    onClick={() => {
-                      const current = filters.smartTags || []
-                      const next = current.includes(opt.id)
-                        ? current.filter((id) => id !== opt.id)
-                        : [...current, opt.id]
-                      set({ smartTags: next })
-                    }}
-                    className={`crm-pill crm-pill--sm ${active ? 'crm-pill-active' : ''}`}
-                  >
-                    {opt.label}
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-
-          <button type="button" onClick={handleApply} disabled={applying} className="crm-btn crm-btn-sm crm-btn-primary">
-            {applying ? 'Applying…' : 'Apply'}
-          </button>
+                  ×
+                </button>
+              </span>
+            )
+          })}
+          {(appliedFilters.smartTags || []).map((id) => {
+            const opt = SMART_TAG_OPTIONS.find((o) => o.id === id)
+            if (!opt) return null
+            return (
+              <FilterChipButton
+                key={id}
+                label={opt.label}
+                onRemove={() =>
+                  onRemoveAppliedFilter?.({
+                    smartTags: (appliedFilters.smartTags || []).filter((x) => x !== id),
+                  })
+                }
+              />
+            )
+          })}
         </div>
       )}
     </div>

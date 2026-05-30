@@ -257,7 +257,7 @@ export default function AppShell() {
       {needsGmailSetup && !needsOnboarding && (
         <GmailSetupModal onDone={() => setNeedsGmailSetup(false)} />
       )}
-      {user && !needsOnboarding && <ConnectAssistant />}
+      {user && !needsOnboarding && <ConnectAssistant onNavigate={navigate} />}
     </div>
   )
 }

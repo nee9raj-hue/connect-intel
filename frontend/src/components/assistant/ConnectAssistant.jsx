@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { getAssistantChat, sendAssistantMessage } from '../../lib/api'
+import { api } from '../../lib/api'
 import { ASSISTANT_QUICK_PROMPTS } from '../../lib/assistantQuickPrompts'
 import { applyAssistantAction } from '../../lib/assistantNavigation'
 import { shouldShowConnectAssistant } from '../../lib/assistantVisibility'
-import { useIsMobile } from '../../hooks/useIsMobile'
-import { useAuth } from '../../context/AuthContext'
-import { useAppNavigation } from '../../context/AppNavigationContext'
-import { IconClose, IconSparkles } from '../ui/icons'
+import useIsMobile from '../../hooks/useIsMobile'
+import { useApp } from '../../context/AppContext'
+import { SparkIcon } from '../ui/icons'
 
 function MessageBubble({ message, onAction }) {
   const isUser = message.role === 'user'
@@ -31,10 +30,9 @@ function MessageBubble({ message, onAction }) {
   )
 }
 
-export default function ConnectAssistant() {
-  const { user } = useAuth()
+export default function ConnectAssistant({ onNavigate }) {
+  const { user, openPipelineLead } = useApp()
   const isMobile = useIsMobile()
-  const { navigate, openPipelineLead } = useAppNavigation()
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [sending, setSending] = useState(false)
@@ -49,7 +47,7 @@ export default function ConnectAssistant() {
     setLoading(true)
     setError('')
     try {
-      const data = await getAssistantChat()
+      const data = await api.getAssistantChat()
       setThreadId(data.threadId || null)
       setMessages(Array.isArray(data.messages) ? data.messages : [])
     } catch (e) {
@@ -75,9 +73,9 @@ export default function ConnectAssistant() {
 
   const handleAction = useCallback(
     (action) => {
-      applyAssistantAction(action, { navigate, openPipelineLead })
+      applyAssistantAction(action, { navigate: onNavigate, openPipelineLead })
     },
-    [navigate, openPipelineLead]
+    [onNavigate, openPipelineLead]
   )
 
   const sendText = useCallback(
@@ -95,7 +93,7 @@ export default function ConnectAssistant() {
       }
       setMessages((prev) => [...prev, optimistic])
       try {
-        const data = await sendAssistantMessage(trimmed, threadId)
+        const data = await api.sendAssistantMessage(trimmed)
         if (data.threadId) setThreadId(data.threadId)
         setMessages((prev) => {
           const withoutTmp = prev.filter((m) => m.id !== optimistic.id)
@@ -141,7 +139,7 @@ export default function ConnectAssistant() {
               <p className="connect-assistant-sub">Pipeline, Gmail, imports, marketing &amp; navigation</p>
             </div>
             <button type="button" className="connect-assistant-close" onClick={() => setOpen(false)} aria-label="Close">
-              <IconClose size={18} />
+              ×
             </button>
           </header>
 
