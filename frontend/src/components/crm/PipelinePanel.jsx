@@ -33,6 +33,7 @@ import { leadHasSendableEmail } from '../../lib/emailUtils'
 import { getLeadCity, getLeadState } from '../../lib/pipelineFilters'
 
 import useIsMobile from '../../hooks/useIsMobile'
+import usePipelineFilterMobile from '../../hooks/usePipelineFilterMobile'
 
 export default function PipelinePanel({ onNavigate, panelOptions }) {
   const {
@@ -57,6 +58,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
 
   const columns = useMemo(() => getVisiblePipelineColumns(user), [user])
   const isMobile = useIsMobile()
+  const useCompactPipelineChrome = usePipelineFilterMobile()
   const [view, setView] = useState('list')
   const [filter, setFilter] = useState(panelOptions?.status || 'all')
   /** Status picked from toolbar on All Leads — does not change sidebar stage navigation. */
@@ -390,7 +392,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const [mobileHeaderSlot, setMobileHeaderSlot] = useState(null)
 
   useEffect(() => {
-    if (!isMobile) {
+    if (!useCompactPipelineChrome) {
       setMobileHeaderSlot(null)
       document.documentElement.removeAttribute('data-pipeline-mobile')
       return undefined
@@ -398,7 +400,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     document.documentElement.setAttribute('data-pipeline-mobile', '1')
     setMobileHeaderSlot(document.getElementById('ci-app-header-pipeline-slot'))
     return () => document.documentElement.removeAttribute('data-pipeline-mobile')
-  }, [isMobile])
+  }, [useCompactPipelineChrome])
 
   const handleLoadMore = useCallback(() => {
     loadMorePipelineLeads(serverFilters)
@@ -558,7 +560,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
 
   return (
     <>
-      {isMobile && mobileHeaderSlot
+      {useCompactPipelineChrome && mobileHeaderSlot
         ? createPortal(
             <PipelineMobileHeaderChrome
               statsText={mobileHeaderStats}
@@ -582,7 +584,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
         } ${useHubSpotList ? 'pipeline-list-workspace' : ''}`}
       >
         <header className="crm-page-header pipeline-page-header">
-          <div className="crm-page-header-top pipeline-page-header-top hidden md:flex">
+          {!useCompactPipelineChrome ? (
+          <div className="crm-page-header-top pipeline-page-header-top">
             <div className="pipeline-page-heading min-w-0">
               <img
                 src={BRAND_ICON_PIPELINE}
@@ -665,6 +668,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               </button>
             </div>
           </div>
+          ) : null}
 
           {savedLeads.length > 0 && (
             <PipelineFiltersBar

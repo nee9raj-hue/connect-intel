@@ -177,7 +177,7 @@ export default function PipelineLeadsTable({
               onSort={onSort}
               className="pipeline-hs-th pipeline-hs-th--email"
             />
-            <th scope="col" className="pipeline-hs-th">
+            <th scope="col" className="pipeline-hs-th pipeline-hs-th--phone">
               Phone number
             </th>
             <th scope="col" className="pipeline-hs-th pipeline-hs-th--owner">
@@ -195,6 +195,7 @@ export default function PipelineLeadsTable({
               activeKey={sortKey}
               sortDir={sortDir}
               onSort={onSort}
+              className="pipeline-hs-th pipeline-hs-th--company"
             />
             {showStatus && (
               <th scope="col" className="pipeline-hs-th">
@@ -207,6 +208,7 @@ export default function PipelineLeadsTable({
               activeKey={sortKey}
               sortDir={sortDir}
               onSort={onSort}
+              className="pipeline-hs-th pipeline-hs-th--activity"
             />
             <SortHeader
               label="Create date"
@@ -214,7 +216,7 @@ export default function PipelineLeadsTable({
               activeKey={sortKey}
               sortDir={sortDir}
               onSort={onSort}
-              className="pipeline-hs-th pipeline-hs-th--sort-active"
+              className="pipeline-hs-th pipeline-hs-th--sort-active pipeline-hs-th--created"
             />
           </tr>
         </thead>
@@ -322,7 +324,7 @@ export default function PipelineLeadsTable({
                     <span className="pipeline-hs-muted">--</span>
                   )}
                 </td>
-                <td className="pipeline-hs-td">
+                <td className="pipeline-hs-td pipeline-hs-td--company">
                   {lead.company ? (
                     <button
                       type="button"
@@ -343,10 +345,10 @@ export default function PipelineLeadsTable({
                     <span className={`pipeline-hs-status ${meta.color}`}>{meta.label}</span>
                   </td>
                 )}
-                <td className="pipeline-hs-td">
+                <td className="pipeline-hs-td pipeline-hs-td--activity">
                   <DateCell iso={lastActivityIso(lead)} />
                 </td>
-                <td className="pipeline-hs-td">
+                <td className="pipeline-hs-td pipeline-hs-td--created">
                   <DateCell iso={createdIso(lead)} />
                 </td>
               </tr>

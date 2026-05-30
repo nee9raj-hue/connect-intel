@@ -8259,6 +8259,10 @@ html[data-pipeline-mobile="1"] .ci-app-header-chip--secondary {
     overflow: visible;
   }
 
+  .pipeline-page-header-top {
+    display: none !important;
+  }
+
   .pipeline-page-header {
     padding-top: 0.2rem;
     padding-bottom: 0;
@@ -8275,6 +8279,41 @@ html[data-pipeline-mobile="1"] .ci-app-header-chip--secondary {
     flex-wrap: nowrap;
     gap: 0.25rem;
     padding-bottom: 0.15rem;
+  }
+
+  .crm-toolbar--hubspot .hs-filter-search.hs-filter-search--compact {
+    flex: 0 0 2rem;
+    max-width: 2rem;
+    min-width: 2rem;
+    transition: flex 0.2s ease, max-width 0.2s ease;
+  }
+
+  .crm-toolbar--hubspot .hs-filter-search.hs-filter-search--compact:focus-within {
+    flex: 1 1 5.5rem;
+    max-width: 6.5rem;
+    min-width: 4.5rem;
+  }
+
+  .crm-toolbar--hubspot .hs-filter-search.hs-filter-search--compact .crm-search-wrap--hubspot {
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .crm-toolbar--hubspot .hs-filter-search.hs-filter-search--compact .crm-search-input--hubspot {
+    min-height: 1.75rem;
+    height: 1.75rem;
+    font-size: 0.6875rem;
+    padding: 0.2rem 0.35rem 0.2rem 1.45rem;
+    width: 100%;
+  }
+
+  .crm-toolbar--hubspot .hs-filter-search.hs-filter-search--compact:not(:focus-within) .crm-search-input--hubspot {
+    color: transparent;
+    caret-color: #33475b;
+  }
+
+  .crm-toolbar--hubspot .hs-filter-search.hs-filter-search--compact:not(:focus-within) .crm-search-input--hubspot::placeholder {
+    color: transparent;
   }
 
   .crm-toolbar--hubspot .hs-filter-search {
@@ -8302,10 +8341,10 @@ html[data-pipeline-mobile="1"] .ci-app-header-chip--secondary {
   }
 
   .crm-toolbar--hubspot .hs-filter-icon-strip {
-    max-width: none;
     flex: 1 1 auto;
     min-width: 0;
     gap: 0.2rem;
+    justify-content: flex-end;
   }
 
   .crm-toolbar--hubspot .hs-filter-icon-btn {
@@ -8318,10 +8357,39 @@ html[data-pipeline-mobile="1"] .ci-app-header-chip--secondary {
     height: 0.875rem;
   }
 
-  .crm-toolbar--hubspot .hs-filter-gear-btn {
-    width: 1.75rem;
-    height: 1.75rem;
-    flex-shrink: 0;
+  .pipeline-hs-th--email,
+  .pipeline-hs-td--email,
+  .pipeline-hs-th--owner,
+  .pipeline-hs-td--owner,
+  .pipeline-hs-th--last-email,
+  .pipeline-hs-td--last-email,
+  .pipeline-hs-th--notes,
+  .pipeline-hs-td--notes,
+  .pipeline-hs-th--company,
+  .pipeline-hs-td--company,
+  .pipeline-hs-th--activity,
+  .pipeline-hs-td--activity,
+  .pipeline-hs-th--created,
+  .pipeline-hs-td--created {
+    display: none;
+  }
+
+  .pipeline-hs-table {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .pipeline-hs-table-wrap {
+    margin: 0;
+    overflow-x: hidden;
+  }
+
+  .pipeline-hs-td--email {
+    min-width: 0;
+  }
+
+  .pipeline-hs-td--phone {
+    min-width: 5.5rem;
   }
 }
 

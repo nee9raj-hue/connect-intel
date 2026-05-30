@@ -599,7 +599,7 @@ export default function PipelineFiltersBar({
   return (
     <div className="crm-toolbar crm-toolbar--hubspot">
       <div className="hs-filter-bar-top">
-        <div className="crm-search-wrap crm-search-wrap--hubspot hs-filter-search">
+        <div className="crm-search-wrap crm-search-wrap--hubspot hs-filter-search hs-filter-search--compact">
           <svg className="crm-search-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
             <path
               fillRule="evenodd"
@@ -650,9 +650,11 @@ export default function PipelineFiltersBar({
 
         <span className="hs-filter-bar-spacer hidden sm:block" aria-hidden />
 
+        {!useMobileFilterSheet ? (
         <button type="button" className="hs-filter-gear-btn shrink-0" onClick={onOpenViewSettings} aria-label="View settings">
           <SettingsIcon className="w-4 h-4" />
         </button>
+        ) : null}
       </div>
 
       <div className="hs-filter-bar-meta flex flex-wrap items-center gap-2 px-0 pt-0.5 pb-0.5 lg:hidden">
