@@ -35,8 +35,8 @@ npm run prod:rollback -- 1e99102
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `e232928` |
-| Log updated (IST) | 30/05/2026, 20:24:00 |
+| Commit | `19f05f9` |
+| Log updated (IST) | 30/05/2026, 20:30:37 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 1e99102
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 30/05/2026, 20:23:46 | `e232928` | Keep leads action and filter labels visible on all viewports. | [preview](https://connect-intel-pqm5anllm-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e232928` | **← LIVE**
+| 30/05/2026, 20:30:21 | `19f05f9` | Apply pipeline filters immediately without a separate Search step. | [preview](https://connect-intel-fhzt2thxc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 19f05f9` | **← LIVE**
+| 30/05/2026, 20:24:31 | `0f2a5a3` | Update production log after leads label visibility deploy. | [preview](https://connect-intel-1jles3l5e-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0f2a5a3` |
+| 30/05/2026, 20:23:46 | `e232928` | Keep leads action and filter labels visible on all viewports. | [preview](https://connect-intel-pqm5anllm-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e232928` |
 | 30/05/2026, 20:20:32 | `2ba48fe` | Update production log after leads mobile UI deploy. | [preview](https://connect-intel-77y4cidjl-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2ba48fe` |
 | 30/05/2026, 20:19:43 | `f65acc0` | Restore leads mobile labels, SVG filter icons, and display settings access. | [preview](https://connect-intel-e766efbj0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f65acc0` |
 | 30/05/2026, 20:15:09 | `8a45175` | Update production log after settings icon contrast deploy. | [preview](https://connect-intel-6theck939-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8a45175` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 1e99102
 | 30/05/2026, 19:24:16 | `aad438b` | Update production log after pipeline PWA crash fix deploy. | [preview](https://connect-intel-jf7wxh3zn-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- aad438b` |
 | 30/05/2026, 19:23:40 | `d11296b` | Fix pipeline crash from missing useIsMobile import and trim mobile helper copy. | [preview](https://connect-intel-o6ika4700-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d11296b` |
 | 30/05/2026, 19:15:04 | `4772f58` | Update production log after UI copy cleanup deploy. | [preview](https://connect-intel-209jqndz4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4772f58` |
-| 30/05/2026, 19:14:34 | `77d4925` | Remove instructional helper copy for a cleaner CRM UI. | [preview](https://connect-intel-8hn1h0bic-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 77d4925` |
-| 30/05/2026, 19:07:56 | `5b352c8` | Update production log after keyboard shortcuts deploy. | [preview](https://connect-intel-7prra6ksc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5b352c8` |
 
 ---
 
