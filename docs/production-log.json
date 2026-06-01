@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-01T07:08:30.862Z",
-  "updatedAtIst": "01/06/2026, 12:38:30",
+  "updatedAt": "2026-06-01T07:16:11.079Z",
+  "updatedAtIst": "01/06/2026, 12:46:11",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "969c39a",
+  "currentProductionCommit": "44a2b25",
   "entries": [
+    {
+      "logId": "20260601-1245-44a2b25",
+      "commit": "44a2b25",
+      "commitFull": "44a2b2555390c7f1f191d02ceb3776c5d1732313",
+      "message": "Speed up pipeline lead assignment after shard PATCH fix.",
+      "deployedAt": "2026-06-01T07:15:58.380Z",
+      "deployedAtIst": "01/06/2026, 12:45:58",
+      "committedAtIst": "01/06/2026, 12:44:27",
+      "vercelPreviewUrl": "https://connect-intel-5fckfc67e-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 44a2b25"
+    },
+    {
+      "logId": "20260601-1239-46ef252",
+      "commit": "46ef252",
+      "commitFull": "46ef2525d14a5160a94b8f500cb062dc75672fce",
+      "message": "Update production log after pipeline timeout fix deploy.",
+      "deployedAt": "2026-06-01T07:09:14.958Z",
+      "deployedAtIst": "01/06/2026, 12:39:14",
+      "committedAtIst": "01/06/2026, 12:38:45",
+      "vercelPreviewUrl": "https://connect-intel-3ngx2syyf-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 46ef252"
+    },
     {
       "logId": "20260601-1238-969c39a",
       "commit": "969c39a",
@@ -15,7 +43,7 @@
       "committedAtIst": "01/06/2026, 12:36:47",
       "vercelPreviewUrl": "https://connect-intel-ki3rwfh1x-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 969c39a"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 3e089c7"
-    },
-    {
-      "logId": "20260530-2005-30e9f48",
-      "commit": "30e9f48",
-      "commitFull": "30e9f4802ff9663052b43f840400db8bf618b603",
-      "message": "Update production log after sidebar typography deploy.",
-      "deployedAt": "2026-05-30T14:35:41.085Z",
-      "deployedAtIst": "30/05/2026, 20:05:41",
-      "committedAtIst": "30/05/2026, 20:05:14",
-      "vercelPreviewUrl": "https://connect-intel-aag8o9qeu-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 30e9f48"
-    },
-    {
-      "logId": "20260530-2004-dc32d9d",
-      "commit": "dc32d9d",
-      "commitFull": "dc32d9df774c0a9e61afaa0fa3d6a6a341c5e848",
-      "message": "Align left sidebar typography with HubSpot premium font scale.",
-      "deployedAt": "2026-05-30T14:34:55.984Z",
-      "deployedAtIst": "30/05/2026, 20:04:55",
-      "committedAtIst": "30/05/2026, 20:04:29",
-      "vercelPreviewUrl": "https://connect-intel-otwxwoq9e-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- dc32d9d"
     }
   ]
 }
