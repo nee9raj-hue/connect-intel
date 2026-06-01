@@ -1,7 +1,4 @@
-import {
-  getEmailValidationState,
-  EMAIL_VALIDATION_TOOLTIPS,
-} from '../../lib/emailUtils'
+import { getEmailValidationState, emailValidationTooltip } from '../../lib/emailUtils'
 import { EmailValidIcon, EmailInvalidIcon, EmailUncertainIcon } from '../ui/icons'
 
 const STATE_CONFIG = {
@@ -15,7 +12,7 @@ export default function EmailValidationIcon({ lead, className = '' }) {
   if (state === 'none') return null
 
   const { Icon, className: stateClass } = STATE_CONFIG[state]
-  const title = EMAIL_VALIDATION_TOOLTIPS[state]
+  const title = emailValidationTooltip(lead)
 
   return (
     <span

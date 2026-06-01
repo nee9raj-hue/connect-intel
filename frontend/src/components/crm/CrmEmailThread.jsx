@@ -46,7 +46,7 @@ export default function CrmEmailThread({
         <div>
           <h3 className="text-xs font-semibold uppercase text-gray-500">Email thread</h3>
           <p className="text-xs text-gray-400 mt-0.5">
-            Email thread — outbound sends and replies in one place
+            Trail mail only — CRM sends and replies for this lead (not your full inbox)
           </p>
         </div>
         <div className="flex flex-wrap gap-1.5">
@@ -58,11 +58,11 @@ export default function CrmEmailThread({
               className="text-xs font-semibold px-2 py-1 rounded-md border border-gray-200 hover:bg-gray-50 disabled:opacity-50"
               title={
                 replySyncEnabled
-                  ? 'Pull recent messages from your inbox'
-                  : 'Reconnect work email to enable automatic reply sync'
+                  ? 'Sync trail mail for this lead (CRM thread + bounces only)'
+                  : 'Reconnect work email to enable trail reply sync'
               }
             >
-              {busy ? 'Syncing…' : '↻ Sync inbox'}
+              {busy ? 'Syncing…' : '↻ Sync trail'}
             </button>
           )}
           <button
@@ -130,7 +130,7 @@ export default function CrmEmailThread({
       <div className="max-h-64 overflow-y-auto p-3 space-y-2">
         {sorted.length === 0 ? (
           <p className="text-xs text-gray-500 text-center py-4">
-            No emails logged yet. Send from below or sync from your inbox.
+            No emails logged yet. Send from below, then sync trail mail for replies.
           </p>
         ) : (
           sorted.map((msg) => {
@@ -153,10 +153,14 @@ export default function CrmEmailThread({
                   <div className="flex items-start justify-between gap-2">
                     <span
                       className={`text-xs font-bold uppercase px-1.5 py-0.5 rounded ${
-                        inbound ? 'bg-violet-200 text-violet-900' : 'bg-gray-200 text-gray-700'
+                        msg.isBounce
+                          ? 'bg-red-200 text-red-900'
+                          : inbound
+                            ? 'bg-violet-200 text-violet-900'
+                            : 'bg-gray-200 text-gray-700'
                       }`}
                     >
-                      {inbound ? 'Reply' : 'Sent'}
+                      {msg.isBounce ? 'Bounced' : inbound ? 'Reply' : 'Sent'}
                     </span>
                     <span className="text-xs text-gray-500 shrink-0">
                       {formatDateTime(msg.sentAt) || formatCrmDate(msg.sentAt)}

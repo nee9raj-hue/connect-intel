@@ -1,5 +1,5 @@
 import { leadHasCallablePhone } from './phoneUtils'
-import { leadHasSendableEmail, leadDisplayName } from './emailUtils'
+import { leadHasSendableEmail, leadDisplayName, leadEmailBounced } from './emailUtils'
 
 export const CONTACT_FILTER_OPTIONS = [
   { id: 'any', label: 'All contacts' },
@@ -9,6 +9,7 @@ export const CONTACT_FILTER_OPTIONS = [
   { id: 'no_phone', label: 'No phone' },
   { id: 'has_both', label: 'Email & phone' },
   { id: 'missing_both', label: 'Missing both' },
+  { id: 'bounced_email', label: 'Bounced email' },
 ]
 
 export const DEFAULT_PIPELINE_FILTERS = {
@@ -95,6 +96,8 @@ function matchesContactFilter(lead, contact) {
       return hasEmail && hasPhone
     case 'missing_both':
       return !hasEmail && !hasPhone
+    case 'bounced_email':
+      return leadEmailBounced(lead)
     default:
       return true
   }

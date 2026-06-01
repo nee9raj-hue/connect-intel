@@ -556,9 +556,11 @@ export default function LeadWorkspace({
     try {
       const data = await syncEmailThread(lead.id)
       setNotice(
-        data.importedCount > 0
-          ? `Synced ${data.importedCount} message(s) from your inbox`
-          : 'No new messages found in the last 90 days'
+        data.bounceDetected
+          ? 'Delivery failure detected — lead email marked as bounced'
+          : data.importedCount > 0
+            ? `Synced ${data.importedCount} trail message(s) for this lead`
+            : 'No new trail messages in the last 90 days'
       )
       const status = await api.getCrmGmailStatus()
       setGmailStatus({

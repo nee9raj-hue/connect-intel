@@ -29,6 +29,7 @@ const KPI = [
   { key: 'staleLeads', label: 'Stale 7d+', nav: 'pipeline', icon: 'pipeline' },
   { key: 'activitiesInPeriod', label: 'Activities', nav: 'crm-log', icon: 'log' },
   { key: 'emailsSent', label: 'Emails sent', nav: 'crm-log', icon: 'mail' },
+  { key: 'bouncedEmails', label: 'Bounced emails', nav: 'pipeline', icon: 'mail' },
   { key: 'meetingsUpcoming', label: 'Upcoming meetings', nav: 'crm-calendar', icon: 'calendar' },
   { key: 'needsFollowUp', label: 'Follow-up due', nav: 'pipeline', filter: 'follow_up', icon: 'task' },
   { key: 'won', label: 'Won deals', nav: 'pipeline', filter: 'won', icon: 'pipeline' },

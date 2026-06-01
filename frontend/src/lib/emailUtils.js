@@ -13,9 +13,14 @@ export function getLeadEmail(lead) {
 }
 
 /** @returns {'none' | 'invalid' | 'uncertain' | 'valid'} */
+export function leadEmailBounced(lead) {
+  return Boolean(lead?.emailBouncedAt)
+}
+
 export function getEmailValidationState(lead) {
   const email = getLeadEmail(lead)
   if (!email) return 'none'
+  if (leadEmailBounced(lead)) return 'invalid'
   if (!hasValidEmailFormat(email)) return 'invalid'
   if (isNonDeliverableEmail(email)) return 'invalid'
 
@@ -32,6 +37,15 @@ export function leadHasSendableEmail(lead) {
 
 export function leadDisplayName(lead) {
   return [lead?.firstName, lead?.lastName].filter(Boolean).join(' ') || lead?.company || 'Lead'
+}
+
+export function emailValidationTooltip(lead) {
+  if (leadEmailBounced(lead)) {
+    const reason = String(lead?.emailBounceReason || '').trim()
+    return reason ? `Email bounced — ${reason}` : 'Email bounced — delivery failed'
+  }
+  const state = getEmailValidationState(lead)
+  return EMAIL_VALIDATION_TOOLTIPS[state] || ''
 }
 
 export const EMAIL_VALIDATION_TOOLTIPS = {
