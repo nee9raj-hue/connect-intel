@@ -603,11 +603,25 @@ export function AppProvider({ children }) {
   )
 
   const assignLead = useCallback(async (leadId, assignToUserId) => {
-    const data = await api.assignLead(leadId, assignToUserId)
-    if (data.lead) {
-      setSavedLeads((current) => mergeLeadInList(current, data.lead))
+    let previous = []
+    setSavedLeads((current) => {
+      previous = current
+      return current.map((lead) =>
+        lead.id === leadId
+          ? { ...lead, assignedToUserId: assignToUserId || null }
+          : lead
+      )
+    })
+    try {
+      const data = await api.assignLead(leadId, assignToUserId)
+      if (data.lead) {
+        setSavedLeads((current) => mergeLeadInList(current, data.lead))
+      }
+      return data
+    } catch (error) {
+      setSavedLeads(previous)
+      throw error
     }
-    return data
   }, [])
 
   const generateEmailDraft = useCallback(async (leadId, options) => {
@@ -652,7 +666,12 @@ export function AppProvider({ children }) {
 
   const bulkUpdatePipeline = useCallback(async (leadIds, actions) => {
     const data = await api.bulkUpdatePipeline({ leadIds, ...actions })
-    if (data.leads) setSavedLeads(data.leads)
+    if (data.leads?.length) {
+      const byId = new Map(data.leads.map((lead) => [lead.id, lead]))
+      setSavedLeads((current) =>
+        current.map((lead) => (byId.has(lead.id) ? { ...lead, ...byId.get(lead.id) } : lead))
+      )
+    }
     return data
   }, [])
 

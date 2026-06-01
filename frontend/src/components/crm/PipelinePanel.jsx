@@ -538,7 +538,6 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     setBulkNotice(null)
     try {
       await bulkUpdatePipeline([...selectedIds], actions)
-      await refreshSavedLeads()
       if (actions.status) {
         setBulkNotice(
           count === 1
