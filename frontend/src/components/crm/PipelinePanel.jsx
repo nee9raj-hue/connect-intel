@@ -83,7 +83,9 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const [bulkBusy, setBulkBusy] = useState(false)
   const [bulkNotice, setBulkNotice] = useState(null)
 
-  const canAssign = Boolean(user?.isOrgAdmin && user?.accountType === 'company')
+  const canAssign = Boolean(
+    (user?.isOrgAdmin || user?.orgRole === 'org_admin') && user?.accountType === 'company'
+  )
 
   useEffect(() => {
     if (canAssign) refreshTeam?.()
