@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- cb243f6
+npm run prod:rollback -- 59e7741
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- cb243f6
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `59e7741` |
-| Log updated (IST) | 30/05/2026, 22:12:47 |
+| Commit | `969c39a` |
+| Log updated (IST) | 01/06/2026, 12:38:30 |
 
 ---
 
@@ -44,7 +44,8 @@ npm run prod:rollback -- cb243f6
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 30/05/2026, 22:12:24 | `59e7741` | Use free OSRM/Nominatim for field visit distance suggestions. | [preview](https://connect-intel-60y8n500c-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 59e7741` | **← LIVE**
+| 01/06/2026, 12:38:02 | `969c39a` | Fix pipeline assign and status PATCH timeouts. | [preview](https://connect-intel-ki3rwfh1x-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 969c39a` | **← LIVE**
+| 30/05/2026, 22:12:24 | `59e7741` | Use free OSRM/Nominatim for field visit distance suggestions. | [preview](https://connect-intel-60y8n500c-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 59e7741` |
 | 30/05/2026, 22:08:15 | `cb243f6` | Add field visit edit and Google distance suggestions. | [preview](https://connect-intel-blu484925-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- cb243f6` |
 | 30/05/2026, 21:53:21 | `e3e18b0` | Add field visit travel claims with expenses page (Phase 1+2). | [preview](https://connect-intel-5filgp18r-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e3e18b0` |
 | 30/05/2026, 21:37:44 | `50f7167` | Fix assignee showing as unassigned in lead side panel. | [preview](https://connect-intel-mi6yvpg2q-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 50f7167` |
@@ -63,7 +64,6 @@ npm run prod:rollback -- cb243f6
 | 30/05/2026, 20:10:36 | `3e089c7` | Add user display settings with group-wise font and icon scaling. | [preview](https://connect-intel-cj5gwn18d-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3e089c7` |
 | 30/05/2026, 20:05:41 | `30e9f48` | Update production log after sidebar typography deploy. | [preview](https://connect-intel-aag8o9qeu-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 30e9f48` |
 | 30/05/2026, 20:04:55 | `dc32d9d` | Align left sidebar typography with HubSpot premium font scale. | [preview](https://connect-intel-otwxwoq9e-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- dc32d9d` |
-| 30/05/2026, 20:03:07 | `3ce8b0f` | Update production log after mobile bottom nav deploy. | [preview](https://connect-intel-jvdea68nr-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3ce8b0f` |
 
 ---
 
