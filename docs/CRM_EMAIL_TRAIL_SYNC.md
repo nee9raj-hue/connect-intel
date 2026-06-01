@@ -16,6 +16,11 @@ During trail sync, delivery failure messages are detected via sender, subject, b
 
 Bounce detection varies by provider; Gmail is the supported sync path today.
 
+## Legacy inbox rows
+
+Leads that were synced before trail-only mode may still have unrelated `gmail_sync` rows.
+Each **Sync trail** run prunes stored emails that are not valid trail mail (CRM sends are kept).
+
 ## User action
 
 Pipeline → lead → Email → **Sync trail** (requires work Gmail with read scope).
