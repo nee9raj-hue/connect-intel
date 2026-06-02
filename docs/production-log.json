@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-01T07:16:11.079Z",
-  "updatedAtIst": "01/06/2026, 12:46:11",
+  "updatedAt": "2026-06-02T08:12:31.719Z",
+  "updatedAtIst": "02/06/2026, 13:42:31",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "44a2b25",
+  "currentProductionCommit": "dfec7e6",
   "entries": [
+    {
+      "logId": "20260602-1342-dfec7e6",
+      "commit": "dfec7e6",
+      "commitFull": "dfec7e6cee6c3dd10981e3612e37e23324f2c150",
+      "message": "Improve campaign/template canvas scrolling and rail usability.",
+      "deployedAt": "2026-06-02T08:12:08.885Z",
+      "deployedAtIst": "02/06/2026, 13:42:08",
+      "committedAtIst": "02/06/2026, 13:41:34",
+      "vercelPreviewUrl": "https://connect-intel-4u0n2knkv-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- dfec7e6"
+    },
+    {
+      "logId": "20260601-1246-6512225",
+      "commit": "6512225",
+      "commitFull": "6512225ca8a9b0103aee7af7dd884d858bf4a2b2",
+      "message": "chore: sync production log after 44a2b25 deploy.",
+      "deployedAt": "2026-06-01T07:16:43.521Z",
+      "deployedAtIst": "01/06/2026, 12:46:43",
+      "committedAtIst": "01/06/2026, 12:46:16",
+      "vercelPreviewUrl": "https://connect-intel-cdpy8t7fa-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 6512225"
+    },
     {
       "logId": "20260601-1245-44a2b25",
       "commit": "44a2b25",
@@ -15,7 +43,7 @@
       "committedAtIst": "01/06/2026, 12:44:27",
       "vercelPreviewUrl": "https://connect-intel-5fckfc67e-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 44a2b25"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 56af2c7"
-    },
-    {
-      "logId": "20260530-2011-f612fc9",
-      "commit": "f612fc9",
-      "commitFull": "f612fc9112976379dd295f95774339c2a39c593e",
-      "message": "Update production log after display settings deploy.",
-      "deployedAt": "2026-05-30T14:41:18.634Z",
-      "deployedAtIst": "30/05/2026, 20:11:18",
-      "committedAtIst": "30/05/2026, 20:10:54",
-      "vercelPreviewUrl": "https://connect-intel-h4iuk66xd-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- f612fc9"
-    },
-    {
-      "logId": "20260530-2010-3e089c7",
-      "commit": "3e089c7",
-      "commitFull": "3e089c7d6e0a4a4fa1e88de59b5340765ca7cabd",
-      "message": "Add user display settings with group-wise font and icon scaling.",
-      "deployedAt": "2026-05-30T14:40:36.510Z",
-      "deployedAtIst": "30/05/2026, 20:10:36",
-      "committedAtIst": "30/05/2026, 20:10:09",
-      "vercelPreviewUrl": "https://connect-intel-cj5gwn18d-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 3e089c7"
     }
   ]
 }
