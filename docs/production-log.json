@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-02T08:12:31.719Z",
-  "updatedAtIst": "02/06/2026, 13:42:31",
+  "updatedAt": "2026-06-02T08:17:32.059Z",
+  "updatedAtIst": "02/06/2026, 13:47:32",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "dfec7e6",
+  "currentProductionCommit": "d473b21",
   "entries": [
+    {
+      "logId": "20260602-1347-d473b21",
+      "commit": "d473b21",
+      "commitFull": "d473b21297308274a6f2e37d821585f55a8a3de0",
+      "message": "Fix campaign/template canvas vertical scrolling on touch devices.",
+      "deployedAt": "2026-06-02T08:17:13.617Z",
+      "deployedAtIst": "02/06/2026, 13:47:13",
+      "committedAtIst": "02/06/2026, 13:46:37",
+      "vercelPreviewUrl": "https://connect-intel-8vezmb2vs-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- d473b21"
+    },
+    {
+      "logId": "20260602-1343-e271351",
+      "commit": "e271351",
+      "commitFull": "e2713511c82cfafda1ec50fb83bb4e9343119ba3",
+      "message": "Update production log after canvas scrolling deploy.",
+      "deployedAt": "2026-06-02T08:13:05.165Z",
+      "deployedAtIst": "02/06/2026, 13:43:05",
+      "committedAtIst": "02/06/2026, 13:42:37",
+      "vercelPreviewUrl": "https://connect-intel-dcrslhrv7-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- e271351"
+    },
     {
       "logId": "20260602-1342-dfec7e6",
       "commit": "dfec7e6",
@@ -15,7 +43,7 @@
       "committedAtIst": "02/06/2026, 13:41:34",
       "vercelPreviewUrl": "https://connect-intel-4u0n2knkv-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- dfec7e6"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- f65acc0"
-    },
-    {
-      "logId": "20260530-2015-8a45175",
-      "commit": "8a45175",
-      "commitFull": "8a45175243e060f0a37810711a821155674597f9",
-      "message": "Update production log after settings icon contrast deploy.",
-      "deployedAt": "2026-05-30T14:45:09.404Z",
-      "deployedAtIst": "30/05/2026, 20:15:09",
-      "committedAtIst": "30/05/2026, 20:14:42",
-      "vercelPreviewUrl": "https://connect-intel-6theck939-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 8a45175"
-    },
-    {
-      "logId": "20260530-2014-56af2c7",
-      "commit": "56af2c7",
-      "commitFull": "56af2c7ccb4d92a889785bfe683aeeb3ff82dd72",
-      "message": "Fix settings nav icon contrast with currentColor stroke gear.",
-      "deployedAt": "2026-05-30T14:44:21.708Z",
-      "deployedAtIst": "30/05/2026, 20:14:21",
-      "committedAtIst": "30/05/2026, 20:13:55",
-      "vercelPreviewUrl": "https://connect-intel-76l7mi984-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 56af2c7"
     }
   ]
 }
