@@ -620,6 +620,7 @@ textarea {
   overflow-x: hidden;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   padding: 0.5rem 0.75rem 1rem;
 }
 
@@ -1288,6 +1289,9 @@ textarea {
   align-items: flex-start;
   padding: 2rem 1.5rem;
   background: #fff;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
 }
 
 .marketing-immersive-rail {
@@ -1303,7 +1307,7 @@ textarea {
 .marketing-immersive-rail--floating {
   position: absolute;
   z-index: 50;
-  max-height: min(88vh, 640px);
+  max-height: min(88vh, 680px);
   border-radius: 14px;
   border: 1px solid #3a3836;
   box-shadow: 0 16px 48px rgb(0 0 0 / 0.28);
@@ -1379,20 +1383,23 @@ textarea {
 .marketing-immersive-rail__sections {
   flex: 1 1 0%;
   min-height: 0;
-  max-height: 38%;
+  max-height: none;
   display: flex;
   flex-direction: column;
   border-bottom: 1px solid #3a3836;
 }
 
 .marketing-immersive-rail__tools {
-  flex-shrink: 0;
+  flex: 1 1 0%;
+  min-height: 0;
   padding: 0.65rem 0.5rem 0.85rem;
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
-  max-height: 42%;
+  max-height: none;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
 }
 
 .marketing-immersive-rail__heading {
@@ -1421,6 +1428,8 @@ textarea {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
 }
 
 .marketing-immersive-rail__empty {
@@ -3793,6 +3802,8 @@ button.ci-lead-tag:disabled {
   width: 100%;
   min-height: 100%;
   overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
 }
 
 .marketing-email-frame-wrap {
