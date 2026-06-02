@@ -1542,11 +1542,13 @@ textarea {
   min-height: 0;
   max-height: none;
   background: transparent;
+  overflow: visible;
 }
 
 .marketing-immersive-canvas-inner .marketing-studio-canvas-inner {
   background: #fff;
   padding: 0;
+  overflow: visible;
 }
 
 .marketing-immersive-canvas-inner .marketing-canvas-html {

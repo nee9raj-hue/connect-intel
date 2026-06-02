@@ -329,6 +329,31 @@ export default function MarketingTemplateBuilder({
       .forEach((row) => row.classList.remove('is-canvas-hover'))
   }
 
+  const handleImmersiveCanvasWheel = useCallback(
+    (e) => {
+      if (!isImmersive) return
+      const scroller = immersiveCanvasRef.current?.querySelector('.marketing-immersive-canvas-inner')
+      if (!scroller) return
+      if (e.defaultPrevented) return
+
+      const deltaY = e.deltaY || 0
+      const deltaX = e.deltaX || 0
+      if (!deltaY && !deltaX) return
+
+      const maxScrollTop = Math.max(0, scroller.scrollHeight - scroller.clientHeight)
+      if (maxScrollTop <= 0) return
+
+      if (deltaY) {
+        const nextTop = Math.max(0, Math.min(maxScrollTop, scroller.scrollTop + deltaY))
+        if (nextTop !== scroller.scrollTop) {
+          e.preventDefault()
+          scroller.scrollTop = nextTop
+        }
+      }
+    },
+    [isImmersive]
+  )
+
   const openStudioPanel = (tab) => {
     setSideTab(tab)
     setStudioPanel(tab)
@@ -1407,6 +1432,7 @@ export default function MarketingTemplateBuilder({
             onClick={handleCanvasAreaClick}
             onMouseMove={handleCanvasAreaMove}
             onMouseLeave={handleCanvasAreaLeave}
+            onWheel={handleImmersiveCanvasWheel}
           >
             <p className="marketing-immersive-canvas-hint" aria-hidden>
               Hover a section to highlight · click to edit
