@@ -1311,7 +1311,7 @@ textarea {
   border-radius: 14px;
   border: 1px solid #3a3836;
   box-shadow: 0 16px 48px rgb(0 0 0 / 0.28);
-  touch-action: none;
+  touch-action: auto;
 }
 
 .marketing-immersive-rail__grip {
@@ -1328,6 +1328,7 @@ textarea {
   cursor: grab;
   user-select: none;
   border-radius: 14px 14px 0 0;
+  touch-action: none;
 }
 
 .marketing-immersive-rail__grip:active {
@@ -1382,7 +1383,7 @@ textarea {
 
 .marketing-immersive-rail__sections {
   flex: 1 1 0%;
-  min-height: 0;
+  min-height: 10.5rem;
   max-height: none;
   display: flex;
   flex-direction: column;
@@ -1391,7 +1392,7 @@ textarea {
 
 .marketing-immersive-rail__tools {
   flex: 1 1 0%;
-  min-height: 0;
+  min-height: 10rem;
   padding: 0.65rem 0.5rem 0.85rem;
   display: flex;
   flex-direction: column;
@@ -7859,6 +7860,7 @@ details summary::-webkit-details-marker {
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-x: contain;
+    overscroll-behavior-y: contain;
   }
 
   .marketing-studio-body > .marketing-studio-rail {
@@ -7887,6 +7889,7 @@ details summary::-webkit-details-marker {
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
   }
 
   .marketing-studio-inspector.is-collapsed .marketing-studio-inspector-body {
