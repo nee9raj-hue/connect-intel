@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-02T08:17:32.059Z",
-  "updatedAtIst": "02/06/2026, 13:47:32",
+  "updatedAt": "2026-06-02T08:24:27.600Z",
+  "updatedAtIst": "02/06/2026, 13:54:27",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "d473b21",
+  "currentProductionCommit": "48b1a9c",
   "entries": [
+    {
+      "logId": "20260602-1354-48b1a9c",
+      "commit": "48b1a9c",
+      "commitFull": "48b1a9c36192ddfecd176851838d5d1827f5c2f6",
+      "message": "Fix immersive canvas trackpad scrolling over email content.",
+      "deployedAt": "2026-06-02T08:24:07.375Z",
+      "deployedAtIst": "02/06/2026, 13:54:07",
+      "committedAtIst": "02/06/2026, 13:53:37",
+      "vercelPreviewUrl": "https://connect-intel-6l1vhq3jc-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 48b1a9c"
+    },
+    {
+      "logId": "20260602-1348-c945911",
+      "commit": "c945911",
+      "commitFull": "c945911b63c78c01d4b59939796f9d0f2017e61f",
+      "message": "Update production log after vertical scroll fix deploy.",
+      "deployedAt": "2026-06-02T08:18:02.333Z",
+      "deployedAtIst": "02/06/2026, 13:48:02",
+      "committedAtIst": "02/06/2026, 13:47:35",
+      "vercelPreviewUrl": "https://connect-intel-q5kaslgq3-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- c945911"
+    },
     {
       "logId": "20260602-1347-d473b21",
       "commit": "d473b21",
@@ -15,7 +43,7 @@
       "committedAtIst": "02/06/2026, 13:46:37",
       "vercelPreviewUrl": "https://connect-intel-8vezmb2vs-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- d473b21"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- e232928"
-    },
-    {
-      "logId": "20260530-2020-2ba48fe",
-      "commit": "2ba48fe",
-      "commitFull": "2ba48fe446ae4745daabd31827f31d6ab50647bb",
-      "message": "Update production log after leads mobile UI deploy.",
-      "deployedAt": "2026-05-30T14:50:32.410Z",
-      "deployedAtIst": "30/05/2026, 20:20:32",
-      "committedAtIst": "30/05/2026, 20:20:05",
-      "vercelPreviewUrl": "https://connect-intel-77y4cidjl-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 2ba48fe"
-    },
-    {
-      "logId": "20260530-2019-f65acc0",
-      "commit": "f65acc0",
-      "commitFull": "f65acc0409c44ac8774f98c819b57588822ea129",
-      "message": "Restore leads mobile labels, SVG filter icons, and display settings access.",
-      "deployedAt": "2026-05-30T14:49:43.878Z",
-      "deployedAtIst": "30/05/2026, 20:19:43",
-      "committedAtIst": "30/05/2026, 20:19:18",
-      "vercelPreviewUrl": "https://connect-intel-e766efbj0-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- f65acc0"
     }
   ]
 }

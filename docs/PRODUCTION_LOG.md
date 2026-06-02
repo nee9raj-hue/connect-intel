@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- e271351
+npm run prod:rollback -- c945911
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- e271351
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `d473b21` |
-| Log updated (IST) | 02/06/2026, 13:47:32 |
+| Commit | `48b1a9c` |
+| Log updated (IST) | 02/06/2026, 13:54:27 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- e271351
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 02/06/2026, 13:47:13 | `d473b21` | Fix campaign/template canvas vertical scrolling on touch devices. | [preview](https://connect-intel-8vezmb2vs-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d473b21` | **← LIVE**
+| 02/06/2026, 13:54:07 | `48b1a9c` | Fix immersive canvas trackpad scrolling over email content. | [preview](https://connect-intel-6l1vhq3jc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 48b1a9c` | **← LIVE**
+| 02/06/2026, 13:48:02 | `c945911` | Update production log after vertical scroll fix deploy. | [preview](https://connect-intel-q5kaslgq3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c945911` |
+| 02/06/2026, 13:47:13 | `d473b21` | Fix campaign/template canvas vertical scrolling on touch devices. | [preview](https://connect-intel-8vezmb2vs-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d473b21` |
 | 02/06/2026, 13:43:05 | `e271351` | Update production log after canvas scrolling deploy. | [preview](https://connect-intel-dcrslhrv7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e271351` |
 | 02/06/2026, 13:42:08 | `dfec7e6` | Improve campaign/template canvas scrolling and rail usability. | [preview](https://connect-intel-4u0n2knkv-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- dfec7e6` |
 | 01/06/2026, 12:46:43 | `6512225` | chore: sync production log after 44a2b25 deploy. | [preview](https://connect-intel-cdpy8t7fa-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6512225` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- e271351
 | 30/05/2026, 20:30:21 | `19f05f9` | Apply pipeline filters immediately without a separate Search step. | [preview](https://connect-intel-fhzt2thxc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 19f05f9` |
 | 30/05/2026, 20:24:31 | `0f2a5a3` | Update production log after leads label visibility deploy. | [preview](https://connect-intel-1jles3l5e-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0f2a5a3` |
 | 30/05/2026, 20:23:46 | `e232928` | Keep leads action and filter labels visible on all viewports. | [preview](https://connect-intel-pqm5anllm-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e232928` |
-| 30/05/2026, 20:20:32 | `2ba48fe` | Update production log after leads mobile UI deploy. | [preview](https://connect-intel-77y4cidjl-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2ba48fe` |
-| 30/05/2026, 20:19:43 | `f65acc0` | Restore leads mobile labels, SVG filter icons, and display settings access. | [preview](https://connect-intel-e766efbj0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f65acc0` |
 
 ---
 
