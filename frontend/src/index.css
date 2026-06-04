@@ -1391,6 +1391,457 @@ textarea {
   color: #64748b;
 }
 
+/* In-panel user guide (animated mockups + cursor) */
+.panel-guide-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(4px);
+}
+
+.panel-guide-dialog {
+  width: min(920px, 100%);
+  max-height: min(92vh, 720px);
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.2);
+  overflow: hidden;
+}
+
+.panel-guide-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.panel-guide-eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+  margin: 0 0 0.2rem;
+}
+
+.panel-guide-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #17191c;
+  margin: 0;
+}
+
+.panel-guide-close {
+  border: none;
+  background: #f1f5f9;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  color: #475569;
+}
+
+.panel-guide-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  overflow: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+@media (max-width: 720px) {
+  .panel-guide-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.panel-guide-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.panel-guide-body {
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: #334155;
+  margin: 0;
+}
+
+.panel-guide-highlights {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.8125rem;
+  color: #516f90;
+}
+
+.panel-guide-progress {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.panel-guide-dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.5rem 1rem;
+}
+
+.panel-guide-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  border: none;
+  background: #e2e8f0;
+  cursor: pointer;
+  padding: 0;
+}
+
+.panel-guide-dot.is-active {
+  background: #ff773d;
+  width: 1.25rem;
+}
+
+.panel-guide-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 1.25rem;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.panel-guide-foot__right {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.panel-guide-prompt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.65rem 1rem;
+  margin: 0 1rem 0.5rem;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #fff4ee, #f8fafc);
+  border: 1px solid #ffd4b8;
+  font-size: 0.8125rem;
+  color: #334155;
+}
+
+.guide-mock {
+  position: relative;
+  min-height: 200px;
+}
+
+.guide-mock__frame {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f8fafc;
+}
+
+.guide-mock__topbar {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.6rem;
+  background: #e2e8f0;
+  border-bottom: 1px solid #cbd5e1;
+}
+
+.guide-mock__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #94a3b8;
+}
+
+.guide-mock__url {
+  margin-left: 0.35rem;
+  font-size: 0.625rem;
+  color: #64748b;
+}
+
+.guide-mock__body {
+  padding: 0.85rem;
+  min-height: 160px;
+}
+
+.guide-mock__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.guide-mock__tab {
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 0.3rem 0.55rem;
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+}
+
+.guide-mock__tab.is-hot,
+.guide-mock .is-hot {
+  border-color: #ff773d;
+  background: #fff4ee;
+  color: #c2410c;
+  box-shadow: 0 0 0 2px rgba(255, 119, 61, 0.25);
+  animation: guide-pulse 1.6s ease-in-out infinite;
+}
+
+.guide-mock__card .guide-mock__row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.4rem 0.5rem;
+  font-size: 0.7rem;
+  background: #fff;
+  border-radius: 6px;
+  margin-bottom: 0.35rem;
+  border: 1px solid #e2e8f0;
+}
+
+.guide-mock__badge {
+  font-size: 0.6rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  background: #e0e7ff;
+  color: #3730a3;
+}
+
+.guide-mock__sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.7rem;
+  color: #64748b;
+}
+
+.guide-mock__sidebar span {
+  padding: 0.25rem 0.45rem;
+  border-radius: 4px;
+}
+
+.guide-mock__split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.guide-mock__panel {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.5rem;
+  font-size: 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.guide-mock__panel.faint {
+  opacity: 0.7;
+}
+
+.guide-mock__editor {
+  display: grid;
+  grid-template-columns: 3.5rem 1fr 3.5rem;
+  gap: 0.35rem;
+  min-height: 120px;
+}
+
+.guide-mock__rail {
+  font-size: 0.55rem;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 0.35rem;
+  text-align: center;
+  color: #94a3b8;
+}
+
+.guide-mock__canvas {
+  background: #fff;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  color: #64748b;
+}
+
+.guide-mock__wizard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.7rem;
+}
+
+.guide-mock__wizard span {
+  padding: 0.35rem 0.5rem;
+  background: #fff;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.guide-mock__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  font-size: 0.6rem;
+  font-weight: 600;
+}
+
+.guide-mock__actions span {
+  padding: 0.25rem 0.45rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.guide-mock__actions .danger {
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+.guide-mock__table {
+  font-size: 0.65rem;
+}
+
+.guide-mock__thead,
+.guide-mock__trow {
+  display: grid;
+  grid-template-columns: 1.2fr 0.6fr 0.8fr;
+  gap: 0.25rem;
+  padding: 0.35rem;
+  background: #fff;
+  border-radius: 6px;
+  margin-bottom: 0.25rem;
+  border: 1px solid #e2e8f0;
+}
+
+.guide-mock__trow .accent {
+  color: #c2410c;
+  font-weight: 600;
+}
+
+.guide-mock .muted {
+  color: #94a3b8;
+}
+
+.guide-mock__cursor {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  pointer-events: none;
+  z-index: 2;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+@keyframes guide-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 2px rgba(255, 119, 61, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgba(255, 119, 61, 0.35);
+  }
+}
+
+@keyframes guide-cursor-overview {
+  0% {
+    transform: translate(12%, 55%);
+  }
+  40% {
+    transform: translate(52%, 55%);
+  }
+  70% {
+    transform: translate(78%, 55%);
+  }
+  100% {
+    transform: translate(78%, 55%);
+  }
+}
+
+.guide-mock__cursor--overview {
+  animation: guide-cursor-overview 3.5s ease-in-out infinite;
+}
+
+@keyframes guide-cursor-email {
+  0%,
+  100% {
+    transform: translate(8%, 42%);
+  }
+  50% {
+    transform: translate(8%, 58%);
+  }
+}
+
+.guide-mock__cursor--email {
+  animation: guide-cursor-email 2.8s ease-in-out infinite;
+}
+
+@keyframes guide-cursor-controls {
+  0%,
+  100% {
+    transform: translate(55%, 62%);
+  }
+  50% {
+    transform: translate(72%, 62%);
+  }
+}
+
+.guide-mock__cursor--controls,
+.guide-mock__cursor--campaign,
+.guide-mock__cursor--reports {
+  animation: guide-cursor-controls 2.5s ease-in-out infinite;
+}
+
+.guide-mock__cursor--lists,
+.guide-mock__cursor--templates,
+.guide-mock__cursor--roles,
+.guide-mock__cursor--archive {
+  animation: guide-cursor-email 3s ease-in-out infinite;
+}
+
+.marketing-guide-fab {
+  position: fixed;
+  z-index: 40;
+  right: 1rem;
+  bottom: 5.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 999px;
+  border: 2px solid #fff;
+  background: #ff773d;
+  color: #17191c;
+  font-size: 1.1rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(255, 119, 61, 0.45);
+}
+
 .marketing-studio-popup {
   width: min(640px, 100%);
   max-height: min(88vh, 720px);

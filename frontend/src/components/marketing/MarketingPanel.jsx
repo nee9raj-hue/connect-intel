@@ -16,6 +16,11 @@ import { leadHasCallablePhone } from '../../lib/phoneUtils'
 import useIsMobile from '../../hooks/useIsMobile'
 import MarketingCampaignSetupFields from './MarketingCampaignSetupFields'
 import MarketingCampaignWizardModal from './MarketingCampaignWizardModal'
+import PanelGuideModal from '../guides/PanelGuideModal'
+import {
+  marketingGuideStepsForUser,
+  marketingGuideStorageKey,
+} from '../../lib/guides/marketingGuide'
 
 const TABS = [
   { id: 'campaigns', label: 'Campaigns', short: 'Camp' },
@@ -78,6 +83,10 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
   const [reportCampaigns, setReportCampaigns] = useState([])
   const [forms, setForms] = useState([])
   const [marketingTipsOpen, setMarketingTipsOpen] = useState(false)
+  const [guideOpen, setGuideOpen] = useState(false)
+  const [guidePrompt, setGuidePrompt] = useState(false)
+  const guideSteps = useMemo(() => marketingGuideStepsForUser(user), [user])
+  const guideStorageKey = marketingGuideStorageKey(user?.id)
   const [campaignSetupOpen, setCampaignSetupOpen] = useState(true)
   const [campaignWizardOpen, setCampaignWizardOpen] = useState(false)
   const [campaignDesktopPhase, setCampaignDesktopPhase] = useState('setup')
@@ -181,6 +190,15 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
   useEffect(() => {
     load()
   }, [load])
+
+  useEffect(() => {
+    if (!user?.id || !isActive) return
+    try {
+      setGuidePrompt(!localStorage.getItem(guideStorageKey))
+    } catch {
+      setGuidePrompt(true)
+    }
+  }, [user?.id, guideStorageKey, isActive])
 
   useEffect(() => {
     if (!notice) return
@@ -768,6 +786,13 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
             </p>
           </div>
           <div className="crm-page-actions flex-wrap">
+            <button
+              type="button"
+              onClick={() => setGuideOpen(true)}
+              className="crm-btn crm-btn-secondary"
+            >
+              How to use
+            </button>
             {(needsWorkEmail ||
               (user?.accountType === 'company' && !isBuilderTab) ||
               (user?.isOrgAdmin && user?.accountType === 'company')) && (
@@ -819,6 +844,35 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
             <span className="marketing-summary-pill">
               <strong>{templates.length || 0}</strong> templates
             </span>
+          </div>
+        )}
+
+        {guidePrompt && !hideMarketingHeader && (
+          <div className="panel-guide-prompt mx-4 sm:mx-6 mb-2">
+            <span>New to Marketing? Walk through lists, campaigns, and reports step by step.</span>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                className="crm-btn crm-btn-primary crm-btn-sm"
+                onClick={() => setGuideOpen(true)}
+              >
+                Open guide
+              </button>
+              <button
+                type="button"
+                className="crm-btn crm-btn-ghost crm-btn-sm"
+                onClick={() => {
+                  try {
+                    localStorage.setItem(guideStorageKey, new Date().toISOString())
+                  } catch {
+                    /* ignore */
+                  }
+                  setGuidePrompt(false)
+                }}
+              >
+                Dismiss
+              </button>
+            </div>
           </div>
         )}
 
@@ -890,7 +944,16 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
           isMobile ? (
             <div className="marketing-mobile-home">
               <div className="marketing-mobile-setup ci-card">
-                <h2 className="marketing-mobile-setup-title">New campaign</h2>
+                <div className="flex items-center justify-between gap-2 mb-1">
+                  <h2 className="marketing-mobile-setup-title mb-0">New campaign</h2>
+                  <button
+                    type="button"
+                    className="crm-btn crm-btn-secondary crm-btn-sm shrink-0"
+                    onClick={() => setGuideOpen(true)}
+                  >
+                    Guide
+                  </button>
+                </div>
                 <p className="marketing-mobile-setup-copy">
                   Pick channel, name, list, and an optional template. Continue opens the design wizard.
                 </p>
@@ -1285,6 +1348,27 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
           </div>
         )}
       </div>
+
+      {hideMarketingHeader && (
+        <button
+          type="button"
+          className="marketing-guide-fab"
+          onClick={() => setGuideOpen(true)}
+          aria-label="Open Marketing guide"
+          title="How to use Marketing"
+        >
+          ?
+        </button>
+      )}
+
+      <PanelGuideModal
+        open={guideOpen}
+        onClose={() => setGuideOpen(false)}
+        title="Marketing guide"
+        steps={guideSteps}
+        storageKey={guideStorageKey}
+        onMarkSeen={() => setGuidePrompt(false)}
+      />
     </div>
   )
 }
