@@ -411,8 +411,13 @@ export const api = {
     }),
   pauseMarketingCampaign: (id) =>
     request('/api/marketing/campaigns', { method: 'PATCH', body: { action: 'pause', id } }),
-  deleteMarketingCampaign: (id) =>
-    request('/api/marketing/campaigns', { method: 'DELETE', body: { id } }),
+  archiveMarketingCampaign: (id) =>
+    request('/api/marketing/campaigns', { method: 'PATCH', body: { action: 'archive', id } }),
+  deleteMarketingCampaign: (id, opts = {}) =>
+    request('/api/marketing/campaigns', {
+      method: 'DELETE',
+      body: { id, permanent: Boolean(opts.permanent) },
+    }),
   listMarketingForms: () => request('/api/marketing/forms'),
   createMarketingForm: (payload) => request('/api/marketing/forms', { method: 'POST', body: payload }),
   updateMarketingForm: (payload) => request('/api/marketing/forms', { method: 'PATCH', body: payload }),

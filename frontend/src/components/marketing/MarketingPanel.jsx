@@ -149,7 +149,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
       const data = await api.getMarketingOverview({ light: true, timeoutMs: 60_000 })
       setLists(data.lists || [])
       setTemplates(data.templates || [])
-      setCampaigns(data.campaigns || [])
+      setCampaigns((data.campaigns || []).filter((c) => c.status !== 'archived'))
       setForms(data.forms || [])
       setSummary(data.summary || null)
     } catch (e) {
@@ -1245,6 +1245,7 @@ function CampaignCard({ campaign, busy, onStart, onNavigate, showCreator }) {
     active: 'crm-status-active',
     paused: 'crm-status-paused',
     completed: 'crm-status-completed',
+    archived: 'crm-status-paused',
   }
   const stats = campaign.stats || {}
   return (

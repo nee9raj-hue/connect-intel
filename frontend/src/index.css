@@ -1205,6 +1205,132 @@ textarea {
   line-height: 1.1;
 }
 
+/* Campaign reports list (Mailchimp-style) */
+.mc-reports-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.mc-reports-folder-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+  background: #fff;
+}
+
+.mc-reports-folder-tab--active {
+  border-color: #17191c;
+  background: #17191c;
+  color: #fff;
+}
+
+.mc-reports-folder-tab__count {
+  font-size: 0.65rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.mc-reports-folder-tab:not(.mc-reports-folder-tab--active) .mc-reports-folder-tab__count {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.mc-reports-select,
+.mc-reports-search,
+.mc-reports-date-input {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.4rem 0.65rem;
+  background: #fff;
+  color: #17191c;
+}
+
+.mc-reports-search {
+  min-width: 10rem;
+}
+
+.mc-reports-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+  gap: 0.5rem;
+}
+
+.mc-reports-summary__tile {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.65rem 0.75rem;
+}
+
+.mc-reports-summary__label {
+  display: block;
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+}
+
+.mc-reports-summary__value {
+  display: block;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #17191c;
+  font-variant-numeric: tabular-nums;
+  margin-top: 0.15rem;
+}
+
+.mc-reports-summary__sub {
+  display: block;
+  font-size: 0.65rem;
+  color: #94a3b8;
+  margin-top: 0.1rem;
+}
+
+.mc-reports-status {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.mc-reports-status--active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.mc-reports-status--completed {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+
+.mc-reports-status--archived {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.mc-reports-table tbody tr:hover .font-medium {
+  color: #ff773d;
+}
+
 .marketing-studio-popup {
   width: min(640px, 100%);
   max-height: min(88vh, 720px);

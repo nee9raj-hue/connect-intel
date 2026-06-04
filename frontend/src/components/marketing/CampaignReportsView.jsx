@@ -8,6 +8,69 @@ import MarketingCreatorBadge from './MarketingCreatorBadge'
 
 const PAGE_SIZE = 100
 
+const DATE_PRESETS = [
+  { id: 'all', label: 'All time' },
+  { id: '7d', label: 'Last 7 days' },
+  { id: '30d', label: 'Last 30 days' },
+  { id: '90d', label: 'Last 90 days' },
+  { id: 'year', label: 'This year' },
+  { id: 'custom', label: 'Custom range' },
+]
+
+function campaignActivityDate(campaign) {
+  return (
+    campaign?.startedAt ||
+    campaign?.completedAt ||
+    campaign?.archivedAt ||
+    campaign?.updatedAt ||
+    campaign?.createdAt ||
+    null
+  )
+}
+
+function parseDateInput(value, endOfDay = false) {
+  if (!value) return null
+  const d = new Date(`${value}T${endOfDay ? '23:59:59' : '00:00:00'}`)
+  return Number.isNaN(d.getTime()) ? null : d.getTime()
+}
+
+function campaignInDateRange(campaign, preset, customFrom, customTo) {
+  if (preset === 'all') return true
+  const raw = campaignActivityDate(campaign)
+  if (!raw) return preset !== 'custom'
+  const t = new Date(raw).getTime()
+  const now = Date.now()
+  if (preset === '7d') return t >= now - 7 * 86400000
+  if (preset === '30d') return t >= now - 30 * 86400000
+  if (preset === '90d') return t >= now - 90 * 86400000
+  if (preset === 'year') return new Date(raw).getFullYear() === new Date().getFullYear()
+  if (preset === 'custom') {
+    const from = parseDateInput(customFrom)
+    const to = parseDateInput(customTo, true)
+    if (from != null && t < from) return false
+    if (to != null && t > to) return false
+    return true
+  }
+  return true
+}
+
+function formatShortDate(iso) {
+  if (!iso) return '—'
+  try {
+    return new Date(iso).toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    })
+  } catch {
+    return '—'
+  }
+}
+
+function campaignStats(campaign) {
+  return campaign?.stats || campaign?.analytics || {}
+}
+
 const FILTERS = [
   { id: 'all', label: 'All recipients' },
   { id: 'sent', label: 'Sent' },
@@ -522,7 +585,7 @@ function CampaignDetailReport({
       </div>
 
       <div
-        className={`grid gap-2 ${isWhatsApp ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3 sm:grid-cols-6'}`}
+        className={`grid gap-2 ${isWhatsApp ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-2 sm:grid-cols-4 lg:grid-cols-7'}`}
       >
         <KpiTile
           label="Enrolled"
@@ -561,11 +624,18 @@ function CampaignDetailReport({
               onClick={() => openKpi('clicked', 'Clicked')}
             />
             <KpiTile
+              label="Unsubscribed"
+              value={stats.unsubscribed ?? 0}
+              accent="text-amber-800"
+              active={filter === 'unsubscribed'}
+              onClick={() => openKpi('unsubscribed', 'Unsubscribed')}
+            />
+            <KpiTile
               label="Failed"
-              value={(stats.failed ?? 0) + (stats.unsubscribed ?? 0)}
+              value={stats.failed ?? 0}
               accent="text-orange-700"
               active={filter === 'failed'}
-              onClick={() => openKpi('failed', 'Failed / unsubscribed')}
+              onClick={() => openKpi('failed', 'Failed')}
             />
           </>
         )}
@@ -675,6 +745,105 @@ function CampaignDetailReport({
   )
 }
 
+function RemoveCampaignModal({ count, names, archiveOnly, busy, onArchive, onPermanentDelete, onCancel }) {
+  return (
+    <ReportOverlay title={archiveOnly ? 'Delete permanently?' : 'Remove campaign?'} onClose={onCancel}>
+      <div className="space-y-4">
+        <p className="text-sm text-gray-700 leading-relaxed">
+          {archiveOnly ? (
+            <>
+              Permanently delete <strong>{count === 1 ? names[0] : `${count} campaigns`}</strong> from
+              Archive? Reports and recipient history will be removed. This cannot be undone.
+            </>
+          ) : (
+            <>
+              Choose what to do with{' '}
+              <strong>{count === 1 ? names[0] || 'this campaign' : `${count} campaigns`}</strong>.
+              Active sends will be stopped when you archive.
+            </>
+          )}
+        </p>
+        <div className="flex flex-col gap-2">
+          {!archiveOnly && (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={onArchive}
+              className="w-full text-sm font-semibold px-4 py-3 rounded-lg bg-[#FF773D] text-[#242424] hover:opacity-95 disabled:opacity-50"
+            >
+              {busy ? 'Working…' : 'Move to Archive'}
+            </button>
+          )}
+          {archiveOnly && (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={onPermanentDelete}
+              className="w-full text-sm font-semibold px-4 py-3 rounded-lg bg-red-700 text-white hover:bg-red-800 disabled:opacity-50"
+            >
+              {busy ? 'Deleting…' : 'Delete permanently'}
+            </button>
+          )}
+          <button
+            type="button"
+            disabled={busy}
+            onClick={onCancel}
+            className="w-full text-sm font-semibold px-4 py-2 text-gray-600 hover:text-gray-900"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </ReportOverlay>
+  )
+}
+
+function ReportsSummaryBar({ rows }) {
+  let sent = 0
+  let opens = 0
+  let clicks = 0
+  let unsubscribed = 0
+  let bounced = 0
+  let enrolled = 0
+  for (const c of rows) {
+    const s = campaignStats(c)
+    const sentN = s.recipientsSent ?? s.sent ?? 0
+    sent += sentN
+    enrolled += s.enrolled ?? 0
+    opens += s.uniqueOpens ?? s.opens ?? 0
+    clicks += s.uniqueClicks ?? s.clicks ?? 0
+    unsubscribed += s.unsubscribed ?? 0
+    bounced += s.bounced ?? 0
+  }
+  const openRate = sent > 0 ? Math.round((opens / sent) * 100) : 0
+  const clickRate = sent > 0 ? Math.round((clicks / sent) * 100) : 0
+  const unsubRate = sent > 0 ? Math.round((unsubscribed / sent) * 100) : 0
+
+  const tiles = [
+    { label: 'Campaigns', value: rows.length },
+    { label: 'Recipients', value: enrolled || sent },
+    { label: 'Emails sent', value: sent },
+    { label: 'Open rate', value: `${openRate}%`, sub: opens },
+    { label: 'Click rate', value: `${clickRate}%`, sub: clicks },
+    { label: 'Unsubscribed', value: unsubscribed, sub: unsubRate ? `${unsubRate}%` : null },
+    { label: 'Bounced', value: bounced },
+  ]
+
+  return (
+    <div className="mc-reports-summary">
+      {tiles.map((t) => (
+        <div key={t.label} className="mc-reports-summary__tile">
+          <span className="mc-reports-summary__label">{t.label}</span>
+          <span className="mc-reports-summary__value">{t.value}</span>
+          {t.sub != null ? (
+            <span className="mc-reports-summary__sub">{t.sub} total</span>
+          ) : null}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 export default function CampaignReportsView({
   campaigns,
   onNavigate,
@@ -687,27 +856,59 @@ export default function CampaignReportsView({
   const [reportCampaignId, setReportCampaignId] = useState(initialCampaignId || null)
   const [selectedIds, setSelectedIds] = useState(() => new Set())
   const [listVisible, setListVisible] = useState(PAGE_SIZE)
-  const [deleteBusy, setDeleteBusy] = useState(false)
-  const [deleteError, setDeleteError] = useState(null)
+  const [actionBusy, setActionBusy] = useState(false)
+  const [actionError, setActionError] = useState(null)
+  const [folder, setFolder] = useState('reports')
+  const [datePreset, setDatePreset] = useState('all')
+  const [customFrom, setCustomFrom] = useState('')
+  const [customTo, setCustomTo] = useState('')
+  const [search, setSearch] = useState('')
+  const [removeModal, setRemoveModal] = useState(null)
 
   useEffect(() => {
     if (initialCampaignId) setReportCampaignId(initialCampaignId)
   }, [initialCampaignId])
 
-  const rows = useMemo(
+  useEffect(() => {
+    setListVisible(PAGE_SIZE)
+    setSelectedIds(new Set())
+  }, [folder, datePreset, customFrom, customTo, search])
+
+  const allCampaigns = useMemo(
     () =>
       [...(campaigns || [])].sort(
-        (a, b) => new Date(b.updatedAt || b.createdAt || 0) - new Date(a.updatedAt || a.createdAt || 0)
+        (a, b) =>
+          new Date(campaignActivityDate(b) || 0).getTime() -
+          new Date(campaignActivityDate(a) || 0).getTime()
       ),
     [campaigns]
   )
 
+  const archiveCount = useMemo(
+    () => allCampaigns.filter((c) => c.status === 'archived').length,
+    [allCampaigns]
+  )
+
+  const rows = useMemo(() => {
+    const inFolder =
+      folder === 'archive'
+        ? allCampaigns.filter((c) => c.status === 'archived')
+        : allCampaigns.filter((c) => c.status !== 'archived')
+    const q = search.trim().toLowerCase()
+    return inFolder.filter((c) => {
+      if (!campaignInDateRange(c, datePreset, customFrom, customTo)) return false
+      if (q && !c.name?.toLowerCase().includes(q)) return false
+      return true
+    })
+  }, [allCampaigns, folder, datePreset, customFrom, customTo, search])
+
   const visibleRows = rows.slice(0, listVisible)
   const hasMoreList = listVisible < rows.length
-  const reportCampaign = rows.find((c) => c.id === reportCampaignId)
+  const reportCampaign = allCampaigns.find((c) => c.id === reportCampaignId)
 
   const allSelected = visibleRows.length > 0 && visibleRows.every((c) => selectedIds.has(c.id))
   const someSelected = selectedIds.size > 0
+  const archiveOnly = folder === 'archive'
 
   const toggleSelect = (id) => {
     setSelectedIds((prev) => {
@@ -734,36 +935,50 @@ export default function CampaignReportsView({
     }
   }
 
-  const deleteSelected = async () => {
-    const ids = [...selectedIds]
-    if (!ids.length) return
+  const openRemoveModal = (ids) => {
     const names = ids
-      .map((id) => rows.find((c) => c.id === id)?.name)
+      .map((id) => allCampaigns.find((c) => c.id === id)?.name)
       .filter(Boolean)
-      .slice(0, 5)
-    const label =
-      ids.length === 1
-        ? `Delete campaign “${names[0] || 'this campaign'}”?`
-        : `Delete ${ids.length} campaigns? This cannot be undone.`
-    if (!window.confirm(label)) return
+    setRemoveModal({ ids, names })
+  }
 
-    setDeleteBusy(true)
-    setDeleteError(null)
+  const runArchive = async (ids) => {
+    setActionBusy(true)
+    setActionError(null)
     const failed = []
     for (const id of ids) {
       try {
-        await api.deleteMarketingCampaign(id)
+        await api.archiveMarketingCampaign(id)
       } catch (e) {
-        failed.push({ id, message: e.message })
+        failed.push(e.message)
       }
     }
-    setDeleteBusy(false)
+    setActionBusy(false)
+    setRemoveModal(null)
     if (failed.length) {
-      setDeleteError(
-        failed.length === ids.length
-          ? failed[0].message
-          : `${failed.length} could not be deleted (pause active campaigns first).`
-      )
+      setActionError(failed[0] || 'Could not archive')
+    } else {
+      setSelectedIds(new Set())
+      if (ids.includes(reportCampaignId)) setReportCampaignId(null)
+    }
+    await onReload?.()
+  }
+
+  const runPermanentDelete = async (ids) => {
+    setActionBusy(true)
+    setActionError(null)
+    const failed = []
+    for (const id of ids) {
+      try {
+        await api.deleteMarketingCampaign(id, { permanent: true })
+      } catch (e) {
+        failed.push(e.message)
+      }
+    }
+    setActionBusy(false)
+    setRemoveModal(null)
+    if (failed.length) {
+      setActionError(failed[0] || 'Could not delete')
     } else {
       setSelectedIds(new Set())
       if (ids.includes(reportCampaignId)) setReportCampaignId(null)
@@ -777,7 +992,27 @@ export default function CampaignReportsView({
   }
 
   return (
-    <div className="space-y-4 max-w-6xl p-1">
+    <div className="space-y-4 max-w-[1280px] p-1">
+      {removeModal && (
+        <RemoveCampaignModal
+          count={removeModal.ids.length}
+          names={removeModal.names}
+          archiveOnly={archiveOnly}
+          busy={actionBusy}
+          onCancel={() => !actionBusy && setRemoveModal(null)}
+          onArchive={() => runArchive(removeModal.ids)}
+          onPermanentDelete={() => {
+            if (!archiveOnly) {
+              setActionError(
+                'Move campaigns to Archive first, then delete permanently from the Archive folder.'
+              )
+              return
+            }
+            runPermanentDelete(removeModal.ids)
+          }}
+        />
+      )}
+
       {reportCampaignId && reportCampaign && (
         <ReportOverlay
           wide
@@ -795,18 +1030,91 @@ export default function CampaignReportsView({
         </ReportOverlay>
       )}
 
-      <section className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+      <div className="mc-reports-toolbar">
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setFolder('reports')}
+            className={`mc-reports-folder-tab ${folder === 'reports' ? 'mc-reports-folder-tab--active' : ''}`}
+          >
+            All campaigns
+          </button>
+          <button
+            type="button"
+            onClick={() => setFolder('archive')}
+            className={`mc-reports-folder-tab ${folder === 'archive' ? 'mc-reports-folder-tab--active' : ''}`}
+          >
+            Archive
+            {archiveCount > 0 ? (
+              <span className="mc-reports-folder-tab__count">{archiveCount}</span>
+            ) : null}
+          </button>
+        </div>
+        <div className="flex flex-wrap items-center gap-2 flex-1 justify-end">
+          <select
+            value={datePreset}
+            onChange={(e) => setDatePreset(e.target.value)}
+            className="mc-reports-select text-sm"
+            aria-label="Date range"
+          >
+            {DATE_PRESETS.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.label}
+              </option>
+            ))}
+          </select>
+          {datePreset === 'custom' && (
+            <>
+              <input
+                type="date"
+                value={customFrom}
+                onChange={(e) => setCustomFrom(e.target.value)}
+                className="mc-reports-date-input text-sm"
+                aria-label="From date"
+              />
+              <span className="text-gray-400 text-xs">to</span>
+              <input
+                type="date"
+                value={customTo}
+                onChange={(e) => setCustomTo(e.target.value)}
+                className="mc-reports-date-input text-sm"
+                aria-label="To date"
+              />
+            </>
+          )}
+          <input
+            type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search campaigns"
+            className="mc-reports-search text-sm"
+          />
+        </div>
+      </div>
+
+      {folder === 'reports' && rows.length > 0 && <ReportsSummaryBar rows={rows} />}
+
+      <section className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
         <div className="px-4 py-3 border-b border-gray-100 flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-sm font-semibold text-gray-900">Campaign reports</h2>
+          <div>
+            <h2 className="text-sm font-semibold text-gray-900">
+              {folder === 'archive' ? 'Archived campaigns' : 'Campaign performance'}
+            </h2>
+            <p className="text-xs text-gray-500 mt-0.5">
+              {folder === 'archive'
+                ? 'Restore is not available — delete permanently when you are sure.'
+                : 'Mailchimp-style metrics for sent campaigns. Click View report for recipient-level detail.'}
+            </p>
+          </div>
           <div className="flex flex-wrap items-center gap-2">
             {someSelected && (
               <button
                 type="button"
-                disabled={deleteBusy || busy}
-                onClick={deleteSelected}
+                disabled={actionBusy || busy}
+                onClick={() => openRemoveModal([...selectedIds])}
                 className="text-xs font-semibold px-3 py-1.5 text-red-800 border border-red-200 rounded-lg hover:bg-red-50 disabled:opacity-50"
               >
-                {deleteBusy ? 'Deleting…' : `Delete (${selectedIds.size})`}
+                {archiveOnly ? `Delete permanently (${selectedIds.size})` : `Remove (${selectedIds.size})`}
               </button>
             )}
             <button
@@ -819,16 +1127,20 @@ export default function CampaignReportsView({
           </div>
         </div>
 
-        {deleteError && (
-          <p className="px-4 py-2 text-xs text-red-700 bg-red-50 border-b border-red-100">{deleteError}</p>
+        {actionError && (
+          <p className="px-4 py-2 text-xs text-red-700 bg-red-50 border-b border-red-100">{actionError}</p>
         )}
 
         {!rows.length ? (
-          <p className="text-sm text-gray-500 p-6">No campaigns yet — create one under Campaigns.</p>
+          <p className="text-sm text-gray-500 p-6">
+            {folder === 'archive'
+              ? 'No archived campaigns in this date range.'
+              : 'No campaigns in this date range — adjust filters or create one under Campaigns.'}
+          </p>
         ) : (
           <>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full text-sm mc-reports-table">
                 <thead>
                   <tr className="text-left text-xs uppercase tracking-wide text-gray-500 border-b border-gray-100 bg-gray-50/80">
                     <th className="px-3 py-2 w-10">
@@ -840,20 +1152,34 @@ export default function CampaignReportsView({
                         className="rounded border-gray-300"
                       />
                     </th>
-                    <th className="px-4 py-2 font-semibold">Campaign</th>
+                    <th className="px-4 py-2 font-semibold min-w-[200px]">Campaign</th>
                     <th className="px-4 py-2 font-semibold">Status</th>
-                    <th className="px-4 py-2 font-semibold">Sent</th>
-                    <th className="px-4 py-2 font-semibold">Bounced</th>
-                    <th className="px-4 py-2 font-semibold">Opens</th>
-                    <th className="px-4 py-2 font-semibold">Clicks</th>
-                    <th className="px-4 py-2 font-semibold w-28" />
+                    <th className="px-4 py-2 font-semibold">Send date</th>
+                    <th className="px-4 py-2 font-semibold text-right">Recipients</th>
+                    <th className="px-4 py-2 font-semibold text-right">Open rate</th>
+                    <th className="px-4 py-2 font-semibold text-right">Click rate</th>
+                    <th className="px-4 py-2 font-semibold text-right">Unsubs</th>
+                    <th className="px-4 py-2 font-semibold text-right">Bounced</th>
+                    <th className="px-4 py-2 font-semibold w-32" />
                   </tr>
                 </thead>
                 <tbody>
                   {visibleRows.map((c) => {
-                    const stats = c.stats || c.analytics || {}
+                    const stats = campaignStats(c)
                     const sentCount = stats.recipientsSent ?? stats.sent ?? 0
+                    const enrolled = stats.enrolled ?? sentCount
+                    const opens = stats.uniqueOpens ?? stats.opens ?? 0
+                    const clicks = stats.uniqueClicks ?? stats.clicks ?? 0
+                    const unsubs = stats.unsubscribed ?? 0
                     const checked = selectedIds.has(c.id)
+                    const sendDate = campaignActivityDate(c)
+                    const channelLabel =
+                      c.channel === 'whatsapp'
+                        ? 'WhatsApp'
+                        : c.type === 'sequence'
+                          ? 'Automation'
+                          : 'Email'
+
                     return (
                       <tr
                         key={c.id}
@@ -869,35 +1195,68 @@ export default function CampaignReportsView({
                           />
                         </td>
                         <td className="px-4 py-3">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span className="font-medium text-gray-900">{c.name}</span>
-                            {showCreator && (
-                              <MarketingCreatorBadge name={c.createdByName} isOwn={c.isOwn} />
-                            )}
+                          <div className="flex flex-col gap-1 min-w-0">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={(e) => openReport(c.id, e)}
+                                className="font-medium text-gray-900 text-left hover:text-[#FF773D] hover:underline"
+                              >
+                                {c.name}
+                              </button>
+                              {showCreator && (
+                                <MarketingCreatorBadge name={c.createdByName} isOwn={c.isOwn} />
+                              )}
+                            </div>
+                            <span className="text-[10px] font-semibold uppercase tracking-wide text-gray-400">
+                              {channelLabel}
+                            </span>
                           </div>
                         </td>
-                        <td className="px-4 py-3 capitalize text-gray-600">{c.status}</td>
-                        <td className="px-4 py-3 tabular-nums">{sentCount}</td>
-                        <td className="px-4 py-3 tabular-nums text-red-700">{stats.bounced || 0}</td>
-                        <td className="px-4 py-3 tabular-nums">
-                          {stats.uniqueOpens ?? stats.opens ?? 0}
-                          {sentCount > 0 ? (
-                            <span className="text-gray-400 text-xs"> ({stats.openRate || 0}%)</span>
+                        <td className="px-4 py-3">
+                          <span
+                            className={`mc-reports-status mc-reports-status--${c.status || 'draft'}`}
+                          >
+                            {c.status}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-gray-600 whitespace-nowrap">
+                          {formatShortDate(sendDate)}
+                        </td>
+                        <td className="px-4 py-3 tabular-nums text-right">{enrolled || sentCount}</td>
+                        <td className="px-4 py-3 tabular-nums text-right">
+                          <span className="font-medium text-gray-900">{stats.openRate || 0}%</span>
+                          <span className="block text-xs text-gray-400">{opens} opened</span>
+                        </td>
+                        <td className="px-4 py-3 tabular-nums text-right">
+                          <span className="font-medium text-gray-900">{stats.clickRate || 0}%</span>
+                          <span className="block text-xs text-gray-400">{clicks} clicked</span>
+                        </td>
+                        <td className="px-4 py-3 tabular-nums text-right text-amber-900">
+                          <span className="font-medium">{unsubs}</span>
+                          {sentCount > 0 && stats.unsubscribeRate != null ? (
+                            <span className="block text-xs text-gray-400">
+                              {stats.unsubscribeRate}%
+                            </span>
                           ) : null}
                         </td>
-                        <td className="px-4 py-3 tabular-nums">
-                          {stats.uniqueClicks ?? stats.clicks ?? 0}
-                          {sentCount > 0 ? (
-                            <span className="text-gray-400 text-xs"> ({stats.clickRate || 0}%)</span>
-                          ) : null}
+                        <td className="px-4 py-3 tabular-nums text-right text-red-700">
+                          {stats.bounced || 0}
                         </td>
-                        <td className="px-4 py-3 text-right">
+                        <td className="px-4 py-3 text-right whitespace-nowrap">
                           <button
                             type="button"
                             onClick={(e) => openReport(c.id, e)}
-                            className="text-xs font-semibold text-[#FF773D] hover:underline"
+                            className="text-xs font-semibold text-[#FF773D] hover:underline mr-2"
                           >
                             View report
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => openRemoveModal([c.id])}
+                            className="text-xs font-semibold text-gray-500 hover:text-red-800"
+                          >
+                            {archiveOnly ? 'Delete' : 'Remove'}
                           </button>
                         </td>
                       </tr>
