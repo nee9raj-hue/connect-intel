@@ -10,6 +10,7 @@ const PAGE_SIZE = 100
 
 const FILTERS = [
   { id: 'all', label: 'All recipients' },
+  { id: 'sent', label: 'Sent' },
   { id: 'delivered', label: 'Delivered' },
   { id: 'opened', label: 'Opened' },
   { id: 'clicked', label: 'Clicked' },
@@ -52,6 +53,8 @@ export function campaignToForm(campaign) {
 }
 
 function filterRecipients(rows, filter) {
+  if (filter === 'sent')
+    return rows.filter((r) => (r.sentCount || 0) > 0 || r.deliveryStatus === 'delivered')
   if (filter === 'delivered') return rows.filter((r) => r.deliveryStatus === 'delivered')
   if (filter === 'pending')
     return rows.filter((r) => r.deliveryStatus === 'pending' || (r.sentCount || 0) === 0)
@@ -64,6 +67,16 @@ function filterRecipients(rows, filter) {
     )
   if (filter === 'unsubscribed') return rows.filter((r) => r.deliveryStatus === 'unsubscribed')
   return rows
+}
+
+function recipientEngagementLabel(row) {
+  if (row.clicks > 0) return 'Clicked'
+  if (row.opens > 0) return 'Opened'
+  if (row.deliveryStatus === 'delivered' || (row.sentCount || 0) > 0) return 'Sent'
+  if (row.deliveryStatus === 'bounced') return 'Bounced'
+  if (row.deliveryStatus === 'failed') return 'Failed'
+  if (row.deliveryStatus === 'unsubscribed') return 'Unsubscribed'
+  return 'Pending'
 }
 
 function ReportOverlay({ title, onClose, children, wide }) {
@@ -197,8 +210,12 @@ function RecipientRow({ row, expanded, onToggle, onOpenLead }) {
         <td className="px-4 py-3 text-gray-600 text-xs">{row.email}</td>
         <td className="px-4 py-3">
           <span className={`text-xs font-semibold uppercase px-2 py-0.5 rounded border ${statusClass}`}>
-            {row.deliveryStatus}
+            {recipientEngagementLabel(row)}
           </span>
+          {row.deliveryStatus !== recipientEngagementLabel(row).toLowerCase() &&
+            row.deliveryStatus !== 'delivered' && (
+              <p className="text-[10px] text-gray-400 mt-0.5 capitalize">{row.deliveryStatus}</p>
+            )}
         </td>
         <td className="px-4 py-3 tabular-nums text-center">
           {row.opens > 0 ? (
@@ -387,7 +404,12 @@ function CampaignDetailReport({
   }
 
   const stats = report?.stats || {}
+  const sentKpi = stats.recipientsSent ?? stats.sent ?? 0
   const allRecipients = report?.recipients || []
+  const reportScopeHint =
+    report?.reportScope === 'org_member'
+      ? 'Org campaign — you see all recipients and engagement for this campaign.'
+      : null
 
   const recipients = useMemo(() => {
     let rows = filterRecipients(allRecipients, filter)
@@ -471,6 +493,19 @@ function CampaignDetailReport({
             {report?.campaign?.type === 'sequence' ? 'Sequence' : 'One-shot'}
             {report?.campaign?.startedAt && ` · ${formatDateTime(report.campaign.startedAt)}`}
           </p>
+          {!isWhatsApp && (
+            <p className="text-xs text-[#516f90] mt-1 leading-relaxed max-w-2xl">
+              {report?.reportScope === 'org_member'
+                ? 'Team view: all org opens/clicks for your visible pipeline leads. Click a KPI to drill down, then expand a row for link activity.'
+                : 'Click a KPI to filter recipients. Expand a row for delivery details and clicked links.'}
+              {stats.sent > 0 && stats.uniqueOpens === 0 && stats.uniqueClicks === 0 && (
+                <span className="block mt-1 text-amber-800">
+                  Opens/clicks appear after recipients load images or click tracked links (some mail clients block
+                  tracking).
+                </span>
+              )}
+            </p>
+          )}
         </div>
         <div className="flex flex-wrap gap-2 shrink-0">
           <button
@@ -502,10 +537,10 @@ function CampaignDetailReport({
         />
         <KpiTile
           label="Sent"
-          value={stats.sent ?? 0}
+          value={sentKpi}
           accent="text-[#FF773D]"
-          active={filter === 'delivered'}
-          onClick={() => openKpi('delivered', 'Sent')}
+          active={filter === 'sent'}
+          onClick={() => openKpi('sent', 'Sent')}
         />
         {!isWhatsApp && (
           <>
@@ -517,14 +552,14 @@ function CampaignDetailReport({
               onClick={() => openKpi('bounced', 'Bounced')}
             />
             <KpiTile
-              label="Opened"
+              label={`Opened${stats.openRate ? ` (${stats.openRate}%)` : ''}`}
               value={stats.uniqueOpens ?? 0}
               accent="text-[#FF773D]"
               active={filter === 'opened'}
               onClick={() => openKpi('opened', 'Opened')}
             />
             <KpiTile
-              label="Clicked"
+              label={`Clicked${stats.clickRate ? ` (${stats.clickRate}%)` : ''}`}
               value={stats.uniqueClicks ?? 0}
               accent="text-blue-700"
               active={filter === 'clicked'}
@@ -588,7 +623,7 @@ function CampaignDetailReport({
                   <th className="px-4 py-2 font-semibold">Contact</th>
                   <th className="px-4 py-2 font-semibold">Company</th>
                   <th className="px-4 py-2 font-semibold">Email</th>
-                  <th className="px-4 py-2 font-semibold">Delivery</th>
+                  <th className="px-4 py-2 font-semibold">Status</th>
                   <th className="px-4 py-2 font-semibold text-center">Opens</th>
                   <th className="px-4 py-2 font-semibold text-center">Clicks</th>
                   <th className="px-4 py-2 font-semibold">Activity</th>
@@ -822,6 +857,7 @@ export default function CampaignReportsView({
                 <tbody>
                   {visibleRows.map((c) => {
                     const stats = c.stats || c.analytics || {}
+                    const sentCount = stats.recipientsSent ?? stats.sent ?? 0
                     const checked = selectedIds.has(c.id)
                     return (
                       <tr
@@ -846,17 +882,17 @@ export default function CampaignReportsView({
                           </div>
                         </td>
                         <td className="px-4 py-3 capitalize text-gray-600">{c.status}</td>
-                        <td className="px-4 py-3 tabular-nums">{stats.sent || 0}</td>
+                        <td className="px-4 py-3 tabular-nums">{sentCount}</td>
                         <td className="px-4 py-3 tabular-nums text-red-700">{stats.bounced || 0}</td>
                         <td className="px-4 py-3 tabular-nums">
                           {stats.uniqueOpens ?? stats.opens ?? 0}
-                          {stats.sent > 0 ? (
+                          {sentCount > 0 ? (
                             <span className="text-gray-400 text-xs"> ({stats.openRate || 0}%)</span>
                           ) : null}
                         </td>
                         <td className="px-4 py-3 tabular-nums">
                           {stats.uniqueClicks ?? stats.clicks ?? 0}
-                          {stats.sent > 0 ? (
+                          {sentCount > 0 ? (
                             <span className="text-gray-400 text-xs"> ({stats.clickRate || 0}%)</span>
                           ) : null}
                         </td>
