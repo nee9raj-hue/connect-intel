@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-04T06:47:29.060Z",
-  "updatedAtIst": "04/06/2026, 12:17:29",
+  "updatedAt": "2026-06-04T07:50:20.416Z",
+  "updatedAtIst": "04/06/2026, 13:20:20",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "10607e4",
+  "currentProductionCommit": "dc1f861",
   "entries": [
+    {
+      "logId": "20260604-1320-dc1f861",
+      "commit": "dc1f861",
+      "commitFull": "dc1f861a59d27359756628a3f61f6636cbd897d5",
+      "message": "Polish campaign report KPI labels and show creator on team view.",
+      "deployedAt": "2026-06-04T07:50:05.335Z",
+      "deployedAtIst": "04/06/2026, 13:20:05",
+      "committedAtIst": "04/06/2026, 13:13:45",
+      "vercelPreviewUrl": "https://connect-intel-e4dg8evzc-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- dc1f861"
+    },
+    {
+      "logId": "20260604-1217-9027bfc",
+      "commit": "9027bfc",
+      "commitFull": "9027bfc9aa6156bb8ae64f6490d88769fa0fac03",
+      "message": "Update production log after bulk email fix deploy.",
+      "deployedAt": "2026-06-04T06:47:57.727Z",
+      "deployedAtIst": "04/06/2026, 12:17:57",
+      "committedAtIst": "04/06/2026, 12:17:31",
+      "vercelPreviewUrl": "https://connect-intel-c4ck1a6yq-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 9027bfc"
+    },
     {
       "logId": "20260604-1217-10607e4",
       "commit": "10607e4",
@@ -15,7 +43,7 @@
       "committedAtIst": "04/06/2026, 12:07:22",
       "vercelPreviewUrl": "https://connect-intel-4yrhwngeq-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 10607e4"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- a56f9c9"
-    },
-    {
-      "logId": "20260530-2031-27346e0",
-      "commit": "27346e0",
-      "commitFull": "27346e024458d64e1318ac7c900e373367d5e0bc",
-      "message": "Update production log after pipeline filter apply deploy.",
-      "deployedAt": "2026-05-30T15:01:07.263Z",
-      "deployedAtIst": "30/05/2026, 20:31:07",
-      "committedAtIst": "30/05/2026, 20:30:40",
-      "vercelPreviewUrl": "https://connect-intel-oczc1kbyq-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 27346e0"
-    },
-    {
-      "logId": "20260530-2030-19f05f9",
-      "commit": "19f05f9",
-      "commitFull": "19f05f98b77279d004954ccab9a19938c9095974",
-      "message": "Apply pipeline filters immediately without a separate Search step.",
-      "deployedAt": "2026-05-30T15:00:21.782Z",
-      "deployedAtIst": "30/05/2026, 20:30:21",
-      "committedAtIst": "30/05/2026, 20:29:54",
-      "vercelPreviewUrl": "https://connect-intel-fhzt2thxc-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 19f05f9"
     }
   ]
 }

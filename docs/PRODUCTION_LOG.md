@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 754c59b
+npm run prod:rollback -- 9027bfc
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 754c59b
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `10607e4` |
-| Log updated (IST) | 04/06/2026, 12:17:29 |
+| Commit | `dc1f861` |
+| Log updated (IST) | 04/06/2026, 13:20:20 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 754c59b
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 04/06/2026, 12:17:10 | `10607e4` | Fix bulk email crash, 100-lead cap, and per-recipient name personalization. | [preview](https://connect-intel-4yrhwngeq-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 10607e4` | **← LIVE**
+| 04/06/2026, 13:20:05 | `dc1f861` | Polish campaign report KPI labels and show creator on team view. | [preview](https://connect-intel-e4dg8evzc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- dc1f861` | **← LIVE**
+| 04/06/2026, 12:17:57 | `9027bfc` | Update production log after bulk email fix deploy. | [preview](https://connect-intel-c4ck1a6yq-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9027bfc` |
+| 04/06/2026, 12:17:10 | `10607e4` | Fix bulk email crash, 100-lead cap, and per-recipient name personalization. | [preview](https://connect-intel-4yrhwngeq-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 10607e4` |
 | 02/06/2026, 13:55:02 | `754c59b` | Update production log after immersive canvas scroll deploy. | [preview](https://connect-intel-dbql6lq7d-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 754c59b` |
 | 02/06/2026, 13:54:07 | `48b1a9c` | Fix immersive canvas trackpad scrolling over email content. | [preview](https://connect-intel-6l1vhq3jc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 48b1a9c` |
 | 02/06/2026, 13:48:02 | `c945911` | Update production log after vertical scroll fix deploy. | [preview](https://connect-intel-q5kaslgq3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c945911` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 754c59b
 | 30/05/2026, 21:31:55 | `d47ce0c` | Reject placeholder and reserved domains in email validation. | [preview](https://connect-intel-1qrvtif0d-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d47ce0c` |
 | 30/05/2026, 21:27:14 | `2e51325` | Add pipeline email validation icons (Phase 1). | [preview](https://connect-intel-apqo7rr6n-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2e51325` |
 | 30/05/2026, 20:36:37 | `a56f9c9` | Fix pipeline empty state when filters return no matches. | [preview](https://connect-intel-7fumqcebo-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a56f9c9` |
-| 30/05/2026, 20:31:07 | `27346e0` | Update production log after pipeline filter apply deploy. | [preview](https://connect-intel-oczc1kbyq-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 27346e0` |
-| 30/05/2026, 20:30:21 | `19f05f9` | Apply pipeline filters immediately without a separate Search step. | [preview](https://connect-intel-fhzt2thxc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 19f05f9` |
 
 ---
 
