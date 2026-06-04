@@ -400,8 +400,13 @@ export const api = {
   processMarketingCampaignSends: (id, opts = {}) =>
     request('/api/marketing/campaigns', {
       method: 'POST',
-      body: { action: 'process_sends', id, limit: opts.limit ?? 1 },
-      timeoutMs: opts.timeoutMs ?? 300_000,
+      body: {
+        action: 'process_sends',
+        id,
+        limit: opts.limit ?? 8,
+        burst: opts.burst !== false,
+      },
+      timeoutMs: opts.timeoutMs ?? 120_000,
       silent: opts.silent,
     }),
   logMarketingWhatsAppSent: (enrollmentId) =>
@@ -411,6 +416,15 @@ export const api = {
     }),
   pauseMarketingCampaign: (id) =>
     request('/api/marketing/campaigns', { method: 'PATCH', body: { action: 'pause', id } }),
+  resumeMarketingCampaign: (id, opts = {}) =>
+    request('/api/marketing/campaigns', {
+      method: 'PATCH',
+      body: { action: 'resume', id, limit: opts.limit },
+      timeoutMs: opts.timeoutMs ?? 120_000,
+      silent: opts.silent,
+    }),
+  stopMarketingCampaign: (id) =>
+    request('/api/marketing/campaigns', { method: 'PATCH', body: { action: 'stop', id } }),
   archiveMarketingCampaign: (id) =>
     request('/api/marketing/campaigns', { method: 'PATCH', body: { action: 'archive', id } }),
   deleteMarketingCampaign: (id, opts = {}) =>

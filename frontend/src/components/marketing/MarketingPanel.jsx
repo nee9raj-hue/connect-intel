@@ -75,6 +75,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
   const [lists, setLists] = useState([])
   const [templates, setTemplates] = useState([])
   const [campaigns, setCampaigns] = useState([])
+  const [reportCampaigns, setReportCampaigns] = useState([])
   const [forms, setForms] = useState([])
   const [marketingTipsOpen, setMarketingTipsOpen] = useState(false)
   const [campaignSetupOpen, setCampaignSetupOpen] = useState(true)
@@ -149,7 +150,9 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
       const data = await api.getMarketingOverview({ light: true, timeoutMs: 60_000 })
       setLists(data.lists || [])
       setTemplates(data.templates || [])
-      setCampaigns((data.campaigns || []).filter((c) => c.status !== 'archived'))
+      const all = data.campaigns || []
+      setReportCampaigns(all)
+      setCampaigns(all.filter((c) => c.status !== 'archived'))
       setForms(data.forms || [])
       setSummary(data.summary || null)
     } catch (e) {
@@ -483,13 +486,14 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
     if (!isActive) stopCampaignSendPoll()
   }, [isActive, stopCampaignSendPoll])
 
-  const processSendChunk = async (campaignId) => {
+  const processSendBurst = async (campaignId) => {
     let lastError = null
     for (let attempt = 0; attempt < 2; attempt += 1) {
       try {
         return await api.processMarketingCampaignSends(campaignId, {
-          limit: 1,
-          timeoutMs: 300_000,
+          limit: 8,
+          burst: true,
+          timeoutMs: 120_000,
           silent: true,
         })
       } catch (e) {
@@ -502,103 +506,137 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
     throw lastError
   }
 
-  const pollCampaignSendsOnce = useCallback(async (campaignId) => {
-    if (!isActive) {
+  const drainCampaignQueue = useCallback(
+    async (campaignId, enrolled, initial = {}) => {
+      if (!isActive) return
       stopCampaignSendPoll()
-      return
-    }
-    const state = sendStateRef.current
-    if (!state || state.campaignId !== campaignId) return
-
-    try {
-      const chunk = await processSendChunk(campaignId)
-      state.totalSent += chunk.sendResult?.sent || 0
-      state.totalFailed += chunk.sendResult?.failed || 0
-      state.pending = chunk.pendingSends ?? 0
-      state.lastError = chunk.firstError || chunk.sendResult?.firstError || state.lastError
-
-      const parts = [`${state.totalSent} sent`]
-      if (state.totalFailed) parts.push(`${state.totalFailed} failed`)
-      if (state.pending > 0) parts.push(`${state.pending} remaining`)
-      setNotice(`Sending… ${parts.join(' · ')}`)
-
-      if (state.lastError && state.totalSent === 0 && state.totalFailed >= 3) {
-        stopCampaignSendPoll()
-        setError(state.lastError)
-        void load().catch(() => {})
-        return
-      }
-
-      if (chunk.sendResult?.processed === 0 && state.pending > 0) {
-        stopCampaignSendPoll()
-        setError(
-          state.lastError ||
-            'Could not process sends. Connect Work email in the sidebar, then start the campaign again.'
-        )
-        void load().catch(() => {})
-        return
-      }
-
-      if (state.pending > 0 && (chunk.sendResult?.sent || chunk.sendResult?.failed)) {
-        sendPollRef.current = setTimeout(() => {
-          void pollCampaignSendsOnce(campaignId)
-        }, 2500)
-        return
-      }
-
-      stopCampaignSendPoll()
-      if (state.pending > 0 && state.totalSent === 0) {
-        setError(
-          state.lastError ||
-            'No emails were sent. Open Work email in the sidebar, connect Gmail, then start the campaign again.'
-        )
-      } else if (state.pending > 0) {
-        setNotice(
-          `Campaign started — ${state.enrolled} enrolled, ${state.totalSent} sent${
-            state.totalFailed ? `, ${state.totalFailed} failed` : ''
-          }. ${state.pending} still queued — keep this tab open or start the campaign again to continue.`
-        )
-      } else {
-        setNotice(
-          `Campaign finished — ${state.enrolled} enrolled, ${state.totalSent} sent${
-            state.totalFailed ? `, ${state.totalFailed} failed` : ''
-          }`
-        )
-      }
-      void load().catch(() => {})
-      refreshSavedLeads?.()
-    } catch (e) {
-      stopCampaignSendPoll()
-      if (state.totalSent > 0) {
-        setNotice(
-          `Sending paused after ${state.totalSent} sent — ${state.pending} still queued. Start the campaign again to continue.`
-        )
-      } else {
-        setError(e.message)
-      }
-      void load().catch(() => {})
-    }
-  }, [isActive, load, refreshSavedLeads, stopCampaignSendPoll])
-
-  const beginCampaignSendPoll = useCallback(
-    (campaignId, enrolled, initial = {}) => {
-      stopCampaignSendPoll()
-      sendStateRef.current = {
+      const state = {
         campaignId,
         enrolled,
         totalSent: initial.sent || 0,
         totalFailed: initial.failed || 0,
         pending: initial.pending ?? enrolled,
+        queued: initial.queued ?? initial.pending ?? enrolled,
         lastError: initial.lastError || null,
       }
-      if (sendStateRef.current.pending > 0) {
-        sendPollRef.current = setTimeout(() => {
-          void pollCampaignSendsOnce(campaignId)
-        }, 800)
+      sendStateRef.current = state
+      sendPollRef.current = 'draining'
+
+      try {
+        let guard = 0
+        while (guard < 40 && state.pending > 0) {
+          guard += 1
+          const chunk = await processSendBurst(campaignId)
+          const sent = chunk.sendResult?.sent ?? chunk.sent ?? 0
+          const failed = chunk.sendResult?.failed ?? chunk.failed ?? 0
+          state.totalSent += sent
+          state.totalFailed += failed
+          state.pending = chunk.pendingSends ?? 0
+          state.queued = chunk.queuedSends ?? state.queued
+          state.lastError = chunk.firstError || chunk.sendResult?.firstError || state.lastError
+
+          const parts = [`${state.totalSent} sent`]
+          if (state.totalFailed) parts.push(`${state.totalFailed} failed`)
+          if (state.pending > 0) parts.push(`${state.pending} due now`)
+          if (state.queued > state.pending) parts.push(`${state.queued} in queue`)
+          setNotice(`Sending… ${parts.join(' · ')}`)
+
+          if (sent === 0 && failed === 0) break
+        }
+
+        if (state.lastError && state.totalSent === 0 && state.totalFailed >= 3) {
+          setError(state.lastError)
+        } else if (state.pending > 0 && state.totalSent === 0) {
+          setError(
+            state.lastError ||
+              'No emails were sent. Connect Work email in the sidebar, then use Continue sending.'
+          )
+        } else if (state.pending > 0) {
+          setNotice(
+            `Sent ${state.totalSent} of ${state.enrolled} — ${state.pending} still due. Click Continue sending or Resume.`
+          )
+        } else {
+          setNotice(
+            `Campaign finished — ${state.enrolled} enrolled, ${state.totalSent} sent${
+              state.totalFailed ? `, ${state.totalFailed} failed` : ''
+            }`
+          )
+        }
+        void load().catch(() => {})
+        refreshSavedLeads?.()
+      } catch (e) {
+        if (state.totalSent > 0) {
+          setNotice(
+            `Sent ${state.totalSent} so far — ${state.pending || state.queued} still queued. Use Continue sending.`
+          )
+        } else {
+          setError(e.message)
+        }
+        void load().catch(() => {})
+      } finally {
+        sendPollRef.current = null
+        sendStateRef.current = null
       }
     },
-    [pollCampaignSendsOnce, stopCampaignSendPoll]
+    [isActive, load, refreshSavedLeads, stopCampaignSendPoll]
   )
+
+  const continueCampaignSending = useCallback(
+    async (id) => {
+      setBusy(true)
+      setError(null)
+      try {
+        const data = await api.resumeMarketingCampaign(id, { timeoutMs: 120_000, silent: true })
+        const enrolled = data.campaign?.stats?.enrolled || 0
+        await drainCampaignQueue(id, enrolled, {
+          sent: data.sendResult?.sent || 0,
+          failed: data.sendResult?.failed || 0,
+          pending: data.pendingSends ?? 0,
+          queued: data.queuedSends ?? 0,
+          lastError: data.firstError,
+        })
+      } catch (e) {
+        setError(e.message)
+      } finally {
+        setBusy(false)
+      }
+    },
+    [drainCampaignQueue]
+  )
+
+  const pauseCampaign = async (id) => {
+    setBusy(true)
+    setError(null)
+    try {
+      await api.pauseMarketingCampaign(id)
+      stopCampaignSendPoll()
+      setNotice('Campaign paused — no more emails will send until you resume.')
+      await load()
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const stopCampaign = async (id, name) => {
+    const label = name
+      ? `Stop “${name}”? Unsent emails will be cancelled.`
+      : 'Stop this campaign? Unsent emails will be cancelled.'
+    if (!window.confirm(label)) return
+    setBusy(true)
+    setError(null)
+    try {
+      await api.stopMarketingCampaign(id)
+      stopCampaignSendPoll()
+      setNotice('Campaign stopped — remaining recipients will not receive this email.')
+      await load()
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setBusy(false)
+    }
+  }
 
   const startCampaign = async (id) => {
     stopCampaignSendPoll()
@@ -616,15 +654,18 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
         if (pending > 0) {
           setNotice(
             initialSent || initialFailed
-              ? `Campaign started — ${initialSent} sent, ${pending} remaining…`
-              : `Queued ${enrolled} recipients — sending one email at a time…`
+              ? `Campaign started — ${initialSent} sent, sending remaining recipients…`
+              : `Sending to ${enrolled} recipients…`
           )
-          beginCampaignSendPoll(id, enrolled, {
+          setBusy(false)
+          void drainCampaignQueue(id, enrolled, {
             sent: initialSent,
             failed: initialFailed,
             pending,
+            queued: data.queuedSends ?? pending,
             lastError: data.sendResult?.firstError || data.firstError,
           })
+          return
         } else if (initialSent === 0 && initialFailed > 0) {
           setError(
             data.sendResult?.firstError ||
@@ -908,6 +949,10 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
                         campaign={c}
                         busy={busy}
                         onStart={startCampaign}
+                        onPause={pauseCampaign}
+                        onResume={continueCampaignSending}
+                        onStop={stopCampaign}
+                        onContinue={continueCampaignSending}
                         onNavigate={onNavigate}
                         showCreator={Boolean(user?.isOrgAdmin && user?.accountType === 'company')}
                       />
@@ -1107,10 +1152,14 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
         ) : tab === 'reports' ? (
           <div className="crm-content-card crm-content-scroll flex-1 min-h-0">
           <CampaignReportsView
-            campaigns={campaigns}
+            campaigns={reportCampaigns}
             onNavigate={onNavigate}
             onDuplicate={duplicateCampaignForResend}
             onReload={load}
+            onPause={pauseCampaign}
+            onResume={continueCampaignSending}
+            onStop={stopCampaign}
+            onContinue={continueCampaignSending}
             busy={busy}
             initialCampaignId={panelOptions?.campaignId}
             showCreator={Boolean(user?.accountType === 'company')}
@@ -1239,15 +1288,30 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
   )
 }
 
-function CampaignCard({ campaign, busy, onStart, onNavigate, showCreator }) {
+function CampaignCard({
+  campaign,
+  busy,
+  onStart,
+  onPause,
+  onResume,
+  onStop,
+  onContinue,
+  onNavigate,
+  showCreator,
+}) {
   const statusClass = {
     draft: 'crm-status-draft',
     active: 'crm-status-active',
     paused: 'crm-status-paused',
     completed: 'crm-status-completed',
+    stopped: 'crm-status-paused',
     archived: 'crm-status-paused',
   }
   const stats = campaign.stats || {}
+  const enrolled = stats.enrolled || 0
+  const sent = stats.recipientsSent ?? stats.sent ?? 0
+  const stillQueued = enrolled > sent && ['active', 'paused'].includes(campaign.status)
+
   return (
     <div className="crm-campaign-card text-sm">
       <div className="flex items-start justify-between gap-2">
@@ -1259,8 +1323,9 @@ function CampaignCard({ campaign, busy, onStart, onNavigate, showCreator }) {
             )}
           </div>
           <p className="text-xs text-[#516f90] mt-0.5">
-            {campaign.type === 'sequence' ? 'Sequence' : 'One-shot'} · {stats.enrolled || 0} enrolled ·{' '}
-            {stats.sent || 0} sent
+            {campaign.type === 'sequence' ? 'Sequence' : 'One-shot'} · {enrolled} enrolled · {sent}{' '}
+            sent
+            {stillQueued ? ` · ${enrolled - sent} queued` : ''}
             {(stats.opens > 0 || stats.clicks > 0) && (
               <>
                 {' '}
@@ -1279,7 +1344,10 @@ function CampaignCard({ campaign, busy, onStart, onNavigate, showCreator }) {
         </span>
       </div>
       <div className="mt-2 flex flex-wrap gap-3">
-        {(stats.sent > 0 || campaign.status === 'completed' || campaign.status === 'active') && (
+        {(sent > 0 ||
+          campaign.status === 'completed' ||
+          campaign.status === 'active' ||
+          campaign.status === 'stopped') && (
           <button
             type="button"
             onClick={() => onNavigate?.('marketing', { tab: 'reports', campaignId: campaign.id })}
@@ -1297,6 +1365,56 @@ function CampaignCard({ campaign, busy, onStart, onNavigate, showCreator }) {
           >
             Start
           </button>
+        )}
+        {campaign.status === 'active' && (
+          <>
+            {stillQueued && (
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => onContinue?.(campaign.id)}
+                className="crm-link-btn p-0 disabled:opacity-50"
+              >
+                Continue sending
+              </button>
+            )}
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => onPause?.(campaign.id)}
+              className="crm-link-btn p-0 disabled:opacity-50"
+            >
+              Pause
+            </button>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => onStop?.(campaign.id, campaign.name)}
+              className="crm-link-btn p-0 text-red-800 disabled:opacity-50"
+            >
+              Stop
+            </button>
+          </>
+        )}
+        {campaign.status === 'paused' && (
+          <>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => onResume?.(campaign.id)}
+              className="crm-link-btn p-0 disabled:opacity-50"
+            >
+              Resume
+            </button>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => onStop?.(campaign.id, campaign.name)}
+              className="crm-link-btn p-0 text-red-800 disabled:opacity-50"
+            >
+              Stop
+            </button>
+          </>
         )}
       </div>
     </div>

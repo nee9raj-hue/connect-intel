@@ -1327,6 +1327,16 @@ textarea {
   color: #92400e;
 }
 
+.mc-reports-status--stopped {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.mc-reports-status--paused {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
 .mc-reports-table tbody tr:hover .font-medium {
   color: #ff773d;
 }

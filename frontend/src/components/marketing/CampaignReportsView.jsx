@@ -849,6 +849,10 @@ export default function CampaignReportsView({
   onNavigate,
   onDuplicate,
   onReload,
+  onPause,
+  onResume,
+  onStop,
+  onContinue,
   busy,
   initialCampaignId,
   showCreator = false,
@@ -1244,20 +1248,72 @@ export default function CampaignReportsView({
                           {stats.bounced || 0}
                         </td>
                         <td className="px-4 py-3 text-right whitespace-nowrap">
-                          <button
-                            type="button"
-                            onClick={(e) => openReport(c.id, e)}
-                            className="text-xs font-semibold text-[#FF773D] hover:underline mr-2"
-                          >
-                            View report
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => openRemoveModal([c.id])}
-                            className="text-xs font-semibold text-gray-500 hover:text-red-800"
-                          >
-                            {archiveOnly ? 'Delete' : 'Remove'}
-                          </button>
+                          <div className="flex flex-wrap justify-end gap-x-2 gap-y-1">
+                            <button
+                              type="button"
+                              onClick={(e) => openReport(c.id, e)}
+                              className="text-xs font-semibold text-[#FF773D] hover:underline"
+                            >
+                              View report
+                            </button>
+                            {!archiveOnly && c.status === 'active' && (
+                              <>
+                                {(enrolled > sentCount || sentCount < enrolled) && (
+                                  <button
+                                    type="button"
+                                    disabled={busy}
+                                    onClick={() => onContinue?.(c.id)}
+                                    className="text-xs font-semibold text-gray-700 hover:underline disabled:opacity-50"
+                                  >
+                                    Continue
+                                  </button>
+                                )}
+                                <button
+                                  type="button"
+                                  disabled={busy}
+                                  onClick={() => onPause?.(c.id)}
+                                  className="text-xs font-semibold text-gray-700 hover:underline disabled:opacity-50"
+                                >
+                                  Pause
+                                </button>
+                                <button
+                                  type="button"
+                                  disabled={busy}
+                                  onClick={() => onStop?.(c.id, c.name)}
+                                  className="text-xs font-semibold text-red-800 hover:underline disabled:opacity-50"
+                                >
+                                  Stop
+                                </button>
+                              </>
+                            )}
+                            {!archiveOnly && c.status === 'paused' && (
+                              <>
+                                <button
+                                  type="button"
+                                  disabled={busy}
+                                  onClick={() => onResume?.(c.id)}
+                                  className="text-xs font-semibold text-gray-700 hover:underline disabled:opacity-50"
+                                >
+                                  Resume
+                                </button>
+                                <button
+                                  type="button"
+                                  disabled={busy}
+                                  onClick={() => onStop?.(c.id, c.name)}
+                                  className="text-xs font-semibold text-red-800 hover:underline disabled:opacity-50"
+                                >
+                                  Stop
+                                </button>
+                              </>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => openRemoveModal([c.id])}
+                              className="text-xs font-semibold text-gray-500 hover:text-red-800"
+                            >
+                              {archiveOnly ? 'Delete' : 'Remove'}
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     )
