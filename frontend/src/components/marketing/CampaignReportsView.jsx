@@ -913,6 +913,71 @@ export default function CampaignReportsView({
   const allSelected = visibleRows.length > 0 && visibleRows.every((c) => selectedIds.has(c.id))
   const someSelected = selectedIds.size > 0
   const archiveOnly = folder === 'archive'
+  const controlBusy = busy || actionBusy
+
+  const handlePause =
+    onPause ||
+    (async (id) => {
+      setActionBusy(true)
+      setActionError(null)
+      try {
+        await api.pauseMarketingCampaign(id)
+        await onReload?.()
+      } catch (e) {
+        setActionError(e.message)
+      } finally {
+        setActionBusy(false)
+      }
+    })
+
+  const handleResume =
+    onResume ||
+    (async (id) => {
+      setActionBusy(true)
+      setActionError(null)
+      try {
+        await api.resumeMarketingCampaign(id, { timeoutMs: 120_000 })
+        await onReload?.()
+      } catch (e) {
+        setActionError(e.message)
+      } finally {
+        setActionBusy(false)
+      }
+    })
+
+  const handleStop =
+    onStop ||
+    (async (id, name) => {
+      const label = name
+        ? `Stop “${name}”? Unsent emails will be cancelled.`
+        : 'Stop this campaign? Unsent emails will be cancelled.'
+      if (!window.confirm(label)) return
+      setActionBusy(true)
+      setActionError(null)
+      try {
+        await api.stopMarketingCampaign(id)
+        await onReload?.()
+      } catch (e) {
+        setActionError(e.message)
+      } finally {
+        setActionBusy(false)
+      }
+    })
+
+  const handleContinue =
+    onContinue ||
+    (async (id) => {
+      setActionBusy(true)
+      setActionError(null)
+      try {
+        await api.resumeMarketingCampaign(id, { timeoutMs: 120_000 })
+        await onReload?.()
+      } catch (e) {
+        setActionError(e.message)
+      } finally {
+        setActionBusy(false)
+      }
+    })
 
   const toggleSelect = (id) => {
     setSelectedIds((prev) => {
@@ -1164,7 +1229,7 @@ export default function CampaignReportsView({
                     <th className="px-4 py-2 font-semibold text-right">Click rate</th>
                     <th className="px-4 py-2 font-semibold text-right">Unsubs</th>
                     <th className="px-4 py-2 font-semibold text-right">Bounced</th>
-                    <th className="px-4 py-2 font-semibold w-32" />
+                    <th className="px-4 py-2 font-semibold min-w-[220px]">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1247,40 +1312,40 @@ export default function CampaignReportsView({
                         <td className="px-4 py-3 tabular-nums text-right text-red-700">
                           {stats.bounced || 0}
                         </td>
-                        <td className="px-4 py-3 text-right whitespace-nowrap">
-                          <div className="flex flex-wrap justify-end gap-x-2 gap-y-1">
+                        <td className="px-4 py-3 text-right">
+                          <div className="mc-reports-actions">
                             <button
                               type="button"
                               onClick={(e) => openReport(c.id, e)}
-                              className="text-xs font-semibold text-[#FF773D] hover:underline"
+                              className="mc-reports-action mc-reports-action--primary"
                             >
-                              View report
+                              Report
                             </button>
                             {!archiveOnly && c.status === 'active' && (
                               <>
                                 {(enrolled > sentCount || sentCount < enrolled) && (
                                   <button
                                     type="button"
-                                    disabled={busy}
-                                    onClick={() => onContinue?.(c.id)}
-                                    className="text-xs font-semibold text-gray-700 hover:underline disabled:opacity-50"
+                                    disabled={controlBusy}
+                                    onClick={() => handleContinue(c.id)}
+                                    className="mc-reports-action"
                                   >
                                     Continue
                                   </button>
                                 )}
                                 <button
                                   type="button"
-                                  disabled={busy}
-                                  onClick={() => onPause?.(c.id)}
-                                  className="text-xs font-semibold text-gray-700 hover:underline disabled:opacity-50"
+                                  disabled={controlBusy}
+                                  onClick={() => handlePause(c.id)}
+                                  className="mc-reports-action"
                                 >
                                   Pause
                                 </button>
                                 <button
                                   type="button"
-                                  disabled={busy}
-                                  onClick={() => onStop?.(c.id, c.name)}
-                                  className="text-xs font-semibold text-red-800 hover:underline disabled:opacity-50"
+                                  disabled={controlBusy}
+                                  onClick={() => handleStop(c.id, c.name)}
+                                  className="mc-reports-action mc-reports-action--danger"
                                 >
                                   Stop
                                 </button>
@@ -1290,17 +1355,17 @@ export default function CampaignReportsView({
                               <>
                                 <button
                                   type="button"
-                                  disabled={busy}
-                                  onClick={() => onResume?.(c.id)}
-                                  className="text-xs font-semibold text-gray-700 hover:underline disabled:opacity-50"
+                                  disabled={controlBusy}
+                                  onClick={() => handleResume(c.id)}
+                                  className="mc-reports-action mc-reports-action--primary"
                                 >
                                   Resume
                                 </button>
                                 <button
                                   type="button"
-                                  disabled={busy}
-                                  onClick={() => onStop?.(c.id, c.name)}
-                                  className="text-xs font-semibold text-red-800 hover:underline disabled:opacity-50"
+                                  disabled={controlBusy}
+                                  onClick={() => handleStop(c.id, c.name)}
+                                  className="mc-reports-action mc-reports-action--danger"
                                 >
                                   Stop
                                 </button>
@@ -1309,9 +1374,9 @@ export default function CampaignReportsView({
                             <button
                               type="button"
                               onClick={() => openRemoveModal([c.id])}
-                              className="text-xs font-semibold text-gray-500 hover:text-red-800"
+                              className="mc-reports-action mc-reports-action--muted"
                             >
-                              {archiveOnly ? 'Delete' : 'Remove'}
+                              {archiveOnly ? 'Delete' : 'Archive'}
                             </button>
                           </div>
                         </td>

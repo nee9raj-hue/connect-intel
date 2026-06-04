@@ -1341,6 +1341,56 @@ textarea {
   color: #ff773d;
 }
 
+.mc-reports-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.35rem;
+  min-width: 12rem;
+}
+
+.mc-reports-action {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  padding: 0.3rem 0.55rem;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  color: #334155;
+  white-space: nowrap;
+}
+
+.mc-reports-action:hover:not(:disabled) {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+.mc-reports-action:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.mc-reports-action--primary {
+  border-color: #ffb899;
+  background: #fff4ee;
+  color: #c2410c;
+}
+
+.mc-reports-action--danger {
+  border-color: #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.mc-reports-action--danger:hover:not(:disabled) {
+  background: #fee2e2;
+  border-color: #f87171;
+}
+
+.mc-reports-action--muted {
+  color: #64748b;
+}
+
 .marketing-studio-popup {
   width: min(640px, 100%);
   max-height: min(88vh, 720px);
