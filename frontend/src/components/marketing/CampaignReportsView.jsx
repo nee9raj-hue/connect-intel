@@ -406,11 +406,6 @@ function CampaignDetailReport({
   const stats = report?.stats || {}
   const sentKpi = stats.recipientsSent ?? stats.sent ?? 0
   const allRecipients = report?.recipients || []
-  const reportScopeHint =
-    report?.reportScope === 'org_member'
-      ? 'Org campaign — you see all recipients and engagement for this campaign.'
-      : null
-
   const recipients = useMemo(() => {
     let rows = filterRecipients(allRecipients, filter)
     const q = search.trim().toLowerCase()
@@ -496,9 +491,9 @@ function CampaignDetailReport({
           {!isWhatsApp && (
             <p className="text-xs text-[#516f90] mt-1 leading-relaxed max-w-2xl">
               {report?.reportScope === 'org_member'
-                ? 'Team view: all org opens/clicks for your visible pipeline leads. Click a KPI to drill down, then expand a row for link activity.'
+                ? 'Team view: all enrolled recipients and engagement for org campaigns you can open. Click a KPI to drill down; expand a row for link activity.'
                 : 'Click a KPI to filter recipients. Expand a row for delivery details and clicked links.'}
-              {stats.sent > 0 && stats.uniqueOpens === 0 && stats.uniqueClicks === 0 && (
+              {sentKpi > 0 && stats.uniqueOpens === 0 && stats.uniqueClicks === 0 && (
                 <span className="block mt-1 text-amber-800">
                   Opens/clicks appear after recipients load images or click tracked links (some mail clients block
                   tracking).

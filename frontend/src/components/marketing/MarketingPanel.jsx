@@ -1113,7 +1113,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
             onReload={load}
             busy={busy}
             initialCampaignId={panelOptions?.campaignId}
-            showCreator={Boolean(user?.isOrgAdmin && user?.accountType === 'company')}
+            showCreator={Boolean(user?.accountType === 'company')}
           />
           </div>
         ) : tab === 'templates' ? (
