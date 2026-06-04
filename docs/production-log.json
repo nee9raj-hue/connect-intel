@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-02T08:24:27.600Z",
-  "updatedAtIst": "02/06/2026, 13:54:27",
+  "updatedAt": "2026-06-04T06:47:29.060Z",
+  "updatedAtIst": "04/06/2026, 12:17:29",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "48b1a9c",
+  "currentProductionCommit": "10607e4",
   "entries": [
+    {
+      "logId": "20260604-1217-10607e4",
+      "commit": "10607e4",
+      "commitFull": "10607e403db16771521d1f143382b646a4c8386a",
+      "message": "Fix bulk email crash, 100-lead cap, and per-recipient name personalization.",
+      "deployedAt": "2026-06-04T06:47:10.120Z",
+      "deployedAtIst": "04/06/2026, 12:17:10",
+      "committedAtIst": "04/06/2026, 12:07:22",
+      "vercelPreviewUrl": "https://connect-intel-4yrhwngeq-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 10607e4"
+    },
+    {
+      "logId": "20260602-1355-754c59b",
+      "commit": "754c59b",
+      "commitFull": "754c59b97e51f16f4e6e7315a3920867f67d21da",
+      "message": "Update production log after immersive canvas scroll deploy.",
+      "deployedAt": "2026-06-02T08:25:02.619Z",
+      "deployedAtIst": "02/06/2026, 13:55:02",
+      "committedAtIst": "02/06/2026, 13:54:30",
+      "vercelPreviewUrl": "https://connect-intel-dbql6lq7d-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 754c59b"
+    },
     {
       "logId": "20260602-1354-48b1a9c",
       "commit": "48b1a9c",
@@ -15,7 +43,7 @@
       "committedAtIst": "02/06/2026, 13:53:37",
       "vercelPreviewUrl": "https://connect-intel-6l1vhq3jc-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 48b1a9c"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 19f05f9"
-    },
-    {
-      "logId": "20260530-2024-0f2a5a3",
-      "commit": "0f2a5a3",
-      "commitFull": "0f2a5a3961b959dac91847e173bf30ad45dbbc9e",
-      "message": "Update production log after leads label visibility deploy.",
-      "deployedAt": "2026-05-30T14:54:31.429Z",
-      "deployedAtIst": "30/05/2026, 20:24:31",
-      "committedAtIst": "30/05/2026, 20:24:04",
-      "vercelPreviewUrl": "https://connect-intel-1jles3l5e-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 0f2a5a3"
-    },
-    {
-      "logId": "20260530-2023-e232928",
-      "commit": "e232928",
-      "commitFull": "e2329287c649445ef145e805ac161d916cf0d94e",
-      "message": "Keep leads action and filter labels visible on all viewports.",
-      "deployedAt": "2026-05-30T14:53:46.033Z",
-      "deployedAtIst": "30/05/2026, 20:23:46",
-      "committedAtIst": "30/05/2026, 20:23:18",
-      "vercelPreviewUrl": "https://connect-intel-pqm5anllm-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- e232928"
     }
   ]
 }
