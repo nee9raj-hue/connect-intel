@@ -55,11 +55,12 @@ export default function BulkEmailCompose({ leadIds, leads, onDone, compact = fal
       setBody(data.draft.body || '')
       setDraftAi(Boolean(data.draft.aiGenerated))
       const name = leadDisplayName(sampleLead)
+      const sampleFirst = sampleLead.firstName?.trim() || '(no first name on this lead)'
       setNotice(
         data.draft.notice ||
-          `Sample draft for ${name} — review below. ${
+          `Sample draft for ${name} (first name: ${sampleFirst}) — review below. ${
             personalizeEach
-              ? 'Each recipient will get a personalized AI version when you send.'
+              ? 'On send, AI writes a separate email per lead using each person’s first name when available.'
               : 'Same text will go to everyone unless you edit it.'
           }`
       )
@@ -242,7 +243,7 @@ export default function BulkEmailCompose({ leadIds, leads, onDone, compact = fal
               placeholder={
                 personalizeEach
                   ? 'Generate a sample draft above, or leave blank to let AI write each email at send'
-                  : 'Message body (same for all recipients)'
+                  : 'Message body — Dear {{firstName}} or Dear [Name] is replaced per recipient'
               }
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono text-xs"
             />
@@ -250,7 +251,9 @@ export default function BulkEmailCompose({ leadIds, leads, onDone, compact = fal
         ) : (
           <>
             <p className="text-xs text-gray-500">
-              Same subject and body for every selected lead. Sends via your connected work or company email.
+              Same template for every lead — use <code className="text-[11px]">{'{{firstName}}'}</code> or{' '}
+              <code className="text-[11px]">[Name]</code> and each recipient gets their own first name (up to 100
+              per batch). Sends via your connected work or company email.
             </p>
             <input
               value={subject}
