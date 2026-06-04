@@ -956,6 +956,7 @@ export default function CampaignReportsView({
       setActionError(null)
       try {
         await api.stopMarketingCampaign(id)
+        setActionError(null)
         await onReload?.()
       } catch (e) {
         setActionError(e.message)
@@ -1321,9 +1322,10 @@ export default function CampaignReportsView({
                             >
                               Report
                             </button>
-                            {!archiveOnly && c.status === 'active' && (
+                            {!archiveOnly &&
+                              (c.status === 'active' || c.status === 'paused') && (
                               <>
-                                {(enrolled > sentCount || sentCount < enrolled) && (
+                                {enrolled > sentCount && (
                                   <button
                                     type="button"
                                     disabled={controlBusy}

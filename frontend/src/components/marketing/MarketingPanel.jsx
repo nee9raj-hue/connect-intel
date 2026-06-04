@@ -629,6 +629,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
     try {
       await api.stopMarketingCampaign(id)
       stopCampaignSendPoll()
+      setError(null)
       setNotice('Campaign stopped — remaining recipients will not receive this email.')
       await load()
     } catch (e) {
