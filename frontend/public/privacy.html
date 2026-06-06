@@ -25,13 +25,17 @@
   </ul>
 
   <h2>How we use Google user data</h2>
-  <p>Connect Intel requests Google OAuth scopes only when you explicitly connect your work Gmail:</p>
+  <p>Connect Intel requests Google OAuth scopes only when you explicitly connect your work Gmail or Google Calendar:</p>
   <ul>
     <li><strong>gmail.send</strong> — To send CRM emails you compose in Connect Intel from your own work mailbox (e.g. sales@yourcompany.com). We do not send email without your action.</li>
     <li><strong>gmail.readonly</strong> (optional) — To sync replies between your mailbox and leads already in your CRM pipeline. We query Gmail only for threads involving lead email addresses you are working on.</li>
-    <li><strong>email / profile</strong> — To identify which Google account you connected and display your connected mailbox in settings.</li>
+    <li><strong>calendar.events</strong> (optional) — To show your Google Calendar events in the Connect Intel calendar view and to add CRM meetings you create to your Google Calendar. We do not modify or delete unrelated calendar events.</li>
+    <li><strong>email / profile / openid</strong> — To sign you in and identify which Google account you connected.</li>
   </ul>
-  <p>We do <strong>not</strong> sell Google user data. We do <strong>not</strong> use Gmail data for advertising. We do <strong>not</strong> read unrelated personal email.</p>
+  <p>We do <strong>not</strong> sell Google user data. We do <strong>not</strong> use Gmail or Calendar data for advertising. We do <strong>not</strong> read unrelated personal email or calendar entries.</p>
+
+  <h2>AI features and Google data</h2>
+  <p>Connect Intel may use third-party AI (e.g. Google Gemini) to draft email or WhatsApp text from CRM fields you enter (lead name, company, notes). <strong>We do not use Google Workspace API data (Gmail or Calendar content) to train machine-learning models.</strong> AI suggestions are generated at request time for the signed-in user and are not retained for model training.</p>
 
   <h2>Google API Services User Data Policy</h2>
   <p>Connect Intel’s use of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a>, including the Limited Use requirements. In summary:</p>

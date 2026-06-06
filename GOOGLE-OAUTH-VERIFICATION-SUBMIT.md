@@ -28,7 +28,7 @@ Project: **Connect Intel** (same OAuth client as login)
 | App logo | Upload Connect Intel logo |
 | Application home page | https://connectintel.net |
 | Privacy policy | https://connectintel.net/privacy.html |
-| Terms of service | https://connectintel.net/privacy.html (or add /terms later) |
+| Terms of service | https://connectintel.net/terms.html |
 | Authorized domains | connectintel.net |
 
 [Audience](https://console.cloud.google.com/auth/audience):

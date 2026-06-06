@@ -149,7 +149,7 @@ Check operator dashboard: **System status** → Google OAuth phase should show *
 | Branding + legal URLs | 1 day |
 | Video + submission | 1 day |
 | Google review (gmail.send) | 1–4+ weeks |
-| CASA / security assessment | Sometimes required; add weeks |
+| CASA Tier 2 security assessment | **Required** — 4–6 weeks; see `docs/GOOGLE_CASA_AND_VERIFICATION.md` |
 
 ---
 
