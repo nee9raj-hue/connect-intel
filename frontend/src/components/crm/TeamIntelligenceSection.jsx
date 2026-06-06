@@ -191,6 +191,21 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
   const comparison = intel?.comparison || {}
   const statusBreakdown = (data?.statusBreakdown || []).filter((r) => r.count > 0)
 
+  const activityTotals = useMemo(() => {
+    const days = data?.activityByDay || []
+    return days.reduce(
+      (acc, d) => ({
+        calls: acc.calls + (d.call || 0),
+        emails: acc.emails + (d.email || 0),
+        tasksCreated: acc.tasksCreated + (d.task || 0),
+        meetings: acc.meetings + (d.meeting || 0),
+        whatsapp: acc.whatsapp + (d.whatsapp || 0),
+        contactsOpened: acc.contactsOpened + (d.count > 0 ? 1 : 0),
+      }),
+      { calls: 0, emails: 0, tasksCreated: 0, meetings: 0, whatsapp: 0, contactsOpened: 0 }
+    )
+  }, [data?.activityByDay])
+
   if (!isActive) return null
 
   return (
@@ -279,8 +294,9 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
           <div className="team-intelligence-kpi-grid">
             {TEAM_KPIS.map((item) => {
               const intelVal = item.intelKey ? rollup[item.intelKey] : null
+              const chartVal = item.intelKey ? activityTotals[item.intelKey] : null
               const summaryVal = item.summaryKey ? summary[item.summaryKey] : null
-              const raw = intelVal ?? summaryVal ?? 0
+              const raw = intelVal ?? chartVal ?? summaryVal ?? 0
               let value = raw.toLocaleString()
               if (item.format === 'currency') value = formatDealValue(raw)
               if (item.format === 'hours') value = formatHours(raw)
