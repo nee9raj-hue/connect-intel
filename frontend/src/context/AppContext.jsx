@@ -597,12 +597,31 @@ export function AppProvider({ children }) {
       return current
     })
 
+    const needsFullReload = Boolean(
+      body?.activity ||
+        body?.task ||
+        body?.meeting ||
+        body?.fieldVisit ||
+        body?.contact ||
+        (body?.crm &&
+          Object.keys(body.crm).some((k) => !['status', 'responseReceived'].includes(k)))
+    )
+
     try {
       const data = await api.updateSavedLead(leadId, body)
-      if (data.lead) {
-        setSavedLeads((current) => mergeLeadInList(current, data.lead))
+      let lead = data.lead
+      if (lead && needsFullReload) {
+        try {
+          const full = await api.getPipelineLead(leadId, { silent: true })
+          if (full?.lead) lead = full.lead
+        } catch {
+          // keep PATCH payload if full fetch fails
+        }
       }
-      return data.lead
+      if (lead) {
+        setSavedLeads((current) => mergeLeadInList(current, lead))
+      }
+      return lead
     } catch (error) {
       setSavedLeads(previous)
       throw error
