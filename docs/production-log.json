@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-06T10:25:56.050Z",
-  "updatedAtIst": "06/06/2026, 15:55:56",
+  "updatedAt": "2026-06-06T10:46:35.791Z",
+  "updatedAtIst": "06/06/2026, 16:16:35",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "0d8c71f",
+  "currentProductionCommit": "1c612f9",
   "entries": [
+    {
+      "logId": "20260606-1615-1c612f9",
+      "commit": "1c612f9",
+      "commitFull": "1c612f9bd90dce4530e349c7cf6fc5d915f999a9",
+      "message": "Fix deploy: keep single Vercel cron (reminders run via daily cron + live poll).",
+      "deployedAt": "2026-06-06T10:45:39.404Z",
+      "deployedAtIst": "06/06/2026, 16:15:39",
+      "committedAtIst": "06/06/2026, 16:15:13",
+      "vercelPreviewUrl": "https://connect-intel-hegxk8blj-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 1c612f9"
+    },
+    {
+      "logId": "20260606-1556-fd1eebe",
+      "commit": "fd1eebe",
+      "commitFull": "fd1eebe20621a221c227e4913fde4bbba08be35f",
+      "message": "Log production deploy 0d8c71f (CRM pipeline and bulk email fixes).",
+      "deployedAt": "2026-06-06T10:26:26.288Z",
+      "deployedAtIst": "06/06/2026, 15:56:26",
+      "committedAtIst": "06/06/2026, 15:55:59",
+      "vercelPreviewUrl": "https://connect-intel-lmt887xq8-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- fd1eebe"
+    },
     {
       "logId": "20260606-1555-0d8c71f",
       "commit": "0d8c71f",
@@ -15,7 +43,7 @@
       "committedAtIst": "06/06/2026, 15:55:10",
       "vercelPreviewUrl": "https://connect-intel-ggu7547fe-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 0d8c71f"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 6512225"
-    },
-    {
-      "logId": "20260601-1245-44a2b25",
-      "commit": "44a2b25",
-      "commitFull": "44a2b2555390c7f1f191d02ceb3776c5d1732313",
-      "message": "Speed up pipeline lead assignment after shard PATCH fix.",
-      "deployedAt": "2026-06-01T07:15:58.380Z",
-      "deployedAtIst": "01/06/2026, 12:45:58",
-      "committedAtIst": "01/06/2026, 12:44:27",
-      "vercelPreviewUrl": "https://connect-intel-5fckfc67e-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 44a2b25"
-    },
-    {
-      "logId": "20260601-1239-46ef252",
-      "commit": "46ef252",
-      "commitFull": "46ef2525d14a5160a94b8f500cb062dc75672fce",
-      "message": "Update production log after pipeline timeout fix deploy.",
-      "deployedAt": "2026-06-01T07:09:14.958Z",
-      "deployedAtIst": "01/06/2026, 12:39:14",
-      "committedAtIst": "01/06/2026, 12:38:45",
-      "vercelPreviewUrl": "https://connect-intel-3ngx2syyf-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 46ef252"
     }
   ]
 }
