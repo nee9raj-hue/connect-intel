@@ -146,7 +146,7 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
     if (isCompany && hasWorkspaceFeature(user, 'homeTeamMetrics')) {
       tiles.push({
         id: 'team-metrics',
-        label: 'Team metrics',
+        label: 'Team intelligence',
         panel: 'crm-dashboard',
         icon: 'chart',
         desc: 'Performance',
@@ -165,7 +165,7 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
         className="crm-btn crm-btn-secondary crm-btn-sm"
         onClick={() => go({ panel: 'crm-dashboard' })}
       >
-        Team metrics
+        Team intelligence
       </button>
     ) : null
 

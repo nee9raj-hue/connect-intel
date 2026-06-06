@@ -18,6 +18,7 @@ import CrmGmailOAuthNotice from './CrmGmailOAuthNotice'
 import MobileRequiredModal from '../profile/MobileRequiredModal'
 import PanelViewport from './PanelViewport'
 import { useWorkspaceSync } from '../../hooks/useWorkspaceSync'
+import { useWorkspacePulse } from '../../hooks/useWorkspacePulse'
 import SessionReconnectBanner from './SessionReconnectBanner'
 import GmailSetupModal, { markGmailSetupDone, useGmailSetupNeeded } from '../onboarding/GmailSetupModal'
 import ConnectAssistant from '../assistant/ConnectAssistant'
@@ -101,6 +102,12 @@ export default function AppShell() {
         void refreshChithiUnread()
       }
     },
+  })
+
+  useWorkspacePulse({
+    enabled: Boolean(user?.onboardingComplete || user?.isPlatformAdmin),
+    userId: user?.id,
+    panel: activePanel,
   })
 
   useEffect(() => {

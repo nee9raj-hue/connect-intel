@@ -741,6 +741,9 @@ export function AppProvider({ children }) {
   const openPipelineLead = useCallback((leadId, tab = null) => {
     if (tab) pendingLeadOpenRef.current = { leadId, tab }
     setPipelineLeadId(leadId)
+    if (leadId) {
+      void api.postWorkspacePulse({ leadId, panel: 'pipeline' }, { silent: true })
+    }
   }, [])
 
   const consumePendingLeadTab = useCallback((leadId) => {

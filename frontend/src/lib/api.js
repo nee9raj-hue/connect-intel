@@ -265,6 +265,8 @@ export const api = {
     ),
   getCrmTeamDashboard: (query = '') =>
     request(`/api/crm/team-dashboard${query ? `?${query}` : ''}`, { timeoutMs: 60_000 }),
+  postWorkspacePulse: (body = {}) =>
+    request('/api/crm/workspace-pulse', { method: 'POST', body }, { silent: true }),
   ackMeetingReminder: (leadId, meetingId, { silent = false } = {}) =>
     request('/api/crm/reminders-ack', { method: 'POST', body: { leadId, meetingId } }, { silent }),
   getCrmGmailStatus: () => request('/api/crm/email-gmail-status'),

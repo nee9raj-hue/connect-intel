@@ -116,7 +116,7 @@ export function buildCustomerNavSections(user, { pipelineCounts = {}, upcomingCo
 
   const homeChildren = [
     { id: 'home-dashboard', label: 'Dashboard', panel: 'overview' },
-    ...(showTeamDash ? [{ id: 'home-team', label: 'Team metrics', panel: 'crm-dashboard' }] : []),
+    ...(showTeamDash ? [{ id: 'home-team', label: 'Team intelligence', panel: 'crm-dashboard' }] : []),
     { id: 'home-activity', label: 'Activity log', panel: 'crm-log' },
   ]
 
