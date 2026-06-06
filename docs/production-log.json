@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-06T11:20:36.484Z",
-  "updatedAtIst": "06/06/2026, 16:50:36",
+  "updatedAt": "2026-06-06T11:25:28.792Z",
+  "updatedAtIst": "06/06/2026, 16:55:28",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "d724b6c",
+  "currentProductionCommit": "ed53a23",
   "entries": [
+    {
+      "logId": "20260606-1655-ed53a23",
+      "commit": "ed53a23",
+      "commitFull": "ed53a233ad85ef9b9b9ed6589b1cecd4f777b546",
+      "message": "Fix blank page after refresh by removing broken Recharts bundle.",
+      "deployedAt": "2026-06-06T11:25:08.075Z",
+      "deployedAtIst": "06/06/2026, 16:55:08",
+      "committedAtIst": "06/06/2026, 16:54:41",
+      "vercelPreviewUrl": "https://connect-intel-5uah2nxwb-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- ed53a23"
+    },
+    {
+      "logId": "20260606-1651-87efbd3",
+      "commit": "87efbd3",
+      "commitFull": "87efbd35041c0ae1756a71b9e17f0dc4fffeaaf3",
+      "message": "Log production deploy d724b6c (Team intelligence dashboard).",
+      "deployedAt": "2026-06-06T11:21:20.674Z",
+      "deployedAtIst": "06/06/2026, 16:51:20",
+      "committedAtIst": "06/06/2026, 16:50:51",
+      "vercelPreviewUrl": "https://connect-intel-qwobe9k84-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 87efbd3"
+    },
     {
       "logId": "20260606-1650-d724b6c",
       "commit": "d724b6c",
@@ -15,7 +43,7 @@
       "committedAtIst": "06/06/2026, 16:49:54",
       "vercelPreviewUrl": "https://connect-intel-er58ip5o7-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- d724b6c"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 10607e4"
-    },
-    {
-      "logId": "20260602-1355-754c59b",
-      "commit": "754c59b",
-      "commitFull": "754c59b97e51f16f4e6e7315a3920867f67d21da",
-      "message": "Update production log after immersive canvas scroll deploy.",
-      "deployedAt": "2026-06-02T08:25:02.619Z",
-      "deployedAtIst": "02/06/2026, 13:55:02",
-      "committedAtIst": "02/06/2026, 13:54:30",
-      "vercelPreviewUrl": "https://connect-intel-dbql6lq7d-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 754c59b"
-    },
-    {
-      "logId": "20260602-1354-48b1a9c",
-      "commit": "48b1a9c",
-      "commitFull": "48b1a9c36192ddfecd176851838d5d1827f5c2f6",
-      "message": "Fix immersive canvas trackpad scrolling over email content.",
-      "deployedAt": "2026-06-02T08:24:07.375Z",
-      "deployedAtIst": "02/06/2026, 13:54:07",
-      "committedAtIst": "02/06/2026, 13:53:37",
-      "vercelPreviewUrl": "https://connect-intel-6l1vhq3jc-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 48b1a9c"
     }
   ]
 }
