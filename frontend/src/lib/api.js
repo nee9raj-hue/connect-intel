@@ -264,7 +264,7 @@ export const api = {
       { silent }
     ),
   getCrmTeamDashboard: (query = '') =>
-    request(`/api/crm/team-dashboard${query ? `?${query}` : ''}`, { timeoutMs: 60_000 }),
+    request(`/api/crm/team-dashboard${query ? `?${query}` : ''}`, { timeoutMs: 120_000 }),
   postWorkspacePulse: (body = {}) =>
     request('/api/crm/workspace-pulse', { method: 'POST', body }, { silent: true }),
   ackMeetingReminder: (leadId, meetingId, { silent = false } = {}) =>
