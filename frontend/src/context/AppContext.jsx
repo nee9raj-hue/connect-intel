@@ -474,6 +474,14 @@ export function AppProvider({ children }) {
     }
   }, [user?.id, user?.organizationId, user?.accountType])
 
+  useEffect(() => {
+    if (!user?.id || !pipelineAssigneeFilter) return
+    const allowed = new Set([String(user.id), ...teamMembers.map((m) => String(m.userId))])
+    if (!allowed.has(String(pipelineAssigneeFilter))) {
+      setPipelineAssigneeFilter(null)
+    }
+  }, [user?.id, teamMembers, pipelineAssigneeFilter, setPipelineAssigneeFilter])
+
   const acceptPendingInvite = useCallback(async () => {
     const token = getStoredInviteToken()
     if (!token) return null
