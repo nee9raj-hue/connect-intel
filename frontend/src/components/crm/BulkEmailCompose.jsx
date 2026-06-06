@@ -81,8 +81,12 @@ export default function BulkEmailCompose({ leadIds, leads, onDone, compact = fal
       setError('Add an agenda (at least a short sentence) for AI personalization')
       return
     }
-    if (!useAiPerLead && (!subject.trim() || !body.trim())) {
-      setError('Generate or write subject and message before sending')
+    if (!useAiPerLead && !subject.trim()) {
+      setError('Subject line is required before sending')
+      return
+    }
+    if (!useAiPerLead && !body.trim()) {
+      setError('Message body is required before sending')
       return
     }
     setBusy(true)

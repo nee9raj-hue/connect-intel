@@ -142,6 +142,10 @@ export default function LeadWorkspace({
   const [editingVisitMeetingId, setEditingVisitMeetingId] = useState(null)
 
   const isManager = user?.isOrgAdmin || user?.orgRole === 'org_admin'
+  const canAssignThisLead =
+    isManager ||
+    (user?.accountType === 'company' && String(lead.assignedToUserId || '') === String(user?.id || ''))
+  const canScheduleForTeam = isManager || canAssignThisLead
   const fieldVisitExpensesEnabled = hasWorkspaceFeature(user, 'fieldVisitExpenses')
   const crm = lead.crm || {}
   const timeline = buildUnifiedTimeline(crm)
@@ -304,8 +308,8 @@ export default function LeadWorkspace({
           action: 'add',
           title: taskTitle.trim(),
           dueAt: fromDatetimeLocalValue(taskDue),
-          assignedToUserId: isManager ? taskAssignee : user.id,
-          participantUserIds: taskParticipants.filter((id) => id !== (isManager ? taskAssignee : user.id)),
+          assignedToUserId: canScheduleForTeam ? taskAssignee : user.id,
+          participantUserIds: taskParticipants.filter((id) => id !== (canScheduleForTeam ? taskAssignee : user.id)),
         },
       },
       'Task saved'
@@ -333,9 +337,9 @@ export default function LeadWorkspace({
           type: meetingType,
           location: meetingLocation,
           notes: meetingNotes,
-          assignedToUserId: isManager ? meetingAssignee : user.id,
+          assignedToUserId: canScheduleForTeam ? meetingAssignee : user.id,
           participantUserIds: meetingParticipants.filter(
-            (id) => id !== (isManager ? meetingAssignee : user.id)
+            (id) => id !== (canScheduleForTeam ? meetingAssignee : user.id)
           ),
         },
       },
@@ -923,7 +927,7 @@ export default function LeadWorkspace({
               </section>
             )}
 
-            {isManager && user?.accountType === 'company' && teamMembers.length > 0 && (
+            {canAssignThisLead && user?.accountType === 'company' && teamMembers.length > 0 && (
               <section>
                 <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Transfer / assign lead</h3>
                 <select
@@ -1088,7 +1092,7 @@ export default function LeadWorkspace({
                   className="w-full text-xs border rounded-lg px-2.5 py-1.5"
                 />
                 <p className="text-xs text-gray-400">Due date appears on team calendar</p>
-                {isManager && teamMembers.length > 0 && (
+                {canScheduleForTeam && teamMembers.length > 0 && (
                   <select value={taskAssignee} onChange={(e) => setTaskAssignee(e.target.value)} className="w-full text-xs border rounded-lg px-2.5 py-1.5">
                     {teamMembers.map((m) => (
                       <option key={m.userId} value={m.userId}>
@@ -1100,7 +1104,7 @@ export default function LeadWorkspace({
                 {teamMembers.length > 0 && (
                   <TeamParticipantPicker
                     members={teamMembers}
-                    primaryUserId={isManager ? taskAssignee : user.id}
+                    primaryUserId={canScheduleForTeam ? taskAssignee : user.id}
                     value={taskParticipants}
                     onChange={setTaskParticipants}
                   />
@@ -1147,7 +1151,7 @@ export default function LeadWorkspace({
                 <input type="datetime-local" value={meetingWhen} onChange={(e) => setMeetingWhen(e.target.value)} className="w-full text-xs border rounded-lg px-2.5 py-1.5" />
                 <input value={meetingLocation} onChange={(e) => setMeetingLocation(e.target.value)} placeholder="Location" className="w-full text-xs border rounded-lg px-2.5 py-1.5" />
                 <textarea value={meetingNotes} onChange={(e) => setMeetingNotes(e.target.value)} rows={2} placeholder="Agenda" className="w-full text-xs border rounded-lg px-2.5 py-1.5" />
-                {isManager && teamMembers.length > 0 && (
+                {canScheduleForTeam && teamMembers.length > 0 && (
                   <select value={meetingAssignee} onChange={(e) => setMeetingAssignee(e.target.value)} className="w-full text-xs border rounded-lg px-2.5 py-1.5">
                     {teamMembers.map((m) => (
                       <option key={m.userId} value={m.userId}>
@@ -1159,7 +1163,7 @@ export default function LeadWorkspace({
                 {teamMembers.length > 0 && (
                   <TeamParticipantPicker
                     members={teamMembers}
-                    primaryUserId={isManager ? meetingAssignee : user.id}
+                    primaryUserId={canScheduleForTeam ? meetingAssignee : user.id}
                     value={meetingParticipants}
                     onChange={setMeetingParticipants}
                     label="Also attending (team)"
