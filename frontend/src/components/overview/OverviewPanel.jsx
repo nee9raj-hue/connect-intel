@@ -115,6 +115,12 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
 
   const recentNotifs = notifications.filter((n) => n.unread).slice(0, 5)
   const pipelineTotal = pipelineSummary.total || savedLeads.length
+  const marketingOpenRate = marketingSummary?.sent
+    ? Math.round(((marketingSummary.opens || 0) / marketingSummary.sent) * 100)
+    : 0
+  const marketingClickRate = marketingSummary?.sent
+    ? Math.round(((marketingSummary.clicks || 0) / marketingSummary.sent) * 100)
+    : 0
 
   const headerActions = null
 
@@ -133,33 +139,44 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
       <div className="dashboard-kpi-grid">
         <DashboardKpiCard
           icon="pipeline"
+          className="dashboard-kpi-card--pipeline"
           label="Pipeline leads"
           value={(pipelineTotal || 0).toLocaleString()}
+          badge={pipelineTotal ? `${Math.round((replied / Math.max(1, pipelineTotal)) * 100)}% replied` : null}
           hint={
             pipelineLoad.hasMore
               ? `${savedLeads.length.toLocaleString()} loaded · ${replied} replied`
               : `${replied} replied`
           }
+          progress={pipelineTotal ? (replied / Math.max(1, pipelineTotal)) * 100 : 0}
           onClick={() => go({ panel: 'pipeline', status: 'all' })}
         />
         <DashboardKpiCard
           icon="calendar"
+          className="dashboard-kpi-card--followup"
           label="Follow-up due"
           value={followUpDue.toLocaleString()}
+          badge={followUpDue > 0 ? 'Needs action' : 'On track'}
           hint="Next 7 days"
+          progress={pipelineTotal ? (followUpDue / Math.max(1, pipelineTotal)) * 100 : 0}
           onClick={() => go({ panel: 'pipeline', status: 'follow_up' })}
         />
         <DashboardKpiCard
           icon="task"
+          className="dashboard-kpi-card--upcoming"
           label="Upcoming"
           value={(upcomingLocal || upcomingEvents.length).toLocaleString()}
+          badge={upcomingEvents.length ? `${upcomingEvents.length} booked` : 'Calendar'}
           hint="Meetings & tasks"
+          progress={Math.min(100, ((upcomingLocal || upcomingEvents.length) / 6) * 100)}
           onClick={() => go({ panel: 'crm-calendar', upcomingOnly: true })}
         />
         <DashboardKpiCard
           icon="spark"
+          className="dashboard-kpi-card--credits"
           label="Credits"
           value={`₹${((user?.creditsPaise ?? 0) / 100).toFixed(0)}`}
+          badge={`${user?.searchesLeft ?? 0} AI left`}
           hint={`${user?.searchesLeft ?? 0} AI searches left`}
           onClick={() => go({ panel: 'search' })}
         />
@@ -180,6 +197,7 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
 
       <DashboardSection
         title="Pipeline by stage"
+        subtitle="Stage coverage across the visible pipeline"
         actionLabel="Open pipeline"
         onAction={() => go({ panel: 'pipeline', status: 'all' })}
       >
@@ -197,28 +215,21 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
       </DashboardSection>
 
       <div className="dashboard-layout-2-1">
-        <DashboardSection title="Marketing" actionLabel="Reports" onAction={() => go({ panel: 'marketing', tab: 'reports' })}>
+        <DashboardSection
+          title="Marketing"
+          subtitle="Campaign output and engagement at a glance"
+          actionLabel="Reports"
+          onAction={() => go({ panel: 'marketing', tab: 'reports' })}
+        >
           {loadingExtras ? (
             <DashboardEmpty>Loading marketing stats…</DashboardEmpty>
           ) : marketingSummary ? (
-            <ul className="dashboard-stat-list">
-              <li>
-                <span>Campaigns</span>
-                <span>{marketingSummary.campaigns}</span>
-              </li>
-              <li>
-                <span>Sent</span>
-                <span>{marketingSummary.sent}</span>
-              </li>
-              <li>
-                <span>Opens</span>
-                <span>{marketingSummary.opens}</span>
-              </li>
-              <li>
-                <span>Clicks</span>
-                <span>{marketingSummary.clicks}</span>
-              </li>
-            </ul>
+            <div className="dashboard-marketing-grid">
+              <OverviewStatMini label="Campaigns" value={marketingSummary.campaigns} accent="default" />
+              <OverviewStatMini label="Sent" value={marketingSummary.sent} accent="default" />
+              <OverviewStatMini label="Open rate" value={`${marketingOpenRate}%`} accent="soft" />
+              <OverviewStatMini label="Click rate" value={`${marketingClickRate}%`} accent="soft" />
+            </div>
           ) : (
             <DashboardEmpty>No campaigns</DashboardEmpty>
           )}
@@ -244,7 +255,12 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
       </div>
 
       <div className="dashboard-layout-2">
-        <DashboardSection title="Upcoming meetings & tasks" actionLabel="View calendar" onAction={() => go({ panel: 'crm-calendar', upcomingOnly: true })}>
+        <DashboardSection
+          title="Upcoming meetings & tasks"
+          subtitle="Next items already scheduled in CRM"
+          actionLabel="View calendar"
+          onAction={() => go({ panel: 'crm-calendar', upcomingOnly: true })}
+        >
           {loadingExtras ? (
             <DashboardEmpty>Loading calendar…</DashboardEmpty>
           ) : upcomingEvents.length === 0 ? (
@@ -296,7 +312,12 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
       </div>
 
       <div className="dashboard-layout-2">
-        <DashboardSection title="Recent AI searches" actionLabel="New search" onAction={() => go({ panel: 'search' })}>
+        <DashboardSection
+          title="Recent AI searches"
+          subtitle="Your latest prospecting prompts and result counts"
+          actionLabel="New search"
+          onAction={() => go({ panel: 'search' })}
+        >
           {searchHistory.length === 0 ? (
             <DashboardEmpty>No searches</DashboardEmpty>
           ) : (
@@ -315,7 +336,12 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
         </DashboardSection>
 
         {isCompany && teamMembers.length > 0 && (
-          <DashboardSection title="Team settings" actionLabel="Manage team" onAction={() => go({ panel: 'team' })}>
+          <DashboardSection
+            title="Team settings"
+            subtitle="Members currently active in this workspace"
+            actionLabel="Manage team"
+            onAction={() => go({ panel: 'team' })}
+          >
             <ul className="dashboard-list">
               {teamMembers.slice(0, 4).map((m) => (
                 <DashboardListRow
@@ -364,4 +390,15 @@ function formatFilters(f) {
   if (f.jobTitles?.length) parts.push(f.jobTitles.slice(0, 2).join(', '))
   if (f.industries?.length) parts.push(f.industries[0])
   return parts.join(' · ') || 'All prospects'
+}
+
+function OverviewStatMini({ label, value, accent = 'default' }) {
+  return (
+    <div className={`dashboard-mini-stat dashboard-mini-stat--${accent}`}>
+      <span className="dashboard-mini-stat__label">{label}</span>
+      <span className="dashboard-mini-stat__value">
+        {typeof value === 'number' ? value.toLocaleString() : value}
+      </span>
+    </div>
+  )
 }

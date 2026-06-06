@@ -55,8 +55,18 @@ export function DashboardShell({ title, subtitle, actions, children }) {
   )
 }
 
-export function DashboardKpiCard({ label, value, hint, icon, onClick, className = '' }) {
+export function DashboardKpiCard({
+  label,
+  value,
+  hint,
+  icon,
+  onClick,
+  className = '',
+  badge = null,
+  progress = null,
+}) {
   const Tag = onClick ? 'button' : 'div'
+  const hasProgress = Number.isFinite(progress)
   return (
     <Tag
       type={onClick ? 'button' : undefined}
@@ -69,11 +79,22 @@ export function DashboardKpiCard({ label, value, hint, icon, onClick, className 
             <DashboardNavIcon name={icon} className="dashboard-icon dashboard-icon--sm" />
           </span>
         ) : null}
-        <ChevronRightIcon className="dashboard-kpi-card__chevron" />
+        <span className="dashboard-kpi-card__top-right">
+          {badge ? <span className="dashboard-kpi-card__badge">{badge}</span> : null}
+          <ChevronRightIcon className="dashboard-kpi-card__chevron" />
+        </span>
       </div>
       <p className="dashboard-kpi-card__label">{label}</p>
       <p className="dashboard-kpi-card__value">{value}</p>
       {hint ? <p className="dashboard-kpi-card__hint">{hint}</p> : null}
+      {hasProgress ? (
+        <div className="dashboard-kpi-card__progress" aria-hidden>
+          <span
+            className="dashboard-kpi-card__progress-fill"
+            style={{ width: `${Math.max(8, Math.min(100, progress))}%` }}
+          />
+        </div>
+      ) : null}
     </Tag>
   )
 }
