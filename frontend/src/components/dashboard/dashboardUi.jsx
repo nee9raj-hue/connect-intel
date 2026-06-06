@@ -55,9 +55,14 @@ export function DashboardShell({ title, subtitle, actions, children }) {
   )
 }
 
-export function DashboardKpiCard({ label, value, hint, icon, onClick }) {
+export function DashboardKpiCard({ label, value, hint, icon, onClick, className = '' }) {
+  const Tag = onClick ? 'button' : 'div'
   return (
-    <button type="button" className="dashboard-kpi-card" onClick={onClick}>
+    <Tag
+      type={onClick ? 'button' : undefined}
+      className={`dashboard-kpi-card ${onClick ? 'dashboard-kpi-card--clickable' : 'dashboard-kpi-card--static'} ${className}`.trim()}
+      onClick={onClick}
+    >
       <div className="dashboard-kpi-card__top">
         {icon ? (
           <span className="dashboard-kpi-card__icon" aria-hidden>
@@ -69,7 +74,7 @@ export function DashboardKpiCard({ label, value, hint, icon, onClick }) {
       <p className="dashboard-kpi-card__label">{label}</p>
       <p className="dashboard-kpi-card__value">{value}</p>
       {hint ? <p className="dashboard-kpi-card__hint">{hint}</p> : null}
-    </button>
+    </Tag>
   )
 }
 

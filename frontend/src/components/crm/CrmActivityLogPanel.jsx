@@ -5,11 +5,12 @@ import { ACTIVITY_LABELS, formatDateTime } from '../../lib/crmUiConstants'
 import LoadingExperience from '../ui/LoadingExperience'
 import { LOADING_MESSAGES } from '../../lib/loadingQuotes'
 
-export default function CrmActivityLogPanel({ onNavigate }) {
+export default function CrmActivityLogPanel({ onNavigate, panelOptions = {} }) {
   const { openPipelineLead, pipelineAssigneeFilter, setPipelineAssigneeFilter, teamMembers } = useApp()
   const [activities, setActivities] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const activityType = panelOptions?.activityType || null
 
   const assigneeName = useMemo(() => {
     if (!pipelineAssigneeFilter) return null
@@ -17,12 +18,18 @@ export default function CrmActivityLogPanel({ onNavigate }) {
     return m?.name || 'Team member'
   }, [pipelineAssigneeFilter, teamMembers])
 
+  const typeLabel = useMemo(() => {
+    if (!activityType) return null
+    return ACTIVITY_LABELS[activityType] || activityType
+  }, [activityType])
+
   const load = useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
       const q = new URLSearchParams()
       if (pipelineAssigneeFilter) q.set('userId', pipelineAssigneeFilter)
+      if (activityType) q.set('type', activityType)
       const data = await api.getCrmActivityLog(q.toString())
       setActivities(data.activities || [])
     } catch (err) {
@@ -30,7 +37,7 @@ export default function CrmActivityLogPanel({ onNavigate }) {
     } finally {
       setLoading(false)
     }
-  }, [pipelineAssigneeFilter])
+  }, [pipelineAssigneeFilter, activityType])
 
   useEffect(() => {
     setActivities([])
@@ -41,7 +48,9 @@ export default function CrmActivityLogPanel({ onNavigate }) {
     <div className="panel-shell">
       <header className="shrink-0 bg-white border-b border-gray-200 px-4 md:px-5 py-4">
         <h1 className="text-lg font-semibold text-gray-900">Activity log</h1>
-        <p className="text-xs text-gray-500 mt-0.5">Notes, emails, calls, visits, and assignments across your pipeline</p>
+        <p className="text-xs text-gray-500 mt-0.5">
+          {typeLabel ? `${typeLabel} across your pipeline` : 'Notes, emails, calls, visits, and assignments across your pipeline'}
+        </p>
       </header>
 
       <div className="panel-body-scroll p-4 md:p-5 max-w-3xl">

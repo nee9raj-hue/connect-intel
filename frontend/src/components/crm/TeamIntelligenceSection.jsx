@@ -21,13 +21,64 @@ import {
 
 const TEAM_KPIS = [
   { key: 'hoursInApp', label: 'Hours in app', intelKey: 'hoursInApp', format: 'hours', icon: 'team', nav: null },
-  { key: 'contactsOpened', label: 'Contacts worked', intelKey: 'contactsOpened', icon: 'people', nav: 'pipeline' },
-  { key: 'emails', label: 'Emails sent', intelKey: 'emails', icon: 'mail', nav: 'crm-log' },
-  { key: 'calls', label: 'Calls logged', intelKey: 'calls', icon: 'log', nav: 'crm-log' },
-  { key: 'tasksCreated', label: 'Tasks created', intelKey: 'tasksCreated', icon: 'task', nav: 'crm-calendar' },
-  { key: 'meetings', label: 'Meetings set', intelKey: 'meetings', icon: 'calendar', nav: 'crm-calendar' },
-  { key: 'pipelineValue', label: 'Pipeline value', summaryKey: 'pipelineValue', format: 'currency', icon: 'chart', nav: 'pipeline' },
-  { key: 'wonValue', label: 'Won value', summaryKey: 'wonValue', format: 'currency', icon: 'chart', nav: 'pipeline', filter: 'won' },
+  {
+    key: 'contactsOpened',
+    label: 'Contacts worked',
+    intelKey: 'contactsOpened',
+    icon: 'people',
+    nav: 'pipeline',
+    navOptions: { status: 'all' },
+  },
+  {
+    key: 'emails',
+    label: 'Emails sent',
+    intelKey: 'emails',
+    icon: 'mail',
+    nav: 'crm-log',
+    navOptions: { activityType: 'email' },
+  },
+  {
+    key: 'calls',
+    label: 'Calls logged',
+    intelKey: 'calls',
+    icon: 'log',
+    nav: 'crm-log',
+    navOptions: { activityType: 'call' },
+  },
+  {
+    key: 'tasksCreated',
+    label: 'Tasks created',
+    intelKey: 'tasksCreated',
+    icon: 'task',
+    nav: 'crm-calendar',
+    navOptions: { upcomingOnly: true },
+  },
+  {
+    key: 'meetings',
+    label: 'Meetings set',
+    intelKey: 'meetings',
+    icon: 'calendar',
+    nav: 'crm-calendar',
+    navOptions: { upcomingOnly: true },
+  },
+  {
+    key: 'pipelineValue',
+    label: 'Pipeline value',
+    summaryKey: 'pipelineValue',
+    format: 'currency',
+    icon: 'chart',
+    nav: 'pipeline',
+    navOptions: { status: 'all' },
+  },
+  {
+    key: 'wonValue',
+    label: 'Won value',
+    summaryKey: 'wonValue',
+    format: 'currency',
+    icon: 'chart',
+    nav: 'pipeline',
+    navOptions: { status: 'won' },
+  },
 ]
 
 const INSIGHT_STYLES = {
@@ -93,12 +144,16 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
 
   const drillTo = (nav, options = {}) => {
     preserveAssignee()
-    if (options.filter) {
-      onNavigate?.(nav, { status: options.filter })
+    if (options.status) {
+      onNavigate?.(nav, { status: options.status })
       return
     }
     if (nav === 'crm-calendar') {
-      onNavigate?.(nav, { upcomingOnly: true })
+      onNavigate?.(nav, { upcomingOnly: true, ...options })
+      return
+    }
+    if (nav === 'crm-log') {
+      onNavigate?.(nav, { activityType: options.activityType || null })
       return
     }
     onNavigate?.(nav, options)
@@ -221,7 +276,7 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
         />
       ) : (
         <>
-          <div className="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-8 gap-2 md:gap-3">
+          <div className="team-intelligence-kpi-grid">
             {TEAM_KPIS.map((item) => {
               const intelVal = item.intelKey ? rollup[item.intelKey] : null
               const summaryVal = item.summaryKey ? summary[item.summaryKey] : null
@@ -230,14 +285,20 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
               if (item.format === 'currency') value = formatDealValue(raw)
               if (item.format === 'hours') value = formatHours(raw)
               const delta = item.intelKey && comparison[item.intelKey]?.delta
+              const clickable = Boolean(item.nav)
               return (
                 <DashboardKpiCard
                   key={item.key}
+                  className={`team-intelligence-kpi team-intelligence-kpi--${item.key}`}
                   icon={item.icon}
                   label={item.label}
                   value={value}
                   hint={delta != null ? `${formatDelta(delta)} vs prev period` : null}
-                  onClick={() => item.nav && drillTo(item.nav, { filter: item.filter })}
+                  onClick={
+                    clickable
+                      ? () => drillTo(item.nav, item.navOptions || {})
+                      : undefined
+                  }
                 />
               )
             })}
@@ -284,7 +345,7 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
                   label: getStatusMeta(r.status)?.label || r.status,
                   count: r.count,
                 }))}
-                onClick={(status) => drillTo('pipeline', { filter: status })}
+                onClick={(status) => drillTo('pipeline', { status })}
               />
             </DashboardSection>
           </div>
