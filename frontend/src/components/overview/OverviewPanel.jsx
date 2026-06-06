@@ -20,7 +20,7 @@ import {
   DashboardEmpty,
   DashboardFeatureCard,
 } from '../dashboard/dashboardUi'
-import DashboardTeamSnapshot from './DashboardTeamSnapshot'
+import TeamIntelligenceSection from '../crm/TeamIntelligenceSection'
 import { hasWorkspaceFeature } from '../../lib/workspaceFeatures'
 
 export default function OverviewPanel({ onNavigate, isActive = true }) {
@@ -33,17 +33,13 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
     unreadNotificationCount,
     notifications,
     teamMembers,
-    pipelineAssigneeFilter,
-    setPipelineAssigneeFilter,
-    openPipelineLead,
   } = useApp()
 
   const [marketingSummary, setMarketingSummary] = useState(null)
   const [upcomingEvents, setUpcomingEvents] = useState([])
-  const [teamDashboard, setTeamDashboard] = useState(null)
-  const [teamPeriod, setTeamPeriod] = useState('week')
   const [loadingExtras, setLoadingExtras] = useState(true)
   const isCompany = user?.accountType === 'company'
+  const showTeamIntelligence = isCompany && hasWorkspaceFeature(user, 'homeTeamMetrics')
 
   const pipelineCounts = useMemo(
     () => pipelineCountsFromSummary(pipelineSummary, savedLeads),
@@ -93,37 +89,8 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
     return () => clearTimeout(timer)
   }, [loadExtras, isActive])
 
-  const reloadTeamDashboard = useCallback(async () => {
-    if (!hasWorkspaceFeature(user, 'dashboardTeamIntelligence')) {
-      setTeamDashboard(null)
-      return
-    }
-    try {
-      const q = new URLSearchParams({ period: teamPeriod })
-      if (pipelineAssigneeFilter) q.set('userId', pipelineAssigneeFilter)
-      const res = await api.getCrmTeamDashboard(q.toString())
-      setTeamDashboard(res)
-    } catch {
-      // keep previous snapshot
-    }
-  }, [teamPeriod, user, pipelineAssigneeFilter])
-
-  useEffect(() => {
-    if (!isActive) return undefined
-    reloadTeamDashboard()
-  }, [isActive, teamPeriod, pipelineAssigneeFilter, reloadTeamDashboard])
-
-  const assigneeFilterName = useMemo(() => {
-    if (!pipelineAssigneeFilter) return null
-    const m = teamMembers.find((t) => String(t.userId) === String(pipelineAssigneeFilter))
-    return m?.name || teamDashboard?.memberOptions?.find(
-      (o) => String(o.userId) === String(pipelineAssigneeFilter)
-    )?.name || 'Team member'
-  }, [pipelineAssigneeFilter, teamMembers, teamDashboard?.memberOptions])
-
   const go = (target) => onNavigate?.(target.panel, navTargetToOptions(target))
 
-  const showTeamIntelligence = hasWorkspaceFeature(user, 'dashboardTeamIntelligence')
   const showActiveCustomersPanel = hasWorkspaceFeature(user, 'panelActiveCustomers')
   const showCompanyWorkspace = hasWorkspaceFeature(user, 'companyWorkspacePage')
 
@@ -143,36 +110,24 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
         desc: 'Your data & reports',
       })
     }
-    if (isCompany && hasWorkspaceFeature(user, 'homeTeamMetrics')) {
-      tiles.push({
-        id: 'team-metrics',
-        label: 'Team intelligence',
-        panel: 'crm-dashboard',
-        icon: 'chart',
-        desc: 'Performance',
-      })
-    }
     return tiles
   }, [user?.accountType, user?.workspacePageTitle, showCompanyWorkspace])
 
   const recentNotifs = notifications.filter((n) => n.unread).slice(0, 5)
   const pipelineTotal = pipelineSummary.total || savedLeads.length
 
-  const headerActions =
-    user?.accountType === 'company' && hasWorkspaceFeature(user, 'homeTeamMetrics') ? (
-      <button
-        type="button"
-        className="crm-btn crm-btn-secondary crm-btn-sm"
-        onClick={() => go({ panel: 'crm-dashboard' })}
-      >
-        Team intelligence
-      </button>
-    ) : null
+  const headerActions = null
 
   return (
     <DashboardShell
-      title="Dashboard"
-      subtitle={user?.name ? `Welcome back, ${user.name.split(' ')[0]}` : undefined}
+      title={showTeamIntelligence ? 'Dashboard & team intelligence' : 'Dashboard'}
+      subtitle={
+        user?.name
+          ? showTeamIntelligence
+            ? `Welcome back, ${user.name.split(' ')[0]} — your pipeline and team metrics`
+            : `Welcome back, ${user.name.split(' ')[0]}`
+          : undefined
+      }
       actions={headerActions}
     >
       <div className="dashboard-kpi-grid">
@@ -210,6 +165,10 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
         />
       </div>
 
+      {showTeamIntelligence ? (
+        <TeamIntelligenceSection onNavigate={onNavigate} isActive={isActive} />
+      ) : null}
+
       <div>
         <p className="dashboard-section-label">Jump to</p>
         <div className="dashboard-quick-grid">
@@ -236,32 +195,6 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
           ))}
         </div>
       </DashboardSection>
-
-      {showTeamIntelligence && teamDashboard?.teamSnapshot && (
-        <DashboardTeamSnapshot
-          data={teamDashboard}
-          loading={!teamDashboard}
-          period={teamPeriod}
-          onPeriodChange={setTeamPeriod}
-          members={isCompany ? teamDashboard?.members || [] : []}
-          assigneeFilter={pipelineAssigneeFilter}
-          assigneeName={assigneeFilterName}
-          onClearAssignee={() => setPipelineAssigneeFilter?.(null)}
-          onNavigate={(panel, options) => {
-            if (panel === 'pipeline' && options?.leadId) {
-              openPipelineLead?.(options.leadId)
-              onNavigate?.('pipeline', { status: 'all' })
-              return
-            }
-            onNavigate?.(panel, options)
-          }}
-          onMemberClick={(m) => {
-            setPipelineAssigneeFilter?.(m.userId)
-            onNavigate?.('crm-dashboard')
-          }}
-          setPipelineAssigneeFilter={setPipelineAssigneeFilter}
-        />
-      )}
 
       <div className="dashboard-layout-2-1">
         <DashboardSection title="Marketing" actionLabel="Reports" onAction={() => go({ panel: 'marketing', tab: 'reports' })}>
@@ -302,7 +235,7 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
           <DashboardFeatureCard
             icon="chart"
             title="Active customers"
-            description={teamDashboard?.teamSnapshot?.activeCustomers?.total?.toLocaleString() ?? '—'}
+            description="Shipment history & trading profiles"
             actionLabel="Open dashboard"
             accent="teal"
             onAction={() => go({ panel: 'active-customers' })}

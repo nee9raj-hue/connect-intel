@@ -13,6 +13,15 @@ export const ACTIVITY_LABELS = {
   form_response: 'Form response',
 }
 
+export const CALL_OUTCOMES = [
+  { id: 'connected', label: 'Connected' },
+  { id: 'no_answer', label: 'No answer' },
+  { id: 'voicemail', label: 'Left voicemail' },
+  { id: 'busy', label: 'Busy / try again' },
+  { id: 'wrong_number', label: 'Wrong number' },
+  { id: 'callback_requested', label: 'Callback requested' },
+]
+
 export const MEETING_TYPES = [
   { id: 'call', label: 'Phone call' },
   { id: 'video', label: 'Video call' },

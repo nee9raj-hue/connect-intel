@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { buildWhatsAppUrl, leadHasCallablePhone } from '../../lib/phoneUtils'
+import LeadCallLogCard from './LeadCallLogCard'
 import LeadPhoneCall from './LeadPhoneCall'
 import EmailValidationIcon from './EmailValidationIcon'
 import { STARTER_TEMPLATES, blocksToPlainText } from '../../lib/marketingEmailDesign'
@@ -82,7 +83,6 @@ export default function LeadWorkspace({
   const [tab, setTab] = useState('overview')
   const [notes, setNotes] = useState(lead.crm?.notes || '')
   const [status, setStatus] = useState(lead.crm?.status || 'new')
-  const [nextFollowUp, setNextFollowUp] = useState(toDatetimeLocalValue(lead.crm?.nextFollowUpAt))
   const [subject, setSubject] = useState('')
   const [body, setBody] = useState('')
   const [purpose, setPurpose] = useState('introduction')
@@ -128,7 +128,6 @@ export default function LeadWorkspace({
   const [meetingAssignee, setMeetingAssignee] = useState(user?.id || '')
   const [taskParticipants, setTaskParticipants] = useState([])
   const [meetingParticipants, setMeetingParticipants] = useState([])
-  const [logCallNote, setLogCallNote] = useState('')
   const [visitMeetingId, setVisitMeetingId] = useState('')
   const [visitNotes, setVisitNotes] = useState('')
   const [visitOutcome, setVisitOutcome] = useState('completed')
@@ -154,7 +153,6 @@ export default function LeadWorkspace({
   useEffect(() => {
     setNotes(lead.crm?.notes || '')
     setStatus(lead.crm?.status || 'new')
-    setNextFollowUp(toDatetimeLocalValue(lead.crm?.nextFollowUpAt))
     setError(null)
     setNotice(null)
     const pendingTab = consumePendingLeadTab(lead.id)
@@ -267,13 +265,6 @@ export default function LeadWorkspace({
     await runPatch({ crm: { notes } }, 'Notes saved')
   }
 
-  const saveNextFollowUp = async () => {
-    await runPatch(
-      { crm: { nextFollowUpAt: fromDatetimeLocalValue(nextFollowUp) } },
-      'Follow-up date saved'
-    )
-  }
-
   const changeStatus = async (next) => {
     setStatus(next)
     setError(null)
@@ -286,13 +277,8 @@ export default function LeadWorkspace({
     }
   }
 
-  const logCall = async () => {
-    if (!logCallNote.trim() || saving) return
-    const ok = await runPatch(
-      { activity: { type: 'call', summary: logCallNote.trim() } },
-      'Call logged'
-    )
-    if (ok) setLogCallNote('')
+  const logCallActivity = async (body) => {
+    await runPatch(body, 'Call logged')
   }
 
   const addTask = async (e) => {
@@ -748,6 +734,8 @@ export default function LeadWorkspace({
       >
         {tab === 'overview' && (
           <>
+            <LeadCallLogCard lead={lead} saving={saving} onLog={logCallActivity} onSuccess={setNotice} />
+
             <section>
               <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Pipeline status</h3>
               <select value={status} onChange={(e) => changeStatus(e.target.value)} className="w-full text-xs border rounded-lg px-2.5 py-1.5">
@@ -973,7 +961,7 @@ export default function LeadWorkspace({
                 </p>
                 <p className="flex flex-wrap items-center gap-1">
                   <span className="text-gray-500">Phone · </span>
-                  <LeadPhoneCall phone={lead.phone} leadId={lead.id} />
+                  <LeadPhoneCall phone={lead.phone} leadId={lead.id} pipelineCallIcon showNumber />
                 </p>
                 <p>
                   <span className="text-gray-500">Location · </span>
@@ -998,36 +986,6 @@ export default function LeadWorkspace({
               <Info label="Summary" value={crm.lastCommunicationSummary || '—'} />
               <Info label="Next follow-up" value={formatDateTime(crm.nextFollowUpAt)} />
               <Info label="Last email" value={formatCrmDate(crm.lastEmailSentAt)} />
-            </section>
-
-            <section>
-              <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Next call / follow-up time</h3>
-              <input
-                type="datetime-local"
-                value={nextFollowUp}
-                onChange={(e) => setNextFollowUp(e.target.value)}
-                onBlur={saveNextFollowUp}
-                className="w-full text-xs border rounded-lg px-2.5 py-1.5"
-              />
-            </section>
-
-            <section>
-              <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Log a call</h3>
-              <textarea
-                value={logCallNote}
-                onChange={(e) => setLogCallNote(e.target.value)}
-                rows={2}
-                placeholder="Call summary…"
-                className="w-full text-xs border rounded-lg px-2.5 py-1.5"
-              />
-              <button
-                type="button"
-                onClick={logCall}
-                disabled={busy}
-                className="mt-2 text-xs font-semibold px-3 py-1.5 bg-gray-900 text-white rounded-lg disabled:opacity-50"
-              >
-                {saving ? 'Saving…' : 'Save call to log'}
-              </button>
             </section>
           </>
         )}

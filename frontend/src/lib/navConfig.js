@@ -74,7 +74,6 @@ export function isNavTargetActive(activePanel, panelOptions, target) {
 export function buildCustomerNavSections(user, { pipelineCounts = {}, upcomingCount = 0 } = {}) {
   const columns = getVisiblePipelineColumns(user)
   const isCompany = user?.accountType === 'company'
-  const showTeamDash = isCompany
 
   const pipelineChildren = [
     { id: 'pipeline-all', label: 'All leads', panel: 'pipeline', status: 'all', badge: pipelineCounts.all },
@@ -116,7 +115,6 @@ export function buildCustomerNavSections(user, { pipelineCounts = {}, upcomingCo
 
   const homeChildren = [
     { id: 'home-dashboard', label: 'Dashboard', panel: 'overview' },
-    ...(showTeamDash ? [{ id: 'home-team', label: 'Team intelligence', panel: 'crm-dashboard' }] : []),
     { id: 'home-activity', label: 'Activity log', panel: 'crm-log' },
   ]
 
