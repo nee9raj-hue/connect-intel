@@ -66,10 +66,6 @@
     {
       "path": "/api/marketing/cron",
       "schedule": "0 9 * * *"
-    },
-    {
-      "path": "/api/crm/reminders-cron",
-      "schedule": "0,30 * * * *"
     }
   ]
 }
