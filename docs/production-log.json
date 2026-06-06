@@ -1,10 +1,52 @@
 {
-  "updatedAt": "2026-06-06T10:46:35.791Z",
-  "updatedAtIst": "06/06/2026, 16:16:35",
+  "updatedAt": "2026-06-06T11:05:47.146Z",
+  "updatedAtIst": "06/06/2026, 16:35:47",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "1c612f9",
+  "currentProductionCommit": "aabc8e1",
   "entries": [
+    {
+      "logId": "20260606-1635-aabc8e1",
+      "commit": "aabc8e1",
+      "commitFull": "aabc8e1e6c18e0160ea548a26e959622311f6d22",
+      "message": "Update privacy policy and docs for Google Calendar OAuth verification.",
+      "deployedAt": "2026-06-06T11:05:33.624Z",
+      "deployedAtIst": "06/06/2026, 16:35:33",
+      "committedAtIst": "06/06/2026, 16:35:05",
+      "vercelPreviewUrl": "https://connect-intel-k50ywa0km-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- aabc8e1"
+    },
+    {
+      "logId": "20260606-1631-7050e72",
+      "commit": "7050e72",
+      "commitFull": "7050e721bfaaf1e88e777fb5e1e79c501a0499bf",
+      "message": "Fix CRM calendar visibility and two-way Google Calendar sync.",
+      "deployedAt": "2026-06-06T11:01:39.119Z",
+      "deployedAtIst": "06/06/2026, 16:31:39",
+      "committedAtIst": "06/06/2026, 16:31:12",
+      "vercelPreviewUrl": "https://connect-intel-fxk0d0xjw-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 7050e72"
+    },
+    {
+      "logId": "20260606-1617-2859428",
+      "commit": "2859428",
+      "commitFull": "2859428872f022757900b9bb99727ce0755dce61",
+      "message": "Log production deploy 1c612f9 (live calendar sync and reminder emails).",
+      "deployedAt": "2026-06-06T10:47:08.815Z",
+      "deployedAtIst": "06/06/2026, 16:17:08",
+      "committedAtIst": "06/06/2026, 16:16:41",
+      "vercelPreviewUrl": "https://connect-intel-m4sqm6jo3-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 2859428"
+    },
     {
       "logId": "20260606-1615-1c612f9",
       "commit": "1c612f9",
@@ -15,7 +57,7 @@
       "committedAtIst": "06/06/2026, 16:15:13",
       "vercelPreviewUrl": "https://connect-intel-hegxk8blj-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 1c612f9"
     },
@@ -242,48 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- d473b21"
-    },
-    {
-      "logId": "20260602-1343-e271351",
-      "commit": "e271351",
-      "commitFull": "e2713511c82cfafda1ec50fb83bb4e9343119ba3",
-      "message": "Update production log after canvas scrolling deploy.",
-      "deployedAt": "2026-06-02T08:13:05.165Z",
-      "deployedAtIst": "02/06/2026, 13:43:05",
-      "committedAtIst": "02/06/2026, 13:42:37",
-      "vercelPreviewUrl": "https://connect-intel-dcrslhrv7-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- e271351"
-    },
-    {
-      "logId": "20260602-1342-dfec7e6",
-      "commit": "dfec7e6",
-      "commitFull": "dfec7e6cee6c3dd10981e3612e37e23324f2c150",
-      "message": "Improve campaign/template canvas scrolling and rail usability.",
-      "deployedAt": "2026-06-02T08:12:08.885Z",
-      "deployedAtIst": "02/06/2026, 13:42:08",
-      "committedAtIst": "02/06/2026, 13:41:34",
-      "vercelPreviewUrl": "https://connect-intel-4u0n2knkv-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- dfec7e6"
-    },
-    {
-      "logId": "20260601-1246-6512225",
-      "commit": "6512225",
-      "commitFull": "6512225ca8a9b0103aee7af7dd884d858bf4a2b2",
-      "message": "chore: sync production log after 44a2b25 deploy.",
-      "deployedAt": "2026-06-01T07:16:43.521Z",
-      "deployedAtIst": "01/06/2026, 12:46:43",
-      "committedAtIst": "01/06/2026, 12:46:16",
-      "vercelPreviewUrl": "https://connect-intel-cdpy8t7fa-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 6512225"
     }
   ]
 }

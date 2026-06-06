@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- fd1eebe
+npm run prod:rollback -- 7050e72
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- fd1eebe
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `1c612f9` |
-| Log updated (IST) | 06/06/2026, 16:16:35 |
+| Commit | `aabc8e1` |
+| Log updated (IST) | 06/06/2026, 16:35:47 |
 
 ---
 
@@ -44,7 +44,10 @@ npm run prod:rollback -- fd1eebe
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 06/06/2026, 16:15:39 | `1c612f9` | Fix deploy: keep single Vercel cron (reminders run via daily cron + live poll). | [preview](https://connect-intel-hegxk8blj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1c612f9` | **← LIVE**
+| 06/06/2026, 16:35:33 | `aabc8e1` | Update privacy policy and docs for Google Calendar OAuth verification. | [preview](https://connect-intel-k50ywa0km-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- aabc8e1` | **← LIVE**
+| 06/06/2026, 16:31:39 | `7050e72` | Fix CRM calendar visibility and two-way Google Calendar sync. | [preview](https://connect-intel-fxk0d0xjw-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7050e72` |
+| 06/06/2026, 16:17:08 | `2859428` | Log production deploy 1c612f9 (live calendar sync and reminder emails). | [preview](https://connect-intel-m4sqm6jo3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2859428` |
+| 06/06/2026, 16:15:39 | `1c612f9` | Fix deploy: keep single Vercel cron (reminders run via daily cron + live poll). | [preview](https://connect-intel-hegxk8blj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1c612f9` |
 | 06/06/2026, 15:56:26 | `fd1eebe` | Log production deploy 0d8c71f (CRM pipeline and bulk email fixes). | [preview](https://connect-intel-lmt887xq8-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- fd1eebe` |
 | 06/06/2026, 15:55:38 | `0d8c71f` | Fix CRM pipeline visibility, calendar sharing, and tracked bulk email. | [preview](https://connect-intel-ggu7547fe-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0d8c71f` |
 | 04/06/2026, 16:19:38 | `6fe3ad4` | Add in-panel Marketing guide with animated UI walkthroughs. | [preview](https://connect-intel-o2osyg2al-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6fe3ad4` |
@@ -61,9 +64,6 @@ npm run prod:rollback -- fd1eebe
 | 02/06/2026, 13:54:07 | `48b1a9c` | Fix immersive canvas trackpad scrolling over email content. | [preview](https://connect-intel-6l1vhq3jc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 48b1a9c` |
 | 02/06/2026, 13:48:02 | `c945911` | Update production log after vertical scroll fix deploy. | [preview](https://connect-intel-q5kaslgq3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c945911` |
 | 02/06/2026, 13:47:13 | `d473b21` | Fix campaign/template canvas vertical scrolling on touch devices. | [preview](https://connect-intel-8vezmb2vs-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d473b21` |
-| 02/06/2026, 13:43:05 | `e271351` | Update production log after canvas scrolling deploy. | [preview](https://connect-intel-dcrslhrv7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e271351` |
-| 02/06/2026, 13:42:08 | `dfec7e6` | Improve campaign/template canvas scrolling and rail usability. | [preview](https://connect-intel-4u0n2knkv-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- dfec7e6` |
-| 01/06/2026, 12:46:43 | `6512225` | chore: sync production log after 44a2b25 deploy. | [preview](https://connect-intel-cdpy8t7fa-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6512225` |
 
 ---
 
