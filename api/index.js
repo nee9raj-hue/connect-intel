@@ -47,6 +47,7 @@ const ROUTES = {
   'crm/field-expenses': () => import('../lib/server/handlers/crm-field-expenses.js'),
   'crm/field-visit/distance': () => import('../lib/server/handlers/crm-field-visit-distance.js'),
   'crm/reminders-ack': () => import('../lib/server/handlers/crm-reminders-ack.js'),
+  'crm/reminders-cron': () => import('../lib/server/handlers/crm-reminders-cron.js'),
   'onboarding/complete': () => import('../lib/server/handlers/onboarding-complete.js'),
   'team/members': () => import('../lib/server/handlers/team-members.js'),
   'team/invite': () => import('../lib/server/handlers/team-invite.js'),

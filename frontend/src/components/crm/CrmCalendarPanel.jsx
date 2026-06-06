@@ -37,6 +37,8 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
   const [members, setMembers] = useState([])
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState(null)
+  const [selectedDay, setSelectedDay] = useState(null)
+  const [selectedDayEvents, setSelectedDayEvents] = useState([])
   const [googleCal, setGoogleCal] = useState(null)
   const [googleBusy, setGoogleBusy] = useState(false)
   const [googleNotice, setGoogleNotice] = useState(null)
@@ -73,6 +75,8 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
 
     if (match) {
       setView('list')
+      setSelectedDay(null)
+      setSelectedDayEvents([])
       setSelected(match)
       clearCalendarFocus()
     }
@@ -83,8 +87,8 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
     return (id) => map[id] || 'Team member'
   }, [members])
 
-  const load = useCallback(async () => {
-    setLoading(true)
+  const load = useCallback(async ({ silent = false } = {}) => {
+    if (!silent) setLoading(true)
     try {
       let q
       if (upcomingOnly) {
@@ -95,14 +99,14 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
         const range = calendarRangeForView(view, anchor)
         q = new URLSearchParams({ from: range.from, to: range.to }).toString()
       }
-      const data = await api.getCrmCalendar(q)
+      const data = await api.getCrmCalendar(q, { silent: true })
       setEvents(data.events || [])
       setMembers(data.members || [])
       setGoogleCal(data.googleCalendar || null)
     } catch {
-      setEvents([])
+      if (!silent) setEvents([])
     } finally {
-      setLoading(false)
+      if (!silent) setLoading(false)
     }
   }, [view, anchor, upcomingOnly])
 
@@ -114,7 +118,23 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
 
   useEffect(() => {
     load()
+    const timer = setInterval(() => load({ silent: true }), 45_000)
+    return () => clearInterval(timer)
   }, [load])
+
+  const openDay = useCallback((day, dayEvents) => {
+    if (!dayEvents?.length) return
+    setSelected(null)
+    setSelectedDay(day)
+    setSelectedDayEvents(dayEvents)
+  }, [])
+
+  const openEvent = useCallback((ev) => {
+    setSelectedDay(null)
+    setSelectedDayEvents([])
+    setSelected(ev)
+  }, [])
+
 
   const connectGoogleCalendar = async () => {
     setGoogleBusy(true)
@@ -143,6 +163,16 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
       setGoogleBusy(false)
     }
   }
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('crm_calendar') !== 'connected') return
+    params.delete('crm_calendar')
+    const qs = params.toString()
+    window.history.replaceState({}, '', qs ? `${window.location.pathname}?${qs}` : window.location.pathname)
+    void syncGoogleCalendar()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run once after OAuth redirect
+  }, [])
 
   const shiftAnchor = (delta) => {
     if (view === 'month') {
@@ -199,7 +229,7 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
             <p className="font-semibold">Google Calendar sync</p>
             <p className="text-emerald-900/90 leading-relaxed">
               {googleCal?.calendarScope
-                ? 'CRM meetings can be added to Google Calendar. Import your Google events here (read-only, green).'
+                ? 'Google events sync automatically while you use Connect Intel. CRM meetings can also be pushed to Google (green events).'
                 : 'Connect the same work Google account to show Gmail Calendar events and push new CRM meetings.'}
             </p>
             <div className="flex flex-wrap gap-2">
@@ -285,17 +315,29 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
         )}
 
         {!loading && view === 'list' && visibleEvents.length > 0 && (
-          <ListView events={visibleEvents} onSelect={setSelected} />
+          <ListView events={visibleEvents} onSelect={openEvent} />
         )}
 
         {!loading && view === 'week' && (
-          <WeekView days={getWeekDays(anchor)} events={events} onSelect={setSelected} />
+          <WeekView days={getWeekDays(anchor)} events={events} onSelect={openEvent} />
         )}
 
         {!loading && view === 'month' && (
-          <MonthView anchor={anchor} events={events} onSelect={setSelected} />
+          <MonthView anchor={anchor} events={events} onSelect={openEvent} onSelectDay={openDay} />
         )}
       </div>
+
+      {selectedDay && selectedDayEvents.length > 0 && (
+        <DayEventsDrawer
+          day={selectedDay}
+          events={selectedDayEvents}
+          onClose={() => {
+            setSelectedDay(null)
+            setSelectedDayEvents([])
+          }}
+          onSelectEvent={openEvent}
+        />
+      )}
 
       {selected && (
         <EventDetailDrawer
@@ -378,7 +420,7 @@ function WeekView({ days, events, onSelect }) {
   )
 }
 
-function MonthView({ anchor, events, onSelect }) {
+function MonthView({ anchor, events, onSelect, onSelectDay }) {
   const grid = getMonthGrid(anchor)
   const month = anchor.getMonth()
 
@@ -397,31 +439,44 @@ function MonthView({ anchor, events, onSelect }) {
           const inMonth = day.getMonth() === month
           const isToday = sameDay(day, new Date())
           return (
-            <button
+            <div
               key={day.toISOString()}
-              type="button"
-              onClick={() => dayEvents[0] && onSelect(dayEvents[0])}
-              className={`min-h-[72px] border-t border-r border-gray-100 p-1 text-left hover:bg-gray-50 ${
+              className={`min-h-[72px] border-t border-r border-gray-100 p-1 text-left ${
                 !inMonth ? 'bg-gray-50/80 text-gray-400' : ''
               } ${isToday ? 'bg-[#fff4ee]/60' : ''}`}
             >
-              <span className={`text-xs font-semibold ${isToday ? 'text-[#8a6600]' : ''}`}>
+              <button
+                type="button"
+                onClick={() => onSelectDay(day, dayEvents)}
+                className={`text-xs font-semibold px-1 rounded hover:bg-gray-100 ${
+                  isToday ? 'text-[#8a6600]' : ''
+                } ${dayEvents.length ? 'underline decoration-dotted' : ''}`}
+                title={dayEvents.length ? `View all ${dayEvents.length} events` : undefined}
+              >
                 {day.getDate()}
-              </span>
+              </button>
               <div className="mt-0.5 space-y-0.5">
                 {dayEvents.slice(0, 3).map((ev) => (
-                  <span
+                  <button
                     key={ev.id}
-                    className={`block text-xs truncate px-1 rounded ${KIND_STYLES[ev.kind]?.bg}`}
+                    type="button"
+                    onClick={() => onSelect(ev)}
+                    className={`block w-full text-left text-xs truncate px-1 rounded hover:ring-1 hover:ring-gray-300 ${KIND_STYLES[ev.kind]?.bg}`}
                   >
                     {ev.title}
-                  </span>
+                  </button>
                 ))}
                 {dayEvents.length > 3 && (
-                  <span className="text-xs text-gray-500">+{dayEvents.length - 3} more</span>
+                  <button
+                    type="button"
+                    onClick={() => onSelectDay(day, dayEvents)}
+                    className="text-xs font-semibold text-[#0091ae] hover:underline px-1"
+                  >
+                    +{dayEvents.length - 3} more
+                  </button>
                 )}
               </div>
-            </button>
+            </div>
           )
         })}
       </div>
@@ -462,6 +517,43 @@ function StatusPill({ status }) {
     <span className={`text-xs font-bold uppercase px-1.5 py-0.5 rounded-full ${map[status] || map.past}`}>
       {status || 'past'}
     </span>
+  )
+}
+
+function DayEventsDrawer({ day, events, onClose, onSelectEvent }) {
+  const sorted = [...events].sort(
+    (a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime()
+  )
+  const label = day.toLocaleDateString(undefined, {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  })
+
+  return (
+    <>
+      <button type="button" aria-label="Close" className="fixed inset-0 z-40 bg-black/30" onClick={onClose} />
+      <aside className="fixed right-0 top-0 bottom-0 z-50 w-full max-w-md bg-white shadow-xl border-l border-gray-200 flex flex-col">
+        <div className="px-5 py-4 border-b border-gray-100 flex items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-bold uppercase text-gray-400">Day schedule</p>
+            <h2 className="text-lg font-semibold text-gray-900 mt-1">{label}</h2>
+            <p className="text-xs text-gray-500 mt-1">
+              {sorted.length} event{sorted.length === 1 ? '' : 's'}
+            </p>
+          </div>
+          <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-700 text-xl leading-none">
+            ×
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-2">
+          {sorted.map((ev) => (
+            <EventChip key={ev.id} event={ev} onClick={() => onSelectEvent(ev)} />
+          ))}
+        </div>
+      </aside>
+    </>
   )
 }
 

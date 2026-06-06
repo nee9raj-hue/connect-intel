@@ -292,13 +292,14 @@ export function AppProvider({ children }) {
         isCompany ? api.getOrgLeadTags({ silent: true }) : Promise.resolve({ tags: null }),
       ])
 
-      let leads = null
       let serverTime = new Date().toISOString()
       let newItems = []
+      let pipelineUpdated = false
 
       if (notifResult.status === 'fulfilled') {
         serverTime = notifResult.value.serverTime || serverTime
         newItems = mergeNotificationItems(notifResult.value.items || [])
+        pipelineUpdated = Boolean(notifResult.value.pipelineUpdated)
       }
 
       if (notifResult.status === 'rejected' && notifResult.reason?.status === 401) {
@@ -312,9 +313,18 @@ export function AppProvider({ children }) {
         setOrgLeadTags(tagsResult.value.tags)
       }
 
-      return { leads, serverTime, newItems }
+      const shouldRefreshPipeline =
+        pipelineUpdated ||
+        newItems.some((n) =>
+          ['assignment', 'reply', 'meeting', 'task', 'follow_up', 'team_task'].includes(n.type)
+        )
+      if (shouldRefreshPipeline) {
+        void refreshSavedLeads().catch(() => {})
+      }
+
+      return { serverTime, newItems, pipelineUpdated }
     },
-    [mergeNotificationItems, user?.accountType, user?.organizationId]
+    [mergeNotificationItems, refreshSavedLeads, user?.accountType, user?.organizationId]
   )
 
   const markNotificationRead = useCallback((id) => {
@@ -432,6 +442,8 @@ export function AppProvider({ children }) {
           loadedCountRef.current = leads.length
           workspaceLoadedAtRef.current = Date.now()
           setSessionError(null)
+
+          void api.getCrmNotifications(undefined, { silent: true }).catch(() => {})
 
           if (user.organizationId && user.accountType === 'company') {
             const data = await api.getTeamMembers({ silent: true })
