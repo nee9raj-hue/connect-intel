@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-06T11:05:47.146Z",
-  "updatedAtIst": "06/06/2026, 16:35:47",
+  "updatedAt": "2026-06-06T11:20:36.484Z",
+  "updatedAtIst": "06/06/2026, 16:50:36",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "aabc8e1",
+  "currentProductionCommit": "d724b6c",
   "entries": [
+    {
+      "logId": "20260606-1650-d724b6c",
+      "commit": "d724b6c",
+      "commitFull": "d724b6c340f4dae6e1391f18cb41ae53a0aa6de6",
+      "message": "Add Team intelligence dashboard with charts and workspace activity tracking.",
+      "deployedAt": "2026-06-06T11:20:21.860Z",
+      "deployedAtIst": "06/06/2026, 16:50:21",
+      "committedAtIst": "06/06/2026, 16:49:54",
+      "vercelPreviewUrl": "https://connect-intel-er58ip5o7-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- d724b6c"
+    },
+    {
+      "logId": "20260606-1636-00d9a1f",
+      "commit": "00d9a1f",
+      "commitFull": "00d9a1f6af5d336e2fb4ef5b4932bf3f08159c23",
+      "message": "Log production deploy aabc8e1 (Google OAuth privacy and verification docs).",
+      "deployedAt": "2026-06-06T11:06:15.929Z",
+      "deployedAtIst": "06/06/2026, 16:36:15",
+      "committedAtIst": "06/06/2026, 16:35:49",
+      "vercelPreviewUrl": "https://connect-intel-fm0nlxnfr-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 00d9a1f"
+    },
     {
       "logId": "20260606-1635-aabc8e1",
       "commit": "aabc8e1",
@@ -15,7 +43,7 @@
       "committedAtIst": "06/06/2026, 16:35:05",
       "vercelPreviewUrl": "https://connect-intel-k50ywa0km-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- aabc8e1"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 48b1a9c"
-    },
-    {
-      "logId": "20260602-1348-c945911",
-      "commit": "c945911",
-      "commitFull": "c945911b63c78c01d4b59939796f9d0f2017e61f",
-      "message": "Update production log after vertical scroll fix deploy.",
-      "deployedAt": "2026-06-02T08:18:02.333Z",
-      "deployedAtIst": "02/06/2026, 13:48:02",
-      "committedAtIst": "02/06/2026, 13:47:35",
-      "vercelPreviewUrl": "https://connect-intel-q5kaslgq3-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- c945911"
-    },
-    {
-      "logId": "20260602-1347-d473b21",
-      "commit": "d473b21",
-      "commitFull": "d473b21297308274a6f2e37d821585f55a8a3de0",
-      "message": "Fix campaign/template canvas vertical scrolling on touch devices.",
-      "deployedAt": "2026-06-02T08:17:13.617Z",
-      "deployedAtIst": "02/06/2026, 13:47:13",
-      "committedAtIst": "02/06/2026, 13:46:37",
-      "vercelPreviewUrl": "https://connect-intel-8vezmb2vs-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- d473b21"
     }
   ]
 }
