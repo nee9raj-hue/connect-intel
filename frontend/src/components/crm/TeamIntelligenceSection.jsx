@@ -90,14 +90,15 @@ const INSIGHT_STYLES = {
 
 /** Team metrics block — embedded on the main Dashboard for managers and reps. */
 export default function TeamIntelligenceSection({ onNavigate, isActive = true }) {
-  const { user, teamMembers, pipelineAssigneeFilter, setPipelineAssigneeFilter, openPipelineLead } = useApp()
+  const { user, teamMembers, openPipelineLead } = useApp()
   const [period, setPeriod] = useState('week')
+  const [intelMemberId, setIntelMemberId] = useState('')
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [expandedMember, setExpandedMember] = useState(null)
 
-  const memberUserId = pipelineAssigneeFilter || ''
+  const memberUserId = intelMemberId
   const intel = data?.teamIntelligence
   const rollup = intel?.rollup || {}
 
@@ -138,12 +139,9 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
     load()
   }, [load, isActive])
 
-  const preserveAssignee = () => {
-    if (memberUserId) setPipelineAssigneeFilter?.(memberUserId)
-  }
+  const preserveAssignee = () => {}
 
   const drillTo = (nav, options = {}) => {
-    preserveAssignee()
     if (options.status) {
       onNavigate?.(nav, { status: options.status })
       return
@@ -153,37 +151,37 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
       return
     }
     if (nav === 'crm-log') {
-      onNavigate?.(nav, { activityType: options.activityType || null })
+      onNavigate?.(nav, {
+        activityType: options.activityType || null,
+        assigneeUserId: memberUserId || null,
+      })
       return
     }
     onNavigate?.(nav, options)
   }
 
   const onMemberRow = (m) => {
-    setPipelineAssigneeFilter?.(m.userId)
+    setIntelMemberId(String(m.userId))
     setExpandedMember((prev) => (prev === m.userId ? null : m.userId))
   }
 
   const onMemberDrill = (m) => {
-    setPipelineAssigneeFilter?.(m.userId)
-    onNavigate?.('pipeline')
+    onNavigate?.('pipeline', { assigneeUserId: m.userId })
   }
 
   const onMemberSelect = (e) => {
     const v = e.target.value
-    setPipelineAssigneeFilter?.(v || null)
+    setIntelMemberId(v || '')
     setExpandedMember(null)
   }
 
   const onInsightClick = (insight) => {
     if (insight.userId) {
-      setPipelineAssigneeFilter?.(insight.userId)
-      onNavigate?.('pipeline')
+      onNavigate?.('pipeline', { assigneeUserId: insight.userId })
       return
     }
     if (insight.userIds?.length === 1) {
-      setPipelineAssigneeFilter?.(insight.userIds[0])
-      onNavigate?.('pipeline')
+      onNavigate?.('pipeline', { assigneeUserId: insight.userIds[0] })
     }
   }
 
@@ -206,6 +204,24 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
     )
   }, [data?.activityByDay])
 
+  const activityHighlights = useMemo(
+    () => [
+      {
+        label: 'Tracked reps',
+        value: (intel?.members?.length || memberOptions.length || 0).toLocaleString(),
+      },
+      {
+        label: 'Active stages',
+        value: statusBreakdown.length.toLocaleString(),
+      },
+      {
+        label: 'Period',
+        value: intel?.periodLabel || (period === 'week' ? 'This week' : 'This month'),
+      },
+    ],
+    [intel?.members?.length, memberOptions.length, statusBreakdown.length, intel?.periodLabel, period]
+  )
+
   if (!isActive) return null
 
   return (
@@ -227,6 +243,15 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
             ]}
           />
         </div>
+      </div>
+
+      <div className="team-intelligence-hero-strip">
+        {activityHighlights.map((item) => (
+          <div key={item.label} className="team-intelligence-hero-stat">
+            <span className="team-intelligence-hero-stat__label">{item.label}</span>
+            <span className="team-intelligence-hero-stat__value">{item.value}</span>
+          </div>
+        ))}
       </div>
 
       {isManagerView && memberOptions.length > 0 ? (
@@ -252,7 +277,7 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
               type="button"
               className="dashboard-team-filter-banner__clear"
               onClick={() => {
-                setPipelineAssigneeFilter?.(null)
+                setIntelMemberId('')
                 setExpandedMember(null)
               }}
             >
@@ -309,7 +334,8 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
                   icon={item.icon}
                   label={item.label}
                   value={value}
-                  hint={delta != null ? `${formatDelta(delta)} vs prev period` : null}
+                  badge={delta != null ? formatDelta(delta) : null}
+                  hint={delta != null ? 'vs previous period' : null}
                   onClick={
                     clickable
                       ? () => drillTo(item.nav, item.navOptions || {})
@@ -431,7 +457,7 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
                                     type="button"
                                     className="crm-btn crm-btn-sm crm-btn-secondary"
                                     onClick={() => {
-                                      setPipelineAssigneeFilter?.(m.userId)
+                                      setIntelMemberId(String(m.userId))
                                       drillTo('crm-log')
                                     }}
                                   >
@@ -441,7 +467,7 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
                                     type="button"
                                     className="crm-btn crm-btn-sm crm-btn-secondary"
                                     onClick={() => {
-                                      setPipelineAssigneeFilter?.(m.userId)
+                                      setIntelMemberId(String(m.userId))
                                       drillTo('crm-calendar')
                                     }}
                                   >
