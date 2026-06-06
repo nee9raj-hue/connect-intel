@@ -1,6 +1,5 @@
-import { useRef } from 'react'
+import { lazy, Suspense, useRef } from 'react'
 import useIsMobile from '../../hooks/useIsMobile'
-import TeamDashboardPanel from '../crm/TeamDashboardPanel'
 import PeopleSearch from '../search/PeopleSearch'
 import SavedLeadsPanel from '../saved/SavedLeadsPanel'
 import PipelinePanel from '../crm/PipelinePanel'
@@ -24,6 +23,9 @@ import CrmAutomationPanel from '../crm/CrmAutomationPanel'
 import ActiveCustomersPanel from '../crm/ActiveCustomersPanel'
 import FieldExpensesPanel from '../crm/FieldExpensesPanel'
 import PanelCustomizationPanel from '../settings/PanelCustomizationPanel'
+import LoadingExperience from '../ui/LoadingExperience'
+
+const TeamDashboardPanel = lazy(() => import('../crm/TeamDashboardPanel'))
 
 const PANELS = {
   overview: OverviewPanel,
@@ -58,6 +60,27 @@ function resolvePanelId(activePanel) {
   return activePanel === 'bulk-email' ? 'marketing' : activePanel
 }
 
+function PanelLoader() {
+  return (
+    <LoadingExperience
+      message="Loading…"
+      fill={false}
+      className="rounded-2xl border border-[#dde3ea] min-h-[200px] bg-white m-4"
+    />
+  )
+}
+
+function renderPanel(panelId, Panel, props) {
+  if (panelId === 'crm-dashboard') {
+    return (
+      <Suspense fallback={<PanelLoader />}>
+        <TeamDashboardPanel {...props} />
+      </Suspense>
+    )
+  }
+  return <Panel {...props} />
+}
+
 export default function PanelViewport({ activePanel, panelOptions, onNavigate, onOpenCrmMenu }) {
   const isMobile = useIsMobile()
   const panelId = resolvePanelId(activePanel)
@@ -67,13 +90,13 @@ export default function PanelViewport({ activePanel, panelOptions, onNavigate, o
   if (!isMobile) {
     return (
       <div className="flex-1 flex flex-col min-h-0 min-w-0 h-full overflow-hidden">
-        <Panel
-          onNavigate={onNavigate}
-          activePanel={activePanel}
-          panelOptions={panelOptions}
-          isActive
-          onOpenCrmMenu={onOpenCrmMenu}
-        />
+        {renderPanel(panelId, Panel, {
+          onNavigate,
+          activePanel,
+          panelOptions,
+          isActive: true,
+          onOpenCrmMenu,
+        })}
       </div>
     )
   }
@@ -91,13 +114,13 @@ export default function PanelViewport({ activePanel, panelOptions, onNavigate, o
             className={`absolute inset-0 flex flex-col min-h-0 min-w-0 ${isActive ? 'z-10' : 'z-0 hidden'}`}
             aria-hidden={!isActive}
           >
-            <Panel
-              onNavigate={onNavigate}
-              activePanel={activePanel}
-              panelOptions={panelOptions}
-              isActive={isActive}
-              onOpenCrmMenu={onOpenCrmMenu}
-            />
+            {renderPanel(panelId, Panel, {
+              onNavigate,
+              activePanel,
+              panelOptions,
+              isActive,
+              onOpenCrmMenu,
+            })}
           </div>
         )
       })}

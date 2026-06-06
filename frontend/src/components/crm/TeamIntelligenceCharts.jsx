@@ -1,61 +1,42 @@
-import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  Legend,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts'
-import { INTEL_CHART_COLORS } from '../../lib/teamIntelligenceConstants'
+/** CSS/SVG charts — avoids recharts bundler breakage with Vite 8 / Rolldown. */
 
-function ChartTooltip({ active, payload, label }) {
-  if (!active || !payload?.length) return null
-  return (
-    <div className="intel-chart-tooltip">
-      <p className="intel-chart-tooltip__label">{label}</p>
-      {payload.map((entry) => (
-        <p key={entry.name} style={{ color: entry.color }}>
-          {entry.name}: <strong>{entry.value}</strong>
-        </p>
-      ))}
-    </div>
-  )
-}
+const MIX_COLORS = ['#00a4bd', '#ff7a59', '#516f90', '#25d366', '#f5c518', '#7c3aed', '#647185', '#e85d75']
 
 export function ActivityMixPie({ data = [] }) {
   if (!data.length) {
     return <p className="dashboard-empty">No activity recorded this period.</p>
   }
-  const chartData = data.map((row) => ({ name: row.label, value: row.count }))
+  const total = data.reduce((s, d) => s + d.count, 0) || 1
+  let offset = 0
+  const slices = data.map((row, i) => {
+    const pct = (row.count / total) * 100
+    const start = offset
+    offset += pct
+    return { ...row, pct, start, color: MIX_COLORS[i % MIX_COLORS.length] }
+  })
+
+  const gradient = slices
+    .map((s) => `${s.color} ${s.start}% ${s.start + s.pct}%`)
+    .join(', ')
+
   return (
-    <div className="intel-chart intel-chart--pie">
-      <ResponsiveContainer width="100%" height={260}>
-        <PieChart>
-          <Pie
-            data={chartData}
-            dataKey="value"
-            nameKey="name"
-            cx="50%"
-            cy="50%"
-            innerRadius={52}
-            outerRadius={88}
-            paddingAngle={2}
-          >
-            {chartData.map((_, i) => (
-              <Cell key={i} fill={INTEL_CHART_COLORS[i % INTEL_CHART_COLORS.length]} />
-            ))}
-          </Pie>
-          <Tooltip content={<ChartTooltip />} />
-          <Legend layout="horizontal" verticalAlign="bottom" />
-        </PieChart>
-      </ResponsiveContainer>
+    <div className="intel-pie-layout">
+      <div
+        className="intel-pie-ring"
+        style={{ background: `conic-gradient(${gradient})` }}
+        aria-hidden
+      />
+      <ul className="intel-pie-legend">
+        {slices.map((s) => (
+          <li key={s.key}>
+            <span className="intel-pie-legend__dot" style={{ background: s.color }} />
+            <span className="intel-pie-legend__label">{s.label}</span>
+            <span className="intel-pie-legend__value">
+              {s.count} ({Math.round(s.pct)}%)
+            </span>
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }
@@ -64,59 +45,79 @@ export function ActivityTrendChart({ data = [] }) {
   if (!data.length) {
     return <p className="dashboard-empty">No daily activity yet.</p>
   }
-  const chartData = data.map((d) => ({
-    label: d.label,
-    Email: d.email || 0,
-    Calls: d.call || 0,
-    WhatsApp: d.whatsapp || 0,
-    Meetings: d.meeting || 0,
-    Tasks: d.task || 0,
-    Notes: d.note || 0,
-    Total: d.count || 0,
-  }))
+  const max = Math.max(1, ...data.map((d) => d.count))
 
   return (
-    <div className="intel-chart intel-chart--area">
-      <ResponsiveContainer width="100%" height={280}>
-        <AreaChart data={chartData} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e8eef3" />
-          <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#647185' }} />
-          <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: '#647185' }} />
-          <Tooltip content={<ChartTooltip />} />
-          <Legend />
-          <Area type="monotone" dataKey="Email" stackId="1" stroke="#00a4bd" fill="#00a4bd" fillOpacity={0.7} />
-          <Area type="monotone" dataKey="Calls" stackId="1" stroke="#ff7a59" fill="#ff7a59" fillOpacity={0.7} />
-          <Area type="monotone" dataKey="WhatsApp" stackId="1" stroke="#25d366" fill="#25d366" fillOpacity={0.7} />
-          <Area type="monotone" dataKey="Meetings" stackId="1" stroke="#516f90" fill="#516f90" fillOpacity={0.7} />
-          <Area type="monotone" dataKey="Tasks" stackId="1" stroke="#f5c518" fill="#f5c518" fillOpacity={0.7} />
-          <Area type="monotone" dataKey="Notes" stackId="1" stroke="#7c3aed" fill="#7c3aed" fillOpacity={0.65} />
-        </AreaChart>
-      </ResponsiveContainer>
+    <div className="intel-stacked-chart">
+      {data.map((day) => {
+        const segments = [
+          { key: 'email', val: day.email, color: '#00a4bd' },
+          { key: 'call', val: day.call, color: '#ff7a59' },
+          { key: 'whatsapp', val: day.whatsapp, color: '#25d366' },
+          { key: 'meeting', val: day.meeting, color: '#516f90' },
+          { key: 'task', val: day.task, color: '#f5c518' },
+          { key: 'note', val: day.note, color: '#7c3aed' },
+        ].filter((s) => s.val > 0)
+        const barH = Math.max(day.count ? 8 : 2, (day.count / max) * 100)
+        return (
+          <div key={day.date} className="intel-stacked-bar" title={`${day.count} activities`}>
+            <div className="intel-stacked-bar__col" style={{ height: `${barH}%` }}>
+              {segments.map((s) => (
+                <span
+                  key={s.key}
+                  className="intel-stacked-bar__seg"
+                  style={{
+                    flexGrow: s.val,
+                    background: s.color,
+                  }}
+                />
+              ))}
+            </div>
+            <span className="intel-stacked-bar__label">{day.label}</span>
+          </div>
+        )
+      })}
     </div>
   )
 }
 
 export function TeamHoursBarChart({ members = [] }) {
   if (!members.length) return <p className="dashboard-empty">No team members.</p>
-  const chartData = members.slice(0, 12).map((m) => ({
-    name: m.name?.split(' ')[0] || 'Member',
-    hours: m.hoursInApp || 0,
-    activities: m.activitiesTotal || 0,
-  }))
+  const rows = members.slice(0, 12)
+  const max = Math.max(1, ...rows.map((m) => Math.max(m.hoursInApp || 0, m.activitiesTotal || 0)))
 
   return (
-    <div className="intel-chart intel-chart--bar">
-      <ResponsiveContainer width="100%" height={260}>
-        <BarChart data={chartData} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e8eef3" vertical={false} />
-          <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#647185' }} />
-          <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: '#647185' }} />
-          <Tooltip content={<ChartTooltip />} />
-          <Legend />
-          <Bar dataKey="hours" name="Hours in app" fill="#00a4bd" radius={[4, 4, 0, 0]} />
-          <Bar dataKey="activities" name="CRM actions" fill="#ff7a59" radius={[4, 4, 0, 0]} />
-        </BarChart>
-      </ResponsiveContainer>
+    <div className="intel-dual-bar-chart">
+      {rows.map((m) => (
+        <div key={m.userId} className="intel-dual-bar-row">
+          <span className="intel-dual-bar-row__name">{m.name?.split(' ')[0] || 'Member'}</span>
+          <div className="intel-dual-bar-row__tracks">
+            <div className="intel-dual-bar-row__track">
+              <span
+                className="intel-dual-bar-row__fill intel-dual-bar-row__fill--hours"
+                style={{ width: `${((m.hoursInApp || 0) / max) * 100}%` }}
+              />
+            </div>
+            <div className="intel-dual-bar-row__track">
+              <span
+                className="intel-dual-bar-row__fill intel-dual-bar-row__fill--acts"
+                style={{ width: `${((m.activitiesTotal || 0) / max) * 100}%` }}
+              />
+            </div>
+          </div>
+          <span className="intel-dual-bar-row__nums">
+            {m.hoursInApp || 0}h · {m.activitiesTotal || 0}
+          </span>
+        </div>
+      ))}
+      <div className="intel-dual-bar-legend">
+        <span>
+          <i className="intel-legend-swatch intel-legend-swatch--hours" /> Hours in app
+        </span>
+        <span>
+          <i className="intel-legend-swatch intel-legend-swatch--acts" /> CRM actions
+        </span>
+      </div>
     </div>
   )
 }
