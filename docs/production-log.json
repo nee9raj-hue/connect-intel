@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-07T05:36:16.071Z",
-  "updatedAtIst": "07/06/2026, 11:06:16",
+  "updatedAt": "2026-06-07T06:49:27.445Z",
+  "updatedAtIst": "07/06/2026, 12:19:27",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "ba6d814",
+  "currentProductionCommit": "07c306d",
   "entries": [
+    {
+      "logId": "20260607-1219-07c306d",
+      "commit": "07c306d",
+      "commitFull": "07c306d20a4b53462e82bf826c399ac29f68e7b4",
+      "message": "Add HubSpot-style multi-deal flow per lead.",
+      "deployedAt": "2026-06-07T06:49:01.564Z",
+      "deployedAtIst": "07/06/2026, 12:19:01",
+      "committedAtIst": "07/06/2026, 12:18:34",
+      "vercelPreviewUrl": "https://connect-intel-1tea6ypih-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 07c306d"
+    },
+    {
+      "logId": "20260607-1106-8d36006",
+      "commit": "8d36006",
+      "commitFull": "8d3600600e2065b8ac52dc21e83e7b1df2ab597e",
+      "message": "Log production deploy ba6d814 (faster task and meeting saves).",
+      "deployedAt": "2026-06-07T05:36:48.203Z",
+      "deployedAtIst": "07/06/2026, 11:06:48",
+      "committedAtIst": "07/06/2026, 11:06:19",
+      "vercelPreviewUrl": "https://connect-intel-gmav9azy3-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 8d36006"
+    },
     {
       "logId": "20260607-1105-ba6d814",
       "commit": "ba6d814",
@@ -15,7 +43,7 @@
       "committedAtIst": "07/06/2026, 11:05:24",
       "vercelPreviewUrl": "https://connect-intel-99kkiuedy-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- ba6d814"
     },
@@ -256,20 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 7da4381"
-    },
-    {
-      "logId": "20260607-0838-eaa453f",
-      "commit": "eaa453f",
-      "commitFull": "eaa453f1f705b9eddcab3cbef711eb7a2fe4f7f3",
-      "message": "Add inbound email reply sync without gmail.readonly.",
-      "deployedAt": "2026-06-07T03:37:20.960Z",
-      "deployedAtIst": "07/06/2026, 09:07:20",
-      "committedAtIst": "07/06/2026, 08:37:46",
-      "vercelPreviewUrl": "https://connect-intel-1sg9dvn2k-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- eaa453f"
     }
   ]
 }

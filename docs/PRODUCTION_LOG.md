@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- e4fd719
+npm run prod:rollback -- 8d36006
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- e4fd719
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `ba6d814` |
-| Log updated (IST) | 07/06/2026, 11:06:16 |
+| Commit | `07c306d` |
+| Log updated (IST) | 07/06/2026, 12:19:27 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- e4fd719
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 07/06/2026, 11:05:51 | `ba6d814` | Speed up task and meeting saves with clearer success feedback. | [preview](https://connect-intel-99kkiuedy-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ba6d814` | **← LIVE**
+| 07/06/2026, 12:19:01 | `07c306d` | Add HubSpot-style multi-deal flow per lead. | [preview](https://connect-intel-1tea6ypih-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 07c306d` | **← LIVE**
+| 07/06/2026, 11:06:48 | `8d36006` | Log production deploy ba6d814 (faster task and meeting saves). | [preview](https://connect-intel-gmav9azy3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8d36006` |
+| 07/06/2026, 11:05:51 | `ba6d814` | Speed up task and meeting saves with clearer success feedback. | [preview](https://connect-intel-99kkiuedy-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ba6d814` |
 | 07/06/2026, 10:54:42 | `e4fd719` | Log production deploy c69dabf (inActivityPeriod ReferenceError fix). | [preview](https://connect-intel-5m77n9gw2-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e4fd719` |
 | 07/06/2026, 10:53:53 | `c69dabf` | Fix inActivityPeriod ReferenceError in crmTouchpoints. | [preview](https://connect-intel-86xiisxya-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c69dabf` |
 | 07/06/2026, 10:52:34 | `85761b1` | Log production deploy 491231d (dashboard KPI activity count fix). | [preview](https://connect-intel-32cv678uc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 85761b1` |
@@ -62,7 +64,6 @@ npm run prod:rollback -- e4fd719
 | 07/06/2026, 09:39:24 | `ddecae2` | Prune CRM email threads to trail-only and show newest first. | [preview](https://connect-intel-ekyygj5qb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ddecae2` |
 | 07/06/2026, 09:32:16 | `66b8d5f` | Fix inbound reply not saving on org pipeline shards. | [preview](https://connect-intel-841jgg4e9-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 66b8d5f` |
 | 07/06/2026, 09:26:24 | `7da4381` | Add GET health check on CRM inbound email webhook. | [preview](https://connect-intel-j3ggvp2a8-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7da4381` |
-| 07/06/2026, 09:07:20 | `eaa453f` | Add inbound email reply sync without gmail.readonly. | [preview](https://connect-intel-1sg9dvn2k-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- eaa453f` |
 
 ---
 
