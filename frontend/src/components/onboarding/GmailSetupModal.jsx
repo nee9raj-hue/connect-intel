@@ -41,7 +41,7 @@ export function useGmailSetupNeeded(user) {
           setNeeded(false)
           return
         }
-        const ready = data.connected && data.replySyncEnabled
+        const ready = data.connected && (data.inboundReplySync || data.replySyncEnabled)
         if (ready) {
           markGmailSetupDone()
           setNeeded(false)
@@ -109,19 +109,15 @@ export default function GmailSetupModal({ onDone }) {
   }
 
   const isAdmin = Boolean(user?.isOrgAdmin)
-  const needsUpgrade = status?.connected && !status?.replySyncEnabled
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/45 p-4">
       <div className="w-full max-w-md bg-white rounded-xl shadow-xl border border-gray-200 p-6 space-y-4">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">
-            {needsUpgrade ? 'Allow reply import' : 'Connect your work email'}
-          </h2>
+          <h2 className="text-lg font-semibold text-gray-900">Connect your work email</h2>
           <p className="text-sm text-gray-600 mt-1 leading-relaxed">
-            {needsUpgrade
-              ? 'Sending works already. Approve read access once so replies sync into the CRM automatically.'
-              : 'Connect once to send emails and sync replies from your work inbox — no DNS setup required.'}
+            Connect once to send from CRM. Lead replies appear in the CRM timeline and are forwarded to your work
+            inbox — only send permission is required (no Gmail read access).
           </p>
         </div>
 
@@ -154,7 +150,7 @@ export default function GmailSetupModal({ onDone }) {
           disabled={connecting}
           className="w-full py-2.5 text-sm font-semibold bg-[#FF773D] text-[#242424] rounded-lg disabled:opacity-50"
         >
-          {connecting ? 'Connecting…' : needsUpgrade ? 'Allow reply import' : 'Connect work email'}
+          {connecting ? 'Connecting…' : 'Connect work email'}
         </button>
 
         <button type="button" onClick={skip} className="w-full text-xs text-gray-500 underline">

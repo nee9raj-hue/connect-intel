@@ -34,6 +34,7 @@ const ROUTES = {
   'whatsapp/webhook': () => import('../lib/server/handlers/whatsapp-cloud-webhook.js'),
   'crm/bulk-update': () => import('../lib/server/handlers/crm-bulk-update.js'),
   'crm/sync-email-thread': () => import('../lib/server/handlers/crm-sync-email-thread.js'),
+  'crm/email-inbound': () => import('../lib/server/handlers/crm-email-inbound-webhook.js'),
   'crm/log-email-reply': () => import('../lib/server/handlers/crm-log-email-reply.js'),
   'crm/notifications': () => import('../lib/server/handlers/crm-notifications.js'),
   'crm/generate-whatsapp': () => import('../lib/server/handlers/crm-generate-whatsapp.js'),

@@ -12,18 +12,18 @@ export default function CrmEmailThread({
   lead,
   emails = [],
   gmailConnected,
+  inboundReplySync = false,
   replySyncEnabled,
   busy,
   onSync,
   onLogReply,
-  onEnableReplySync,
-  enableReplySyncBusy = false,
-  showReplySyncUpgrade = false,
 }) {
   const [showReplyForm, setShowReplyForm] = useState(false)
   const [replySubject, setReplySubject] = useState('')
   const [replyBody, setReplyBody] = useState('')
   const [expandedId, setExpandedId] = useState(null)
+
+  const autoReplySync = inboundReplySync || replySyncEnabled
 
   const sorted = [...emails].sort(
     (a, b) => new Date(a.sentAt || 0) - new Date(b.sentAt || 0)
@@ -46,21 +46,19 @@ export default function CrmEmailThread({
         <div>
           <h3 className="text-xs font-semibold uppercase text-gray-500">Email thread</h3>
           <p className="text-xs text-gray-400 mt-0.5">
-            Trail mail only — CRM sends and replies for this lead (not your full inbox)
+            {autoReplySync
+              ? 'Replies log in CRM automatically and forward to your work inbox'
+              : 'Trail mail — CRM sends and replies for this lead'}
           </p>
         </div>
         <div className="flex flex-wrap gap-1.5">
-          {gmailConnected && (
+          {gmailConnected && !inboundReplySync && (
             <button
               type="button"
               disabled={busy}
               onClick={() => onSync?.()}
               className="text-xs font-semibold px-2 py-1 rounded-md border border-gray-200 hover:bg-gray-50 disabled:opacity-50"
-              title={
-                replySyncEnabled
-                  ? 'Sync trail mail for this lead (CRM thread + bounces only)'
-                  : 'Reconnect work email to enable trail reply sync'
-              }
+              title="Sync trail mail for this lead (legacy Gmail read)"
             >
               {busy ? 'Syncing…' : '↻ Sync trail'}
             </button>
@@ -76,19 +74,10 @@ export default function CrmEmailThread({
         </div>
       </div>
 
-      {showReplySyncUpgrade && gmailConnected && !replySyncEnabled && onEnableReplySync && (
-        <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-amber-950 bg-amber-50 border-b border-amber-100 px-3 py-2">
-          <p className="leading-relaxed">
-            Allow email import (one-time). If sign-in is blocked, contact your Connect Intel administrator.
-          </p>
-          <button
-            type="button"
-            disabled={busy || enableReplySyncBusy}
-            onClick={() => onEnableReplySync()}
-            className="shrink-0 text-xs font-semibold px-2.5 py-1 rounded-md bg-[#FF773D] text-[#242424] border border-[#ffd4b8] disabled:opacity-50"
-          >
-            {enableReplySyncBusy ? 'Connecting…' : 'Allow reply import'}
-          </button>
+      {inboundReplySync && gmailConnected && (
+        <div className="text-xs text-emerald-900 bg-emerald-50 border-b border-emerald-100 px-3 py-2 leading-relaxed">
+          When {lead?.email || 'this lead'} replies to your CRM email, it appears here and in your Gmail inbox — no
+          Gmail read permission needed.
         </div>
       )}
 
@@ -130,7 +119,9 @@ export default function CrmEmailThread({
       <div className="max-h-64 overflow-y-auto p-3 space-y-2">
         {sorted.length === 0 ? (
           <p className="text-xs text-gray-500 text-center py-4">
-            No emails logged yet. Send from below, then sync trail mail for replies.
+            {autoReplySync
+              ? 'No emails yet. Send from below — replies will sync automatically.'
+              : 'No emails logged yet. Send from below, then sync trail mail for replies.'}
           </p>
         ) : (
           sorted.map((msg) => {

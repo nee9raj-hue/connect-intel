@@ -96,6 +96,7 @@ export default function LeadWorkspace({
     connected: false,
     mailbox: null,
     replySyncEnabled: false,
+    inboundReplySync: false,
     gmailConnectAvailable: false,
     googleVerificationPending: true,
   })
@@ -206,6 +207,7 @@ export default function LeadWorkspace({
           connected: data.connected,
           mailbox: data.mailbox,
           replySyncEnabled: Boolean(data.replySyncEnabled),
+          inboundReplySync: Boolean(data.inboundReplySync),
           gmailConnectAvailable: Boolean(data.gmailConnectAvailable),
           googleVerificationPending: Boolean(data.googleVerificationPending),
         })
@@ -215,6 +217,7 @@ export default function LeadWorkspace({
           connected: false,
           mailbox: null,
           replySyncEnabled: false,
+          inboundReplySync: false,
           gmailConnectAvailable: false,
           googleVerificationPending: true,
         })
@@ -237,6 +240,7 @@ export default function LeadWorkspace({
           connected: data.connected,
           mailbox: data.mailbox,
           replySyncEnabled: Boolean(data.replySyncEnabled),
+          inboundReplySync: Boolean(data.inboundReplySync),
           gmailConnectAvailable: Boolean(data.gmailConnectAvailable),
           googleVerificationPending: Boolean(data.googleVerificationPending),
         })
@@ -557,6 +561,7 @@ export default function LeadWorkspace({
         connected: status.connected,
         mailbox: status.mailbox,
         replySyncEnabled: Boolean(status.replySyncEnabled),
+        inboundReplySync: Boolean(status.inboundReplySync),
         gmailConnectAvailable: Boolean(status.gmailConnectAvailable),
         googleVerificationPending: Boolean(status.googleVerificationPending),
       })
@@ -1289,7 +1294,10 @@ export default function LeadWorkspace({
 
             {canSendEmail && gmailStatus.connected && (
               <p className="text-xs text-emerald-800 bg-emerald-50 border border-emerald-100 rounded-lg px-2 py-1.5">
-                Sending via <strong>{gmailStatus.mailbox}</strong> · use Sync replies below to pull inbound mail
+                Sending via <strong>{gmailStatus.mailbox}</strong>
+                {gmailStatus.inboundReplySync
+                  ? ' · lead replies sync to CRM and forward to your inbox automatically'
+                  : ' · use Sync trail below to pull inbound mail (legacy)'}
               </p>
             )}
 
@@ -1443,13 +1451,9 @@ export default function LeadWorkspace({
               lead={lead}
               emails={crm.emails || []}
               gmailConnected={gmailStatus.connected}
+              inboundReplySync={gmailStatus.inboundReplySync}
               replySyncEnabled={gmailStatus.replySyncEnabled}
               busy={threadSyncing || sending}
-              enableReplySyncBusy={connectingGmail}
-              onEnableReplySync={
-                gmailStatus.gmailConnectAvailable ? connectWorkGmail : undefined
-              }
-              showReplySyncUpgrade={gmailStatus.gmailConnectAvailable}
               onSync={handleSyncEmailThread}
               onLogReply={handleLogReply}
             />

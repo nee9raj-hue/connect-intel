@@ -28,7 +28,7 @@
   <p>Connect Intel requests Google OAuth scopes only when you explicitly connect your work Gmail or Google Calendar:</p>
   <ul>
     <li><strong>gmail.send</strong> — To send CRM emails you compose in Connect Intel from your own work mailbox (e.g. sales@yourcompany.com). We do not send email without your action.</li>
-    <li><strong>gmail.readonly</strong> (optional) — To sync replies between your mailbox and leads already in your CRM pipeline. We query Gmail only for threads involving lead email addresses you are working on.</li>
+    <li><strong>Inbound reply routing</strong> — When you send CRM email, we set a Connect Intel reply address on the message. If a lead replies, that reply is logged in your CRM pipeline and forwarded to your work inbox. We do not read your Gmail inbox.</li>
     <li><strong>calendar.events</strong> (optional) — To show your Google Calendar events in the Connect Intel calendar view and to add CRM meetings you create to your Google Calendar. We do not modify or delete unrelated calendar events.</li>
     <li><strong>email / profile / openid</strong> — To sign you in and identify which Google account you connected.</li>
   </ul>
