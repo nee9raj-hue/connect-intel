@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-07T07:02:48.950Z",
-  "updatedAtIst": "07/06/2026, 12:32:48",
+  "updatedAt": "2026-06-07T07:08:39.818Z",
+  "updatedAtIst": "07/06/2026, 12:38:39",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "2c03ebe",
+  "currentProductionCommit": "20d32df",
   "entries": [
+    {
+      "logId": "20260607-1238-20d32df",
+      "commit": "20d32df",
+      "commitFull": "20d32df31857c9647e24b1a7d0cc17d067448df4",
+      "message": "Fix pipeline timeouts for large orgs and freight deal saves.",
+      "deployedAt": "2026-06-07T07:08:25.854Z",
+      "deployedAtIst": "07/06/2026, 12:38:25",
+      "committedAtIst": "07/06/2026, 12:37:57",
+      "vercelPreviewUrl": "https://connect-intel-nl47y7yrf-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 20d32df"
+    },
+    {
+      "logId": "20260607-1233-bc025ed",
+      "commit": "bc025ed",
+      "commitFull": "bc025ed79e7e052a9295b44ed28c5a144ce58e1c",
+      "message": "Log production deploy 2c03ebe (freight RFQ on deals for Xindus).",
+      "deployedAt": "2026-06-07T07:03:24.812Z",
+      "deployedAtIst": "07/06/2026, 12:33:24",
+      "committedAtIst": "07/06/2026, 12:32:58",
+      "vercelPreviewUrl": "https://connect-intel-nsgzbwrnz-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- bc025ed"
+    },
     {
       "logId": "20260607-1232-2c03ebe",
       "commit": "2c03ebe",
@@ -15,7 +43,7 @@
       "committedAtIst": "07/06/2026, 12:32:00",
       "vercelPreviewUrl": "https://connect-intel-ni7d07ah4-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 2c03ebe"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- ef4045e"
-    },
-    {
-      "logId": "20260607-0940-4dd9c06",
-      "commit": "4dd9c06",
-      "commitFull": "4dd9c0649b4b04bfab6d230b8afba6d8d02cfd45",
-      "message": "Log production deploy ddecae2 (CRM email trail prune and sort).",
-      "deployedAt": "2026-06-07T04:10:11.816Z",
-      "deployedAtIst": "07/06/2026, 09:40:11",
-      "committedAtIst": "07/06/2026, 09:39:45",
-      "vercelPreviewUrl": "https://connect-intel-er47x6uw6-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 4dd9c06"
-    },
-    {
-      "logId": "20260607-0939-ddecae2",
-      "commit": "ddecae2",
-      "commitFull": "ddecae2916e7f8e40f1806a146efe95f93cd2178",
-      "message": "Prune CRM email threads to trail-only and show newest first.",
-      "deployedAt": "2026-06-07T04:09:24.808Z",
-      "deployedAtIst": "07/06/2026, 09:39:24",
-      "committedAtIst": "07/06/2026, 09:38:55",
-      "vercelPreviewUrl": "https://connect-intel-ekyygj5qb-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- ddecae2"
     }
   ]
 }
