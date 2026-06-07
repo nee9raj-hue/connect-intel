@@ -99,9 +99,10 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
   const [expandedMember, setExpandedMember] = useState(null)
 
   const memberUserId = intelMemberId
+  const activeMemberId = data?.memberUserId ?? memberUserId
   const intel = data?.teamIntelligence
   const rollup = intel?.rollup || {}
-  const isFilteredMember = Boolean(memberUserId)
+  const isFilteredMember = Boolean(activeMemberId)
 
   const isManagerView = Boolean(
     user?.isOrgAdmin || user?.orgRole === 'org_admin' || data?.isAdmin
@@ -113,11 +114,12 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
   }, [data?.memberOptions, teamMembers])
 
   const memberName = useMemo(() => {
-    if (!memberUserId) return null
-    const fromOptions = memberOptions.find((m) => String(m.userId) === String(memberUserId))
+    if (!activeMemberId) return null
+    const fromOptions = memberOptions.find((m) => String(m.userId) === String(activeMemberId))
     if (fromOptions?.name) return fromOptions.name
-    return 'Team member'
-  }, [memberUserId, memberOptions])
+    const fromIntel = intel?.members?.find((m) => String(m.userId) === String(activeMemberId))
+    return fromIntel?.name || 'Team member'
+  }, [activeMemberId, memberOptions, intel?.members])
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -139,6 +141,13 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
     if (!isActive) return undefined
     load()
   }, [load, isActive])
+
+  useEffect(() => {
+    if (data?.memberUserId == null && intelMemberId) return
+    if (data?.memberUserId && String(data.memberUserId) !== String(intelMemberId)) {
+      setIntelMemberId(String(data.memberUserId))
+    }
+  }, [data?.memberUserId, intelMemberId])
 
   const preserveAssignee = () => {}
 
@@ -258,6 +267,7 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
             <select
               value={memberUserId}
               onChange={onMemberSelect}
+              disabled={loading}
               className="team-member-filter-bar__select dashboard-select"
               aria-label="Filter dashboard by team member"
             >
@@ -285,7 +295,7 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
         </div>
       ) : null}
 
-      {memberUserId && memberName ? (
+      {activeMemberId && memberName ? (
         <div className="dashboard-team-filter-banner" role="status">
           <span>
             Showing metrics for <strong>{memberName}</strong>
@@ -314,7 +324,12 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
         />
       ) : (
         <>
-          <div className="team-intelligence-kpi-grid" key={`${period}-${memberUserId || 'all'}`}>
+          {loading ? (
+            <p className="text-xs text-[#647185] mb-2" role="status">
+              Updating metrics…
+            </p>
+          ) : null}
+          <div className="team-intelligence-kpi-grid" key={`${period}-${activeMemberId || 'all'}`}>
             {TEAM_KPIS.map((item) => {
               let raw = 0
               if (item.intelKey) {
