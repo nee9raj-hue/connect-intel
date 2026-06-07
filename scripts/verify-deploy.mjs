@@ -26,6 +26,8 @@ const SERVER_IMPORTS = [
   'lib/server/handlers/chithi.js',
   'lib/server/handlers/marketing-lists.js',
   'lib/server/handlers/marketing-campaigns.js',
+  'lib/server/handlers/crm-activity-log.js',
+  'lib/server/handlers/crm-team-dashboard.js',
 ]
 
 function fail(msg) {
