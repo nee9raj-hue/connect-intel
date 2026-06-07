@@ -4,7 +4,7 @@ import { storeSessionToken } from '../lib/sessionAuth'
 import { defaultCrm } from '../lib/crmConstants'
 import { loadReadNotificationIds, saveReadNotificationIds } from '../lib/notificationStorage'
 import { getNotificationTarget } from '../lib/notificationNavigation'
-import { navTargetToOptions } from '../lib/navConfig'
+import { navTargetToOptions, normalizePipelineSummary } from '../lib/navConfig'
 import { withTimeout } from '../lib/fetchWithTimeout'
 
 const AppContext = createContext(null)
@@ -82,12 +82,9 @@ export function AppProvider({ children }) {
   const pendingLeadOpenRef = useRef({ leadId: null, tab: null })
   const workspaceLoadedAtRef = useRef(0)
   const workspaceLoadInFlightRef = useRef(null)
-  const [pipelineSummary, setPipelineSummary] = useState({
-    total: 0,
-    byStatus: [],
-    cities: [],
-    states: [],
-  })
+  const [pipelineSummary, setPipelineSummary] = useState(() =>
+    normalizePipelineSummary({ total: 0, byStatus: [], cities: [], states: [] })
+  )
   const [pipelineLoad, setPipelineLoad] = useState({
     total: 0,
     loaded: 0,
@@ -240,12 +237,7 @@ export function AppProvider({ children }) {
           api.fetchPipelineLeads({ offset: 0, limit: 100, silent: false }),
         ])
         const leads = page.leads || []
-        setPipelineSummary({
-          total: summary.total ?? 0,
-          byStatus: summary.byStatus || [],
-          cities: summary.cities || [],
-          states: summary.states || [],
-        })
+        setPipelineSummary(normalizePipelineSummary(summary))
         setSavedLeads(leads)
         setSessionError(null)
         setPipelineLoad({
@@ -436,7 +428,7 @@ export function AppProvider({ children }) {
         setSavedLeads([])
         setSearchHistory([])
         setTeamMembers([])
-          setPipelineSummary({ total: 0, byStatus: [], cities: [], states: [] })
+          setPipelineSummary(normalizePipelineSummary({ total: 0, byStatus: [], cities: [], states: [] }))
         setPipelineLoad({ total: 0, loaded: 0, hasMore: false, loadingMore: false })
         workspaceLoadedAtRef.current = 0
         return
@@ -458,12 +450,7 @@ export function AppProvider({ children }) {
           if (cancelled) return
 
           const leads = page.leads || []
-          setPipelineSummary({
-            total: summary.total ?? 0,
-            byStatus: summary.byStatus || [],
-            cities: summary.cities || [],
-            states: summary.states || [],
-          })
+          setPipelineSummary(normalizePipelineSummary(summary))
           setSavedLeads(leads)
           setSearchHistory(historyResult.history || [])
           setPipelineLoad({

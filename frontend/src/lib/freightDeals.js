@@ -44,5 +44,13 @@ export function freightRouteLabel(freight) {
 }
 
 export function dealCountsFromSummary(pipelineSummary) {
-  return pipelineSummary?.openDealCounts || pipelineSummary?.dealCounts || null
+  return pipelineSummary?.openDealCounts || null
+}
+
+export function allDealCountsFromSummary(pipelineSummary) {
+  return pipelineSummary?.dealCounts || null
+}
+
+export function sumDealAmounts(dealRows = []) {
+  return dealRows.reduce((sum, row) => sum + (Number(row?.deal?.amount) || 0), 0)
 }

@@ -25,6 +25,18 @@ export function pipelineCountsFromSummary(pipelineSummary, savedLeads = []) {
   return countPipelineByStatus(savedLeads)
 }
 
+/** Preserve deal-count fields from GET /api/saved-leads?summary=1 */
+export function normalizePipelineSummary(summary = {}) {
+  return {
+    total: summary.total ?? 0,
+    byStatus: summary.byStatus || [],
+    cities: summary.cities || [],
+    states: summary.states || [],
+    openDealCounts: summary.openDealCounts || null,
+    dealCounts: summary.dealCounts || null,
+  }
+}
+
 export function countUpcomingFromLeads(leads = []) {
   const now = Date.now()
   let n = 0
