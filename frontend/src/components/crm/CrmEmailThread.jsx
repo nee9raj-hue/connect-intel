@@ -26,7 +26,7 @@ export default function CrmEmailThread({
   const autoReplySync = inboundReplySync || replySyncEnabled
 
   const sorted = [...emails].sort(
-    (a, b) => new Date(a.sentAt || 0) - new Date(b.sentAt || 0)
+    (a, b) => new Date(b.sentAt || 0) - new Date(a.sentAt || 0)
   )
 
   const submitReply = async () => {
