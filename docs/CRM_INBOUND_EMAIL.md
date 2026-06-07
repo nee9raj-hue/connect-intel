@@ -5,9 +5,9 @@ Connect Intel routes lead **replies** through a platform inbound address instead
 ## How it works
 
 1. **Outbound CRM send** (Gmail `gmail.send` or org Resend) sets:
-   - `Reply-To: sync-{leadId}-{sig}@inbound.connectintel.net`
+   - `Reply-To: "rep@company.com" <sync-{leadId}-{sig}@…>` — the lead sees the rep's work email; routing uses the inbound address
    - `Message-ID` for threading when forwarding back to the rep
-2. **Lead replies** to that address (their mail client uses Reply-To).
+2. **Lead replies** (their mail client uses Reply-To; CRM still receives via the hidden routing address).
 3. **Resend inbound** receives the message and POSTs to `/api/crm/email-inbound`.
 4. **Connect Intel**:
    - Appends the reply to the lead CRM timeline

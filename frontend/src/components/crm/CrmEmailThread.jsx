@@ -76,8 +76,8 @@ export default function CrmEmailThread({
 
       {inboundReplySync && gmailConnected && (
         <div className="text-xs text-emerald-900 bg-emerald-50 border-b border-emerald-100 px-3 py-2 leading-relaxed">
-          When {lead?.email || 'this lead'} replies to your CRM email, it appears here and in your Gmail inbox — no
-          Gmail read permission needed.
+          When {lead?.email || 'this lead'} replies, their mail app shows your work email — the reply is
+          logged here and copied to your Gmail inbox. No Gmail read permission needed.
         </div>
       )}
 
