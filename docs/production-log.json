@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-07T07:57:39.336Z",
-  "updatedAtIst": "07/06/2026, 13:27:39",
+  "updatedAt": "2026-06-07T08:13:01.947Z",
+  "updatedAtIst": "07/06/2026, 13:43:01",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "000fdfd",
+  "currentProductionCommit": "c7bb7f4",
   "entries": [
+    {
+      "logId": "20260607-1342-c7bb7f4",
+      "commit": "c7bb7f4",
+      "commitFull": "c7bb7f48d4b15876879e60adbf75e24258c59e74",
+      "message": "Auto-generate deal names, allow rename, and add duplicate deal.",
+      "deployedAt": "2026-06-07T08:12:45.271Z",
+      "deployedAtIst": "07/06/2026, 13:42:45",
+      "committedAtIst": "07/06/2026, 13:42:18",
+      "vercelPreviewUrl": "https://connect-intel-dss7hwxu6-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- c7bb7f4"
+    },
+    {
+      "logId": "20260607-1328-f075305",
+      "commit": "f075305",
+      "commitFull": "f075305422e5a3866665af465eabbe3306b67c97",
+      "message": "Log production deploy 000fdfd (dashboard freight deal counts).",
+      "deployedAt": "2026-06-07T07:58:08.514Z",
+      "deployedAtIst": "07/06/2026, 13:28:08",
+      "committedAtIst": "07/06/2026, 13:27:42",
+      "vercelPreviewUrl": "https://connect-intel-iiwqk4os0-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- f075305"
+    },
     {
       "logId": "20260607-1327-000fdfd",
       "commit": "000fdfd",
@@ -15,7 +43,7 @@
       "committedAtIst": "07/06/2026, 13:26:56",
       "vercelPreviewUrl": "https://connect-intel-6v92cm2gf-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 000fdfd"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 8d36006"
-    },
-    {
-      "logId": "20260607-1105-ba6d814",
-      "commit": "ba6d814",
-      "commitFull": "ba6d8141258573d85c3c98249e120a1df4609bdc",
-      "message": "Speed up task and meeting saves with clearer success feedback.",
-      "deployedAt": "2026-06-07T05:35:51.160Z",
-      "deployedAtIst": "07/06/2026, 11:05:51",
-      "committedAtIst": "07/06/2026, 11:05:24",
-      "vercelPreviewUrl": "https://connect-intel-99kkiuedy-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- ba6d814"
-    },
-    {
-      "logId": "20260607-1054-e4fd719",
-      "commit": "e4fd719",
-      "commitFull": "e4fd719697328b2dd437c88e841805c3e6960aa9",
-      "message": "Log production deploy c69dabf (inActivityPeriod ReferenceError fix).",
-      "deployedAt": "2026-06-07T05:24:42.874Z",
-      "deployedAtIst": "07/06/2026, 10:54:42",
-      "committedAtIst": "07/06/2026, 10:54:16",
-      "vercelPreviewUrl": "https://connect-intel-5m77n9gw2-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- e4fd719"
     }
   ]
 }

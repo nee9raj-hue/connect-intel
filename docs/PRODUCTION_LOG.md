@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 759fb7b
+npm run prod:rollback -- f075305
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 759fb7b
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `000fdfd` |
-| Log updated (IST) | 07/06/2026, 13:27:39 |
+| Commit | `c7bb7f4` |
+| Log updated (IST) | 07/06/2026, 13:43:01 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 759fb7b
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 07/06/2026, 13:27:23 | `000fdfd` | Fix freight deal counts on dashboard and add won/lost sections. | [preview](https://connect-intel-6v92cm2gf-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 000fdfd` | **← LIVE**
+| 07/06/2026, 13:42:45 | `c7bb7f4` | Auto-generate deal names, allow rename, and add duplicate deal. | [preview](https://connect-intel-dss7hwxu6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c7bb7f4` | **← LIVE**
+| 07/06/2026, 13:28:08 | `f075305` | Log production deploy 000fdfd (dashboard freight deal counts). | [preview](https://connect-intel-iiwqk4os0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f075305` |
+| 07/06/2026, 13:27:23 | `000fdfd` | Fix freight deal counts on dashboard and add won/lost sections. | [preview](https://connect-intel-6v92cm2gf-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 000fdfd` |
 | 07/06/2026, 13:19:50 | `759fb7b` | Log production deploy 5265d4b (deal share). | [preview](https://connect-intel-6ca1bynk2-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 759fb7b` |
 | 07/06/2026, 13:19:04 | `5265d4b` | Add deal share via copy, email with CC, and WhatsApp. | [preview](https://connect-intel-enz9lnnm6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5265d4b` |
 | 07/06/2026, 13:11:51 | `6173cbf` | Log production deploy 5041fa4 (freight deal types). | [preview](https://connect-intel-2kj98s5qq-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6173cbf` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 759fb7b
 | 07/06/2026, 12:19:57 | `9e5f604` | Log production deploy 07c306d (multi-deal flow per lead). | [preview](https://connect-intel-3s9vg7mjq-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9e5f604` |
 | 07/06/2026, 12:19:01 | `07c306d` | Add HubSpot-style multi-deal flow per lead. | [preview](https://connect-intel-1tea6ypih-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 07c306d` |
 | 07/06/2026, 11:06:48 | `8d36006` | Log production deploy ba6d814 (faster task and meeting saves). | [preview](https://connect-intel-gmav9azy3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8d36006` |
-| 07/06/2026, 11:05:51 | `ba6d814` | Speed up task and meeting saves with clearer success feedback. | [preview](https://connect-intel-99kkiuedy-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ba6d814` |
-| 07/06/2026, 10:54:42 | `e4fd719` | Log production deploy c69dabf (inActivityPeriod ReferenceError fix). | [preview](https://connect-intel-5m77n9gw2-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e4fd719` |
 
 ---
 
