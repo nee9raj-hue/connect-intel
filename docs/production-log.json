@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-07T07:20:19.133Z",
-  "updatedAtIst": "07/06/2026, 12:50:19",
+  "updatedAt": "2026-06-07T07:30:33.647Z",
+  "updatedAtIst": "07/06/2026, 13:00:33",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "873c78e",
+  "currentProductionCommit": "38bd279",
   "entries": [
+    {
+      "logId": "20260607-1300-38bd279",
+      "commit": "38bd279",
+      "commitFull": "38bd279ee70ff13fb751c9daa4e577227c3660a6",
+      "message": "Use freight-specific deal stages instead of lead pipeline statuses.",
+      "deployedAt": "2026-06-07T07:30:21.195Z",
+      "deployedAtIst": "07/06/2026, 13:00:21",
+      "committedAtIst": "07/06/2026, 12:59:54",
+      "vercelPreviewUrl": "https://connect-intel-mj8myxp8h-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 38bd279"
+    },
+    {
+      "logId": "20260607-1250-636afe1",
+      "commit": "636afe1",
+      "commitFull": "636afe1cf5f0d668c5d31b2b0690ff33885c1c9f",
+      "message": "Log production deploy 873c78e (freight deal pipeline nav).",
+      "deployedAt": "2026-06-07T07:20:51.975Z",
+      "deployedAtIst": "07/06/2026, 12:50:51",
+      "committedAtIst": "07/06/2026, 12:50:23",
+      "vercelPreviewUrl": "https://connect-intel-er91bkjol-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 636afe1"
+    },
     {
       "logId": "20260607-1250-873c78e",
       "commit": "873c78e",
@@ -15,7 +43,7 @@
       "committedAtIst": "07/06/2026, 12:49:36",
       "vercelPreviewUrl": "https://connect-intel-7gk6w4khj-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 873c78e"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 3ecf39a"
-    },
-    {
-      "logId": "20260607-1004-ab3d1b1",
-      "commit": "ab3d1b1",
-      "commitFull": "ab3d1b15fcd88162dd3b5acf7f4c52fdcf7d27d8",
-      "message": "Log production deploy 685980a (inbound CRM reply sync fix).",
-      "deployedAt": "2026-06-07T04:34:50.416Z",
-      "deployedAtIst": "07/06/2026, 10:04:50",
-      "committedAtIst": "07/06/2026, 10:04:23",
-      "vercelPreviewUrl": "https://connect-intel-qwvifgojf-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- ab3d1b1"
-    },
-    {
-      "logId": "20260607-1004-685980a",
-      "commit": "685980a",
-      "commitFull": "685980a152110e612226bea3b0deb9072d2c3814",
-      "message": "Fix inbound CRM reply sync on org shards and auto-refresh email threads.",
-      "deployedAt": "2026-06-07T04:34:04.017Z",
-      "deployedAtIst": "07/06/2026, 10:04:04",
-      "committedAtIst": "07/06/2026, 10:03:34",
-      "vercelPreviewUrl": "https://connect-intel-ai4fz8qtt-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 685980a"
     }
   ]
 }
