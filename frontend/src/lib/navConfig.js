@@ -1,6 +1,7 @@
-import { CRM_STATUSES, getVisiblePipelineColumns } from './crmConstants'
+import { CRM_STATUSES, getVisiblePipelineColumns, RFQ_DEAL_STAGE } from './crmConstants'
 import { isChithiPanel } from './chithiNav'
 import { hasWorkspaceFeature } from './workspaceFeatures'
+import { isFreightDealOrg } from './freightDeal'
 
 export function countPipelineByStatus(leads = []) {
   const counts = { all: leads.length }
@@ -43,6 +44,8 @@ export function navTargetToOptions(target = {}) {
   const options = {}
   if (target.tab) options.tab = target.tab
   if (target.status || target.filter) options.status = target.status || target.filter
+  if (target.view) options.view = target.view
+  if (target.dealStage) options.dealStage = target.dealStage
   if (target.upcomingOnly) options.upcomingOnly = true
   return options
 }
@@ -60,31 +63,137 @@ export function isNavTargetActive(activePanel, panelOptions, target) {
   }
   if (activePanel !== target.panel) return false
   if (target.tab && panelOptions?.tab !== target.tab) return false
+
+  if (target.panel === 'pipeline') {
+    const view = panelOptions?.view || 'leads'
+    const targetView = target.view || 'leads'
+    if (view !== targetView) return false
+    if (targetView === 'deals') {
+      const stage = panelOptions?.dealStage || 'all'
+      const targetStage = target.dealStage || 'all'
+      return stage === targetStage
+    }
+    if (target.status && (panelOptions?.status || 'all') !== target.status) return false
+    if (!target.status) return (panelOptions?.status || 'all') === 'all'
+    return true
+  }
+
   if (target.status && (panelOptions?.status || 'all') !== target.status) return false
   if (target.panel === 'crm-calendar') {
     const upcoming = Boolean(panelOptions?.upcomingOnly)
     return target.upcomingOnly ? upcoming : !upcoming
   }
-  if (target.panel === 'pipeline' && !target.status) {
-    return (panelOptions?.status || 'all') === 'all'
-  }
   return true
 }
 
-export function buildCustomerNavSections(user, { pipelineCounts = {}, upcomingCount = 0 } = {}) {
+function buildFreightPipelineChildren(columns, pipelineCounts, openDealCounts = {}, allDealCounts = {}) {
+  const open = openDealCounts || {}
+  const all = allDealCounts || {}
+  const items = [
+    {
+      id: 'pipeline-all',
+      label: 'All leads',
+      panel: 'pipeline',
+      status: 'all',
+      view: 'leads',
+      badge: pipelineCounts.all,
+    },
+    {
+      id: 'pipeline-all-deals',
+      label: 'All open deals',
+      panel: 'pipeline',
+      view: 'deals',
+      dealStage: 'all',
+      badge: open.all || null,
+    },
+    {
+      id: 'pipeline-rfq-group',
+      label: RFQ_DEAL_STAGE.label,
+      children: [
+        {
+          id: 'pipeline-rfq-deals',
+          label: 'Deals',
+          panel: 'pipeline',
+          view: 'deals',
+          dealStage: 'rfq',
+          badge: open.rfq || null,
+        },
+      ],
+    },
+  ]
+
+  for (const col of columns) {
+    if (col.id === 'active_trading') continue
+    items.push({
+      id: `pipeline-${col.id}-group`,
+      label: col.label,
+      children: [
+        {
+          id: `pipeline-${col.id}-leads`,
+          label: 'Leads',
+          panel: 'pipeline',
+          status: col.id,
+          view: 'leads',
+          badge: pipelineCounts[col.id] || 0,
+        },
+        {
+          id: `pipeline-${col.id}-deals`,
+          label: 'Deals',
+          panel: 'pipeline',
+          view: 'deals',
+          dealStage: col.id,
+          badge: open[col.id] || null,
+        },
+      ],
+    })
+  }
+
+  items.push({
+    id: 'pipeline-won-lost-group',
+    label: 'Closed deals',
+    children: [
+      {
+        id: 'pipeline-won-deals',
+        label: 'Won',
+        panel: 'pipeline',
+        view: 'deals',
+        dealStage: 'won',
+        badge: all.won || null,
+      },
+      {
+        id: 'pipeline-lost-deals',
+        label: 'Lost',
+        panel: 'pipeline',
+        view: 'deals',
+        dealStage: 'lost',
+        badge: all.lost || null,
+      },
+    ],
+  })
+
+  return items
+}
+
+export function buildCustomerNavSections(
+  user,
+  { pipelineCounts = {}, upcomingCount = 0, dealCounts = null, allDealCounts = null } = {}
+) {
   const columns = getVisiblePipelineColumns(user)
   const isCompany = user?.accountType === 'company'
+  const freightOrg = isFreightDealOrg(user)
 
-  const pipelineChildren = [
-    { id: 'pipeline-all', label: 'All leads', panel: 'pipeline', status: 'all', badge: pipelineCounts.all },
-    ...columns.map((col) => ({
-      id: `pipeline-${col.id}`,
-      label: col.label,
-      panel: 'pipeline',
-      status: col.id,
-      badge: pipelineCounts[col.id] || 0,
-    })),
-  ]
+  const pipelineChildren = freightOrg
+    ? buildFreightPipelineChildren(columns, pipelineCounts, dealCounts || {}, allDealCounts || {})
+    : [
+        { id: 'pipeline-all', label: 'All leads', panel: 'pipeline', status: 'all', badge: pipelineCounts.all },
+        ...columns.map((col) => ({
+          id: `pipeline-${col.id}`,
+          label: col.label,
+          panel: 'pipeline',
+          status: col.id,
+          badge: pipelineCounts[col.id] || 0,
+        })),
+      ]
 
   const marketingChildren = [
     { id: 'marketing-campaigns', label: 'Campaigns', panel: 'marketing', tab: 'campaigns' },

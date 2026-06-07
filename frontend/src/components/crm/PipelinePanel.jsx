@@ -31,6 +31,9 @@ import { leadHasCallablePhone } from '../../lib/phoneUtils'
 import LeadPhoneCall from './LeadPhoneCall'
 import { leadHasSendableEmail, getLeadEmail } from '../../lib/emailUtils'
 import { getLeadCity, getLeadState } from '../../lib/pipelineFilters'
+import PipelineDealsView from './PipelineDealsView'
+import { isFreightDealOrg } from '../../lib/freightDeal'
+import { getDealStageMeta } from '../../lib/crmConstants'
 import EmailValidationIcon from './EmailValidationIcon'
 
 import { hasActiveTextSelection } from '../../lib/keyboardShortcuts'
@@ -93,7 +96,12 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     if (canAssign) refreshTeam?.()
   }, [canAssign, refreshTeam])
 
+  const freightOrg = isFreightDealOrg(user)
+  const isDealsView = freightOrg && panelOptions?.view === 'deals'
+  const dealsStage = panelOptions?.dealStage || 'all'
+
   useEffect(() => {
+    if (panelOptions?.view === 'deals') return
     if (panelOptions?.status) {
       setFilter(panelOptions.status)
       if (panelOptions.status !== 'all') {
@@ -101,7 +109,19 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
         setListStatusFilter('all')
       }
     }
-  }, [panelOptions?.status])
+  }, [panelOptions?.status, panelOptions?.view])
+
+  const dealsStageLabel = useMemo(() => {
+    if (dealsStage === 'all') return 'All open deals'
+    return getDealStageMeta(dealsStage).label
+  }, [dealsStage])
+
+  const openDealFromPipeline = useCallback(
+    (leadId, tab = 'deals') => {
+      openPipelineLead(leadId, tab)
+    },
+    [openPipelineLead]
+  )
 
   const [workspaceLead, setWorkspaceLead] = useState(null)
 
@@ -688,6 +708,12 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                     {' · '}
                     {pipelineSummary.total.toLocaleString()} leads in pipeline
                   </>
+                ) : isDealsView ? (
+                  <>
+                    <span className="sr-only">Freight deals — </span>
+                    <strong>{dealsStageLabel}</strong>
+                    {' · shipment RFQs'}
+                  </>
                 ) : (
                   <>
                     <span className="sr-only">Pipeline — </span>
@@ -705,7 +731,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
             </div>
             ) : null}
             <div className="crm-page-actions pipeline-page-actions">
-              {!stageListMode && !usePipelineNarrow ? (
+              {!stageListMode && !usePipelineNarrow && !isDealsView ? (
                 <div className="crm-view-tabs">
                   {[
                     { id: 'board', label: 'Board' },
@@ -743,7 +769,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
             </div>
           </div>
 
-          {showPipelineFilters && (
+          {showPipelineFilters && !isDealsView && (
             <PipelineFiltersBar
               search={search}
               onSearchChange={setSearch}
@@ -826,6 +852,14 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
           {filterApplying ? (
             <div className="flex flex-col items-center justify-center py-16 text-center px-4">
               <p className="text-sm font-medium text-[#516f90]">Updating leads…</p>
+            </div>
+          ) : isDealsView ? (
+            <div className="p-3 md:p-4">
+              <PipelineDealsView
+                dealStage={dealsStage}
+                assigneeFilter={pipelineAssigneeFilter}
+                onOpenLead={openDealFromPipeline}
+              />
             </div>
           ) : showPipelineOnboarding ? (
             <EmptyPipeline

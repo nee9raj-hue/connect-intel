@@ -165,6 +165,17 @@ export const api = {
   getPipelineSummary: ({ silent = false } = {}) =>
     request('/api/saved-leads?summary=1&light=1', { timeoutMs: 45_000 }, { silent }),
 
+  fetchPipelineDeals: ({ dealStage = 'all', offset = 0, limit = 100, silent = false } = {}) => {
+    const qs = new URLSearchParams({
+      view: 'deals',
+      limit: String(limit),
+      offset: String(offset),
+      light: '1',
+    })
+    if (dealStage && dealStage !== 'all') qs.set('dealStage', dealStage)
+    return request(`/api/saved-leads?${qs}`, { timeoutMs: 60_000 }, { silent })
+  },
+
   fetchPipelineBoard: (params = {}) => {
     const qs = new URLSearchParams({ view: 'board', light: '1' })
     if (params.status && params.status !== 'all') qs.set('status', params.status)

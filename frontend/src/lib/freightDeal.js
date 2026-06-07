@@ -3,4 +3,5 @@ export {
   emptyFreightRfq,
   emptyFreightBox,
   isFreightDealOrg,
+  TRANSPORT_MODE_OPTIONS,
 } from '../../../lib/freightDeal.js'

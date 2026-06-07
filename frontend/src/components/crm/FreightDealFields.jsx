@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { api } from '../../lib/api'
-import { CARGO_READINESS_OPTIONS, emptyFreightBox } from '../../lib/freightDeal'
+import { CARGO_READINESS_OPTIONS, emptyFreightBox, TRANSPORT_MODE_OPTIONS } from '../../lib/freightDeal'
 
 function LocationBlock({ title, side, freight, onChange, disabled }) {
   const [lookupMsg, setLookupMsg] = useState(null)
@@ -114,6 +114,32 @@ export default function FreightDealFields({ freight, onChange, disabled = false,
         placeholder="RFQ details — commodity, incoterms, special handling…"
         className="w-full text-xs border rounded-lg px-2 py-1.5 bg-white"
       />
+      <div>
+        <p className="text-[10px] font-semibold uppercase text-gray-500 mb-1">Transport mode</p>
+        <div className="flex flex-wrap gap-2">
+          {TRANSPORT_MODE_OPTIONS.map((o) => (
+            <label
+              key={o.id}
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs cursor-pointer ${
+                freight.transportMode === o.id
+                  ? 'border-indigo-400 bg-indigo-50 text-indigo-900 font-semibold'
+                  : 'border-gray-200 bg-white text-gray-700'
+              } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              <input
+                type="radio"
+                name="transportMode"
+                value={o.id}
+                checked={freight.transportMode === o.id}
+                disabled={disabled}
+                onChange={() => onChange({ ...freight, transportMode: o.id })}
+                className="sr-only"
+              />
+              {o.label}
+            </label>
+          ))}
+        </div>
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         <LocationBlock title="Pickup" side="pickup" freight={freight} onChange={onChange} disabled={disabled} />
         <LocationBlock title="Delivery" side="delivery" freight={freight} onChange={onChange} disabled={disabled} />
@@ -256,6 +282,12 @@ export function formatFreightSummary(freight) {
   if (freight.grossWeightKg != null) parts.push(`${freight.grossWeightKg} kg`)
   if (freight.boxCount != null) parts.push(`${freight.boxCount} boxes`)
   const readiness = CARGO_READINESS_OPTIONS.find((o) => o.id === freight.cargoReadiness)
+  if (freight.transportMode) parts.push(transportModeLabel(freight.transportMode))
   if (readiness) parts.push(readiness.label)
   return parts.length ? parts.join(' · ') : null
+}
+
+function transportModeLabel(mode) {
+  const row = TRANSPORT_MODE_OPTIONS.find((o) => o.id === mode)
+  return row?.label || mode || '—'
 }

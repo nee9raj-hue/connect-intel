@@ -17,6 +17,8 @@ export function parseAppLocation(search = '') {
 
   if (params.get('tab')) panelOptions.tab = params.get('tab')
   if (params.get('status')) panelOptions.status = params.get('status')
+  if (params.get('view')) panelOptions.view = params.get('view')
+  if (params.get('dealStage')) panelOptions.dealStage = params.get('dealStage')
   if (params.get('channel')) panelOptions.channel = params.get('channel')
   if (params.get('upcoming') === '1') panelOptions.upcomingOnly = true
   if (params.get('campaign')) panelOptions.campaignId = params.get('campaign')
@@ -32,6 +34,10 @@ export function serializeAppLocation({ panel = 'overview', panelOptions = {}, le
   if (panel && panel !== 'overview') params.set('panel', panel)
   if (panelOptions.tab) params.set('tab', panelOptions.tab)
   if (panelOptions.status && panelOptions.status !== 'all') params.set('status', panelOptions.status)
+  if (panelOptions.view && panelOptions.view !== 'leads') params.set('view', panelOptions.view)
+  if (panelOptions.dealStage && panelOptions.dealStage !== 'all') {
+    params.set('dealStage', panelOptions.dealStage)
+  }
   if (panelOptions.channel) params.set('channel', panelOptions.channel)
   if (panelOptions.upcomingOnly) params.set('upcoming', '1')
   if (panelOptions.campaignId) params.set('campaign', String(panelOptions.campaignId))

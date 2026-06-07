@@ -115,6 +115,8 @@ export default function Sidebar({
     return buildCustomerNavSections(user, {
       pipelineCounts,
       upcomingCount,
+      dealCounts: pipelineSummary?.openDealCounts,
+      allDealCounts: pipelineSummary?.dealCounts,
     })
   }, [isOperator, user, pipelineCounts, upcomingCount])
 
@@ -131,11 +133,17 @@ export default function Sidebar({
     setExpanded((prev) => {
       const next = { ...prev }
       for (const section of sections) {
-        for (const group of section.groups) {
-          if (group.children?.some((child) => isTargetActive(child))) {
+      for (const group of section.groups) {
+        if (group.children?.some((child) => isTargetActive(child))) {
+          next[group.id] = true
+        }
+        for (const child of group.children || []) {
+          if (child.children?.some((nested) => isTargetActive(nested))) {
             next[group.id] = true
+            next[`stage:${child.id}`] = true
           }
         }
+      }
       }
       return next
     })
@@ -275,7 +283,16 @@ export default function Sidebar({
                   icons={ICONS}
                   compact={compactNav}
                   navExpanded={Boolean(expanded[group.id])}
+                  stageExpanded={expanded}
                   onToggle={() => toggleGroup(group.id)}
+                  onToggleStage={(stageId) => {
+                    const key = `stage:${stageId}`
+                    setExpanded((prev) => {
+                      const next = { ...prev, [key]: !prev[key] }
+                      saveExpanded(next)
+                      return next
+                    })
+                  }}
                   isTargetActive={isTargetActive}
                   onGo={go}
                   resolveBadge={resolveBadge}
@@ -353,7 +370,9 @@ function NavGroup({
   icons,
   compact,
   navExpanded,
+  stageExpanded = {},
   onToggle,
+  onToggleStage,
   isTargetActive,
   onGo,
   resolveBadge,
@@ -438,15 +457,27 @@ function NavGroup({
       </button>
       {navExpanded && (
         <div className="ml-3 mt-1 mb-1 space-y-1 border-l border-white/10 pl-2">
-          {group.children.map((child) => (
-            <NavSubBtn
-              key={child.id}
-              label={child.label}
-              active={isTargetActive(child)}
-              badge={resolveBadge(child)}
-              onClick={() => onGo(child)}
-            />
-          ))}
+          {group.children.map((child) =>
+            child.children?.length ? (
+              <NavStageGroup
+                key={child.id}
+                stage={child}
+                expanded={Boolean(stageExpanded[`stage:${child.id}`])}
+                onToggle={() => onToggleStage?.(child.id)}
+                isTargetActive={isTargetActive}
+                onGo={onGo}
+                resolveBadge={resolveBadge}
+              />
+            ) : (
+              <NavSubBtn
+                key={child.id}
+                label={child.label}
+                active={isTargetActive(child)}
+                badge={resolveBadge(child)}
+                onClick={() => onGo(child)}
+              />
+            )
+          )}
         </div>
       )}
     </div>
@@ -695,6 +726,39 @@ function NavBtn({ label, icon: Icon, active, onClick, badge, muted = false, navP
         </span>
       )}
     </button>
+  )
+}
+
+function NavStageGroup({ stage, expanded, onToggle, isTargetActive, onGo, resolveBadge }) {
+  const stageActive = stage.children.some((c) => isTargetActive(c))
+  return (
+    <div className="mb-0.5">
+      <button
+        type="button"
+        onClick={onToggle}
+        className={`w-full flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold transition-colors ${
+          stageActive ? 'text-white bg-white/10' : 'text-[#bcc4cc] hover:bg-white/6 hover:text-white'
+        }`}
+      >
+        <ChevronRightIcon
+          className={`w-3 h-3 shrink-0 transition-transform ${expanded ? 'rotate-90' : ''}`}
+        />
+        <span className="flex-1 text-left truncate">{stage.label}</span>
+      </button>
+      {expanded && (
+        <div className="ml-3 mt-0.5 space-y-0.5 border-l border-white/8 pl-2">
+          {stage.children.map((child) => (
+            <NavSubBtn
+              key={child.id}
+              label={child.label}
+              active={isTargetActive(child)}
+              badge={resolveBadge(child)}
+              onClick={() => onGo(child)}
+            />
+          ))}
+        </div>
+      )}
+    </div>
   )
 }
 

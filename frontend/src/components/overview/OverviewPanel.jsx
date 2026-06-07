@@ -21,7 +21,9 @@ import {
   DashboardFeatureCard,
 } from '../dashboard/dashboardUi'
 import TeamIntelligenceSection from '../crm/TeamIntelligenceSection'
+import FreightDealsDashboard from './FreightDealsDashboard'
 import { hasWorkspaceFeature } from '../../lib/workspaceFeatures'
+import { isFreightDealOrg } from '../../lib/freightDeal'
 
 export default function OverviewPanel({ onNavigate, isActive = true }) {
   const {
@@ -181,6 +183,10 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
           onClick={() => go({ panel: 'search' })}
         />
       </div>
+
+      {isFreightDealOrg(user) && (
+        <FreightDealsDashboard user={user} pipelineSummary={pipelineSummary} onNavigate={onNavigate} />
+      )}
 
       {showTeamIntelligence ? (
         <TeamIntelligenceSection onNavigate={onNavigate} isActive={isActive} />

@@ -271,25 +271,36 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
             <FreightDealFields freight={freight} onChange={setFreight} disabled={dealBusy} />
           )}
           <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="text-[10px] font-semibold uppercase text-gray-500 block mb-1">
+                Deal stage
+              </label>
+              <select
+                value={stage}
+                onChange={(e) => setStage(e.target.value)}
+                className="w-full text-xs border rounded-lg px-2.5 py-1.5 bg-white"
+              >
+                {stageOptions.filter((s) => !isClosedDealStage(s.id)).map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.label}
+                  </option>
+                ))}
+              </select>
+              {freightOrg && (
+                <p className="text-[10px] text-gray-500 mt-1 leading-snug">
+                  Where this shipment opportunity sits in your freight pipeline (RFQ → quoted → won).
+                  This is separate from the contact&apos;s lead status.
+                </p>
+              )}
+            </div>
             <input
               type="number"
               min={0}
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="Amount ₹"
-              className="w-full text-xs border rounded-lg px-2.5 py-1.5 bg-white"
+              className="w-full text-xs border rounded-lg px-2.5 py-1.5 bg-white self-end"
             />
-            <select
-              value={stage}
-              onChange={(e) => setStage(e.target.value)}
-              className="w-full text-xs border rounded-lg px-2.5 py-1.5 bg-white"
-            >
-              {stageOptions.filter((s) => !isClosedDealStage(s.id)).map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.label}
-                </option>
-              ))}
-            </select>
           </div>
           <input
             type="date"
