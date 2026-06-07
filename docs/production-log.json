@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-07T06:49:27.445Z",
-  "updatedAtIst": "07/06/2026, 12:19:27",
+  "updatedAt": "2026-06-07T07:02:48.950Z",
+  "updatedAtIst": "07/06/2026, 12:32:48",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "07c306d",
+  "currentProductionCommit": "2c03ebe",
   "entries": [
+    {
+      "logId": "20260607-1232-2c03ebe",
+      "commit": "2c03ebe",
+      "commitFull": "2c03ebec281f559b0d68bfd871c47c7d513482d5",
+      "message": "Add freight RFQ fields on deals for Xindus shipping workflows.",
+      "deployedAt": "2026-06-07T07:02:30.568Z",
+      "deployedAtIst": "07/06/2026, 12:32:30",
+      "committedAtIst": "07/06/2026, 12:32:00",
+      "vercelPreviewUrl": "https://connect-intel-ni7d07ah4-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 2c03ebe"
+    },
+    {
+      "logId": "20260607-1219-9e5f604",
+      "commit": "9e5f604",
+      "commitFull": "9e5f6045eb778379441e103423e6bfa1022c3b06",
+      "message": "Log production deploy 07c306d (multi-deal flow per lead).",
+      "deployedAt": "2026-06-07T06:49:57.506Z",
+      "deployedAtIst": "07/06/2026, 12:19:57",
+      "committedAtIst": "07/06/2026, 12:19:30",
+      "vercelPreviewUrl": "https://connect-intel-3s9vg7mjq-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 9e5f604"
+    },
     {
       "logId": "20260607-1219-07c306d",
       "commit": "07c306d",
@@ -15,7 +43,7 @@
       "committedAtIst": "07/06/2026, 12:18:34",
       "vercelPreviewUrl": "https://connect-intel-1tea6ypih-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 07c306d"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- ddecae2"
-    },
-    {
-      "logId": "20260607-0932-66b8d5f",
-      "commit": "66b8d5f",
-      "commitFull": "66b8d5f38cb9524bc4a9c482c56636bc49af4e2c",
-      "message": "Fix inbound reply not saving on org pipeline shards.",
-      "deployedAt": "2026-06-07T04:02:16.188Z",
-      "deployedAtIst": "07/06/2026, 09:32:16",
-      "committedAtIst": "07/06/2026, 09:31:50",
-      "vercelPreviewUrl": "https://connect-intel-841jgg4e9-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 66b8d5f"
-    },
-    {
-      "logId": "20260607-0916-7da4381",
-      "commit": "7da4381",
-      "commitFull": "7da4381c4a92fb08af696f51a37e26857c97af35",
-      "message": "Add GET health check on CRM inbound email webhook.",
-      "deployedAt": "2026-06-07T03:56:24.614Z",
-      "deployedAtIst": "07/06/2026, 09:26:24",
-      "committedAtIst": "07/06/2026, 09:15:52",
-      "vercelPreviewUrl": "https://connect-intel-j3ggvp2a8-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 7da4381"
     }
   ]
 }
