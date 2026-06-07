@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-07T07:41:21.801Z",
-  "updatedAtIst": "07/06/2026, 13:11:21",
+  "updatedAt": "2026-06-07T07:49:20.266Z",
+  "updatedAtIst": "07/06/2026, 13:19:20",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "5041fa4",
+  "currentProductionCommit": "5265d4b",
   "entries": [
+    {
+      "logId": "20260607-1319-5265d4b",
+      "commit": "5265d4b",
+      "commitFull": "5265d4b8e45a757c964be9486642e679b073658e",
+      "message": "Add deal share via copy, email with CC, and WhatsApp.",
+      "deployedAt": "2026-06-07T07:49:04.598Z",
+      "deployedAtIst": "07/06/2026, 13:19:04",
+      "committedAtIst": "07/06/2026, 13:18:37",
+      "vercelPreviewUrl": "https://connect-intel-enz9lnnm6-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 5265d4b"
+    },
+    {
+      "logId": "20260607-1311-6173cbf",
+      "commit": "6173cbf",
+      "commitFull": "6173cbf55602601b1c21ad0c937fa0a25cc80e8d",
+      "message": "Log production deploy 5041fa4 (freight deal types).",
+      "deployedAt": "2026-06-07T07:41:51.286Z",
+      "deployedAtIst": "07/06/2026, 13:11:51",
+      "committedAtIst": "07/06/2026, 13:11:24",
+      "vercelPreviewUrl": "https://connect-intel-2kj98s5qq-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 6173cbf"
+    },
     {
       "logId": "20260607-1311-5041fa4",
       "commit": "5041fa4",
@@ -15,7 +43,7 @@
       "committedAtIst": "07/06/2026, 13:10:40",
       "vercelPreviewUrl": "https://connect-intel-kljczdt1j-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 5041fa4"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 85761b1"
-    },
-    {
-      "logId": "20260607-1051-491231d",
-      "commit": "491231d",
-      "commitFull": "491231dffef04c7a06090e64a3d7a72bcbe70832",
-      "message": "Fix dashboard KPIs by sharing activity log counting logic.",
-      "deployedAt": "2026-06-07T05:21:34.987Z",
-      "deployedAtIst": "07/06/2026, 10:51:34",
-      "committedAtIst": "07/06/2026, 10:51:08",
-      "vercelPreviewUrl": "https://connect-intel-lqx5zglz1-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 491231d"
-    },
-    {
-      "logId": "20260607-1038-143ec4f",
-      "commit": "143ec4f",
-      "commitFull": "143ec4f6346dea7fff0e9e4d792564611e598bc5",
-      "message": "Fix dashboard KPIs by merging CRM activity like the activity log.",
-      "deployedAt": "2026-06-07T05:08:08.282Z",
-      "deployedAtIst": "07/06/2026, 10:38:08",
-      "committedAtIst": "07/06/2026, 10:37:40",
-      "vercelPreviewUrl": "https://connect-intel-3qcrxrxno-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 143ec4f"
     }
   ]
 }
