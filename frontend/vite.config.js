@@ -29,7 +29,7 @@ export default defineConfig({
       ? [viteSingleFile(), pwaStubPlugin()]
       : [
           VitePWA({
-            registerType: 'autoUpdate',
+            registerType: 'prompt',
             includeAssets: [
               'connect-intel-hero-logo.png',
               'connect-intel-logo-icon-light.png',

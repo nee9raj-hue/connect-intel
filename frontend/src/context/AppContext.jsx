@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { api } from '../lib/api'
-import { storeSessionToken } from '../lib/sessionAuth'
+import { storeSessionToken, getSessionToken } from '../lib/sessionAuth'
 import { defaultCrm } from '../lib/crmConstants'
 import { loadReadNotificationIds, saveReadNotificationIds } from '../lib/notificationStorage'
 import { getNotificationTarget } from '../lib/notificationNavigation'
@@ -58,12 +58,12 @@ function mergeLeadInList(prev, lead) {
 
 export function AppProvider({ children }) {
   const [user, setUser] = useState(null)
-  const [screen, setScreen] = useState('landing') // landing | auth | app
+  const [screen, setScreen] = useState(() => (getSessionToken() ? 'app' : 'landing')) // landing | auth | app
   const [savedLeads, setSavedLeads] = useState([])
   const [searchHistory, setSearchHistory] = useState([])
   const [teamMembers, setTeamMembers] = useState([])
   const [orgLeadTags, setOrgLeadTags] = useState([])
-  const [ready, setReady] = useState(false)
+  const [ready, setReady] = useState(() => Boolean(getSessionToken()))
   const [authBusy, setAuthBusy] = useState(false)
   const [pipelineLeadId, setPipelineLeadId] = useState(null)
   const [pipelineLeadDetailAt, setPipelineLeadDetailAt] = useState(0)

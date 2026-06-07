@@ -5,6 +5,7 @@ import {
   appLocationKey,
   parseAppLocation,
   pushAppLocation,
+  resolveInitialAppLocation,
   stripEphemeralQueryParams,
 } from '../../lib/appHistory'
 import { useApp } from '../../context/AppContext'
@@ -31,6 +32,7 @@ import usePanelPreferences from '../../hooks/usePanelPreferences'
 import useChithiAlerts from '../../hooks/useChithiAlerts'
 import useAppKeyboardShortcuts from '../../hooks/useAppKeyboardShortcuts'
 import PwaInstallBanner from './PwaInstallBanner'
+import PwaUpdateBanner from './PwaUpdateBanner'
 import ChithiPushBanner from './ChithiPushBanner'
 import { MenuIcon, SettingsGearIcon } from '../ui/icons'
 
@@ -142,11 +144,9 @@ export default function AppShell() {
 
     applyingHistoryRef.current = true
 
-    const fromUrl = parseAppLocation(window.location.search)
-    let initial = fromUrl
-    if (user.isPlatformAdmin && !new URLSearchParams(window.location.search).get('panel')) {
-      initial = { panel: 'admin-customers', panelOptions: {}, leadId: null }
-    }
+    const initial = resolveInitialAppLocation(window.location.search, {
+      isPlatformAdmin: user.isPlatformAdmin,
+    })
 
     applyLocation(initial)
     commitHistory(initial, { replace: true })
@@ -328,6 +328,7 @@ export default function AppShell() {
           }
         />
         <SessionReconnectBanner />
+        <PwaUpdateBanner />
         {user && !user.isPlatformAdmin && !needsOnboarding && (
           <PwaInstallBanner enabled={!chithiFocus} />
         )}

@@ -41,7 +41,7 @@ export function openExternalUrl(url, { newTab = true } = {}) {
   const link = document.createElement('a')
   link.href = url
   link.rel = 'noopener noreferrer'
-  if (newTab && !isMobileDevice()) link.target = '_blank'
+  if (newTab) link.target = '_blank'
   link.style.display = 'none'
   document.body.appendChild(link)
   link.click()
@@ -52,7 +52,7 @@ export function openExternalUrl(url, { newTab = true } = {}) {
 export function openWhatsAppChat(phone, message = '') {
   const url = buildWhatsAppUrl(phone, message)
   if (!url) return false
-  return openExternalUrl(url, { newTab: !isMobileDevice() })
+  return openExternalUrl(url, { newTab: true })
 }
 
 export function leadHasCallablePhone(lead) {

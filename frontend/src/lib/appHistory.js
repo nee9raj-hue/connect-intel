@@ -1,6 +1,7 @@
 /** Browser history + URL helpers for in-app panel navigation. */
 
 const OAUTH_QUERY_KEYS = ['email_oauth', 'crm_gmail', 'mailbox', 'invite']
+const LAST_LOCATION_KEY = 'ci_last_app_location'
 
 export function parseAppLocation(search = '') {
   const params = new URLSearchParams(search)
@@ -26,6 +27,70 @@ export function parseAppLocation(search = '') {
   const leadId = params.get('lead') || null
 
   return { panel, panelOptions, leadId }
+}
+
+export function urlHasAppNavigation(search = '') {
+  const params = new URLSearchParams(search)
+  return (
+    params.has('panel') ||
+    params.has('lead') ||
+    params.has('tab') ||
+    params.has('status') ||
+    params.has('view') ||
+    params.has('dealStage') ||
+    params.has('channel') ||
+    params.has('upcoming') ||
+    params.has('campaign')
+  )
+}
+
+export function persistAppLocation(location) {
+  if (typeof window === 'undefined' || !location?.panel) return
+  try {
+    sessionStorage.setItem(
+      LAST_LOCATION_KEY,
+      JSON.stringify({
+        panel: location.panel || 'overview',
+        panelOptions: location.panelOptions || {},
+        leadId: location.leadId || null,
+      })
+    )
+  } catch {
+    // ignore private mode
+  }
+}
+
+export function loadPersistedAppLocation() {
+  if (typeof window === 'undefined') return null
+  try {
+    const raw = sessionStorage.getItem(LAST_LOCATION_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw)
+    if (!parsed?.panel) return null
+    return {
+      panel: parsed.panel,
+      panelOptions: parsed.panelOptions || {},
+      leadId: parsed.leadId || null,
+    }
+  } catch {
+    return null
+  }
+}
+
+/** Prefer URL state; fall back to last session location when URL is bare (e.g. PWA reopen). */
+export function resolveInitialAppLocation(search = '', { isPlatformAdmin = false } = {}) {
+  if (urlHasAppNavigation(search)) {
+    return parseAppLocation(search)
+  }
+
+  const persisted = loadPersistedAppLocation()
+  if (persisted) return persisted
+
+  if (isPlatformAdmin) {
+    return { panel: 'admin-customers', panelOptions: {}, leadId: null }
+  }
+
+  return parseAppLocation(search)
 }
 
 export function serializeAppLocation({ panel = 'overview', panelOptions = {}, leadId = null } = {}) {
@@ -62,6 +127,7 @@ export function appLocationUrl(location) {
 }
 
 export function pushAppLocation(location, { replace = false } = {}) {
+  persistAppLocation(location)
   const url = appLocationUrl(location)
   const state = { ciApp: 1, ...location }
   if (replace) window.history.replaceState(state, '', url)

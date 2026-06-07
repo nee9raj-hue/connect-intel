@@ -36,7 +36,7 @@ function Router() {
     }
   }, [inviteToken, screen, setScreen])
 
-  if (!ready || authBusy) {
+  if (authBusy || (!ready && screen !== 'app')) {
     return (
       <div className="min-h-screen flex flex-col bg-[#f6f7f9]">
         <LoadingExperience
