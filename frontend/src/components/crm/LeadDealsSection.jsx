@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import {
   getDealStageMeta,
@@ -6,32 +6,67 @@ import {
   isClosedDealStage,
 } from '../../lib/crmConstants'
 import { formatDealValue } from '../../lib/crmTimeline'
+import { buildAutoDealName } from '../../lib/dealNaming'
 import { emptyFreightRfq, isFreightDealOrg } from '../../lib/freightDeal'
 import FreightDealFields, { formatFreightSummary, freightDealCreateLabel } from './FreightDealFields'
 import { getFreightCustomerTypeMeta } from '../../lib/freightDeal'
 import DealShareActions from './DealShareActions'
 
-function DealRow({ deal, busy, freightOrg, lead, user, onUpdate, onWon, onLost, patchLead, logCrmEmailSend, onNotice, onError }) {
+function DealRow({
+  deal,
+  busy,
+  freightOrg,
+  lead,
+  user,
+  onUpdate,
+  onWon,
+  onLost,
+  onDuplicate,
+  patchLead,
+  logCrmEmailSend,
+  onNotice,
+  onError,
+}) {
   const [lostReason, setLostReason] = useState('')
   const [showLost, setShowLost] = useState(false)
   const [showFreight, setShowFreight] = useState(false)
   const [freightDraft, setFreightDraft] = useState(deal.freight || emptyFreightRfq())
+  const [nameDraft, setNameDraft] = useState(deal.name || '')
   const meta = getDealStageMeta(deal.stage, { freightOrg })
   const closed = isClosedDealStage(deal.stage)
   const stageOptions = getDealStagesForFreight(freightOrg)
   const typeMeta = getFreightCustomerTypeMeta(deal.freight?.customerType)
   const freightSummary = formatFreightSummary(deal.freight)
 
+  useEffect(() => {
+    setNameDraft(deal.name || '')
+  }, [deal.name])
+
   const saveFreight = () => {
     onUpdate(deal.id, { freight: freightDraft })
     setShowFreight(false)
   }
 
+  const saveName = () => {
+    const next = nameDraft.trim()
+    if (!next || next === deal.name) return
+    onUpdate(deal.id, { name: next })
+  }
+
   return (
     <li className={`text-xs border rounded-lg p-2.5 space-y-2 ${closed ? 'opacity-80 bg-gray-50' : 'bg-white'}`}>
       <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0">
-          <p className="font-semibold text-gray-900 truncate">{deal.name}</p>
+        <div className="min-w-0 flex-1">
+          <label className="text-[10px] font-semibold uppercase text-gray-400 block mb-0.5">
+            Deal name
+          </label>
+          <input
+            value={nameDraft}
+            disabled={busy}
+            onChange={(e) => setNameDraft(e.target.value)}
+            onBlur={saveName}
+            className="w-full text-xs font-semibold text-gray-900 border rounded-lg px-2 py-1 bg-white"
+          />
           <div className="flex flex-wrap items-center gap-1 mt-1">
             <span className={`inline-block px-1.5 py-0.5 rounded border text-[10px] font-semibold uppercase ${meta.color}`}>
               {meta.label}
@@ -144,6 +179,14 @@ function DealRow({ deal, busy, freightOrg, lead, user, onUpdate, onWon, onLost, 
             >
               Mark lost
             </button>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => onDuplicate(deal.id)}
+              className="px-2.5 py-1 rounded-lg text-[11px] font-semibold border border-indigo-200 text-indigo-800 bg-indigo-50/50"
+            >
+              Duplicate
+            </button>
           </div>
           {showLost && (
             <div className="flex gap-2">
@@ -164,6 +207,19 @@ function DealRow({ deal, busy, freightOrg, lead, user, onUpdate, onWon, onLost, 
             </div>
           )}
         </>
+      )}
+
+      {closed && (
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => onDuplicate(deal.id)}
+            className="px-2.5 py-1 rounded-lg text-[11px] font-semibold border border-indigo-200 text-indigo-800 bg-indigo-50/50"
+          >
+            Duplicate deal
+          </button>
+        </div>
       )}
 
       <DealShareActions
@@ -190,6 +246,7 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
   const stageOptions = getDealStagesForFreight(freightOrg)
 
   const [name, setName] = useState('')
+  const [nameTouched, setNameTouched] = useState(false)
   const [amount, setAmount] = useState('')
   const [stage, setStage] = useState(freightOrg ? 'rfq' : 'new')
   const [expectedCloseDate, setExpectedCloseDate] = useState('')
@@ -215,6 +272,20 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
     return { openValue, wonValue }
   }, [open, won])
 
+  const suggestedDealName = useMemo(
+    () => buildAutoDealName({ company: lead.company, existingDeals: deals }),
+    [lead.company, deals]
+  )
+
+  useEffect(() => {
+    if (!nameTouched) setName(suggestedDealName)
+  }, [suggestedDealName, nameTouched])
+
+  const regenerateDealName = () => {
+    setNameTouched(false)
+    setName(buildAutoDealName({ company: lead.company, existingDeals: deals }))
+  }
+
   const runDeal = async (body, okMsg) => {
     if (saving || busy) return false
     setSaving(true)
@@ -237,10 +308,12 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
 
   const addDeal = async (e) => {
     e.preventDefault()
-    if (!name.trim()) return
+    const dealName = name.trim() || buildAutoDealName({ company: lead.company, existingDeals: deals })
     const payload = {
       action: 'add',
-      name: name.trim(),
+      name: dealName,
+      autoName: !name.trim(),
+      company: lead.company || '',
       stage,
       amount: amount === '' ? null : Number(amount),
       expectedCloseDate: expectedCloseDate || null,
@@ -248,7 +321,7 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
     if (freightOrg) payload.freight = freight
     const ok = await runDeal(payload, freightOrg ? `${freightDealCreateLabel(freight.customerType).replace('Create ', '')} created` : 'Deal created')
     if (ok) {
-      setName('')
+      setNameTouched(false)
       setAmount('')
       setStage(freightOrg ? 'rfq' : 'new')
       setExpectedCloseDate('')
@@ -257,6 +330,17 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
   }
 
   const updateDeal = (dealId, patch) => runDeal({ action: 'update', dealId, ...patch }, 'Deal updated')
+
+  const duplicateDeal = (dealId) =>
+    runDeal(
+      {
+        action: 'duplicate',
+        dealId,
+        company: lead.company || '',
+        stage: freightOrg ? 'rfq' : 'new',
+      },
+      'Deal duplicated'
+    )
 
   const markWon = (dealId) => runDeal({ action: 'won', dealId }, 'Deal marked won')
 
@@ -295,13 +379,32 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
           {freightOrg ? 'Create freight deal' : 'Create deal'}
         </h3>
         <form onSubmit={addDeal} className="space-y-2 border rounded-lg p-2.5 bg-gray-50">
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder={freightOrg ? 'Deal name (e.g. Mumbai → US air freight)' : 'Deal name (e.g. Q2 freight contract)'}
-            required
-            className="w-full text-xs border rounded-lg px-2.5 py-1.5 bg-white"
-          />
+          <div>
+            <div className="flex items-center justify-between gap-2 mb-1">
+              <label className="text-[10px] font-semibold uppercase text-gray-500">Deal name</label>
+              <button
+                type="button"
+                disabled={dealBusy}
+                onClick={regenerateDealName}
+                className="text-[10px] font-semibold text-indigo-700"
+              >
+                Regenerate
+              </button>
+            </div>
+            <input
+              value={name}
+              onChange={(e) => {
+                setNameTouched(true)
+                setName(e.target.value)
+              }}
+              placeholder="DD-MM-YYYY Company 001"
+              required
+              className="w-full text-xs border rounded-lg px-2.5 py-1.5 bg-white"
+            />
+            <p className="text-[10px] text-gray-500 mt-1 leading-snug">
+              Auto-filled as date + company + sequence (001 first today, then Q#### for additional same-day deals).
+            </p>
+          </div>
           {freightOrg && (
             <FreightDealFields freight={freight} onChange={setFreight} disabled={dealBusy} />
           )}
@@ -383,6 +486,7 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
                 onUpdate={updateDeal}
                 onWon={markWon}
                 onLost={markLost}
+                onDuplicate={duplicateDeal}
                 patchLead={patchLead}
                 logCrmEmailSend={logCrmEmailSend}
                 onNotice={onNotice}
@@ -408,6 +512,7 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
                 onUpdate={updateDeal}
                 onWon={markWon}
                 onLost={markLost}
+                onDuplicate={duplicateDeal}
                 patchLead={patchLead}
                 logCrmEmailSend={logCrmEmailSend}
                 onNotice={onNotice}
@@ -433,6 +538,7 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
                 onUpdate={updateDeal}
                 onWon={markWon}
                 onLost={markLost}
+                onDuplicate={duplicateDeal}
                 patchLead={patchLead}
                 logCrmEmailSend={logCrmEmailSend}
                 onNotice={onNotice}
