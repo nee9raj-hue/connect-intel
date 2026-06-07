@@ -15,11 +15,23 @@ export const CRM_STATUSES = [
 /** HubSpot-style deal stages (multiple deals per lead). */
 export const DEAL_STAGES = CRM_STATUSES.filter((col) => col.id !== 'active_trading')
 
+export const RFQ_DEAL_STAGE = {
+  id: 'rfq',
+  label: 'RFQ',
+  color: 'bg-indigo-50 text-indigo-800 border-indigo-200',
+}
+
+/** Deal stage options — includes RFQ for freight/shipping orgs (e.g. Xindus). */
+export function getDealStagesForFreight(isFreightOrg) {
+  return isFreightOrg ? [RFQ_DEAL_STAGE, ...DEAL_STAGES] : DEAL_STAGES
+}
+
 export function isClosedDealStage(stage) {
   return stage === 'won' || stage === 'lost'
 }
 
 export function getDealStageMeta(stage) {
+  if (stage === 'rfq') return RFQ_DEAL_STAGE
   return DEAL_STAGES.find((s) => s.id === stage) || DEAL_STAGES[0]
 }
 

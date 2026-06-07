@@ -257,6 +257,13 @@ export const api = {
   suggestFieldVisitDistance: (body) =>
     request('/api/crm/field-visit/distance', { method: 'POST', body }),
   getFieldVisitDistanceStatus: () => request('/api/crm/field-visit/distance'),
+  lookupPostalCode: ({ pin, side = 'delivery' } = {}) => {
+    const params = new URLSearchParams()
+    if (pin) params.set('pin', pin)
+    if (side) params.set('side', side)
+    const qs = params.toString()
+    return request(`/api/crm/pincode-lookup${qs ? `?${qs}` : ''}`)
+  },
   getCrmNotifications: (since, { silent = false } = {}) =>
     request(
       `/api/crm/notifications${since ? `?since=${encodeURIComponent(since)}` : ''}`,

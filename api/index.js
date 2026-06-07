@@ -48,6 +48,7 @@ const ROUTES = {
   'crm/settings': () => import('../lib/server/handlers/crm-settings.js'),
   'crm/field-expenses': () => import('../lib/server/handlers/crm-field-expenses.js'),
   'crm/field-visit/distance': () => import('../lib/server/handlers/crm-field-visit-distance.js'),
+  'crm/pincode-lookup': () => import('../lib/server/handlers/crm-pincode-lookup.js'),
   'crm/reminders-ack': () => import('../lib/server/handlers/crm-reminders-ack.js'),
   'crm/reminders-cron': () => import('../lib/server/handlers/crm-reminders-cron.js'),
   'onboarding/complete': () => import('../lib/server/handlers/onboarding-complete.js'),

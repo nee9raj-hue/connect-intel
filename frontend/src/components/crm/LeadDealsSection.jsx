@@ -1,12 +1,27 @@
 import { useMemo, useState } from 'react'
-import { DEAL_STAGES, getDealStageMeta, isClosedDealStage } from '../../lib/crmConstants'
+import {
+  getDealStageMeta,
+  getDealStagesForFreight,
+  isClosedDealStage,
+} from '../../lib/crmConstants'
 import { formatDealValue } from '../../lib/crmTimeline'
+import { emptyFreightRfq, isFreightDealOrg } from '../../lib/freightDeal'
+import FreightDealFields, { formatFreightSummary } from './FreightDealFields'
 
-function DealRow({ deal, busy, onUpdate, onWon, onLost }) {
+function DealRow({ deal, busy, freightOrg, onUpdate, onWon, onLost }) {
   const [lostReason, setLostReason] = useState('')
   const [showLost, setShowLost] = useState(false)
+  const [showFreight, setShowFreight] = useState(false)
+  const [freightDraft, setFreightDraft] = useState(deal.freight || emptyFreightRfq())
   const meta = getDealStageMeta(deal.stage)
   const closed = isClosedDealStage(deal.stage)
+  const stageOptions = getDealStagesForFreight(freightOrg)
+  const freightSummary = formatFreightSummary(deal.freight)
+
+  const saveFreight = () => {
+    onUpdate(deal.id, { freight: freightDraft })
+    setShowFreight(false)
+  }
 
   return (
     <li className={`text-xs border rounded-lg p-2.5 space-y-2 ${closed ? 'opacity-80 bg-gray-50' : 'bg-white'}`}>
@@ -22,11 +37,49 @@ function DealRow({ deal, busy, onUpdate, onWon, onLost }) {
         )}
       </div>
 
+      {freightOrg && freightSummary && (
+        <p className="text-gray-600 bg-indigo-50/60 border border-indigo-100 rounded px-2 py-1">{freightSummary}</p>
+      )}
+      {freightOrg && deal.freight?.rfqDetails && (
+        <p className="text-gray-600 whitespace-pre-wrap">{deal.freight.rfqDetails}</p>
+      )}
+
       {deal.expectedCloseDate && (
         <p className="text-gray-500">Close: {new Date(deal.expectedCloseDate).toLocaleDateString()}</p>
       )}
       {deal.lostReason && <p className="text-gray-500">Lost reason: {deal.lostReason}</p>}
       {deal.notes && <p className="text-gray-600 whitespace-pre-wrap">{deal.notes}</p>}
+
+      {freightOrg && (
+        <div>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => {
+              setFreightDraft(deal.freight || emptyFreightRfq())
+              setShowFreight((v) => !v)
+            }}
+            className="text-[11px] font-semibold text-indigo-700"
+          >
+            {showFreight ? 'Hide RFQ details' : deal.freight ? 'Edit RFQ details' : 'Add RFQ details'}
+          </button>
+          {showFreight && (
+            <div className="mt-2 space-y-2">
+              <FreightDealFields freight={freightDraft} onChange={setFreightDraft} disabled={busy} compact />
+              {!closed && (
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={saveFreight}
+                  className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-indigo-600 text-white disabled:opacity-50"
+                >
+                  Save RFQ
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       {!closed && (
         <>
@@ -37,7 +90,7 @@ function DealRow({ deal, busy, onUpdate, onWon, onLost }) {
               onChange={(e) => onUpdate(deal.id, { stage: e.target.value })}
               className="w-full text-xs border rounded-lg px-2 py-1.5"
             >
-              {DEAL_STAGES.filter((s) => !isClosedDealStage(s.id)).map((s) => (
+              {stageOptions.filter((s) => !isClosedDealStage(s.id)).map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.label}
                 </option>
@@ -99,14 +152,17 @@ function DealRow({ deal, busy, onUpdate, onWon, onLost }) {
 }
 
 /** HubSpot-style deals — multiple opportunities per lead. */
-export default function LeadDealsSection({ lead, patchLead, busy = false, onNotice, onError }) {
+export default function LeadDealsSection({ lead, patchLead, user, busy = false, onNotice, onError }) {
   const crm = lead.crm || {}
   const deals = crm.deals || []
+  const freightOrg = isFreightDealOrg(user)
+  const stageOptions = getDealStagesForFreight(freightOrg)
 
   const [name, setName] = useState('')
   const [amount, setAmount] = useState('')
-  const [stage, setStage] = useState('new')
+  const [stage, setStage] = useState(freightOrg ? 'rfq' : 'new')
   const [expectedCloseDate, setExpectedCloseDate] = useState('')
+  const [freight, setFreight] = useState(emptyFreightRfq())
   const [saving, setSaving] = useState(false)
   const [feedback, setFeedback] = useState(null)
 
@@ -151,21 +207,21 @@ export default function LeadDealsSection({ lead, patchLead, busy = false, onNoti
   const addDeal = async (e) => {
     e.preventDefault()
     if (!name.trim()) return
-    const ok = await runDeal(
-      {
-        action: 'add',
-        name: name.trim(),
-        stage,
-        amount: amount === '' ? null : Number(amount),
-        expectedCloseDate: expectedCloseDate || null,
-      },
-      'Deal created'
-    )
+    const payload = {
+      action: 'add',
+      name: name.trim(),
+      stage,
+      amount: amount === '' ? null : Number(amount),
+      expectedCloseDate: expectedCloseDate || null,
+    }
+    if (freightOrg) payload.freight = freight
+    const ok = await runDeal(payload, freightOrg ? 'Freight RFQ deal created' : 'Deal created')
     if (ok) {
       setName('')
       setAmount('')
-      setStage('new')
+      setStage(freightOrg ? 'rfq' : 'new')
       setExpectedCloseDate('')
+      setFreight(emptyFreightRfq())
     }
   }
 
@@ -180,6 +236,12 @@ export default function LeadDealsSection({ lead, patchLead, busy = false, onNoti
 
   return (
     <div className="space-y-4">
+      {freightOrg && (
+        <p className="text-xs text-indigo-800 bg-indigo-50 border border-indigo-100 rounded-lg px-2.5 py-2">
+          Shipping freight mode — deals include RFQ fields with pickup/delivery ZIP lookup.
+        </p>
+      )}
+
       <section className="grid grid-cols-2 gap-2">
         <div className="border rounded-lg p-2.5 bg-white">
           <p className="text-[10px] font-semibold uppercase text-gray-400">Open pipeline</p>
@@ -194,15 +256,20 @@ export default function LeadDealsSection({ lead, patchLead, busy = false, onNoti
       </section>
 
       <section>
-        <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Create deal</h3>
+        <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">
+          {freightOrg ? 'Create freight RFQ deal' : 'Create deal'}
+        </h3>
         <form onSubmit={addDeal} className="space-y-2 border rounded-lg p-2.5 bg-gray-50">
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Deal name (e.g. Q2 freight contract)"
+            placeholder={freightOrg ? 'Deal name (e.g. Mumbai → US air freight)' : 'Deal name (e.g. Q2 freight contract)'}
             required
             className="w-full text-xs border rounded-lg px-2.5 py-1.5 bg-white"
           />
+          {freightOrg && (
+            <FreightDealFields freight={freight} onChange={setFreight} disabled={dealBusy} />
+          )}
           <div className="grid grid-cols-2 gap-2">
             <input
               type="number"
@@ -217,7 +284,7 @@ export default function LeadDealsSection({ lead, patchLead, busy = false, onNoti
               onChange={(e) => setStage(e.target.value)}
               className="w-full text-xs border rounded-lg px-2.5 py-1.5 bg-white"
             >
-              {DEAL_STAGES.filter((s) => !isClosedDealStage(s.id)).map((s) => (
+              {stageOptions.filter((s) => !isClosedDealStage(s.id)).map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.label}
                 </option>
@@ -235,7 +302,7 @@ export default function LeadDealsSection({ lead, patchLead, busy = false, onNoti
             disabled={dealBusy}
             className="w-full py-2 text-xs font-semibold bg-[#FF773D] text-white rounded-lg disabled:opacity-50"
           >
-            {saving ? 'Creating…' : 'Create deal'}
+            {saving ? 'Creating…' : freightOrg ? 'Create RFQ deal' : 'Create deal'}
           </button>
           {feedback && (
             <p className="text-xs font-semibold text-green-800 bg-green-50 border border-green-200 rounded-lg px-2.5 py-2" role="status">
@@ -250,7 +317,15 @@ export default function LeadDealsSection({ lead, patchLead, busy = false, onNoti
           <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Open deals</h3>
           <ul className="space-y-2">
             {open.map((d) => (
-              <DealRow key={d.id} deal={d} busy={dealBusy} onUpdate={updateDeal} onWon={markWon} onLost={markLost} />
+              <DealRow
+                key={d.id}
+                deal={d}
+                busy={dealBusy}
+                freightOrg={freightOrg}
+                onUpdate={updateDeal}
+                onWon={markWon}
+                onLost={markLost}
+              />
             ))}
           </ul>
         </section>
@@ -261,7 +336,15 @@ export default function LeadDealsSection({ lead, patchLead, busy = false, onNoti
           <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Won deals</h3>
           <ul className="space-y-2">
             {won.map((d) => (
-              <DealRow key={d.id} deal={d} busy={dealBusy} onUpdate={updateDeal} onWon={markWon} onLost={markLost} />
+              <DealRow
+                key={d.id}
+                deal={d}
+                busy={dealBusy}
+                freightOrg={freightOrg}
+                onUpdate={updateDeal}
+                onWon={markWon}
+                onLost={markLost}
+              />
             ))}
           </ul>
         </section>
@@ -272,7 +355,15 @@ export default function LeadDealsSection({ lead, patchLead, busy = false, onNoti
           <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Lost deals</h3>
           <ul className="space-y-2">
             {lost.map((d) => (
-              <DealRow key={d.id} deal={d} busy={dealBusy} onUpdate={updateDeal} onWon={markWon} onLost={markLost} />
+              <DealRow
+                key={d.id}
+                deal={d}
+                busy={dealBusy}
+                freightOrg={freightOrg}
+                onUpdate={updateDeal}
+                onWon={markWon}
+                onLost={markLost}
+              />
             ))}
           </ul>
         </section>
@@ -280,7 +371,9 @@ export default function LeadDealsSection({ lead, patchLead, busy = false, onNoti
 
       {!deals.length && (
         <p className="text-xs text-gray-500">
-          No deals yet. Create one opportunity per product line, contract, or renewal — like HubSpot deals on a contact.
+          {freightOrg
+            ? 'No freight deals yet. Create an RFQ with pickup/delivery ZIP, weight, and box dimensions for each shipment opportunity.'
+            : 'No deals yet. Create one opportunity per product line, contract, or renewal — like HubSpot deals on a contact.'}
         </p>
       )}
     </div>

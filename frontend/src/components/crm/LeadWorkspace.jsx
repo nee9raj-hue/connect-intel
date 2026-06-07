@@ -1012,6 +1012,7 @@ export default function LeadWorkspace({
         {tab === 'deals' && (
           <LeadDealsSection
             lead={lead}
+            user={user}
             patchLead={patchLead}
             busy={savingScope !== null && savingScope !== 'deal'}
             onNotice={setNotice}
