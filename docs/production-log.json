@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-07T07:08:39.818Z",
-  "updatedAtIst": "07/06/2026, 12:38:39",
+  "updatedAt": "2026-06-07T07:20:19.133Z",
+  "updatedAtIst": "07/06/2026, 12:50:19",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "20d32df",
+  "currentProductionCommit": "873c78e",
   "entries": [
+    {
+      "logId": "20260607-1250-873c78e",
+      "commit": "873c78e",
+      "commitFull": "873c78e777b820fc0b17ae0aaed5d23015adb83c",
+      "message": "Add freight deal pipeline nav, dashboard block, and transport mode.",
+      "deployedAt": "2026-06-07T07:20:04.300Z",
+      "deployedAtIst": "07/06/2026, 12:50:04",
+      "committedAtIst": "07/06/2026, 12:49:36",
+      "vercelPreviewUrl": "https://connect-intel-7gk6w4khj-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 873c78e"
+    },
+    {
+      "logId": "20260607-1239-fcfd004",
+      "commit": "fcfd004",
+      "commitFull": "fcfd004de97dd14763f2180830c12ce05a315ef2",
+      "message": "Log production deploy 20d32df (pipeline timeout fixes).",
+      "deployedAt": "2026-06-07T07:09:09.150Z",
+      "deployedAtIst": "07/06/2026, 12:39:09",
+      "committedAtIst": "07/06/2026, 12:38:42",
+      "vercelPreviewUrl": "https://connect-intel-c9wjr2amh-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- fcfd004"
+    },
     {
       "logId": "20260607-1238-20d32df",
       "commit": "20d32df",
@@ -15,7 +43,7 @@
       "committedAtIst": "07/06/2026, 12:37:57",
       "vercelPreviewUrl": "https://connect-intel-nl47y7yrf-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 20d32df"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 685980a"
-    },
-    {
-      "logId": "20260607-0945-1fce29e",
-      "commit": "1fce29e",
-      "commitFull": "1fce29e3719b78deb1b96e84a371f7c1253211fa",
-      "message": "Log production deploy ef4045e (friendly CRM Reply-To display).",
-      "deployedAt": "2026-06-07T04:15:10.631Z",
-      "deployedAtIst": "07/06/2026, 09:45:10",
-      "committedAtIst": "07/06/2026, 09:44:43",
-      "vercelPreviewUrl": "https://connect-intel-ph0xdpj7v-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 1fce29e"
-    },
-    {
-      "logId": "20260607-0944-ef4045e",
-      "commit": "ef4045e",
-      "commitFull": "ef4045e5cd314ac57d1b7370cc954066931c9668",
-      "message": "Show rep work email in CRM Reply-To so leads see a familiar address.",
-      "deployedAt": "2026-06-07T04:14:26.229Z",
-      "deployedAtIst": "07/06/2026, 09:44:26",
-      "committedAtIst": "07/06/2026, 09:43:57",
-      "vercelPreviewUrl": "https://connect-intel-adxbodjer-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- ef4045e"
     }
   ]
 }

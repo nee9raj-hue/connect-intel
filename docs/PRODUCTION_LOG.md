@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- bc025ed
+npm run prod:rollback -- fcfd004
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- bc025ed
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `20d32df` |
-| Log updated (IST) | 07/06/2026, 12:38:39 |
+| Commit | `873c78e` |
+| Log updated (IST) | 07/06/2026, 12:50:19 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- bc025ed
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 07/06/2026, 12:38:25 | `20d32df` | Fix pipeline timeouts for large orgs and freight deal saves. | [preview](https://connect-intel-nl47y7yrf-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 20d32df` | **← LIVE**
+| 07/06/2026, 12:50:04 | `873c78e` | Add freight deal pipeline nav, dashboard block, and transport mode. | [preview](https://connect-intel-7gk6w4khj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 873c78e` | **← LIVE**
+| 07/06/2026, 12:39:09 | `fcfd004` | Log production deploy 20d32df (pipeline timeout fixes). | [preview](https://connect-intel-c9wjr2amh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- fcfd004` |
+| 07/06/2026, 12:38:25 | `20d32df` | Fix pipeline timeouts for large orgs and freight deal saves. | [preview](https://connect-intel-nl47y7yrf-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 20d32df` |
 | 07/06/2026, 12:33:24 | `bc025ed` | Log production deploy 2c03ebe (freight RFQ on deals for Xindus). | [preview](https://connect-intel-nsgzbwrnz-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- bc025ed` |
 | 07/06/2026, 12:32:30 | `2c03ebe` | Add freight RFQ fields on deals for Xindus shipping workflows. | [preview](https://connect-intel-ni7d07ah4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2c03ebe` |
 | 07/06/2026, 12:19:57 | `9e5f604` | Log production deploy 07c306d (multi-deal flow per lead). | [preview](https://connect-intel-3s9vg7mjq-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9e5f604` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- bc025ed
 | 07/06/2026, 10:13:22 | `3ecf39a` | Fix team dashboard KPIs from full pipeline activity logs. | [preview](https://connect-intel-c4v79d8fe-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3ecf39a` |
 | 07/06/2026, 10:04:50 | `ab3d1b1` | Log production deploy 685980a (inbound CRM reply sync fix). | [preview](https://connect-intel-qwvifgojf-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ab3d1b1` |
 | 07/06/2026, 10:04:04 | `685980a` | Fix inbound CRM reply sync on org shards and auto-refresh email threads. | [preview](https://connect-intel-ai4fz8qtt-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 685980a` |
-| 07/06/2026, 09:45:10 | `1fce29e` | Log production deploy ef4045e (friendly CRM Reply-To display). | [preview](https://connect-intel-ph0xdpj7v-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1fce29e` |
-| 07/06/2026, 09:44:26 | `ef4045e` | Show rep work email in CRM Reply-To so leads see a familiar address. | [preview](https://connect-intel-adxbodjer-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ef4045e` |
 
 ---
 
