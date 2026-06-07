@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react'
 
-const POLL_MS = 60 * 1000
-const INITIAL_DELAY_MS = 8 * 1000
+const POLL_MS = 45 * 1000
+const INITIAL_DELAY_MS = 5 * 1000
 const AUTH_FAIL_PAUSE_MS = 2 * 60 * 1000
-const FOCUS_SYNC_MIN_GAP_MS = 3 * 60 * 1000
+const FOCUS_SYNC_MIN_GAP_MS = 90 * 1000
 
 function showBrowserNotification(item) {
   if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return

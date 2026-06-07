@@ -95,6 +95,7 @@ export default function AppShell() {
     onNewNotifications: (items) => {
       const hit =
         items.find((i) => i.type === 'assignment') ||
+        items.find((i) => i.type === 'reply') ||
         items.find((i) => i.type === 'team_note') ||
         items.find((i) => i.type === 'team_task')
       if (hit) setLiveToast(hit.title)

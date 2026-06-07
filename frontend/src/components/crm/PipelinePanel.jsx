@@ -50,6 +50,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     closePipelineLead,
     openPipelineLead,
     refreshSavedLeads,
+    refreshPipelineLead,
+    pipelineLeadDetailAt,
     pipelineAssigneeFilter,
     setPipelineAssigneeFilter,
     teamMembers,
@@ -208,7 +210,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     return () => {
       cancelled = true
     }
-  }, [pipelineLeadId, listLead])
+  }, [pipelineLeadId, listLead, pipelineLeadDetailAt])
 
   const selectedLead = workspaceLead
   const stageListMode = filter !== 'all'

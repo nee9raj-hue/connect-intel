@@ -79,6 +79,7 @@ export default function LeadWorkspace({
     openContact,
     saveEmailSignature,
     orgLeadTags,
+    refreshPipelineLead,
   } = useApp()
   const [tab, setTab] = useState('overview')
   const [notes, setNotes] = useState(lead.crm?.notes || '')
@@ -193,6 +194,17 @@ export default function LeadWorkspace({
       .then((data) => setWaTemplates(data.templates || []))
       .catch(() => setWaTemplates([]))
   }, [tab])
+
+  useEffect(() => {
+    if (tab !== 'email') return undefined
+    if (!gmailStatus.inboundReplySync) return undefined
+    const poll = () => {
+      void refreshPipelineLead?.(lead.id, { silent: true })
+    }
+    poll()
+    const id = setInterval(poll, 30_000)
+    return () => clearInterval(id)
+  }, [tab, lead.id, gmailStatus.inboundReplySync, refreshPipelineLead])
 
   useEffect(() => {
     if (tab !== 'email') return

@@ -66,6 +66,7 @@ export function AppProvider({ children }) {
   const [ready, setReady] = useState(false)
   const [authBusy, setAuthBusy] = useState(false)
   const [pipelineLeadId, setPipelineLeadId] = useState(null)
+  const [pipelineLeadDetailAt, setPipelineLeadDetailAt] = useState(0)
   const [pipelineAssigneeFilter, setPipelineAssigneeFilterState] = useState(loadPipelineAssigneeFilter)
   const setPipelineAssigneeFilter = useCallback((userId) => {
     const next = userId ? String(userId) : null
@@ -284,6 +285,23 @@ export function AppProvider({ children }) {
     return newItems
   }, [])
 
+  const refreshPipelineLead = useCallback(async (leadId, { silent = true } = {}) => {
+    if (!leadId) return null
+    try {
+      const data = await api.getPipelineLead(leadId, { silent })
+      if (data?.lead) {
+        setSavedLeads((prev) => mergeLeadInList(prev, data.lead))
+        if (String(pipelineLeadId) === String(leadId)) {
+          setPipelineLeadDetailAt(Date.now())
+        }
+        return data.lead
+      }
+    } catch {
+      // ignore
+    }
+    return null
+  }, [pipelineLeadId])
+
   const syncWorkspace = useCallback(
     async (since) => {
       const isCompany = user?.accountType === 'company' && user?.organizationId
@@ -313,6 +331,15 @@ export function AppProvider({ children }) {
         setOrgLeadTags(tagsResult.value.tags)
       }
 
+      const replyLeadIds = [
+        ...new Set(
+          newItems.filter((n) => n.type === 'reply' && n.leadId).map((n) => n.leadId)
+        ),
+      ]
+      for (const leadId of replyLeadIds) {
+        void refreshPipelineLead(leadId, { silent: true })
+      }
+
       const shouldRefreshPipeline =
         pipelineUpdated ||
         newItems.some((n) =>
@@ -324,7 +351,13 @@ export function AppProvider({ children }) {
 
       return { serverTime, newItems, pipelineUpdated }
     },
-    [mergeNotificationItems, refreshSavedLeads, user?.accountType, user?.organizationId]
+    [
+      mergeNotificationItems,
+      refreshPipelineLead,
+      refreshSavedLeads,
+      user?.accountType,
+      user?.organizationId,
+    ]
   )
 
   const markNotificationRead = useCallback((id) => {
@@ -907,6 +940,8 @@ export function AppProvider({ children }) {
         contactsFocusId,
         clearContactsFocus,
         pipelineLeadId,
+        pipelineLeadDetailAt,
+        refreshPipelineLead,
         setPipelineLeadId,
         setPanelNavigate,
         setClosePipelineLead,
@@ -928,6 +963,7 @@ export function AppProvider({ children }) {
         refreshChithiUnread,
         markChithiSeen,
         refreshSavedLeads,
+        refreshPipelineLead,
         syncWorkspace,
         notifications,
         unreadNotificationCount,

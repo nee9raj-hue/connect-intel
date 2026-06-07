@@ -14,7 +14,7 @@
 <body>
   <h1>Privacy Policy</h1>
   <p><strong>Connect Intel</strong> — B2B CRM and AI prospect search for sales teams.</p>
-  <p>Last updated: May 2026</p>
+  <p>Last updated: June 2026</p>
   <p>Contact: <a href="mailto:invite@connectintel.net">invite@connectintel.net</a></p>
 
   <h2>What we collect</h2>
@@ -22,17 +22,27 @@
     <li><strong>Account data</strong> — When you sign in with Google, we receive your name, email address, and profile picture to create and secure your account.</li>
     <li><strong>CRM data</strong> — Leads, contacts, companies, pipeline stages, notes, tasks, meetings, and email activity you save in the product.</li>
     <li><strong>Search data</strong> — Search queries and filters you run in AI prospect search.</li>
+    <li><strong>Inbound email replies</strong> — When a lead replies to a CRM email, we receive that reply through our inbound mail service (subject, body, sender address, and timestamps) so it can be shown in your CRM timeline and forwarded to your work inbox.</li>
   </ul>
 
   <h2>How we use Google user data</h2>
-  <p>Connect Intel requests Google OAuth scopes only when you explicitly connect your work Gmail or Google Calendar:</p>
+  <p>Connect Intel requests Google OAuth scopes only when you explicitly connect your work Gmail or Google Calendar. We request the <strong>minimum scopes needed</strong> for each feature:</p>
   <ul>
-    <li><strong>gmail.send</strong> — To send CRM emails you compose in Connect Intel from your own work mailbox (e.g. sales@yourcompany.com). We do not send email without your action.</li>
-    <li><strong>Inbound reply routing</strong> — When you send CRM email, we set a Connect Intel reply address on the message. If a lead replies, that reply is logged in your CRM pipeline and forwarded to your work inbox. We do not read your Gmail inbox.</li>
-    <li><strong>calendar.events</strong> (optional) — To show your Google Calendar events in the Connect Intel calendar view and to add CRM meetings you create to your Google Calendar. We do not modify or delete unrelated calendar events.</li>
+    <li><strong>gmail.send</strong> — To send CRM and marketing emails you compose in Connect Intel from your own work mailbox (e.g. sales@yourcompany.com). We do not send email without your action.</li>
+    <li><strong>calendar.events</strong> (optional, separate connect step) — To show your Google Calendar events in the Connect Intel calendar view and to add CRM meetings you create to your Google Calendar. We do not modify or delete unrelated calendar events.</li>
     <li><strong>email / profile / openid</strong> — To sign you in and identify which Google account you connected.</li>
   </ul>
-  <p>We do <strong>not</strong> sell Google user data. We do <strong>not</strong> use Gmail or Calendar data for advertising. We do <strong>not</strong> read unrelated personal email or calendar entries.</p>
+  <p>We do <strong>not</strong> request <strong>gmail.readonly</strong> or any other Gmail scope that reads your inbox. We do <strong>not</strong> use the Gmail API to scan, import, or sync messages from your mailbox.</p>
+
+  <h2>CRM email replies (without reading your Gmail inbox)</h2>
+  <p>When you send email from Connect Intel, outbound messages include a <strong>Reply-To</strong> address that routes lead replies to Connect Intel’s inbound mail system. When a lead replies:</p>
+  <ul>
+    <li>The reply is <strong>logged in the lead’s CRM email thread</strong> in Connect Intel.</li>
+    <li>A copy is <strong>forwarded to your connected work Gmail inbox</strong> so you can continue the conversation in Gmail if you choose.</li>
+    <li>The lead’s mail app typically shows your work email as the reply destination; the technical routing address is used only to deliver the message to our service.</li>
+  </ul>
+  <p>This design lets reps see replies in CRM and Gmail <strong>without</strong> Connect Intel reading their Gmail inbox via the Gmail API.</p>
+  <p>You may also log a reply manually in the CRM if needed.</p>
 
   <h2>AI features and Google data</h2>
   <p>Connect Intel may use third-party AI (e.g. Google Gemini) to draft email or WhatsApp text from CRM fields you enter (lead name, company, notes). <strong>We do not use Google Workspace API data (Gmail or Calendar content) to train machine-learning models.</strong> AI suggestions are generated at request time for the signed-in user and are not retained for model training.</p>
@@ -40,25 +50,34 @@
   <h2>Google API Services User Data Policy</h2>
   <p>Connect Intel’s use of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a>, including the Limited Use requirements. In summary:</p>
   <ul>
-    <li>We use Gmail data only to provide user-facing CRM email features (send, optional reply sync).</li>
-    <li>We do not transfer Gmail data to third parties except as needed to operate the service (hosting) or when required by law.</li>
-    <li>We do not use Gmail data for ads or to build unrelated user profiles.</li>
-    <li>Humans do not read Gmail content except when necessary for security, support with your consent, or legal compliance.</li>
+    <li>We use Gmail API access only to <strong>send</strong> email that you compose in Connect Intel from your connected work mailbox.</li>
+    <li>We do not use the Gmail API to read your inbox or to build advertising profiles.</li>
+    <li>We do not transfer Google user data to third parties except as needed to operate the service (hosting, email delivery) or when required by law.</li>
+    <li>We do not use Google user data for ads or unrelated profiling.</li>
+    <li>Humans do not read Google user data except when necessary for security, support with your consent, or legal compliance.</li>
   </ul>
 
   <h2>Data storage and retention</h2>
-  <p>CRM and account data are stored on secure cloud infrastructure (Vercel, Supabase). Gmail OAuth refresh tokens are stored encrypted at rest and used only to send mail or sync threads you request. You may disconnect Gmail at any time by revoking access at <a href="https://myaccount.google.com/permissions">Google Account permissions</a>.</p>
+  <p>CRM and account data are stored on secure cloud infrastructure (Vercel, Supabase). Gmail OAuth refresh tokens are stored encrypted at rest and used only to send mail on your behalf via <strong>gmail.send</strong>. Inbound lead replies are processed by our email provider and stored as part of your CRM lead record.</p>
+  <p>You may disconnect work Gmail at any time by revoking access at <a href="https://myaccount.google.com/permissions">Google Account permissions</a> or through Connect Intel settings.</p>
 
   <h2>How we use data</h2>
-  <p>To provide B2B CRM features, team collaboration, AI prospect search, and optional email sending from your connected work Gmail.</p>
+  <p>To provide B2B CRM features, team collaboration, AI prospect search, optional email sending from your connected work Gmail, inbound reply logging, and optional calendar sync.</p>
 
   <h2>Third parties</h2>
-  <p>We use hosting (Vercel), database (Supabase), Google Gmail API (when you connect work Gmail), and optional email delivery providers as configured.</p>
+  <p>We use service providers to operate Connect Intel, including:</p>
+  <ul>
+    <li><strong>Vercel</strong> — application hosting</li>
+    <li><strong>Supabase</strong> — database storage</li>
+    <li><strong>Google</strong> — Sign-In, Gmail send API, and optional Calendar API when you connect those features</li>
+    <li><strong>Resend</strong> (and similar email infrastructure) — inbound reply processing, outbound platform email (invites, forwards), and optional company-domain sending when configured</li>
+  </ul>
+  <p>These providers process data only to deliver the service on our behalf, under our instructions and applicable agreements.</p>
 
   <h2>Your choices</h2>
   <ul>
-    <li>Disconnect work Gmail in Google Account settings or contact support to remove tokens.</li>
-    <li>Request account deletion by emailing invite@connectintel.net.</li>
+    <li>Disconnect work Gmail in Google Account settings or contact support to remove OAuth tokens.</li>
+    <li>Request account deletion by emailing <a href="mailto:invite@connectintel.net">invite@connectintel.net</a>.</li>
   </ul>
 
   <p>Website: <a href="https://connectintel.net">connectintel.net</a></p>
