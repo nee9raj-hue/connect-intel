@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-07T07:38:09.883Z",
-  "updatedAtIst": "07/06/2026, 13:08:09",
+  "updatedAt": "2026-06-07T07:41:21.801Z",
+  "updatedAtIst": "07/06/2026, 13:11:21",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "cdc422b",
+  "currentProductionCommit": "5041fa4",
   "entries": [
+    {
+      "logId": "20260607-1311-5041fa4",
+      "commit": "5041fa4",
+      "commitFull": "5041fa4824fdf4c8e7facb84d674c89d101f1efb",
+      "message": "Add freight deal types with invoice vs freight charges split.",
+      "deployedAt": "2026-06-07T07:41:07.005Z",
+      "deployedAtIst": "07/06/2026, 13:11:07",
+      "committedAtIst": "07/06/2026, 13:10:40",
+      "vercelPreviewUrl": "https://connect-intel-kljczdt1j-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 5041fa4"
+    },
+    {
+      "logId": "20260607-1308-6d35d01",
+      "commit": "6d35d01",
+      "commitFull": "6d35d014a84a77f445ffc3eebacf1d9dc0321452",
+      "message": "Log production deploy cdc422b (sidebar flyout + RFQ fields).",
+      "deployedAt": "2026-06-07T07:38:38.637Z",
+      "deployedAtIst": "07/06/2026, 13:08:38",
+      "committedAtIst": "07/06/2026, 13:08:12",
+      "vercelPreviewUrl": "https://connect-intel-kg9h3z5nr-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 6d35d01"
+    },
     {
       "logId": "20260607-1307-cdc422b",
       "commit": "cdc422b",
@@ -15,7 +43,7 @@
       "committedAtIst": "07/06/2026, 13:07:22",
       "vercelPreviewUrl": "https://connect-intel-4cte2giix-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- cdc422b"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 143ec4f"
-    },
-    {
-      "logId": "20260607-1034-a1ee2a9",
-      "commit": "a1ee2a9",
-      "commitFull": "a1ee2a90e0d583ab697fb3d88faf5f963c236b63",
-      "message": "Fix dashboard KPIs by merging monolith CRM activity into shard reads.",
-      "deployedAt": "2026-06-07T05:04:29.347Z",
-      "deployedAtIst": "07/06/2026, 10:34:29",
-      "committedAtIst": "07/06/2026, 10:34:03",
-      "vercelPreviewUrl": "https://connect-intel-x6x7luqzr-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- a1ee2a9"
-    },
-    {
-      "logId": "20260607-1024-07ad2b0",
-      "commit": "07ad2b0",
-      "commitFull": "07ad2b0b00c6e854a84cdacaee5f30a98acd284e",
-      "message": "Fix dashboard showing admin stats for every team member filter.",
-      "deployedAt": "2026-06-07T04:54:29.694Z",
-      "deployedAtIst": "07/06/2026, 10:24:29",
-      "committedAtIst": "07/06/2026, 10:24:02",
-      "vercelPreviewUrl": "https://connect-intel-amyrq1mgt-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 07ad2b0"
     }
   ]
 }

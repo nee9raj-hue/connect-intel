@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- c74a935
+npm run prod:rollback -- 6d35d01
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- c74a935
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `cdc422b` |
-| Log updated (IST) | 07/06/2026, 13:08:09 |
+| Commit | `5041fa4` |
+| Log updated (IST) | 07/06/2026, 13:11:21 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- c74a935
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 07/06/2026, 13:07:47 | `cdc422b` | Fix collapsed pipeline flyouts and add RFQ incoterm fields. | [preview](https://connect-intel-4cte2giix-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- cdc422b` | **← LIVE**
+| 07/06/2026, 13:11:07 | `5041fa4` | Add freight deal types with invoice vs freight charges split. | [preview](https://connect-intel-kljczdt1j-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5041fa4` | **← LIVE**
+| 07/06/2026, 13:08:38 | `6d35d01` | Log production deploy cdc422b (sidebar flyout + RFQ fields). | [preview](https://connect-intel-kg9h3z5nr-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6d35d01` |
+| 07/06/2026, 13:07:47 | `cdc422b` | Fix collapsed pipeline flyouts and add RFQ incoterm fields. | [preview](https://connect-intel-4cte2giix-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- cdc422b` |
 | 07/06/2026, 13:01:16 | `c74a935` | Log production deploy 38bd279 (freight deal stages fix). | [preview](https://connect-intel-p1zw1iafa-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c74a935` |
 | 07/06/2026, 13:00:21 | `38bd279` | Use freight-specific deal stages instead of lead pipeline statuses. | [preview](https://connect-intel-mj8myxp8h-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 38bd279` |
 | 07/06/2026, 12:50:51 | `636afe1` | Log production deploy 873c78e (freight deal pipeline nav). | [preview](https://connect-intel-er91bkjol-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 636afe1` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- c74a935
 | 07/06/2026, 10:52:34 | `85761b1` | Log production deploy 491231d (dashboard KPI activity count fix). | [preview](https://connect-intel-32cv678uc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 85761b1` |
 | 07/06/2026, 10:51:34 | `491231d` | Fix dashboard KPIs by sharing activity log counting logic. | [preview](https://connect-intel-lqx5zglz1-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 491231d` |
 | 07/06/2026, 10:38:08 | `143ec4f` | Fix dashboard KPIs by merging CRM activity like the activity log. | [preview](https://connect-intel-3qcrxrxno-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 143ec4f` |
-| 07/06/2026, 10:34:29 | `a1ee2a9` | Fix dashboard KPIs by merging monolith CRM activity into shard reads. | [preview](https://connect-intel-x6x7luqzr-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a1ee2a9` |
-| 07/06/2026, 10:24:29 | `07ad2b0` | Fix dashboard showing admin stats for every team member filter. | [preview](https://connect-intel-amyrq1mgt-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 07ad2b0` |
 
 ---
 
