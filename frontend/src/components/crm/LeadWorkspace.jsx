@@ -89,7 +89,9 @@ export default function LeadWorkspace({
   const [purpose, setPurpose] = useState('introduction')
   const [generating, setGenerating] = useState(false)
   const [sending, setSending] = useState(false)
-  const [saving, setSaving] = useState(false)
+  const [savingScope, setSavingScope] = useState(null)
+  const [scheduleFeedback, setScheduleFeedback] = useState(null)
+  const [visitFormKey, setVisitFormKey] = useState(0)
   const [error, setError] = useState(null)
   const [notice, setNotice] = useState(null)
   const [orgEmail, setOrgEmail] = useState(null)
@@ -151,6 +153,10 @@ export default function LeadWorkspace({
   const crm = lead.crm || {}
   const timeline = buildUnifiedTimeline(crm)
   const statusMeta = getStatusMeta(status)
+  const saving = savingScope !== null
+  const savingTask = savingScope === 'task'
+  const savingMeeting = savingScope === 'meeting'
+  const savingVisit = savingScope === 'visit'
 
   useEffect(() => {
     setNotes(lead.crm?.notes || '')
@@ -167,6 +173,12 @@ export default function LeadWorkspace({
     const timer = setTimeout(() => setNotice(null), 5000)
     return () => clearTimeout(timer)
   }, [notice])
+
+  useEffect(() => {
+    if (!scheduleFeedback) return
+    const timer = setTimeout(() => setScheduleFeedback(null), 6000)
+    return () => clearTimeout(timer)
+  }, [scheduleFeedback])
 
   useEffect(() => {
     setEmailSignature(user?.emailSignature || '')
@@ -261,19 +273,41 @@ export default function LeadWorkspace({
     setTab('email')
   }, [])
 
-  const runPatch = async (body, okMsg) => {
-    if (saving) return false
-    setSaving(true)
+  const resetTaskForm = () => {
+    setTaskTitle('')
+    setTaskDue('')
+    setTaskParticipants([])
+    setTaskAssignee(user?.id || '')
+  }
+
+  const resetMeetingForm = () => {
+    setMeetingTitle('')
+    setMeetingWhen('')
+    setMeetingType('call')
+    setMeetingLocation('')
+    setMeetingNotes('')
+    setMeetingParticipants([])
+    setMeetingAssignee(user?.id || '')
+  }
+
+  const runPatch = async (body, okMsg, scope = 'general') => {
+    if (savingScope) return false
+    setSavingScope(scope)
     setError(null)
     try {
       await patchLead(lead.id, body)
-      if (okMsg) setNotice(okMsg)
+      if (okMsg) {
+        setNotice(okMsg)
+        if (scope === 'task' || scope === 'meeting' || scope === 'visit') {
+          setScheduleFeedback({ form: scope, message: okMsg })
+        }
+      }
       return true
     } catch (e) {
       setError(e.message)
-      throw e
+      return false
     } finally {
-      setSaving(false)
+      setSavingScope(null)
     }
   }
 
@@ -294,12 +328,12 @@ export default function LeadWorkspace({
   }
 
   const logCallActivity = async (body) => {
-    await runPatch(body, 'Call logged')
+    await runPatch(body, 'Call logged', 'activity')
   }
 
   const addTask = async (e) => {
     e.preventDefault()
-    if (!taskTitle.trim() || saving) return
+    if (!taskTitle.trim() || savingScope) return
     if (!taskDue) {
       setError('Pick a due date so the task appears on the calendar')
       return
@@ -314,18 +348,15 @@ export default function LeadWorkspace({
           participantUserIds: taskParticipants.filter((id) => id !== (canScheduleForTeam ? taskAssignee : user.id)),
         },
       },
-      'Task saved'
+      'Task saved — add another below',
+      'task'
     )
-    if (ok) {
-      setTaskTitle('')
-      setTaskDue('')
-      setTaskParticipants([])
-    }
+    if (ok) resetTaskForm()
   }
 
   const addMeeting = async (e) => {
     e.preventDefault()
-    if (saving) return
+    if (savingScope) return
     if (!meetingWhen) {
       setError('Pick date and time')
       return
@@ -345,19 +376,14 @@ export default function LeadWorkspace({
           ),
         },
       },
-      'Meeting scheduled — reminder 30 min before'
+      'Meeting scheduled — reminder 30 min before',
+      'meeting'
     )
-    if (ok) {
-      setMeetingTitle('')
-      setMeetingWhen('')
-      setMeetingLocation('')
-      setMeetingNotes('')
-      setMeetingParticipants([])
-    }
+    if (ok) resetMeetingForm()
   }
 
   const recordVisit = async (payload) => {
-    if (saving) return
+    if (savingScope) return
     const isUpdate = payload?.action === 'update'
     const mid =
       payload?.meetingId ||
@@ -384,11 +410,16 @@ export default function LeadWorkspace({
       fieldVisitExpensesEnabled
         ? isUpdate
           ? 'Field visit updated'
-          : 'Field visit & claim saved'
-        : 'Field visit recorded'
+          : 'Field visit saved — ready to log another'
+        : 'Field visit recorded',
+      'visit'
     )
     if (ok) {
-      if (!fieldVisitExpensesEnabled) setVisitNotes('')
+      if (!fieldVisitExpensesEnabled) {
+        setVisitNotes('')
+        setVisitMeetingId('')
+      }
+      if (fieldVisitExpensesEnabled && !isUpdate) setVisitFormKey((k) => k + 1)
       if (isUpdate) setEditingVisitMeetingId(null)
     }
   }
@@ -405,8 +436,8 @@ export default function LeadWorkspace({
   )
 
   const completeTask = async (taskId) => {
-    if (saving) return
-    await runPatch({ task: { action: 'complete', taskId } }, 'Task completed')
+    if (savingScope) return
+    await runPatch({ task: { action: 'complete', taskId } }, 'Task marked complete', 'task')
   }
 
   const connectWorkGmail = async () => {
@@ -728,16 +759,16 @@ export default function LeadWorkspace({
             </button>
           ))}
         </div>
-        {(notice || saving) && (
+        {(notice || savingScope === 'general') && (
           <div
             className={`mt-2 text-xs font-medium rounded-lg px-2.5 py-1.5 border ${
-              saving
+              savingScope === 'general'
                 ? 'bg-amber-50 text-amber-900 border-amber-200'
                 : 'bg-green-50 text-green-900 border-green-200'
             }`}
             role="status"
           >
-            {saving ? 'Saving…' : notice}
+            {savingScope === 'general' ? 'Saving…' : notice}
           </div>
         )}
       </div>
@@ -1084,9 +1115,14 @@ export default function LeadWorkspace({
                     onChange={setTaskParticipants}
                   />
                 )}
-                <button type="submit" disabled={busy} className="w-full py-2 text-xs font-semibold bg-[#FF773D] rounded-lg disabled:opacity-50">
-                  {saving ? 'Saving…' : 'Add task'}
+                <button type="submit" disabled={busy || savingTask} className="w-full py-2 text-xs font-semibold bg-[#FF773D] rounded-lg disabled:opacity-50">
+                  {savingTask ? 'Saving task…' : 'Add task'}
                 </button>
+                {scheduleFeedback?.form === 'task' && (
+                  <p className="text-xs font-semibold text-green-800 bg-green-50 border border-green-200 rounded-lg px-2.5 py-2" role="status">
+                    ✓ {scheduleFeedback.message}
+                  </p>
+                )}
               </form>
               <ul className="space-y-2">
                 {(crm.tasks || []).map((t) => (
@@ -1144,9 +1180,14 @@ export default function LeadWorkspace({
                     label="Also attending (team)"
                   />
                 )}
-                <button type="submit" disabled={busy} className="w-full py-2 text-xs font-semibold bg-gray-900 text-white rounded-lg disabled:opacity-50">
-                  {saving ? 'Scheduling…' : 'Schedule'}
+                <button type="submit" disabled={busy || savingMeeting} className="w-full py-2 text-xs font-semibold bg-gray-900 text-white rounded-lg disabled:opacity-50">
+                  {savingMeeting ? 'Scheduling…' : 'Schedule meeting'}
                 </button>
+                {scheduleFeedback?.form === 'meeting' && (
+                  <p className="text-xs font-semibold text-green-800 bg-green-50 border border-green-200 rounded-lg px-2.5 py-2" role="status">
+                    ✓ {scheduleFeedback.message}
+                  </p>
+                )}
               </form>
             </section>
 
@@ -1156,20 +1197,22 @@ export default function LeadWorkspace({
               </h3>
               {fieldVisitExpensesEnabled && editingVisitMeeting ? (
                 <FieldVisitRecordForm
+                  key={`visit-edit-${editingVisitMeetingId}`}
                   lead={lead}
                   meetings={crm.meetings || []}
                   settings={fieldVisitSettings}
-                  busy={busy}
+                  busy={busy || savingVisit}
                   editMeeting={editingVisitMeeting}
                   onCancel={() => setEditingVisitMeetingId(null)}
                   onSubmit={recordVisit}
                 />
               ) : fieldVisitExpensesEnabled ? (
                 <FieldVisitRecordForm
+                  key={`visit-new-${visitFormKey}`}
                   lead={lead}
                   meetings={crm.meetings || []}
                   settings={fieldVisitSettings}
-                  busy={busy}
+                  busy={busy || savingVisit}
                   onSubmit={recordVisit}
                 />
               ) : (
@@ -1212,12 +1255,17 @@ export default function LeadWorkspace({
                   />
                   <button
                     type="submit"
-                    disabled={busy}
+                    disabled={busy || savingVisit}
                     className="w-full py-2 text-xs font-semibold border-2 border-[#FF773D] rounded-lg disabled:opacity-50"
                   >
-                    {saving ? 'Saving…' : 'Save field visit report'}
+                    {savingVisit ? 'Saving visit…' : 'Save field visit report'}
                   </button>
                 </form>
+              )}
+              {scheduleFeedback?.form === 'visit' && (
+                <p className="mt-2 text-xs font-semibold text-green-800 bg-green-50 border border-green-200 rounded-lg px-2.5 py-2" role="status">
+                  ✓ {scheduleFeedback.message}
+                </p>
               )}
             </section>
 

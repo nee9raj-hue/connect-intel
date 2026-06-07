@@ -639,11 +639,7 @@ export function AppProvider({ children }) {
     })
 
     const needsFullReload = Boolean(
-      body?.activity ||
-        body?.task ||
-        body?.meeting ||
-        body?.fieldVisit ||
-        body?.contact ||
+      body?.contact ||
         (body?.crm &&
           Object.keys(body.crm).some((k) => !['status', 'responseReceived'].includes(k)))
     )
