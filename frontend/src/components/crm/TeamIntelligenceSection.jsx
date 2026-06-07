@@ -90,7 +90,7 @@ const INSIGHT_STYLES = {
 
 /** Team metrics block — embedded on the main Dashboard for managers and reps. */
 export default function TeamIntelligenceSection({ onNavigate, isActive = true }) {
-  const { user, teamMembers, openPipelineLead } = useApp()
+  const { user, teamMembers, openPipelineLead, setPipelineAssigneeFilter } = useApp()
   const [period, setPeriod] = useState('week')
   const [intelMemberId, setIntelMemberId] = useState('')
   const [data, setData] = useState(null)
@@ -151,11 +151,15 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
       return
     }
     if (nav === 'crm-log') {
+      if (memberUserId) setPipelineAssigneeFilter?.(memberUserId)
       onNavigate?.(nav, {
         activityType: options.activityType || null,
         assigneeUserId: memberUserId || null,
       })
       return
+    }
+    if (memberUserId && nav === 'pipeline') {
+      setPipelineAssigneeFilter?.(memberUserId)
     }
     onNavigate?.(nav, options)
   }
@@ -173,6 +177,7 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
     const v = e.target.value
     setIntelMemberId(v || '')
     setExpandedMember(null)
+    setPipelineAssigneeFilter?.(v || null)
   }
 
   const onInsightClick = (insight) => {
@@ -279,6 +284,7 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
               onClick={() => {
                 setIntelMemberId('')
                 setExpandedMember(null)
+                setPipelineAssigneeFilter?.(null)
               }}
             >
               Clear filter
