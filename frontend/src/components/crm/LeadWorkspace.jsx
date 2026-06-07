@@ -25,6 +25,7 @@ import CrmEmailThread from './CrmEmailThread'
 import { buildUnifiedTimeline, formatDealValue, timelineTypeLabel } from '../../lib/crmTimeline'
 import { hasWorkspaceFeature } from '../../lib/workspaceFeatures'
 import FieldVisitRecordForm from './FieldVisitRecordForm'
+import LeadDealsSection from './LeadDealsSection'
 import { DEFAULT_FIELD_VISIT_EXPENSE_SETTINGS } from '../../lib/fieldVisitExpenses'
 
 const MAX_EMAIL_ATTACHMENTS = 5
@@ -50,6 +51,7 @@ function formatAttachmentSize(bytes) {
 
 const TABS = [
   { id: 'overview', label: 'Overview' },
+  { id: 'deals', label: 'Deals' },
   { id: 'notes', label: 'Timeline' },
   { id: 'schedule', label: 'Tasks & meetings' },
   { id: 'email', label: 'Email' },
@@ -135,10 +137,6 @@ export default function LeadWorkspace({
   const [visitMeetingId, setVisitMeetingId] = useState('')
   const [visitNotes, setVisitNotes] = useState('')
   const [visitOutcome, setVisitOutcome] = useState('completed')
-  const [dealValue, setDealValue] = useState(lead.crm?.dealValue ?? '')
-  const [expectedCloseDate, setExpectedCloseDate] = useState(
-    lead.crm?.expectedCloseDate ? lead.crm.expectedCloseDate.slice(0, 10) : ''
-  )
   const [sequences, setSequences] = useState([])
   const [enrollSequenceId, setEnrollSequenceId] = useState('')
   const [fieldVisitSettings, setFieldVisitSettings] = useState(DEFAULT_FIELD_VISIT_EXPENSE_SETTINGS)
@@ -871,53 +869,26 @@ export default function LeadWorkspace({
               </section>
             ) : null}
 
-            <section className="grid grid-cols-2 gap-2">
-              <label className="block">
-                <span className="text-xs font-semibold uppercase text-gray-400 mb-1 block">Deal value (₹)</span>
-                <input
-                  type="number"
-                  min={0}
-                  value={dealValue}
-                  onChange={(e) => setDealValue(e.target.value)}
-                  onBlur={async () => {
-                    try {
-                      await patchLead(lead.id, {
-                        crm: { dealValue: dealValue === '' ? null : Number(dealValue) },
-                      })
-                      setNotice('Deal value saved')
-                    } catch (err) {
-                      setError(err.message)
-                    }
-                  }}
-                  className="w-full text-xs border rounded-lg px-2.5 py-1.5"
-                  placeholder="0"
-                />
-              </label>
-              <label className="block">
-                <span className="text-xs font-semibold uppercase text-gray-400 mb-1 block">Expected close</span>
-                <input
-                  type="date"
-                  value={expectedCloseDate}
-                  onChange={(e) => setExpectedCloseDate(e.target.value)}
-                  onBlur={async () => {
-                    try {
-                      await patchLead(lead.id, {
-                        crm: { expectedCloseDate: expectedCloseDate || null },
-                      })
-                      setNotice('Close date saved')
-                    } catch (err) {
-                      setError(err.message)
-                    }
-                  }}
-                  className="w-full text-xs border rounded-lg px-2.5 py-1.5"
-                />
-              </label>
+            <section className="border rounded-lg p-2.5 bg-gray-50">
+              <div className="flex items-center justify-between gap-2">
+                <div>
+                  <p className="text-[10px] font-semibold uppercase text-gray-400">Deals</p>
+                  <p className="text-sm font-bold text-gray-900">
+                    {formatDealValue(crm.dealValue)}
+                    <span className="text-xs font-normal text-gray-500 ml-1">
+                      open · {(crm.deals || []).length} total
+                    </span>
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setTab('deals')}
+                  className="text-xs font-semibold text-[#FF773D] underline shrink-0"
+                >
+                  Manage deals
+                </button>
+              </div>
             </section>
-            {(dealValue || crm.dealValue) && (
-              <p className="text-xs text-gray-600 -mt-2">
-                Pipeline value: {formatDealValue(dealValue || crm.dealValue)}
-              </p>
-            )}
 
             {user?.accountType === 'company' && (
               <section>
@@ -1036,6 +1007,16 @@ export default function LeadWorkspace({
               <Info label="Last email" value={formatCrmDate(crm.lastEmailSentAt)} />
             </section>
           </>
+        )}
+
+        {tab === 'deals' && (
+          <LeadDealsSection
+            lead={lead}
+            patchLead={patchLead}
+            busy={savingScope !== null && savingScope !== 'deal'}
+            onNotice={setNotice}
+            onError={setError}
+          />
         )}
 
         {tab === 'notes' && (

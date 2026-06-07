@@ -12,6 +12,17 @@ export const CRM_STATUSES = [
   { id: 'lost', label: 'Lost', color: 'bg-gray-100 text-gray-500 border-gray-200' },
 ]
 
+/** HubSpot-style deal stages (multiple deals per lead). */
+export const DEAL_STAGES = CRM_STATUSES.filter((col) => col.id !== 'active_trading')
+
+export function isClosedDealStage(stage) {
+  return stage === 'won' || stage === 'lost'
+}
+
+export function getDealStageMeta(stage) {
+  return DEAL_STAGES.find((s) => s.id === stage) || DEAL_STAGES[0]
+}
+
 const PIPELINE_ROLE_COLUMNS = {
   org_admin: ['new', 'contacted', 'follow_up', 'replied', 'won', 'active_trading', 'lost'],
   member: ['new', 'contacted', 'follow_up', 'replied', 'won', 'active_trading', 'lost'],
