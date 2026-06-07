@@ -11,6 +11,7 @@ export default function CrmActivityLogPanel({ onNavigate, panelOptions = {} }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const activityType = panelOptions?.activityType || null
+  const logPeriod = panelOptions?.period || 'week'
 
   const assigneeName = useMemo(() => {
     if (!pipelineAssigneeFilter) return null
@@ -27,7 +28,7 @@ export default function CrmActivityLogPanel({ onNavigate, panelOptions = {} }) {
     setLoading(true)
     setError(null)
     try {
-      const q = new URLSearchParams()
+      const q = new URLSearchParams({ period: logPeriod })
       if (pipelineAssigneeFilter) q.set('userId', pipelineAssigneeFilter)
       if (activityType) q.set('type', activityType)
       const data = await api.getCrmActivityLog(q.toString())
@@ -37,7 +38,7 @@ export default function CrmActivityLogPanel({ onNavigate, panelOptions = {} }) {
     } finally {
       setLoading(false)
     }
-  }, [pipelineAssigneeFilter, activityType])
+  }, [pipelineAssigneeFilter, activityType, logPeriod])
 
   useEffect(() => {
     setActivities([])

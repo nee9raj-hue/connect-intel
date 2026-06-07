@@ -101,6 +101,7 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
   const memberUserId = intelMemberId
   const intel = data?.teamIntelligence
   const rollup = intel?.rollup || {}
+  const isFilteredMember = Boolean(memberUserId)
 
   const isManagerView = Boolean(
     user?.isOrgAdmin || user?.orgRole === 'org_admin' || data?.isAdmin
@@ -121,6 +122,7 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
   const load = useCallback(async () => {
     setLoading(true)
     setError(null)
+    setData(null)
     try {
       const q = new URLSearchParams({ period })
       if (memberUserId) q.set('userId', memberUserId)
@@ -135,7 +137,6 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
 
   useEffect(() => {
     if (!isActive) return undefined
-    setData(null)
     load()
   }, [load, isActive])
 
@@ -154,7 +155,7 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
       if (memberUserId) setPipelineAssigneeFilter?.(memberUserId)
       onNavigate?.(nav, {
         activityType: options.activityType || null,
-        assigneeUserId: memberUserId || null,
+        period,
       })
       return
     }
@@ -165,7 +166,9 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
   }
 
   const onMemberRow = (m) => {
-    setIntelMemberId(String(m.userId))
+    const uid = String(m.userId)
+    setIntelMemberId(uid)
+    setPipelineAssigneeFilter?.(uid)
     setExpandedMember((prev) => (prev === m.userId ? null : m.userId))
   }
 
@@ -194,26 +197,14 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
   const comparison = intel?.comparison || {}
   const statusBreakdown = (data?.statusBreakdown || []).filter((r) => r.count > 0)
 
-  const activityTotals = useMemo(() => {
-    const days = data?.activityByDay || []
-    return days.reduce(
-      (acc, d) => ({
-        calls: acc.calls + (d.call || 0),
-        emails: acc.emails + (d.email || 0),
-        tasksCreated: acc.tasksCreated + (d.task || 0),
-        meetings: acc.meetings + (d.meeting || 0),
-        whatsapp: acc.whatsapp + (d.whatsapp || 0),
-        contactsOpened: acc.contactsOpened + (d.count > 0 ? 1 : 0),
-      }),
-      { calls: 0, emails: 0, tasksCreated: 0, meetings: 0, whatsapp: 0, contactsOpened: 0 }
-    )
-  }, [data?.activityByDay])
-
+  const periodLabelText =
+    intel?.periodLabel ||
+    (period === 'day' ? 'Today' : period === 'month' ? 'This month' : 'This week')
   const activityHighlights = useMemo(
     () => [
       {
         label: 'Tracked reps',
-        value: (intel?.members?.length || memberOptions.length || 0).toLocaleString(),
+        value: (isFilteredMember ? 1 : intel?.members?.length || memberOptions.length || 0).toLocaleString(),
       },
       {
         label: 'Active stages',
@@ -221,10 +212,10 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
       },
       {
         label: 'Period',
-        value: intel?.periodLabel || (period === 'week' ? 'This week' : 'This month'),
+        value: periodLabelText,
       },
     ],
-    [intel?.members?.length, memberOptions.length, statusBreakdown.length, intel?.periodLabel, period]
+    [isFilteredMember, intel?.members?.length, memberOptions.length, statusBreakdown.length, periodLabelText]
   )
 
   if (!isActive) return null
@@ -243,6 +234,7 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
             value={period}
             onChange={setPeriod}
             options={[
+              { value: 'day', label: 'Today' },
               { value: 'week', label: 'This week' },
               { value: 'month', label: 'This month' },
             ]}
@@ -322,12 +314,14 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
         />
       ) : (
         <>
-          <div className="team-intelligence-kpi-grid">
+          <div className="team-intelligence-kpi-grid" key={`${period}-${memberUserId || 'all'}`}>
             {TEAM_KPIS.map((item) => {
-              const intelVal = item.intelKey ? rollup[item.intelKey] : null
-              const chartVal = item.intelKey ? activityTotals[item.intelKey] : null
-              const summaryVal = item.summaryKey ? summary[item.summaryKey] : null
-              const raw = intelVal ?? chartVal ?? summaryVal ?? 0
+              let raw = 0
+              if (item.intelKey) {
+                raw = rollup[item.intelKey] ?? 0
+              } else if (item.summaryKey) {
+                raw = summary[item.summaryKey] ?? 0
+              }
               let value = raw.toLocaleString()
               if (item.format === 'currency') value = formatDealValue(raw)
               if (item.format === 'hours') value = formatHours(raw)
@@ -400,8 +394,12 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
 
           {intel?.members?.length ? (
             <DashboardSection
-              title={memberUserId ? `${memberName || 'Member'} detail` : 'Team performance table'}
-              subtitle="Click a row to expand or drill into pipeline"
+              title={isFilteredMember ? `${memberName || 'Member'} detail` : 'Team performance table'}
+              subtitle={
+                isFilteredMember
+                  ? 'Individual metrics for the selected rep'
+                  : 'Click a row to filter the dashboard to that rep'
+              }
               actionLabel="Activity log"
               onAction={() => drillTo('crm-log')}
             >
