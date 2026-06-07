@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-07T05:22:01.019Z",
-  "updatedAtIst": "07/06/2026, 10:52:01",
+  "updatedAt": "2026-06-07T05:24:13.707Z",
+  "updatedAtIst": "07/06/2026, 10:54:13",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "491231d",
+  "currentProductionCommit": "c69dabf",
   "entries": [
+    {
+      "logId": "20260607-1053-c69dabf",
+      "commit": "c69dabf",
+      "commitFull": "c69dabfb52ac8c1453457ed378b5eabed583cffd",
+      "message": "Fix inActivityPeriod ReferenceError in crmTouchpoints.",
+      "deployedAt": "2026-06-07T05:23:53.145Z",
+      "deployedAtIst": "07/06/2026, 10:53:53",
+      "committedAtIst": "07/06/2026, 10:53:26",
+      "vercelPreviewUrl": "https://connect-intel-86xiisxya-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- c69dabf"
+    },
+    {
+      "logId": "20260607-1052-85761b1",
+      "commit": "85761b1",
+      "commitFull": "85761b1cca5f77fcab3ae1ac88296a3515b7cf29",
+      "message": "Log production deploy 491231d (dashboard KPI activity count fix).",
+      "deployedAt": "2026-06-07T05:22:34.782Z",
+      "deployedAtIst": "07/06/2026, 10:52:34",
+      "committedAtIst": "07/06/2026, 10:52:07",
+      "vercelPreviewUrl": "https://connect-intel-32cv678uc-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 85761b1"
+    },
     {
       "logId": "20260607-1051-491231d",
       "commit": "491231d",
@@ -15,7 +43,7 @@
       "committedAtIst": "07/06/2026, 10:51:08",
       "vercelPreviewUrl": "https://connect-intel-lqx5zglz1-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 491231d"
     },
@@ -228,20 +256,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 4e92363"
-    },
-    {
-      "logId": "20260606-1822-03cb50e",
-      "commit": "03cb50e",
-      "commitFull": "03cb50ee8de74491c0448231a3324154924277b9",
-      "message": "Polish dashboard KPI cards and marketing stats layout.",
-      "deployedAt": "2026-06-06T12:53:39.759Z",
-      "deployedAtIst": "06/06/2026, 18:23:39",
-      "committedAtIst": "06/06/2026, 18:22:19",
-      "vercelPreviewUrl": "https://connect-intel-75qkueunb-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 03cb50e"
     }
   ]
 }

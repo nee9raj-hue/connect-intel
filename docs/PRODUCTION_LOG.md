@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 143ec4f
+npm run prod:rollback -- 85761b1
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 143ec4f
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `491231d` |
-| Log updated (IST) | 07/06/2026, 10:52:01 |
+| Commit | `c69dabf` |
+| Log updated (IST) | 07/06/2026, 10:54:13 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 143ec4f
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 07/06/2026, 10:51:34 | `491231d` | Fix dashboard KPIs by sharing activity log counting logic. | [preview](https://connect-intel-lqx5zglz1-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 491231d` | **← LIVE**
+| 07/06/2026, 10:53:53 | `c69dabf` | Fix inActivityPeriod ReferenceError in crmTouchpoints. | [preview](https://connect-intel-86xiisxya-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c69dabf` | **← LIVE**
+| 07/06/2026, 10:52:34 | `85761b1` | Log production deploy 491231d (dashboard KPI activity count fix). | [preview](https://connect-intel-32cv678uc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 85761b1` |
+| 07/06/2026, 10:51:34 | `491231d` | Fix dashboard KPIs by sharing activity log counting logic. | [preview](https://connect-intel-lqx5zglz1-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 491231d` |
 | 07/06/2026, 10:38:08 | `143ec4f` | Fix dashboard KPIs by merging CRM activity like the activity log. | [preview](https://connect-intel-3qcrxrxno-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 143ec4f` |
 | 07/06/2026, 10:34:29 | `a1ee2a9` | Fix dashboard KPIs by merging monolith CRM activity into shard reads. | [preview](https://connect-intel-x6x7luqzr-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a1ee2a9` |
 | 07/06/2026, 10:24:29 | `07ad2b0` | Fix dashboard showing admin stats for every team member filter. | [preview](https://connect-intel-amyrq1mgt-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 07ad2b0` |
@@ -60,7 +62,6 @@ npm run prod:rollback -- 143ec4f
 | 07/06/2026, 09:26:24 | `7da4381` | Add GET health check on CRM inbound email webhook. | [preview](https://connect-intel-j3ggvp2a8-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7da4381` |
 | 07/06/2026, 09:07:20 | `eaa453f` | Add inbound email reply sync without gmail.readonly. | [preview](https://connect-intel-1sg9dvn2k-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- eaa453f` |
 | 06/06/2026, 18:30:21 | `4e92363` | Fix team dashboard timeouts on large org pipelines. | [preview](https://connect-intel-gppe5w925-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4e92363` |
-| 06/06/2026, 18:23:39 | `03cb50e` | Polish dashboard KPI cards and marketing stats layout. | [preview](https://connect-intel-75qkueunb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 03cb50e` |
 
 ---
 
