@@ -391,7 +391,7 @@ export function AppProvider({ children }) {
       try {
         const session = await withTimeout(
           api.getSession(),
-          24_000,
+          45_000,
           'Sign-in check timed out. You can refresh or continue from the home page.'
         )
         if (cancelled) return

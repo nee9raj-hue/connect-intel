@@ -231,9 +231,13 @@ export const api = {
   addManualLead: (manual) => request('/api/saved-leads', { method: 'POST', body: { manual } }),
   removeLead: (leadId) => request('/api/saved-leads', { method: 'DELETE', body: { leadId } }),
   updateSavedLead: (leadId, body) =>
-    request('/api/saved-leads', { method: 'PATCH', body: { leadId, ...body } }),
+    request('/api/saved-leads', { method: 'PATCH', body: { leadId, ...body }, timeoutMs: 60_000 }),
   assignLead: (leadId, assignToUserId) =>
-    request('/api/saved-leads', { method: 'PATCH', body: { leadId, assignToUserId } }),
+    request('/api/saved-leads', {
+      method: 'PATCH',
+      body: { leadId, assignToUserId },
+      timeoutMs: 60_000,
+    }),
   getCrmCalendar: (query = '', { silent = false } = {}) =>
     request(`/api/crm/calendar${query ? `?${query}` : ''}`, {}, { silent }),
   getCrmGoogleCalendarStatus: () => request('/api/crm/calendar/google'),
@@ -257,12 +261,12 @@ export const api = {
   suggestFieldVisitDistance: (body) =>
     request('/api/crm/field-visit/distance', { method: 'POST', body }),
   getFieldVisitDistanceStatus: () => request('/api/crm/field-visit/distance'),
-  lookupPostalCode: ({ pin, side = 'delivery' } = {}) => {
+  lookupPostalCode: ({ pin, side = 'delivery' } = {}, { silent = true } = {}) => {
     const params = new URLSearchParams()
     if (pin) params.set('pin', pin)
     if (side) params.set('side', side)
     const qs = params.toString()
-    return request(`/api/crm/pincode-lookup${qs ? `?${qs}` : ''}`)
+    return request(`/api/crm/pincode-lookup${qs ? `?${qs}` : ''}`, { timeoutMs: 15_000 }, { silent })
   },
   getCrmNotifications: (since, { silent = false } = {}) =>
     request(
