@@ -1,6 +1,21 @@
 import { useState } from 'react'
 import { api } from '../../lib/api'
-import { CARGO_READINESS_OPTIONS, emptyFreightBox, INCOTERM_OPTIONS, TRANSPORT_MODE_OPTIONS } from '../../lib/freightDeal'
+import {
+  CARGO_READINESS_OPTIONS,
+  emptyFreightBox,
+  emptyFreightRfq,
+  FREIGHT_CUSTOMER_TYPES,
+  getFreightCustomerTypeMeta,
+  INCOTERM_OPTIONS,
+  showsCourierFields,
+  showsSpotRfqFields,
+  TRANSPORT_MODE_OPTIONS,
+} from '../../lib/freightDeal'
+import CourierContractFields, { formatCourierSummary } from './CourierContractFields'
+
+function FieldLabel({ children }) {
+  return <p className="text-[10px] font-semibold uppercase text-gray-500 mb-1">{children}</p>
+}
 
 function LocationBlock({ title, side, freight, onChange, disabled }) {
   const [lookupMsg, setLookupMsg] = useState(null)
@@ -80,32 +95,42 @@ function LocationBlock({ title, side, freight, onChange, disabled }) {
   )
 }
 
-/** Freight RFQ fields for shipping deals (Xindus). */
-export default function FreightDealFields({ freight, onChange, disabled = false, compact = false }) {
-  const boxes = Array.isArray(freight?.boxes) && freight.boxes.length ? freight.boxes : [emptyFreightBox()]
-
-  const setBoxes = (next) => onChange({ ...freight, boxes: next })
-
-  const updateBox = (index, patch) => {
-    const next = boxes.map((b, i) => (i === index ? { ...b, ...patch } : b))
-    setBoxes(next)
-  }
-
-  const addBox = () => {
-    if (boxes.length >= 20) return
-    setBoxes([...boxes, emptyFreightBox()])
-  }
-
-  const removeBox = (index) => {
-    if (boxes.length <= 1) return
-    setBoxes(boxes.filter((_, i) => i !== index))
-  }
-
+function SpotRfqSection({ freight, onChange, disabled, compact, boxes, setBoxes, updateBox, addBox, removeBox }) {
   return (
-    <div className={`space-y-2 ${compact ? '' : 'border rounded-lg p-2.5 bg-indigo-50/40 border-indigo-100'}`}>
+    <div className={`space-y-2 ${compact ? '' : 'border rounded-lg p-2.5 bg-indigo-50/30 border-indigo-100'}`}>
       {!compact && (
-        <p className="text-[10px] font-semibold uppercase text-indigo-700">Freight RFQ</p>
+        <div>
+          <p className="text-[10px] font-semibold uppercase text-indigo-700">Spot cargo RFQ</p>
+          <p className="text-[10px] text-indigo-600/80 mt-0.5">Shipment lanes, cargo specs, and declared invoice value.</p>
+        </div>
       )}
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div>
+          <FieldLabel>Invoice amount (₹)</FieldLabel>
+          <input
+            type="number"
+            min={0}
+            step="0.01"
+            value={freight.invoiceAmount ?? ''}
+            disabled={disabled}
+            onChange={(e) =>
+              onChange({
+                ...freight,
+                invoiceAmount: e.target.value === '' ? null : Number(e.target.value),
+              })
+            }
+            placeholder="Declared value for customs"
+            className="w-full text-xs border rounded-lg px-2 py-1.5 bg-white"
+          />
+        </div>
+        <div className="flex items-end">
+          <p className="text-[10px] text-gray-500 leading-snug pb-2">
+            Freight charges for this shipment are recorded separately as the deal amount below.
+          </p>
+        </div>
+      </div>
+
       <textarea
         value={freight.rfqDetails || ''}
         disabled={disabled}
@@ -114,9 +139,10 @@ export default function FreightDealFields({ freight, onChange, disabled = false,
         placeholder="Additional RFQ notes — special handling, packaging, insurance…"
         className="w-full text-xs border rounded-lg px-2 py-1.5 bg-white"
       />
+
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
         <div>
-          <p className="text-[10px] font-semibold uppercase text-gray-500 mb-1">Incoterm</p>
+          <FieldLabel>Incoterm</FieldLabel>
           <select
             value={freight.incoterm || ''}
             disabled={disabled}
@@ -131,7 +157,7 @@ export default function FreightDealFields({ freight, onChange, disabled = false,
           </select>
         </div>
         <div>
-          <p className="text-[10px] font-semibold uppercase text-gray-500 mb-1">Commodity type</p>
+          <FieldLabel>Commodity type</FieldLabel>
           <input
             value={freight.commodityType || ''}
             disabled={disabled}
@@ -141,7 +167,7 @@ export default function FreightDealFields({ freight, onChange, disabled = false,
           />
         </div>
         <div>
-          <p className="text-[10px] font-semibold uppercase text-gray-500 mb-1">HSN code</p>
+          <FieldLabel>HSN code</FieldLabel>
           <input
             value={freight.hsnCode || ''}
             disabled={disabled}
@@ -152,8 +178,9 @@ export default function FreightDealFields({ freight, onChange, disabled = false,
           />
         </div>
       </div>
+
       <div>
-        <p className="text-[10px] font-semibold uppercase text-gray-500 mb-1">Transport mode</p>
+        <FieldLabel>Transport mode</FieldLabel>
         <div className="flex flex-wrap gap-2">
           {TRANSPORT_MODE_OPTIONS.map((o) => (
             <label
@@ -178,10 +205,12 @@ export default function FreightDealFields({ freight, onChange, disabled = false,
           ))}
         </div>
       </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         <LocationBlock title="Pickup" side="pickup" freight={freight} onChange={onChange} disabled={disabled} />
         <LocationBlock title="Delivery" side="delivery" freight={freight} onChange={onChange} disabled={disabled} />
       </div>
+
       <div className="grid grid-cols-2 gap-2">
         <input
           type="number"
@@ -214,9 +243,10 @@ export default function FreightDealFields({ freight, onChange, disabled = false,
           className="w-full text-xs border rounded-lg px-2 py-1.5 bg-white"
         />
       </div>
+
       <div className="space-y-2">
         <div className="flex items-center justify-between gap-2">
-          <p className="text-[10px] font-semibold uppercase text-gray-500">Box dimensions (cm)</p>
+          <FieldLabel>Box dimensions (cm)</FieldLabel>
           <button
             type="button"
             disabled={disabled || boxes.length >= 20}
@@ -282,6 +312,7 @@ export default function FreightDealFields({ freight, onChange, disabled = false,
           </div>
         ))}
       </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         <select
           value={freight.cargoReadiness || 'ready'}
@@ -309,12 +340,100 @@ export default function FreightDealFields({ freight, onChange, disabled = false,
   )
 }
 
+/** Freight deal fields — customer type drives RFQ vs courier contract sections. */
+export default function FreightDealFields({ freight, onChange, disabled = false, compact = false }) {
+  const data = freight || emptyFreightRfq()
+  const customerType = data.customerType || 'spot_rfq'
+  const boxes = Array.isArray(data.boxes) && data.boxes.length ? data.boxes : [emptyFreightBox()]
+
+  const setCustomerType = (nextType) => onChange({ ...data, customerType: nextType })
+
+  const setBoxes = (next) => onChange({ ...data, boxes: next })
+  const updateBox = (index, patch) => {
+    const next = boxes.map((b, i) => (i === index ? { ...b, ...patch } : b))
+    setBoxes(next)
+  }
+  const addBox = () => {
+    if (boxes.length >= 20) return
+    setBoxes([...boxes, emptyFreightBox()])
+  }
+  const removeBox = (index) => {
+    if (boxes.length <= 1) return
+    setBoxes(boxes.filter((_, i) => i !== index))
+  }
+
+  const setCourier = (courier) => onChange({ ...data, courier })
+
+  return (
+    <div className="space-y-3">
+      <div className={compact ? '' : 'border rounded-lg p-2.5 bg-white border-gray-200'}>
+        <FieldLabel>Opportunity type</FieldLabel>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-1">
+          {FREIGHT_CUSTOMER_TYPES.map((type) => {
+            const active = customerType === type.id
+            return (
+              <button
+                key={type.id}
+                type="button"
+                disabled={disabled}
+                onClick={() => setCustomerType(type.id)}
+                className={`text-left rounded-xl border px-2.5 py-2 transition-colors ${
+                  active
+                    ? 'border-[#FF773D] bg-[#fff8f4] ring-1 ring-[#ffd4b8]'
+                    : 'border-gray-200 bg-gray-50 hover:border-gray-300'
+                } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                <p className={`text-xs font-semibold ${active ? 'text-[#c44f0f]' : 'text-gray-900'}`}>
+                  {type.label}
+                </p>
+                <p className="text-[10px] text-gray-500 mt-0.5 leading-snug">{type.description}</p>
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
+      {showsCourierFields(customerType) && (
+        <CourierContractFields
+          courier={data.courier}
+          onChange={setCourier}
+          disabled={disabled}
+          compact={compact}
+        />
+      )}
+
+      {showsSpotRfqFields(customerType) && (
+        <SpotRfqSection
+          freight={data}
+          onChange={onChange}
+          disabled={disabled}
+          compact={compact}
+          boxes={boxes}
+          setBoxes={setBoxes}
+          updateBox={updateBox}
+          addBox={addBox}
+          removeBox={removeBox}
+        />
+      )}
+    </div>
+  )
+}
+
 export function formatFreightSummary(freight) {
   if (!freight) return null
   const parts = []
+  const typeMeta = getFreightCustomerTypeMeta(freight.customerType)
+  if (freight.customerType && freight.customerType !== 'spot_rfq') {
+    parts.push(typeMeta.shortLabel)
+  }
+  const courierLine = formatCourierSummary(freight.courier)
+  if (courierLine) parts.push(courierLine)
   if (freight.commodityType) parts.push(freight.commodityType)
   if (freight.hsnCode) parts.push(`HSN ${freight.hsnCode}`)
   if (freight.incoterm) parts.push(freight.incoterm)
+  if (freight.invoiceAmount != null && freight.invoiceAmount > 0) {
+    parts.push(`Invoice ₹${Number(freight.invoiceAmount).toLocaleString('en-IN')}`)
+  }
   if (freight.pickupZip || freight.deliveryZip) {
     const from = [freight.pickupCity, freight.pickupZip].filter(Boolean).join(' ')
     const to = [freight.deliveryCity, freight.deliveryZip].filter(Boolean).join(' ')
@@ -324,11 +443,18 @@ export function formatFreightSummary(freight) {
   if (freight.boxCount != null) parts.push(`${freight.boxCount} boxes`)
   const readiness = CARGO_READINESS_OPTIONS.find((o) => o.id === freight.cargoReadiness)
   if (freight.transportMode) parts.push(transportModeLabel(freight.transportMode))
-  if (readiness) parts.push(readiness.label)
+  if (readiness && showsSpotRfqFields(freight.customerType || 'spot_rfq')) parts.push(readiness.label)
   return parts.length ? parts.join(' · ') : null
 }
 
 function transportModeLabel(mode) {
   const row = TRANSPORT_MODE_OPTIONS.find((o) => o.id === mode)
   return row?.label || mode || '—'
+}
+
+export function freightDealCreateLabel(customerType) {
+  const meta = getFreightCustomerTypeMeta(customerType)
+  if (customerType === 'courier') return 'Create courier deal'
+  if (customerType === 'mixed') return 'Create mixed deal'
+  return 'Create RFQ deal'
 }

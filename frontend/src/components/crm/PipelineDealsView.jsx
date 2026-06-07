@@ -5,6 +5,7 @@ import {
   freightRouteLabel,
   formatDealValue,
   transportModeLabel,
+  freightCustomerTypeLabel,
 } from '../../lib/freightDeals'
 
 function formatWeight(kg) {
@@ -58,7 +59,7 @@ export default function PipelineDealsView({
         <div>
           <h2 className="text-sm font-semibold text-gray-900">{stageMeta.label}</h2>
           <p className="text-xs text-gray-500">
-            Shipment opportunities — value and gross weight from RFQ. Click a row to open the lead.
+            Shipment opportunities — freight charges and gross weight from deal / RFQ. Click a row to open the lead.
           </p>
         </div>
         <p className="text-xs text-gray-500 tabular-nums">{total} deal{total === 1 ? '' : 's'}</p>
@@ -84,11 +85,13 @@ export default function PipelineDealsView({
                 <tr className="bg-gray-50 text-left text-[10px] font-semibold uppercase text-gray-500">
                   <th className="px-3 py-2">Deal</th>
                   <th className="px-3 py-2">Lead / company</th>
+                  <th className="px-3 py-2">Type</th>
                   <th className="px-3 py-2">Stage</th>
                   <th className="px-3 py-2">Mode</th>
-                  <th className="px-3 py-2">Route</th>
+                  <th className="px-3 py-2">Route / lanes</th>
                   <th className="px-3 py-2 text-right">Weight</th>
-                  <th className="px-3 py-2 text-right">Value</th>
+                  <th className="px-3 py-2 text-right">Freight</th>
+                  <th className="px-3 py-2 text-right">Invoice</th>
                 </tr>
               </thead>
               <tbody>
@@ -110,6 +113,9 @@ export default function PipelineDealsView({
                           <p className="truncate text-[10px] text-gray-400">{company}</p>
                         )}
                       </td>
+                      <td className="px-3 py-2.5 text-gray-700 whitespace-nowrap">
+                        {freightCustomerTypeLabel(freight?.customerType)}
+                      </td>
                       <td className="px-3 py-2.5">
                         <span
                           className={`inline-block px-1.5 py-0.5 rounded border text-[10px] font-semibold uppercase ${meta.color}`}
@@ -128,6 +134,9 @@ export default function PipelineDealsView({
                       </td>
                       <td className="px-3 py-2.5 text-right tabular-nums font-medium text-gray-900">
                         {formatDealValue(deal.amount, deal.currency)}
+                      </td>
+                      <td className="px-3 py-2.5 text-right tabular-nums text-gray-600">
+                        {formatDealValue(freight?.invoiceAmount, deal.currency)}
                       </td>
                     </tr>
                   )

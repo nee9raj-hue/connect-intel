@@ -6,7 +6,8 @@ import {
 } from '../../lib/crmConstants'
 import { formatDealValue } from '../../lib/crmTimeline'
 import { emptyFreightRfq, isFreightDealOrg } from '../../lib/freightDeal'
-import FreightDealFields, { formatFreightSummary } from './FreightDealFields'
+import FreightDealFields, { formatFreightSummary, freightDealCreateLabel } from './FreightDealFields'
+import { getFreightCustomerTypeMeta } from '../../lib/freightDeal'
 
 function DealRow({ deal, busy, freightOrg, onUpdate, onWon, onLost }) {
   const [lostReason, setLostReason] = useState('')
@@ -16,6 +17,7 @@ function DealRow({ deal, busy, freightOrg, onUpdate, onWon, onLost }) {
   const meta = getDealStageMeta(deal.stage, { freightOrg })
   const closed = isClosedDealStage(deal.stage)
   const stageOptions = getDealStagesForFreight(freightOrg)
+  const typeMeta = getFreightCustomerTypeMeta(deal.freight?.customerType)
   const freightSummary = formatFreightSummary(deal.freight)
 
   const saveFreight = () => {
@@ -28,13 +30,27 @@ function DealRow({ deal, busy, freightOrg, onUpdate, onWon, onLost }) {
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <p className="font-semibold text-gray-900 truncate">{deal.name}</p>
-          <span className={`inline-block mt-1 px-1.5 py-0.5 rounded border text-[10px] font-semibold uppercase ${meta.color}`}>
-            {meta.label}
-          </span>
+          <div className="flex flex-wrap items-center gap-1 mt-1">
+            <span className={`inline-block px-1.5 py-0.5 rounded border text-[10px] font-semibold uppercase ${meta.color}`}>
+              {meta.label}
+            </span>
+            {freightOrg && deal.freight?.customerType && deal.freight.customerType !== 'spot_rfq' && (
+              <span className="inline-block px-1.5 py-0.5 rounded border text-[10px] font-semibold uppercase bg-teal-50 text-teal-800 border-teal-200">
+                {typeMeta.shortLabel}
+              </span>
+            )}
+          </div>
         </div>
-        {deal.amount != null && deal.amount > 0 && (
-          <p className="font-semibold text-gray-900 shrink-0">{formatDealValue(deal.amount, deal.currency)}</p>
-        )}
+        <div className="shrink-0 text-right space-y-0.5">
+          {deal.amount != null && deal.amount > 0 && (
+            <p className="font-semibold text-gray-900">{formatDealValue(deal.amount, deal.currency)}</p>
+          )}
+          {freightOrg && deal.freight?.invoiceAmount != null && deal.freight.invoiceAmount > 0 && (
+            <p className="text-[10px] text-gray-500">
+              Invoice {formatDealValue(deal.freight.invoiceAmount, deal.currency)}
+            </p>
+          )}
+        </div>
       </div>
 
       {freightOrg && freightSummary && (
@@ -101,7 +117,7 @@ function DealRow({ deal, busy, freightOrg, onUpdate, onWon, onLost }) {
               min={0}
               defaultValue={deal.amount ?? ''}
               disabled={busy}
-              placeholder="Amount ₹"
+              placeholder={freightOrg ? 'Freight charges ₹' : 'Amount ₹'}
               onBlur={(e) => {
                 const val = e.target.value === '' ? null : Number(e.target.value)
                 if (val !== deal.amount) onUpdate(deal.id, { amount: val })
@@ -215,7 +231,7 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
       expectedCloseDate: expectedCloseDate || null,
     }
     if (freightOrg) payload.freight = freight
-    const ok = await runDeal(payload, freightOrg ? 'Freight RFQ deal created' : 'Deal created')
+    const ok = await runDeal(payload, freightOrg ? `${freightDealCreateLabel(freight.customerType).replace('Create ', '')} created` : 'Deal created')
     if (ok) {
       setName('')
       setAmount('')
@@ -238,7 +254,8 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
     <div className="space-y-4">
       {freightOrg && (
         <p className="text-xs text-indigo-800 bg-indigo-50 border border-indigo-100 rounded-lg px-2.5 py-2">
-          Shipping freight mode — deals include RFQ fields with pickup/delivery ZIP lookup.
+          Choose opportunity type per deal — spot RFQ, courier contract, or mixed. Invoice value lives on the
+          RFQ; freight charges are the deal amount used in pipeline totals.
         </p>
       )}
 
@@ -246,7 +263,10 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
         <div className="border rounded-lg p-2.5 bg-white">
           <p className="text-[10px] font-semibold uppercase text-gray-400">Open pipeline</p>
           <p className="text-sm font-bold text-gray-900">{formatDealValue(totals.openValue || crm.dealValue)}</p>
-          <p className="text-[11px] text-gray-500">{open.length} open deal{open.length === 1 ? '' : 's'}</p>
+          <p className="text-[11px] text-gray-500">
+            {open.length} open deal{open.length === 1 ? '' : 's'}
+            {freightOrg ? ' · freight charges' : ''}
+          </p>
         </div>
         <div className="border rounded-lg p-2.5 bg-white">
           <p className="text-[10px] font-semibold uppercase text-gray-400">Won</p>
@@ -257,7 +277,7 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
 
       <section>
         <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">
-          {freightOrg ? 'Create freight RFQ deal' : 'Create deal'}
+          {freightOrg ? 'Create freight deal' : 'Create deal'}
         </h3>
         <form onSubmit={addDeal} className="space-y-2 border rounded-lg p-2.5 bg-gray-50">
           <input
@@ -289,18 +309,28 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
               {freightOrg && (
                 <p className="text-[10px] text-gray-500 mt-1 leading-snug">
                   Shipment pipeline: RFQ → Quoted → Negotiation → Booked → Won.
-                  Separate from this contact&apos;s lead status (New, Contacted, etc.).
+                  Separate from this contact&apos;s lead status.
                 </p>
               )}
             </div>
-            <input
-              type="number"
-              min={0}
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              placeholder="Amount ₹"
-              className="w-full text-xs border rounded-lg px-2.5 py-1.5 bg-white self-end"
-            />
+            <div>
+              <label className="text-[10px] font-semibold uppercase text-gray-500 block mb-1">
+                Freight charges (₹)
+              </label>
+              <input
+                type="number"
+                min={0}
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="Quoted / booked freight rate"
+                className="w-full text-xs border rounded-lg px-2.5 py-1.5 bg-white"
+              />
+              {freightOrg && (
+                <p className="text-[10px] text-gray-500 mt-1 leading-snug">
+                  Your freight quote for this shipment — used in pipeline value totals.
+                </p>
+              )}
+            </div>
           </div>
           <input
             type="date"
@@ -313,7 +343,7 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
             disabled={dealBusy}
             className="w-full py-2 text-xs font-semibold bg-[#FF773D] text-white rounded-lg disabled:opacity-50"
           >
-            {saving ? 'Creating…' : freightOrg ? 'Create RFQ deal' : 'Create deal'}
+            {saving ? 'Creating…' : freightOrg ? freightDealCreateLabel(freight.customerType) : 'Create deal'}
           </button>
           {feedback && (
             <p className="text-xs font-semibold text-green-800 bg-green-50 border border-green-200 rounded-lg px-2.5 py-2" role="status">
@@ -383,7 +413,7 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
       {!deals.length && (
         <p className="text-xs text-gray-500">
           {freightOrg
-            ? 'No freight deals yet. Create an RFQ with pickup/delivery ZIP, weight, and box dimensions for each shipment opportunity.'
+            ? 'No freight deals yet. Create spot RFQs, courier contracts, or mixed opportunities — one deal per shipment or contract lane.'
             : 'No deals yet. Create one opportunity per product line, contract, or renewal — like HubSpot deals on a contact.'}
         </p>
       )}

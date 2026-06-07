@@ -4,11 +4,18 @@ export {
   isClosedDealStage,
 } from '../../../lib/dealPipeline.js'
 
+import { getFreightCustomerTypeMeta } from '../../../lib/freightDeal.js'
+
 export {
   FREIGHT_DEAL_STAGES,
   getFreightDealStageMeta,
+  getFreightCustomerTypeMeta,
   isFreightDealOrg,
 } from '../../../lib/freightDeal.js'
+
+export function freightCustomerTypeLabel(type) {
+  return getFreightCustomerTypeMeta(type).shortLabel
+}
 
 export { formatDealValue } from './crmTimeline'
 
@@ -23,8 +30,17 @@ export function freightRouteLabel(freight) {
   if (!freight) return '—'
   const from = [freight.pickupCity, freight.pickupZip].filter(Boolean).join(' ')
   const to = [freight.deliveryCity, freight.deliveryZip].filter(Boolean).join(' ')
-  if (!from && !to) return '—'
-  return `${from || '—'} → ${to || '—'}`
+  if (from || to) return `${from || '—'} → ${to || '—'}`
+  const countries = freight.courier?.destinationCountries
+  if (Array.isArray(countries) && countries.length) {
+    return countries
+      .map((id) => {
+        const labels = { usa: 'USA', uk: 'UK', canada: 'Canada', australia: 'AU', uae: 'UAE', eu: 'EU', singapore: 'SG', other: 'Other' }
+        return labels[id] || id
+      })
+      .join(', ')
+  }
+  return '—'
 }
 
 export function dealCountsFromSummary(pipelineSummary) {
