@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
-import { buildWhatsAppUrl, leadHasCallablePhone } from '../../lib/phoneUtils'
+import { leadHasCallablePhone, openWhatsAppChat } from '../../lib/phoneUtils'
 import LeadCallLogCard from './LeadCallLogCard'
 import LeadPhoneCall from './LeadPhoneCall'
 import EmailValidationIcon from './EmailValidationIcon'
@@ -658,29 +658,23 @@ export default function LeadWorkspace({
     }
   }
 
-  const openWhatsApp = async () => {
+  const openWhatsApp = () => {
     if (!waMessage.trim()) {
       setError('Write or generate a message first')
       return
     }
-    const url = buildWhatsAppUrl(lead.phone, waMessage.trim())
-    if (!url) {
+    if (!openWhatsAppChat(lead.phone, waMessage.trim())) {
       setError('Lead has no valid phone number for WhatsApp')
       return
     }
-    try {
-      await patchLead(lead.id, {
-        activity: {
-          type: 'whatsapp',
-          summary: `WhatsApp: ${waMessage.trim().slice(0, 120)}`,
-          meta: { message: waMessage.trim() },
-        },
-      })
-      setNotice('WhatsApp opened — send from your app')
-    } catch {
-      // still open wa
-    }
-    window.open(url, '_blank', 'noopener,noreferrer')
+    setNotice('WhatsApp opened — send from your app')
+    void patchLead(lead.id, {
+      activity: {
+        type: 'whatsapp',
+        summary: `WhatsApp: ${waMessage.trim().slice(0, 120)}`,
+        meta: { message: waMessage.trim() },
+      },
+    }).catch(() => {})
   }
 
   return (

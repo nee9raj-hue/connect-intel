@@ -8451,9 +8451,22 @@ details summary::-webkit-details-marker {
 
 /* —— Mobile layout: scroll overflow + compact chrome —— */
 @media (max-width: 767px) {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
   .ci-app-main {
     min-width: 0;
     overflow-x: hidden;
+    touch-action: manipulation;
+  }
+
+  /* iOS Safari zooms focused inputs below 16px — keep layout fixed on mobile */
+  .ci-app-main input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='hidden']):not([type='button']):not([type='submit']):not([type='reset']),
+  .ci-app-main textarea,
+  .ci-app-main select {
+    font-size: 16px !important;
   }
 
   .crm-page-header-top:not(.pipeline-page-header-top) {

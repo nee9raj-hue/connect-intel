@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
-import { buildWhatsAppUrl, leadHasCallablePhone } from '../../lib/phoneUtils'
+import { leadHasCallablePhone, openWhatsAppChat } from '../../lib/phoneUtils'
 import { leadDisplayName } from '../../lib/emailUtils'
 
 export default function BulkWhatsAppModal({ open, leads, onClose }) {
@@ -18,8 +18,7 @@ export default function BulkWhatsAppModal({ open, leads, onClose }) {
   if (!open) return null
 
   const openOne = (lead) => {
-    const url = buildWhatsAppUrl(lead.phone, message.trim())
-    if (url) window.open(url, '_blank', 'noopener,noreferrer')
+    openWhatsAppChat(lead.phone, message.trim())
   }
 
   const sendAllAutomatic = async () => {

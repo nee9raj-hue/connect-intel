@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { formatDealShareContent } from '../../lib/dealShareFormat'
-import { buildWhatsAppUrl, leadHasCallablePhone } from '../../lib/phoneUtils'
+import { leadHasCallablePhone, openWhatsAppChat } from '../../lib/phoneUtils'
 
 function leadHasEmail(lead) {
   const email = String(lead?.email || '').trim()
@@ -84,29 +84,23 @@ export default function DealShareActions({
     }
   }
 
-  const shareWhatsApp = async () => {
+  const shareWhatsApp = () => {
     if (!hasPhone) {
       onError?.('This contact has no phone number for WhatsApp')
       return
     }
-    const url = buildWhatsAppUrl(lead.phone, share.plainText)
-    if (!url) {
+    if (!openWhatsAppChat(lead.phone, share.plainText)) {
       onError?.('Invalid phone number for WhatsApp')
       return
     }
-    try {
-      await patchLead(lead.id, {
-        activity: {
-          type: 'whatsapp',
-          summary: `Deal shared: ${deal.name}`,
-          meta: { dealId: deal.id, channel: 'whatsapp_share' },
-        },
-      })
-      onNotice?.('WhatsApp opened — send the pre-filled deal summary')
-    } catch {
-      // still open WhatsApp
-    }
-    window.open(url, '_blank', 'noopener,noreferrer')
+    onNotice?.('WhatsApp opened — send the pre-filled deal summary')
+    void patchLead(lead.id, {
+      activity: {
+        type: 'whatsapp',
+        summary: `Deal shared: ${deal.name}`,
+        meta: { dealId: deal.id, channel: 'whatsapp_share' },
+      },
+    }).catch(() => {})
   }
 
   return (
