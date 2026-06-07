@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 87efbd3
+npm run prod:rollback -- 66b8d5f
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 87efbd3
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `ed53a23` |
-| Log updated (IST) | 06/06/2026, 16:55:28 |
+| Commit | `ddecae2` |
+| Log updated (IST) | 07/06/2026, 09:39:39 |
 
 ---
 
@@ -44,26 +44,23 @@ npm run prod:rollback -- 87efbd3
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 06/06/2026, 16:55:08 | `ed53a23` | Fix blank page after refresh by removing broken Recharts bundle. | [preview](https://connect-intel-5uah2nxwb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ed53a23` | **← LIVE**
-| 06/06/2026, 16:51:20 | `87efbd3` | Log production deploy d724b6c (Team intelligence dashboard). | [preview](https://connect-intel-qwobe9k84-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 87efbd3` |
-| 06/06/2026, 16:50:21 | `d724b6c` | Add Team intelligence dashboard with charts and workspace activity tracking. | [preview](https://connect-intel-er58ip5o7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d724b6c` |
-| 06/06/2026, 16:36:15 | `00d9a1f` | Log production deploy aabc8e1 (Google OAuth privacy and verification docs). | [preview](https://connect-intel-fm0nlxnfr-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 00d9a1f` |
-| 06/06/2026, 16:35:33 | `aabc8e1` | Update privacy policy and docs for Google Calendar OAuth verification. | [preview](https://connect-intel-k50ywa0km-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- aabc8e1` |
-| 06/06/2026, 16:31:39 | `7050e72` | Fix CRM calendar visibility and two-way Google Calendar sync. | [preview](https://connect-intel-fxk0d0xjw-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7050e72` |
-| 06/06/2026, 16:17:08 | `2859428` | Log production deploy 1c612f9 (live calendar sync and reminder emails). | [preview](https://connect-intel-m4sqm6jo3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2859428` |
-| 06/06/2026, 16:15:39 | `1c612f9` | Fix deploy: keep single Vercel cron (reminders run via daily cron + live poll). | [preview](https://connect-intel-hegxk8blj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1c612f9` |
-| 06/06/2026, 15:56:26 | `fd1eebe` | Log production deploy 0d8c71f (CRM pipeline and bulk email fixes). | [preview](https://connect-intel-lmt887xq8-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- fd1eebe` |
-| 06/06/2026, 15:55:38 | `0d8c71f` | Fix CRM pipeline visibility, calendar sharing, and tracked bulk email. | [preview](https://connect-intel-ggu7547fe-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0d8c71f` |
-| 04/06/2026, 16:19:38 | `6fe3ad4` | Add in-panel Marketing guide with animated UI walkthroughs. | [preview](https://connect-intel-o2osyg2al-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6fe3ad4` |
-| 04/06/2026, 16:12:41 | `f70ea0d` | Fix Stop/Pause when campaign status disagrees with enrollment queue. | [preview](https://connect-intel-768e71nrl-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f70ea0d` |
-| 04/06/2026, 16:08:37 | `b70745d` | Deploy campaign Stop/Pause controls with visible action buttons. | [preview](https://connect-intel-l8kq09kni-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b70745d` |
-| 04/06/2026, 14:57:27 | `307eab9` | Add Mailchimp-style campaign reports with archive and date filters. | [preview](https://connect-intel-i8oo9w6ka-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 307eab9` |
-| 04/06/2026, 14:40:54 | `9663b74` | Fix campaign reports list when overview loads without pipeline. | [preview](https://connect-intel-ch7340swr-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9663b74` |
-| 04/06/2026, 13:24:15 | `05245ab` | Fix campaign reports list to match enrollment engagement. | [preview](https://connect-intel-hho3nzfp9-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 05245ab` |
-| 04/06/2026, 13:20:50 | `64d3606` | Update production log after campaign reporting deploy. | [preview](https://connect-intel-kh94m7ln0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 64d3606` |
-| 04/06/2026, 13:20:05 | `dc1f861` | Polish campaign report KPI labels and show creator on team view. | [preview](https://connect-intel-e4dg8evzc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- dc1f861` |
-| 04/06/2026, 12:17:57 | `9027bfc` | Update production log after bulk email fix deploy. | [preview](https://connect-intel-c4ck1a6yq-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9027bfc` |
-| 04/06/2026, 12:17:10 | `10607e4` | Fix bulk email crash, 100-lead cap, and per-recipient name personalization. | [preview](https://connect-intel-4yrhwngeq-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 10607e4` |
+| 07/06/2026, 09:39:24 | `ddecae2` | Prune CRM email threads to trail-only and show newest first. | [preview](https://connect-intel-ekyygj5qb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ddecae2` | **← LIVE**
+| 07/06/2026, 09:32:16 | `66b8d5f` | Fix inbound reply not saving on org pipeline shards. | [preview](https://connect-intel-841jgg4e9-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 66b8d5f` |
+| 07/06/2026, 09:26:24 | `7da4381` | Add GET health check on CRM inbound email webhook. | [preview](https://connect-intel-j3ggvp2a8-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7da4381` |
+| 07/06/2026, 09:07:20 | `eaa453f` | Add inbound email reply sync without gmail.readonly. | [preview](https://connect-intel-1sg9dvn2k-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- eaa453f` |
+| 06/06/2026, 18:30:21 | `4e92363` | Fix team dashboard timeouts on large org pipelines. | [preview](https://connect-intel-gppe5w925-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4e92363` |
+| 06/06/2026, 18:23:39 | `03cb50e` | Polish dashboard KPI cards and marketing stats layout. | [preview](https://connect-intel-75qkueunb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 03cb50e` |
+| 06/06/2026, 18:21:17 | `81d0c89` | Fix team KPI activity counts and per-rep filter behavior. | [preview](https://connect-intel-6ry1417fa-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 81d0c89` |
+| 06/06/2026, 18:12:17 | `9905b8b` | Fix dashboard timeouts on large pipelines and stale assignee filter. | [preview](https://connect-intel-mgvu4p9zp-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9905b8b` |
+| 06/06/2026, 18:07:01 | `389592e` | Fix team KPI counts using activity-log touchpoint rollup. | [preview](https://connect-intel-68cpkvzpl-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 389592e` |
+| 06/06/2026, 18:00:34 | `5439971` | Fix team intelligence KPIs to count org-wide CRM activity. | [preview](https://connect-intel-hbe0wa28p-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5439971` |
+| 06/06/2026, 17:35:50 | `e3709ea` | Fix team dashboard metrics, card navigation, and KPI styling. | [preview](https://connect-intel-2ergfnhbw-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e3709ea` |
+| 06/06/2026, 17:27:56 | `6b37e1c` | Fix broken pipelineMaintain import that crashed production API. | [preview](https://connect-intel-fd0e9bepk-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6b37e1c` |
+| 06/06/2026, 17:22:30 | `a69af6b` | Fix empty pipeline and dashboard when shard copy is stale or blank. | [preview](https://connect-intel-78ygyhnxt-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a69af6b` |
+| 06/06/2026, 17:17:06 | `40d1205` | Fix CRM data loss when pipeline shards and savedLeads diverged. | [preview](https://connect-intel-cf5t85xmr-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 40d1205` |
+| 06/06/2026, 17:03:47 | `f2a2ade` | Add lead call logging and unify team intelligence on Dashboard. | [preview](https://connect-intel-f02szd0g3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f2a2ade` |
+| 06/06/2026, 16:55:55 | `2e32290` | Log production deploy ed53a23 (fix blank page hotfix). | [preview](https://connect-intel-1mto1xrag-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2e32290` |
+| 06/06/2026, 16:55:08 | `ed53a23` | Fix blank page after refresh by removing broken Recharts bundle. | [preview](https://connect-intel-5uah2nxwb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ed53a23` |
 
 ---
 
