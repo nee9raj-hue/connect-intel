@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-07T04:14:41.120Z",
-  "updatedAtIst": "07/06/2026, 09:44:41",
+  "updatedAt": "2026-06-07T04:34:20.253Z",
+  "updatedAtIst": "07/06/2026, 10:04:20",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "ef4045e",
+  "currentProductionCommit": "685980a",
   "entries": [
+    {
+      "logId": "20260607-1004-685980a",
+      "commit": "685980a",
+      "commitFull": "685980a152110e612226bea3b0deb9072d2c3814",
+      "message": "Fix inbound CRM reply sync on org shards and auto-refresh email threads.",
+      "deployedAt": "2026-06-07T04:34:04.017Z",
+      "deployedAtIst": "07/06/2026, 10:04:04",
+      "committedAtIst": "07/06/2026, 10:03:34",
+      "vercelPreviewUrl": "https://connect-intel-ai4fz8qtt-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 685980a"
+    },
+    {
+      "logId": "20260607-0945-1fce29e",
+      "commit": "1fce29e",
+      "commitFull": "1fce29e3719b78deb1b96e84a371f7c1253211fa",
+      "message": "Log production deploy ef4045e (friendly CRM Reply-To display).",
+      "deployedAt": "2026-06-07T04:15:10.631Z",
+      "deployedAtIst": "07/06/2026, 09:45:10",
+      "committedAtIst": "07/06/2026, 09:44:43",
+      "vercelPreviewUrl": "https://connect-intel-ph0xdpj7v-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 1fce29e"
+    },
     {
       "logId": "20260607-0944-ef4045e",
       "commit": "ef4045e",
@@ -15,7 +43,7 @@
       "committedAtIst": "07/06/2026, 09:43:57",
       "vercelPreviewUrl": "https://connect-intel-adxbodjer-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- ef4045e"
     },
@@ -214,34 +242,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- a69af6b"
-    },
-    {
-      "logId": "20260606-1717-40d1205",
-      "commit": "40d1205",
-      "commitFull": "40d1205db2b2c3689c2b00617d1f41013cf68fca",
-      "message": "Fix CRM data loss when pipeline shards and savedLeads diverged.",
-      "deployedAt": "2026-06-06T11:47:06.928Z",
-      "deployedAtIst": "06/06/2026, 17:17:06",
-      "committedAtIst": "06/06/2026, 17:16:40",
-      "vercelPreviewUrl": "https://connect-intel-cf5t85xmr-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 40d1205"
-    },
-    {
-      "logId": "20260606-1703-f2a2ade",
-      "commit": "f2a2ade",
-      "commitFull": "f2a2ade245d7fd716ca0c91bcfa7e2bcbb61beb6",
-      "message": "Add lead call logging and unify team intelligence on Dashboard.",
-      "deployedAt": "2026-06-06T11:33:47.523Z",
-      "deployedAtIst": "06/06/2026, 17:03:47",
-      "committedAtIst": "06/06/2026, 17:03:19",
-      "vercelPreviewUrl": "https://connect-intel-f02szd0g3-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- f2a2ade"
     }
   ]
 }

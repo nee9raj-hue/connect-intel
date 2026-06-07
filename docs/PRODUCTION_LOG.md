@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 4dd9c06
+npm run prod:rollback -- 1fce29e
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 4dd9c06
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `ef4045e` |
-| Log updated (IST) | 07/06/2026, 09:44:41 |
+| Commit | `685980a` |
+| Log updated (IST) | 07/06/2026, 10:04:20 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 4dd9c06
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 07/06/2026, 09:44:26 | `ef4045e` | Show rep work email in CRM Reply-To so leads see a familiar address. | [preview](https://connect-intel-adxbodjer-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ef4045e` | **← LIVE**
+| 07/06/2026, 10:04:04 | `685980a` | Fix inbound CRM reply sync on org shards and auto-refresh email threads. | [preview](https://connect-intel-ai4fz8qtt-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 685980a` | **← LIVE**
+| 07/06/2026, 09:45:10 | `1fce29e` | Log production deploy ef4045e (friendly CRM Reply-To display). | [preview](https://connect-intel-ph0xdpj7v-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1fce29e` |
+| 07/06/2026, 09:44:26 | `ef4045e` | Show rep work email in CRM Reply-To so leads see a familiar address. | [preview](https://connect-intel-adxbodjer-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ef4045e` |
 | 07/06/2026, 09:40:11 | `4dd9c06` | Log production deploy ddecae2 (CRM email trail prune and sort). | [preview](https://connect-intel-er47x6uw6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4dd9c06` |
 | 07/06/2026, 09:39:24 | `ddecae2` | Prune CRM email threads to trail-only and show newest first. | [preview](https://connect-intel-ekyygj5qb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ddecae2` |
 | 07/06/2026, 09:32:16 | `66b8d5f` | Fix inbound reply not saving on org pipeline shards. | [preview](https://connect-intel-841jgg4e9-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 66b8d5f` |
@@ -59,8 +61,6 @@ npm run prod:rollback -- 4dd9c06
 | 06/06/2026, 17:35:50 | `e3709ea` | Fix team dashboard metrics, card navigation, and KPI styling. | [preview](https://connect-intel-2ergfnhbw-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e3709ea` |
 | 06/06/2026, 17:27:56 | `6b37e1c` | Fix broken pipelineMaintain import that crashed production API. | [preview](https://connect-intel-fd0e9bepk-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6b37e1c` |
 | 06/06/2026, 17:22:30 | `a69af6b` | Fix empty pipeline and dashboard when shard copy is stale or blank. | [preview](https://connect-intel-78ygyhnxt-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a69af6b` |
-| 06/06/2026, 17:17:06 | `40d1205` | Fix CRM data loss when pipeline shards and savedLeads diverged. | [preview](https://connect-intel-cf5t85xmr-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 40d1205` |
-| 06/06/2026, 17:03:47 | `f2a2ade` | Add lead call logging and unify team intelligence on Dashboard. | [preview](https://connect-intel-f02szd0g3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f2a2ade` |
 
 ---
 
