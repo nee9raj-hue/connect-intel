@@ -365,6 +365,11 @@ export default function Sidebar({
   )
 }
 
+function navChildIsActive(child, isTargetActive) {
+  if (child.children?.length) return child.children.some((c) => isTargetActive(c))
+  return isTargetActive(child)
+}
+
 function NavGroup({
   group,
   icons,
@@ -381,7 +386,7 @@ function NavGroup({
 }) {
   const Icon = icons[group.icon] || HomeIcon
   const hasChildren = group.children?.length > 0
-  const groupActive = hasChildren && group.children.some((child) => isTargetActive(child))
+  const groupActive = hasChildren && group.children.some((child) => navChildIsActive(child, isTargetActive))
   const badge = resolveBadge(group)
 
   if (!hasChildren) {
@@ -418,16 +423,28 @@ function NavGroup({
   if (compact) {
     return (
       <RailFlyoutAnchor label={group.label} active={groupActive} muted={muted} badge={badge} icon={Icon}>
-        {group.children.map((child) => (
-          <NavSubBtn
-            key={child.id}
-            label={child.label}
-            active={isTargetActive(child)}
-            badge={resolveBadge(child)}
-            onClick={() => onGo(child)}
-            inRailFlyout
-          />
-        ))}
+        {group.children.map((child) =>
+          child.children?.length ? (
+            <RailFlyoutStageGroup
+              key={child.id}
+              stage={child}
+              expanded={stageExpanded[`stage:${child.id}`] ?? true}
+              onToggle={() => onToggleStage?.(child.id)}
+              isTargetActive={isTargetActive}
+              onGo={onGo}
+              resolveBadge={resolveBadge}
+            />
+          ) : (
+            <NavSubBtn
+              key={child.id}
+              label={child.label}
+              active={isTargetActive(child)}
+              badge={resolveBadge(child)}
+              onClick={() => onGo(child)}
+              inRailFlyout
+            />
+          )
+        )}
       </RailFlyoutAnchor>
     )
   }
@@ -726,6 +743,40 @@ function NavBtn({ label, icon: Icon, active, onClick, badge, muted = false, navP
         </span>
       )}
     </button>
+  )
+}
+
+function RailFlyoutStageGroup({ stage, expanded, onToggle, isTargetActive, onGo, resolveBadge }) {
+  const stageActive = stage.children.some((c) => isTargetActive(c))
+  return (
+    <div className="mb-0.5">
+      <button
+        type="button"
+        onClick={onToggle}
+        className={`w-full flex items-center gap-1 px-2 py-1.5 rounded-lg text-[11px] font-semibold transition-colors ${
+          stageActive ? 'text-white bg-white/10' : 'text-[#c8cfd6] hover:bg-white/8 hover:text-white'
+        }`}
+      >
+        <ChevronRightIcon
+          className={`w-3 h-3 shrink-0 transition-transform ${expanded ? 'rotate-90' : ''}`}
+        />
+        <span className="flex-1 text-left truncate">{stage.label}</span>
+      </button>
+      {expanded && (
+        <div className="ml-2 mt-0.5 space-y-0.5 border-l border-white/10 pl-2">
+          {stage.children.map((child) => (
+            <NavSubBtn
+              key={child.id}
+              label={child.label}
+              active={isTargetActive(child)}
+              badge={resolveBadge(child)}
+              onClick={() => onGo(child)}
+              inRailFlyout
+            />
+          ))}
+        </div>
+      )}
+    </div>
   )
 }
 

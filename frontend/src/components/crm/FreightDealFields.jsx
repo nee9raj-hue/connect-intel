@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { api } from '../../lib/api'
-import { CARGO_READINESS_OPTIONS, emptyFreightBox, TRANSPORT_MODE_OPTIONS } from '../../lib/freightDeal'
+import { CARGO_READINESS_OPTIONS, emptyFreightBox, INCOTERM_OPTIONS, TRANSPORT_MODE_OPTIONS } from '../../lib/freightDeal'
 
 function LocationBlock({ title, side, freight, onChange, disabled }) {
   const [lookupMsg, setLookupMsg] = useState(null)
@@ -111,9 +111,47 @@ export default function FreightDealFields({ freight, onChange, disabled = false,
         disabled={disabled}
         onChange={(e) => onChange({ ...freight, rfqDetails: e.target.value })}
         rows={compact ? 2 : 3}
-        placeholder="RFQ details — commodity, incoterms, special handling…"
+        placeholder="Additional RFQ notes — special handling, packaging, insurance…"
         className="w-full text-xs border rounded-lg px-2 py-1.5 bg-white"
       />
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+        <div>
+          <p className="text-[10px] font-semibold uppercase text-gray-500 mb-1">Incoterm</p>
+          <select
+            value={freight.incoterm || ''}
+            disabled={disabled}
+            onChange={(e) => onChange({ ...freight, incoterm: e.target.value })}
+            className="w-full text-xs border rounded-lg px-2 py-1.5 bg-white"
+          >
+            {INCOTERM_OPTIONS.map((o) => (
+              <option key={o.id || 'none'} value={o.id}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <p className="text-[10px] font-semibold uppercase text-gray-500 mb-1">Commodity type</p>
+          <input
+            value={freight.commodityType || ''}
+            disabled={disabled}
+            onChange={(e) => onChange({ ...freight, commodityType: e.target.value })}
+            placeholder="e.g. Electronics, textiles"
+            className="w-full text-xs border rounded-lg px-2 py-1.5 bg-white"
+          />
+        </div>
+        <div>
+          <p className="text-[10px] font-semibold uppercase text-gray-500 mb-1">HSN code</p>
+          <input
+            value={freight.hsnCode || ''}
+            disabled={disabled}
+            onChange={(e) => onChange({ ...freight, hsnCode: e.target.value.replace(/\s+/g, '') })}
+            placeholder="e.g. 8517"
+            maxLength={20}
+            className="w-full text-xs border rounded-lg px-2 py-1.5 bg-white"
+          />
+        </div>
+      </div>
       <div>
         <p className="text-[10px] font-semibold uppercase text-gray-500 mb-1">Transport mode</p>
         <div className="flex flex-wrap gap-2">
@@ -274,6 +312,9 @@ export default function FreightDealFields({ freight, onChange, disabled = false,
 export function formatFreightSummary(freight) {
   if (!freight) return null
   const parts = []
+  if (freight.commodityType) parts.push(freight.commodityType)
+  if (freight.hsnCode) parts.push(`HSN ${freight.hsnCode}`)
+  if (freight.incoterm) parts.push(freight.incoterm)
   if (freight.pickupZip || freight.deliveryZip) {
     const from = [freight.pickupCity, freight.pickupZip].filter(Boolean).join(' ')
     const to = [freight.deliveryCity, freight.deliveryZip].filter(Boolean).join(' ')
