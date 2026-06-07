@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useApp } from '../../context/AppContext'
 import {
   getDealStageMeta,
   getDealStagesForFreight,
@@ -8,8 +9,9 @@ import { formatDealValue } from '../../lib/crmTimeline'
 import { emptyFreightRfq, isFreightDealOrg } from '../../lib/freightDeal'
 import FreightDealFields, { formatFreightSummary, freightDealCreateLabel } from './FreightDealFields'
 import { getFreightCustomerTypeMeta } from '../../lib/freightDeal'
+import DealShareActions from './DealShareActions'
 
-function DealRow({ deal, busy, freightOrg, onUpdate, onWon, onLost }) {
+function DealRow({ deal, busy, freightOrg, lead, user, onUpdate, onWon, onLost, patchLead, logCrmEmailSend, onNotice, onError }) {
   const [lostReason, setLostReason] = useState('')
   const [showLost, setShowLost] = useState(false)
   const [showFreight, setShowFreight] = useState(false)
@@ -163,12 +165,25 @@ function DealRow({ deal, busy, freightOrg, onUpdate, onWon, onLost }) {
           )}
         </>
       )}
+
+      <DealShareActions
+        deal={deal}
+        lead={lead}
+        user={user}
+        freightOrg={freightOrg}
+        busy={busy}
+        onNotice={onNotice}
+        onError={onError}
+        patchLead={patchLead}
+        logCrmEmailSend={logCrmEmailSend}
+      />
     </li>
   )
 }
 
 /** HubSpot-style deals — multiple opportunities per lead. */
 export default function LeadDealsSection({ lead, patchLead, user, busy = false, onNotice, onError }) {
+  const { logCrmEmailSend } = useApp()
   const crm = lead.crm || {}
   const deals = crm.deals || []
   const freightOrg = isFreightDealOrg(user)
@@ -361,11 +376,17 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
               <DealRow
                 key={d.id}
                 deal={d}
+                lead={lead}
+                user={user}
                 busy={dealBusy}
                 freightOrg={freightOrg}
                 onUpdate={updateDeal}
                 onWon={markWon}
                 onLost={markLost}
+                patchLead={patchLead}
+                logCrmEmailSend={logCrmEmailSend}
+                onNotice={onNotice}
+                onError={onError}
               />
             ))}
           </ul>
@@ -380,11 +401,17 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
               <DealRow
                 key={d.id}
                 deal={d}
+                lead={lead}
+                user={user}
                 busy={dealBusy}
                 freightOrg={freightOrg}
                 onUpdate={updateDeal}
                 onWon={markWon}
                 onLost={markLost}
+                patchLead={patchLead}
+                logCrmEmailSend={logCrmEmailSend}
+                onNotice={onNotice}
+                onError={onError}
               />
             ))}
           </ul>
@@ -399,11 +426,17 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
               <DealRow
                 key={d.id}
                 deal={d}
+                lead={lead}
+                user={user}
                 busy={dealBusy}
                 freightOrg={freightOrg}
                 onUpdate={updateDeal}
                 onWon={markWon}
                 onLost={markLost}
+                patchLead={patchLead}
+                logCrmEmailSend={logCrmEmailSend}
+                onNotice={onNotice}
+                onError={onError}
               />
             ))}
           </ul>
