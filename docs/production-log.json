@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-07T05:24:13.707Z",
-  "updatedAtIst": "07/06/2026, 10:54:13",
+  "updatedAt": "2026-06-07T05:36:16.071Z",
+  "updatedAtIst": "07/06/2026, 11:06:16",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "c69dabf",
+  "currentProductionCommit": "ba6d814",
   "entries": [
+    {
+      "logId": "20260607-1105-ba6d814",
+      "commit": "ba6d814",
+      "commitFull": "ba6d8141258573d85c3c98249e120a1df4609bdc",
+      "message": "Speed up task and meeting saves with clearer success feedback.",
+      "deployedAt": "2026-06-07T05:35:51.160Z",
+      "deployedAtIst": "07/06/2026, 11:05:51",
+      "committedAtIst": "07/06/2026, 11:05:24",
+      "vercelPreviewUrl": "https://connect-intel-99kkiuedy-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- ba6d814"
+    },
+    {
+      "logId": "20260607-1054-e4fd719",
+      "commit": "e4fd719",
+      "commitFull": "e4fd719697328b2dd437c88e841805c3e6960aa9",
+      "message": "Log production deploy c69dabf (inActivityPeriod ReferenceError fix).",
+      "deployedAt": "2026-06-07T05:24:42.874Z",
+      "deployedAtIst": "07/06/2026, 10:54:42",
+      "committedAtIst": "07/06/2026, 10:54:16",
+      "vercelPreviewUrl": "https://connect-intel-5m77n9gw2-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- e4fd719"
+    },
     {
       "logId": "20260607-1053-c69dabf",
       "commit": "c69dabf",
@@ -15,7 +43,7 @@
       "committedAtIst": "07/06/2026, 10:53:26",
       "vercelPreviewUrl": "https://connect-intel-86xiisxya-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- c69dabf"
     },
@@ -242,20 +270,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- eaa453f"
-    },
-    {
-      "logId": "20260606-1830-4e92363",
-      "commit": "4e92363",
-      "commitFull": "4e92363ec6eae496df10a9ac8bdb34131ee6abb7",
-      "message": "Fix team dashboard timeouts on large org pipelines.",
-      "deployedAt": "2026-06-06T13:00:21.047Z",
-      "deployedAtIst": "06/06/2026, 18:30:21",
-      "committedAtIst": "06/06/2026, 18:29:54",
-      "vercelPreviewUrl": "https://connect-intel-gppe5w925-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 4e92363"
     }
   ]
 }
