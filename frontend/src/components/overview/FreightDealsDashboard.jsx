@@ -89,7 +89,7 @@ export default function FreightDealsDashboard({ user, pipelineSummary, onNavigat
       {!loading && recentDeals.length > 0 && (
         <ul className="space-y-1">
           {recentDeals.map(({ deal, leadId, leadName, company }) => {
-            const meta = getDealStageMeta(deal.stage)
+            const meta = getDealStageMeta(deal.stage, { freightOrg: true })
             const freight = deal.freight
             const metaLine = [
               leadName,

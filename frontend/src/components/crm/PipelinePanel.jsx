@@ -113,7 +113,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
 
   const dealsStageLabel = useMemo(() => {
     if (dealsStage === 'all') return 'All open deals'
-    return getDealStageMeta(dealsStage).label
+    return getDealStageMeta(dealsStage, { freightOrg: true }).label
   }, [dealsStage])
 
   const openDealFromPipeline = useCallback(

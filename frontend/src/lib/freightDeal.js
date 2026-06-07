@@ -1,7 +1,9 @@
 export {
   CARGO_READINESS_OPTIONS,
+  TRANSPORT_MODE_OPTIONS,
+  FREIGHT_DEAL_STAGES,
   emptyFreightRfq,
   emptyFreightBox,
   isFreightDealOrg,
-  TRANSPORT_MODE_OPTIONS,
+  getFreightDealStageMeta,
 } from '../../../lib/freightDeal.js'

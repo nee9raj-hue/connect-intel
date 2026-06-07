@@ -5,14 +5,11 @@ export {
 } from '../../../lib/dealPipeline.js'
 
 export {
-  CARGO_READINESS_OPTIONS,
-  TRANSPORT_MODE_OPTIONS,
-  emptyFreightRfq,
-  emptyFreightBox,
+  FREIGHT_DEAL_STAGES,
+  getFreightDealStageMeta,
   isFreightDealOrg,
 } from '../../../lib/freightDeal.js'
 
-export { getDealStageMeta, getDealStagesForFreight, RFQ_DEAL_STAGE } from './crmConstants'
 export { formatDealValue } from './crmTimeline'
 
 export function transportModeLabel(mode) {

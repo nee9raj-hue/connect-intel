@@ -26,7 +26,7 @@ export default function PipelineDealsView({
 
   const stageMeta = useMemo(() => {
     if (dealStage === 'all') return { label: 'All open deals' }
-    return getDealStageMeta(dealStage)
+    return getDealStageMeta(dealStage, { freightOrg: true })
   }, [dealStage])
 
   const load = useCallback(async () => {
@@ -93,7 +93,7 @@ export default function PipelineDealsView({
               </thead>
               <tbody>
                 {rows.map(({ deal, leadId, leadName, company }) => {
-                  const meta = getDealStageMeta(deal.stage)
+                  const meta = getDealStageMeta(deal.stage, { freightOrg: true })
                   const freight = deal.freight
                   return (
                     <tr

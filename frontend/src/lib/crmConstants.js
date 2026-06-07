@@ -1,3 +1,9 @@
+import {
+  FREIGHT_DEAL_STAGES,
+  getFreightDealStageMeta,
+  isFreightDealStageClosed,
+} from '../../../lib/freightDeal.js'
+
 export const CRM_STATUSES = [
   { id: 'new', label: 'New', color: 'bg-slate-100 text-slate-700 border-slate-200' },
   { id: 'contacted', label: 'Contacted', color: 'bg-blue-50 text-blue-700 border-blue-200' },
@@ -12,26 +18,28 @@ export const CRM_STATUSES = [
   { id: 'lost', label: 'Lost', color: 'bg-gray-100 text-gray-500 border-gray-200' },
 ]
 
-/** HubSpot-style deal stages (multiple deals per lead). */
+/** HubSpot-style deal stages for standard (non-freight) orgs. */
 export const DEAL_STAGES = CRM_STATUSES.filter((col) => col.id !== 'active_trading')
 
-export const RFQ_DEAL_STAGE = {
-  id: 'rfq',
-  label: 'RFQ',
-  color: 'bg-indigo-50 text-indigo-800 border-indigo-200',
-}
+export { FREIGHT_DEAL_STAGES, getFreightDealStageMeta }
 
-/** Deal stage options — includes RFQ for freight/shipping orgs (e.g. Xindus). */
+/** @deprecated use FREIGHT_DEAL_STAGES[0] */
+export const RFQ_DEAL_STAGE = FREIGHT_DEAL_STAGES[0]
+
+/** Deal stage dropdown — freight uses shipment pipeline; others use CRM deal stages. */
 export function getDealStagesForFreight(isFreightOrg) {
-  return isFreightOrg ? [RFQ_DEAL_STAGE, ...DEAL_STAGES] : DEAL_STAGES
+  if (!isFreightOrg) {
+    return DEAL_STAGES.filter((s) => !isClosedDealStage(s.id))
+  }
+  return FREIGHT_DEAL_STAGES.filter((s) => !isFreightDealStageClosed(s.id))
 }
 
 export function isClosedDealStage(stage) {
-  return stage === 'won' || stage === 'lost'
+  return stage === 'won' || stage === 'lost' || isFreightDealStageClosed(stage)
 }
 
-export function getDealStageMeta(stage) {
-  if (stage === 'rfq') return RFQ_DEAL_STAGE
+export function getDealStageMeta(stage, { freightOrg = false } = {}) {
+  if (freightOrg) return getFreightDealStageMeta(stage)
   return DEAL_STAGES.find((s) => s.id === stage) || DEAL_STAGES[0]
 }
 

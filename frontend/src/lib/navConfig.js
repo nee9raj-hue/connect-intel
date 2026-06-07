@@ -1,7 +1,7 @@
-import { CRM_STATUSES, getVisiblePipelineColumns, RFQ_DEAL_STAGE } from './crmConstants'
+import { CRM_STATUSES, getVisiblePipelineColumns } from './crmConstants'
 import { isChithiPanel } from './chithiNav'
 import { hasWorkspaceFeature } from './workspaceFeatures'
-import { isFreightDealOrg } from './freightDeal'
+import { isFreightDealOrg, FREIGHT_DEAL_STAGES } from './freightDeal'
 
 export function countPipelineByStatus(leads = []) {
   const counts = { all: leads.length }
@@ -89,87 +89,70 @@ export function isNavTargetActive(activePanel, panelOptions, target) {
 function buildFreightPipelineChildren(columns, pipelineCounts, openDealCounts = {}, allDealCounts = {}) {
   const open = openDealCounts || {}
   const all = allDealCounts || {}
+  const leadColumns = columns.filter((col) => col.id !== 'active_trading' && col.id !== 'won' && col.id !== 'lost')
+
   const items = [
     {
-      id: 'pipeline-all',
-      label: 'All leads',
-      panel: 'pipeline',
-      status: 'all',
-      view: 'leads',
-      badge: pipelineCounts.all,
-    },
-    {
-      id: 'pipeline-all-deals',
-      label: 'All open deals',
-      panel: 'pipeline',
-      view: 'deals',
-      dealStage: 'all',
-      badge: open.all || null,
-    },
-    {
-      id: 'pipeline-rfq-group',
-      label: RFQ_DEAL_STAGE.label,
+      id: 'pipeline-leads-group',
+      label: 'Leads',
       children: [
         {
-          id: 'pipeline-rfq-deals',
-          label: 'Deals',
+          id: 'pipeline-all',
+          label: 'All leads',
           panel: 'pipeline',
-          view: 'deals',
-          dealStage: 'rfq',
-          badge: open.rfq || null,
+          status: 'all',
+          view: 'leads',
+          badge: pipelineCounts.all,
         },
-      ],
-    },
-  ]
-
-  for (const col of columns) {
-    if (col.id === 'active_trading') continue
-    items.push({
-      id: `pipeline-${col.id}-group`,
-      label: col.label,
-      children: [
-        {
+        ...leadColumns.map((col) => ({
           id: `pipeline-${col.id}-leads`,
-          label: 'Leads',
+          label: col.label,
           panel: 'pipeline',
           status: col.id,
           view: 'leads',
           badge: pipelineCounts[col.id] || 0,
-        },
+        })),
+      ],
+    },
+    {
+      id: 'pipeline-deals-group',
+      label: 'Deals',
+      children: [
         {
-          id: `pipeline-${col.id}-deals`,
-          label: 'Deals',
+          id: 'pipeline-all-deals',
+          label: 'All open',
           panel: 'pipeline',
           view: 'deals',
-          dealStage: col.id,
-          badge: open[col.id] || null,
+          dealStage: 'all',
+          badge: open.all || null,
+        },
+        ...FREIGHT_DEAL_STAGES.filter((s) => s.id !== 'won' && s.id !== 'lost').map((stage) => ({
+          id: `pipeline-deal-${stage.id}`,
+          label: stage.label,
+          panel: 'pipeline',
+          view: 'deals',
+          dealStage: stage.id,
+          badge: open[stage.id] || null,
+        })),
+        {
+          id: 'pipeline-won-deals',
+          label: 'Won',
+          panel: 'pipeline',
+          view: 'deals',
+          dealStage: 'won',
+          badge: all.won || null,
+        },
+        {
+          id: 'pipeline-lost-deals',
+          label: 'Lost',
+          panel: 'pipeline',
+          view: 'deals',
+          dealStage: 'lost',
+          badge: all.lost || null,
         },
       ],
-    })
-  }
-
-  items.push({
-    id: 'pipeline-won-lost-group',
-    label: 'Closed deals',
-    children: [
-      {
-        id: 'pipeline-won-deals',
-        label: 'Won',
-        panel: 'pipeline',
-        view: 'deals',
-        dealStage: 'won',
-        badge: all.won || null,
-      },
-      {
-        id: 'pipeline-lost-deals',
-        label: 'Lost',
-        panel: 'pipeline',
-        view: 'deals',
-        dealStage: 'lost',
-        badge: all.lost || null,
-      },
-    ],
-  })
+    },
+  ]
 
   return items
 }

@@ -13,7 +13,7 @@ function DealRow({ deal, busy, freightOrg, onUpdate, onWon, onLost }) {
   const [showLost, setShowLost] = useState(false)
   const [showFreight, setShowFreight] = useState(false)
   const [freightDraft, setFreightDraft] = useState(deal.freight || emptyFreightRfq())
-  const meta = getDealStageMeta(deal.stage)
+  const meta = getDealStageMeta(deal.stage, { freightOrg })
   const closed = isClosedDealStage(deal.stage)
   const stageOptions = getDealStagesForFreight(freightOrg)
   const freightSummary = formatFreightSummary(deal.freight)
@@ -288,8 +288,8 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
               </select>
               {freightOrg && (
                 <p className="text-[10px] text-gray-500 mt-1 leading-snug">
-                  Where this shipment opportunity sits in your freight pipeline (RFQ → quoted → won).
-                  This is separate from the contact&apos;s lead status.
+                  Shipment pipeline: RFQ → Quoted → Negotiation → Booked → Won.
+                  Separate from this contact&apos;s lead status (New, Contacted, etc.).
                 </p>
               )}
             </div>
