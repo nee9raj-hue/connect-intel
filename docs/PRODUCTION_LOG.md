@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 66b8d5f
+npm run prod:rollback -- 4dd9c06
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 66b8d5f
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `ddecae2` |
-| Log updated (IST) | 07/06/2026, 09:39:39 |
+| Commit | `ef4045e` |
+| Log updated (IST) | 07/06/2026, 09:44:41 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 66b8d5f
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 07/06/2026, 09:39:24 | `ddecae2` | Prune CRM email threads to trail-only and show newest first. | [preview](https://connect-intel-ekyygj5qb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ddecae2` | **← LIVE**
+| 07/06/2026, 09:44:26 | `ef4045e` | Show rep work email in CRM Reply-To so leads see a familiar address. | [preview](https://connect-intel-adxbodjer-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ef4045e` | **← LIVE**
+| 07/06/2026, 09:40:11 | `4dd9c06` | Log production deploy ddecae2 (CRM email trail prune and sort). | [preview](https://connect-intel-er47x6uw6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4dd9c06` |
+| 07/06/2026, 09:39:24 | `ddecae2` | Prune CRM email threads to trail-only and show newest first. | [preview](https://connect-intel-ekyygj5qb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ddecae2` |
 | 07/06/2026, 09:32:16 | `66b8d5f` | Fix inbound reply not saving on org pipeline shards. | [preview](https://connect-intel-841jgg4e9-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 66b8d5f` |
 | 07/06/2026, 09:26:24 | `7da4381` | Add GET health check on CRM inbound email webhook. | [preview](https://connect-intel-j3ggvp2a8-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7da4381` |
 | 07/06/2026, 09:07:20 | `eaa453f` | Add inbound email reply sync without gmail.readonly. | [preview](https://connect-intel-1sg9dvn2k-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- eaa453f` |
@@ -59,8 +61,6 @@ npm run prod:rollback -- 66b8d5f
 | 06/06/2026, 17:22:30 | `a69af6b` | Fix empty pipeline and dashboard when shard copy is stale or blank. | [preview](https://connect-intel-78ygyhnxt-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a69af6b` |
 | 06/06/2026, 17:17:06 | `40d1205` | Fix CRM data loss when pipeline shards and savedLeads diverged. | [preview](https://connect-intel-cf5t85xmr-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 40d1205` |
 | 06/06/2026, 17:03:47 | `f2a2ade` | Add lead call logging and unify team intelligence on Dashboard. | [preview](https://connect-intel-f02szd0g3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f2a2ade` |
-| 06/06/2026, 16:55:55 | `2e32290` | Log production deploy ed53a23 (fix blank page hotfix). | [preview](https://connect-intel-1mto1xrag-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2e32290` |
-| 06/06/2026, 16:55:08 | `ed53a23` | Fix blank page after refresh by removing broken Recharts bundle. | [preview](https://connect-intel-5uah2nxwb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ed53a23` |
 
 ---
 

@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-07T04:09:39.816Z",
-  "updatedAtIst": "07/06/2026, 09:39:39",
+  "updatedAt": "2026-06-07T04:14:41.120Z",
+  "updatedAtIst": "07/06/2026, 09:44:41",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "ddecae2",
+  "currentProductionCommit": "ef4045e",
   "entries": [
+    {
+      "logId": "20260607-0944-ef4045e",
+      "commit": "ef4045e",
+      "commitFull": "ef4045e5cd314ac57d1b7370cc954066931c9668",
+      "message": "Show rep work email in CRM Reply-To so leads see a familiar address.",
+      "deployedAt": "2026-06-07T04:14:26.229Z",
+      "deployedAtIst": "07/06/2026, 09:44:26",
+      "committedAtIst": "07/06/2026, 09:43:57",
+      "vercelPreviewUrl": "https://connect-intel-adxbodjer-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- ef4045e"
+    },
+    {
+      "logId": "20260607-0940-4dd9c06",
+      "commit": "4dd9c06",
+      "commitFull": "4dd9c0649b4b04bfab6d230b8afba6d8d02cfd45",
+      "message": "Log production deploy ddecae2 (CRM email trail prune and sort).",
+      "deployedAt": "2026-06-07T04:10:11.816Z",
+      "deployedAtIst": "07/06/2026, 09:40:11",
+      "committedAtIst": "07/06/2026, 09:39:45",
+      "vercelPreviewUrl": "https://connect-intel-er47x6uw6-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 4dd9c06"
+    },
     {
       "logId": "20260607-0939-ddecae2",
       "commit": "ddecae2",
@@ -15,7 +43,7 @@
       "committedAtIst": "07/06/2026, 09:38:55",
       "vercelPreviewUrl": "https://connect-intel-ekyygj5qb-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- ddecae2"
     },
@@ -214,34 +242,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- f2a2ade"
-    },
-    {
-      "logId": "20260606-1655-2e32290",
-      "commit": "2e32290",
-      "commitFull": "2e3229062dc21b821036f1307686d053a6ba8c94",
-      "message": "Log production deploy ed53a23 (fix blank page hotfix).",
-      "deployedAt": "2026-06-06T11:25:55.403Z",
-      "deployedAtIst": "06/06/2026, 16:55:55",
-      "committedAtIst": "06/06/2026, 16:55:28",
-      "vercelPreviewUrl": "https://connect-intel-1mto1xrag-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 2e32290"
-    },
-    {
-      "logId": "20260606-1655-ed53a23",
-      "commit": "ed53a23",
-      "commitFull": "ed53a233ad85ef9b9b9ed6589b1cecd4f777b546",
-      "message": "Fix blank page after refresh by removing broken Recharts bundle.",
-      "deployedAt": "2026-06-06T11:25:08.075Z",
-      "deployedAtIst": "06/06/2026, 16:55:08",
-      "committedAtIst": "06/06/2026, 16:54:41",
-      "vercelPreviewUrl": "https://connect-intel-5uah2nxwb-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- ed53a23"
     }
   ]
 }
