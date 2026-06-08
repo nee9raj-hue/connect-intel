@@ -9,14 +9,13 @@ import {
 import { useApp } from '../../context/AppContext'
 import InviteEmailSetup from '../team/InviteEmailSetup'
 import OrgWhatsAppCloudSetup from '../team/OrgWhatsAppCloudSetup'
+import { IMPORT_UPLOAD_CHUNK_ROWS, prepareImportUploadRows } from '../../lib/importUploadPrep'
 
 const DATASET_OPTIONS = [
   { id: 'exporters', label: 'Exporters' },
   { id: 'shipping', label: 'Shipping / Logistics' },
   { id: 'general', label: 'General companies' },
 ]
-
-const IMPORT_CHUNK_ROWS = 300
 
 export default function AdminPanel() {
   const { user } = useApp()
@@ -33,6 +32,7 @@ export default function AdminPanel() {
   const [researchResults, setResearchResults] = useState([])
   const [researchLoading, setResearchLoading] = useState(false)
   const [importProgress, setImportProgress] = useState(null)
+  const [dedupeLoading, setDedupeLoading] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -104,6 +104,40 @@ export default function AdminPanel() {
     }
   }
 
+  const uploadChunkWithRetry = async (payload, attempt = 0) => {
+    try {
+      return await api.createImport(payload)
+    } catch (err) {
+      if (attempt < 1 && /timed out|timeout|522|503|504/i.test(err.message || '')) {
+        await new Promise((r) => setTimeout(r, 1500))
+        return uploadChunkWithRetry(payload, attempt + 1)
+      }
+      throw err
+    }
+  }
+
+  const handleDedupe = async () => {
+    if (!window.confirm('Remove duplicate companies and contacts from the master database? This cannot be undone.')) {
+      return
+    }
+    setDedupeLoading(true)
+    setError('')
+    setMessage('')
+    try {
+      const data = await api.dedupeMasterDatabase()
+      setOverview(data)
+      const d = data.dedupe || {}
+      setMessage(
+        `Removed ${d.companiesRemoved || 0} duplicate companies and ${d.contactsRemoved || 0} duplicate contacts. ` +
+          `Database now has ${d.companiesLeft || 0} companies and ${d.contactsLeft || 0} contacts.`
+      )
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setDedupeLoading(false)
+    }
+  }
+
   const handleUpload = async () => {
     if (!rows.length) return
 
@@ -111,17 +145,24 @@ export default function AdminPanel() {
     setError('')
     setMessage('')
 
+    const { rows: slimRows } = prepareImportUploadRows(rows)
+    if (!slimRows.length) {
+      setError('No valid rows to import after cleaning the file.')
+      setLoading(false)
+      return
+    }
+
     const chunks = []
-    for (let i = 0; i < rows.length; i += IMPORT_CHUNK_ROWS) {
-      chunks.push(rows.slice(i, i + IMPORT_CHUNK_ROWS))
+    for (let i = 0; i < slimRows.length; i += IMPORT_UPLOAD_CHUNK_ROWS) {
+      chunks.push(slimRows.slice(i, i + IMPORT_UPLOAD_CHUNK_ROWS))
     }
 
     try {
       let importJobId = null
       let lastOverview = null
       for (let i = 0; i < chunks.length; i += 1) {
-        setImportProgress({ current: i + 1, total: chunks.length, rows: rows.length })
-        const data = await api.createImport({
+        setImportProgress({ current: i + 1, total: chunks.length, rows: slimRows.length })
+        const data = await uploadChunkWithRetry({
           datasetType,
           rows: chunks[i],
           importJobId,
@@ -129,10 +170,16 @@ export default function AdminPanel() {
           done: i === chunks.length - 1,
         })
         if (!importJobId && data.importJobId) importJobId = data.importJobId
-        if (data.imports) lastOverview = data
+        if (data.imports || data.counts) lastOverview = data
+        if (i < chunks.length - 1) {
+          await new Promise((r) => setTimeout(r, 400))
+        }
+      }
+      if (!lastOverview?.counts) {
+        lastOverview = await api.getAdminOverview()
       }
       if (lastOverview) setOverview(lastOverview)
-      const imported = lastOverview?.imports?.[0]?.rowCount || rows.length
+      const imported = lastOverview?.importJob?.rowCount || slimRows.length
       setRows([])
       setFileName('')
       setMessage(
@@ -197,11 +244,27 @@ export default function AdminPanel() {
         <OrgWhatsAppCloudSetup scope="platform" />
       </section>
 
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-3 gap-4 mb-4">
         <StatCard label="Companies" value={overview?.counts?.companies ?? 0} />
         <StatCard label="Contacts" value={overview?.counts?.contacts ?? 0} />
         <StatCard label="Imports" value={overview?.counts?.imports ?? 0} />
       </div>
+
+      <section className="mb-6 bg-white rounded-2xl border border-amber-200 p-5 max-w-xl">
+        <h2 className="text-sm font-semibold text-gray-900">Clean master database</h2>
+        <p className="text-xs text-gray-500 mt-1 mb-3 leading-relaxed">
+          Run this before large imports if uploads time out or search shows duplicate companies. Merges rows with the
+          same domain or company + city + state.
+        </p>
+        <button
+          type="button"
+          onClick={handleDedupe}
+          disabled={dedupeLoading || loading}
+          className="px-4 py-2 bg-gray-900 text-white text-sm font-semibold rounded-lg disabled:opacity-50"
+        >
+          {dedupeLoading ? 'Removing duplicates…' : 'Remove duplicate entries'}
+        </button>
+      </section>
 
       <div className="grid grid-cols-[1.2fr_1fr] gap-4">
         <section className="bg-white rounded-2xl border border-gray-200 p-5">
@@ -304,8 +367,8 @@ export default function AdminPanel() {
               ? importProgress
                 ? `Importing batch ${importProgress.current}/${importProgress.total}…`
                 : 'Importing…'
-              : rows.length > IMPORT_CHUNK_ROWS
-                ? `Import ${rows.length} rows (${Math.ceil(rows.length / IMPORT_CHUNK_ROWS)} batches)`
+              : rows.length > IMPORT_UPLOAD_CHUNK_ROWS
+                ? `Import ${rows.length} rows (${Math.ceil(rows.length / IMPORT_UPLOAD_CHUNK_ROWS)} batches)`
                 : 'Import dataset'}
           </button>
         </section>

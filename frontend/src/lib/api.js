@@ -337,7 +337,7 @@ export const api = {
     request('/api/search-leads', { method: 'POST', body: { filters, count, provider } }),
   addSearchHistory: (entry) => request('/api/search-history', { method: 'POST', body: { entry } }),
   unlockLead: (lead, field) => request('/api/lead-unlocks', { method: 'POST', body: { lead, field } }),
-  getAdminOverview: () => request('/api/admin/imports'),
+  getAdminOverview: () => request('/api/admin/imports', { timeoutMs: 180_000 }),
   getAdminSupportOverview: () => request('/api/admin/support-overview'),
   listAdminSupportTickets: ({ status = 'active', q = '' } = {}) =>
     request(
@@ -361,8 +361,10 @@ export const api = {
     request('/api/admin/imports', {
       method: 'POST',
       body: { datasetType, rows, importJobId, chunkIndex, done },
-      timeoutMs: 120_000,
+      timeoutMs: 180_000,
     }),
+  dedupeMasterDatabase: () =>
+    request('/api/admin/imports', { method: 'POST', body: { action: 'dedupe' }, timeoutMs: 300_000 }),
   researchLeads: (filters, count = 10) =>
     request('/api/admin/research-leads', { method: 'POST', body: { filters, count } }),
   getOrgImportOverview: () => request('/api/org/imports'),
