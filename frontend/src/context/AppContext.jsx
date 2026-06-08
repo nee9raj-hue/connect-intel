@@ -713,9 +713,12 @@ export function AppProvider({ children }) {
       skippedCount: 0,
       results: [],
       leads: null,
+      campaignId: null,
     }
+    let campaignId = null
     for (let i = 0; i < ids.length; i += CHUNK) {
       const chunkIndex = Math.floor(i / CHUNK) + 1
+      const isLast = i + CHUNK >= ids.length
       onProgress?.({
         chunk: chunkIndex,
         totalChunks,
@@ -724,9 +727,17 @@ export function AppProvider({ children }) {
       })
       const chunkIds = ids.slice(i, i + CHUNK)
       const data = await api.sendBulkCrmEmail(
-        { ...payload, leadIds: chunkIds },
+        {
+          ...payload,
+          leadIds: chunkIds,
+          campaignId: campaignId || undefined,
+          enrollmentOffset: i,
+          finalize: isLast,
+        },
         { silent: i > 0, timeoutMs: 120_000 }
       )
+      if (data.campaignId && !campaignId) campaignId = data.campaignId
+      aggregate.campaignId = campaignId || data.campaignId || null
       aggregate.sentCount += data.sentCount || 0
       aggregate.failedCount += data.failedCount || 0
       aggregate.skippedCount += data.skippedCount || 0
