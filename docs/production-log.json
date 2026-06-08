@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-08T17:39:59.246Z",
-  "updatedAtIst": "08/06/2026, 23:09:59",
+  "updatedAt": "2026-06-08T17:59:13.717Z",
+  "updatedAtIst": "08/06/2026, 23:29:13",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "397fd1c",
+  "currentProductionCommit": "b376c8d",
   "entries": [
+    {
+      "logId": "20260608-2328-b376c8d",
+      "commit": "b376c8d",
+      "commitFull": "b376c8d2ab2292d7b76e17192377d744b33a6921",
+      "message": "Rebuild Chithi as CRM-native collaboration with context panels and activity feed.",
+      "deployedAt": "2026-06-08T17:58:59.015Z",
+      "deployedAtIst": "08/06/2026, 23:28:59",
+      "committedAtIst": "08/06/2026, 23:28:29",
+      "vercelPreviewUrl": "https://connect-intel-77hynyxwq-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- b376c8d"
+    },
+    {
+      "logId": "20260608-2310-92d8157",
+      "commit": "92d8157",
+      "commitFull": "92d8157eb6390cd34fc09a7a399744cad0531b4a",
+      "message": "Update production log for 397fd1c marketing workspaces deploy.",
+      "deployedAt": "2026-06-08T17:40:46.410Z",
+      "deployedAtIst": "08/06/2026, 23:10:46",
+      "committedAtIst": "08/06/2026, 23:10:19",
+      "vercelPreviewUrl": "https://connect-intel-k5tr1wc3a-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 92d8157"
+    },
     {
       "logId": "20260608-2309-397fd1c",
       "commit": "397fd1c",
@@ -15,7 +43,7 @@
       "committedAtIst": "08/06/2026, 23:09:10",
       "vercelPreviewUrl": "https://connect-intel-hl955qpes-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 397fd1c"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- f9b07a8"
-    },
-    {
-      "logId": "20260608-2137-240e589",
-      "commit": "240e589",
-      "commitFull": "240e589f19508a6cf4e2f4b5138f65d0d0805352",
-      "message": "Add CRM Phase 1: companies hub, pipelines, workflows, timeline, scoring.",
-      "deployedAt": "2026-06-08T16:07:26.465Z",
-      "deployedAtIst": "08/06/2026, 21:37:26",
-      "committedAtIst": "08/06/2026, 21:36:56",
-      "vercelPreviewUrl": "https://connect-intel-2rc6mym8v-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 240e589"
-    },
-    {
-      "logId": "20260608-2132-12d5196",
-      "commit": "12d5196",
-      "commitFull": "12d5196b300a3f14c5c72655ff4263c57b15e23b",
-      "message": "Update production log for bfc34d4 CRM platform Phase 0 deploy.",
-      "deployedAt": "2026-06-08T16:02:39.325Z",
-      "deployedAtIst": "08/06/2026, 21:32:39",
-      "committedAtIst": "08/06/2026, 21:32:09",
-      "vercelPreviewUrl": "https://connect-intel-7pmalo07t-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 12d5196"
     }
   ]
 }
