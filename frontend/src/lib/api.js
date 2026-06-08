@@ -433,6 +433,12 @@ export const api = {
       timeoutMs: 120_000,
     }),
   updateUserProfile: (payload) => request('/api/user/profile', { method: 'PATCH', body: payload }),
+  resolveBulkEmailRecipients: (leadIds) =>
+    request('/api/crm/bulk-email', {
+      method: 'POST',
+      body: { action: 'resolve', leadIds },
+      silent: true,
+    }),
   sendBulkCrmEmail: (payload, opts = {}) =>
     request('/api/crm/bulk-email', {
       method: 'POST',

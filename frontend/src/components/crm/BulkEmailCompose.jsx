@@ -1,15 +1,23 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { EMAIL_PURPOSES } from '../../lib/crmConstants'
 import { leadDisplayName, leadHasSendableEmail } from '../../lib/emailUtils'
 import { bulkEmailChunkSize } from '../../lib/bulkEmailLimits.js'
+import { crmTemplateToComposeFields, loadCrmMarketingTemplates } from '../../lib/crmMarketingTemplates.js'
+import { MarketingTemplatePicker, RecipientEmailPreview } from './MarketingEmailComposeTools'
 
 const COMPOSE_TABS = [
   { id: 'ai', label: '✨ AI draft' },
   { id: 'manual', label: 'Manual' },
 ]
 
-export default function BulkEmailCompose({ leadIds, leads, onDone, compact = false }) {
+export default function BulkEmailCompose({
+  leadIds,
+  leads,
+  onDone,
+  compact = false,
+  skippedCount = 0,
+}) {
   const { user, sendBulkEmail, generateEmailDraft } = useApp()
   const [composeTab, setComposeTab] = useState('ai')
   const [cc, setCc] = useState('')
@@ -28,10 +36,53 @@ export default function BulkEmailCompose({ leadIds, leads, onDone, compact = fal
   const [notice, setNotice] = useState(null)
   const [result, setResult] = useState(null)
   const [resumeCampaignId, setResumeCampaignId] = useState(null)
+  const [previewIndex, setPreviewIndex] = useState(0)
+  const [templates, setTemplates] = useState([])
+  const [templateId, setTemplateId] = useState('')
+  const [aiPreview, setAiPreview] = useState(null)
+  const [aiPreviewLoading, setAiPreviewLoading] = useState(false)
 
-  const withEmail = leads.filter((l) => leadIds.includes(l.id) && leadHasSendableEmail(l))
-  const missingEmail = leadIds.length - withEmail.length
+  useEffect(() => {
+    let cancelled = false
+    loadCrmMarketingTemplates().then((rows) => {
+      if (!cancelled) setTemplates(rows)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const withEmail = useMemo(
+    () => leads.filter((l) => leadIds.includes(l.id) && leadHasSendableEmail(l)),
+    [leads, leadIds]
+  )
+  const missingEmail = Math.max(0, leadIds.length - withEmail.length)
   const sampleLead = withEmail[0]
+
+  const recipientSummary = useMemo(() => {
+    const parts = [`${withEmail.length} recipient${withEmail.length === 1 ? '' : 's'}`]
+    if (skippedCount > 0) {
+      parts.push(`${skippedCount} skipped`)
+    } else if (missingEmail > 0) {
+      parts.push(`${missingEmail} skipped (no email)`)
+    }
+    return parts.join(' · ')
+  }, [withEmail.length, skippedCount, missingEmail])
+
+  const selectedTemplate = useMemo(
+    () => templates.find((t) => t.id === templateId) || null,
+    [templates, templateId]
+  )
+
+  const applySelectedTemplate = () => {
+    if (!selectedTemplate) return
+    const { subject: subj, body: text } = crmTemplateToComposeFields(selectedTemplate)
+    setSubject(subj)
+    setBody(text)
+    setDraftAi(false)
+    setNotice(`Applied Marketing Hub template “${selectedTemplate.name}”. Edit or preview per recipient below.`)
+    setAiPreview(null)
+  }
 
   const handleGenerate = async () => {
     if (!sampleLead) {
@@ -67,10 +118,39 @@ export default function BulkEmailCompose({ leadIds, leads, onDone, compact = fal
               : 'Same text will go to everyone unless you edit it.'
           }`
       )
+      setAiPreview(null)
     } catch (e) {
       setError(e.message)
     } finally {
       setGenerating(false)
+    }
+  }
+
+  const handlePreviewAiDraft = async (lead) => {
+    if (agenda.trim().length < 8) {
+      setError('Add an agenda before previewing AI drafts')
+      return
+    }
+    setAiPreviewLoading(true)
+    setError(null)
+    try {
+      const data = await generateEmailDraft(lead.id, {
+        purpose,
+        tone: 'professional',
+        agenda: agenda.trim(),
+        keyPoints: keyPoints.trim(),
+        senderCompany: senderCompany.trim(),
+        senderName: user?.name,
+      })
+      setAiPreview({
+        leadId: lead.id,
+        subject: data.draft.subject || '',
+        body: data.draft.body || '',
+      })
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setAiPreviewLoading(false)
     }
   }
 
@@ -152,18 +232,12 @@ export default function BulkEmailCompose({ leadIds, leads, onDone, compact = fal
       {!compact && (
         <div className="shrink-0 px-4 py-3 border-b border-[#dfe3eb] bg-white">
           <h2 className="text-sm font-semibold text-[#33475b]">Compose</h2>
-          <p className="text-xs text-[#516f90] mt-0.5">
-            {withEmail.length} recipient{withEmail.length === 1 ? '' : 's'}
-            {missingEmail > 0 ? ` · ${missingEmail} skipped (no email)` : ''}
-          </p>
+          <p className="text-xs text-[#516f90] mt-0.5">{recipientSummary}</p>
         </div>
       )}
 
       {compact && (
-        <p className="shrink-0 px-5 pt-4 pb-1 text-xs text-[#516f90]">
-          {withEmail.length} recipient{withEmail.length === 1 ? '' : 's'}
-          {missingEmail > 0 ? ` · ${missingEmail} skipped (no email)` : ''}
-        </p>
+        <p className="shrink-0 px-5 pt-4 pb-1 text-xs text-[#516f90]">{recipientSummary}</p>
       )}
 
       <div
@@ -185,6 +259,14 @@ export default function BulkEmailCompose({ leadIds, leads, onDone, compact = fal
             </button>
           ))}
         </div>
+
+        <MarketingTemplatePicker
+          templates={templates}
+          value={templateId}
+          onChange={setTemplateId}
+          onApply={applySelectedTemplate}
+          disabled={busy}
+        />
 
         <div>
           <label className="text-xs font-semibold uppercase text-gray-400">Cc (optional)</label>
@@ -250,7 +332,10 @@ export default function BulkEmailCompose({ leadIds, leads, onDone, compact = fal
                 type="checkbox"
                 className="mt-0.5"
                 checked={personalizeEach}
-                onChange={(e) => setPersonalizeEach(e.target.checked)}
+                onChange={(e) => {
+                  setPersonalizeEach(e.target.checked)
+                  setAiPreview(null)
+                }}
               />
               Personalize with AI for each recipient at send time (recommended)
             </label>
@@ -305,6 +390,20 @@ export default function BulkEmailCompose({ leadIds, leads, onDone, compact = fal
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono text-xs"
             />
           </>
+        )}
+
+        {withEmail.length > 0 && (
+          <RecipientEmailPreview
+            recipients={withEmail}
+            previewIndex={previewIndex}
+            onPreviewIndexChange={setPreviewIndex}
+            subject={subject}
+            body={body}
+            personalizeEach={composeTab === 'ai' && personalizeEach}
+            aiPreview={aiPreview}
+            aiPreviewLoading={aiPreviewLoading}
+            onPreviewAiDraft={composeTab === 'ai' && personalizeEach ? handlePreviewAiDraft : undefined}
+          />
         )}
 
         {error && <p className="text-xs text-red-700 bg-red-50 rounded-lg px-2 py-1.5">{error}</p>}
