@@ -174,6 +174,74 @@ export default function MarketingCampaignSetupFields({
               Send test to my email
             </button>
           )}
+          <label className="block text-xs text-gray-600 mt-2">
+            Recurring send
+            <select
+              value={campaignForm.recurrence || ''}
+              onChange={(e) => setCampaignForm((p) => ({ ...p, recurrence: e.target.value }))}
+              className="ci-input w-full mt-1"
+            >
+              <option value="">One-time only</option>
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+            </select>
+          </label>
+          <label className="flex items-center gap-2 text-xs text-gray-700 mt-2">
+            <input
+              type="checkbox"
+              checked={Boolean(campaignForm.abTest?.enabled)}
+              onChange={(e) =>
+                setCampaignForm((p) => ({
+                  ...p,
+                  abTest: e.target.checked
+                    ? {
+                        enabled: true,
+                        winnerMetric: 'open',
+                        variants: [
+                          { id: 'a', label: 'Variant A', weight: 50, subject: p.subject },
+                          { id: 'b', label: 'Variant B', weight: 50, subject: `${p.subject || ''} (B)`.trim() },
+                        ],
+                      }
+                    : null,
+                }))
+              }
+            />
+            A/B test subject lines
+          </label>
+          {campaignForm.abTest?.enabled && (
+            <input
+              className="ci-input w-full mt-1"
+              placeholder="Variant B subject"
+              value={campaignForm.abTest?.variants?.[1]?.subject || ''}
+              onChange={(e) =>
+                setCampaignForm((p) => ({
+                  ...p,
+                  abTest: {
+                    ...p.abTest,
+                    variants: [
+                      p.abTest.variants[0],
+                      { ...p.abTest.variants[1], subject: e.target.value },
+                    ],
+                  },
+                }))
+              }
+            />
+          )}
+          <label className="block text-xs text-gray-600 mt-2">
+            Email provider
+            <select
+              value={campaignForm.emailProvider || 'auto'}
+              onChange={(e) => setCampaignForm((p) => ({ ...p, emailProvider: e.target.value }))}
+              className="ci-input w-full mt-1"
+            >
+              <option value="auto">Auto (Resend → Gmail)</option>
+              <option value="resend">Resend</option>
+              <option value="gmail">Gmail</option>
+              <option value="ses">Amazon SES</option>
+              <option value="sendgrid">SendGrid</option>
+            </select>
+          </label>
         </div>
       )}
 

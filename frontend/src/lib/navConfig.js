@@ -204,6 +204,8 @@ export function buildCustomerNavSections(
     { id: 'marketing-reports', label: 'Reports', panel: 'marketing', tab: 'reports' },
     { id: 'marketing-templates', label: 'Templates', panel: 'marketing', tab: 'templates' },
     { id: 'marketing-forms', label: 'Forms', panel: 'marketing', tab: 'forms' },
+    { id: 'marketing-landing', label: 'Landing', panel: 'marketing', tab: 'landing' },
+    { id: 'marketing-feeds', label: 'RSS', panel: 'marketing', tab: 'feeds' },
     { id: 'marketing-automations', label: 'Automations', panel: 'marketing', tab: 'automations' },
     { id: 'marketing-suppressions', label: 'Suppressions', panel: 'marketing', tab: 'suppressions' },
     { id: 'marketing-domains', label: 'Domains', panel: 'marketing', tab: 'domains' },

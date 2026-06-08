@@ -5,6 +5,11 @@ import { DEFAULT_THEME } from '../../lib/marketingEmailDesign'
 import { formatDateTime } from '../../lib/crmUiConstants'
 import LoadingExperience from '../ui/LoadingExperience'
 import MarketingCreatorBadge from './MarketingCreatorBadge'
+import {
+  exportCampaignReportCsv,
+  exportCampaignReportExcel,
+  exportCampaignReportPdf,
+} from '../../lib/marketingReportExport'
 
 const PAGE_SIZE = 100
 
@@ -581,8 +586,63 @@ function CampaignDetailReport({
           >
             Refresh
           </button>
+          <button
+            type="button"
+            onClick={() => exportCampaignReportCsv(report, `${campaignName || 'campaign'}.csv`)}
+            className="text-xs font-semibold px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50"
+          >
+            CSV
+          </button>
+          <button
+            type="button"
+            onClick={() => exportCampaignReportExcel(report, `${campaignName || 'campaign'}.xlsx`)}
+            className="text-xs font-semibold px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50"
+          >
+            Excel
+          </button>
+          <button
+            type="button"
+            onClick={() => exportCampaignReportPdf(report)}
+            className="text-xs font-semibold px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50"
+          >
+            PDF
+          </button>
         </div>
       </div>
+
+      {report?.revenue?.attributedRevenue > 0 && (
+        <p className="text-sm text-[#33475b] bg-emerald-50 border border-emerald-100 rounded-lg px-3 py-2">
+          Attributed revenue: <strong>{report.revenue.attributedRevenue}</strong> {report.revenue.currency} across{' '}
+          <strong>{report.revenue.attributedDeals}</strong> won deal(s) after campaign clicks.
+        </p>
+      )}
+
+      {report?.abVariants?.length > 1 && (
+        <div className="overflow-x-auto">
+          <table className="crm-table w-full text-sm">
+            <thead>
+              <tr>
+                <th>Variant</th>
+                <th>Enrolled</th>
+                <th>Sent</th>
+                <th>Open %</th>
+                <th>Click %</th>
+              </tr>
+            </thead>
+            <tbody>
+              {report.abVariants.map((v) => (
+                <tr key={v.id}>
+                  <td>{v.label}</td>
+                  <td>{v.enrolled}</td>
+                  <td>{v.sent}</td>
+                  <td>{v.sent > 0 ? Math.round((v.uniqueOpens / v.sent) * 100) : 0}%</td>
+                  <td>{v.sent > 0 ? Math.round((v.uniqueClicks / v.sent) * 100) : 0}%</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       <div
         className={`grid gap-2 ${isWhatsApp ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-2 sm:grid-cols-4 lg:grid-cols-7'}`}

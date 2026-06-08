@@ -83,6 +83,13 @@ export default function MarketingDashboard({ onNavigate }) {
         <KpiCard label="Click rate" value={kpis.clickRate ?? 0} suffix="%" />
         <KpiCard label="Bounce rate" value={kpis.bounceRate ?? 0} suffix="%" />
         <KpiCard label="Unsubscribe rate" value={kpis.unsubscribeRate ?? 0} suffix="%" />
+        {(data?.revenue?.revenue ?? 0) > 0 && (
+          <KpiCard
+            label="Attributed revenue"
+            value={data.revenue.revenue}
+            suffix={` · ${data.revenue.deals} deal${data.revenue.deals === 1 ? '' : 's'}`}
+          />
+        )}
       </div>
 
       <div className="grid lg:grid-cols-2 gap-4">
@@ -101,6 +108,24 @@ export default function MarketingDashboard({ onNavigate }) {
             </div>
           ) : (
             <p className="text-xs text-gray-500">No sends in this period yet.</p>
+          )}
+        </div>
+
+        <div className="marketing-dash-card">
+          <h3 className="marketing-dash-card-title">Analytics rollup</h3>
+          {(data?.analyticsTrend || []).length ? (
+            <div className="marketing-dash-trend">
+              {data.analyticsTrend.map((row) => (
+                <div key={row.date} className="marketing-dash-trend-row">
+                  <span className="marketing-dash-trend-date">{row.date}</span>
+                  <span>{row.sent || 0} sent</span>
+                  <span>{row.opens || 0} opens</span>
+                  <span>{row.clicks || 0} clicks</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-gray-500">Event rollups populate as campaigns send.</p>
           )}
         </div>
 

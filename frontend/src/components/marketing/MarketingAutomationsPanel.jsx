@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '../../lib/api'
 import LoadingExperience from '../ui/LoadingExperience'
+import AutomationCanvas from './AutomationCanvas'
 
 const TRIGGERS = [
   { id: 'contact_added', label: 'Contact added to pipeline' },
@@ -28,7 +29,9 @@ export default function MarketingAutomationsPanel({
     segmentId: '',
     listId: '',
     delayDays: 0,
+    graph: null,
   })
+  const [showCanvas, setShowCanvas] = useState(false)
 
   const canManage = permissions?.canManageAutomations || permissions?.canCreate
 
@@ -54,6 +57,17 @@ export default function MarketingAutomationsPanel({
     setBusy(true)
     setError(null)
     try {
+      const graph = form.graph || {
+        nodes: [
+          { id: 'start', type: 'trigger', label: form.triggerType, x: 80, y: 120, config: { type: form.triggerType } },
+          { id: 'delay', type: 'delay', label: `${form.delayDays}d`, x: 280, y: 120, config: { delayDays: Number(form.delayDays) || 0 } },
+          { id: 'send', type: 'action', label: 'Send email', x: 480, y: 120, config: { action: 'send_email', campaignId: form.campaignId } },
+        ],
+        edges: [
+          { from: 'start', to: 'delay' },
+          { from: 'delay', to: 'send' },
+        ],
+      }
       await api.createMarketingAutomation({
         name: form.name.trim(),
         status: 'draft',
@@ -62,17 +76,7 @@ export default function MarketingAutomationsPanel({
         segmentId: form.segmentId || undefined,
         listId: form.listId || undefined,
         delayDays: Number(form.delayDays) || 0,
-        graph: {
-          nodes: [
-            { id: 'start', type: 'trigger', label: form.triggerType },
-            { id: 'delay', type: 'delay', label: `${form.delayDays}d` },
-            { id: 'send', type: 'action', label: 'Send email' },
-          ],
-          edges: [
-            { from: 'start', to: 'delay' },
-            { from: 'delay', to: 'send' },
-          ],
-        },
+        graph,
       })
       setForm({
         name: '',
@@ -174,9 +178,22 @@ export default function MarketingAutomationsPanel({
               </option>
             ))}
           </select>
+          <button type="button" className="ci-btn ci-btn-secondary !text-xs" onClick={() => setShowCanvas((v) => !v)}>
+            {showCanvas ? 'Hide canvas' : 'Visual builder'}
+          </button>
           <button type="button" className="ci-btn ci-btn-accent" disabled={busy} onClick={handleCreate}>
             Create automation
           </button>
+          {showCanvas && (
+            <AutomationCanvas
+              graph={form.graph}
+              campaigns={campaigns}
+              triggerType={form.triggerType}
+              campaignId={form.campaignId}
+              delayDays={form.delayDays}
+              onChange={(graph) => setForm((p) => ({ ...p, graph }))}
+            />
+          )}
         </div>
       )}
 

@@ -11331,3 +11331,78 @@ html[data-pipeline-mobile="1"] .ci-app-header-chip--secondary {
   color: #94a3b8;
   font-weight: 400;
 }
+
+.automation-canvas-wrap {
+  margin-top: 0.75rem;
+  border: 1px solid #eaf0f6;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f8fafc;
+}
+
+.automation-canvas-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding: 0.5rem 0.65rem;
+  border-bottom: 1px solid #eaf0f6;
+  background: #fff;
+}
+
+.automation-canvas {
+  position: relative;
+  min-height: 280px;
+  height: 320px;
+  overflow: hidden;
+  cursor: default;
+}
+
+.automation-canvas-svg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.automation-canvas-node {
+  position: absolute;
+  min-width: 120px;
+  max-width: 160px;
+  padding: 0.5rem 0.6rem;
+  border-radius: 10px;
+  border: 2px solid #cbd5e1;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+  cursor: grab;
+  user-select: none;
+}
+
+.automation-canvas-node:active {
+  cursor: grabbing;
+}
+
+.automation-canvas-node-type {
+  display: block;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+  font-weight: 700;
+}
+
+.automation-canvas-node-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #33475b;
+  margin-top: 0.15rem;
+}
+
+.automation-canvas-node-select,
+.automation-canvas-node-input {
+  margin-top: 0.35rem;
+  width: 100%;
+  font-size: 0.65rem;
+  padding: 0.2rem 0.35rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+}

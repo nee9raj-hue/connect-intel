@@ -548,6 +548,20 @@ export const api = {
       body: { action: 'start', id, scheduledAt },
       timeoutMs: 120_000,
     }),
+  getMarketingLandingPages: () => request('/api/marketing/landing-pages'),
+  createMarketingLandingPage: (payload) =>
+    request('/api/marketing/landing-pages', { method: 'POST', body: payload }),
+  updateMarketingLandingPage: (payload) =>
+    request('/api/marketing/landing-pages', { method: 'PATCH', body: payload }),
+  deleteMarketingLandingPage: (id) =>
+    request('/api/marketing/landing-pages', { method: 'DELETE', body: { id } }),
+  getMarketingFeeds: () => request('/api/marketing/feeds'),
+  createMarketingFeed: (payload) =>
+    request('/api/marketing/feeds', { method: 'POST', body: payload }),
+  deleteMarketingFeed: (id) =>
+    request('/api/marketing/feeds', { method: 'DELETE', body: { id } }),
+  updateMarketingOrgSettings: (payload) =>
+    request('/api/marketing/dashboard', { method: 'PATCH', body: payload }),
   getChithiSummary: () => request('/api/chithi?resource=summary', { timeoutMs: 25_000 }),
   markChithiSeen: () =>
     request('/api/chithi?resource=summary', { method: 'POST', body: { action: 'seen' }, timeoutMs: 25_000 }),

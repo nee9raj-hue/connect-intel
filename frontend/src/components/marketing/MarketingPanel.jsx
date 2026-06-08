@@ -21,6 +21,8 @@ import MarketingSegmentsPanel from './MarketingSegmentsPanel'
 import MarketingSuppressionPanel from './MarketingSuppressionPanel'
 import MarketingDomainsPanel from './MarketingDomainsPanel'
 import MarketingAutomationsPanel from './MarketingAutomationsPanel'
+import MarketingLandingPanel from './MarketingLandingPanel'
+import MarketingFeedsPanel from './MarketingFeedsPanel'
 import PanelGuideModal from '../guides/PanelGuideModal'
 import {
   marketingGuideStepsForUser,
@@ -35,6 +37,8 @@ const TABS = [
   { id: 'reports', label: 'Reports', short: 'Rpt' },
   { id: 'templates', label: 'Templates', short: 'Tpl' },
   { id: 'forms', label: 'Forms', short: 'Form' },
+  { id: 'landing', label: 'Landing', short: 'Land' },
+  { id: 'feeds', label: 'RSS', short: 'RSS' },
   { id: 'automations', label: 'Automations', short: 'Auto' },
   { id: 'inbox', label: 'WA Inbox', short: 'WA' },
   { id: 'suppressions', label: 'Suppressions', short: 'Sup' },
@@ -42,7 +46,7 @@ const TABS = [
 ]
 
 const MOBILE_TABS = TABS.filter(
-  (t) => !['templates', 'forms', 'automations', 'suppressions', 'domains'].includes(t.id)
+  (t) => !['templates', 'forms', 'landing', 'feeds', 'automations', 'suppressions', 'domains'].includes(t.id)
 )
 
 const EMPTY_TEMPLATE = {
@@ -83,6 +87,9 @@ const EMPTY_CAMPAIGN = {
   audienceMode: 'list',
   sendMode: 'immediate',
   scheduledAt: '',
+  recurrence: '',
+  abTest: null,
+  emailProvider: 'auto',
 }
 
 export default function MarketingPanel({ onNavigate, panelOptions, isActive = true }) {
@@ -168,7 +175,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
   useEffect(() => {
     if (
       isMobile &&
-      ['templates', 'forms', 'automations', 'suppressions', 'domains'].includes(tab)
+      ['templates', 'forms', 'landing', 'feeds', 'automations', 'suppressions', 'domains'].includes(tab)
     ) {
       setTab('campaigns')
     }
@@ -476,6 +483,9 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
           campaignForm.sendMode === 'scheduled' && campaignForm.scheduledAt
             ? new Date(campaignForm.scheduledAt).toISOString()
             : undefined,
+        recurrence: campaignForm.recurrence || undefined,
+        abTest: campaignForm.abTest || undefined,
+        emailProvider: campaignForm.emailProvider !== 'auto' ? campaignForm.emailProvider : undefined,
         templateId: campaignForm.templateId || undefined,
         type: steps.length > 1 ? 'sequence' : 'one_shot',
         subject: campaignForm.subject.trim(),
@@ -1329,6 +1339,19 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
             setNotice={setNotice}
             onListsReload={load}
           />
+        ) : tab === 'landing' ? (
+          <div className="crm-content-card crm-content-scroll flex-1 min-h-0 p-4 sm:p-6">
+            <MarketingLandingPanel forms={forms} onReload={load} />
+          </div>
+        ) : tab === 'feeds' ? (
+          <div className="crm-content-card crm-content-scroll flex-1 min-h-0 p-4 sm:p-6">
+            <MarketingFeedsPanel
+              lists={lists}
+              segments={segments}
+              templates={templates}
+              onReload={load}
+            />
+          </div>
         ) : tab === 'automations' ? (
           <div className="crm-content-card crm-content-scroll flex-1 min-h-0 p-4 sm:p-6">
             <MarketingAutomationsPanel
