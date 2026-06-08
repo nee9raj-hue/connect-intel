@@ -10,12 +10,14 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
 
   return (
     <div className="panel-shell overview-panel-v3 myday-shell">
-      <MyDayDashboard onNavigate={onNavigate} isActive={isActive} />
-      {isFreightDealOrg(user) ? (
-        <div className="myday-freight-addon">
-          <FreightDealsDashboard user={user} pipelineSummary={pipelineSummary} onNavigate={onNavigate} />
-        </div>
-      ) : null}
+      <div className="myday-scroll panel-body-scroll">
+        <MyDayDashboard onNavigate={onNavigate} isActive={isActive} />
+        {isFreightDealOrg(user) ? (
+          <div className="myday-freight-addon">
+            <FreightDealsDashboard user={user} pipelineSummary={pipelineSummary} onNavigate={onNavigate} />
+          </div>
+        ) : null}
+      </div>
     </div>
   )
 }

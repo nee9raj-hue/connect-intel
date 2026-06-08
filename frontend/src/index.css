@@ -13441,6 +13441,17 @@ html[data-pipeline-mobile="1"] .ci-app-header-chip--secondary {
 /* My Day Dashboard — personal execution OS */
 .myday-shell {
   background: #f6f7f9;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.myday-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
 }
 
 .myday-page {
