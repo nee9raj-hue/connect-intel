@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-08T11:33:11.056Z",
-  "updatedAtIst": "08/06/2026, 17:03:11",
+  "updatedAt": "2026-06-08T11:40:01.414Z",
+  "updatedAtIst": "08/06/2026, 17:10:01",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "c87e73e",
+  "currentProductionCommit": "328295d",
   "entries": [
+    {
+      "logId": "20260608-1709-328295d",
+      "commit": "328295d",
+      "commitFull": "328295d665d25f03237cb4736d5e2a159345ac61",
+      "message": "Fix AI search timeouts by querying the database before live AI.",
+      "deployedAt": "2026-06-08T11:39:30.505Z",
+      "deployedAtIst": "08/06/2026, 17:09:30",
+      "committedAtIst": "08/06/2026, 17:09:03",
+      "vercelPreviewUrl": "https://connect-intel-fo1odk44n-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 328295d"
+    },
+    {
+      "logId": "20260608-1703-b91ead0",
+      "commit": "b91ead0",
+      "commitFull": "b91ead0d47e4195430a7f419e22b80945fb059bf",
+      "message": "Log production deploy c87e73e (AI search dedupe and real DB results).",
+      "deployedAt": "2026-06-08T11:33:38.812Z",
+      "deployedAtIst": "08/06/2026, 17:03:38",
+      "committedAtIst": "08/06/2026, 17:03:11",
+      "vercelPreviewUrl": "https://connect-intel-e562ipxpz-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- b91ead0"
+    },
     {
       "logId": "20260608-1702-c87e73e",
       "commit": "c87e73e",
@@ -15,7 +43,7 @@
       "committedAtIst": "08/06/2026, 17:02:13",
       "vercelPreviewUrl": "https://connect-intel-9y3kadio0-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- c87e73e"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- db39a92"
-    },
-    {
-      "logId": "20260608-1014-8d3e043",
-      "commit": "8d3e043",
-      "commitFull": "8d3e043dd9a704624d38f8fa7d9f5247e551316e",
-      "message": "Fix bulk email timeouts when AI personalizes each lead.",
-      "deployedAt": "2026-06-08T04:44:36.677Z",
-      "deployedAtIst": "08/06/2026, 10:14:36",
-      "committedAtIst": "08/06/2026, 10:14:09",
-      "vercelPreviewUrl": "https://connect-intel-dc45994im-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 8d3e043"
-    },
-    {
-      "logId": "20260607-1353-7d42c26",
-      "commit": "7d42c26",
-      "commitFull": "7d42c260f4b4a88827b8082b12f47244b74b2f97",
-      "message": "Keep users on their screen after reload and external app switches.",
-      "deployedAt": "2026-06-07T08:23:08.717Z",
-      "deployedAtIst": "07/06/2026, 13:53:08",
-      "committedAtIst": "07/06/2026, 13:52:41",
-      "vercelPreviewUrl": "https://connect-intel-6oc17yum2-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 7d42c26"
     }
   ]
 }

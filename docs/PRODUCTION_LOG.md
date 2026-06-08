@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- e2be456
+npm run prod:rollback -- b91ead0
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- e2be456
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `c87e73e` |
-| Log updated (IST) | 08/06/2026, 17:03:11 |
+| Commit | `328295d` |
+| Log updated (IST) | 08/06/2026, 17:10:01 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- e2be456
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 08/06/2026, 17:02:40 | `c87e73e` | Fix AI search showing one repeated mock lead instead of real database results. | [preview](https://connect-intel-9y3kadio0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c87e73e` | **← LIVE**
+| 08/06/2026, 17:09:30 | `328295d` | Fix AI search timeouts by querying the database before live AI. | [preview](https://connect-intel-fo1odk44n-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 328295d` | **← LIVE**
+| 08/06/2026, 17:03:38 | `b91ead0` | Log production deploy c87e73e (AI search dedupe and real DB results). | [preview](https://connect-intel-e562ipxpz-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b91ead0` |
+| 08/06/2026, 17:02:40 | `c87e73e` | Fix AI search showing one repeated mock lead instead of real database results. | [preview](https://connect-intel-9y3kadio0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c87e73e` |
 | 08/06/2026, 16:56:08 | `e2be456` | Log production deploy 4899d0d (import timeout and dedupe fixes). | [preview](https://connect-intel-agi8927p6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e2be456` |
 | 08/06/2026, 16:55:06 | `4899d0d` | Fix master DB import timeouts and add duplicate cleanup. | [preview](https://connect-intel-8btknavc4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4899d0d` |
 | 08/06/2026, 16:49:58 | `4b4d3d7` | Log production deploy daa6f20 (chunked imports and operator console). | [preview](https://connect-intel-5ywngeyt9-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4b4d3d7` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- e2be456
 | 08/06/2026, 11:59:07 | `439540d` | Add incoming call option to lead call outcome logging. | [preview](https://connect-intel-nkgsm5nff-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 439540d` |
 | 08/06/2026, 11:18:45 | `4a4fad0` | Improve deals table layout and add bulk won/lost/delete actions. | [preview](https://connect-intel-3gxy07ktc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4a4fad0` |
 | 08/06/2026, 11:03:18 | `db39a92` | Add delete option for deals and freight RFQs on leads. | [preview](https://connect-intel-5kemqs65k-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- db39a92` |
-| 08/06/2026, 10:14:36 | `8d3e043` | Fix bulk email timeouts when AI personalizes each lead. | [preview](https://connect-intel-dc45994im-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8d3e043` |
-| 07/06/2026, 13:53:08 | `7d42c26` | Keep users on their screen after reload and external app switches. | [preview](https://connect-intel-6oc17yum2-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7d42c26` |
 
 ---
 
