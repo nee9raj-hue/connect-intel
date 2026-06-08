@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 3c0aea3
+npm run prod:rollback -- 9dfaf7d
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 3c0aea3
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `db50dc8` |
-| Log updated (IST) | 08/06/2026, 22:29:38 |
+| Commit | `a1a7f83` |
+| Log updated (IST) | 08/06/2026, 22:34:15 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 3c0aea3
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 08/06/2026, 22:29:23 | `db50dc8` | Rebuild Dashboard as My Day personal execution workspace. | [preview](https://connect-intel-65dipk2vv-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- db50dc8` | **← LIVE**
+| 08/06/2026, 22:34:00 | `a1a7f83` | Fix My Day dashboard scroll by adding panel-body-scroll wrapper. | [preview](https://connect-intel-nyjlpdlvz-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a1a7f83` | **← LIVE**
+| 08/06/2026, 22:30:12 | `9dfaf7d` | Update production log for db50dc8 My Day dashboard deploy. | [preview](https://connect-intel-fmm53qlys-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9dfaf7d` |
+| 08/06/2026, 22:29:23 | `db50dc8` | Rebuild Dashboard as My Day personal execution workspace. | [preview](https://connect-intel-65dipk2vv-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- db50dc8` |
 | 08/06/2026, 22:20:50 | `3c0aea3` | Update production log for fb8870d Activity Log hub deploy. | [preview](https://connect-intel-ipjcqfctq-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3c0aea3` |
 | 08/06/2026, 22:20:05 | `fb8870d` | Rebuild Activity Log as a V3 linkage hub for cross-page navigation. | [preview](https://connect-intel-2ead0m3a7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- fb8870d` |
 | 08/06/2026, 22:16:36 | `c789767` | Update production log for 9ff8ed1 dashboard V3 deploy. | [preview](https://connect-intel-i4c552sm4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c789767` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 3c0aea3
 | 08/06/2026, 21:11:29 | `9b9d254` | Update production log for 03674f8 Phase 2 marketing deploy. | [preview](https://connect-intel-f2eln6kna-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9b9d254` |
 | 08/06/2026, 21:10:34 | `03674f8` | Add Phase 2 marketing: canvas automations, A/B, RSS, landing pages, exports. | [preview](https://connect-intel-4rjf31tdx-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 03674f8` |
 | 08/06/2026, 21:02:31 | `cb3d8f6` | Update production log for 8c6ef7d email marketing deploy. | [preview](https://connect-intel-kbcvto2g4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- cb3d8f6` |
-| 08/06/2026, 21:01:33 | `8c6ef7d` | Add enterprise email marketing module inside CRM Marketing. | [preview](https://connect-intel-n568uqi1i-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8c6ef7d` |
-| 08/06/2026, 20:45:49 | `c16f247` | Update production log for ad3855c kanban bulk email fix deploy. | [preview](https://connect-intel-l6xuupsz1-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c16f247` |
 
 ---
 

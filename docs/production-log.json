@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-08T16:59:38.632Z",
-  "updatedAtIst": "08/06/2026, 22:29:38",
+  "updatedAt": "2026-06-08T17:04:15.182Z",
+  "updatedAtIst": "08/06/2026, 22:34:15",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "db50dc8",
+  "currentProductionCommit": "a1a7f83",
   "entries": [
+    {
+      "logId": "20260608-2234-a1a7f83",
+      "commit": "a1a7f83",
+      "commitFull": "a1a7f8348bb366702b4c6512b131f7b70c6f2e49",
+      "message": "Fix My Day dashboard scroll by adding panel-body-scroll wrapper.",
+      "deployedAt": "2026-06-08T17:04:00.499Z",
+      "deployedAtIst": "08/06/2026, 22:34:00",
+      "committedAtIst": "08/06/2026, 22:33:33",
+      "vercelPreviewUrl": "https://connect-intel-nyjlpdlvz-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- a1a7f83"
+    },
+    {
+      "logId": "20260608-2230-9dfaf7d",
+      "commit": "9dfaf7d",
+      "commitFull": "9dfaf7d44ed81cae8ed2fbc05ed0048f40bbffef",
+      "message": "Update production log for db50dc8 My Day dashboard deploy.",
+      "deployedAt": "2026-06-08T17:00:12.675Z",
+      "deployedAtIst": "08/06/2026, 22:30:12",
+      "committedAtIst": "08/06/2026, 22:29:43",
+      "vercelPreviewUrl": "https://connect-intel-fmm53qlys-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 9dfaf7d"
+    },
     {
       "logId": "20260608-2229-db50dc8",
       "commit": "db50dc8",
@@ -15,7 +43,7 @@
       "committedAtIst": "08/06/2026, 22:28:52",
       "vercelPreviewUrl": "https://connect-intel-65dipk2vv-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- db50dc8"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- cb3d8f6"
-    },
-    {
-      "logId": "20260608-2101-8c6ef7d",
-      "commit": "8c6ef7d",
-      "commitFull": "8c6ef7d4b723b29a3f5db7894d5f72dea90dcaaf",
-      "message": "Add enterprise email marketing module inside CRM Marketing.",
-      "deployedAt": "2026-06-08T15:31:33.056Z",
-      "deployedAtIst": "08/06/2026, 21:01:33",
-      "committedAtIst": "08/06/2026, 21:01:02",
-      "vercelPreviewUrl": "https://connect-intel-n568uqi1i-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 8c6ef7d"
-    },
-    {
-      "logId": "20260608-2045-c16f247",
-      "commit": "c16f247",
-      "commitFull": "c16f24750d69ed8f8ccbc29997cf5aecb2b69b8b",
-      "message": "Update production log for ad3855c kanban bulk email fix deploy.",
-      "deployedAt": "2026-06-08T15:15:49.084Z",
-      "deployedAtIst": "08/06/2026, 20:45:49",
-      "committedAtIst": "08/06/2026, 20:45:23",
-      "vercelPreviewUrl": "https://connect-intel-l6xuupsz1-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- c16f247"
     }
   ]
 }
