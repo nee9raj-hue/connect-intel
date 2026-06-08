@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- be4bc3c
+npm run prod:rollback -- b925d6f
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- be4bc3c
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `7fc22cf` |
-| Log updated (IST) | 08/06/2026, 23:42:40 |
+| Commit | `2c42b51` |
+| Log updated (IST) | 09/06/2026, 00:27:34 |
 
 ---
 
@@ -44,7 +44,11 @@ npm run prod:rollback -- be4bc3c
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 08/06/2026, 23:42:27 | `7fc22cf` | Fix My Day command bar counts, preview drawers, and return navigation. | [preview](https://connect-intel-39fgv936i-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7fc22cf` | **← LIVE**
+| 09/06/2026, 00:27:08 | `2c42b51` | Harden pipeline navigation history so dashboard pills do not crash the app. | [preview](https://connect-intel-b6a4g90ol-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2c42b51` | **← LIVE**
+| 09/06/2026, 00:15:29 | `b925d6f` | Apply hot-lead and follow-up filters server-side for large pipelines. | [preview](https://connect-intel-4bag17t6o-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b925d6f` |
+| 09/06/2026, 00:07:02 | `2eaff40` | Fix marketing templates tab layout so marketplace renders in the hub shell. | [preview](https://connect-intel-klt89un76-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2eaff40` |
+| 08/06/2026, 23:43:14 | `547d176` | Update production log for 7fc22cf My Day dashboard fix deploy. | [preview](https://connect-intel-oawco41nm-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 547d176` |
+| 08/06/2026, 23:42:27 | `7fc22cf` | Fix My Day command bar counts, preview drawers, and return navigation. | [preview](https://connect-intel-39fgv936i-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7fc22cf` |
 | 08/06/2026, 23:29:45 | `be4bc3c` | Update production log for b376c8d Chithi V2 deploy. | [preview](https://connect-intel-kcuoyre12-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- be4bc3c` |
 | 08/06/2026, 23:28:59 | `b376c8d` | Rebuild Chithi as CRM-native collaboration with context panels and activity feed. | [preview](https://connect-intel-77hynyxwq-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b376c8d` |
 | 08/06/2026, 23:10:46 | `92d8157` | Update production log for 397fd1c marketing workspaces deploy. | [preview](https://connect-intel-k5tr1wc3a-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 92d8157` |
@@ -60,10 +64,6 @@ npm run prod:rollback -- be4bc3c
 | 08/06/2026, 22:20:50 | `3c0aea3` | Update production log for fb8870d Activity Log hub deploy. | [preview](https://connect-intel-ipjcqfctq-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3c0aea3` |
 | 08/06/2026, 22:20:05 | `fb8870d` | Rebuild Activity Log as a V3 linkage hub for cross-page navigation. | [preview](https://connect-intel-2ead0m3a7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- fb8870d` |
 | 08/06/2026, 22:16:36 | `c789767` | Update production log for 9ff8ed1 dashboard V3 deploy. | [preview](https://connect-intel-i4c552sm4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c789767` |
-| 08/06/2026, 22:15:49 | `9ff8ed1` | Rebuild Home dashboard as a V3 command center aligned with Team Intelligence. | [preview](https://connect-intel-elf2iewea-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9ff8ed1` |
-| 08/06/2026, 22:10:34 | `1a44248` | Update production log for 5900b31 Team Intelligence V3 deploy. | [preview](https://connect-intel-4s4tsackn-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1a44248` |
-| 08/06/2026, 22:09:44 | `5900b31` | Rebuild Team Intelligence as a V3 revenue command center. | [preview](https://connect-intel-hokjczyp3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5900b31` |
-| 08/06/2026, 21:54:09 | `88d72f2` | Update production log for 1e9f225 Team Intelligence V2 deploy. | [preview](https://connect-intel-gb67of1uh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 88d72f2` |
 
 ---
 
