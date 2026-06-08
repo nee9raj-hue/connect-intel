@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-08T14:35:17.746Z",
-  "updatedAtIst": "08/06/2026, 20:05:17",
+  "updatedAt": "2026-06-08T14:45:36.192Z",
+  "updatedAtIst": "08/06/2026, 20:15:36",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "b3a9f3b",
+  "currentProductionCommit": "455806b",
   "entries": [
+    {
+      "logId": "20260608-2015-455806b",
+      "commit": "455806b",
+      "commitFull": "455806ba62829af0358028f69912c0878396ab30",
+      "message": "Paginate Team Intelligence detailed activity to five rows with load more.",
+      "deployedAt": "2026-06-08T14:45:21.776Z",
+      "deployedAtIst": "08/06/2026, 20:15:21",
+      "committedAtIst": "08/06/2026, 20:14:54",
+      "vercelPreviewUrl": "https://connect-intel-kwinca27d-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 455806b"
+    },
+    {
+      "logId": "20260608-2005-925bced",
+      "commit": "925bced",
+      "commitFull": "925bced36b3f8cf38ba7db704d843eb87de55541",
+      "message": "Update production log for b3a9f3b Team Intelligence upgrade deploy.",
+      "deployedAt": "2026-06-08T14:35:56.885Z",
+      "deployedAtIst": "08/06/2026, 20:05:56",
+      "committedAtIst": "08/06/2026, 20:05:27",
+      "vercelPreviewUrl": "https://connect-intel-mwbftfxs4-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 925bced"
+    },
     {
       "logId": "20260608-2005-b3a9f3b",
       "commit": "b3a9f3b",
@@ -15,7 +43,7 @@
       "committedAtIst": "08/06/2026, 20:04:26",
       "vercelPreviewUrl": "https://connect-intel-3jifbmn2c-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- b3a9f3b"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- bd56469"
-    },
-    {
-      "logId": "20260608-1353-971db3a",
-      "commit": "971db3a",
-      "commitFull": "971db3a24b8fe023560f837870d1ad3abb3fce9e",
-      "message": "Log production deploy ee67ea3 (team dashboard KPI fixes).",
-      "deployedAt": "2026-06-08T08:23:42.560Z",
-      "deployedAtIst": "08/06/2026, 13:53:42",
-      "committedAtIst": "08/06/2026, 13:53:15",
-      "vercelPreviewUrl": "https://connect-intel-rb5hqbs70-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 971db3a"
-    },
-    {
-      "logId": "20260608-1352-ee67ea3",
-      "commit": "ee67ea3",
-      "commitFull": "ee67ea3d6d9571f1fb1126a53972718728197471",
-      "message": "Fix team dashboard KPI counts and speed up intelligence loading.",
-      "deployedAt": "2026-06-08T08:22:56.565Z",
-      "deployedAtIst": "08/06/2026, 13:52:56",
-      "committedAtIst": "08/06/2026, 13:52:30",
-      "vercelPreviewUrl": "https://connect-intel-gczzf8bri-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- ee67ea3"
     }
   ]
 }
