@@ -357,8 +357,12 @@ export const api = {
   getAdminOrganization: (organizationId) =>
     request(`/api/admin/customers?organizationId=${encodeURIComponent(organizationId)}`),
   adminCustomerAction: (payload) => request('/api/admin/customers', { method: 'PATCH', body: payload }),
-  createImport: ({ datasetType, rows }) =>
-    request('/api/admin/imports', { method: 'POST', body: { datasetType, rows } }),
+  createImport: ({ datasetType, rows, importJobId, chunkIndex = 0, done = true }) =>
+    request('/api/admin/imports', {
+      method: 'POST',
+      body: { datasetType, rows, importJobId, chunkIndex, done },
+      timeoutMs: 120_000,
+    }),
   researchLeads: (filters, count = 10) =>
     request('/api/admin/research-leads', { method: 'POST', body: { filters, count } }),
   getOrgImportOverview: () => request('/api/org/imports'),

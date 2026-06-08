@@ -24,6 +24,7 @@ import ActiveCustomersPanel from '../crm/ActiveCustomersPanel'
 import FieldExpensesPanel from '../crm/FieldExpensesPanel'
 import PanelCustomizationPanel from '../settings/PanelCustomizationPanel'
 import CompanyWorkspacePanel from '../workspace/CompanyWorkspacePanel'
+import PlatformAdminHome from '../admin/PlatformAdminHome'
 import LoadingExperience from '../ui/LoadingExperience'
 
 const TeamDashboardPanel = lazy(() => import('../crm/TeamDashboardPanel'))
@@ -53,6 +54,7 @@ const PANELS = {
   'whatsapp-settings': WhatsAppSettingsPanel,
   integrations: IntegrationsPanel,
   admin: AdminPanel,
+  'admin-home': PlatformAdminHome,
   'admin-customers': PlatformCustomersPanel,
   'app-settings': PanelCustomizationPanel,
   'company-workspace': CompanyWorkspacePanel,

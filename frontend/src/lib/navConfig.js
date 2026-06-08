@@ -63,6 +63,7 @@ export function navTargetToOptions(target = {}) {
   if (target.period) options.period = target.period
   if (target.userId) options.userId = target.userId
   if (target.campaignId) options.campaignId = target.campaignId
+  if (target.adminTab) options.tab = target.adminTab
   return options
 }
 
@@ -313,7 +314,13 @@ export function buildOperatorNavSections() {
     {
       title: 'Platform backend',
       groups: [
-        { id: 'admin-customers', label: 'Support desk', icon: 'support', panel: 'admin-customers' },
+        { id: 'admin-home', label: 'Overview', icon: 'home', panel: 'admin-home' },
+        {
+          id: 'admin-customers',
+          label: 'Customers & tickets',
+          icon: 'support',
+          panel: 'admin-customers',
+        },
         { id: 'admin', label: 'Data & imports', icon: 'database', panel: 'admin' },
         { id: 'integrations', label: 'System status', icon: 'bolt', panel: 'integrations' },
       ],

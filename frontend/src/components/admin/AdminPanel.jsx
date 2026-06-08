@@ -16,6 +16,8 @@ const DATASET_OPTIONS = [
   { id: 'general', label: 'General companies' },
 ]
 
+const IMPORT_CHUNK_ROWS = 300
+
 export default function AdminPanel() {
   const { user } = useApp()
   const [datasetType, setDatasetType] = useState('exporters')
@@ -30,6 +32,7 @@ export default function AdminPanel() {
   const [researchCities, setResearchCities] = useState('Jaipur, Jodhpur, Udaipur')
   const [researchResults, setResearchResults] = useState([])
   const [researchLoading, setResearchLoading] = useState(false)
+  const [importProgress, setImportProgress] = useState(null)
 
   useEffect(() => {
     let cancelled = false
@@ -108,16 +111,40 @@ export default function AdminPanel() {
     setError('')
     setMessage('')
 
+    const chunks = []
+    for (let i = 0; i < rows.length; i += IMPORT_CHUNK_ROWS) {
+      chunks.push(rows.slice(i, i + IMPORT_CHUNK_ROWS))
+    }
+
     try {
-      const data = await api.createImport({ datasetType, rows })
-      setOverview(data)
+      let importJobId = null
+      let lastOverview = null
+      for (let i = 0; i < chunks.length; i += 1) {
+        setImportProgress({ current: i + 1, total: chunks.length, rows: rows.length })
+        const data = await api.createImport({
+          datasetType,
+          rows: chunks[i],
+          importJobId,
+          chunkIndex: i,
+          done: i === chunks.length - 1,
+        })
+        if (!importJobId && data.importJobId) importJobId = data.importJobId
+        if (data.imports) lastOverview = data
+      }
+      if (lastOverview) setOverview(lastOverview)
+      const imported = lastOverview?.imports?.[0]?.rowCount || rows.length
       setRows([])
       setFileName('')
-      setMessage(`Imported ${data.imports?.[0]?.rowCount || 0} rows into ${datasetType}`)
+      setMessage(
+        chunks.length > 1
+          ? `Imported ${imported} rows in ${chunks.length} batches into ${datasetType}`
+          : `Imported ${imported} rows into ${datasetType}`
+      )
     } catch (err) {
       setError(err.message)
     } finally {
       setLoading(false)
+      setImportProgress(null)
     }
   }
 
@@ -250,6 +277,20 @@ export default function AdminPanel() {
             </div>
           )}
 
+          {importProgress ? (
+            <div className="mt-4 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3">
+              <p className="text-sm font-medium text-blue-900">
+                Uploading batch {importProgress.current} of {importProgress.total} ({importProgress.rows} rows total)…
+              </p>
+              <div className="mt-2 h-2 rounded-full bg-blue-100 overflow-hidden">
+                <div
+                  className="h-full bg-blue-500 transition-all duration-300"
+                  style={{ width: `${Math.round((importProgress.current / importProgress.total) * 100)}%` }}
+                />
+              </div>
+            </div>
+          ) : null}
+
           {message && <p className="mt-4 text-sm text-green-700">{message}</p>}
           {error && <p className="mt-4 text-sm text-red-700">{error}</p>}
 
@@ -259,7 +300,13 @@ export default function AdminPanel() {
             disabled={!rows.length || loading}
             className="mt-5 px-4 py-2 bg-[#FF773D] hover:bg-[#e5652f] text-[#242424] text-sm font-semibold rounded-lg disabled:opacity-50"
           >
-            {loading ? 'Importing…' : 'Import dataset'}
+            {loading
+              ? importProgress
+                ? `Importing batch ${importProgress.current}/${importProgress.total}…`
+                : 'Importing…'
+              : rows.length > IMPORT_CHUNK_ROWS
+                ? `Import ${rows.length} rows (${Math.ceil(rows.length / IMPORT_CHUNK_ROWS)} batches)`
+                : 'Import dataset'}
           </button>
         </section>
 

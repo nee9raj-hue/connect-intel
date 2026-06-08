@@ -7,14 +7,16 @@ import { LOADING_MESSAGES } from '../../lib/loadingQuotes'
 import PlatformSupportTickets from './PlatformSupportTickets'
 
 const TABS = [
+  { id: 'overview', label: 'Overview' },
+  { id: 'escalations', label: 'Escalations' },
   { id: 'tickets', label: 'Support tickets' },
   { id: 'users', label: 'Customers' },
   { id: 'organizations', label: 'Organizations' },
 ]
 
-export default function PlatformCustomersPanel() {
+export default function PlatformCustomersPanel({ onNavigate, panelOptions = {} }) {
   const { user } = useApp()
-  const [tab, setTab] = useState('tickets')
+  const [tab, setTab] = useState(panelOptions?.tab || 'overview')
   const [query, setQuery] = useState('')
   const [overview, setOverview] = useState(null)
   const [rows, setRows] = useState([])
@@ -81,6 +83,12 @@ export default function PlatformCustomersPanel() {
   }, [tab, selectedUserId, selectedOrgId])
 
   useEffect(() => {
+    if (panelOptions?.tab && TABS.some((t) => t.id === panelOptions.tab)) {
+      setTab(panelOptions.tab)
+    }
+  }, [panelOptions?.tab])
+
+  useEffect(() => {
     if (user?.isPlatformAdmin) loadOverview()
   }, [user, loadOverview])
 
@@ -138,11 +146,11 @@ export default function PlatformCustomersPanel() {
   return (
     <div className="h-full flex flex-col bg-[#f0f1f4] overflow-hidden">
       <header className="shrink-0 bg-gray-900 text-white px-5 py-4 border-b border-gray-800">
-        <p className="text-xs font-bold uppercase tracking-widest text-[#FF773D]">Connect Intel · Support desk</p>
-        <h1 className="text-xl font-semibold mt-0.5">Platform support backend</h1>
+        <p className="text-xs font-bold uppercase tracking-widest text-[#FF773D]">Connect Intel · Platform backend</p>
+        <h1 className="text-xl font-semibold mt-0.5">Customer operations</h1>
         <p className="text-sm text-gray-400 mt-1 max-w-2xl">
-          Triage customer tickets (24–48h SLA), reply by email, and manage credits, access, and onboarding — no live call
-          queue.
+          View customer accounts, triage escalations and tickets, adjust credits and CRM access, and help teams get
+          unblocked.
         </p>
       </header>
 
@@ -193,8 +201,57 @@ export default function PlatformCustomersPanel() {
         </div>
       )}
 
-      {tab === 'tickets' ? (
+      {tab === 'overview' ? (
+        <main className="flex-1 overflow-y-auto p-5">
+          <div className="max-w-4xl grid sm:grid-cols-2 gap-3">
+            <OverviewCard
+              title="Escalations"
+              description={`${metrics.supportTicketsOverdue || 0} overdue · assistant and high-priority queue`}
+              onClick={() => setTab('escalations')}
+              warn={metrics.supportTicketsOverdue > 0}
+            />
+            <OverviewCard
+              title="Active tickets"
+              description={`${metrics.supportTicketsActive || 0} open · reply within 24–48h SLA`}
+              onClick={() => setTab('tickets')}
+            />
+            <OverviewCard
+              title="Customers"
+              description={`${metrics.totalUsers || 0} accounts · credits, onboarding, CRM fixes`}
+              onClick={() => setTab('users')}
+            />
+            <OverviewCard
+              title="Organizations"
+              description={`${metrics.totalOrganizations || 0} companies · team recharge and billing`}
+              onClick={() => setTab('organizations')}
+            />
+            <OverviewCard
+              title="Import master data"
+              description="Upload exporter and contact sheets for shared search"
+              onClick={() => onNavigate?.('admin')}
+            />
+            <OverviewCard
+              title="System status"
+              description="Integrations, API health, and environment checks"
+              onClick={() => onNavigate?.('integrations')}
+            />
+          </div>
+          {overview?.recentAudit?.length > 0 && (
+            <section className="mt-6 max-w-4xl rounded-xl border border-gray-200 bg-white p-4">
+              <h3 className="text-sm font-semibold text-gray-900 mb-2">Recent operator actions</h3>
+              <div className="space-y-1 text-xs text-gray-600">
+                {overview.recentAudit.map((a) => (
+                  <p key={a.id}>
+                    {a.action} · {a.targetType} · {formatDateTime(a.createdAt)}
+                  </p>
+                ))}
+              </div>
+            </section>
+          )}
+        </main>
+      ) : tab === 'tickets' || tab === 'escalations' ? (
         <PlatformSupportTickets
+          initialStatusFilter={tab === 'escalations' ? 'escalations' : 'active'}
           onSelectCustomer={(userId) => {
             setTab('users')
             setSelectedUserId(userId)
@@ -261,7 +318,7 @@ export default function PlatformCustomersPanel() {
       </div>
       )}
 
-      {overview?.recentAudit?.length > 0 && tab !== 'tickets' && (
+      {overview?.recentAudit?.length > 0 && !['tickets', 'escalations', 'overview'].includes(tab) && (
         <footer className="shrink-0 border-t border-gray-200 bg-white px-5 py-2 max-h-24 overflow-y-auto">
           <p className="text-xs font-semibold uppercase text-gray-400 mb-1">Recent support actions</p>
           <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-600">
@@ -274,6 +331,21 @@ export default function PlatformCustomersPanel() {
         </footer>
       )}
     </div>
+  )
+}
+
+function OverviewCard({ title, description, onClick, warn = false }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`text-left rounded-xl border p-4 hover:shadow-sm transition-shadow ${
+        warn ? 'border-amber-200 bg-amber-50' : 'border-gray-200 bg-white'
+      }`}
+    >
+      <p className="text-sm font-semibold text-gray-900">{title}</p>
+      <p className="text-xs text-gray-600 mt-1">{description}</p>
+    </button>
   )
 }
 
@@ -493,6 +565,21 @@ function CustomerDetail({ detail, busy, onAction }) {
               </p>
             ))}
           </div>
+        </section>
+      )}
+
+      {detail.supportTickets?.length > 0 && (
+        <section className="bg-white rounded-xl border border-gray-200 p-4">
+          <h3 className="text-sm font-semibold text-gray-900 mb-2">Support tickets</h3>
+          <ul className="space-y-2">
+            {detail.supportTickets.map((ticket) => (
+              <li key={ticket.id} className="text-xs text-gray-700 rounded-lg border border-gray-100 px-3 py-2">
+                <span className="font-semibold text-gray-900">{ticket.ticketNumber}</span> · {ticket.subject} ·{' '}
+                <span className="capitalize">{ticket.status.replace(/_/g, ' ')}</span> ·{' '}
+                {formatDateTime(ticket.createdAt)}
+              </li>
+            ))}
+          </ul>
         </section>
       )}
 

@@ -5,6 +5,7 @@ import LoadingExperience from '../ui/LoadingExperience'
 import { LOADING_MESSAGES } from '../../lib/loadingQuotes'
 
 const STATUS_FILTERS = [
+  { id: 'escalations', label: 'Escalations' },
   { id: 'active', label: 'Active' },
   { id: 'open', label: 'Open' },
   { id: 'in_progress', label: 'In progress' },
@@ -26,8 +27,8 @@ function statusBadge(status) {
   return map[status] || map.open
 }
 
-export default function PlatformSupportTickets({ onSelectCustomer }) {
-  const [statusFilter, setStatusFilter] = useState('active')
+export default function PlatformSupportTickets({ onSelectCustomer, initialStatusFilter = 'active' }) {
+  const [statusFilter, setStatusFilter] = useState(initialStatusFilter)
   const [query, setQuery] = useState('')
   const [metrics, setMetrics] = useState(null)
   const [tickets, setTickets] = useState([])
@@ -70,6 +71,10 @@ export default function PlatformSupportTickets({ onSelectCustomer }) {
       setDetailLoading(false)
     }
   }, [selectedId])
+
+  useEffect(() => {
+    setStatusFilter(initialStatusFilter)
+  }, [initialStatusFilter])
 
   useEffect(() => {
     const t = setTimeout(loadList, 200)

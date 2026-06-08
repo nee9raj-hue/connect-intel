@@ -26,6 +26,7 @@ export function parseAppLocation(search = '') {
   if (params.get('activityType')) panelOptions.activityType = params.get('activityType')
   if (params.get('period')) panelOptions.period = params.get('period')
   if (params.get('userId')) panelOptions.userId = params.get('userId')
+  if (params.get('adminTab')) panelOptions.tab = params.get('adminTab')
 
   const leadId = params.get('lead') || null
 
@@ -46,7 +47,8 @@ export function urlHasAppNavigation(search = '') {
     params.has('campaign') ||
     params.has('activityType') ||
     params.has('period') ||
-    params.has('userId')
+    params.has('userId') ||
+    params.has('adminTab')
   )
 }
 
@@ -93,7 +95,7 @@ export function resolveInitialAppLocation(search = '', { isPlatformAdmin = false
   if (persisted) return persisted
 
   if (isPlatformAdmin) {
-    return { panel: 'admin-customers', panelOptions: {}, leadId: null }
+    return { panel: 'admin-home', panelOptions: {}, leadId: null }
   }
 
   return parseAppLocation(search)
@@ -115,6 +117,13 @@ export function serializeAppLocation({ panel = 'overview', panelOptions = {}, le
   if (panelOptions.activityType) params.set('activityType', panelOptions.activityType)
   if (panelOptions.period && panelOptions.period !== 'week') params.set('period', panelOptions.period)
   if (panelOptions.userId) params.set('userId', String(panelOptions.userId))
+  if (
+    panelOptions.tab &&
+    (panel === 'admin-customers' || panel === 'admin-home') &&
+    !['notes', 'tasks', 'meetings', 'campaigns', 'reports', 'lists'].includes(panelOptions.tab)
+  ) {
+    params.set('adminTab', panelOptions.tab)
+  }
   if (leadId) params.set('lead', String(leadId))
 
   return params.toString()

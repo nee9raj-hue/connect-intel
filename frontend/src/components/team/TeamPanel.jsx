@@ -73,16 +73,16 @@ export default function TeamPanel({ onNavigate }) {
             </span>
             <h2 className="text-lg font-semibold text-gray-900">Platform operator</h2>
             <p className="mt-2 text-sm text-gray-500 leading-relaxed">
-              Customer team & billing live in their workspaces. Use <strong>Support desk</strong> for tickets and
+              Customer team & billing live in their workspaces. Use <strong>Customer operations</strong> for tickets and
               account changes, and <strong>Data & imports</strong> for master sheets.
             </p>
             <div className="mt-5 flex flex-wrap justify-center gap-2">
               <button
                 type="button"
-                onClick={() => onNavigate?.('admin-customers')}
+                onClick={() => onNavigate?.('admin-home')}
                 className="px-4 py-2.5 bg-[#FF773D] text-[#242424] text-sm font-semibold rounded-lg hover:bg-[#e5652f]"
               >
-                Support desk
+                Platform backend
               </button>
               <button
                 type="button"
