@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-08T08:23:12.385Z",
-  "updatedAtIst": "08/06/2026, 13:53:12",
+  "updatedAt": "2026-06-08T08:27:16.119Z",
+  "updatedAtIst": "08/06/2026, 13:57:16",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "ee67ea3",
+  "currentProductionCommit": "bd56469",
   "entries": [
+    {
+      "logId": "20260608-1357-bd56469",
+      "commit": "bd56469",
+      "commitFull": "bd56469248005e7c5160b1b1690decee46105625",
+      "message": "Fix duplicate activities in log and dashboard after shard merge.",
+      "deployedAt": "2026-06-08T08:27:02.492Z",
+      "deployedAtIst": "08/06/2026, 13:57:02",
+      "committedAtIst": "08/06/2026, 13:56:34",
+      "vercelPreviewUrl": "https://connect-intel-13g2yndve-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- bd56469"
+    },
+    {
+      "logId": "20260608-1353-971db3a",
+      "commit": "971db3a",
+      "commitFull": "971db3a24b8fe023560f837870d1ad3abb3fce9e",
+      "message": "Log production deploy ee67ea3 (team dashboard KPI fixes).",
+      "deployedAt": "2026-06-08T08:23:42.560Z",
+      "deployedAtIst": "08/06/2026, 13:53:42",
+      "committedAtIst": "08/06/2026, 13:53:15",
+      "vercelPreviewUrl": "https://connect-intel-rb5hqbs70-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 971db3a"
+    },
     {
       "logId": "20260608-1352-ee67ea3",
       "commit": "ee67ea3",
@@ -15,7 +43,7 @@
       "committedAtIst": "08/06/2026, 13:52:30",
       "vercelPreviewUrl": "https://connect-intel-gczzf8bri-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- ee67ea3"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 5041fa4"
-    },
-    {
-      "logId": "20260607-1308-6d35d01",
-      "commit": "6d35d01",
-      "commitFull": "6d35d014a84a77f445ffc3eebacf1d9dc0321452",
-      "message": "Log production deploy cdc422b (sidebar flyout + RFQ fields).",
-      "deployedAt": "2026-06-07T07:38:38.637Z",
-      "deployedAtIst": "07/06/2026, 13:08:38",
-      "committedAtIst": "07/06/2026, 13:08:12",
-      "vercelPreviewUrl": "https://connect-intel-kg9h3z5nr-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 6d35d01"
-    },
-    {
-      "logId": "20260607-1307-cdc422b",
-      "commit": "cdc422b",
-      "commitFull": "cdc422becc6e23837146d6a123200de8fcdfc2ea",
-      "message": "Fix collapsed pipeline flyouts and add RFQ incoterm fields.",
-      "deployedAt": "2026-06-07T07:37:47.770Z",
-      "deployedAtIst": "07/06/2026, 13:07:47",
-      "committedAtIst": "07/06/2026, 13:07:22",
-      "vercelPreviewUrl": "https://connect-intel-4cte2giix-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- cdc422b"
     }
   ]
 }
