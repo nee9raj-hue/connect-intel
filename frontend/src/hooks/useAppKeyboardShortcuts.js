@@ -8,12 +8,26 @@ const PIPELINE_SEARCH_ID = 'ci-pipeline-search'
  * - Never blocks Ctrl/Cmd+C/V/X/Z/A/Y or Ctrl/Cmd+F
  * - "/" focuses pipeline search when on the pipeline panel
  */
-export default function useAppKeyboardShortcuts({ enabled = true, activePanel } = {}) {
+export default function useAppKeyboardShortcuts({
+  enabled = true,
+  activePanel,
+  onCommandPalette,
+} = {}) {
   useEffect(() => {
     if (!enabled) return undefined
 
     const onKeyDown = (event) => {
       if (shouldAllowBrowserShortcut(event)) return
+
+      if (
+        (event.metaKey || event.ctrlKey) &&
+        event.key.toLowerCase() === 'k' &&
+        !isEditableTarget(event.target)
+      ) {
+        event.preventDefault()
+        onCommandPalette?.()
+        return
+      }
 
       if (
         event.key === '/' &&
@@ -34,7 +48,7 @@ export default function useAppKeyboardShortcuts({ enabled = true, activePanel } 
 
     document.addEventListener('keydown', onKeyDown)
     return () => document.removeEventListener('keydown', onKeyDown)
-  }, [enabled, activePanel])
+  }, [enabled, activePanel, onCommandPalette])
 }
 
 export { PIPELINE_SEARCH_ID }

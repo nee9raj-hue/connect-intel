@@ -1,0 +1,182 @@
+/**
+ * Connect Intel platform design tokens — original system inspired by
+ * HubSpot / Attio / Linear polish. Extend here; migrate legacy classes gradually.
+ */
+
+:root {
+  --ci-platform-radius-sm: 8px;
+  --ci-platform-radius-md: 12px;
+  --ci-platform-radius-lg: 16px;
+  --ci-platform-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --ci-platform-shadow-md: 0 8px 30px rgba(15, 23, 42, 0.12);
+  --ci-platform-border: #e5e9ee;
+  --ci-platform-surface: #ffffff;
+  --ci-platform-surface-muted: #f7f9fb;
+  --ci-platform-text: #202938;
+  --ci-platform-text-muted: #516f90;
+  --ci-platform-accent: #ff7a59;
+  --ci-platform-accent-text: #242424;
+  --ci-platform-focus: #0ea5e9;
+}
+
+/* Command palette */
+.ci-cmd-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: min(12vh, 96px) 1rem 1rem;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+}
+
+.ci-cmd-panel {
+  width: min(640px, 100%);
+  max-height: min(70vh, 520px);
+  display: flex;
+  flex-direction: column;
+  background: var(--ci-platform-surface);
+  border: 1px solid var(--ci-platform-border);
+  border-radius: var(--ci-platform-radius-lg);
+  box-shadow: var(--ci-platform-shadow-md);
+  overflow: hidden;
+}
+
+.ci-cmd-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--ci-platform-border);
+}
+
+.ci-cmd-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--ci-platform-text);
+  background: transparent;
+}
+
+.ci-cmd-input::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+.ci-cmd-kbd {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ci-platform-text-muted);
+  border: 1px solid var(--ci-platform-border);
+  border-radius: 6px;
+  padding: 0.15rem 0.4rem;
+  background: var(--ci-platform-surface-muted);
+}
+
+.ci-cmd-results {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.35rem 0.5rem 0.5rem;
+}
+
+.ci-cmd-section {
+  margin: 0.5rem 0.5rem 0.25rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #94a3b8;
+}
+
+.ci-cmd-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  text-align: left;
+  padding: 0.55rem 0.65rem;
+  border: none;
+  border-radius: var(--ci-platform-radius-sm);
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.ci-cmd-item:hover,
+.ci-cmd-item.is-active {
+  background: var(--ci-platform-surface-muted);
+}
+
+.ci-cmd-item-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ci-platform-text);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ci-cmd-item-meta {
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  color: var(--ci-platform-text-muted);
+}
+
+.ci-cmd-empty {
+  padding: 1.25rem 1rem;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--ci-platform-text-muted);
+}
+
+.ci-cmd-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  border-top: 1px solid var(--ci-platform-border);
+  font-size: 0.65rem;
+  color: #94a3b8;
+}
+
+/* Header search trigger */
+.ci-header-search-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 280px;
+  flex: 1;
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid var(--ci-platform-border);
+  background: var(--ci-platform-surface-muted);
+  color: var(--ci-platform-text-muted);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s;
+}
+
+.ci-header-search-btn:hover {
+  border-color: #cbd5e1;
+  background: #eef2f6;
+}
+
+.ci-header-search-btn kbd {
+  margin-left: auto;
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: #94a3b8;
+  border: 1px solid var(--ci-platform-border);
+  border-radius: 5px;
+  padding: 0.1rem 0.35rem;
+  background: #fff;
+}

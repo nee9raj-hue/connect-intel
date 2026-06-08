@@ -1,0 +1,32 @@
+---
+description: Master CRM platform evolution — unified objects, shell UX, and module integration for Connect Intel
+alwaysApply: true
+---
+
+# CRM platform evolution
+
+Read `docs/CRM_PLATFORM_BLUEPRINT.md` before building any CRM, Marketing, Sales, Automation, or Analytics feature.
+
+## Non-negotiables
+
+- **Extend** Vite/React + Vercel serverless + existing store — do not greenfield Next.js/NestJS/K8s unless the user explicitly requests a stack migration.
+- **Unified platform** — new features must share workspace scoping, timeline events, permissions patterns, and navigation (`navConfig.js`).
+- **Original design** — HubSpot/Attio/Linear/Notion/Stripe-level polish; never copy their assets or layouts.
+
+## Shell UX
+
+- Left nav · top command bar · `LeadWorkspace` record pattern · no full page reloads.
+- Global **⌘K / Ctrl+K** command palette (`CommandPalette.jsx`, `/api/platform/search`).
+- Prefer `platform-design-system.css` tokens for new UI.
+
+## Objects
+
+Pipeline `savedLeads` is the hub. Promote Companies/Deals/Contacts as views without breaking lead-centric APIs.
+
+## Automations
+
+Reuse marketing graph runner + `AutomationCanvas` patterns for CRM workflows. Wire triggers to pipeline save, deal status, marketing events.
+
+## Before shipping
+
+Run `npm run prod:ship`. Do not commit Android/Capacitor unless deploy scope includes mobile.

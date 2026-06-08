@@ -91,6 +91,7 @@ const ROUTES = {
   'marketing/landing': () => import('../lib/server/handlers/marketing-landing.js'),
   'marketing/feeds': () => import('../lib/server/handlers/marketing-feeds.js'),
   'webhooks/resend': () => import('../lib/server/handlers/resend-webhook.js'),
+  'platform/search': () => import('../lib/server/handlers/platform-search.js'),
   contacts: () => import('../lib/server/handlers/contacts.js'),
   'contacts/linkedin-search': () => import('../lib/server/handlers/contacts-linkedin-search.js'),
   'public-config': () => import('../lib/server/handlers/public-config.js'),

@@ -495,6 +495,8 @@ export const api = {
   createMarketingForm: (payload) => request('/api/marketing/forms', { method: 'POST', body: payload }),
   updateMarketingForm: (payload) => request('/api/marketing/forms', { method: 'PATCH', body: payload }),
   deleteMarketingForm: (id) => request('/api/marketing/forms', { method: 'DELETE', body: { id } }),
+  platformSearch: (q, limit = 20) =>
+    request(`/api/platform/search?q=${encodeURIComponent(q)}&limit=${limit}`),
   getMarketingDashboard: (period = '30d') =>
     request(`/api/marketing/dashboard?period=${encodeURIComponent(period)}`),
   listMarketingSegments: () => request('/api/marketing/segments'),

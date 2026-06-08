@@ -2,7 +2,12 @@ import { useApp } from '../../context/AppContext'
 import NotificationBell from './NotificationBell'
 import SidebarToggleButton from './SidebarToggleButton'
 
-export default function AppHeader({ onNavigate, sidebarMode = 'expanded', onToggleSidebarCollapsed }) {
+export default function AppHeader({
+  onNavigate,
+  onOpenCommandPalette,
+  sidebarMode = 'expanded',
+  onToggleSidebarCollapsed,
+}) {
   const { user } = useApp()
   if (!user || user.isPlatformAdmin) return null
 
@@ -13,7 +18,16 @@ export default function AppHeader({ onNavigate, sidebarMode = 'expanded', onTogg
   return (
     <header className="ci-app-header shrink-0 flex items-center justify-between gap-2 border-b border-[#e5e9ee] bg-white px-4 py-2.5">
       <SidebarToggleButton mode={sidebarMode} onToggle={onToggleSidebarCollapsed} className="shrink-0 hidden md:inline-flex" />
-      <div className="ci-app-header-chips flex items-center justify-end gap-2 flex-1 min-w-0">
+      <button
+        type="button"
+        onClick={() => onOpenCommandPalette?.()}
+        className="ci-header-search-btn hidden md:inline-flex min-w-0"
+        aria-label="Open command palette"
+      >
+        <span>Search CRM…</span>
+        <kbd>⌘K</kbd>
+      </button>
+      <div className="ci-app-header-chips flex items-center justify-end gap-2 flex-1 min-w-0 md:flex-none">
         <NotificationBell />
         <button
           type="button"

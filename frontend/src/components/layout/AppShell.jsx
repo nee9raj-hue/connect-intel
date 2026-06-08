@@ -23,6 +23,7 @@ import { useWorkspacePulse } from '../../hooks/useWorkspacePulse'
 import SessionReconnectBanner from './SessionReconnectBanner'
 import GmailSetupModal, { markGmailSetupDone, useGmailSetupNeeded } from '../onboarding/GmailSetupModal'
 import ConnectAssistant from '../assistant/ConnectAssistant'
+import CommandPalette from '../platform/CommandPalette'
 import MobileNavPill from './MobileNavPill'
 import DesktopNavPill from './DesktopNavPill'
 import NotificationBell from './NotificationBell'
@@ -67,6 +68,7 @@ export default function AppShell() {
     })
   }, [])
   const [liveToast, setLiveToast] = useState(null)
+  const [commandOpen, setCommandOpen] = useState(false)
   const needsOnboarding = user && !user.onboardingComplete && !user.isPlatformAdmin
   const { needed: needsGmailSetup, setNeeded: setNeedsGmailSetup } = useGmailSetupNeeded(user)
   const chithiFocus = isChithiPanel(activePanel)
@@ -89,6 +91,7 @@ export default function AppShell() {
   useAppKeyboardShortcuts({
     enabled: Boolean(user && !needsOnboarding),
     activePanel,
+    onCommandPalette: () => setCommandOpen(true),
   })
 
   useWorkspaceSync({
@@ -319,6 +322,7 @@ export default function AppShell() {
         {!user?.isPlatformAdmin && !chithiFocus && (
           <AppHeader
             onNavigate={navigate}
+            onOpenCommandPalette={() => setCommandOpen(true)}
             sidebarMode={sidebarMode}
             onToggleSidebarCollapsed={toggleSidebarCollapsed}
           />
@@ -384,6 +388,15 @@ export default function AppShell() {
         <ConnectAssistant
           onNavigate={navigate}
           fabAboveMobilePill={showMobileNavPill && mobilePillVisible}
+        />
+      )}
+      {user && !needsOnboarding && !user.isPlatformAdmin && (
+        <CommandPalette
+          open={commandOpen}
+          onClose={() => setCommandOpen(false)}
+          onNavigate={navigate}
+          openPipelineLead={openPipelineLead}
+          user={user}
         />
       )}
     </div>
