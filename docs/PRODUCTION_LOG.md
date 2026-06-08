@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 0eecdb0
+npm run prod:rollback -- c61fe98
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 0eecdb0
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `8d704f3` |
-| Log updated (IST) | 08/06/2026, 14:41:24 |
+| Commit | `daa6f20` |
+| Log updated (IST) | 08/06/2026, 16:49:25 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 0eecdb0
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 08/06/2026, 14:40:53 | `8d704f3` | Fix navigation bugs and wire dashboard reporting drill-downs. | [preview](https://connect-intel-9imc52u6c-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8d704f3` | **← LIVE**
+| 08/06/2026, 16:48:54 | `daa6f20` | Fix large platform imports and expand operator admin console. | [preview](https://connect-intel-g49ihyidj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- daa6f20` | **← LIVE**
+| 08/06/2026, 14:42:00 | `c61fe98` | Log production deploy 8d704f3 (navigation and reporting drill-downs). | [preview](https://connect-intel-ipgy2qk9f-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c61fe98` |
+| 08/06/2026, 14:40:53 | `8d704f3` | Fix navigation bugs and wire dashboard reporting drill-downs. | [preview](https://connect-intel-9imc52u6c-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8d704f3` |
 | 08/06/2026, 14:06:11 | `0eecdb0` | Fix pipeline bulk email creating duplicate campaigns per batch. | [preview](https://connect-intel-phn0l8g2k-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0eecdb0` |
 | 08/06/2026, 13:57:53 | `c4a59d7` | Log production deploy bd56469 (activity log dedupe fix). | [preview](https://connect-intel-1ebulsvt1-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c4a59d7` |
 | 08/06/2026, 13:57:02 | `bd56469` | Fix duplicate activities in log and dashboard after shard merge. | [preview](https://connect-intel-13g2yndve-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- bd56469` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 0eecdb0
 | 07/06/2026, 13:43:34 | `596d3e1` | Log production deploy c7bb7f4 (auto deal names + duplicate). | [preview](https://connect-intel-ax7cizqyt-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 596d3e1` |
 | 07/06/2026, 13:42:45 | `c7bb7f4` | Auto-generate deal names, allow rename, and add duplicate deal. | [preview](https://connect-intel-dss7hwxu6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c7bb7f4` |
 | 07/06/2026, 13:28:08 | `f075305` | Log production deploy 000fdfd (dashboard freight deal counts). | [preview](https://connect-intel-iiwqk4os0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f075305` |
-| 07/06/2026, 13:27:23 | `000fdfd` | Fix freight deal counts on dashboard and add won/lost sections. | [preview](https://connect-intel-6v92cm2gf-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 000fdfd` |
-| 07/06/2026, 13:19:50 | `759fb7b` | Log production deploy 5265d4b (deal share). | [preview](https://connect-intel-6ca1bynk2-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 759fb7b` |
 
 ---
 

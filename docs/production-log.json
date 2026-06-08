@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-08T09:11:24.894Z",
-  "updatedAtIst": "08/06/2026, 14:41:24",
+  "updatedAt": "2026-06-08T11:19:25.158Z",
+  "updatedAtIst": "08/06/2026, 16:49:25",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "8d704f3",
+  "currentProductionCommit": "daa6f20",
   "entries": [
+    {
+      "logId": "20260608-1648-daa6f20",
+      "commit": "daa6f20",
+      "commitFull": "daa6f204cca35808f0435704d8f4263736392b01",
+      "message": "Fix large platform imports and expand operator admin console.",
+      "deployedAt": "2026-06-08T11:18:54.558Z",
+      "deployedAtIst": "08/06/2026, 16:48:54",
+      "committedAtIst": "08/06/2026, 16:48:25",
+      "vercelPreviewUrl": "https://connect-intel-g49ihyidj-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- daa6f20"
+    },
+    {
+      "logId": "20260608-1442-c61fe98",
+      "commit": "c61fe98",
+      "commitFull": "c61fe98d368fa3fa921296abd1188945caa4999c",
+      "message": "Log production deploy 8d704f3 (navigation and reporting drill-downs).",
+      "deployedAt": "2026-06-08T09:12:00.672Z",
+      "deployedAtIst": "08/06/2026, 14:42:00",
+      "committedAtIst": "08/06/2026, 14:41:33",
+      "vercelPreviewUrl": "https://connect-intel-ipgy2qk9f-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- c61fe98"
+    },
     {
       "logId": "20260608-1440-8d704f3",
       "commit": "8d704f3",
@@ -15,7 +43,7 @@
       "committedAtIst": "08/06/2026, 14:40:23",
       "vercelPreviewUrl": "https://connect-intel-9imc52u6c-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 8d704f3"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- f075305"
-    },
-    {
-      "logId": "20260607-1327-000fdfd",
-      "commit": "000fdfd",
-      "commitFull": "000fdfd6cb3a7f804ca40e7413787c2ba8b89a54",
-      "message": "Fix freight deal counts on dashboard and add won/lost sections.",
-      "deployedAt": "2026-06-07T07:57:23.405Z",
-      "deployedAtIst": "07/06/2026, 13:27:23",
-      "committedAtIst": "07/06/2026, 13:26:56",
-      "vercelPreviewUrl": "https://connect-intel-6v92cm2gf-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 000fdfd"
-    },
-    {
-      "logId": "20260607-1319-759fb7b",
-      "commit": "759fb7b",
-      "commitFull": "759fb7bcc628e59c64fdc1fa45e5f4688659057a",
-      "message": "Log production deploy 5265d4b (deal share).",
-      "deployedAt": "2026-06-07T07:49:50.851Z",
-      "deployedAtIst": "07/06/2026, 13:19:50",
-      "committedAtIst": "07/06/2026, 13:19:23",
-      "vercelPreviewUrl": "https://connect-intel-6ca1bynk2-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 759fb7b"
     }
   ]
 }
