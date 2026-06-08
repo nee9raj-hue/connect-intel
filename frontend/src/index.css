@@ -6012,6 +6012,20 @@ details summary::-webkit-details-marker {
   background: linear-gradient(180deg, #f7f9fb 0%, #fff 100%);
 }
 
+button.dashboard-mini-stat--clickable {
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+button.dashboard-mini-stat--clickable:hover {
+  border-color: #c5d0dc;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+}
+
 .dashboard-mini-stat__label {
   font-size: 0.625rem;
   font-weight: 700;

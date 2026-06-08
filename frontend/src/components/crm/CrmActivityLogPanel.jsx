@@ -48,10 +48,21 @@ export default function CrmActivityLogPanel({ onNavigate, panelOptions = {} }) {
   return (
     <div className="panel-shell">
       <header className="shrink-0 bg-white border-b border-gray-200 px-4 md:px-5 py-4">
-        <h1 className="text-lg font-semibold text-gray-900">Activity log</h1>
-        <p className="text-xs text-gray-500 mt-0.5">
-          {typeLabel ? `${typeLabel} across your pipeline` : 'Notes, emails, calls, visits, and assignments across your pipeline'}
-        </p>
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="text-lg font-semibold text-gray-900">Activity log</h1>
+            <p className="text-xs text-gray-500 mt-0.5">
+              {typeLabel ? `${typeLabel} across your pipeline` : 'Notes, emails, calls, visits, and assignments across your pipeline'}
+            </p>
+          </div>
+          <button
+            type="button"
+            className="crm-btn crm-btn-secondary crm-btn-sm shrink-0"
+            onClick={() => onNavigate?.('overview')}
+          >
+            Dashboard
+          </button>
+        </div>
       </header>
 
       <div className="panel-body-scroll p-4 md:p-5 max-w-3xl">

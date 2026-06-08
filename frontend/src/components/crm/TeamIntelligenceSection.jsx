@@ -19,6 +19,7 @@ import {
   PipelineFunnelChart,
   TeamHoursBarChart,
 } from './TeamIntelligenceCharts'
+import { isFreightDealOrg } from '../../lib/freightDeal'
 
 const TEAM_KPIS = [
   { key: 'hoursInApp', label: 'Hours in app', intelKey: 'hoursInApp', format: 'hours', icon: 'team', nav: null },
@@ -51,16 +52,16 @@ const TEAM_KPIS = [
     label: 'Tasks created',
     intelKey: 'tasksCreated',
     icon: 'task',
-    nav: 'crm-calendar',
-    navOptions: { upcomingOnly: true },
+    nav: 'crm-log',
+    navOptions: { activityType: 'task' },
   },
   {
     key: 'meetings',
     label: 'Meetings set',
     intelKey: 'meetings',
     icon: 'calendar',
-    nav: 'crm-calendar',
-    navOptions: { upcomingOnly: true },
+    nav: 'crm-log',
+    navOptions: { activityType: 'meeting' },
   },
   {
     key: 'pipelineValue',
@@ -151,13 +152,22 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
 
   const preserveAssignee = () => {}
 
+  const freightOrg = isFreightDealOrg(user)
+
   const drillTo = (nav, options = {}) => {
+    const sharedOpts = memberUserId ? { userId: memberUserId } : {}
+
     if (options.status) {
-      onNavigate?.(nav, { status: options.status })
+      if (memberUserId && nav === 'pipeline') setPipelineAssigneeFilter?.(memberUserId)
+      if (nav === 'pipeline' && options.status === 'won' && freightOrg) {
+        onNavigate?.('pipeline', { view: 'deals', dealStage: 'won', ...sharedOpts })
+        return
+      }
+      onNavigate?.(nav, { status: options.status, ...sharedOpts })
       return
     }
     if (nav === 'crm-calendar') {
-      onNavigate?.(nav, { upcomingOnly: true, ...options })
+      onNavigate?.(nav, { upcomingOnly: true, ...options, ...sharedOpts })
       return
     }
     if (nav === 'crm-log') {
@@ -165,13 +175,14 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
       onNavigate?.(nav, {
         activityType: options.activityType || null,
         period,
+        ...sharedOpts,
       })
       return
     }
     if (memberUserId && nav === 'pipeline') {
       setPipelineAssigneeFilter?.(memberUserId)
     }
-    onNavigate?.(nav, options)
+    onNavigate?.(nav, { ...options, ...sharedOpts })
   }
 
   const onMemberRow = (m) => {
@@ -182,7 +193,8 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
   }
 
   const onMemberDrill = (m) => {
-    onNavigate?.('pipeline', { assigneeUserId: m.userId })
+    setPipelineAssigneeFilter?.(m.userId)
+    onNavigate?.('pipeline', { status: 'all', userId: m.userId })
   }
 
   const onMemberSelect = (e) => {
@@ -193,13 +205,10 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
   }
 
   const onInsightClick = (insight) => {
-    if (insight.userId) {
-      onNavigate?.('pipeline', { assigneeUserId: insight.userId })
-      return
-    }
-    if (insight.userIds?.length === 1) {
-      onNavigate?.('pipeline', { assigneeUserId: insight.userIds[0] })
-    }
+    const uid = insight.userId || (insight.userIds?.length === 1 ? insight.userIds[0] : null)
+    if (!uid) return
+    setPipelineAssigneeFilter?.(uid)
+    onNavigate?.('pipeline', { status: 'all', userId: uid })
   }
 
   const summary = data?.summary || {}

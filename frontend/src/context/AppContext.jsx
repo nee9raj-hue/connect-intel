@@ -865,19 +865,6 @@ export function AppProvider({ children }) {
         return
       }
 
-      if (
-        target.panel === 'chithi' ||
-        target.panel === 'team-hub' ||
-        target.panel === 'team-notes' ||
-        target.panel === 'team-tasks'
-      ) {
-        if (target.leadId) {
-          openPipelineLead(target.leadId, 'overview')
-          panelNavigateRef.current?.('pipeline')
-        }
-        return
-      }
-
       if (target.leadId) {
         openPipelineLead(target.leadId, target.leadTab)
       }

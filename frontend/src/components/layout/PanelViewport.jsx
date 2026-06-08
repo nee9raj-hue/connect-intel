@@ -23,6 +23,7 @@ import CrmAutomationPanel from '../crm/CrmAutomationPanel'
 import ActiveCustomersPanel from '../crm/ActiveCustomersPanel'
 import FieldExpensesPanel from '../crm/FieldExpensesPanel'
 import PanelCustomizationPanel from '../settings/PanelCustomizationPanel'
+import CompanyWorkspacePanel from '../workspace/CompanyWorkspacePanel'
 import LoadingExperience from '../ui/LoadingExperience'
 
 const TeamDashboardPanel = lazy(() => import('../crm/TeamDashboardPanel'))
@@ -54,6 +55,7 @@ const PANELS = {
   admin: AdminPanel,
   'admin-customers': PlatformCustomersPanel,
   'app-settings': PanelCustomizationPanel,
+  'company-workspace': CompanyWorkspacePanel,
 }
 
 function resolvePanelId(activePanel) {

@@ -59,6 +59,10 @@ export function navTargetToOptions(target = {}) {
   if (target.view) options.view = target.view
   if (target.dealStage) options.dealStage = target.dealStage
   if (target.upcomingOnly) options.upcomingOnly = true
+  if (target.activityType) options.activityType = target.activityType
+  if (target.period) options.period = target.period
+  if (target.userId) options.userId = target.userId
+  if (target.campaignId) options.campaignId = target.campaignId
   return options
 }
 

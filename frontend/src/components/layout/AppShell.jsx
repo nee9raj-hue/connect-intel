@@ -47,6 +47,7 @@ export default function AppShell() {
     chithiUnread,
     refreshChithiUnread,
     setClosePipelineLead,
+    setPipelineAssigneeFilter,
   } = useApp()
   const isMobile = useIsMobile()
   const [activePanel, setActivePanel] = useState('overview')
@@ -125,10 +126,12 @@ export default function AppShell() {
       setActivePanel(panel || 'overview')
       setPanelOptions(opts)
       setMobileNavOpen(false)
+      const assigneeId = opts.assigneeUserId || opts.userId
+      if (assigneeId) setPipelineAssigneeFilter(assigneeId)
       if (leadId) openPipelineLead(leadId)
       else setPipelineLeadId(null)
     },
-    [openPipelineLead, setPipelineLeadId]
+    [openPipelineLead, setPipelineLeadId, setPipelineAssigneeFilter]
   )
 
   const commitHistory = useCallback((location, { replace = false } = {}) => {
@@ -199,6 +202,9 @@ export default function AppShell() {
         saveSidebarMode('expanded')
       }
 
+      const assigneeId = options?.assigneeUserId || options?.userId
+      if (assigneeId) setPipelineAssigneeFilter(assigneeId)
+
       const loc = { panel: id, panelOptions: options || {}, leadId: null }
 
       if (pipelineLeadId) setPipelineLeadId(null)
@@ -210,7 +216,7 @@ export default function AppShell() {
         commitHistory(loc, { replace })
       }
     },
-    [activePanel, sidebarMode, pipelineLeadId, setPipelineLeadId, commitHistory]
+    [activePanel, sidebarMode, pipelineLeadId, setPipelineLeadId, setPipelineAssigneeFilter, commitHistory]
   )
 
   useEffect(() => {

@@ -23,6 +23,9 @@ export function parseAppLocation(search = '') {
   if (params.get('channel')) panelOptions.channel = params.get('channel')
   if (params.get('upcoming') === '1') panelOptions.upcomingOnly = true
   if (params.get('campaign')) panelOptions.campaignId = params.get('campaign')
+  if (params.get('activityType')) panelOptions.activityType = params.get('activityType')
+  if (params.get('period')) panelOptions.period = params.get('period')
+  if (params.get('userId')) panelOptions.userId = params.get('userId')
 
   const leadId = params.get('lead') || null
 
@@ -40,7 +43,10 @@ export function urlHasAppNavigation(search = '') {
     params.has('dealStage') ||
     params.has('channel') ||
     params.has('upcoming') ||
-    params.has('campaign')
+    params.has('campaign') ||
+    params.has('activityType') ||
+    params.has('period') ||
+    params.has('userId')
   )
 }
 
@@ -106,6 +112,9 @@ export function serializeAppLocation({ panel = 'overview', panelOptions = {}, le
   if (panelOptions.channel) params.set('channel', panelOptions.channel)
   if (panelOptions.upcomingOnly) params.set('upcoming', '1')
   if (panelOptions.campaignId) params.set('campaign', String(panelOptions.campaignId))
+  if (panelOptions.activityType) params.set('activityType', panelOptions.activityType)
+  if (panelOptions.period && panelOptions.period !== 'week') params.set('period', panelOptions.period)
+  if (panelOptions.userId) params.set('userId', String(panelOptions.userId))
   if (leadId) params.set('lead', String(leadId))
 
   return params.toString()

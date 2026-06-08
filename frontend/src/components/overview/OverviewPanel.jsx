@@ -231,10 +231,30 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
             <DashboardEmpty>Loading marketing stats…</DashboardEmpty>
           ) : marketingSummary ? (
             <div className="dashboard-marketing-grid">
-              <OverviewStatMini label="Campaigns" value={marketingSummary.campaigns} accent="default" />
-              <OverviewStatMini label="Sent" value={marketingSummary.sent} accent="default" />
-              <OverviewStatMini label="Open rate" value={`${marketingOpenRate}%`} accent="soft" />
-              <OverviewStatMini label="Click rate" value={`${marketingClickRate}%`} accent="soft" />
+              <OverviewStatMini
+                label="Campaigns"
+                value={marketingSummary.campaigns}
+                accent="default"
+                onClick={() => go({ panel: 'marketing', tab: 'campaigns' })}
+              />
+              <OverviewStatMini
+                label="Sent"
+                value={marketingSummary.sent}
+                accent="default"
+                onClick={() => go({ panel: 'marketing', tab: 'reports' })}
+              />
+              <OverviewStatMini
+                label="Open rate"
+                value={`${marketingOpenRate}%`}
+                accent="soft"
+                onClick={() => go({ panel: 'marketing', tab: 'reports' })}
+              />
+              <OverviewStatMini
+                label="Click rate"
+                value={`${marketingClickRate}%`}
+                accent="soft"
+                onClick={() => go({ panel: 'marketing', tab: 'reports' })}
+              />
             </div>
           ) : (
             <DashboardEmpty>No campaigns</DashboardEmpty>
@@ -398,13 +418,18 @@ function formatFilters(f) {
   return parts.join(' · ') || 'All prospects'
 }
 
-function OverviewStatMini({ label, value, accent = 'default' }) {
+function OverviewStatMini({ label, value, accent = 'default', onClick }) {
+  const Tag = onClick ? 'button' : 'div'
   return (
-    <div className={`dashboard-mini-stat dashboard-mini-stat--${accent}`}>
+    <Tag
+      type={onClick ? 'button' : undefined}
+      className={`dashboard-mini-stat dashboard-mini-stat--${accent}${onClick ? ' dashboard-mini-stat--clickable' : ''}`}
+      onClick={onClick}
+    >
       <span className="dashboard-mini-stat__label">{label}</span>
       <span className="dashboard-mini-stat__value">
         {typeof value === 'number' ? value.toLocaleString() : value}
       </span>
-    </div>
+    </Tag>
   )
 }

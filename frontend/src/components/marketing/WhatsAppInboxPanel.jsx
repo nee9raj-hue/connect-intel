@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { formatPhoneDisplay } from '../../lib/phoneUtils'
 import useIsMobile from '../../hooks/useIsMobile'
@@ -12,6 +13,7 @@ function MsgTick({ status }) {
 }
 
 export default function WhatsAppInboxPanel({ onNavigate }) {
+  const { openPipelineLead } = useApp()
   const [configured, setConfigured] = useState(true)
   const [setupMessage, setSetupMessage] = useState('')
   const [threads, setThreads] = useState([])
@@ -137,7 +139,8 @@ export default function WhatsAppInboxPanel({ onNavigate }) {
 
   const openLead = () => {
     if (!thread?.leadId) return
-    onNavigate?.('pipeline', { leadId: thread.leadId })
+    openPipelineLead(thread.leadId)
+    onNavigate?.('pipeline')
   }
 
   const selectedThreadMeta = threads.find((t) => t.id === selected)
