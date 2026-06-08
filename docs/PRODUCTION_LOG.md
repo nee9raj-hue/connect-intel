@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 1a44248
+npm run prod:rollback -- c789767
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 1a44248
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `9ff8ed1` |
-| Log updated (IST) | 08/06/2026, 22:16:04 |
+| Commit | `fb8870d` |
+| Log updated (IST) | 08/06/2026, 22:20:18 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 1a44248
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 08/06/2026, 22:15:49 | `9ff8ed1` | Rebuild Home dashboard as a V3 command center aligned with Team Intelligence. | [preview](https://connect-intel-elf2iewea-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9ff8ed1` | **← LIVE**
+| 08/06/2026, 22:20:05 | `fb8870d` | Rebuild Activity Log as a V3 linkage hub for cross-page navigation. | [preview](https://connect-intel-2ead0m3a7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- fb8870d` | **← LIVE**
+| 08/06/2026, 22:16:36 | `c789767` | Update production log for 9ff8ed1 dashboard V3 deploy. | [preview](https://connect-intel-i4c552sm4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c789767` |
+| 08/06/2026, 22:15:49 | `9ff8ed1` | Rebuild Home dashboard as a V3 command center aligned with Team Intelligence. | [preview](https://connect-intel-elf2iewea-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9ff8ed1` |
 | 08/06/2026, 22:10:34 | `1a44248` | Update production log for 5900b31 Team Intelligence V3 deploy. | [preview](https://connect-intel-4s4tsackn-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1a44248` |
 | 08/06/2026, 22:09:44 | `5900b31` | Rebuild Team Intelligence as a V3 revenue command center. | [preview](https://connect-intel-hokjczyp3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5900b31` |
 | 08/06/2026, 21:54:09 | `88d72f2` | Update production log for 1e9f225 Team Intelligence V2 deploy. | [preview](https://connect-intel-gb67of1uh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 88d72f2` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 1a44248
 | 08/06/2026, 20:45:49 | `c16f247` | Update production log for ad3855c kanban bulk email fix deploy. | [preview](https://connect-intel-l6xuupsz1-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c16f247` |
 | 08/06/2026, 20:45:05 | `ad3855c` | Fix bulk email button for kanban selections on large pipelines. | [preview](https://connect-intel-c98uvv1jm-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ad3855c` |
 | 08/06/2026, 20:33:37 | `3645ff3` | Update production log for 968ad4f bulk email deploy. | [preview](https://connect-intel-ivcz2mmc6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3645ff3` |
-| 08/06/2026, 20:32:51 | `968ad4f` | Improve pipeline bulk email for up to 200 leads with parallel sends and resume. | [preview](https://connect-intel-nn2lxuhmn-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 968ad4f` |
-| 08/06/2026, 20:25:11 | `093bab2` | Update production log for 98298dc timezone and Monday week deploy. | [preview](https://connect-intel-1o2gxsbeb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 093bab2` |
 
 ---
 
