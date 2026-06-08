@@ -33,6 +33,7 @@ import { leadHasSendableEmail, getLeadEmail } from '../../lib/emailUtils'
 import { getLeadCity, getLeadState } from '../../lib/pipelineFilters'
 import PipelineDealsView from './PipelineDealsView'
 import { isFreightDealOrg } from '../../lib/freightDeal'
+import { BULK_EMAIL_MAX } from '../../lib/bulkEmailLimits.js'
 import { getDealStageMeta } from '../../lib/crmConstants'
 import EmailValidationIcon from './EmailValidationIcon'
 
@@ -424,10 +425,24 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     pipelineHasLeads && filtered.length === 0 && !filterApplying
   const showPipelineFilters = pipelineHasLeads || hasPipelineFiltersActive
 
-  const selectedLeads = useMemo(
-    () => savedLeads.filter((l) => selectedIds.has(l.id)),
-    [savedLeads, selectedIds]
-  )
+  const selectedLeads = useMemo(() => {
+    const byId = new Map()
+    const index = (list) => {
+      for (const lead of list || []) {
+        if (lead?.id && selectedIds.has(lead.id) && !byId.has(lead.id)) {
+          byId.set(lead.id, lead)
+        }
+      }
+    }
+    index(savedLeads)
+    index(filtered)
+    if (boardLeadsByStatus) {
+      for (const columnLeads of Object.values(boardLeadsByStatus)) {
+        index(columnLeads)
+      }
+    }
+    return [...selectedIds].map((id) => byId.get(id)).filter(Boolean)
+  }, [savedLeads, filtered, boardLeadsByStatus, selectedIds])
 
   const selectedEmailCount = useMemo(
     () => selectedLeads.filter(leadHasSendableEmail).length,
@@ -438,6 +453,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     () => selectedLeads.filter(leadHasCallablePhone).length,
     [selectedLeads]
   )
+
+  const bulkEmailOverLimit = selectedIds.size > BULK_EMAIL_MAX
 
   const hasMoreLeads =
     pipelineLoad.hasMore ||
@@ -827,10 +844,19 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                 onEdit={() => setBulkEditOpen(true)}
                 onTags={orgLeadTags?.length ? () => setBulkTagsOpen(true) : undefined}
                 onMarkReplied={() => runBulk({ markReplied: true })}
-                onEmail={() => setBulkOpen(true)}
+                onEmail={() => {
+                  if (bulkEmailOverLimit) return
+                  setBulkOpen(true)
+                }}
                 onWhatsApp={() => setWaOpen(true)}
                 emailCount={selectedEmailCount}
                 phoneCount={selectedPhoneCount}
+                emailDisabled={bulkEmailOverLimit}
+                emailDisabledTitle={
+                  bulkEmailOverLimit
+                    ? `Bulk email supports up to ${BULK_EMAIL_MAX} leads — narrow your selection`
+                    : undefined
+                }
                 onClear={() => setSelectedIds(new Set())}
               />
             )}
@@ -957,7 +983,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       <BulkEmailModal
         open={bulkOpen}
         leadIds={[...selectedIds]}
-        leads={selectedLeads.filter(leadHasSendableEmail)}
+        leads={selectedLeads}
         onClose={() => setBulkOpen(false)}
         onDone={() => {
           setBulkOpen(false)

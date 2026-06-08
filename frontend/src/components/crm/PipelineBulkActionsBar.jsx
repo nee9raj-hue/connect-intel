@@ -30,6 +30,8 @@ export default function PipelineBulkActionsBar({
   onEmail,
   onWhatsApp,
   emailCount = null,
+  emailDisabled = false,
+  emailDisabledTitle = null,
   phoneCount = null,
   onClear,
   recordLabel = 'lead',
@@ -91,9 +93,12 @@ export default function PipelineBulkActionsBar({
         <button
           type="button"
           className="pipeline-bulk-hs-bar__btn"
-          disabled={busy || (emailCount !== null && emailCount < 1)}
+          disabled={busy || emailDisabled || (emailCount !== null && emailCount < 1)}
           onClick={onEmail}
-          title={emailCount === 0 ? 'No selected leads have email' : undefined}
+          title={
+            emailDisabledTitle ||
+            (emailCount === 0 ? 'No selected leads have a sendable email' : undefined)
+          }
         >
           <MailIcon className="pipeline-bulk-hs-bar__icon" />
           Email{emailCount != null && emailCount > 0 ? ` (${emailCount})` : ''}
