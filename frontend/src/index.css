@@ -14011,6 +14011,100 @@ html[data-pipeline-mobile="1"] .ci-app-header-chip--secondary {
   box-shadow: 0 8px 32px rgba(15, 23, 42, 0.15);
 }
 
+.myday-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  background: rgba(15, 23, 42, 0.45);
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+.myday-drawer {
+  width: min(480px, 100%);
+  max-height: 85vh;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.18);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.myday-drawer__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem 1.15rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+.myday-drawer__head h2 { margin: 0; font-size: 1.125rem; font-weight: 800; }
+.myday-drawer__head p { margin: 0.2rem 0 0; font-size: 0.8125rem; color: #64748b; }
+.myday-drawer__count { display: block; margin-top: 0.35rem; font-size: 0.75rem; font-weight: 700; color: #ff773d; }
+.myday-drawer__close {
+  border: none;
+  background: #f1f5f9;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 10px;
+  font-size: 1.25rem;
+  cursor: pointer;
+  line-height: 1;
+}
+.myday-drawer__body { flex: 1; overflow-y: auto; padding: 0.5rem 0; }
+.myday-drawer__empty { padding: 1.5rem 1.15rem; color: #94a3b8; font-size: 0.875rem; margin: 0; }
+.myday-drawer__list { list-style: none; margin: 0; padding: 0; }
+.myday-drawer__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1.15rem;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  border-bottom: 1px solid #f8fafc;
+}
+.myday-drawer__row:hover { background: #fafbfc; }
+.myday-drawer__row-main { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
+.myday-drawer__row-main strong { font-size: 0.875rem; }
+.myday-drawer__row-main span { font-size: 0.75rem; color: #64748b; }
+.myday-drawer__row time { font-size: 0.6875rem; color: #94a3b8; flex-shrink: 0; }
+.myday-drawer__foot {
+  padding: 0.85rem 1.15rem 1rem;
+  border-top: 1px solid #f1f5f9;
+  background: #fafbfc;
+}
+.myday-drawer__view-all {
+  width: 100%;
+  padding: 0.65rem 1rem;
+  border-radius: 12px;
+  border: none;
+  background: #ff773d;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+.myday-drawer__hint { margin: 0.5rem 0 0; font-size: 0.6875rem; color: #94a3b8; text-align: center; }
+
+.myday-return-bar {
+  padding: 0.5rem 1rem;
+  background: linear-gradient(90deg, #fff7ed, #fff);
+  border-bottom: 1px solid #ffedd5;
+}
+.myday-return-bar__btn {
+  border: none;
+  background: none;
+  color: #c2410c;
+  font-weight: 700;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  padding: 0.25rem 0;
+}
+
 .myday-goals {
   display: flex;
   gap: 1rem;

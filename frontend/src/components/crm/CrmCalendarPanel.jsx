@@ -15,6 +15,7 @@ import {
   sameDay,
   startOfDay,
 } from '../../lib/calendarUtils'
+import MyDayReturnBar from '../overview/MyDayReturnBar'
 
 function parseFocusDate(iso) {
   if (!iso) return null
@@ -200,6 +201,7 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
 
   return (
     <div className="panel-shell relative">
+      <MyDayReturnBar panelOptions={panelOptions} onNavigate={onNavigate} />
       <header className="shrink-0 bg-white border-b border-gray-200 px-4 md:px-5 py-4 space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>

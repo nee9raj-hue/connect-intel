@@ -70,6 +70,8 @@ export function navTargetToOptions(target = {}) {
   if (target.closingThisWeek) options.closingThisWeek = true
   if (Array.isArray(target.smartTags) && target.smartTags.length) options.smartTags = [...target.smartTags]
   if (target.audienceTab) options.audienceTab = target.audienceTab
+  if (target.returnTo) options.returnTo = target.returnTo
+  if (target.leadTab) options.leadTab = target.leadTab
   return options
 }
 

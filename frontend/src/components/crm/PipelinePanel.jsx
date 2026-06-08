@@ -45,6 +45,7 @@ import EmailValidationIcon from './EmailValidationIcon'
 import { hasActiveTextSelection } from '../../lib/keyboardShortcuts'
 import useIsMobile from '../../hooks/useIsMobile'
 import usePipelineFilterMobile, { usePipelineNarrowViewport } from '../../hooks/usePipelineFilterMobile'
+import MyDayReturnBar from '../overview/MyDayReturnBar'
 
 export default function PipelinePanel({ onNavigate, panelOptions }) {
   const {
@@ -754,6 +755,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
           selectedLead ? 'hidden md:flex' : 'flex'
         } ${useHubSpotList ? 'pipeline-list-workspace' : ''}`}
       >
+        <MyDayReturnBar panelOptions={panelOptions} onNavigate={onNavigate} />
         <header className="crm-page-header pipeline-page-header">
           <div
             className={`crm-page-header-top pipeline-page-header-top ${

@@ -205,8 +205,11 @@ export function applyPipelineFilters(
     const endToday = new Date()
     endToday.setHours(23, 59, 59, 999)
     list = list.filter((l) => {
-      const at = l.crm?.nextFollowUpAt
-      return at && new Date(at).getTime() <= endToday.getTime()
+      const crm = l.crm || {}
+      if (crm.status !== 'follow_up') return false
+      const at = crm.nextFollowUpAt
+      if (!at) return true
+      return new Date(at).getTime() <= endToday.getTime()
     })
   }
 
@@ -217,14 +220,15 @@ export function applyPipelineFilters(
     list = list.filter((l) => {
       const crm = l.crm || {}
       for (const deal of crm.deals || []) {
-        if (deal.wonAt || deal.lostAt) continue
-        const close = deal.expectedCloseAt
+        if (deal.wonAt || deal.lostAt || deal.stage === 'won' || deal.stage === 'lost') continue
+        const close = deal.expectedCloseDate || deal.expectedCloseAt
         if (!close) continue
         const t = new Date(close).getTime()
         if (t >= start.getTime() && t <= weekEnd) return true
       }
-      if (crm.expectedCloseAt) {
-        const t = new Date(crm.expectedCloseAt).getTime()
+      const legacyClose = crm.expectedCloseDate || crm.expectedCloseAt
+      if (legacyClose) {
+        const t = new Date(legacyClose).getTime()
         if (t >= start.getTime() && t <= weekEnd) return true
       }
       return false

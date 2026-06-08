@@ -32,7 +32,7 @@ export function PersonalCommandBar({ items = [], onAction }) {
               {item.trend}%
             </span>
           ) : (
-            <span className="myday-cmd-card__action">Open →</span>
+            <span className="myday-cmd-card__action">Preview →</span>
           )}
         </button>
       ))}
@@ -182,7 +182,7 @@ export function RevenueProgressBar({ revenue }) {
   )
 }
 
-export function LeadFocusCards({ focus, onNavigate }) {
+export function LeadFocusCards({ focus, onCardClick, onNavigate }) {
   if (!focus) return null
   const cards = [
     { id: 'new', label: 'New leads', count: focus.newLeads, status: 'new' },
@@ -198,11 +198,13 @@ export function LeadFocusCards({ focus, onNavigate }) {
           type="button"
           className="myday-lead-card"
           onClick={() =>
-            onNavigate?.('pipeline', {
-              status: c.status,
-              smartTags: c.smartTags,
-              followUpDue: c.followUpDue || undefined,
-            })
+            onCardClick
+              ? onCardClick(c)
+              : onNavigate?.('pipeline', {
+                  status: c.status,
+                  smartTags: c.smartTags,
+                  followUpDue: c.followUpDue || undefined,
+                })
           }
         >
           <span className="myday-lead-card__count">{c.count}</span>
