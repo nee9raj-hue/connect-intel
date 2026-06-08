@@ -17,8 +17,11 @@ import useIsMobile from '../../hooks/useIsMobile'
 import MarketingCampaignSetupFields from './MarketingCampaignSetupFields'
 import MarketingCampaignWizardModal from './MarketingCampaignWizardModal'
 import MarketingHubShell from './MarketingHubShell'
-import MarketingHubDashboard from './MarketingHubDashboard'
-import MarketingCampaignsHub from './MarketingCampaignsHub'
+import MarketingCommandCenter from './MarketingCommandCenter'
+import MarketingCampaignStudio from './MarketingCampaignStudio'
+import MarketingCampaignWizardStudio from './MarketingCampaignWizardStudio'
+import MarketingTemplateMarketplace from './MarketingTemplateMarketplace'
+import MarketingBrandKit, { mergeBrandKit } from './MarketingBrandKit'
 import MarketingAnalyticsHub from './MarketingAnalyticsHub'
 import MarketingAudiencesHub from './MarketingAudiencesHub'
 import MarketingAssetsHub from './MarketingAssetsHub'
@@ -112,6 +115,9 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
   const [campaignSetupOpen, setCampaignSetupOpen] = useState(true)
   const [campaignWizardOpen, setCampaignWizardOpen] = useState(false)
   const [campaignDesktopPhase, setCampaignDesktopPhase] = useState('list')
+  const [campaignWizardStep, setCampaignWizardStep] = useState(0)
+  const [templatePhase, setTemplatePhase] = useState('marketplace')
+  const [brandKitOpen, setBrandKitOpen] = useState(false)
   const isMobile = useIsMobile()
 
   const isBuilderTab = tab === 'campaigns' || tab === 'templates'
@@ -119,7 +125,8 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
     isBuilderTab || tab === 'analytics' || tab === 'audiences' || tab === 'overview' || tab === 'assets'
   const hideMarketingHeader =
     !isMobile &&
-    (tab === 'templates' || (tab === 'campaigns' && campaignDesktopPhase === 'editor'))
+    ((tab === 'templates' && templatePhase === 'editor') ||
+      (tab === 'campaigns' && campaignDesktopPhase === 'editor'))
   const visibleTabs = isMobile ? MOBILE_TABS : TABS
   const [summary, setSummary] = useState(null)
   const [gmailStatus, setGmailStatus] = useState(null)
@@ -161,6 +168,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
     setCampaignSetupOpen(false)
     setCampaignWizardOpen(false)
     setCampaignDesktopPhase('list')
+    setCampaignWizardStep(0)
     setError(null)
   }, [])
 
@@ -286,10 +294,24 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
       subject: tpl.subject || '',
       body: tpl.body || '',
       blocks: tpl.blocks || [],
-      design: tpl.design || { ...DEFAULT_THEME },
+      design: mergeBrandKit(tpl.design || { ...DEFAULT_THEME }),
       previewText: tpl.previewText || '',
     })
+    setTemplatePhase('editor')
     setTab('templates')
+  }
+
+  const openTemplateFromMarketplace = (tpl) => {
+    setTemplateForm({
+      id: tpl.source === 'saved' ? tpl.id : undefined,
+      name: tpl.name || '',
+      subject: tpl.subject || '',
+      body: tpl.body || '',
+      blocks: tpl.blocks ? [...tpl.blocks] : [],
+      design: mergeBrandKit(tpl.design || { ...DEFAULT_THEME }),
+      previewText: tpl.previewText || '',
+    })
+    setTemplatePhase('editor')
   }
 
   const deleteTemplate = async (id) => {
@@ -828,24 +850,49 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
     }
   }
 
-  const renderTemplatesTab = () => (
-    <div className="marketing-immersive-editor flex-1 min-h-0 flex flex-col bg-white">
-      <MarketingTemplateBuilder
-        studioMode
-        immersive
-        historyResetKey={templateForm.id || 'template-new'}
-        value={templateForm}
-        onChange={setTemplateForm}
-        onSave={saveTemplate}
-        onCancel={() => setTemplateForm({ ...EMPTY_TEMPLATE, design: { ...DEFAULT_THEME } })}
-        busy={busy}
-        templates={templates}
-        onEdit={editTemplate}
-        onDelete={deleteTemplate}
-        marketingForms={forms}
-      />
-    </div>
-  )
+  const renderTemplatesTab = () => {
+    if (templatePhase === 'marketplace') {
+      return (
+        <div className="flex-1 min-h-0 overflow-auto bg-white">
+          <MarketingTemplateMarketplace
+            templates={templates}
+            onSelect={openTemplateFromMarketplace}
+            onCreateBlank={() => {
+              setTemplateForm({ ...EMPTY_TEMPLATE, design: mergeBrandKit({ ...DEFAULT_THEME }) })
+              setTemplatePhase('editor')
+            }}
+            onOpenBrandKit={() => setBrandKitOpen(true)}
+          />
+          <MarketingBrandKit
+            open={brandKitOpen}
+            onClose={() => setBrandKitOpen(false)}
+            onSave={() => setNotice('Brand kit saved — applied to new designs')}
+          />
+        </div>
+      )
+    }
+    return (
+      <div className="marketing-immersive-editor flex-1 min-h-0 flex flex-col bg-white">
+        <MarketingTemplateBuilder
+          studioMode
+          immersive
+          historyResetKey={templateForm.id || 'template-new'}
+          value={templateForm}
+          onChange={setTemplateForm}
+          onSave={saveTemplate}
+          onCancel={() => {
+            setTemplateForm({ ...EMPTY_TEMPLATE, design: mergeBrandKit({ ...DEFAULT_THEME }) })
+            setTemplatePhase('marketplace')
+          }}
+          busy={busy}
+          templates={templates}
+          onEdit={editTemplate}
+          onDelete={deleteTemplate}
+          marketingForms={forms}
+        />
+      </div>
+    )
+  }
 
   const renderCampaignsTab = () => {
     if (isMobile) {
@@ -951,9 +998,10 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
 
     if (campaignDesktopPhase === 'list') {
       return (
-        <MarketingCampaignsHub
+        <MarketingCampaignStudio
           campaigns={campaigns}
           lists={lists}
+          summary={summary}
           busy={busy}
           user={user}
           permissions={permissions}
@@ -967,68 +1015,48 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
           onReject={rejectCampaign}
           onCreate={() => {
             resetCampaignForm()
-            setCampaignDesktopPhase('setup')
+            setCampaignForm((p) => ({ ...p, design: mergeBrandKit(p.design) }))
+            setCampaignWizardStep(0)
+            setCampaignDesktopPhase('wizard')
           }}
-          onEdit={() => setCampaignDesktopPhase('setup')}
+          onEdit={() => {
+            setCampaignWizardStep(1)
+            setCampaignDesktopPhase('wizard')
+          }}
         />
       )
     }
 
-    if (campaignDesktopPhase === 'setup') {
+    if (campaignDesktopPhase === 'wizard') {
       return (
-        <div className="marketing-campaign-setup-page flex-1 flex flex-col items-center justify-center p-6 sm:p-10 bg-white">
-          <div className="w-full max-w-lg">
-            <button type="button" className="mhub-link mb-4" onClick={() => setCampaignDesktopPhase('list')}>
-              ← All campaigns
-            </button>
-            <h2 className="text-xl font-bold text-[#17191c] tracking-tight">New campaign</h2>
-            <div className="mt-6">
-              <MarketingCampaignSetupFields
-                campaignForm={campaignForm}
-                setCampaignForm={setCampaignForm}
-                lists={lists}
-                segments={segments}
-                templates={templates}
-                applyTemplate={applyTemplate}
-                user={user}
-                permissions={permissions}
-                onNavigate={onNavigate}
-                onTestSend={handleTestSend}
-                testSendBusy={busy}
-              />
-            </div>
-            {campaignForm.useSequence && (
-              <div className="flex flex-wrap gap-2 mt-4">
-                {[
-                  { id: 1, label: 'Message 1' },
-                  { id: 2, label: 'Follow-up' },
-                ].map((step) => (
-                  <button
-                    key={step.id}
-                    type="button"
-                    onClick={() => setCampaignEmailStep(step.id)}
-                    className={`ci-btn !text-xs ${campaignEmailStep === step.id ? 'ci-btn-accent' : 'ci-btn-secondary'}`}
-                  >
-                    {step.label}
-                  </button>
-                ))}
-              </div>
-            )}
-            <button
-              type="button"
-              disabled={!canEnterCampaignEditor}
-              onClick={() => setCampaignDesktopPhase('editor')}
-              className="crm-btn crm-btn-primary w-full mt-6"
-            >
-              Continue to design
-            </button>
-            {!canEnterCampaignEditor && (
-              <p className="text-xs text-[#7c98b6] mt-2 text-center">
-                Enter name, list{campaignForm.channel === 'email' ? ', and subject' : ''} to continue.
-              </p>
-            )}
-          </div>
-        </div>
+        <>
+          <MarketingCampaignWizardStudio
+            campaignForm={campaignForm}
+            setCampaignForm={setCampaignForm}
+            lists={lists}
+            segments={segments}
+            templates={templates}
+            summary={summary}
+            step={campaignWizardStep}
+            setStep={setCampaignWizardStep}
+            onBackToList={() => setCampaignDesktopPhase('list')}
+            onEnterEditor={() => setCampaignDesktopPhase('editor')}
+            onSaveDraft={async () => {
+              setError(null)
+              await createCampaign()
+            }}
+            onLaunch={createAndStart}
+            busy={busy}
+            error={error}
+            notice={notice}
+            onOpenBrandKit={() => setBrandKitOpen(true)}
+          />
+          <MarketingBrandKit
+            open={brandKitOpen}
+            onClose={() => setBrandKitOpen(false)}
+            onSave={() => setNotice('Brand kit saved')}
+          />
+        </>
       )
     }
 
@@ -1076,7 +1104,10 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
                 body: next.body ?? p.body,
               }))
             }
-            onBack={() => setCampaignDesktopPhase('setup')}
+            onBack={() => {
+              setCampaignDesktopPhase('wizard')
+              setCampaignWizardStep(4)
+            }}
             onSaveDraft={async () => {
               setError(null)
               await createCampaign()
@@ -1115,7 +1146,10 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
                 step2Body: next.body ?? p.step2Body,
               }))
             }
-            onBack={() => setCampaignDesktopPhase('setup')}
+            onBack={() => {
+              setCampaignDesktopPhase('wizard')
+              setCampaignWizardStep(4)
+            }}
             onSaveDraft={async () => {
               setError(null)
               await createCampaign()
@@ -1166,8 +1200,10 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
           onSearchChange={setHubSearch}
           onCreateCampaign={() => {
             setTab('campaigns')
-            setCampaignDesktopPhase('setup')
             resetCampaignForm()
+            setCampaignForm((p) => ({ ...p, design: mergeBrandKit(p.design) }))
+            setCampaignWizardStep(0)
+            setCampaignDesktopPhase('wizard')
           }}
           onCreateAutomation={() => setTab('automations')}
           onImportContacts={() => {
@@ -1219,7 +1255,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
           {loading ? (
             <LoadingExperience message={LOADING_MESSAGES.marketing} />
           ) : tab === 'overview' ? (
-            <MarketingHubDashboard onNavigate={onNavigate} period={hubPeriod} onPeriodChange={setHubPeriod} />
+            <MarketingCommandCenter onNavigate={onNavigate} period={hubPeriod} onPeriodChange={setHubPeriod} />
           ) : tab === 'campaigns' ? (
             renderCampaignsTab()
           ) : tab === 'audiences' ? (
