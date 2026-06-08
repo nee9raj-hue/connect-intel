@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-08T16:40:02.505Z",
-  "updatedAtIst": "08/06/2026, 22:10:02",
+  "updatedAt": "2026-06-08T16:46:04.172Z",
+  "updatedAtIst": "08/06/2026, 22:16:04",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "5900b31",
+  "currentProductionCommit": "9ff8ed1",
   "entries": [
+    {
+      "logId": "20260608-2215-9ff8ed1",
+      "commit": "9ff8ed1",
+      "commitFull": "9ff8ed1a2c8d53b87091356acd213561be507721",
+      "message": "Rebuild Home dashboard as a V3 command center aligned with Team Intelligence.",
+      "deployedAt": "2026-06-08T16:45:49.930Z",
+      "deployedAtIst": "08/06/2026, 22:15:49",
+      "committedAtIst": "08/06/2026, 22:15:19",
+      "vercelPreviewUrl": "https://connect-intel-elf2iewea-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 9ff8ed1"
+    },
+    {
+      "logId": "20260608-2210-1a44248",
+      "commit": "1a44248",
+      "commitFull": "1a442488575d1a07e5fb8957ee1eec1d127f7374",
+      "message": "Update production log for 5900b31 Team Intelligence V3 deploy.",
+      "deployedAt": "2026-06-08T16:40:34.908Z",
+      "deployedAtIst": "08/06/2026, 22:10:34",
+      "committedAtIst": "08/06/2026, 22:10:05",
+      "vercelPreviewUrl": "https://connect-intel-4s4tsackn-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 1a44248"
+    },
     {
       "logId": "20260608-2209-5900b31",
       "commit": "5900b31",
@@ -15,7 +43,7 @@
       "committedAtIst": "08/06/2026, 22:09:13",
       "vercelPreviewUrl": "https://connect-intel-hokjczyp3-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 5900b31"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 093bab2"
-    },
-    {
-      "logId": "20260608-2024-98298dc",
-      "commit": "98298dc",
-      "commitFull": "98298dc52d95e61aa5f2e9e4ff28eb8c31071f36",
-      "message": "Use Monday-based calendar weeks and local timezone for periods and dates.",
-      "deployedAt": "2026-06-08T14:54:27.670Z",
-      "deployedAtIst": "08/06/2026, 20:24:27",
-      "committedAtIst": "08/06/2026, 20:23:56",
-      "vercelPreviewUrl": "https://connect-intel-mb53ve6j6-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 98298dc"
-    },
-    {
-      "logId": "20260608-2016-d810ae7",
-      "commit": "d810ae7",
-      "commitFull": "d810ae7946b57ffe67ee78d1fda97a7f3b0ee2ac",
-      "message": "Update production log for 455806b activity pagination deploy.",
-      "deployedAt": "2026-06-08T14:46:09.635Z",
-      "deployedAtIst": "08/06/2026, 20:16:09",
-      "committedAtIst": "08/06/2026, 20:15:41",
-      "vercelPreviewUrl": "https://connect-intel-3nxlepyay-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- d810ae7"
     }
   ]
 }
