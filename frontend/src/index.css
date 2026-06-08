@@ -15330,3 +15330,396 @@ html[data-pipeline-mobile="1"] .ci-app-header-chip--secondary {
   .mkt-command__kpi-strip { grid-template-columns: 1fr; }
   .mkt-campaign-mini-grid { grid-template-columns: 1fr; }
 }
+
+/* Chithi V2 — CRM-native collaboration */
+.chithi2-app {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  background: #f4f6f8;
+}
+.chithi2-body {
+  display: grid;
+  grid-template-columns: 260px 1fr 300px;
+  flex: 1;
+  min-height: 0;
+  border-top: 3px solid #ff7a59;
+}
+.chithi2-rail {
+  background: #fff;
+  border-right: 1px solid #e8ecf0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+.chithi2-rail__search { padding: 0.75rem; border-bottom: 1px solid #f1f5f9; }
+.chithi2-rail__search input {
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  font-size: 0.8125rem;
+  background: #f8fafc;
+}
+.chithi2-rail__home {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.5rem 0.65rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 12px;
+  border: none;
+  background: transparent;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: left;
+}
+.chithi2-rail__home.is-active { background: #fff4ee; color: #c2410c; }
+.chithi2-badge {
+  margin-left: auto;
+  font-style: normal;
+  font-size: 0.625rem;
+  font-weight: 800;
+  background: #ff7a59;
+  color: #fff;
+  padding: 0.15rem 0.45rem;
+  border-radius: 99px;
+}
+.chithi2-rail__section {
+  padding: 0.35rem 0.65rem;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+.chithi2-rail__section > p {
+  font-size: 0.625rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
+  padding: 0.35rem 0.5rem;
+  margin: 0;
+}
+.chithi2-rail__channel {
+  display: flex;
+  width: 100%;
+  padding: 0.45rem 0.65rem;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  font-size: 0.8125rem;
+  text-align: left;
+  cursor: pointer;
+  color: #334155;
+}
+.chithi2-rail__channel.is-active { background: #f1f5f9; font-weight: 700; color: #17191c; }
+.chithi2-rail__channel-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chithi2-rail__foot {
+  margin-top: auto;
+  padding: 0.65rem;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.chithi2-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  background: #fff;
+}
+.chithi2-main__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0.85rem 1.15rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+.chithi2-main__head h2 { margin: 0; font-size: 1.125rem; font-weight: 800; }
+.chithi2-main__head p { margin: 0.2rem 0 0; font-size: 0.8125rem; color: #64748b; }
+.chithi2-feed {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem 1.15rem;
+  min-height: 0;
+}
+.chithi2-composer {
+  padding: 0.75rem 1rem;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: flex-end;
+  background: #fafbfc;
+}
+.chithi2-composer__input {
+  flex: 1;
+  min-width: 12rem;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.chithi2-msg-group {
+  display: flex;
+  gap: 0.65rem;
+  margin-bottom: 1.25rem;
+}
+.chithi2-msg-group.is-mine { flex-direction: row-reverse; }
+.chithi2-avatar {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.chithi2-msg-group.is-mine .chithi2-avatar { background: linear-gradient(135deg, #ff7a59, #ff9a5c); }
+.chithi2-msg-group__body { flex: 1; min-width: 0; }
+.chithi2-msg-group__body header {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  margin-bottom: 0.35rem;
+}
+.chithi2-msg-group__body header strong { font-size: 0.8125rem; }
+.chithi2-msg-group__body header time { font-size: 0.6875rem; color: #94a3b8; }
+.chithi2-msg__bubble {
+  background: #f8fafc;
+  border-radius: 14px;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.875rem;
+  border: 1px solid #f1f5f9;
+  margin-bottom: 0.35rem;
+}
+.chithi2-msg-group.is-mine .chithi2-msg__bubble {
+  background: #fff4ee;
+  border-color: #ffd4b8;
+}
+.chithi2-msg__meta { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.chithi2-msg__meta button {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 99px;
+  border: 1px solid #e8ecf0;
+  background: #fff;
+  cursor: pointer;
+}
+.chithi2-activity-msg {
+  background: linear-gradient(90deg, #eff6ff, #f8fafc);
+  border: 1px solid #dbeafe;
+  border-radius: 14px;
+  padding: 0.65rem 0.85rem;
+  margin-bottom: 0.5rem;
+}
+.chithi2-activity-msg__badge {
+  font-size: 0.625rem;
+  font-weight: 800;
+  color: #2563eb;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.chithi2-activity-msg p { margin: 0.25rem 0; font-size: 0.875rem; }
+.chithi2-activity-msg time { font-size: 0.6875rem; color: #94a3b8; }
+
+.chithi2-ctx {
+  background: #fafbfc;
+  border-left: 1px solid #e8ecf0;
+  overflow-y: auto;
+  padding: 1rem;
+  min-height: 0;
+}
+.chithi2-ctx--empty { display: grid; place-items: center; padding: 2rem; text-align: center; color: #64748b; font-size: 0.875rem; }
+.chithi2-ctx__head { margin-bottom: 1rem; }
+.chithi2-ctx__kind { font-size: 0.625rem; font-weight: 800; text-transform: uppercase; color: #ff7a59; letter-spacing: 0.08em; }
+.chithi2-ctx__head h2 { margin: 0.25rem 0 0; font-size: 1.125rem; font-weight: 800; }
+.chithi2-ctx__section { margin-bottom: 1rem; }
+.chithi2-ctx__section h3 { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: #94a3b8; margin: 0 0 0.5rem; }
+.chithi2-ctx-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 0.85rem;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+  font-size: 0.8125rem;
+}
+.chithi2-ctx-pill {
+  display: inline-block;
+  font-size: 0.625rem;
+  font-weight: 800;
+  padding: 0.2rem 0.5rem;
+  border-radius: 99px;
+  background: #f1f5f9;
+  margin-bottom: 0.35rem;
+}
+.chithi2-ctx-metric { font-size: 1.125rem; font-weight: 800; margin: 0.35rem 0; }
+.chithi2-ctx-list { list-style: none; margin: 0; padding: 0; }
+.chithi2-ctx-row {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.5rem 0;
+  border: none;
+  background: none;
+  border-bottom: 1px solid #f1f5f9;
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.8125rem;
+}
+.chithi2-ctx-feed { list-style: none; margin: 0; padding: 0; }
+.chithi2-ctx-feed li { padding: 0.5rem 0; border-bottom: 1px solid #f1f5f9; font-size: 0.8125rem; }
+.chithi2-ctx-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; text-align: center; }
+.chithi2-ctx-stats strong { display: block; font-size: 1.25rem; font-weight: 800; }
+.chithi2-link { border: none; background: none; color: #ff7a59; font-weight: 700; font-size: 0.8125rem; cursor: pointer; margin-top: 0.35rem; }
+
+.chithi2-home {
+  padding: 1.25rem 1.5rem 2rem;
+  overflow-y: auto;
+  min-height: 0;
+  flex: 1;
+}
+.chithi2-home__hero h1 { margin: 0; font-size: 1.65rem; font-weight: 800; }
+.chithi2-home__hero p { color: #64748b; margin: 0.35rem 0 1.25rem; }
+.chithi2-home__grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1rem;
+}
+.chithi2-home-panel {
+  grid-column: span 4;
+  background: #fafbfc;
+  border: 1px solid #f1f5f9;
+  border-radius: 16px;
+  padding: 1rem 1.1rem;
+}
+.chithi2-home-panel--wide { grid-column: span 8; }
+.chithi2-home-panel h2 { font-size: 0.875rem; font-weight: 800; margin: 0 0 0.75rem; }
+.chithi2-home-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-bottom: 0.75rem; }
+.chithi2-stat {
+  background: #fff;
+  border-radius: 12px;
+  padding: 0.65rem;
+  text-align: center;
+  border: 1px solid #f1f5f9;
+}
+.chithi2-stat strong { display: block; font-size: 1.25rem; font-weight: 800; }
+.chithi2-stat span { font-size: 0.625rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; }
+.chithi2-home-list { list-style: none; margin: 0; padding: 0; }
+.chithi2-home-list button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.55rem 0;
+  border: none;
+  background: none;
+  border-bottom: 1px solid #f1f5f9;
+  cursor: pointer;
+  font-size: 0.8125rem;
+}
+.chithi2-home-list strong { display: block; }
+.chithi2-home-list span, .chithi2-home-list time { font-size: 0.75rem; color: #64748b; }
+.chithi2-activity-feed { list-style: none; margin: 0; padding: 0; }
+.chithi2-activity-feed button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.65rem 0;
+  border: none;
+  background: none;
+  border-bottom: 1px solid #f1f5f9;
+  cursor: pointer;
+}
+.chithi2-activity-badge {
+  font-size: 0.625rem;
+  font-weight: 800;
+  color: #2563eb;
+  margin-right: 0.35rem;
+}
+.chithi2-quick-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.chithi2-muted { color: #94a3b8; font-size: 0.8125rem; }
+
+.chithi2-btn {
+  padding: 0.5rem 0.85rem;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.chithi2-btn--primary { background: #ff7a59; border-color: #ff7a59; color: #fff; }
+.chithi2-btn--ghost { background: transparent; border-color: transparent; color: #64748b; }
+.chithi2-btn--sm { padding: 0.35rem 0.6rem; font-size: 0.75rem; }
+.chithi2-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.chithi2-alert { margin: 0.5rem 1rem; padding: 0.5rem 0.75rem; background: #fef2f2; color: #b91c1c; border-radius: 10px; font-size: 0.8125rem; }
+.chithi2-empty { text-align: center; color: #94a3b8; padding: 3rem 1rem; }
+
+.chithi2-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(15, 23, 42, 0.4);
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+.chithi2-search, .chithi2-ai {
+  width: min(520px, 100%);
+  max-height: 80vh;
+  overflow: auto;
+  background: #fff;
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.15);
+}
+.chithi2-search header, .chithi2-ai header { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
+.chithi2-search header input { flex: 1; padding: 0.6rem 0.85rem; border-radius: 12px; border: 1px solid #e2e8f0; }
+.chithi2-search__results button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.65rem 0;
+  border: none;
+  background: none;
+  border-bottom: 1px solid #f1f5f9;
+  cursor: pointer;
+}
+.chithi2-ai__prompts { display: flex; flex-direction: column; gap: 0.35rem; }
+.chithi2-ai__prompts button {
+  text-align: left;
+  padding: 0.65rem 0.85rem;
+  border-radius: 12px;
+  border: 1px solid #f1f5f9;
+  background: #fafbfc;
+  cursor: pointer;
+  font-size: 0.8125rem;
+}
+.chithi2-ai__reply {
+  margin-top: 0.75rem;
+  padding: 0.85rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 1200px) {
+  .chithi2-body { grid-template-columns: 240px 1fr; }
+  .chithi2-ctx { display: none; }
+}
+@media (max-width: 768px) {
+  .chithi2-body { grid-template-columns: 1fr; }
+  .chithi2-body--mobile-list .chithi2-main,
+  .chithi2-body--mobile-list .chithi2-ctx { display: none; }
+  .chithi2-body--mobile-chat .chithi2-rail { display: none; }
+  .chithi2-home-panel, .chithi2-home-panel--wide { grid-column: span 12; }
+}

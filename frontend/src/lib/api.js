@@ -591,6 +591,13 @@ export const api = {
     }),
   reactChithiMessage: (messageId, emoji) =>
     request('/api/chithi?resource=react', { method: 'POST', body: { messageId, emoji }, timeoutMs: 30_000 }),
+  getChithiWorkspace: () => request('/api/chithi?resource=workspace', { timeoutMs: 25_000 }),
+  getChithiContext: (channelId) =>
+    request(`/api/chithi?resource=context&channelId=${encodeURIComponent(channelId)}`, { timeoutMs: 25_000 }),
+  searchChithi: (q) =>
+    request(`/api/chithi?resource=search&q=${encodeURIComponent(q)}`, { timeoutMs: 15_000 }),
+  openChithiEntityChannel: (payload) =>
+    request('/api/chithi?resource=entity-channel', { method: 'POST', body: payload, timeoutMs: 25_000 }),
   getChithiSettings: () => request('/api/chithi?resource=settings', { timeoutMs: 30_000 }),
   updateChithiSettings: (payload) =>
     request('/api/chithi?resource=settings', { method: 'PATCH', body: payload, timeoutMs: 25_000 }),
