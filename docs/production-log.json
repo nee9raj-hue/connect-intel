@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-08T17:09:49.311Z",
-  "updatedAtIst": "08/06/2026, 22:39:49",
+  "updatedAt": "2026-06-08T17:22:29.104Z",
+  "updatedAtIst": "08/06/2026, 22:52:29",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "1ddcb03",
+  "currentProductionCommit": "21d4981",
   "entries": [
+    {
+      "logId": "20260608-2252-21d4981",
+      "commit": "21d4981",
+      "commitFull": "21d4981ab4c499be059000eb94947589ab7b4afd",
+      "message": "Rebuild Marketing as unified Hub V2 command center workspace.",
+      "deployedAt": "2026-06-08T17:22:12.972Z",
+      "deployedAtIst": "08/06/2026, 22:52:12",
+      "committedAtIst": "08/06/2026, 22:51:45",
+      "vercelPreviewUrl": "https://connect-intel-qccm3g512-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 21d4981"
+    },
+    {
+      "logId": "20260608-2240-9363474",
+      "commit": "9363474",
+      "commitFull": "93634740ca6f34205ee43e374c337ffc05fd8751",
+      "message": "Update production log for 1ddcb03 command bar navigation fix.",
+      "deployedAt": "2026-06-08T17:10:15.707Z",
+      "deployedAtIst": "08/06/2026, 22:40:15",
+      "committedAtIst": "08/06/2026, 22:39:49",
+      "vercelPreviewUrl": "https://connect-intel-oiktdsliw-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 9363474"
+    },
     {
       "logId": "20260608-2239-1ddcb03",
       "commit": "1ddcb03",
@@ -15,7 +43,7 @@
       "committedAtIst": "08/06/2026, 22:39:06",
       "vercelPreviewUrl": "https://connect-intel-1zmvd7fwg-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 1ddcb03"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 789ff50"
-    },
-    {
-      "logId": "20260608-2118-8e209f2",
-      "commit": "8e209f2",
-      "commitFull": "8e209f2157a18215afc43b4e91f918344d6b37ad",
-      "message": "Fix Marketing Domains UX when work email is already connected.",
-      "deployedAt": "2026-06-08T15:48:15.514Z",
-      "deployedAtIst": "08/06/2026, 21:18:15",
-      "committedAtIst": "08/06/2026, 21:17:47",
-      "vercelPreviewUrl": "https://connect-intel-ripu2i8s5-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 8e209f2"
-    },
-    {
-      "logId": "20260608-2111-9b9d254",
-      "commit": "9b9d254",
-      "commitFull": "9b9d2540d63e8db219ad57259dd37d7daa9cb4b1",
-      "message": "Update production log for 03674f8 Phase 2 marketing deploy.",
-      "deployedAt": "2026-06-08T15:41:29.402Z",
-      "deployedAtIst": "08/06/2026, 21:11:29",
-      "committedAtIst": "08/06/2026, 21:10:59",
-      "vercelPreviewUrl": "https://connect-intel-f2eln6kna-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 9b9d254"
     }
   ]
 }
