@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-08T16:07:40.382Z",
-  "updatedAtIst": "08/06/2026, 21:37:40",
+  "updatedAt": "2026-06-08T16:23:31.756Z",
+  "updatedAtIst": "08/06/2026, 21:53:31",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "240e589",
+  "currentProductionCommit": "1e9f225",
   "entries": [
+    {
+      "logId": "20260608-2153-1e9f225",
+      "commit": "1e9f225",
+      "commitFull": "1e9f225cf06702c4a753b5cd3f87266dc9aabf50",
+      "message": "Redesign Team Intelligence as an executive intelligence workspace.",
+      "deployedAt": "2026-06-08T16:23:18.535Z",
+      "deployedAtIst": "08/06/2026, 21:53:18",
+      "committedAtIst": "08/06/2026, 21:52:46",
+      "vercelPreviewUrl": "https://connect-intel-m5uttp6m8-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 1e9f225"
+    },
+    {
+      "logId": "20260608-2138-f9b07a8",
+      "commit": "f9b07a8",
+      "commitFull": "f9b07a84ead0a09249c7e48d180d215356173155",
+      "message": "Update production log for 240e589 CRM Phase 1 deploy.",
+      "deployedAt": "2026-06-08T16:08:17.187Z",
+      "deployedAtIst": "08/06/2026, 21:38:17",
+      "committedAtIst": "08/06/2026, 21:37:50",
+      "vercelPreviewUrl": "https://connect-intel-hxcme9wd6-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- f9b07a8"
+    },
     {
       "logId": "20260608-2137-240e589",
       "commit": "240e589",
@@ -15,7 +43,7 @@
       "committedAtIst": "08/06/2026, 21:36:56",
       "vercelPreviewUrl": "https://connect-intel-2rc6mym8v-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 240e589"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 925bced"
-    },
-    {
-      "logId": "20260608-2005-b3a9f3b",
-      "commit": "b3a9f3b",
-      "commitFull": "b3a9f3b6f6d79e8d6e3548cbb10cede10f8e5d5e",
-      "message": "Upgrade Team Intelligence with filter counts, roster selection, and activity detail modals.",
-      "deployedAt": "2026-06-08T14:35:03.829Z",
-      "deployedAtIst": "08/06/2026, 20:05:03",
-      "committedAtIst": "08/06/2026, 20:04:26",
-      "vercelPreviewUrl": "https://connect-intel-3jifbmn2c-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- b3a9f3b"
-    },
-    {
-      "logId": "20260608-1948-3a03a29",
-      "commit": "3a03a29",
-      "commitFull": "3a03a29ca89166efe866713113fbaa24db38245f",
-      "message": "Add full Team Intelligence page for manager rep reviews.",
-      "deployedAt": "2026-06-08T14:18:42.461Z",
-      "deployedAtIst": "08/06/2026, 19:48:42",
-      "committedAtIst": "08/06/2026, 19:48:14",
-      "vercelPreviewUrl": "https://connect-intel-6wqix7pis-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 3a03a29"
     }
   ]
 }
