@@ -43,6 +43,7 @@ const ROUTES = {
   'crm/calendar/google': () => import('../lib/server/handlers/crm-calendar-google.js'),
   'crm/activity-log': () => import('../lib/server/handlers/crm-activity-log.js'),
   'crm/team-dashboard': () => import('../lib/server/handlers/crm-team-dashboard.js'),
+  'crm/my-day': () => import('../lib/server/handlers/crm-my-day.js'),
   'crm/workspace-pulse': () => import('../lib/server/handlers/crm-workspace-pulse.js'),
   'crm/saved-views': () => import('../lib/server/handlers/crm-saved-views.js'),
   'crm/sequences': () => import('../lib/server/handlers/crm-sequences.js'),

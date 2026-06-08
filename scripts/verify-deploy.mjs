@@ -28,6 +28,7 @@ const SERVER_IMPORTS = [
   'lib/server/handlers/marketing-campaigns.js',
   'lib/server/handlers/crm-activity-log.js',
   'lib/server/handlers/crm-team-dashboard.js',
+  'lib/server/handlers/crm-my-day.js',
 ]
 
 function fail(msg) {
