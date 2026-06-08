@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-08T15:03:08.051Z",
-  "updatedAtIst": "08/06/2026, 20:33:08",
+  "updatedAt": "2026-06-08T15:15:20.449Z",
+  "updatedAtIst": "08/06/2026, 20:45:20",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "968ad4f",
+  "currentProductionCommit": "ad3855c",
   "entries": [
+    {
+      "logId": "20260608-2045-ad3855c",
+      "commit": "ad3855c",
+      "commitFull": "ad3855c0eaaab4be584b0c84f95584ffe8908c53",
+      "message": "Fix bulk email button for kanban selections on large pipelines.",
+      "deployedAt": "2026-06-08T15:15:05.492Z",
+      "deployedAtIst": "08/06/2026, 20:45:05",
+      "committedAtIst": "08/06/2026, 20:44:38",
+      "vercelPreviewUrl": "https://connect-intel-c98uvv1jm-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- ad3855c"
+    },
+    {
+      "logId": "20260608-2033-3645ff3",
+      "commit": "3645ff3",
+      "commitFull": "3645ff3f211560fe38881efbb758f0d502034ceb",
+      "message": "Update production log for 968ad4f bulk email deploy.",
+      "deployedAt": "2026-06-08T15:03:37.172Z",
+      "deployedAtIst": "08/06/2026, 20:33:37",
+      "committedAtIst": "08/06/2026, 20:33:10",
+      "vercelPreviewUrl": "https://connect-intel-ivcz2mmc6-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 3645ff3"
+    },
     {
       "logId": "20260608-2032-968ad4f",
       "commit": "968ad4f",
@@ -15,7 +43,7 @@
       "committedAtIst": "08/06/2026, 20:32:26",
       "vercelPreviewUrl": "https://connect-intel-nn2lxuhmn-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 968ad4f"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 4b4d3d7"
-    },
-    {
-      "logId": "20260608-1648-daa6f20",
-      "commit": "daa6f20",
-      "commitFull": "daa6f204cca35808f0435704d8f4263736392b01",
-      "message": "Fix large platform imports and expand operator admin console.",
-      "deployedAt": "2026-06-08T11:18:54.558Z",
-      "deployedAtIst": "08/06/2026, 16:48:54",
-      "committedAtIst": "08/06/2026, 16:48:25",
-      "vercelPreviewUrl": "https://connect-intel-g49ihyidj-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- daa6f20"
-    },
-    {
-      "logId": "20260608-1442-c61fe98",
-      "commit": "c61fe98",
-      "commitFull": "c61fe98d368fa3fa921296abd1188945caa4999c",
-      "message": "Log production deploy 8d704f3 (navigation and reporting drill-downs).",
-      "deployedAt": "2026-06-08T09:12:00.672Z",
-      "deployedAtIst": "08/06/2026, 14:42:00",
-      "committedAtIst": "08/06/2026, 14:41:33",
-      "vercelPreviewUrl": "https://connect-intel-ipgy2qk9f-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- c61fe98"
     }
   ]
 }

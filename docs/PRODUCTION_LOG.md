@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 093bab2
+npm run prod:rollback -- 3645ff3
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 093bab2
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `968ad4f` |
-| Log updated (IST) | 08/06/2026, 20:33:08 |
+| Commit | `ad3855c` |
+| Log updated (IST) | 08/06/2026, 20:45:20 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 093bab2
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 08/06/2026, 20:32:51 | `968ad4f` | Improve pipeline bulk email for up to 200 leads with parallel sends and resume. | [preview](https://connect-intel-nn2lxuhmn-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 968ad4f` | **← LIVE**
+| 08/06/2026, 20:45:05 | `ad3855c` | Fix bulk email button for kanban selections on large pipelines. | [preview](https://connect-intel-c98uvv1jm-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ad3855c` | **← LIVE**
+| 08/06/2026, 20:33:37 | `3645ff3` | Update production log for 968ad4f bulk email deploy. | [preview](https://connect-intel-ivcz2mmc6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3645ff3` |
+| 08/06/2026, 20:32:51 | `968ad4f` | Improve pipeline bulk email for up to 200 leads with parallel sends and resume. | [preview](https://connect-intel-nn2lxuhmn-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 968ad4f` |
 | 08/06/2026, 20:25:11 | `093bab2` | Update production log for 98298dc timezone and Monday week deploy. | [preview](https://connect-intel-1o2gxsbeb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 093bab2` |
 | 08/06/2026, 20:24:27 | `98298dc` | Use Monday-based calendar weeks and local timezone for periods and dates. | [preview](https://connect-intel-mb53ve6j6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 98298dc` |
 | 08/06/2026, 20:16:09 | `d810ae7` | Update production log for 455806b activity pagination deploy. | [preview](https://connect-intel-3nxlepyay-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d810ae7` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 093bab2
 | 08/06/2026, 16:56:08 | `e2be456` | Log production deploy 4899d0d (import timeout and dedupe fixes). | [preview](https://connect-intel-agi8927p6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e2be456` |
 | 08/06/2026, 16:55:06 | `4899d0d` | Fix master DB import timeouts and add duplicate cleanup. | [preview](https://connect-intel-8btknavc4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4899d0d` |
 | 08/06/2026, 16:49:58 | `4b4d3d7` | Log production deploy daa6f20 (chunked imports and operator console). | [preview](https://connect-intel-5ywngeyt9-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4b4d3d7` |
-| 08/06/2026, 16:48:54 | `daa6f20` | Fix large platform imports and expand operator admin console. | [preview](https://connect-intel-g49ihyidj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- daa6f20` |
-| 08/06/2026, 14:42:00 | `c61fe98` | Log production deploy 8d704f3 (navigation and reporting drill-downs). | [preview](https://connect-intel-ipgy2qk9f-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c61fe98` |
 
 ---
 
