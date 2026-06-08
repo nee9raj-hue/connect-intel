@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { getStatusMeta } from '../../lib/crmConstants'
@@ -17,7 +17,14 @@ import {
   formatShortDate,
   timelineTypeLabel,
 } from '../../lib/teamIntelligenceConstants'
-import { ACTIVITY_LABELS, formatDateTime } from '../../lib/crmUiConstants'
+import { formatDateTime } from '../../lib/crmUiConstants'
+import {
+  TIMELINE_FILTERS,
+  countTimelineFilters,
+  matchesTimelineFilter,
+} from '../../lib/teamIntelligenceFilters'
+import { saveTeamIntelReturn } from '../../lib/teamIntelReturn'
+import TeamIntelligenceDetailModal from './TeamIntelligenceDetailModal'
 import {
   ActivityMixPie,
   ActivityTrendChart,
@@ -34,29 +41,13 @@ const TEAM_KPIS = [
   { key: 'meetings', label: 'Meetings set', intelKey: 'meetings', icon: 'calendar' },
 ]
 
-const TIMELINE_FILTERS = [
-  { id: 'all', label: 'All' },
-  { id: 'call', label: 'Calls' },
-  { id: 'email', label: 'Emails' },
-  { id: 'deal', label: 'Deals' },
-  { id: 'task', label: 'Tasks' },
-  { id: 'meeting', label: 'Meetings' },
-  { id: 'note', label: 'Notes' },
-]
-
-function matchesTimelineFilter(item, filter) {
-  if (!filter || filter === 'all') return true
-  if (filter === 'deal') return item.kind === 'deal' || String(item.type || '').startsWith('deal_')
-  if (filter === 'task') return item.kind === 'task' || String(item.type || '').startsWith('task')
-  if (filter === 'meeting') return item.kind === 'meeting' || item.type === 'field_visit'
-  return String(item.type || '').toLowerCase() === filter
-}
-
 export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, isActive = true }) {
   const { user, teamMembers, openPipelineLead, setPipelineAssigneeFilter } = useApp()
   const [period, setPeriod] = useState(panelOptions?.period || 'week')
   const [memberUserId, setMemberUserId] = useState(panelOptions?.userId || '')
-  const [timelineFilter, setTimelineFilter] = useState('all')
+  const [timelineFilter, setTimelineFilter] = useState(panelOptions?.timelineFilter || 'all')
+  const [detailItem, setDetailItem] = useState(null)
+  const scrollRef = useRef(null)
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -107,9 +98,19 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
   }, [load, isActive])
 
   useEffect(() => {
-    if (panelOptions?.userId) setMemberUserId(String(panelOptions.userId))
+    if (!isActive || loading || !panelOptions?.teamIntelScrollY || !scrollRef.current) return undefined
+    const y = panelOptions.teamIntelScrollY
+    const t = requestAnimationFrame(() => {
+      scrollRef.current.scrollTop = y
+    })
+    return () => cancelAnimationFrame(t)
+  }, [isActive, loading, panelOptions?.teamIntelScrollY, data])
+
+  useEffect(() => {
+    if (panelOptions?.userId !== undefined) setMemberUserId(panelOptions.userId ? String(panelOptions.userId) : '')
     if (panelOptions?.period) setPeriod(panelOptions.period)
-  }, [panelOptions?.userId, panelOptions?.period])
+    if (panelOptions?.timelineFilter) setTimelineFilter(panelOptions.timelineFilter)
+  }, [panelOptions?.userId, panelOptions?.period, panelOptions?.timelineFilter])
 
   const selectMember = (uid) => {
     const id = uid ? String(uid) : ''
@@ -118,10 +119,32 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
     setTimelineFilter('all')
   }
 
+  const timelineCounts = useMemo(
+    () => countTimelineFilters(data?.activityTimeline || []),
+    [data?.activityTimeline]
+  )
+
   const filteredTimeline = useMemo(() => {
     const rows = data?.activityTimeline || []
     return rows.filter((item) => matchesTimelineFilter(item, timelineFilter))
   }, [data?.activityTimeline, timelineFilter])
+
+  const openInCrm = useCallback(
+    (item, leadTab) => {
+      if (!item?.leadId) return
+      saveTeamIntelReturn({
+        period,
+        memberUserId: activeMemberId,
+        timelineFilter,
+        activityId: item.id,
+        scrollY: scrollRef.current?.scrollTop || 0,
+      })
+      openPipelineLead(item.leadId, leadTab || 'notes')
+      onNavigate?.('pipeline')
+      setDetailItem(null)
+    },
+    [period, activeMemberId, timelineFilter, openPipelineLead, onNavigate]
+  )
 
   const statusBreakdown = (data?.statusBreakdown || []).filter((r) => r.count > 0)
   const memberUsage = data?.memberUsage
@@ -154,7 +177,7 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
         </div>
       </header>
 
-      <div className="team-intel-page__body panel-body-scroll">
+      <div ref={scrollRef} className="team-intel-page__body panel-body-scroll">
         {error ? (
           <p className="text-sm text-red-800 bg-red-50 border border-red-200 rounded-xl px-3 py-2 font-medium mb-4">
             {error}
@@ -180,11 +203,14 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
                   <span className="team-intel-roster__name">All team</span>
                   <span className="team-intel-roster__meta">{intel?.members?.length || 0} reps</span>
                 </button>
-                {(intel?.members || []).map((m) => (
+                {(intel?.members || []).map((m) => {
+                  const isSelected = String(activeMemberId) === String(m.userId)
+                  const isDimmed = activeMemberId && !isSelected
+                  return (
                   <button
                     key={m.userId}
                     type="button"
-                    className={`team-intel-roster__item${String(activeMemberId) === String(m.userId) ? ' is-active' : ''}`}
+                    className={`team-intel-roster__item${isSelected ? ' is-active' : ''}${isDimmed ? ' is-dimmed' : ''}`}
                     onClick={() => selectMember(m.userId)}
                   >
                     <span className="team-intel-roster__name">{m.name}</span>
@@ -192,7 +218,8 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
                       {m.activitiesTotal || 0} actions · {formatHours(m.hoursInApp)}
                     </span>
                   </button>
-                ))}
+                  )
+                })}
               </aside>
             ) : null}
 
@@ -307,6 +334,9 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
                       onClick={() => setTimelineFilter(f.id)}
                     >
                       {f.label}
+                      <span className="team-intel-timeline-filters__count" aria-label={`${timelineCounts[f.id] ?? 0} items`}>
+                        {timelineCounts[f.id] ?? 0}
+                      </span>
                     </button>
                   ))}
                 </div>
@@ -322,12 +352,7 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
                         <button
                           type="button"
                           className="team-intel-timeline__card"
-                          onClick={() => {
-                            if (item.leadId) {
-                              openPipelineLead(item.leadId)
-                              onNavigate?.('pipeline')
-                            }
-                          }}
+                          onClick={() => setDetailItem(item)}
                         >
                           <div className="team-intel-timeline__head">
                             <span className="team-intel-timeline__type">
@@ -352,7 +377,7 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
                           ) : null}
                           <p className="team-intel-timeline__actor">
                             {item.actorName || 'Rep'}
-                            {item.leadId ? ' · Open lead' : ''}
+                            {item.leadId ? ' · View details' : ''}
                           </p>
                         </button>
                       </li>
@@ -404,6 +429,13 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
           </div>
         )}
       </div>
+
+      <TeamIntelligenceDetailModal
+        item={detailItem}
+        user={user}
+        onClose={() => setDetailItem(null)}
+        onOpenInCrm={openInCrm}
+      />
     </div>
   )
 }

@@ -26,6 +26,7 @@ import { buildUnifiedTimeline, formatDealValue, timelineTypeLabel } from '../../
 import { hasWorkspaceFeature } from '../../lib/workspaceFeatures'
 import FieldVisitRecordForm from './FieldVisitRecordForm'
 import LeadDealsSection from './LeadDealsSection'
+import TeamIntelReturnBanner from './TeamIntelReturnBanner'
 import { DEFAULT_FIELD_VISIT_EXPENSE_SETTINGS } from '../../lib/fieldVisitExpenses'
 
 const MAX_EMAIL_ATTACHMENTS = 5
@@ -685,6 +686,7 @@ export default function LeadWorkspace({
           : 'crm-drawer fixed inset-0 z-[75] md:static md:inset-auto md:w-full md:max-w-[420px] shrink-0'
       }
     >
+      <TeamIntelReturnBanner onNavigate={onNavigate} onCloseLead={onClose} />
       <div className={recordPanel ? 'crm-record-panel__header' : 'crm-drawer-header'}>
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0 flex-1">

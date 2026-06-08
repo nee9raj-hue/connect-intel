@@ -10828,6 +10828,15 @@ html[data-pipeline-mobile="1"] .ci-app-header-chip--secondary {
   box-shadow: inset 0 0 0 1px #99d5df;
 }
 
+.team-intel-roster__item.is-dimmed {
+  opacity: 0.5;
+}
+
+.team-intel-roster__item.is-dimmed:hover {
+  opacity: 0.82;
+  background: #f8fafc;
+}
+
 .team-intel-roster__name {
   display: block;
   font-size: 0.875rem;
@@ -10957,6 +10966,9 @@ html[data-pipeline-mobile="1"] .ci-app-header-chip--secondary {
 }
 
 .team-intel-timeline-filters__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
   font-size: 0.75rem;
   font-weight: 600;
   padding: 0.35rem 0.65rem;
@@ -10965,6 +10977,25 @@ html[data-pipeline-mobile="1"] .ci-app-header-chip--secondary {
   background: #fff;
   color: #475569;
   cursor: pointer;
+}
+
+.team-intel-timeline-filters__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25rem;
+  padding: 0.05rem 0.35rem;
+  border-radius: 999px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  line-height: 1.2;
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.team-intel-timeline-filters__btn.is-active .team-intel-timeline-filters__count {
+  background: #0d9488;
+  color: #fff;
 }
 
 .team-intel-timeline-filters__btn.is-active {
@@ -11047,4 +11078,115 @@ html[data-pipeline-mobile="1"] .ci-app-header-chip--secondary {
   margin-top: 0.45rem;
   font-size: 0.6875rem;
   color: #94a3b8;
+}
+
+.team-intel-detail-modal {
+  max-width: 36rem;
+  width: calc(100% - 2rem);
+}
+
+.team-intel-detail-modal__eyebrow {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-bottom: 0.15rem;
+}
+
+.team-intel-detail-modal__subtitle {
+  font-size: 0.8125rem;
+  color: #475569;
+  margin-top: 0.25rem;
+  font-weight: 500;
+}
+
+.team-intel-detail-modal__body {
+  max-height: min(60vh, 520px);
+  overflow-y: auto;
+}
+
+.team-intel-detail-modal__section + .team-intel-detail-modal__section {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.team-intel-detail-modal__section-title {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+}
+
+.team-intel-detail-modal__dl {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.team-intel-detail-modal__row {
+  display: grid;
+  grid-template-columns: 7rem 1fr;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+}
+
+.team-intel-detail-modal__row dt {
+  color: #64748b;
+  font-weight: 500;
+}
+
+.team-intel-detail-modal__row dd {
+  color: #0f172a;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.team-intel-detail-modal__pre {
+  font-size: 0.75rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.75rem;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.team-intel-detail-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.team-intel-return-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  padding: 0.5rem 0.75rem;
+  background: linear-gradient(90deg, #ecfdf5 0%, #f0fdfa 100%);
+  border-bottom: 1px solid #99d5df;
+  z-index: 20;
+}
+
+.team-intel-return-banner__btn {
+  border: none;
+  background: #0d9488;
+  color: #fff;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.team-intel-return-banner__btn:hover {
+  background: #0f766e;
+}
+
+.team-intel-return-banner__hint {
+  font-size: 0.75rem;
+  color: #475569;
 }
