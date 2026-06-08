@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 9363474
+npm run prod:rollback -- b234ec5
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 9363474
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `21d4981` |
-| Log updated (IST) | 08/06/2026, 22:52:29 |
+| Commit | `397fd1c` |
+| Log updated (IST) | 08/06/2026, 23:09:59 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 9363474
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 08/06/2026, 22:52:12 | `21d4981` | Rebuild Marketing as unified Hub V2 command center workspace. | [preview](https://connect-intel-qccm3g512-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 21d4981` | **← LIVE**
+| 08/06/2026, 23:09:45 | `397fd1c` | Replace Marketing Hub forms with professional marketing workspaces. | [preview](https://connect-intel-hl955qpes-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 397fd1c` | **← LIVE**
+| 08/06/2026, 22:52:58 | `b234ec5` | Update production log for 21d4981 Marketing Hub V2 deploy. | [preview](https://connect-intel-ao4e0nqwz-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b234ec5` |
+| 08/06/2026, 22:52:12 | `21d4981` | Rebuild Marketing as unified Hub V2 command center workspace. | [preview](https://connect-intel-qccm3g512-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 21d4981` |
 | 08/06/2026, 22:40:15 | `9363474` | Update production log for 1ddcb03 command bar navigation fix. | [preview](https://connect-intel-oiktdsliw-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9363474` |
 | 08/06/2026, 22:39:36 | `1ddcb03` | Fix My Day command bar navigation and deals closing count. | [preview](https://connect-intel-1zmvd7fwg-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1ddcb03` |
 | 08/06/2026, 22:34:45 | `d3711ad` | Update production log for a1a7f83 dashboard scroll fix. | [preview](https://connect-intel-58d4ymt7x-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d3711ad` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 9363474
 | 08/06/2026, 21:38:17 | `f9b07a8` | Update production log for 240e589 CRM Phase 1 deploy. | [preview](https://connect-intel-hxcme9wd6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f9b07a8` |
 | 08/06/2026, 21:37:26 | `240e589` | Add CRM Phase 1: companies hub, pipelines, workflows, timeline, scoring. | [preview](https://connect-intel-2rc6mym8v-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 240e589` |
 | 08/06/2026, 21:32:39 | `12d5196` | Update production log for bfc34d4 CRM platform Phase 0 deploy. | [preview](https://connect-intel-7pmalo07t-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 12d5196` |
-| 08/06/2026, 21:31:50 | `bfc34d4` | Add CRM platform Phase 0: blueprint, command palette, and unified search. | [preview](https://connect-intel-3wdssc8c9-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- bfc34d4` |
-| 08/06/2026, 21:19:00 | `789ff50` | Update production log for 8e209f2 Marketing Domains UX fix. | [preview](https://connect-intel-hy8y9pdez-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 789ff50` |
 
 ---
 

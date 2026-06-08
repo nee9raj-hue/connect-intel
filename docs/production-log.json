@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-08T17:22:29.104Z",
-  "updatedAtIst": "08/06/2026, 22:52:29",
+  "updatedAt": "2026-06-08T17:39:59.246Z",
+  "updatedAtIst": "08/06/2026, 23:09:59",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "21d4981",
+  "currentProductionCommit": "397fd1c",
   "entries": [
+    {
+      "logId": "20260608-2309-397fd1c",
+      "commit": "397fd1c",
+      "commitFull": "397fd1cc76018dc1600b358384a5b3fb2a9ac15a",
+      "message": "Replace Marketing Hub forms with professional marketing workspaces.",
+      "deployedAt": "2026-06-08T17:39:45.639Z",
+      "deployedAtIst": "08/06/2026, 23:09:45",
+      "committedAtIst": "08/06/2026, 23:09:10",
+      "vercelPreviewUrl": "https://connect-intel-hl955qpes-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 397fd1c"
+    },
+    {
+      "logId": "20260608-2252-b234ec5",
+      "commit": "b234ec5",
+      "commitFull": "b234ec5757b19fafe4edc7c4639c6125df2c5f39",
+      "message": "Update production log for 21d4981 Marketing Hub V2 deploy.",
+      "deployedAt": "2026-06-08T17:22:58.518Z",
+      "deployedAtIst": "08/06/2026, 22:52:58",
+      "committedAtIst": "08/06/2026, 22:52:29",
+      "vercelPreviewUrl": "https://connect-intel-ao4e0nqwz-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- b234ec5"
+    },
     {
       "logId": "20260608-2252-21d4981",
       "commit": "21d4981",
@@ -15,7 +43,7 @@
       "committedAtIst": "08/06/2026, 22:51:45",
       "vercelPreviewUrl": "https://connect-intel-qccm3g512-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 21d4981"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 12d5196"
-    },
-    {
-      "logId": "20260608-2131-bfc34d4",
-      "commit": "bfc34d4",
-      "commitFull": "bfc34d420375f2115eceb8f734021873b243de12",
-      "message": "Add CRM platform Phase 0: blueprint, command palette, and unified search.",
-      "deployedAt": "2026-06-08T16:01:50.437Z",
-      "deployedAtIst": "08/06/2026, 21:31:50",
-      "committedAtIst": "08/06/2026, 21:31:22",
-      "vercelPreviewUrl": "https://connect-intel-3wdssc8c9-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- bfc34d4"
-    },
-    {
-      "logId": "20260608-2119-789ff50",
-      "commit": "789ff50",
-      "commitFull": "789ff507fefe87e78b0e184406cd5459d00df3e5",
-      "message": "Update production log for 8e209f2 Marketing Domains UX fix.",
-      "deployedAt": "2026-06-08T15:49:00.077Z",
-      "deployedAtIst": "08/06/2026, 21:19:00",
-      "committedAtIst": "08/06/2026, 21:18:32",
-      "vercelPreviewUrl": "https://connect-intel-hy8y9pdez-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 789ff50"
     }
   ]
 }
