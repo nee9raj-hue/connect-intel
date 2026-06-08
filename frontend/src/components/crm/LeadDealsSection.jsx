@@ -22,6 +22,7 @@ function DealRow({
   onWon,
   onLost,
   onDuplicate,
+  onDelete,
   patchLead,
   logCrmEmailSend,
   onNotice,
@@ -29,6 +30,7 @@ function DealRow({
 }) {
   const [lostReason, setLostReason] = useState('')
   const [showLost, setShowLost] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
   const [showFreight, setShowFreight] = useState(false)
   const [freightDraft, setFreightDraft] = useState(deal.freight || emptyFreightRfq())
   const [nameDraft, setNameDraft] = useState(deal.name || '')
@@ -52,6 +54,8 @@ function DealRow({
     if (!next || next === deal.name) return
     onUpdate(deal.id, { name: next })
   }
+
+  const deleteLabel = freightOrg && deal.stage === 'rfq' ? 'Delete RFQ' : 'Delete deal'
 
   return (
     <li className={`text-xs border rounded-lg p-2.5 space-y-2 ${closed ? 'opacity-80 bg-gray-50' : 'bg-white'}`}>
@@ -187,6 +191,39 @@ function DealRow({
             >
               Duplicate
             </button>
+            {!confirmDelete ? (
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => setConfirmDelete(true)}
+                className="px-2.5 py-1 rounded-lg text-[11px] font-semibold border border-red-200 text-red-700 bg-red-50/60"
+              >
+                {deleteLabel}
+              </button>
+            ) : (
+              <div className="flex flex-wrap items-center gap-1.5 w-full">
+                <span className="text-[11px] text-red-700">Remove permanently?</span>
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => {
+                    onDelete(deal.id)
+                    setConfirmDelete(false)
+                  }}
+                  className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-red-600 text-white"
+                >
+                  Yes, delete
+                </button>
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => setConfirmDelete(false)}
+                  className="px-2.5 py-1 rounded-lg text-[11px] font-semibold border border-gray-300 text-gray-600"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
           </div>
           {showLost && (
             <div className="flex gap-2">
@@ -210,7 +247,7 @@ function DealRow({
       )}
 
       {closed && (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 items-center">
           <button
             type="button"
             disabled={busy}
@@ -219,6 +256,39 @@ function DealRow({
           >
             Duplicate deal
           </button>
+          {!confirmDelete ? (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => setConfirmDelete(true)}
+              className="px-2.5 py-1 rounded-lg text-[11px] font-semibold border border-red-200 text-red-700 bg-red-50/60"
+            >
+              {deleteLabel}
+            </button>
+          ) : (
+            <div className="flex flex-wrap items-center gap-1.5 w-full">
+              <span className="text-[11px] text-red-700">Remove permanently?</span>
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => {
+                  onDelete(deal.id)
+                  setConfirmDelete(false)
+                }}
+                className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-red-600 text-white"
+              >
+                Yes, delete
+              </button>
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => setConfirmDelete(false)}
+                className="px-2.5 py-1 rounded-lg text-[11px] font-semibold border border-gray-300 text-gray-600"
+              >
+                Cancel
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -346,6 +416,9 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
 
   const markLost = (dealId, lostReason) =>
     runDeal({ action: 'lost', dealId, lostReason: lostReason.trim() }, 'Deal marked lost')
+
+  const removeDeal = (dealId) =>
+    runDeal({ action: 'delete', dealId }, freightOrg ? 'Deal / RFQ deleted' : 'Deal deleted')
 
   const dealBusy = saving || busy
 
@@ -487,6 +560,7 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
                 onWon={markWon}
                 onLost={markLost}
                 onDuplicate={duplicateDeal}
+                onDelete={removeDeal}
                 patchLead={patchLead}
                 logCrmEmailSend={logCrmEmailSend}
                 onNotice={onNotice}
@@ -513,6 +587,7 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
                 onWon={markWon}
                 onLost={markLost}
                 onDuplicate={duplicateDeal}
+                onDelete={removeDeal}
                 patchLead={patchLead}
                 logCrmEmailSend={logCrmEmailSend}
                 onNotice={onNotice}
@@ -539,6 +614,7 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
                 onWon={markWon}
                 onLost={markLost}
                 onDuplicate={duplicateDeal}
+                onDelete={removeDeal}
                 patchLead={patchLead}
                 logCrmEmailSend={logCrmEmailSend}
                 onNotice={onNotice}
