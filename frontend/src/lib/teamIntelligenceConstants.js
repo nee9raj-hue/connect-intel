@@ -1,3 +1,5 @@
+import { formatDate } from './dateLocale.js'
+
 export const INTEL_CHART_COLORS = [
   '#00a4bd',
   '#ff7a59',
@@ -52,10 +54,5 @@ export function timelineTypeLabel(type) {
 }
 
 export function formatShortDate(iso) {
-  if (!iso) return '—'
-  try {
-    return new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
-  } catch {
-    return '—'
-  }
+  return formatDate(iso, { day: 'numeric', month: 'short' })
 }

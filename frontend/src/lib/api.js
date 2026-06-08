@@ -1,3 +1,4 @@
+import { appendTimeZoneToQuery } from './dateLocale.js'
 import { getSessionToken, storeSessionToken } from './sessionAuth'
 import { trackApiLoading } from './apiLoading'
 import { fetchWithTimeout } from './fetchWithTimeout'
@@ -292,7 +293,7 @@ export const api = {
   startCrmGmailOAuthWithCalendar: () =>
     request('/api/crm/email-oauth/start?calendar=1'),
   getCrmActivityLog: (query = '') =>
-    request(`/api/crm/activity-log${query ? `?${query}` : ''}`, { timeoutMs: 60_000 }),
+    request(`/api/crm/activity-log?${appendTimeZoneToQuery(query)}`, { timeoutMs: 60_000 }),
   getFieldVisitExpenses: (query = '', { silent = false } = {}) =>
     request(`/api/crm/field-expenses${query ? `?${query}` : ''}`, { timeoutMs: 60_000 }, { silent }),
   updateFieldVisitExpenseSettings: (body) =>
@@ -314,7 +315,7 @@ export const api = {
       { silent }
     ),
   getCrmTeamDashboard: (query = '') =>
-    request(`/api/crm/team-dashboard${query ? `?${query}` : ''}`, { timeoutMs: 120_000 }),
+    request(`/api/crm/team-dashboard?${appendTimeZoneToQuery(query)}`, { timeoutMs: 120_000 }),
   postWorkspacePulse: (body = {}) =>
     request('/api/crm/workspace-pulse', { method: 'POST', body }, { silent: true }),
   ackMeetingReminder: (leadId, meetingId, { silent = false } = {}) =>

@@ -32,7 +32,7 @@ const { periodStart } = await load('lib/server/dashboardPeriod.js')
 
 const userId = 'user-neeraj'
 const orgId = 'org-xindus'
-const since = periodStart('week')
+const since = periodStart('week', 'Asia/Kolkata')
 
 const store = {
   users: [

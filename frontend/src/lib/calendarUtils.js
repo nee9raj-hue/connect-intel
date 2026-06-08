@@ -1,3 +1,5 @@
+import { getUserTimeZone } from './dateLocale.js'
+
 const MS_DAY = 86400000
 
 export function startOfDay(d) {
@@ -21,7 +23,12 @@ export function sameDay(a, b) {
 }
 
 export function formatDayKey(d) {
-  return d.toISOString().slice(0, 10)
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: getUserTimeZone(),
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(d)
 }
 
 export function getWeekDays(anchor) {

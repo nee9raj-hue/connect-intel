@@ -30,20 +30,7 @@ export const MEETING_TYPES = [
   { id: 'office', label: 'Office meeting' },
 ]
 
-export function formatDateTime(iso) {
-  if (!iso) return '—'
-  try {
-    return new Date(iso).toLocaleString(undefined, {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-    })
-  } catch {
-    return iso
-  }
-}
+export { formatDateTime } from './dateLocale.js'
 
 export function toDatetimeLocalValue(iso) {
   if (!iso) return ''

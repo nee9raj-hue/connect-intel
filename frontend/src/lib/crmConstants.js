@@ -3,6 +3,7 @@ import {
   getFreightDealStageMeta,
   isFreightDealStageClosed,
 } from '../../../lib/freightDeal.js'
+import { formatDate } from './dateLocale.js'
 
 export const CRM_STATUSES = [
   { id: 'new', label: 'New', color: 'bg-slate-100 text-slate-700 border-slate-200' },
@@ -91,16 +92,7 @@ export function getStatusMeta(statusId) {
 }
 
 export function formatCrmDate(iso) {
-  if (!iso) return '—'
-  try {
-    return new Date(iso).toLocaleDateString(undefined, {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    })
-  } catch {
-    return '—'
-  }
+  return formatDate(iso, { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
 export function buildMailto(lead, subject, body) {
