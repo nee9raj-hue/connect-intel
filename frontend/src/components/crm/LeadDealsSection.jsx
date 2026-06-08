@@ -82,7 +82,7 @@ function DealRow({
             )}
           </div>
         </div>
-        <div className="shrink-0 text-right space-y-0.5">
+        <div className="shrink-0 text-right space-y-1 max-w-[9.5rem]">
           {deal.amount != null && deal.amount > 0 && (
             <p className="font-semibold text-gray-900">{formatDealValue(deal.amount, deal.currency)}</p>
           )}
@@ -90,6 +90,41 @@ function DealRow({
             <p className="text-[10px] text-gray-500">
               Invoice {formatDealValue(deal.freight.invoiceAmount, deal.currency)}
             </p>
+          )}
+          {!confirmDelete ? (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => setConfirmDelete(true)}
+              className="px-2 py-0.5 rounded-md text-[10px] font-semibold border border-red-200 text-red-700 bg-red-50/80 hover:bg-red-50"
+            >
+              {deleteLabel}
+            </button>
+          ) : (
+            <div className="flex flex-col items-end gap-1">
+              <span className="text-[10px] text-red-700 leading-tight">Delete permanently?</span>
+              <div className="flex flex-wrap justify-end gap-1">
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => {
+                    onDelete(deal.id)
+                    setConfirmDelete(false)
+                  }}
+                  className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-red-600 text-white"
+                >
+                  Yes
+                </button>
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => setConfirmDelete(false)}
+                  className="px-2 py-0.5 rounded-md text-[10px] font-semibold border border-gray-300 text-gray-600"
+                >
+                  No
+                </button>
+              </div>
+            </div>
           )}
         </div>
       </div>
@@ -191,39 +226,6 @@ function DealRow({
             >
               Duplicate
             </button>
-            {!confirmDelete ? (
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => setConfirmDelete(true)}
-                className="px-2.5 py-1 rounded-lg text-[11px] font-semibold border border-red-200 text-red-700 bg-red-50/60"
-              >
-                {deleteLabel}
-              </button>
-            ) : (
-              <div className="flex flex-wrap items-center gap-1.5 w-full">
-                <span className="text-[11px] text-red-700">Remove permanently?</span>
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={() => {
-                    onDelete(deal.id)
-                    setConfirmDelete(false)
-                  }}
-                  className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-red-600 text-white"
-                >
-                  Yes, delete
-                </button>
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={() => setConfirmDelete(false)}
-                  className="px-2.5 py-1 rounded-lg text-[11px] font-semibold border border-gray-300 text-gray-600"
-                >
-                  Cancel
-                </button>
-              </div>
-            )}
           </div>
           {showLost && (
             <div className="flex gap-2">
@@ -256,39 +258,6 @@ function DealRow({
           >
             Duplicate deal
           </button>
-          {!confirmDelete ? (
-            <button
-              type="button"
-              disabled={busy}
-              onClick={() => setConfirmDelete(true)}
-              className="px-2.5 py-1 rounded-lg text-[11px] font-semibold border border-red-200 text-red-700 bg-red-50/60"
-            >
-              {deleteLabel}
-            </button>
-          ) : (
-            <div className="flex flex-wrap items-center gap-1.5 w-full">
-              <span className="text-[11px] text-red-700">Remove permanently?</span>
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => {
-                  onDelete(deal.id)
-                  setConfirmDelete(false)
-                }}
-                className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-red-600 text-white"
-              >
-                Yes, delete
-              </button>
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => setConfirmDelete(false)}
-                className="px-2.5 py-1 rounded-lg text-[11px] font-semibold border border-gray-300 text-gray-600"
-              >
-                Cancel
-              </button>
-            </div>
-          )}
         </div>
       )}
 

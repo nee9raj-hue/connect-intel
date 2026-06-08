@@ -2960,6 +2960,137 @@ button.ci-lead-tag:disabled {
   position: relative;
 }
 
+/* Freight deals table — full width, fixed columns */
+.pipeline-deals-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  background: #fff;
+  border: 1px solid #dfe3eb;
+  border-radius: 8px;
+}
+
+.pipeline-deals-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 0.75rem;
+  color: #33475b;
+}
+
+.pipeline-deals-col-check {
+  width: 2.75rem;
+}
+
+.pipeline-deals-col-deal {
+  width: 14%;
+}
+
+.pipeline-deals-col-lead {
+  width: 16%;
+}
+
+.pipeline-deals-col-type {
+  width: 7%;
+}
+
+.pipeline-deals-col-stage {
+  width: 8%;
+}
+
+.pipeline-deals-col-mode {
+  width: 7%;
+}
+
+.pipeline-deals-col-route {
+  width: 26%;
+}
+
+.pipeline-deals-col-weight {
+  width: 8%;
+}
+
+.pipeline-deals-col-freight {
+  width: 7%;
+}
+
+.pipeline-deals-col-invoice {
+  width: 7%;
+}
+
+.pipeline-deals-th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 0.5rem 0.65rem;
+  text-align: left;
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: #516f90;
+  background: #f5f8fa;
+  border-bottom: 1px solid #cbd6e2;
+  white-space: nowrap;
+}
+
+.pipeline-deals-th-check,
+.pipeline-deals-td-check {
+  width: 2.75rem;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.pipeline-deals-th-num,
+.pipeline-deals-td-num {
+  text-align: right;
+}
+
+.pipeline-deals-row {
+  border-bottom: 1px solid #eaf0f6;
+  cursor: pointer;
+}
+
+.pipeline-deals-row:hover {
+  background: #f5f8fa;
+}
+
+.pipeline-deals-row.is-checked {
+  background: #fff4ee;
+}
+
+.pipeline-deals-td {
+  padding: 0.55rem 0.65rem;
+  vertical-align: middle;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pipeline-deals-td-deal .pipeline-deals-primary {
+  display: block;
+  font-weight: 600;
+  color: #33475b;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pipeline-deals-td-route {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #516f90;
+}
+
+@media (max-width: 767px) {
+  .pipeline-deals-table-wrap {
+    border-radius: 6px;
+  }
+
+  .pipeline-deals-table {
+    min-width: 52rem;
+  }
+}
+
 .pipeline-bulk-hs-menu {
   position: absolute;
   top: calc(100% + 4px);
