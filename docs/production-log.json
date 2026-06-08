@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-08T15:31:54.253Z",
-  "updatedAtIst": "08/06/2026, 21:01:54",
+  "updatedAt": "2026-06-08T15:40:47.613Z",
+  "updatedAtIst": "08/06/2026, 21:10:47",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "8c6ef7d",
+  "currentProductionCommit": "03674f8",
   "entries": [
+    {
+      "logId": "20260608-2110-03674f8",
+      "commit": "03674f8",
+      "commitFull": "03674f88e8bfaff63338274cd8c066d657a551eb",
+      "message": "Add Phase 2 marketing: canvas automations, A/B, RSS, landing pages, exports.",
+      "deployedAt": "2026-06-08T15:40:34.982Z",
+      "deployedAtIst": "08/06/2026, 21:10:34",
+      "committedAtIst": "08/06/2026, 21:10:01",
+      "vercelPreviewUrl": "https://connect-intel-4rjf31tdx-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 03674f8"
+    },
+    {
+      "logId": "20260608-2102-cb3d8f6",
+      "commit": "cb3d8f6",
+      "commitFull": "cb3d8f6746cba55b663eec7f8f7801894360a82f",
+      "message": "Update production log for 8c6ef7d email marketing deploy.",
+      "deployedAt": "2026-06-08T15:32:31.128Z",
+      "deployedAtIst": "08/06/2026, 21:02:31",
+      "committedAtIst": "08/06/2026, 21:02:03",
+      "vercelPreviewUrl": "https://connect-intel-kbcvto2g4-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- cb3d8f6"
+    },
     {
       "logId": "20260608-2101-8c6ef7d",
       "commit": "8c6ef7d",
@@ -15,7 +43,7 @@
       "committedAtIst": "08/06/2026, 21:01:02",
       "vercelPreviewUrl": "https://connect-intel-n568uqi1i-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 8c6ef7d"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- b91ead0"
-    },
-    {
-      "logId": "20260608-1702-c87e73e",
-      "commit": "c87e73e",
-      "commitFull": "c87e73e7960b0d30c54165e9005fb9fde847ac2e",
-      "message": "Fix AI search showing one repeated mock lead instead of real database results.",
-      "deployedAt": "2026-06-08T11:32:40.348Z",
-      "deployedAtIst": "08/06/2026, 17:02:40",
-      "committedAtIst": "08/06/2026, 17:02:13",
-      "vercelPreviewUrl": "https://connect-intel-9y3kadio0-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- c87e73e"
-    },
-    {
-      "logId": "20260608-1656-e2be456",
-      "commit": "e2be456",
-      "commitFull": "e2be456a5135710dc81f78ca471510a33284eb00",
-      "message": "Log production deploy 4899d0d (import timeout and dedupe fixes).",
-      "deployedAt": "2026-06-08T11:26:08.621Z",
-      "deployedAtIst": "08/06/2026, 16:56:08",
-      "committedAtIst": "08/06/2026, 16:55:40",
-      "vercelPreviewUrl": "https://connect-intel-agi8927p6-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- e2be456"
     }
   ]
 }
