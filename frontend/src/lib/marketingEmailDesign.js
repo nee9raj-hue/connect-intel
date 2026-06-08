@@ -21,6 +21,7 @@ import {
   mergeFormBlocksForLead,
   resolveFormBlockUrl,
 } from '../../../lib/marketingFormSchema.js'
+import { buildExtendedStarterTemplates } from './marketingStarterTemplates.js'
 
 export { FONT_OPTIONS, FONT_SIZE_OPTIONS, IMAGE_PRESETS, POPULAR_ICONS, SOCIAL_NETWORKS, iconifyUrl, socialIconUrl }
 
@@ -54,8 +55,6 @@ export const MERGE_FIELDS = [
   { token: '{{name}}', label: 'Full name' },
   { token: '{{title}}', label: 'Job title' },
 ]
-
-import { buildExtendedStarterTemplates } from './marketingStarterTemplates.js'
 
 const HANDCRAFTED_STARTER_TEMPLATES = [
   {

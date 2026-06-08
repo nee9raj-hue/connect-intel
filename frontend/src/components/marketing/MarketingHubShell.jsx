@@ -23,7 +23,7 @@ export default function MarketingHubShell({
   const visibleTabs = isMobile ? MOBILE_HUB_TABS : MARKETING_HUB_TABS
 
   return (
-    <div className="mhub-shell panel-shell">
+    <div className="mhub-shell panel-shell flex-1 min-h-0 w-full">
       <header className="mhub-header">
         <div className="mhub-header__top">
           <div className="mhub-header__brand">
@@ -99,7 +99,7 @@ export default function MarketingHubShell({
         {alerts}
       </header>
 
-      <div className="mhub-body panel-body-scroll">{children}</div>
+      <div className="mhub-body panel-body-scroll flex flex-col min-h-0">{children}</div>
     </div>
   )
 }

@@ -14357,8 +14357,9 @@ html[data-pipeline-mobile="1"] .ci-app-header-chip--secondary {
 }
 
 .mhub-body {
-  flex: 1;
+  flex: 1 1 0%;
   min-height: 0;
+  overflow-y: auto;
 }
 
 .mhub-tab-pad {

@@ -311,8 +311,12 @@ function buildBlocks(layout, recipe, idx, imageUrl, palette) {
   const social = {
     id: id('soc'),
     type: 'social',
-    networks: ['linkedin', 'x', 'instagram'],
     align: 'center',
+    links: [
+      { network: 'linkedin', url: 'https://linkedin.com' },
+      { network: 'x', url: 'https://x.com' },
+      { network: 'instagram', url: 'https://instagram.com' },
+    ],
   }
   const btn2 = {
     id: id('btn2'),

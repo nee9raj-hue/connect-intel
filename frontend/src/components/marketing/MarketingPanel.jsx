@@ -857,7 +857,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
   const renderTemplatesTab = () => {
     if (templatePhase === 'marketplace') {
       return (
-        <div className="flex-1 min-h-0 overflow-auto bg-white">
+        <>
           <MarketingTemplateMarketplace
             templates={templates}
             onSelect={openTemplateFromMarketplace}
@@ -872,7 +872,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
             onClose={() => setBrandKitOpen(false)}
             onSave={() => setNotice('Brand kit saved — applied to new designs')}
           />
-        </div>
+        </>
       )
     }
     return (
@@ -1172,7 +1172,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
 
   return (
     <div
-      className={`crm-workspace flex h-full min-h-0 w-full overflow-hidden ${
+      className={`crm-workspace flex flex-col h-full min-h-0 w-full overflow-hidden ${
         isBuilderTab ? 'marketing-campaigns-shell' : ''
       } ${hideMarketingHeader ? 'marketing-immersive-shell' : ''}`}
     >
@@ -1184,7 +1184,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
       )}
 
       {hideMarketingHeader ? (
-        <div className="marketing-immersive-body flex-1 min-h-0 flex flex-col bg-white">
+        <div className="marketing-immersive-body flex-1 min-h-0 w-full flex flex-col bg-white">
           {loading ? (
             <LoadingExperience message={LOADING_MESSAGES.marketing} />
           ) : tab === 'campaigns' ? (
