@@ -101,6 +101,21 @@ assert(
   'merged CRM must include today email from monolith'
 )
 
+// Mirrored shard + monolith copies must not duplicate the same activity id.
+const sharedCall = {
+  id: 'act-call-dup',
+  type: 'call',
+  summary: 'Incoming call: test',
+  createdAt: today,
+  createdByUserId: userId,
+  createdByName: 'Neeraj',
+}
+const shardMirror = makeEntry('lead-dup', [...staleActivities(3), sharedCall])
+const monoMirror = makeEntry('lead-dup', [sharedCall])
+const mergedMirror = overlayMonolithCrmForRead([shardMirror], [monoMirror])
+const dupCalls = (mergedMirror[0].crm.activities || []).filter((a) => a.id === 'act-call-dup')
+assert(dupCalls.length === 1, `merge must dedupe activity ids, got ${dupCalls.length} copies`)
+
 const entries = merged
 const logActs = listCrmActivities(store, user, entries, {
   since,
@@ -120,6 +135,15 @@ const logTasks = logActs.filter((a) => a.type === 'task').length
 
 assert(logEmails === 1, `activity log should show 1 email, got ${logEmails}`)
 assert(logCalls === 1, `activity log should show 1 call, got ${logCalls}`)
+
+const mirrorLogCalls = listCrmActivities(store, user, mergedMirror, {
+  since,
+  feedLimit: ACTIVITY_FEED_LIMIT,
+}).filter((a) => a.type === 'call')
+assert(
+  mirrorLogCalls.length === 1,
+  `activity log must not duplicate mirrored calls, got ${mirrorLogCalls.length}`
+)
 assert(logTasks === 1, `activity log should show 1 task, got ${logTasks}`)
 
 const perUser = rollup.perUser.get(userId) || rollup.org
