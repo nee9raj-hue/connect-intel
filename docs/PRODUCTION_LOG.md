@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 789ff50
+npm run prod:rollback -- 12d5196
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 789ff50
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `bfc34d4` |
-| Log updated (IST) | 08/06/2026, 21:32:05 |
+| Commit | `240e589` |
+| Log updated (IST) | 08/06/2026, 21:37:40 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 789ff50
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 08/06/2026, 21:31:50 | `bfc34d4` | Add CRM platform Phase 0: blueprint, command palette, and unified search. | [preview](https://connect-intel-3wdssc8c9-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- bfc34d4` | **← LIVE**
+| 08/06/2026, 21:37:26 | `240e589` | Add CRM Phase 1: companies hub, pipelines, workflows, timeline, scoring. | [preview](https://connect-intel-2rc6mym8v-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 240e589` | **← LIVE**
+| 08/06/2026, 21:32:39 | `12d5196` | Update production log for bfc34d4 CRM platform Phase 0 deploy. | [preview](https://connect-intel-7pmalo07t-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 12d5196` |
+| 08/06/2026, 21:31:50 | `bfc34d4` | Add CRM platform Phase 0: blueprint, command palette, and unified search. | [preview](https://connect-intel-3wdssc8c9-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- bfc34d4` |
 | 08/06/2026, 21:19:00 | `789ff50` | Update production log for 8e209f2 Marketing Domains UX fix. | [preview](https://connect-intel-hy8y9pdez-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 789ff50` |
 | 08/06/2026, 21:18:15 | `8e209f2` | Fix Marketing Domains UX when work email is already connected. | [preview](https://connect-intel-ripu2i8s5-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8e209f2` |
 | 08/06/2026, 21:11:29 | `9b9d254` | Update production log for 03674f8 Phase 2 marketing deploy. | [preview](https://connect-intel-f2eln6kna-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9b9d254` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 789ff50
 | 08/06/2026, 20:05:56 | `925bced` | Update production log for b3a9f3b Team Intelligence upgrade deploy. | [preview](https://connect-intel-mwbftfxs4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 925bced` |
 | 08/06/2026, 20:05:03 | `b3a9f3b` | Upgrade Team Intelligence with filter counts, roster selection, and activity detail modals. | [preview](https://connect-intel-3jifbmn2c-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b3a9f3b` |
 | 08/06/2026, 19:48:42 | `3a03a29` | Add full Team Intelligence page for manager rep reviews. | [preview](https://connect-intel-6wqix7pis-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3a03a29` |
-| 08/06/2026, 19:34:52 | `fb040ab` | Speed up CRM load with precomputed pipeline index and bootstrap API. | [preview](https://connect-intel-hshadiqob-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- fb040ab` |
-| 08/06/2026, 19:18:31 | `8d39bf2` | Fix Ludhiana textile search: ignore india keyword, restore live AI fallback. | [preview](https://connect-intel-38gtiwjs3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8d39bf2` |
 
 ---
 

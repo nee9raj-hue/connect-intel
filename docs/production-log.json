@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-08T16:02:05.743Z",
-  "updatedAtIst": "08/06/2026, 21:32:05",
+  "updatedAt": "2026-06-08T16:07:40.382Z",
+  "updatedAtIst": "08/06/2026, 21:37:40",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "bfc34d4",
+  "currentProductionCommit": "240e589",
   "entries": [
+    {
+      "logId": "20260608-2137-240e589",
+      "commit": "240e589",
+      "commitFull": "240e589f19508a6cf4e2f4b5138f65d0d0805352",
+      "message": "Add CRM Phase 1: companies hub, pipelines, workflows, timeline, scoring.",
+      "deployedAt": "2026-06-08T16:07:26.465Z",
+      "deployedAtIst": "08/06/2026, 21:37:26",
+      "committedAtIst": "08/06/2026, 21:36:56",
+      "vercelPreviewUrl": "https://connect-intel-2rc6mym8v-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 240e589"
+    },
+    {
+      "logId": "20260608-2132-12d5196",
+      "commit": "12d5196",
+      "commitFull": "12d5196b300a3f14c5c72655ff4263c57b15e23b",
+      "message": "Update production log for bfc34d4 CRM platform Phase 0 deploy.",
+      "deployedAt": "2026-06-08T16:02:39.325Z",
+      "deployedAtIst": "08/06/2026, 21:32:39",
+      "committedAtIst": "08/06/2026, 21:32:09",
+      "vercelPreviewUrl": "https://connect-intel-7pmalo07t-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 12d5196"
+    },
     {
       "logId": "20260608-2131-bfc34d4",
       "commit": "bfc34d4",
@@ -15,7 +43,7 @@
       "committedAtIst": "08/06/2026, 21:31:22",
       "vercelPreviewUrl": "https://connect-intel-3wdssc8c9-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- bfc34d4"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 3a03a29"
-    },
-    {
-      "logId": "20260608-1934-fb040ab",
-      "commit": "fb040ab",
-      "commitFull": "fb040aba58cb8b78c9104e2058a7317e33b119fa",
-      "message": "Speed up CRM load with precomputed pipeline index and bootstrap API.",
-      "deployedAt": "2026-06-08T14:04:52.211Z",
-      "deployedAtIst": "08/06/2026, 19:34:52",
-      "committedAtIst": "08/06/2026, 19:34:23",
-      "vercelPreviewUrl": "https://connect-intel-hshadiqob-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- fb040ab"
-    },
-    {
-      "logId": "20260608-1918-8d39bf2",
-      "commit": "8d39bf2",
-      "commitFull": "8d39bf21eaad2ec46b4974aa8bfafb78f1756d30",
-      "message": "Fix Ludhiana textile search: ignore india keyword, restore live AI fallback.",
-      "deployedAt": "2026-06-08T13:48:31.763Z",
-      "deployedAtIst": "08/06/2026, 19:18:31",
-      "committedAtIst": "08/06/2026, 19:18:03",
-      "vercelPreviewUrl": "https://connect-intel-38gtiwjs3-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 8d39bf2"
     }
   ]
 }
