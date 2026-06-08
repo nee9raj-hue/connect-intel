@@ -10666,3 +10666,63 @@ html[data-pipeline-mobile="1"] .ci-app-header-chip--secondary {
   color: #516f90;
   font-weight: 600;
 }
+
+.team-intelligence-recent-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 0.25rem;
+}
+
+@media (min-width: 960px) {
+  .team-intelligence-recent-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.team-intelligence-recent-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.team-intelligence-recent-row {
+  width: 100%;
+  text-align: left;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #fff;
+  padding: 0.65rem 0.75rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.team-intelligence-recent-row:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+}
+
+.team-intelligence-recent-row__title {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.team-intelligence-recent-row__meta {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.6875rem;
+  color: #64748b;
+}
+
+.team-intelligence-recent-row__summary {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: #475569;
+}

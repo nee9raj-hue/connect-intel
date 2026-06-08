@@ -12,6 +12,7 @@ import {
   DashboardEmpty,
 } from '../dashboard/dashboardUi'
 import { formatDelta, formatHours, formatShortDate } from '../../lib/teamIntelligenceConstants'
+import { ACTIVITY_LABELS, formatDateTime } from '../../lib/crmUiConstants'
 import {
   ActivityMixPie,
   ActivityTrendChart,
@@ -124,7 +125,6 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
   const load = useCallback(async () => {
     setLoading(true)
     setError(null)
-    setData(null)
     try {
       const q = new URLSearchParams({ period })
       if (memberUserId) q.set('userId', memberUserId)
@@ -205,6 +205,22 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
   const summary = data?.summary || {}
   const comparison = intel?.comparison || {}
   const statusBreakdown = (data?.statusBreakdown || []).filter((r) => r.count > 0)
+  const recentActivities = data?.recentActivities || []
+  const recentCalls = useMemo(
+    () => recentActivities.filter((a) => a.type === 'call').slice(0, 6),
+    [recentActivities]
+  )
+  const recentContacts = useMemo(() => {
+    const seen = new Set()
+    const rows = []
+    for (const act of recentActivities) {
+      if (!act.leadId || seen.has(act.leadId)) continue
+      seen.add(act.leadId)
+      rows.push(act)
+      if (rows.length >= 6) break
+    }
+    return rows
+  }, [recentActivities])
 
   const periodLabelText =
     intel?.periodLabel ||
@@ -360,6 +376,79 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
               )
             })}
           </div>
+
+          {recentContacts.length > 0 || recentCalls.length > 0 ? (
+            <div className="team-intelligence-recent-grid">
+              {recentContacts.length > 0 ? (
+                <DashboardSection
+                  title="Contacts worked"
+                  subtitle="Leads touched this period — open for full timeline"
+                  actionLabel="View all"
+                  onAction={() => drillTo('crm-log')}
+                >
+                  <ul className="team-intelligence-recent-list">
+                    {recentContacts.map((act) => (
+                      <li key={`${act.leadId}-${act.id}`}>
+                        <button
+                          type="button"
+                          className="team-intelligence-recent-row"
+                          onClick={() => {
+                            openPipelineLead(act.leadId)
+                            onNavigate?.('pipeline')
+                          }}
+                        >
+                          <span className="team-intelligence-recent-row__title">
+                            {act.leadName}
+                            {act.company && act.company !== act.leadName ? ` · ${act.company}` : ''}
+                          </span>
+                          <span className="team-intelligence-recent-row__meta">
+                            {ACTIVITY_LABELS[act.type] || act.type} · {formatDateTime(act.createdAt)}
+                          </span>
+                          {act.summary ? (
+                            <span className="team-intelligence-recent-row__summary">{act.summary}</span>
+                          ) : null}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </DashboardSection>
+              ) : null}
+              {recentCalls.length > 0 ? (
+                <DashboardSection
+                  title="Calls logged"
+                  subtitle="Outbound and incoming calls with remarks"
+                  actionLabel="Call log"
+                  onAction={() => drillTo('crm-log', { activityType: 'call' })}
+                >
+                  <ul className="team-intelligence-recent-list">
+                    {recentCalls.map((act) => (
+                      <li key={act.id}>
+                        <button
+                          type="button"
+                          className="team-intelligence-recent-row"
+                          onClick={() => {
+                            openPipelineLead(act.leadId)
+                            onNavigate?.('pipeline')
+                          }}
+                        >
+                          <span className="team-intelligence-recent-row__title">
+                            {act.leadName}
+                            {act.company && act.company !== act.leadName ? ` · ${act.company}` : ''}
+                          </span>
+                          <span className="team-intelligence-recent-row__meta">
+                            {act.createdByName || 'Rep'} · {formatDateTime(act.createdAt)}
+                          </span>
+                          {act.summary ? (
+                            <span className="team-intelligence-recent-row__summary">{act.summary}</span>
+                          ) : null}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </DashboardSection>
+              ) : null}
+            </div>
+          ) : null}
 
           {intel?.weeklyReview?.length ? (
             <DashboardSection title="Weekly review insights" subtitle="Talking points for your team call">
