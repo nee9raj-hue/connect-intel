@@ -2,7 +2,9 @@ import { useEffect, useMemo, useState } from 'react'
 import { CRM_STATUSES } from '../../lib/crmConstants'
 import { CONTACT_FILTER_OPTIONS } from '../../lib/pipelineFilters'
 import { SEGMENT_FILTER_DEFAULTS } from '../../../../lib/marketingSegmentFilters.js'
+import { SMART_LIST_PRESETS } from '../../../../lib/marketingSmartListPresets.js'
 import { api } from '../../lib/api'
+import MarketingSegmentTagFilter from './MarketingSegmentTagFilter'
 
 export default function MarketingSegmentBuilder({
   user,
@@ -14,6 +16,7 @@ export default function MarketingSegmentBuilder({
   setBusy,
   setError,
   setNotice,
+  orgLeadTags = [],
 }) {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
@@ -33,7 +36,7 @@ export default function MarketingSegmentBuilder({
     setPreviewing(true)
     setError?.(null)
     try {
-      const res = await api.previewMarketingSegment(filters)
+      const res = await api.previewMarketingSegment(filters, { channel })
       setPreview(res)
     } catch (e) {
       setError?.(e.message)
@@ -51,6 +54,12 @@ export default function MarketingSegmentBuilder({
 
   const updateFilter = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }))
+  }
+
+  const applyPreset = (preset) => {
+    const contact = channel === 'whatsapp' ? 'has_phone' : preset.filters.contact || 'has_email'
+    setFilters({ ...SEGMENT_FILTER_DEFAULTS, ...preset.filters, contact })
+    if (!name.trim()) setName(preset.label)
   }
 
   const handleSave = async () => {
@@ -98,6 +107,23 @@ export default function MarketingSegmentBuilder({
         placeholder="Description (optional)"
         className="ci-input w-full min-h-[4rem]"
       />
+
+      <div>
+        <p className="text-xs font-semibold text-[#33475b] mb-2">Start from a preset</p>
+        <div className="flex flex-wrap gap-2">
+          {SMART_LIST_PRESETS.map((preset) => (
+            <button
+              key={preset.id}
+              type="button"
+              title={preset.description}
+              onClick={() => applyPreset(preset)}
+              className="text-xs font-semibold px-3 py-1.5 rounded-lg border bg-white text-[#516f90] border-[#dfe3eb] hover:border-[#99acc2]"
+            >
+              {preset.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
       <div className="marketing-segment-filters grid sm:grid-cols-2 gap-3">
         <label className="block text-xs">
@@ -220,6 +246,61 @@ export default function MarketingSegmentBuilder({
             placeholder="e.g. 30"
           />
         </label>
+
+        <label className="block text-xs">
+          <span className="text-gray-600">Min lead score</span>
+          <input
+            type="number"
+            min={0}
+            max={100}
+            value={filters.minLeadScore ?? ''}
+            onChange={(e) =>
+              updateFilter('minLeadScore', e.target.value ? Number(e.target.value) : null)
+            }
+            className="ci-input w-full mt-1"
+            placeholder="e.g. 70"
+          />
+        </label>
+
+        <label className="block text-xs">
+          <span className="text-gray-600">Stale (no activity N days)</span>
+          <input
+            type="number"
+            min={0}
+            value={filters.staleDays ?? ''}
+            onChange={(e) =>
+              updateFilter('staleDays', e.target.value ? Number(e.target.value) : null)
+            }
+            className="ci-input w-full mt-1"
+            placeholder="e.g. 30"
+          />
+        </label>
+
+        <label className="flex items-center gap-2 text-xs text-gray-600 sm:col-span-2">
+          <input
+            type="checkbox"
+            checked={Boolean(filters.followUpDue)}
+            onChange={(e) => updateFilter('followUpDue', e.target.checked)}
+          />
+          Follow-up due today or overdue
+        </label>
+
+        <label className="flex items-center gap-2 text-xs text-gray-600 sm:col-span-2">
+          <input
+            type="checkbox"
+            checked={Boolean(filters.overdueFollowUp)}
+            onChange={(e) => updateFilter('overdueFollowUp', e.target.checked)}
+          />
+          Overdue follow-up only
+        </label>
+
+        <MarketingSegmentTagFilter
+          orgLeadTags={orgLeadTags}
+          tagIds={filters.tagIds}
+          tagMode={filters.tagMode}
+          onTagIdsChange={(tagIds) => updateFilter('tagIds', tagIds)}
+          onTagModeChange={(tagMode) => updateFilter('tagMode', tagMode)}
+        />
       </div>
 
       <div className="marketing-segment-preview">

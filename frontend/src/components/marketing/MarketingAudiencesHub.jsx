@@ -9,6 +9,10 @@ export default function MarketingAudiencesHub({
   user,
   teamMembers,
   lists,
+  setLists,
+  savedLeads,
+  refreshTeam,
+  orgLeadTags,
   segments,
   campaigns,
   onReload,
@@ -63,7 +67,10 @@ export default function MarketingAudiencesHub({
               ]}
             />
           </section>
-          <p className="mhub-hint">Open Lists or Segments to manage contacts and targeting rules.</p>
+          <p className="mhub-hint">
+            Use <strong>Lists → + List → Smart list</strong> for one-click audiences split into 200-contact
+            send batches. Use <strong>Segments</strong> for live audiences that refresh in campaigns.
+          </p>
         </div>
       ) : null}
 
@@ -71,8 +78,12 @@ export default function MarketingAudiencesHub({
         <MarketingListsPanel
           user={user}
           teamMembers={teamMembers}
+          refreshTeam={refreshTeam}
+          savedLeads={savedLeads}
           lists={lists}
-          onReload={onReload}
+          setLists={setLists}
+          onListsReload={onReload}
+          orgLeadTags={orgLeadTags}
           busy={busy}
           setBusy={setBusy}
           setError={setError}
@@ -87,6 +98,7 @@ export default function MarketingAudiencesHub({
           segments={segments}
           campaigns={campaigns}
           onReload={onReload}
+          orgLeadTags={orgLeadTags}
           busy={busy}
           setBusy={setBusy}
           setError={setError}

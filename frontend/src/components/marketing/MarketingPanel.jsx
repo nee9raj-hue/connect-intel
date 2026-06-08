@@ -90,7 +90,7 @@ const EMPTY_CAMPAIGN = {
 }
 
 export default function MarketingPanel({ onNavigate, panelOptions, isActive = true }) {
-  const { savedLeads, refreshSavedLeads, user, teamMembers, refreshTeam } = useApp()
+  const { savedLeads, refreshSavedLeads, user, teamMembers, refreshTeam, orgLeadTags } = useApp()
   const [tab, setTab] = useState(normalizeMarketingTab(panelOptions?.tab || 'overview'))
   const [hubPeriod, setHubPeriod] = useState('30d')
   const [hubSearch, setHubSearch] = useState('')
@@ -1275,7 +1275,11 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
               }}
               user={user}
               teamMembers={teamMembers}
+              refreshTeam={refreshTeam}
+              savedLeads={savedLeads}
+              orgLeadTags={orgLeadTags}
               lists={lists}
+              setLists={setLists}
               segments={segments}
               campaigns={reportCampaigns}
               onReload={load}

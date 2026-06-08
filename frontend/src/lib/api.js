@@ -452,6 +452,11 @@ export const api = {
   createMarketingList: (payload) => request('/api/marketing/lists', { method: 'POST', body: payload }),
   createMarketingListBatches: (payload) =>
     request('/api/marketing/lists', { method: 'POST', body: { action: 'create_batches', ...payload } }),
+  createMarketingListBatchesFromFilters: (payload) =>
+    request('/api/marketing/lists', {
+      method: 'POST',
+      body: { action: 'create_batches_from_filters', ...payload },
+    }),
   updateMarketingList: (payload) => request('/api/marketing/lists', { method: 'PATCH', body: payload }),
   addMarketingListLeads: (id, leadIds) =>
     request('/api/marketing/lists', { method: 'PATCH', body: { id, action: 'add_leads', leadIds } }),
@@ -521,8 +526,11 @@ export const api = {
   getMarketingHub: (period = '30d') =>
     request(`/api/marketing/dashboard?hub=1&period=${encodeURIComponent(period)}`),
   listMarketingSegments: () => request('/api/marketing/segments'),
-  previewMarketingSegment: (filterJson) =>
-    request('/api/marketing/segments', { method: 'POST', body: { action: 'preview', filterJson } }),
+  previewMarketingSegment: (filterJson, { channel = 'email' } = {}) =>
+    request('/api/marketing/segments', {
+      method: 'POST',
+      body: { action: 'preview', filterJson, channel },
+    }),
   createMarketingSegment: (payload) =>
     request('/api/marketing/segments', { method: 'POST', body: payload }),
   refreshMarketingSegment: (id) =>

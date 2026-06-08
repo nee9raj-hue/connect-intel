@@ -4,6 +4,7 @@ import FullScreenDetailModal from '../ui/FullScreenDetailModal'
 import { CRM_STATUSES } from '../../lib/crmConstants'
 import FilterDropdown from '../crm/FilterDropdown'
 import MarketingListBuilder from './MarketingListBuilder'
+import MarketingSmartListBuilder from './MarketingSmartListBuilder'
 import MarketingListDetail from './MarketingListDetail'
 import MarketingListsFiltersSheet from './MarketingListsFiltersSheet'
 import MarketingCreatorBadge from './MarketingCreatorBadge'
@@ -39,9 +40,11 @@ export default function MarketingListsPanel({
   setError,
   setNotice,
   onListsReload,
+  orgLeadTags = [],
 }) {
   const [selectedListId, setSelectedListId] = useState(null)
   const [createOpen, setCreateOpen] = useState(false)
+  const [createMode, setCreateMode] = useState('smart')
   const [listSearch, setListSearch] = useState('')
   const [listChannel, setListChannel] = useState('email')
   const [appliedFilters, setAppliedFilters] = useState(DEFAULT_LIST_FILTERS)
@@ -340,6 +343,21 @@ export default function MarketingListsPanel({
                   {listChannel === 'whatsapp' ? 'WhatsApp' : 'Email'} · {assigneeLabel || '—'} ·{' '}
                   {stageLabel}
                 </p>
+                <div className="crm-view-tabs mt-2">
+                  {[
+                    { id: 'smart', label: 'Smart list' },
+                    { id: 'manual', label: 'Pick leads' },
+                  ].map((m) => (
+                    <button
+                      key={m.id}
+                      type="button"
+                      className={`crm-view-tab ${createMode === m.id ? 'is-active' : ''}`}
+                      onClick={() => setCreateMode(m.id)}
+                    >
+                      {m.label}
+                    </button>
+                  ))}
+                </div>
               </div>
               <button
                 type="button"
@@ -351,28 +369,44 @@ export default function MarketingListsPanel({
               </button>
             </header>
             <div className="crm-modal-body crm-modal-body-padded">
-              <MarketingListBuilder
-                hideSetupFields
-                user={user}
-                teamMembers={teamMembers}
-                refreshTeam={refreshTeam}
-                savedLeads={savedLeads}
-                busy={busy}
-                setBusy={setBusy}
-                setError={setError}
-                setNotice={setNotice}
-                onListsCreated={handleListsCreated}
-                listChannel={listChannel}
-                onListChannelChange={setListChannel}
-                assigneeUserId={assigneeUserId}
-                onAssigneeChange={(v) =>
-                  setAppliedFilters((prev) => ({ ...prev, assigneeUserId: v || '' }))
-                }
-                pipelineStage={pipelineStage}
-                onPipelineStageChange={(v) =>
-                  setAppliedFilters((prev) => ({ ...prev, pipelineStage: v || 'all' }))
-                }
-              />
+              {createMode === 'smart' ? (
+                <MarketingSmartListBuilder
+                  user={user}
+                  teamMembers={teamMembers}
+                  listChannel={listChannel}
+                  assigneeUserId={assigneeUserId}
+                  busy={busy}
+                  setBusy={setBusy}
+                  setError={setError}
+                  setNotice={setNotice}
+                  onListsCreated={handleListsCreated}
+                  onSegmentSaved={() => setCreateOpen(false)}
+                  orgLeadTags={orgLeadTags}
+                />
+              ) : (
+                <MarketingListBuilder
+                  hideSetupFields
+                  user={user}
+                  teamMembers={teamMembers}
+                  refreshTeam={refreshTeam}
+                  savedLeads={savedLeads}
+                  busy={busy}
+                  setBusy={setBusy}
+                  setError={setError}
+                  setNotice={setNotice}
+                  onListsCreated={handleListsCreated}
+                  listChannel={listChannel}
+                  onListChannelChange={setListChannel}
+                  assigneeUserId={assigneeUserId}
+                  onAssigneeChange={(v) =>
+                    setAppliedFilters((prev) => ({ ...prev, assigneeUserId: v || '' }))
+                  }
+                  pipelineStage={pipelineStage}
+                  onPipelineStageChange={(v) =>
+                    setAppliedFilters((prev) => ({ ...prev, pipelineStage: v || 'all' }))
+                  }
+                />
+              )}
             </div>
             <footer className="crm-modal-footer">
               <button

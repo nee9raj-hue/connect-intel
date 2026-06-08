@@ -14,6 +14,7 @@ export default function MarketingSegmentsPanel({
   setBusy,
   setError,
   setNotice,
+  orgLeadTags = [],
 }) {
   const [creating, setCreating] = useState(false)
 
@@ -77,6 +78,7 @@ export default function MarketingSegmentsPanel({
               await onReload?.()
             }}
             onCancel={() => setCreating(false)}
+            orgLeadTags={orgLeadTags}
           />
         </div>
       )}
