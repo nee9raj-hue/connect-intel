@@ -705,6 +705,7 @@ export function AppProvider({ children }) {
     const ids = [...new Set(Array.isArray(payload.leadIds) ? payload.leadIds : [])]
     const CHUNK = bulkEmailChunkSize({ useAiPerLead: payload.useAiPerLead })
     const totalChunks = Math.max(1, Math.ceil(ids.length / CHUNK))
+    const requestTimeoutMs = payload.useAiPerLead ? 280_000 : 180_000
     const aggregate = {
       sentCount: 0,
       failedCount: 0,
@@ -713,38 +714,80 @@ export function AppProvider({ children }) {
       leads: null,
       campaignId: null,
     }
-    let campaignId = null
-    for (let i = 0; i < ids.length; i += CHUNK) {
-      const chunkIndex = Math.floor(i / CHUNK) + 1
-      const isLast = i + CHUNK >= ids.length
-      onProgress?.({
-        chunk: chunkIndex,
-        totalChunks,
-        sentSoFar: aggregate.sentCount,
-        total: ids.length,
-      })
-      const chunkIds = ids.slice(i, i + CHUNK)
-      const data = await api.sendBulkCrmEmail(
+    let campaignId = payload.campaignId || null
+
+    const sendChunk = async (chunkIds, chunkIndex, isLast, enrollmentOffset) => {
+      return api.sendBulkCrmEmail(
         {
           ...payload,
           leadIds: chunkIds,
           campaignId: campaignId || undefined,
-          enrollmentOffset: i,
+          enrollmentOffset,
           finalize: isLast,
         },
-        { silent: i > 0, timeoutMs: 120_000 }
+        { silent: chunkIndex > 1, timeoutMs: requestTimeoutMs }
       )
-      if (data.campaignId && !campaignId) campaignId = data.campaignId
-      aggregate.campaignId = campaignId || data.campaignId || null
-      aggregate.sentCount += data.sentCount || 0
-      aggregate.failedCount += data.failedCount || 0
-      aggregate.skippedCount += data.skippedCount || 0
-      aggregate.results.push(...(data.results || []))
-      if (data.leads) aggregate.leads = data.leads
     }
-    if (aggregate.leads) setSavedLeads(aggregate.leads)
-    return aggregate
-  }, [])
+
+    try {
+      for (let i = 0; i < ids.length; i += CHUNK) {
+        const chunkIndex = Math.floor(i / CHUNK) + 1
+        const isLast = i + CHUNK >= ids.length
+        const chunkIds = ids.slice(i, i + CHUNK)
+
+        onProgress?.({
+          chunk: chunkIndex,
+          totalChunks,
+          sentSoFar: aggregate.sentCount,
+          failedSoFar: aggregate.failedCount,
+          total: ids.length,
+        })
+
+        let data
+        try {
+          data = await sendChunk(chunkIds, chunkIndex, isLast, i)
+        } catch (firstError) {
+          try {
+            data = await sendChunk(chunkIds, chunkIndex, isLast, i)
+          } catch {
+            throw firstError
+          }
+        }
+
+        if (data.campaignId && !campaignId) campaignId = data.campaignId
+        aggregate.campaignId = campaignId || data.campaignId || null
+        aggregate.sentCount += data.sentCount || 0
+        aggregate.failedCount += data.failedCount || 0
+        aggregate.skippedCount += data.skippedCount || 0
+        aggregate.results.push(...(data.results || []))
+        if (data.leads) aggregate.leads = data.leads
+
+        onProgress?.({
+          chunk: chunkIndex,
+          totalChunks,
+          sentSoFar: aggregate.sentCount,
+          failedSoFar: aggregate.failedCount,
+          total: ids.length,
+          done: isLast,
+        })
+      }
+
+      if (aggregate.leads) {
+        setSavedLeads(aggregate.leads)
+      } else if (aggregate.sentCount > 0) {
+        void refreshSavedLeads()
+      }
+      return aggregate
+    } catch (error) {
+      error.bulkEmailProgress = {
+        campaignId: aggregate.campaignId || campaignId,
+        sentCount: aggregate.sentCount,
+        failedCount: aggregate.failedCount,
+        skippedCount: aggregate.skippedCount,
+      }
+      throw error
+    }
+  }, [refreshSavedLeads])
 
   const bulkUpdatePipeline = useCallback(async (leadIds, actions) => {
     const data = await api.bulkUpdatePipeline({ leadIds, ...actions })

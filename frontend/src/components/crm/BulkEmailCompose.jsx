@@ -27,6 +27,7 @@ export default function BulkEmailCompose({ leadIds, leads, onDone, compact = fal
   const [error, setError] = useState(null)
   const [notice, setNotice] = useState(null)
   const [result, setResult] = useState(null)
+  const [resumeCampaignId, setResumeCampaignId] = useState(null)
 
   const withEmail = leads.filter((l) => leadIds.includes(l.id) && leadHasSendableEmail(l))
   const missingEmail = leadIds.length - withEmail.length
@@ -100,6 +101,7 @@ export default function BulkEmailCompose({ leadIds, leads, onDone, compact = fal
       const data = await sendBulkEmail(
         {
           leadIds: withEmail.map((l) => l.id),
+          campaignId: resumeCampaignId || undefined,
           cc: cc.trim(),
           agenda: agenda.trim(),
           keyPoints: keyPoints.trim(),
@@ -113,11 +115,19 @@ export default function BulkEmailCompose({ leadIds, leads, onDone, compact = fal
         { onProgress: setSendProgress }
       )
       setResult(data)
+      setResumeCampaignId(null)
       onDone?.(data)
     } catch (e) {
+      if (e.bulkEmailProgress?.campaignId) {
+        setResumeCampaignId(e.bulkEmailProgress.campaignId)
+        const sent = e.bulkEmailProgress.sentCount || 0
+        if (sent > 0) {
+          setNotice(`${sent} email${sent === 1 ? '' : 's'} already sent — click Send again to continue.`)
+        }
+      }
       setError(
-        e.message?.includes('timed out') && useAiPerLead
-          ? `${e.message} AI personalization sends a few leads at a time — please try again; progress is saved for emails already sent.`
+        e.message?.includes('timed out')
+          ? `${e.message} Progress is saved — click Send again to continue from where it stopped.`
           : e.message
       )
     } finally {
@@ -246,8 +256,9 @@ export default function BulkEmailCompose({ leadIds, leads, onDone, compact = fal
             </label>
             {personalizeEach && withEmail.length > batchSize && (
               <p className="text-xs text-[#516f90] bg-[#f5f8fa] rounded-lg px-2 py-1.5">
-                Sends in {batchCount} small batches of up to {batchSize} (AI + email per lead). This may take a
-                few minutes for {withEmail.length} recipients — keep this tab open.
+                AI writes a unique email per lead, then sends from your mailbox — up to {batchSize} per step (
+                {batchCount} step{batchCount === 1 ? '' : 's'} for {withEmail.length} recipients). Progress is
+                saved; you can retry if a step is interrupted.
               </p>
             )}
 
@@ -277,8 +288,8 @@ export default function BulkEmailCompose({ leadIds, leads, onDone, compact = fal
           <>
             <p className="text-xs text-gray-500">
               Same template for every lead — use <code className="text-[11px]">{'{{firstName}}'}</code> or{' '}
-              <code className="text-[11px]">[Name]</code> and each recipient gets their own first name (up to 100
-              per batch). Sends via your connected work or company email.
+              <code className="text-[11px]">[Name]</code> and each recipient gets their own first name (up to 200
+              with email). Sends via your connected work or company email.
             </p>
             <input
               value={subject}
@@ -298,10 +309,26 @@ export default function BulkEmailCompose({ leadIds, leads, onDone, compact = fal
 
         {error && <p className="text-xs text-red-700 bg-red-50 rounded-lg px-2 py-1.5">{error}</p>}
         {busy && sendProgress && (
-          <p className="text-xs text-[#33475b] bg-[#eaf0f6] rounded-lg px-2 py-1.5">
-            Sending batch {sendProgress.chunk} of {sendProgress.totalChunks}
-            {sendProgress.sentSoFar > 0 ? ` · ${sendProgress.sentSoFar} sent so far` : ''}…
-          </p>
+          <div className="text-xs text-[#33475b] bg-[#eaf0f6] rounded-lg px-2 py-2 space-y-1.5">
+            <p>
+              Sending step {sendProgress.chunk} of {sendProgress.totalChunks}
+              {sendProgress.sentSoFar > 0 ? ` · ${sendProgress.sentSoFar} of ${sendProgress.total} sent` : ''}
+              {sendProgress.failedSoFar > 0 ? ` · ${sendProgress.failedSoFar} failed` : ''}…
+            </p>
+            <div className="h-1.5 rounded-full bg-[#cbd6e2] overflow-hidden">
+              <div
+                className="h-full bg-[#00a4bd] transition-all duration-300"
+                style={{
+                  width: `${Math.min(
+                    100,
+                    Math.round(
+                      ((sendProgress.sentSoFar + (sendProgress.failedSoFar || 0)) / sendProgress.total) * 100
+                    )
+                  )}%`,
+                }}
+              />
+            </div>
+          </div>
         )}
         {result && (
           <p className="text-xs text-green-800 bg-green-50 rounded-lg px-2 py-1.5">
