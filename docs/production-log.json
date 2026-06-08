@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-08T14:45:36.192Z",
-  "updatedAtIst": "08/06/2026, 20:15:36",
+  "updatedAt": "2026-06-08T14:54:40.874Z",
+  "updatedAtIst": "08/06/2026, 20:24:40",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "455806b",
+  "currentProductionCommit": "98298dc",
   "entries": [
+    {
+      "logId": "20260608-2024-98298dc",
+      "commit": "98298dc",
+      "commitFull": "98298dc52d95e61aa5f2e9e4ff28eb8c31071f36",
+      "message": "Use Monday-based calendar weeks and local timezone for periods and dates.",
+      "deployedAt": "2026-06-08T14:54:27.670Z",
+      "deployedAtIst": "08/06/2026, 20:24:27",
+      "committedAtIst": "08/06/2026, 20:23:56",
+      "vercelPreviewUrl": "https://connect-intel-mb53ve6j6-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 98298dc"
+    },
+    {
+      "logId": "20260608-2016-d810ae7",
+      "commit": "d810ae7",
+      "commitFull": "d810ae7946b57ffe67ee78d1fda97a7f3b0ee2ac",
+      "message": "Update production log for 455806b activity pagination deploy.",
+      "deployedAt": "2026-06-08T14:46:09.635Z",
+      "deployedAtIst": "08/06/2026, 20:16:09",
+      "committedAtIst": "08/06/2026, 20:15:41",
+      "vercelPreviewUrl": "https://connect-intel-3nxlepyay-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- d810ae7"
+    },
     {
       "logId": "20260608-2015-455806b",
       "commit": "455806b",
@@ -15,7 +43,7 @@
       "committedAtIst": "08/06/2026, 20:14:54",
       "vercelPreviewUrl": "https://connect-intel-kwinca27d-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 455806b"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 0eecdb0"
-    },
-    {
-      "logId": "20260608-1357-c4a59d7",
-      "commit": "c4a59d7",
-      "commitFull": "c4a59d730b256f535f47cbdaa54c147b717844f9",
-      "message": "Log production deploy bd56469 (activity log dedupe fix).",
-      "deployedAt": "2026-06-08T08:27:53.615Z",
-      "deployedAtIst": "08/06/2026, 13:57:53",
-      "committedAtIst": "08/06/2026, 13:57:25",
-      "vercelPreviewUrl": "https://connect-intel-1ebulsvt1-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- c4a59d7"
-    },
-    {
-      "logId": "20260608-1357-bd56469",
-      "commit": "bd56469",
-      "commitFull": "bd56469248005e7c5160b1b1690decee46105625",
-      "message": "Fix duplicate activities in log and dashboard after shard merge.",
-      "deployedAt": "2026-06-08T08:27:02.492Z",
-      "deployedAtIst": "08/06/2026, 13:57:02",
-      "committedAtIst": "08/06/2026, 13:56:34",
-      "vercelPreviewUrl": "https://connect-intel-13g2yndve-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- bd56469"
     }
   ]
 }

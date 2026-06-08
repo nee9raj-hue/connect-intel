@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 925bced
+npm run prod:rollback -- d810ae7
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 925bced
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `455806b` |
-| Log updated (IST) | 08/06/2026, 20:15:36 |
+| Commit | `98298dc` |
+| Log updated (IST) | 08/06/2026, 20:24:40 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 925bced
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 08/06/2026, 20:15:21 | `455806b` | Paginate Team Intelligence detailed activity to five rows with load more. | [preview](https://connect-intel-kwinca27d-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 455806b` | **← LIVE**
+| 08/06/2026, 20:24:27 | `98298dc` | Use Monday-based calendar weeks and local timezone for periods and dates. | [preview](https://connect-intel-mb53ve6j6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 98298dc` | **← LIVE**
+| 08/06/2026, 20:16:09 | `d810ae7` | Update production log for 455806b activity pagination deploy. | [preview](https://connect-intel-3nxlepyay-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d810ae7` |
+| 08/06/2026, 20:15:21 | `455806b` | Paginate Team Intelligence detailed activity to five rows with load more. | [preview](https://connect-intel-kwinca27d-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 455806b` |
 | 08/06/2026, 20:05:56 | `925bced` | Update production log for b3a9f3b Team Intelligence upgrade deploy. | [preview](https://connect-intel-mwbftfxs4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 925bced` |
 | 08/06/2026, 20:05:03 | `b3a9f3b` | Upgrade Team Intelligence with filter counts, roster selection, and activity detail modals. | [preview](https://connect-intel-3jifbmn2c-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b3a9f3b` |
 | 08/06/2026, 19:48:42 | `3a03a29` | Add full Team Intelligence page for manager rep reviews. | [preview](https://connect-intel-6wqix7pis-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3a03a29` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 925bced
 | 08/06/2026, 14:42:00 | `c61fe98` | Log production deploy 8d704f3 (navigation and reporting drill-downs). | [preview](https://connect-intel-ipgy2qk9f-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c61fe98` |
 | 08/06/2026, 14:40:53 | `8d704f3` | Fix navigation bugs and wire dashboard reporting drill-downs. | [preview](https://connect-intel-9imc52u6c-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8d704f3` |
 | 08/06/2026, 14:06:11 | `0eecdb0` | Fix pipeline bulk email creating duplicate campaigns per batch. | [preview](https://connect-intel-phn0l8g2k-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0eecdb0` |
-| 08/06/2026, 13:57:53 | `c4a59d7` | Log production deploy bd56469 (activity log dedupe fix). | [preview](https://connect-intel-1ebulsvt1-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c4a59d7` |
-| 08/06/2026, 13:57:02 | `bd56469` | Fix duplicate activities in log and dashboard after shard merge. | [preview](https://connect-intel-13g2yndve-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- bd56469` |
 
 ---
 
