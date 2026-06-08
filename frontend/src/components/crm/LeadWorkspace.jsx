@@ -22,7 +22,13 @@ import {
 import TeamParticipantPicker from './TeamParticipantPicker'
 import LeadTagsEditor from './LeadTagsEditor'
 import CrmEmailThread from './CrmEmailThread'
-import { buildUnifiedTimeline, formatDealValue, timelineTypeLabel } from '../../lib/crmTimeline'
+import {
+  buildUnifiedTimeline,
+  filterTimelineItems,
+  formatDealValue,
+  timelineTypeLabel,
+  TIMELINE_FILTERS,
+} from '../../lib/crmTimeline'
 import { hasWorkspaceFeature } from '../../lib/workspaceFeatures'
 import FieldVisitRecordForm from './FieldVisitRecordForm'
 import LeadDealsSection from './LeadDealsSection'
@@ -142,6 +148,8 @@ export default function LeadWorkspace({
   const [enrollSequenceId, setEnrollSequenceId] = useState('')
   const [fieldVisitSettings, setFieldVisitSettings] = useState(DEFAULT_FIELD_VISIT_EXPENSE_SETTINGS)
   const [editingVisitMeetingId, setEditingVisitMeetingId] = useState(null)
+  const [timelineFilter, setTimelineFilter] = useState('all')
+  const [marketingTimeline, setMarketingTimeline] = useState([])
 
   const isManager = user?.isOrgAdmin || user?.orgRole === 'org_admin'
   const canAssignThisLead =
@@ -150,7 +158,10 @@ export default function LeadWorkspace({
   const canScheduleForTeam = isManager || canAssignThisLead
   const fieldVisitExpensesEnabled = hasWorkspaceFeature(user, 'fieldVisitExpenses')
   const crm = lead.crm || {}
-  const timeline = buildUnifiedTimeline(crm)
+  const timeline = useMemo(
+    () => filterTimelineItems(buildUnifiedTimeline(crm, { marketingEvents: marketingTimeline }), timelineFilter),
+    [crm, marketingTimeline, timelineFilter]
+  )
   const statusMeta = getStatusMeta(status)
   const saving = savingScope !== null
   const savingTask = savingScope === 'task'
@@ -205,6 +216,14 @@ export default function LeadWorkspace({
       .then((data) => setWaTemplates(data.templates || []))
       .catch(() => setWaTemplates([]))
   }, [tab])
+
+  useEffect(() => {
+    if (tab !== 'notes') return
+    api
+      .getCrmLeadTimeline(lead.id)
+      .then((data) => setMarketingTimeline(data.marketingEvents || []))
+      .catch(() => setMarketingTimeline([]))
+  }, [tab, lead.id])
 
   useEffect(() => {
     if (tab !== 'email') return undefined
@@ -1031,7 +1050,22 @@ export default function LeadWorkspace({
             </section>
             <section>
               <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Unified timeline</h3>
-              <p className="text-xs text-gray-400 mb-2">Emails, calls, tasks, meetings, and notes in one place.</p>
+              <div className="flex flex-wrap gap-1.5 mb-3">
+                {TIMELINE_FILTERS.map((f) => (
+                  <button
+                    key={f.id}
+                    type="button"
+                    onClick={() => setTimelineFilter(f.id)}
+                    className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${
+                      timelineFilter === f.id
+                        ? 'bg-[#fff4ee] border-[#ffd4b8] text-[#FF773D]'
+                        : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
               <ul className="space-y-2 max-h-[50vh] overflow-y-auto">
                 {timeline.map((item) => (
                   <li key={item.id} className="text-xs border rounded-lg p-2.5 bg-gray-50">

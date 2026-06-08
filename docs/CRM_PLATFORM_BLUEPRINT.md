@@ -303,13 +303,15 @@ Every list view should support:
 - [x] Design system tokens
 - [ ] Cursor rule for agents
 
-### Phase 1 — CRM depth (4–6 weeks)
+### Phase 1 — CRM depth (shipped)
 
-- Companies hub (account view)
-- Org-custom pipeline stages
-- Timeline filters + marketing events on lead timeline
-- Org-shared saved views
-- Hook all automation triggers (lead created, deal won)
+- [x] Companies hub (account view aggregated from pipeline)
+- [x] Org-custom pipeline stages (multiple pipelines per workspace)
+- [x] CRM visual workflow builder (AutomationCanvas mode)
+- [x] Timeline filters + marketing events on lead timeline
+- [x] Configurable lead scoring (org-defined point rules)
+- [ ] Org-shared saved views
+- [ ] Hook deal-won automation triggers
 
 ### Phase 2 — Workflow unification (4–6 weeks)
 

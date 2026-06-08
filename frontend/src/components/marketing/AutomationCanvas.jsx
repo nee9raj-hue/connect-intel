@@ -23,6 +23,12 @@ function snapId(prefix) {
   return `${prefix}_${Math.random().toString(36).slice(2, 8)}`
 }
 
+const CRM_ACTIONS = [
+  { id: 'add_task', label: 'Create task' },
+  { id: 'add_note', label: 'Add note' },
+  { id: 'set_status', label: 'Set status' },
+]
+
 export default function AutomationCanvas({
   graph,
   onChange,
@@ -30,6 +36,8 @@ export default function AutomationCanvas({
   triggerType = 'contact_added',
   campaignId = '',
   delayDays = 0,
+  mode = 'marketing',
+  pipelineStages = [],
 }) {
   const initial = graph?.nodes?.length ? graph : DEFAULT_GRAPH
   const [localGraph, setLocalGraph] = useState(initial)
@@ -83,7 +91,9 @@ export default function AutomationCanvas({
         type === 'delay'
           ? { delayDays }
           : type === 'action'
-            ? { action: 'send_email', campaignId }
+            ? mode === 'crm'
+              ? { action: 'add_task', title: 'Follow up', dueDays: 1 }
+              : { action: 'send_email', campaignId }
             : type === 'trigger'
               ? { type: triggerType }
               : { type: 'lead_stage', value: 'new' },
@@ -146,7 +156,67 @@ export default function AutomationCanvas({
             >
               <span className="automation-canvas-node-type">{node.type}</span>
               <span className="automation-canvas-node-label">{node.label}</span>
-              {node.type === 'action' && (
+              {node.type === 'action' && mode === 'crm' && (
+                <>
+                  <select
+                    className="automation-canvas-node-select"
+                    value={node.config?.action || 'add_task'}
+                    onChange={(e) => {
+                      sync({
+                        ...localGraph,
+                        nodes: nodes.map((n) =>
+                          n.id === node.id ? { ...n, config: { ...n.config, action: e.target.value } } : n
+                        ),
+                      })
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {CRM_ACTIONS.map((a) => (
+                      <option key={a.id} value={a.id}>
+                        {a.label}
+                      </option>
+                    ))}
+                  </select>
+                  {(node.config?.action === 'add_task' || !node.config?.action) && (
+                    <input
+                      className="automation-canvas-node-input"
+                      placeholder="Task title"
+                      value={node.config?.title || ''}
+                      onChange={(e) => {
+                        sync({
+                          ...localGraph,
+                          nodes: nodes.map((n) =>
+                            n.id === node.id ? { ...n, config: { ...n.config, title: e.target.value } } : n
+                          ),
+                        })
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  )}
+                  {node.config?.action === 'set_status' && (
+                    <select
+                      className="automation-canvas-node-select"
+                      value={node.config?.status || 'follow_up'}
+                      onChange={(e) => {
+                        sync({
+                          ...localGraph,
+                          nodes: nodes.map((n) =>
+                            n.id === node.id ? { ...n, config: { ...n.config, status: e.target.value } } : n
+                          ),
+                        })
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {pipelineStages.map((s) => (
+                        <option key={s.id} value={s.id}>
+                          {s.label}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </>
+              )}
+              {node.type === 'action' && mode !== 'crm' && (
                 <select
                   className="automation-canvas-node-select"
                   value={node.config?.campaignId || campaignId || ''}

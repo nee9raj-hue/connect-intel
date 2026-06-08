@@ -250,6 +250,9 @@ export function buildCustomerNavSections(
           ? [{ id: 'active-customers', label: 'Active customers', icon: 'chart', panel: 'active-customers' }]
           : []),
         { id: 'contacts', label: 'Contacts', icon: 'people', panel: 'contacts' },
+        ...(isCompany
+          ? [{ id: 'companies', label: 'Companies', icon: 'chart', panel: 'companies' }]
+          : []),
         { id: 'marketing', label: 'Marketing', icon: 'mail', children: marketingChildren },
         { id: 'calendar', label: 'Calendar', icon: 'calendar', children: calendarChildren },
         ...(automationChildren.length

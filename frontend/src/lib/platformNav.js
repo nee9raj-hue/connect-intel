@@ -61,6 +61,13 @@ export const QUICK_ACTIONS = [
     options: { tab: 'campaigns' },
   },
   {
+    id: 'qa-companies',
+    label: 'Companies hub',
+    group: 'Quick actions',
+    panel: 'companies',
+    options: {},
+  },
+  {
     id: 'qa-activity',
     label: 'Open activity log',
     group: 'Quick actions',

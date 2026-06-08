@@ -3,6 +3,11 @@ import { createPortal } from 'react-dom'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { formatCrmDate, getStatusMeta, getVisiblePipelineColumns } from '../../lib/crmConstants'
+import {
+  getDefaultPipelineId,
+  getVisiblePipelineColumnsForSettings,
+  pipelinesFromSettings,
+} from '../../lib/crmPipelines'
 import { PipelineIcon, PlusIcon, UploadIcon } from '../ui/icons'
 import LeadWorkspace from './LeadWorkspace'
 import PipelineImportModal from './PipelineImportModal'
@@ -64,7 +69,34 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     orgLeadTags,
   } = useApp()
 
-  const columns = useMemo(() => getVisiblePipelineColumns(user), [user])
+  const [crmSettings, setCrmSettings] = useState(null)
+  const [activePipelineId, setActivePipelineId] = useState('default')
+
+  useEffect(() => {
+    if (user?.accountType !== 'company') return
+    api
+      .getCrmSettings()
+      .then((d) => {
+        setCrmSettings(d.settings)
+        setActivePipelineId(getDefaultPipelineId(d.settings))
+      })
+      .catch(() => {})
+  }, [user?.accountType, user?.id])
+
+  const orgPipelines = useMemo(() => pipelinesFromSettings(crmSettings), [crmSettings])
+  const columns = useMemo(() => {
+    if (crmSettings && user?.accountType === 'company') {
+      return getVisiblePipelineColumnsForSettings(user, crmSettings, activePipelineId)
+    }
+    return getVisiblePipelineColumns(user)
+  }, [user, crmSettings, activePipelineId])
+
+  const pipelineScopedLeads = useMemo(() => {
+    if (!crmSettings?.pipelines?.length || orgPipelines.length <= 1) return savedLeads
+    return (savedLeads || []).filter(
+      (e) => (e.crm?.pipelineId || getDefaultPipelineId(crmSettings)) === activePipelineId
+    )
+  }, [savedLeads, crmSettings, activePipelineId, orgPipelines.length])
   const isMobile = useIsMobile()
   const useMobileFilterSheet = usePipelineFilterMobile()
   const usePipelineNarrow = usePipelineNarrowViewport()
@@ -139,9 +171,9 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   }, [pipelineAssigneeFilter, teamMembers])
 
   const scopedLeads = useMemo(() => {
-    if (!pipelineAssigneeFilter) return savedLeads
-    return savedLeads.filter((l) => leadMatchesAssignee(l, pipelineAssigneeFilter))
-  }, [savedLeads, pipelineAssigneeFilter])
+    if (!pipelineAssigneeFilter) return pipelineScopedLeads
+    return pipelineScopedLeads.filter((l) => leadMatchesAssignee(l, pipelineAssigneeFilter))
+  }, [pipelineScopedLeads, pipelineAssigneeFilter])
 
   const locationOptions = useMemo(() => {
     const fromLoaded = collectLocationOptions(scopedLeads)
@@ -356,7 +388,11 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
 
   const filtered = useMemo(() => {
     const base =
-      serverSidePipeline && pipelineAssigneeFilter ? scopedLeads : serverSidePipeline ? savedLeads : scopedLeads
+      serverSidePipeline && pipelineAssigneeFilter
+        ? scopedLeads
+        : serverSidePipeline
+          ? pipelineScopedLeads
+          : scopedLeads
     return applyPipelineFilters(base, {
       status: serverSidePipeline ? 'all' : pipelineStatusFilter,
       cities: serverSidePipeline ? [] : getFilterCities(appliedAdvanced),
@@ -375,7 +411,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     appliedSearch,
     smartViewFilters,
     serverSidePipeline,
-    savedLeads,
+    pipelineScopedLeads,
     pipelineAssigneeFilter,
   ])
 
@@ -785,6 +821,26 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               </button>
             </div>
           </div>
+
+          {orgPipelines.length > 1 && !isDealsView && (
+            <div className="px-4 pb-2 flex flex-wrap items-center gap-2">
+              <span className="text-xs font-semibold text-gray-500">Pipeline</span>
+              {orgPipelines.map((pipe) => (
+                <button
+                  key={pipe.id}
+                  type="button"
+                  onClick={() => setActivePipelineId(pipe.id)}
+                  className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${
+                    activePipelineId === pipe.id
+                      ? 'bg-[#fff4ee] border-[#ffd4b8] text-[#FF773D]'
+                      : 'border-gray-200 text-gray-600'
+                  }`}
+                >
+                  {pipe.name}
+                </button>
+              ))}
+            </div>
+          )}
 
           {showPipelineFilters && !isDealsView && (
             <PipelineFiltersBar

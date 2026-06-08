@@ -17,6 +17,7 @@ import ChithiPanel from '../chithi/ChithiPanel'
 import TeamNotesPanel from '../team/TeamNotesPanel'
 import TeamTasksPanel from '../team/TeamTasksPanel'
 import ContactsPanel from '../contacts/ContactsPanel'
+import CompaniesPanel from '../companies/CompaniesPanel'
 import CrmSequencesPanel from '../crm/CrmSequencesPanel'
 import CrmAutomationPanel from '../crm/CrmAutomationPanel'
 import ActiveCustomersPanel from '../crm/ActiveCustomersPanel'
@@ -37,6 +38,7 @@ const PANELS = {
   'active-customers': ActiveCustomersPanel,
   'field-expenses': FieldExpensesPanel,
   contacts: ContactsPanel,
+  companies: CompaniesPanel,
   chithi: ChithiPanel,
   'team-hub': ChithiPanel,
   'team-notes': ChithiPanel,

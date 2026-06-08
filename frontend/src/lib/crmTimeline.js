@@ -1,12 +1,29 @@
 import { ACTIVITY_LABELS } from './crmUiConstants'
 
-export function buildUnifiedTimeline(crm = {}) {
+export const TIMELINE_FILTERS = [
+  { id: 'all', label: 'All' },
+  { id: 'email', label: 'Email' },
+  { id: 'marketing', label: 'Marketing' },
+  { id: 'meetings', label: 'Meetings' },
+  { id: 'tasks', label: 'Tasks' },
+  { id: 'notes', label: 'Notes' },
+]
+
+function marketingEventTitle(ev) {
+  if (ev.type === 'email_open' || ev.type === 'open') return 'Email opened'
+  if (ev.type === 'link_click' || ev.type === 'click') return 'Link clicked'
+  if (ev.type === 'unsubscribe') return 'Unsubscribed'
+  return ev.type || 'Marketing event'
+}
+
+export function buildUnifiedTimeline(crm = {}, { marketingEvents = [] } = {}) {
   const items = []
 
   for (const act of crm.activities || []) {
     items.push({
       id: act.id,
       kind: 'activity',
+      category: act.type === 'note' ? 'notes' : 'activity',
       type: act.type,
       at: act.createdAt,
       title: act.summary,
@@ -19,6 +36,7 @@ export function buildUnifiedTimeline(crm = {}) {
     items.push({
       id: em.id || `email-${em.sentAt}`,
       kind: 'email',
+      category: 'email',
       type: em.direction === 'inbound' ? 'email_inbound' : 'email',
       at: em.sentAt,
       title: em.subject || '(no subject)',
@@ -31,6 +49,7 @@ export function buildUnifiedTimeline(crm = {}) {
     items.push({
       id: t.id,
       kind: 'task',
+      category: 'tasks',
       type: 'task',
       at: t.createdAt,
       title: t.title,
@@ -42,6 +61,7 @@ export function buildUnifiedTimeline(crm = {}) {
     items.push({
       id: m.id,
       kind: 'meeting',
+      category: 'meetings',
       type: 'meeting',
       at: m.scheduledAt || m.createdAt,
       title: m.title,
@@ -49,9 +69,34 @@ export function buildUnifiedTimeline(crm = {}) {
     })
   }
 
+  for (const ev of marketingEvents || []) {
+    items.push({
+      id: ev.id || `mkt-${ev.createdAt}`,
+      kind: 'marketing',
+      category: 'marketing',
+      type: ev.type === 'open' ? 'email_open' : ev.type === 'click' ? 'link_click' : ev.type,
+      at: ev.createdAt,
+      title: marketingEventTitle(ev),
+      subtitle: ev.url ? String(ev.url).slice(0, 80) : 'Campaign activity',
+      meta: { campaignId: ev.campaignId },
+    })
+  }
+
   return items
     .filter((i) => i.at)
     .sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime())
+}
+
+export function filterTimelineItems(items, filterId) {
+  if (!filterId || filterId === 'all') return items
+  if (filterId === 'email') return items.filter((i) => i.category === 'email')
+  if (filterId === 'marketing') return items.filter((i) => i.category === 'marketing')
+  if (filterId === 'meetings') return items.filter((i) => i.category === 'meetings')
+  if (filterId === 'tasks') return items.filter((i) => i.category === 'tasks')
+  if (filterId === 'notes') {
+    return items.filter((i) => i.category === 'notes' || i.type === 'note')
+  }
+  return items
 }
 
 export function timelineTypeLabel(type) {

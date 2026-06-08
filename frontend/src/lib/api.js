@@ -633,4 +633,12 @@ export const api = {
   processCrmSequences: () => request('/api/crm/sequences?process=1'),
   getCrmSettings: () => request('/api/crm/settings'),
   updateCrmSettings: (payload) => request('/api/crm/settings', { method: 'PATCH', body: payload }),
+  getCompaniesHub: ({ q = '', limit = 50, offset = 0 } = {}) =>
+    request(
+      `/api/companies/hub?q=${encodeURIComponent(q)}&limit=${limit}&offset=${offset}`
+    ),
+  getCompanyDetail: (companyId) =>
+    request(`/api/companies/hub?companyId=${encodeURIComponent(companyId)}`),
+  getCrmLeadTimeline: (leadId) =>
+    request(`/api/crm/lead-timeline?leadId=${encodeURIComponent(leadId)}`),
 }

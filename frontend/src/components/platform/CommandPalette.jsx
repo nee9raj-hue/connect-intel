@@ -6,6 +6,7 @@ import { flattenNavSections, filterNavItems, QUICK_ACTIONS } from '../../lib/pla
 const TYPE_LABELS = {
   lead: 'Lead',
   contact: 'Contact',
+  company: 'Company',
   campaign: 'Campaign',
   deal: 'Deal',
 }
