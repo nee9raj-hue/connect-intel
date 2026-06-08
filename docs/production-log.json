@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-08T17:04:15.182Z",
-  "updatedAtIst": "08/06/2026, 22:34:15",
+  "updatedAt": "2026-06-08T17:09:49.311Z",
+  "updatedAtIst": "08/06/2026, 22:39:49",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "a1a7f83",
+  "currentProductionCommit": "1ddcb03",
   "entries": [
+    {
+      "logId": "20260608-2239-1ddcb03",
+      "commit": "1ddcb03",
+      "commitFull": "1ddcb03c4b4b1b4fd143ca1703f871fe6f072f19",
+      "message": "Fix My Day command bar navigation and deals closing count.",
+      "deployedAt": "2026-06-08T17:09:36.351Z",
+      "deployedAtIst": "08/06/2026, 22:39:36",
+      "committedAtIst": "08/06/2026, 22:39:06",
+      "vercelPreviewUrl": "https://connect-intel-1zmvd7fwg-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 1ddcb03"
+    },
+    {
+      "logId": "20260608-2234-d3711ad",
+      "commit": "d3711ad",
+      "commitFull": "d3711adac5c9a28a152b6519612901cd099dc201",
+      "message": "Update production log for a1a7f83 dashboard scroll fix.",
+      "deployedAt": "2026-06-08T17:04:45.774Z",
+      "deployedAtIst": "08/06/2026, 22:34:45",
+      "committedAtIst": "08/06/2026, 22:34:15",
+      "vercelPreviewUrl": "https://connect-intel-58d4ymt7x-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- d3711ad"
+    },
     {
       "logId": "20260608-2234-a1a7f83",
       "commit": "a1a7f83",
@@ -15,7 +43,7 @@
       "committedAtIst": "08/06/2026, 22:33:33",
       "vercelPreviewUrl": "https://connect-intel-nyjlpdlvz-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- a1a7f83"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 9b9d254"
-    },
-    {
-      "logId": "20260608-2110-03674f8",
-      "commit": "03674f8",
-      "commitFull": "03674f88e8bfaff63338274cd8c066d657a551eb",
-      "message": "Add Phase 2 marketing: canvas automations, A/B, RSS, landing pages, exports.",
-      "deployedAt": "2026-06-08T15:40:34.982Z",
-      "deployedAtIst": "08/06/2026, 21:10:34",
-      "committedAtIst": "08/06/2026, 21:10:01",
-      "vercelPreviewUrl": "https://connect-intel-4rjf31tdx-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 03674f8"
-    },
-    {
-      "logId": "20260608-2102-cb3d8f6",
-      "commit": "cb3d8f6",
-      "commitFull": "cb3d8f6746cba55b663eec7f8f7801894360a82f",
-      "message": "Update production log for 8c6ef7d email marketing deploy.",
-      "deployedAt": "2026-06-08T15:32:31.128Z",
-      "deployedAtIst": "08/06/2026, 21:02:31",
-      "committedAtIst": "08/06/2026, 21:02:03",
-      "vercelPreviewUrl": "https://connect-intel-kbcvto2g4-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- cb3d8f6"
     }
   ]
 }
