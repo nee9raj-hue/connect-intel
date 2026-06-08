@@ -40,13 +40,17 @@ export function getFilterStates(filters) {
   return normalizeLocationFilterList(filters, 'states', 'state')
 }
 
-/** Match lead owner/assignee to a team member id (string-safe). */
+/**
+ * Match a lead to a team member for assignee-scoped views (Team Intelligence drill-down, etc.).
+ * Uses assigned owner when set; unassigned rows fall back to who saved the lead.
+ */
 export function leadMatchesAssignee(lead, assigneeUserId) {
   if (!assigneeUserId) return true
+  if (assigneeUserId === '__unassigned__') return !lead?.assignedToUserId
   const id = String(assigneeUserId)
-  return [lead?.assignedToUserId, lead?.savedByUserId, lead?.userId]
-    .filter(Boolean)
-    .some((v) => String(v) === id)
+  const owner = lead?.assignedToUserId
+  if (owner) return String(owner) === id
+  return [lead?.savedByUserId, lead?.userId].filter(Boolean).some((v) => String(v) === id)
 }
 
 function matchesAnyLocationField(value, filterList) {

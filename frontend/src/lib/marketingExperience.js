@@ -23,8 +23,10 @@ export const TEMPLATE_CATEGORIES = [
   { id: 'all', label: 'All' },
   { id: 'popular', label: 'Popular' },
   { id: 'welcome', label: 'Welcome' },
-  { id: 'promo', label: 'Promotions' },
   { id: 'newsletter', label: 'Newsletter' },
+  { id: 'promo', label: 'Promotions' },
+  { id: 'announcement', label: 'Announcements' },
+  { id: 'event', label: 'Events' },
   { id: 'saved', label: 'Saved' },
   { id: 'recent', label: 'Recent' },
 ]

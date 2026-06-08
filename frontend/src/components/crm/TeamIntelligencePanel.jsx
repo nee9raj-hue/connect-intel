@@ -160,9 +160,15 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
   const navigateAction = useCallback(
     (panel, opts = {}) => {
       if (panel === 'crm-dashboard' || panel === 'team-intelligence' || panel === 'team') return
-      onNavigate?.(panel, { period, userId: opts.userId || activeMemberId || undefined, ...opts })
+      const scopedUserId = opts.userId || activeMemberId || null
+      if (scopedUserId && panel === 'pipeline') setPipelineAssigneeFilter?.(scopedUserId)
+      onNavigate?.(panel, {
+        period,
+        ...opts,
+        ...(scopedUserId ? { userId: scopedUserId, assigneeUserId: scopedUserId } : {}),
+      })
     },
-    [onNavigate, period, activeMemberId]
+    [onNavigate, period, activeMemberId, setPipelineAssigneeFilter]
   )
 
   const handleCenterAction = useCallback(

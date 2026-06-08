@@ -41,8 +41,11 @@ export default function DashboardTeamSnapshot({
   const go = (target) => onNavigate?.(target.panel, target.options || {})
 
   const drill = (panel, options = {}) => {
+    const scoped = assigneeFilter
+      ? { ...options, userId: assigneeFilter, assigneeUserId: assigneeFilter }
+      : options
     if (assigneeFilter) setPipelineAssigneeFilter?.(assigneeFilter)
-    go({ panel, options })
+    go({ panel, options: scoped })
   }
 
   if (loading && !snap) {

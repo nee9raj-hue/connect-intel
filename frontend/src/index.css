@@ -15195,6 +15195,21 @@ html[data-pipeline-mobile="1"] .ci-app-header-chip--secondary {
   font-size: 0.875rem;
 }
 .mkt-marketplace__cats { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.mkt-marketplace__count {
+  font-size: 0.8125rem;
+  color: #64748b;
+  margin: 0 0 0.75rem;
+}
+.mkt-marketplace__empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem 1.5rem;
+  background: #fff;
+  border-radius: var(--mkt-radius);
+  border: 1px dashed #e2e8f0;
+  color: #64748b;
+}
+.mkt-marketplace__empty p { margin: 0 0 1rem; }
 .mkt-marketplace__grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));

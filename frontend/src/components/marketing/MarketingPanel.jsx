@@ -118,6 +118,10 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
   const [campaignWizardStep, setCampaignWizardStep] = useState(0)
   const [templatePhase, setTemplatePhase] = useState('marketplace')
   const [brandKitOpen, setBrandKitOpen] = useState(false)
+  const handleMarketingTabChange = (newTab) => {
+    if (newTab === 'templates') setTemplatePhase('marketplace')
+    setTab(newTab)
+  }
   const isMobile = useIsMobile()
 
   const isBuilderTab = tab === 'campaigns' || tab === 'templates'
@@ -1192,7 +1196,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
       ) : (
         <MarketingHubShell
           tab={tab}
-          onTabChange={setTab}
+          onTabChange={handleMarketingTabChange}
           onNavigate={onNavigate}
           period={hubPeriod}
           onPeriodChange={setHubPeriod}
@@ -1258,6 +1262,8 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
             <MarketingCommandCenter onNavigate={onNavigate} period={hubPeriod} onPeriodChange={setHubPeriod} />
           ) : tab === 'campaigns' ? (
             renderCampaignsTab()
+          ) : tab === 'templates' ? (
+            renderTemplatesTab()
           ) : tab === 'audiences' ? (
             <MarketingAudiencesHub
               initialTab={audienceSubTab}

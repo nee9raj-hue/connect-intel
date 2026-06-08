@@ -130,6 +130,18 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     if (canAssign) refreshTeam?.()
   }, [canAssign, refreshTeam])
 
+  useEffect(() => {
+    if (panelOptions?.userId === undefined) return
+    const id = panelOptions.userId ? String(panelOptions.userId) : null
+    setPipelineAssigneeFilter?.(id)
+  }, [panelOptions?.userId, setPipelineAssigneeFilter])
+
+  const effectiveAssigneeFilter = useMemo(() => {
+    if (pipelineAssigneeFilter) return pipelineAssigneeFilter
+    if (user?.accountType === 'company' && !canAssign && user?.id) return String(user.id)
+    return null
+  }, [pipelineAssigneeFilter, user?.accountType, user?.id, canAssign])
+
   const freightOrg = isFreightDealOrg(user)
   const isDealsView = freightOrg && panelOptions?.view === 'deals'
   const dealsStage = panelOptions?.dealStage || 'all'
@@ -198,15 +210,19 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   }, [bulkNotice])
 
   const assigneeName = useMemo(() => {
-    if (!pipelineAssigneeFilter) return null
-    const m = teamMembers.find((t) => String(t.userId) === String(pipelineAssigneeFilter))
-    return m?.name || 'Team member'
-  }, [pipelineAssigneeFilter, teamMembers])
+    if (!effectiveAssigneeFilter) return null
+    const m = teamMembers.find((t) => String(t.userId) === String(effectiveAssigneeFilter))
+    if (m?.name) return m.name
+    if (String(effectiveAssigneeFilter) === String(user?.id)) {
+      return user?.name || user?.email || 'You'
+    }
+    return 'Team member'
+  }, [effectiveAssigneeFilter, teamMembers, user?.id, user?.name, user?.email])
 
   const scopedLeads = useMemo(() => {
-    if (!pipelineAssigneeFilter) return pipelineScopedLeads
-    return pipelineScopedLeads.filter((l) => leadMatchesAssignee(l, pipelineAssigneeFilter))
-  }, [pipelineScopedLeads, pipelineAssigneeFilter])
+    if (!effectiveAssigneeFilter) return pipelineScopedLeads
+    return pipelineScopedLeads.filter((l) => leadMatchesAssignee(l, effectiveAssigneeFilter))
+  }, [pipelineScopedLeads, effectiveAssigneeFilter])
 
   const locationOptions = useMemo(() => {
     const fromLoaded = collectLocationOptions(scopedLeads)
@@ -317,10 +333,10 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       q: q || undefined,
       cities: getFilterCities(adv).length ? getFilterCities(adv) : undefined,
       states: getFilterStates(adv).length ? getFilterStates(adv) : undefined,
-      assigneeUserId: pipelineAssigneeFilter || undefined,
+      assigneeUserId: effectiveAssigneeFilter || undefined,
       tagIds: adv.tagIds?.length ? adv.tagIds : undefined,
     }),
-    [filter, listStatusFilter, pipelineAssigneeFilter]
+    [filter, listStatusFilter, effectiveAssigneeFilter]
   )
 
   const serverFilters = useMemo(
@@ -421,7 +437,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
 
   const filtered = useMemo(() => {
     const base =
-      serverSidePipeline && pipelineAssigneeFilter
+      serverSidePipeline && effectiveAssigneeFilter
         ? scopedLeads
         : serverSidePipeline
           ? pipelineScopedLeads
@@ -448,7 +464,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     smartViewFilters,
     serverSidePipeline,
     pipelineScopedLeads,
-    pipelineAssigneeFilter,
+    effectiveAssigneeFilter,
   ])
 
   const applySmartView = useCallback((view) => {
@@ -976,7 +992,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
             <div className="p-3 md:p-4">
               <PipelineDealsView
                 dealStage={dealsStage}
-                assigneeFilter={pipelineAssigneeFilter}
+                assigneeFilter={effectiveAssigneeFilter}
                 onOpenLead={openDealFromPipeline}
               />
             </div>

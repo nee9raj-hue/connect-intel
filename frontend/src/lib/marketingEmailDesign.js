@@ -55,7 +55,9 @@ export const MERGE_FIELDS = [
   { token: '{{title}}', label: 'Job title' },
 ]
 
-export const STARTER_TEMPLATES = [
+import { buildExtendedStarterTemplates } from './marketingStarterTemplates.js'
+
+const HANDCRAFTED_STARTER_TEMPLATES = [
   {
     id: 'welcome',
     name: 'Welcome',
@@ -339,6 +341,11 @@ export const STARTER_TEMPLATES = [
       { id: 'f1', type: 'footer' },
     ],
   },
+]
+
+export const STARTER_TEMPLATES = [
+  ...HANDCRAFTED_STARTER_TEMPLATES,
+  ...buildExtendedStarterTemplates(),
 ]
 
 export const PREVIEW_LEAD = {

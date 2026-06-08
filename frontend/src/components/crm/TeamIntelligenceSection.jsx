@@ -150,15 +150,27 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
     }
   }, [data?.memberUserId, intelMemberId])
 
-  const preserveAssignee = () => {}
+  const scopedUserId = memberUserId || activeMemberId || null
 
   const freightOrg = isFreightDealOrg(user)
 
+  const openLeadInPipeline = useCallback(
+    (leadId) => {
+      if (scopedUserId) setPipelineAssigneeFilter?.(scopedUserId)
+      openPipelineLead(leadId)
+      onNavigate?.(
+        'pipeline',
+        scopedUserId ? { userId: scopedUserId, assigneeUserId: scopedUserId } : {}
+      )
+    },
+    [scopedUserId, setPipelineAssigneeFilter, openPipelineLead, onNavigate]
+  )
+
   const drillTo = (nav, options = {}) => {
-    const sharedOpts = memberUserId ? { userId: memberUserId } : {}
+    const sharedOpts = scopedUserId ? { userId: scopedUserId, assigneeUserId: scopedUserId } : {}
 
     if (options.status) {
-      if (memberUserId && nav === 'pipeline') setPipelineAssigneeFilter?.(memberUserId)
+      if (scopedUserId && nav === 'pipeline') setPipelineAssigneeFilter?.(scopedUserId)
       if (nav === 'pipeline' && options.status === 'won' && freightOrg) {
         onNavigate?.('pipeline', { view: 'deals', dealStage: 'won', ...sharedOpts })
         return
@@ -171,7 +183,7 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
       return
     }
     if (nav === 'crm-log') {
-      if (memberUserId) setPipelineAssigneeFilter?.(memberUserId)
+      if (scopedUserId) setPipelineAssigneeFilter?.(scopedUserId)
       onNavigate?.(nav, {
         activityType: options.activityType || null,
         period,
@@ -179,8 +191,8 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
       })
       return
     }
-    if (memberUserId && nav === 'pipeline') {
-      setPipelineAssigneeFilter?.(memberUserId)
+    if (scopedUserId && nav === 'pipeline') {
+      setPipelineAssigneeFilter?.(scopedUserId)
     }
     onNavigate?.(nav, { ...options, ...sharedOpts })
   }
@@ -415,10 +427,7 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
                         <button
                           type="button"
                           className="team-intelligence-recent-row"
-                          onClick={() => {
-                            openPipelineLead(act.leadId)
-                            onNavigate?.('pipeline')
-                          }}
+                          onClick={() => openLeadInPipeline(act.leadId)}
                         >
                           <span className="team-intelligence-recent-row__title">
                             {act.leadName}
@@ -449,10 +458,7 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
                         <button
                           type="button"
                           className="team-intelligence-recent-row"
-                          onClick={() => {
-                            openPipelineLead(act.leadId)
-                            onNavigate?.('pipeline')
-                          }}
+                          onClick={() => openLeadInPipeline(act.leadId)}
                         >
                           <span className="team-intelligence-recent-row__title">
                             {act.leadName}

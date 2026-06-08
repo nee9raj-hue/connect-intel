@@ -49,6 +49,7 @@ export default function AppShell() {
     refreshChithiUnread,
     setClosePipelineLead,
     setPipelineAssigneeFilter,
+    pipelineAssigneeFilter,
   } = useApp()
   const isMobile = useIsMobile()
   const [activePanel, setActivePanel] = useState('overview')
@@ -123,18 +124,32 @@ export default function AppShell() {
     return () => clearTimeout(t)
   }, [liveToast])
 
+  const resolvePanelOptions = useCallback(
+    (panel, options = {}) => {
+      const assigneeId = options.assigneeUserId || options.userId
+      if (assigneeId) return options
+      const scopedPanels = new Set(['pipeline', 'crm-log', 'crm-calendar'])
+      if (scopedPanels.has(panel) && pipelineAssigneeFilter) {
+        return { ...options, userId: pipelineAssigneeFilter }
+      }
+      return options
+    },
+    [pipelineAssigneeFilter]
+  )
+
   const applyLocation = useCallback(
     (location) => {
       const { panel, panelOptions: opts = {}, leadId } = location || {}
+      const resolved = resolvePanelOptions(panel || 'overview', opts)
       setActivePanel(panel || 'overview')
-      setPanelOptions(opts)
+      setPanelOptions(resolved)
       setMobileNavOpen(false)
-      const assigneeId = opts.assigneeUserId || opts.userId
+      const assigneeId = resolved.assigneeUserId || resolved.userId
       if (assigneeId) setPipelineAssigneeFilter(assigneeId)
       if (leadId) openPipelineLead(leadId)
       else setPipelineLeadId(null)
     },
-    [openPipelineLead, setPipelineLeadId, setPipelineAssigneeFilter]
+    [openPipelineLead, setPipelineLeadId, setPipelineAssigneeFilter, resolvePanelOptions]
   )
 
   const commitHistory = useCallback((location, { replace = false } = {}) => {
@@ -205,21 +220,22 @@ export default function AppShell() {
         saveSidebarMode('expanded')
       }
 
-      const assigneeId = options?.assigneeUserId || options?.userId
+      const resolvedOptions = resolvePanelOptions(id, options || {})
+      const assigneeId = resolvedOptions.assigneeUserId || resolvedOptions.userId
       if (assigneeId) setPipelineAssigneeFilter(assigneeId)
 
-      const loc = { panel: id, panelOptions: options || {}, leadId: null }
+      const loc = { panel: id, panelOptions: resolvedOptions, leadId: null }
 
       if (pipelineLeadId) setPipelineLeadId(null)
       setActivePanel(id)
-      setPanelOptions(options || {})
+      setPanelOptions(resolvedOptions)
       setMobileNavOpen(false)
 
       if (!applyingHistoryRef.current && historyReadyRef.current) {
         commitHistory(loc, { replace })
       }
     },
-    [activePanel, sidebarMode, pipelineLeadId, setPipelineLeadId, setPipelineAssigneeFilter, commitHistory]
+    [activePanel, sidebarMode, pipelineLeadId, setPipelineLeadId, setPipelineAssigneeFilter, commitHistory, resolvePanelOptions]
   )
 
   useEffect(() => {
