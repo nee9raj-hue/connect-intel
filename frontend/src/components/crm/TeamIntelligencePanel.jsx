@@ -1,19 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
-import LoadingExperience from '../ui/LoadingExperience'
-import { LOADING_MESSAGES } from '../../lib/loadingQuotes'
-import { formatDealValue } from '../../lib/crmTimeline'
-import {
-  DashboardSegmented,
-  DashboardEmpty,
-} from '../dashboard/dashboardUi'
-import {
-  formatDelta,
-  formatHours,
-  timelineTypeLabel,
-} from '../../lib/teamIntelligenceConstants'
-import { formatDateTime } from '../../lib/crmUiConstants'
+import { DashboardSegmented } from '../dashboard/dashboardUi'
 import {
   TIMELINE_FILTERS,
   countTimelineFilters,
@@ -22,132 +10,31 @@ import {
 import { saveTeamIntelReturn } from '../../lib/teamIntelReturn'
 import TeamIntelligenceDetailModal from './TeamIntelligenceDetailModal'
 import {
-  Sparkline,
-  HealthRadial,
-  TrendLineChart,
-  PipelineFunnelChart,
-  WorkloadDistributionChart,
-  AdoptionScoreChart,
-} from './TeamIntelligenceCharts'
+  CommandBarMetric,
+  InsightsCarousel,
+  PerformanceMatrix,
+  PipelineHealthFunnel,
+  RevenueLeakGrid,
+  CapacityChart,
+  AdoptionPanel,
+  EffectivenessGrid,
+  ActionCenterPanel,
+  ActivityFeed,
+  SkeletonBlock,
+} from './TeamIntelligenceV3Charts'
 
-const TIMELINE_PAGE_SIZE = 5
+const TIMELINE_PAGE_SIZE = 8
 
-const BADGE_LABELS = {
-  top: 'Top performer',
-  rising: 'Rising star',
-  attention: 'Needs attention',
-}
-
-const INSIGHT_ICONS = {
-  highlight: '↑',
-  risk: '!',
-}
-
-const KPI_COLORS = {
-  revenue: '#516f90',
-  newLeads: '#00a4bd',
-  followUps: '#f5c518',
-  activeDeals: '#7c3aed',
-  calls: '#ff7a59',
-  meetings: '#25d366',
-  responses: '#00a4bd',
-  activityScore: '#e85d75',
-}
-
-function formatKpiValue(kpi) {
-  if (kpi.format === 'currency') return formatDealValue(kpi.value)
-  if (kpi.format === 'score') return `${kpi.value}`
-  return (kpi.value ?? 0).toLocaleString()
-}
-
-function deltaTone(delta) {
-  if (delta == null || Number.isNaN(delta)) return 'neutral'
-  if (delta > 0) return 'up'
-  if (delta < 0) return 'down'
-  return 'neutral'
-}
-
-function ExecutiveKpiCard({ kpi }) {
-  const tone = deltaTone(kpi.delta)
-  return (
-    <article className={`ti2-kpi ti2-kpi--${kpi.id}`}>
-      <div className="ti2-kpi__top">
-        <span className="ti2-kpi__label">{kpi.label}</span>
-        {kpi.delta != null ? (
-          <span className={`ti2-kpi__delta ti2-kpi__delta--${tone}`}>{formatDelta(kpi.delta)}</span>
-        ) : null}
-      </div>
-      <div className="ti2-kpi__value-row">
-        <span className="ti2-kpi__value">
-          {formatKpiValue(kpi)}
-          {kpi.format === 'score' ? <span className="ti2-kpi__suffix">/100</span> : null}
-        </span>
-        <Sparkline data={kpi.spark} color={KPI_COLORS[kpi.id] || '#00a4bd'} />
-      </div>
-    </article>
+function useIsMobile(breakpoint = 768) {
+  const [mobile, setMobile] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth < breakpoint : false
   )
-}
-
-function LeaderboardTable({ rows = [], onSelectRep, showAdoption = false }) {
-  if (!rows.length) return <DashboardEmpty>No team activity this period.</DashboardEmpty>
-
-  return (
-    <div className="ti2-leaderboard-wrap">
-      <table className="ti2-leaderboard">
-        <thead>
-          <tr>
-            <th>Rep</th>
-            <th>Activity</th>
-            <th>Calls</th>
-            <th>Emails</th>
-            <th>Meetings</th>
-            <th>Leads</th>
-            <th>Deals</th>
-            <th>Win %</th>
-            <th>CRM time</th>
-            {showAdoption ? <th>Adoption</th> : null}
-            <th>Health</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <tr key={row.userId} className={row.badge === 'attention' ? 'ti2-leaderboard__row--risk' : ''}>
-              <td>
-                <button type="button" className="ti2-leaderboard__rep" onClick={() => onSelectRep?.(row.userId)}>
-                  <span className="ti2-leaderboard__name">{row.name}</span>
-                  {row.badge ? (
-                    <span className={`ti2-badge ti2-badge--${row.badge}`}>{BADGE_LABELS[row.badge]}</span>
-                  ) : null}
-                </button>
-              </td>
-              <td>
-                <span className="ti2-score-pill">{row.activityScore}</span>
-              </td>
-              <td>{row.calls}</td>
-              <td>{row.emails}</td>
-              <td>{row.meetings}</td>
-              <td>{row.newLeads}</td>
-              <td>{row.activeDeals}</td>
-              <td>{row.winRate != null ? `${row.winRate}%` : '—'}</td>
-              <td>{formatHours(row.crmTimeHours)}</td>
-              {showAdoption ? (
-                <td>
-                  <span className={`ti2-adoption-pill${row.adoptionScore >= 65 ? ' is-good' : row.adoptionScore >= 40 ? ' is-warn' : ' is-risk'}`}>
-                    {row.adoptionScore}
-                  </span>
-                </td>
-              ) : null}
-              <td>
-                <span className={`ti2-health-pill${row.healthScore >= 70 ? ' is-good' : row.healthScore >= 45 ? ' is-warn' : ' is-risk'}`}>
-                  {row.healthScore}
-                </span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  )
+  useEffect(() => {
+    const onResize = () => setMobile(window.innerWidth < breakpoint)
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [breakpoint])
+  return mobile
 }
 
 export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, isActive = true }) {
@@ -156,16 +43,18 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
   const [memberUserId, setMemberUserId] = useState(panelOptions?.userId || '')
   const [timelineFilter, setTimelineFilter] = useState(panelOptions?.timelineFilter || 'all')
   const [timelineVisible, setTimelineVisible] = useState(TIMELINE_PAGE_SIZE)
-  const [timelineOpen, setTimelineOpen] = useState(false)
+  const [expandedFeedId, setExpandedFeedId] = useState(null)
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false)
   const [detailItem, setDetailItem] = useState(null)
   const scrollRef = useRef(null)
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const isMobile = useIsMobile()
 
   const intel = data?.teamIntelligence
-  const v2 = data?.intelligenceV2
-  const isManagerView = Boolean(v2?.isManagerView ?? (data?.isAdmin && !data?.memberUserId))
+  const v3 = data?.intelligenceV3
+  const isManagerView = Boolean(v3?.isManagerView ?? (data?.isAdmin && !data?.memberUserId))
 
   const memberOptions = useMemo(() => {
     if (data?.memberOptions?.length) return data.memberOptions
@@ -218,12 +107,16 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
     if (panelOptions?.timelineFilter) setTimelineFilter(panelOptions.timelineFilter)
   }, [panelOptions?.userId, panelOptions?.period, panelOptions?.timelineFilter])
 
-  const selectMember = (uid) => {
-    const id = uid ? String(uid) : ''
-    setMemberUserId(id)
-    setPipelineAssigneeFilter?.(id || null)
-    setTimelineFilter('all')
-  }
+  const selectMember = useCallback(
+    (uid) => {
+      const id = uid ? String(uid) : ''
+      setMemberUserId(id)
+      setPipelineAssigneeFilter?.(id || null)
+      setTimelineFilter('all')
+      setFilterDrawerOpen(false)
+    },
+    [setPipelineAssigneeFilter]
+  )
 
   const timelineCounts = useMemo(
     () => countTimelineFilters(data?.activityTimeline || []),
@@ -244,6 +137,7 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
 
   useEffect(() => {
     setTimelineVisible(TIMELINE_PAGE_SIZE)
+    setExpandedFeedId(null)
   }, [period, memberUserId, timelineFilter, data?.activityTimeline])
 
   const openInCrm = useCallback(
@@ -263,338 +157,278 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
     [period, activeMemberId, timelineFilter, openPipelineLead, onNavigate]
   )
 
-  const handleAction = useCallback(
-    (action) => {
-      if (!action) return
-      if (action.action === 'pipeline') {
-        onNavigate?.('pipeline', { status: action.filter || 'all', view: action.view })
-      } else if (action.action === 'crm-log') {
-        onNavigate?.('crm-log', { period, userId: activeMemberId || undefined })
-      } else if (action.action === 'coaching' && action.userIds?.[0]) {
-        selectMember(action.userIds[0])
-      }
+  const navigateAction = useCallback(
+    (panel, opts = {}) => {
+      if (panel === 'crm-dashboard' || panel === 'team-intelligence' || panel === 'team') return
+      onNavigate?.(panel, { period, userId: opts.userId || activeMemberId || undefined, ...opts })
     },
     [onNavigate, period, activeMemberId]
   )
 
-  const periodLabel = intel?.periodLabel || period
-  const leaderboardRows = useMemo(() => {
-    const rows = v2?.leaderboard || []
+  const handleCenterAction = useCallback(
+    (item, act) => {
+      const panel = act.panel || 'pipeline'
+      if (panel === 'coaching' && item.userIds?.[0]) {
+        selectMember(item.userIds[0])
+        return
+      }
+      navigateAction(panel, {
+        status: act.status || item.filter,
+        view: act.view || item.view,
+        userId: item.userIds?.[0],
+      })
+    },
+    [navigateAction, selectMember]
+  )
+
+  const handleLeak = useCallback(
+    (leakId) => {
+      const map = {
+        not_contacted: { panel: 'pipeline', status: 'new' },
+        inactive_deals: { panel: 'pipeline', view: 'deals' },
+        missing_step: { panel: 'pipeline', status: 'follow_up' },
+        overdue_tasks: { panel: 'crm-log' },
+        inactive_reps: { panel: 'crm-dashboard' },
+      }
+      const target = map[leakId]
+      if (target) navigateAction(target.panel, target)
+    },
+    [navigateAction]
+  )
+
+  const matrixRows = useMemo(() => {
+    const rows = v3?.performanceMatrix || []
     if (activeMemberId) return rows.filter((r) => String(r.userId) === String(activeMemberId))
     return rows
-  }, [v2?.leaderboard, activeMemberId])
+  }, [v3?.performanceMatrix, activeMemberId])
+
+  const winning =
+    (v3?.commandBar?.find((m) => m.id === 'teamHealth')?.value ?? 0) >= 60 &&
+    (v3?.commandBar?.find((m) => m.id === 'pipeline')?.status ?? 'risk') !== 'risk'
 
   if (!isActive) return null
 
+  const filterControls = (
+    <>
+      {isManagerView && memberOptions.length > 0 ? (
+        <label className="ti3-filter-field">
+          <span className="sr-only">Team member</span>
+          <select value={activeMemberId || ''} onChange={(e) => selectMember(e.target.value)}>
+            <option value="">All team</option>
+            {memberOptions.map((m) => (
+              <option key={m.userId} value={m.userId}>
+                {m.name}
+              </option>
+            ))}
+          </select>
+        </label>
+      ) : null}
+      <DashboardSegmented
+        value={period}
+        onChange={setPeriod}
+        options={[
+          { value: 'day', label: 'Today' },
+          { value: 'week', label: '7d' },
+          { value: 'month', label: '30d' },
+        ]}
+      />
+    </>
+  )
+
   return (
-    <div className="panel-shell team-intel-page team-intel-page--v2">
-      <header className="team-intel-page__header ti2-header shrink-0">
-        <div className="team-intel-page__header-main">
-          <h1 className="team-intel-page__title">Team intelligence</h1>
-          <p className="team-intel-page__subtitle">
-            {isManagerView && !activeMemberId
-              ? 'Performance → Risks → Insights → Actions'
-              : activeMemberId
-                ? `${memberName} — personal performance workspace`
-                : 'Your CRM performance pulse'}
-          </p>
-        </div>
-        <div className="team-intel-page__header-actions ti2-header__actions">
-          {isManagerView && memberOptions.length > 0 ? (
-            <label className="ti2-filter-select">
-              <span className="sr-only">Filter by rep</span>
-              <select
-                value={activeMemberId || ''}
-                onChange={(e) => selectMember(e.target.value)}
-              >
-                <option value="">All team</option>
-                {memberOptions.map((m) => (
-                  <option key={m.userId} value={m.userId}>
-                    {m.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-          ) : null}
-          <DashboardSegmented
-            value={period}
-            onChange={setPeriod}
-            options={[
-              { value: 'day', label: 'Today' },
-              { value: 'week', label: '7 days' },
-              { value: 'month', label: '30 days' },
-            ]}
-          />
+    <div className="panel-shell team-intel-page team-intel-page--v3">
+      <div ref={scrollRef} className="ti3-scroll panel-body-scroll">
+        {/* Minimal page chrome — secondary to command bar */}
+        <div className="ti3-chrome">
+          <div className="ti3-chrome__title">
+            <h1>Team intelligence</h1>
+            <p className={`ti3-chrome__pulse${winning ? ' is-winning' : ' is-risk'}`}>
+              {winning ? 'On target' : 'Needs attention'}
+              {activeMemberId && memberName ? ` · ${memberName}` : ''}
+            </p>
+          </div>
+          <div className="ti3-chrome__controls ti3-chrome__controls--desktop">{filterControls}</div>
           <button
             type="button"
-            className="crm-btn crm-btn-secondary crm-btn-sm"
-            onClick={load}
-            disabled={loading}
+            className="ti3-chrome__filters-btn"
+            onClick={() => setFilterDrawerOpen(true)}
+            aria-label="Open filters"
           >
-            Refresh
-          </button>
-          <button type="button" className="crm-btn crm-btn-secondary crm-btn-sm" onClick={() => onNavigate?.('overview')}>
-            Dashboard
+            Filters
           </button>
         </div>
-      </header>
 
-      <div ref={scrollRef} className="team-intel-page__body panel-body-scroll ti2-body">
         {error ? (
-          <p className="text-sm text-red-800 bg-red-50 border border-red-200 rounded-xl px-3 py-2 font-medium mb-4">
-            {error}
-          </p>
+          <p className="ti3-error">{error}</p>
         ) : null}
 
         {loading && !data ? (
-          <LoadingExperience
-            message={LOADING_MESSAGES.team}
-            fill={false}
-            className="rounded-2xl border border-[#dde3ea] min-h-[240px] bg-white"
-          />
+          <div className="ti3-cockpit ti3-cockpit--loading">
+            <div className="ti3-cmd-strip">{[1, 2, 3, 4, 5, 6].map((i) => <SkeletonBlock key={i} className="ti3-skeleton--cmd" />)}</div>
+            <SkeletonBlock className="ti3-skeleton--insights" />
+            <SkeletonBlock className="ti3-skeleton--panel" />
+          </div>
         ) : (
-          <div className="ti2-dashboard">
-            {loading ? (
-              <p className="ti2-updating" role="status">
-                Updating…
-              </p>
-            ) : null}
-
-            {/* SECTION 1 — Executive summary */}
-            <section className="ti2-section ti2-kpi-strip" aria-label="Executive summary">
-              <div className="ti2-kpi-grid">
-                {(v2?.executiveKpis || []).map((kpi) => (
-                  <ExecutiveKpiCard key={kpi.id} kpi={kpi} />
-                ))}
-              </div>
+          <div className="ti3-cockpit">
+            {/* SECTION 1 — Executive command bar (sticky) */}
+            <section className="ti3-cmd-strip" aria-label="Executive command bar">
+              {(v3?.commandBar || []).map((metric) => (
+                <CommandBarMetric key={metric.id} metric={metric} />
+              ))}
             </section>
 
-            {/* SECTION 2 + 5 — Health + Insights */}
-            <div className="ti2-split ti2-split--health">
-              <section className="ti2-card ti2-card--health" aria-label="Team health">
-                <div className="ti2-card__head">
-                  <h2 className="ti2-card__title">Team health</h2>
-                  <p className="ti2-card__sub">Are we on track?</p>
-                </div>
-                <HealthRadial
-                  score={v2?.teamHealth?.overall ?? 0}
-                  factors={v2?.teamHealth?.factors || []}
+            {/* SECTION 2 — AI insights */}
+            <section className="ti3-panel ti3-panel--insights" aria-label="Intelligence insights">
+              <header className="ti3-panel__head">
+                <h2>Insights</h2>
+                <span className="ti3-panel__tag">AI intelligence</span>
+              </header>
+              {loading ? <SkeletonBlock className="ti3-skeleton--insights" /> : (
+                <InsightsCarousel
+                  insights={v3?.insights}
+                  onSelect={(userId, action) => {
+                    if (userId) selectMember(userId)
+                    else if (action?.panel) navigateAction(action.panel, { status: action.status })
+                  }}
                 />
+              )}
+            </section>
+
+            <div className="ti3-grid">
+              {/* SECTION 3 — Performance matrix */}
+              <section className="ti3-panel ti3-span-12" aria-label="Team performance matrix">
+                <header className="ti3-panel__head">
+                  <h2>{activeMemberId ? 'Your performance' : 'Team performance'}</h2>
+                  <p>Who is strong — who needs coaching</p>
+                </header>
+                <PerformanceMatrix rows={matrixRows} onSelectRep={selectMember} mobile={isMobile} />
               </section>
 
-              <section className="ti2-card ti2-card--insights" aria-label="Team insights">
-                <div className="ti2-card__head">
-                  <h2 className="ti2-card__title">Insights</h2>
-                  <p className="ti2-card__sub">{periodLabel}</p>
-                </div>
-                {(v2?.insights || []).length ? (
-                  <ul className="ti2-insights">
-                    {v2.insights.map((insight, i) => (
-                      <li key={i}>
-                        <button
-                          type="button"
-                          className={`ti2-insight ti2-insight--${insight.kind || 'highlight'}`}
-                          onClick={() => insight.userId && selectMember(insight.userId)}
-                        >
-                          <span className="ti2-insight__icon" aria-hidden>
-                            {INSIGHT_ICONS[insight.kind] || '•'}
-                          </span>
-                          <span className="ti2-insight__text">{insight.text}</span>
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <DashboardEmpty>No insights for this period yet.</DashboardEmpty>
-                )}
+              {/* SECTION 4 — Pipeline health */}
+              <section className="ti3-panel ti3-span-7" aria-label="Pipeline health">
+                <header className="ti3-panel__head">
+                  <h2>Pipeline health</h2>
+                  <p>Volume, conversion, and bottlenecks</p>
+                </header>
+                <PipelineHealthFunnel pipeline={v3?.pipelineHealth} />
+              </section>
+
+              {/* SECTION 5 — Revenue leak detector */}
+              <section className="ti3-panel ti3-span-5 ti3-panel--risk" aria-label="Revenue leak detector">
+                <header className="ti3-panel__head">
+                  <h2>Revenue leaks</h2>
+                  <p>Action required</p>
+                </header>
+                <RevenueLeakGrid leaks={v3?.revenueLeaks} onAction={handleLeak} />
+              </section>
+
+              {/* SECTION 6 — Capacity */}
+              <section className="ti3-panel ti3-span-6" aria-label="Team capacity">
+                <header className="ti3-panel__head">
+                  <h2>Capacity & workload</h2>
+                  <p>Leads · tasks · deals · meetings</p>
+                </header>
+                <CapacityChart rows={v3?.capacity} onSelect={selectMember} />
+              </section>
+
+              {/* SECTION 7 — CRM adoption */}
+              {isManagerView && !activeMemberId ? (
+                <section className="ti3-panel ti3-span-6" aria-label="CRM adoption">
+                  <header className="ti3-panel__head">
+                    <h2>CRM adoption</h2>
+                    <p>Logins, notes, calls, meetings, deals</p>
+                  </header>
+                  <AdoptionPanel adoption={v3?.adoption} />
+                </section>
+              ) : null}
+
+              {/* SECTION 8 — Activity effectiveness */}
+              <section className={`ti3-panel ${isManagerView && !activeMemberId ? 'ti3-span-12' : 'ti3-span-6'}`} aria-label="Activity effectiveness">
+                <header className="ti3-panel__head">
+                  <h2>Activity effectiveness</h2>
+                  <p>Outcomes — not just volume</p>
+                </header>
+                <EffectivenessGrid rows={v3?.activityEffectiveness} />
+              </section>
+
+              {/* SECTION 9 — Action center (desktop inline) */}
+              <section className="ti3-panel ti3-span-12 ti3-panel--actions ti3-action-desktop" aria-label="Action center">
+                <header className="ti3-panel__head">
+                  <h2>Action center</h2>
+                  <p>Priority-ordered management tasks</p>
+                </header>
+                <ActionCenterPanel items={v3?.actionCenter} onAction={handleCenterAction} />
               </section>
             </div>
 
-            {/* SECTION 3 — Leaderboard (centerpiece) */}
-            <section className="ti2-card ti2-card--leaderboard" aria-label="Team performance leaderboard">
-              <div className="ti2-card__head ti2-card__head--row">
+            {/* Activity feed */}
+            <section className="ti3-panel ti3-panel--feed" aria-label="Activity feed">
+              <header className="ti3-panel__head ti3-panel__head--row">
                 <div>
-                  <h2 className="ti2-card__title">
-                    {activeMemberId ? 'Rep performance' : 'Team leaderboard'}
-                  </h2>
-                  <p className="ti2-card__sub">
-                    {activeMemberId
-                      ? 'How am I performing?'
-                      : 'Who is performing best — who needs attention?'}
-                  </p>
+                  <h2>Activity feed</h2>
+                  <p>{filteredTimeline.length} events · {intel?.periodLabel || period}</p>
                 </div>
-                {isManagerView && !activeMemberId ? (
-                  <span className="ti2-card__meta">{leaderboardRows.length} reps</span>
-                ) : null}
-              </div>
-              <LeaderboardTable
-                rows={leaderboardRows}
-                onSelectRep={selectMember}
-                showAdoption={isManagerView && !activeMemberId}
+                <div className="ti3-feed-filters">
+                  {TIMELINE_FILTERS.map((f) => (
+                    <button
+                      key={f.id}
+                      type="button"
+                      className={`ti3-feed-filter${timelineFilter === f.id ? ' is-active' : ''}`}
+                      onClick={() => setTimelineFilter(f.id)}
+                    >
+                      {f.label}
+                      <span>{timelineCounts[f.id] ?? 0}</span>
+                    </button>
+                  ))}
+                </div>
+              </header>
+              <ActivityFeed
+                items={visibleTimeline}
+                expandedId={expandedFeedId}
+                onToggle={(id) => setExpandedFeedId((cur) => (cur === id ? null : id))}
+                onOpen={(item) => setDetailItem(item)}
               />
-            </section>
-
-            {/* SECTION 4 — Activity intelligence */}
-            <section className="ti2-card" aria-label="Activity trends">
-              <div className="ti2-card__head">
-                <h2 className="ti2-card__title">Activity intelligence</h2>
-                <p className="ti2-card__sub">What activities are driving results?</p>
-              </div>
-              <div className="ti2-trends-grid">
-                <TrendLineChart data={v2?.trends?.calls} color="#ff7a59" label="Calls" />
-                <TrendLineChart data={v2?.trends?.emails} color="#00a4bd" label="Emails" />
-                <TrendLineChart data={v2?.trends?.followUps} color="#f5c518" label="Follow-ups" />
-                <TrendLineChart data={v2?.trends?.leads} color="#7c3aed" label="Lead activity" />
-              </div>
-            </section>
-
-            {/* SECTION 6 + 7 + 9 — Bottlenecks, Workload, Actions */}
-            <div className="ti2-triple">
-              <section className="ti2-card ti2-card--compact" aria-label="Bottleneck analysis">
-                <div className="ti2-card__head">
-                  <h2 className="ti2-card__title">Bottlenecks</h2>
-                  <p className="ti2-card__sub">Where revenue is leaking</p>
-                </div>
-                <PipelineFunnelChart
-                  rows={(v2?.bottlenecks?.funnel || []).map((r) => ({
-                    id: r.id,
-                    label: r.label,
-                    count: r.count,
-                  }))}
-                  onClick={() => onNavigate?.('pipeline')}
-                />
-              </section>
-
-              <section className="ti2-card ti2-card--compact" aria-label="Workload distribution">
-                <div className="ti2-card__head">
-                  <h2 className="ti2-card__title">Workload</h2>
-                  <p className="ti2-card__sub">Balance across reps</p>
-                </div>
-                <WorkloadDistributionChart rows={v2?.workload || []} onSelect={selectMember} />
-              </section>
-
-              <section className="ti2-card ti2-card--compact ti2-card--actions" aria-label="Manager action center">
-                <div className="ti2-card__head">
-                  <h2 className="ti2-card__title">Action center</h2>
-                  <p className="ti2-card__sub">What should we do next?</p>
-                </div>
-                {(v2?.actionCenter || []).length ? (
-                  <ul className="ti2-actions">
-                    {v2.actionCenter.map((action) => (
-                      <li key={action.id}>
-                        <button
-                          type="button"
-                          className={`ti2-action ti2-action--${action.severity || 'medium'}`}
-                          onClick={() => handleAction(action)}
-                        >
-                          <span className="ti2-action__label">{action.label}</span>
-                          <span className="ti2-action__cta">Review →</span>
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <DashboardEmpty>All clear — no urgent actions.</DashboardEmpty>
-                )}
-              </section>
-            </div>
-
-            {/* SECTION 8 — CRM adoption */}
-            {isManagerView && !activeMemberId ? (
-              <section className="ti2-card" aria-label="CRM adoption score">
-                <div className="ti2-card__head">
-                  <h2 className="ti2-card__title">CRM adoption</h2>
-                  <p className="ti2-card__sub">Login, notes, calls, meetings, and deal updates</p>
-                </div>
-                <AdoptionScoreChart rows={v2?.leaderboard || []} />
-              </section>
-            ) : null}
-
-            {/* Drill-down — activity timeline */}
-            <section className="ti2-card ti2-card--timeline">
-              <button
-                type="button"
-                className="ti2-timeline-toggle"
-                onClick={() => setTimelineOpen((o) => !o)}
-                aria-expanded={timelineOpen}
-              >
-                <span>
-                  <strong>Activity drill-down</strong>
-                  <span className="ti2-card__sub">
-                    {activeMemberId ? memberName : 'Select a rep'} · {filteredTimeline.length} events
-                  </span>
-                </span>
-                <span className="ti2-timeline-toggle__chev">{timelineOpen ? '−' : '+'}</span>
-              </button>
-
-              {timelineOpen ? (
-                <div className="ti2-timeline-body">
-                  <div className="team-intel-timeline-filters">
-                    {TIMELINE_FILTERS.map((f) => (
-                      <button
-                        key={f.id}
-                        type="button"
-                        className={`team-intel-timeline-filters__btn${timelineFilter === f.id ? ' is-active' : ''}`}
-                        onClick={() => setTimelineFilter(f.id)}
-                      >
-                        {f.label}
-                        <span className="team-intel-timeline-filters__count" aria-label={`${timelineCounts[f.id] ?? 0} items`}>
-                          {timelineCounts[f.id] ?? 0}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-
-                  {!filteredTimeline.length ? (
-                    <DashboardEmpty>
-                      No {timelineFilter === 'all' ? '' : `${timelineFilter} `}activity for this period yet.
-                    </DashboardEmpty>
-                  ) : (
-                    <ul className="team-intel-timeline">
-                      {visibleTimeline.map((item) => (
-                        <li key={item.id} className={`team-intel-timeline__item team-intel-timeline__item--${item.kind}`}>
-                          <button
-                            type="button"
-                            className="team-intel-timeline__card"
-                            onClick={() => setDetailItem(item)}
-                          >
-                            <div className="team-intel-timeline__head">
-                              <span className="team-intel-timeline__type">{timelineTypeLabel(item.type)}</span>
-                              <time className="team-intel-timeline__time">{formatDateTime(item.at)}</time>
-                            </div>
-                            <p className="team-intel-timeline__title">
-                              {item.title}
-                              {item.company && item.company !== item.title ? ` · ${item.company}` : ''}
-                            </p>
-                            {item.body ? <p className="team-intel-timeline__body">{item.body}</p> : null}
-                            <p className="team-intel-timeline__actor">
-                              {item.actorName || 'Rep'}
-                              {item.leadId ? ' · View details' : ''}
-                            </p>
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                  {timelineRemaining > 0 ? (
-                    <div className="team-intel-timeline__more">
-                      <button
-                        type="button"
-                        className="crm-btn crm-btn-secondary crm-btn-sm"
-                        onClick={() =>
-                          setTimelineVisible((n) => Math.min(filteredTimeline.length, n + TIMELINE_PAGE_SIZE))
-                        }
-                      >
-                        Load more ({timelineRemaining})
-                      </button>
-                    </div>
-                  ) : null}
-                </div>
+              {timelineRemaining > 0 ? (
+                <button
+                  type="button"
+                  className="ti3-load-more"
+                  onClick={() => setTimelineVisible((n) => Math.min(filteredTimeline.length, n + TIMELINE_PAGE_SIZE))}
+                >
+                  Load {Math.min(TIMELINE_PAGE_SIZE, timelineRemaining)} more
+                </button>
               ) : null}
             </section>
           </div>
         )}
       </div>
+
+      {/* SECTION 9 — Sticky action center (mobile/PWA) */}
+      {!loading && (v3?.actionCenter?.length ?? 0) > 0 ? (
+        <aside className="ti3-action-sheet" aria-label="Quick actions">
+          <details className="ti3-action-sheet__details">
+            <summary>
+              <span className="ti3-action-sheet__count">{v3.actionCenter.length}</span>
+              Actions today
+            </summary>
+            <ActionCenterPanel items={v3.actionCenter} onAction={handleCenterAction} compact />
+          </details>
+        </aside>
+      ) : null}
+
+      {/* Filter drawer (mobile) */}
+      {filterDrawerOpen ? (
+        <div className="ti3-drawer-backdrop" role="presentation" onClick={() => setFilterDrawerOpen(false)}>
+          <div className="ti3-drawer" role="dialog" aria-label="Filters" onClick={(e) => e.stopPropagation()}>
+            <header className="ti3-drawer__head">
+              <h2>Filters</h2>
+              <button type="button" onClick={() => setFilterDrawerOpen(false)} aria-label="Close">
+                ×
+              </button>
+            </header>
+            <div className="ti3-drawer__body">{filterControls}</div>
+          </div>
+        </div>
+      ) : null}
 
       <TeamIntelligenceDetailModal
         item={detailItem}
