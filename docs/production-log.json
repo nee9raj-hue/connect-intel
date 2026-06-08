@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-08T17:59:13.717Z",
-  "updatedAtIst": "08/06/2026, 23:29:13",
+  "updatedAt": "2026-06-08T18:12:40.635Z",
+  "updatedAtIst": "08/06/2026, 23:42:40",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "b376c8d",
+  "currentProductionCommit": "7fc22cf",
   "entries": [
+    {
+      "logId": "20260608-2342-7fc22cf",
+      "commit": "7fc22cf",
+      "commitFull": "7fc22cf1ce2c511541363ba5a78a5babbaaaafaa",
+      "message": "Fix My Day command bar counts, preview drawers, and return navigation.",
+      "deployedAt": "2026-06-08T18:12:27.620Z",
+      "deployedAtIst": "08/06/2026, 23:42:27",
+      "committedAtIst": "08/06/2026, 23:41:57",
+      "vercelPreviewUrl": "https://connect-intel-39fgv936i-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 7fc22cf"
+    },
+    {
+      "logId": "20260608-2329-be4bc3c",
+      "commit": "be4bc3c",
+      "commitFull": "be4bc3caa6b532a03271072c07c57541634a5606",
+      "message": "Update production log for b376c8d Chithi V2 deploy.",
+      "deployedAt": "2026-06-08T17:59:45.199Z",
+      "deployedAtIst": "08/06/2026, 23:29:45",
+      "committedAtIst": "08/06/2026, 23:29:16",
+      "vercelPreviewUrl": "https://connect-intel-kcuoyre12-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- be4bc3c"
+    },
     {
       "logId": "20260608-2328-b376c8d",
       "commit": "b376c8d",
@@ -15,7 +43,7 @@
       "committedAtIst": "08/06/2026, 23:28:29",
       "vercelPreviewUrl": "https://connect-intel-77hynyxwq-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- b376c8d"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 88d72f2"
-    },
-    {
-      "logId": "20260608-2153-1e9f225",
-      "commit": "1e9f225",
-      "commitFull": "1e9f225cf06702c4a753b5cd3f87266dc9aabf50",
-      "message": "Redesign Team Intelligence as an executive intelligence workspace.",
-      "deployedAt": "2026-06-08T16:23:18.535Z",
-      "deployedAtIst": "08/06/2026, 21:53:18",
-      "committedAtIst": "08/06/2026, 21:52:46",
-      "vercelPreviewUrl": "https://connect-intel-m5uttp6m8-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 1e9f225"
-    },
-    {
-      "logId": "20260608-2138-f9b07a8",
-      "commit": "f9b07a8",
-      "commitFull": "f9b07a84ead0a09249c7e48d180d215356173155",
-      "message": "Update production log for 240e589 CRM Phase 1 deploy.",
-      "deployedAt": "2026-06-08T16:08:17.187Z",
-      "deployedAtIst": "08/06/2026, 21:38:17",
-      "committedAtIst": "08/06/2026, 21:37:50",
-      "vercelPreviewUrl": "https://connect-intel-hxcme9wd6-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- f9b07a8"
     }
   ]
 }
