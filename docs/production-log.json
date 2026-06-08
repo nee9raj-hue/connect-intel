@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-08T19:08:34.778Z",
-  "updatedAtIst": "09/06/2026, 00:38:34",
+  "updatedAt": "2026-06-08T19:17:59.633Z",
+  "updatedAtIst": "09/06/2026, 00:47:59",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "c8d12c4",
+  "currentProductionCommit": "6ad29db",
   "entries": [
+    {
+      "logId": "20260609-0047-6ad29db",
+      "commit": "6ad29db",
+      "commitFull": "6ad29db8ce85d412a7b31bab210a4a9d0a8ac13b",
+      "message": "Fix segment tag picker scroll jump and blank audiences layout.",
+      "deployedAt": "2026-06-08T19:17:45.048Z",
+      "deployedAtIst": "09/06/2026, 00:47:45",
+      "committedAtIst": "09/06/2026, 00:47:17",
+      "vercelPreviewUrl": "https://connect-intel-lngf42az0-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 6ad29db"
+    },
+    {
+      "logId": "20260609-0039-48b515a",
+      "commit": "48b515a",
+      "commitFull": "48b515a37f3d0c3b96b3f8f70f96d7786eb7fe9f",
+      "message": "Update production log for c8d12c4 smart list and tag filters deploy.",
+      "deployedAt": "2026-06-08T19:09:08.954Z",
+      "deployedAtIst": "09/06/2026, 00:39:08",
+      "committedAtIst": "09/06/2026, 00:38:40",
+      "vercelPreviewUrl": "https://connect-intel-kes8q5xz9-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 48b515a"
+    },
     {
       "logId": "20260609-0038-c8d12c4",
       "commit": "c8d12c4",
@@ -15,7 +43,7 @@
       "committedAtIst": "09/06/2026, 00:37:49",
       "vercelPreviewUrl": "https://connect-intel-fnlozs59s-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- c8d12c4"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 9dfaf7d"
-    },
-    {
-      "logId": "20260608-2229-db50dc8",
-      "commit": "db50dc8",
-      "commitFull": "db50dc8e398b79dfd1140a2398b682554fb103eb",
-      "message": "Rebuild Dashboard as My Day personal execution workspace.",
-      "deployedAt": "2026-06-08T16:59:23.759Z",
-      "deployedAtIst": "08/06/2026, 22:29:23",
-      "committedAtIst": "08/06/2026, 22:28:52",
-      "vercelPreviewUrl": "https://connect-intel-65dipk2vv-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- db50dc8"
-    },
-    {
-      "logId": "20260608-2220-3c0aea3",
-      "commit": "3c0aea3",
-      "commitFull": "3c0aea3a4c6b494208da3e6e77dd48097d505922",
-      "message": "Update production log for fb8870d Activity Log hub deploy.",
-      "deployedAt": "2026-06-08T16:50:50.618Z",
-      "deployedAtIst": "08/06/2026, 22:20:50",
-      "committedAtIst": "08/06/2026, 22:20:21",
-      "vercelPreviewUrl": "https://connect-intel-ipjcqfctq-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 3c0aea3"
     }
   ]
 }
