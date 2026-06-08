@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 48b515a
+npm run prod:rollback -- 4bc40c7
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 48b515a
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `6ad29db` |
-| Log updated (IST) | 09/06/2026, 00:47:59 |
+| Commit | `62d2db8` |
+| Log updated (IST) | 09/06/2026, 01:08:12 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 48b515a
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 09/06/2026, 00:47:45 | `6ad29db` | Fix segment tag picker scroll jump and blank audiences layout. | [preview](https://connect-intel-lngf42az0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6ad29db` | **← LIVE**
+| 09/06/2026, 01:07:29 | `62d2db8` | Fix bulk email recipient counts and add Marketing Hub compose tools. | [preview](https://connect-intel-ckhv4ddqx-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 62d2db8` | **← LIVE**
+| 09/06/2026, 00:48:30 | `4bc40c7` | Update production log for 6ad29db segment tag layout fix deploy. | [preview](https://connect-intel-ccn7pg5j5-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4bc40c7` |
+| 09/06/2026, 00:47:45 | `6ad29db` | Fix segment tag picker scroll jump and blank audiences layout. | [preview](https://connect-intel-lngf42az0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6ad29db` |
 | 09/06/2026, 00:39:08 | `48b515a` | Update production log for c8d12c4 smart list and tag filters deploy. | [preview](https://connect-intel-kes8q5xz9-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 48b515a` |
 | 09/06/2026, 00:38:22 | `c8d12c4` | Add smart list builder with tag filters and 200-contact send batches. | [preview](https://connect-intel-fnlozs59s-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c8d12c4` |
 | 09/06/2026, 00:28:12 | `c49d61c` | Update production log for 2c42b51 pipeline navigation fix deploy. | [preview](https://connect-intel-t2q7vujk0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c49d61c` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 48b515a
 | 08/06/2026, 22:40:15 | `9363474` | Update production log for 1ddcb03 command bar navigation fix. | [preview](https://connect-intel-oiktdsliw-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9363474` |
 | 08/06/2026, 22:39:36 | `1ddcb03` | Fix My Day command bar navigation and deals closing count. | [preview](https://connect-intel-1zmvd7fwg-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1ddcb03` |
 | 08/06/2026, 22:34:45 | `d3711ad` | Update production log for a1a7f83 dashboard scroll fix. | [preview](https://connect-intel-58d4ymt7x-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d3711ad` |
-| 08/06/2026, 22:34:00 | `a1a7f83` | Fix My Day dashboard scroll by adding panel-body-scroll wrapper. | [preview](https://connect-intel-nyjlpdlvz-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a1a7f83` |
-| 08/06/2026, 22:30:12 | `9dfaf7d` | Update production log for db50dc8 My Day dashboard deploy. | [preview](https://connect-intel-fmm53qlys-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9dfaf7d` |
 
 ---
 

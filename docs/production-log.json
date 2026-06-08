@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-08T19:17:59.633Z",
-  "updatedAtIst": "09/06/2026, 00:47:59",
+  "updatedAt": "2026-06-08T19:38:12.728Z",
+  "updatedAtIst": "09/06/2026, 01:08:12",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "6ad29db",
+  "currentProductionCommit": "62d2db8",
   "entries": [
+    {
+      "logId": "20260609-0107-62d2db8",
+      "commit": "62d2db8",
+      "commitFull": "62d2db8a364cbddf080e06358ec07b0fddfb21a1",
+      "message": "Fix bulk email recipient counts and add Marketing Hub compose tools.",
+      "deployedAt": "2026-06-08T19:37:29.074Z",
+      "deployedAtIst": "09/06/2026, 01:07:29",
+      "committedAtIst": "09/06/2026, 01:06:53",
+      "vercelPreviewUrl": "https://connect-intel-ckhv4ddqx-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 62d2db8"
+    },
+    {
+      "logId": "20260609-0048-4bc40c7",
+      "commit": "4bc40c7",
+      "commitFull": "4bc40c711b532cfef390cbd7d3e20c6ccc94320b",
+      "message": "Update production log for 6ad29db segment tag layout fix deploy.",
+      "deployedAt": "2026-06-08T19:18:30.174Z",
+      "deployedAtIst": "09/06/2026, 00:48:30",
+      "committedAtIst": "09/06/2026, 00:47:59",
+      "vercelPreviewUrl": "https://connect-intel-ccn7pg5j5-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 4bc40c7"
+    },
     {
       "logId": "20260609-0047-6ad29db",
       "commit": "6ad29db",
@@ -15,7 +43,7 @@
       "committedAtIst": "09/06/2026, 00:47:17",
       "vercelPreviewUrl": "https://connect-intel-lngf42az0-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 6ad29db"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- d3711ad"
-    },
-    {
-      "logId": "20260608-2234-a1a7f83",
-      "commit": "a1a7f83",
-      "commitFull": "a1a7f8348bb366702b4c6512b131f7b70c6f2e49",
-      "message": "Fix My Day dashboard scroll by adding panel-body-scroll wrapper.",
-      "deployedAt": "2026-06-08T17:04:00.499Z",
-      "deployedAtIst": "08/06/2026, 22:34:00",
-      "committedAtIst": "08/06/2026, 22:33:33",
-      "vercelPreviewUrl": "https://connect-intel-nyjlpdlvz-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- a1a7f83"
-    },
-    {
-      "logId": "20260608-2230-9dfaf7d",
-      "commit": "9dfaf7d",
-      "commitFull": "9dfaf7d44ed81cae8ed2fbc05ed0048f40bbffef",
-      "message": "Update production log for db50dc8 My Day dashboard deploy.",
-      "deployedAt": "2026-06-08T17:00:12.675Z",
-      "deployedAtIst": "08/06/2026, 22:30:12",
-      "committedAtIst": "08/06/2026, 22:29:43",
-      "vercelPreviewUrl": "https://connect-intel-fmm53qlys-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 9dfaf7d"
     }
   ]
 }
