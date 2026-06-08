@@ -165,6 +165,34 @@ export const api = {
   getPipelineSummary: ({ silent = false } = {}) =>
     request('/api/saved-leads?summary=1&light=1', { timeoutMs: 45_000 }, { silent }),
 
+  /** One request: pipeline summary + first page (faster app open). */
+  getPipelineBootstrap: ({
+    offset = 0,
+    limit = 100,
+    status,
+    q,
+    city,
+    state,
+    cities,
+    states,
+    assigneeUserId,
+    tagIds,
+    silent = false,
+  } = {}) => {
+    const qs = new URLSearchParams({ limit: String(limit), offset: String(offset) })
+    if (status && status !== 'all') qs.set('status', status)
+    if (q) qs.set('q', q)
+    for (const c of cities || (city ? [city] : [])) {
+      if (c) qs.append('city', c)
+    }
+    for (const s of states || (state ? [state] : [])) {
+      if (s) qs.append('state', s)
+    }
+    if (assigneeUserId) qs.set('assigneeUserId', assigneeUserId)
+    for (const id of tagIds || []) qs.append('tagId', id)
+    return request(`/api/pipeline/bootstrap?${qs}`, { timeoutMs: 60_000 }, { silent })
+  },
+
   fetchPipelineDeals: ({ dealStage = 'all', offset = 0, limit = 100, silent = false } = {}) => {
     const qs = new URLSearchParams({
       view: 'deals',

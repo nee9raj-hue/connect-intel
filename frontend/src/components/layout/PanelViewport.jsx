@@ -2,7 +2,6 @@ import { lazy, Suspense, useRef } from 'react'
 import useIsMobile from '../../hooks/useIsMobile'
 import PeopleSearch from '../search/PeopleSearch'
 import SavedLeadsPanel from '../saved/SavedLeadsPanel'
-import PipelinePanel from '../crm/PipelinePanel'
 import TeamPanel from '../team/TeamPanel'
 import OrgBillingPanel from '../team/OrgBillingPanel'
 import MyEmailPanel from '../team/MyEmailPanel'
@@ -28,6 +27,7 @@ import PlatformAdminHome from '../admin/PlatformAdminHome'
 import LoadingExperience from '../ui/LoadingExperience'
 
 const TeamDashboardPanel = lazy(() => import('../crm/TeamDashboardPanel'))
+const PipelinePanel = lazy(() => import('../crm/PipelinePanel'))
 
 const PANELS = {
   overview: OverviewPanel,
@@ -75,10 +75,10 @@ function PanelLoader() {
 }
 
 function renderPanel(panelId, Panel, props) {
-  if (panelId === 'crm-dashboard') {
+  if (panelId === 'crm-dashboard' || panelId === 'pipeline') {
     return (
       <Suspense fallback={<PanelLoader />}>
-        <TeamDashboardPanel {...props} />
+        <Panel {...props} />
       </Suspense>
     )
   }

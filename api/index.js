@@ -12,6 +12,7 @@ const ROUTES = {
   'integrations/status': () => import('../lib/server/handlers/integrations-status.js'),
   'search-leads': () => import('../lib/server/handlers/search-leads.js'),
   'saved-leads': () => import('../lib/server/handlers/saved-leads.js'),
+  'pipeline/bootstrap': () => import('../lib/server/handlers/pipeline-bootstrap.js'),
   'search-history': () => import('../lib/server/handlers/search-history.js'),
   'lead-unlocks': () => import('../lib/server/handlers/lead-unlocks.js'),
   'admin/imports': () => import('../lib/server/handlers/admin-imports.js'),

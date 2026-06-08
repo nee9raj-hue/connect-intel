@@ -233,18 +233,16 @@ export function AppProvider({ children }) {
   const refreshSavedLeads = useCallback(
     async () => {
       try {
-        const [summary, page] = await Promise.all([
-          api.getPipelineSummary({ silent: false }),
-          api.fetchPipelineLeads({ offset: 0, limit: 100, silent: false }),
-        ])
-        const leads = page.leads || []
+        const bootstrap = await api.getPipelineBootstrap({ offset: 0, limit: 100, silent: false })
+        const leads = bootstrap.leads || []
+        const summary = bootstrap.summary || {}
         setPipelineSummary(normalizePipelineSummary(summary))
         setSavedLeads(leads)
         setSessionError(null)
         setPipelineLoad({
-          total: summary.total ?? page.pipelineTotal ?? leads.length,
+          total: summary.total ?? bootstrap.pipelineTotal ?? leads.length,
           loaded: leads.length,
-          hasMore: Boolean(page.hasMore),
+          hasMore: Boolean(bootstrap.hasMore),
           loadingMore: false,
         })
         loadedCountRef.current = leads.length
@@ -442,22 +440,22 @@ export function AppProvider({ children }) {
 
       const run = (async () => {
         try {
-          const [summary, page, historyResult] = await Promise.all([
-            api.getPipelineSummary({ silent: true }),
-            api.fetchPipelineLeads({ offset: 0, limit: 100, silent: true }),
+          const [bootstrap, historyResult] = await Promise.all([
+            api.getPipelineBootstrap({ offset: 0, limit: 100, silent: true }),
             api.getSearchHistory({ silent: true }),
           ])
 
           if (cancelled) return
 
-          const leads = page.leads || []
+          const leads = bootstrap.leads || []
+          const summary = bootstrap.summary || {}
           setPipelineSummary(normalizePipelineSummary(summary))
           setSavedLeads(leads)
           setSearchHistory(historyResult.history || [])
           setPipelineLoad({
-            total: summary.total ?? page.pipelineTotal ?? leads.length,
+            total: summary.total ?? bootstrap.pipelineTotal ?? leads.length,
             loaded: leads.length,
-            hasMore: Boolean(page.hasMore),
+            hasMore: Boolean(bootstrap.hasMore),
             loadingMore: false,
           })
           loadedCountRef.current = leads.length
