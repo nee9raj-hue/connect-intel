@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-08T16:50:18.510Z",
-  "updatedAtIst": "08/06/2026, 22:20:18",
+  "updatedAt": "2026-06-08T16:59:38.632Z",
+  "updatedAtIst": "08/06/2026, 22:29:38",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "fb8870d",
+  "currentProductionCommit": "db50dc8",
   "entries": [
+    {
+      "logId": "20260608-2229-db50dc8",
+      "commit": "db50dc8",
+      "commitFull": "db50dc8e398b79dfd1140a2398b682554fb103eb",
+      "message": "Rebuild Dashboard as My Day personal execution workspace.",
+      "deployedAt": "2026-06-08T16:59:23.759Z",
+      "deployedAtIst": "08/06/2026, 22:29:23",
+      "committedAtIst": "08/06/2026, 22:28:52",
+      "vercelPreviewUrl": "https://connect-intel-65dipk2vv-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- db50dc8"
+    },
+    {
+      "logId": "20260608-2220-3c0aea3",
+      "commit": "3c0aea3",
+      "commitFull": "3c0aea3a4c6b494208da3e6e77dd48097d505922",
+      "message": "Update production log for fb8870d Activity Log hub deploy.",
+      "deployedAt": "2026-06-08T16:50:50.618Z",
+      "deployedAtIst": "08/06/2026, 22:20:50",
+      "committedAtIst": "08/06/2026, 22:20:21",
+      "vercelPreviewUrl": "https://connect-intel-ipjcqfctq-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 3c0aea3"
+    },
     {
       "logId": "20260608-2220-fb8870d",
       "commit": "fb8870d",
@@ -15,7 +43,7 @@
       "committedAtIst": "08/06/2026, 22:19:29",
       "vercelPreviewUrl": "https://connect-intel-2ead0m3a7-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- fb8870d"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- c16f247"
-    },
-    {
-      "logId": "20260608-2045-ad3855c",
-      "commit": "ad3855c",
-      "commitFull": "ad3855c0eaaab4be584b0c84f95584ffe8908c53",
-      "message": "Fix bulk email button for kanban selections on large pipelines.",
-      "deployedAt": "2026-06-08T15:15:05.492Z",
-      "deployedAtIst": "08/06/2026, 20:45:05",
-      "committedAtIst": "08/06/2026, 20:44:38",
-      "vercelPreviewUrl": "https://connect-intel-c98uvv1jm-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- ad3855c"
-    },
-    {
-      "logId": "20260608-2033-3645ff3",
-      "commit": "3645ff3",
-      "commitFull": "3645ff3f211560fe38881efbb758f0d502034ceb",
-      "message": "Update production log for 968ad4f bulk email deploy.",
-      "deployedAt": "2026-06-08T15:03:37.172Z",
-      "deployedAtIst": "08/06/2026, 20:33:37",
-      "committedAtIst": "08/06/2026, 20:33:10",
-      "vercelPreviewUrl": "https://connect-intel-ivcz2mmc6-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 3645ff3"
     }
   ]
 }
