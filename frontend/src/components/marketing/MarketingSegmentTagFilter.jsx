@@ -19,7 +19,7 @@ export default function MarketingSegmentTagFilter({
   }
 
   return (
-    <div className="sm:col-span-2 space-y-2">
+    <div className="marketing-segment-tag-filter sm:col-span-2 space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="text-xs text-[#516f90]">Lead tags</span>
         <select
@@ -32,25 +32,25 @@ export default function MarketingSegmentTagFilter({
           <option value="all">Match all tags</option>
         </select>
       </div>
-      <div className="flex flex-wrap gap-2">
-        {orgLeadTags.map((tag) => (
-          <label
-            key={tag.id}
-            className={`inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded-lg border cursor-pointer ${
-              selected.has(tag.id)
-                ? 'border-[#17191c] bg-[#f5f8fa]'
-                : 'border-[#dfe3eb] bg-white hover:border-[#99acc2]'
-            }`}
-          >
-            <input
-              type="checkbox"
-              className="sr-only"
-              checked={selected.has(tag.id)}
-              onChange={() => toggle(tag.id)}
-            />
-            <LeadTag name={tag.name} active={selected.has(tag.id)} />
-          </label>
-        ))}
+      <div className="marketing-segment-tag-filter__pills flex flex-wrap gap-2">
+        {orgLeadTags.map((tag) => {
+          const isOn = selected.has(tag.id)
+          return (
+            <button
+              key={tag.id}
+              type="button"
+              aria-pressed={isOn}
+              onClick={() => toggle(tag.id)}
+              className={`inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded-lg border cursor-pointer transition-colors ${
+                isOn
+                  ? 'border-[#17191c] bg-[#f5f8fa]'
+                  : 'border-[#dfe3eb] bg-white hover:border-[#99acc2]'
+              }`}
+            >
+              <LeadTag name={tag.name} active={isOn} />
+            </button>
+          )
+        })}
       </div>
     </div>
   )

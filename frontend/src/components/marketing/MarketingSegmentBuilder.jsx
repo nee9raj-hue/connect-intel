@@ -45,12 +45,14 @@ export default function MarketingSegmentBuilder({
     }
   }
 
+  const filterPreviewKey = useMemo(() => JSON.stringify(filters), [filters])
+
   useEffect(() => {
     const t = setTimeout(() => {
       runPreview().catch(() => {})
     }, 400)
     return () => clearTimeout(t)
-  }, [filters, channel])
+  }, [filterPreviewKey, channel])
 
   const updateFilter = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }))

@@ -64,7 +64,7 @@ export default function MarketingSegmentsPanel({
       </div>
 
       {creating && (
-        <div className="crm-content-card p-4">
+        <div className="marketing-segment-builder-card">
           <MarketingSegmentBuilder
             user={user}
             teamMembers={teamMembers}

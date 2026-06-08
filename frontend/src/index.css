@@ -11293,11 +11293,25 @@ html[data-pipeline-mobile="1"] .ci-app-header-chip--secondary {
   max-width: 40rem;
 }
 
+.marketing-segment-builder-card {
+  background: #fff;
+  border: 1px solid #cbd6e2;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+  overflow: visible;
+}
+
+.marketing-segment-tag-filter__pills {
+  align-items: flex-start;
+}
+
 .marketing-segment-preview {
   padding: 0.65rem 0.85rem;
   background: #fff7ed;
   border: 1px solid #fed7aa;
   border-radius: 10px;
+  min-height: 2.75rem;
 }
 
 .marketing-auto-card {

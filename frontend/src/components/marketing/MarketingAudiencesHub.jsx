@@ -26,7 +26,7 @@ export default function MarketingAudiencesHub({
   const stats = audienceStats || {}
 
   return (
-    <div className="mhub-audiences-page">
+    <div className="mhub-audiences-page mhub-tab-pad">
       <header className="mhub-audiences-page__head">
         <div>
           <h2>Audiences</h2>
