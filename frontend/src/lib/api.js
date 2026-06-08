@@ -334,7 +334,7 @@ export const api = {
   sendCrmEmail: (leadId, payload) =>
     request('/api/crm-send-email', { method: 'POST', body: { leadId, ...payload }, timeoutMs: 120_000 }),
   searchLeads: (filters, count = 50, provider = 'free') =>
-    request('/api/search-leads', { method: 'POST', body: { filters, count, provider }, timeoutMs: 120_000 }),
+    request('/api/search-leads', { method: 'POST', body: { filters, count, provider }, timeoutMs: 180_000 }),
   addSearchHistory: (entry) => request('/api/search-history', { method: 'POST', body: { entry } }),
   unlockLead: (lead, field) => request('/api/lead-unlocks', { method: 'POST', body: { lead, field } }),
   getAdminOverview: () => request('/api/admin/imports', { timeoutMs: 180_000 }),
