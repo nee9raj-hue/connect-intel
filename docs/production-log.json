@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-08T18:57:34.132Z",
-  "updatedAtIst": "09/06/2026, 00:27:34",
+  "updatedAt": "2026-06-08T19:08:34.778Z",
+  "updatedAtIst": "09/06/2026, 00:38:34",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "2c42b51",
+  "currentProductionCommit": "c8d12c4",
   "entries": [
+    {
+      "logId": "20260609-0038-c8d12c4",
+      "commit": "c8d12c4",
+      "commitFull": "c8d12c44f4defcddc86a7a92af46de1f994ac75a",
+      "message": "Add smart list builder with tag filters and 200-contact send batches.",
+      "deployedAt": "2026-06-08T19:08:22.552Z",
+      "deployedAtIst": "09/06/2026, 00:38:22",
+      "committedAtIst": "09/06/2026, 00:37:49",
+      "vercelPreviewUrl": "https://connect-intel-fnlozs59s-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- c8d12c4"
+    },
+    {
+      "logId": "20260609-0028-c49d61c",
+      "commit": "c49d61c",
+      "commitFull": "c49d61c9208b0b631688778056c75c6174273941",
+      "message": "Update production log for 2c42b51 pipeline navigation fix deploy.",
+      "deployedAt": "2026-06-08T18:58:12.769Z",
+      "deployedAtIst": "09/06/2026, 00:28:12",
+      "committedAtIst": "09/06/2026, 00:27:43",
+      "vercelPreviewUrl": "https://connect-intel-t2q7vujk0-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- c49d61c"
+    },
     {
       "logId": "20260609-0027-2c42b51",
       "commit": "2c42b51",
@@ -15,7 +43,7 @@
       "committedAtIst": "09/06/2026, 00:26:34",
       "vercelPreviewUrl": "https://connect-intel-b6a4g90ol-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 2c42b51"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 3c0aea3"
-    },
-    {
-      "logId": "20260608-2220-fb8870d",
-      "commit": "fb8870d",
-      "commitFull": "fb8870d8e6b171443dd244f17c12fc9d40b3b4d7",
-      "message": "Rebuild Activity Log as a V3 linkage hub for cross-page navigation.",
-      "deployedAt": "2026-06-08T16:50:05.310Z",
-      "deployedAtIst": "08/06/2026, 22:20:05",
-      "committedAtIst": "08/06/2026, 22:19:29",
-      "vercelPreviewUrl": "https://connect-intel-2ead0m3a7-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- fb8870d"
-    },
-    {
-      "logId": "20260608-2216-c789767",
-      "commit": "c789767",
-      "commitFull": "c78976757628e9826eb5c03a2e4878439f2a0600",
-      "message": "Update production log for 9ff8ed1 dashboard V3 deploy.",
-      "deployedAt": "2026-06-08T16:46:36.731Z",
-      "deployedAtIst": "08/06/2026, 22:16:36",
-      "committedAtIst": "08/06/2026, 22:16:07",
-      "vercelPreviewUrl": "https://connect-intel-i4c552sm4-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- c789767"
     }
   ]
 }
