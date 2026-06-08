@@ -186,9 +186,9 @@ export function LeadFocusCards({ focus, onNavigate }) {
   if (!focus) return null
   const cards = [
     { id: 'new', label: 'New leads', count: focus.newLeads, status: 'new' },
-    { id: 'hot', label: 'Hot leads', count: focus.hotLeads, panel: 'pipeline' },
+    { id: 'hot', label: 'Hot leads', count: focus.hotLeads, smartTags: ['hot_score'] },
     { id: 'uncontacted', label: 'Uncontacted', count: focus.uncontacted, status: 'new' },
-    { id: 'followup', label: 'Follow-up due', count: focus.followUpDue, status: 'follow_up' },
+    { id: 'followup', label: 'Follow-up due', count: focus.followUpDue, status: 'follow_up', followUpDue: true },
   ]
   return (
     <div className="myday-lead-focus">
@@ -197,7 +197,13 @@ export function LeadFocusCards({ focus, onNavigate }) {
           key={c.id}
           type="button"
           className="myday-lead-card"
-          onClick={() => onNavigate?.('pipeline', { status: c.status })}
+          onClick={() =>
+            onNavigate?.('pipeline', {
+              status: c.status,
+              smartTags: c.smartTags,
+              followUpDue: c.followUpDue || undefined,
+            })
+          }
         >
           <span className="myday-lead-card__count">{c.count}</span>
           <span className="myday-lead-card__label">{c.label}</span>

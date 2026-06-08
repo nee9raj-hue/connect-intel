@@ -44,11 +44,11 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
   const [googleNotice, setGoogleNotice] = useState(null)
 
   useEffect(() => {
-    if (panelOptions?.upcomingOnly) {
+    if (panelOptions?.upcomingOnly || panelOptions?.focusToday) {
       setView('list')
       setAnchor(startOfDay(new Date()))
     }
-  }, [panelOptions?.upcomingOnly])
+  }, [panelOptions?.upcomingOnly, panelOptions?.focusToday])
 
   useEffect(() => {
     if (!calendarFocus?.scheduledAt) return

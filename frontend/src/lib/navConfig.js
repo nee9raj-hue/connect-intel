@@ -59,11 +59,16 @@ export function navTargetToOptions(target = {}) {
   if (target.view) options.view = target.view
   if (target.dealStage) options.dealStage = target.dealStage
   if (target.upcomingOnly) options.upcomingOnly = true
+  if (target.focusToday) options.focusToday = true
   if (target.activityType) options.activityType = target.activityType
   if (target.period) options.period = target.period
   if (target.userId) options.userId = target.userId
   if (target.campaignId) options.campaignId = target.campaignId
   if (target.adminTab) options.tab = target.adminTab
+  if (target.overdueFollowUp) options.overdueFollowUp = true
+  if (target.followUpDue) options.followUpDue = true
+  if (target.closingThisWeek) options.closingThisWeek = true
+  if (Array.isArray(target.smartTags) && target.smartTags.length) options.smartTags = [...target.smartTags]
   return options
 }
 

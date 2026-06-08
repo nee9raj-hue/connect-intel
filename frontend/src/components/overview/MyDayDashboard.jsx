@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
+import { navTargetToOptions } from '../../lib/navConfig'
 import {
   PersonalCommandBar,
   PriorityList,
@@ -26,7 +27,7 @@ function useIsMobile(bp = 768) {
 }
 
 export default function MyDayDashboard({ onNavigate, isActive = true }) {
-  const { user, openPipelineLead, unreadNotificationCount } = useApp()
+  const { user, openPipelineLead, unreadNotificationCount, notifications, navigateToNotification } = useApp()
   const [myDay, setMyDay] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -53,28 +54,49 @@ export default function MyDayDashboard({ onNavigate, isActive = true }) {
     load()
   }, [load, isActive])
 
-  const go = useCallback(
-    (panel, opts = {}) => {
-      if (opts.leadId) {
-        openPipelineLead(opts.leadId)
-        onNavigate?.('pipeline')
+  const runAction = useCallback(
+    (action = {}) => {
+      if (!action?.panel && !action?.leadId) return
+
+      if (action.panel === 'notifications') {
+        const first = (notifications || []).find((n) => n.unread)
+        if (first) {
+          navigateToNotification(first)
+        } else {
+          onNavigate?.('crm-log', { period: 'day', userId: user?.id })
+        }
         return
       }
-      onNavigate?.(panel, opts)
+
+      const panel = action.panel || 'pipeline'
+      const options = navTargetToOptions(action)
+
+      if (action.leadId) {
+        openPipelineLead(action.leadId, action.leadTab || 'overview')
+      }
+
+      onNavigate?.(panel, options)
     },
-    [onNavigate, openPipelineLead]
+    [notifications, navigateToNotification, user?.id, onNavigate, openPipelineLead]
+  )
+
+  const go = useCallback(
+    (panel, opts = {}) => {
+      runAction({ panel, ...opts })
+    },
+    [runAction]
   )
 
   const openPriority = useCallback(
     (item) => {
-      const a = item.action || {}
-      if (a.leadId) {
-        openPipelineLead(a.leadId)
-        onNavigate?.('pipeline')
-      } else if (a.panel) go(a.panel, a)
-      else go('pipeline', { status: item.kind === 'follow_up' ? 'follow_up' : 'all' })
+      const action = item.action || {}
+      if (action.panel || action.leadId) {
+        runAction(action)
+        return
+      }
+      go('pipeline', { status: item.kind === 'follow_up' ? 'follow_up' : 'all' })
     },
-    [go, openPipelineLead, onNavigate]
+    [go, runAction]
   )
 
   const commandBar = myDay?.commandBar?.map((item) =>
@@ -113,7 +135,7 @@ export default function MyDayDashboard({ onNavigate, isActive = true }) {
           <section className="myday-section myday-span-12 myday-section--sticky" aria-label="Personal command bar">
             <PersonalCommandBar
               items={commandBar}
-              onAction={(item) => go(item.action?.panel || 'pipeline', item.action || {})}
+              onAction={(item) => runAction(item.action || { panel: 'pipeline' })}
             />
           </section>
 
@@ -164,7 +186,7 @@ export default function MyDayDashboard({ onNavigate, isActive = true }) {
               <h2>Smart insights</h2>
               <p>Proactive recommendations</p>
             </div>
-            <InsightPills insights={myDay?.smartInsights} onAction={(a) => go(a.panel, a)} />
+            <InsightPills insights={myDay?.smartInsights} onAction={(a) => runAction(a)} />
           </section>
 
           <section className="myday-section myday-span-6" aria-label="Today's timeline">

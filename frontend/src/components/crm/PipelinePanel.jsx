@@ -134,15 +134,47 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const dealsStage = panelOptions?.dealStage || 'all'
 
   useEffect(() => {
-    if (panelOptions?.view === 'deals') return
-    if (panelOptions?.status) {
-      setFilter(panelOptions.status)
-      if (panelOptions.status !== 'all') {
+    const po = panelOptions || {}
+    if (po.view === 'deals') {
+      if (po.status) setFilter(po.status)
+      return
+    }
+
+    const adv = { ...DEFAULT_PIPELINE_FILTERS }
+    if (po.overdueFollowUp) adv.overdueFollowUp = true
+    if (po.followUpDue) adv.followUpDue = true
+    if (po.closingThisWeek) adv.closingThisWeek = true
+    if (po.smartTags?.length) adv.smartTags = po.smartTags
+
+    const hasAdv =
+      po.overdueFollowUp || po.followUpDue || po.closingThisWeek || (po.smartTags?.length > 0)
+
+    if (hasAdv) {
+      setSmartViewId(null)
+      setSmartViewFilters({})
+      setAdvancedFilters(adv)
+      setAppliedAdvanced(adv)
+      setView('list')
+      setListStatusFilter('all')
+    }
+
+    if (po.status) {
+      setFilter(po.status)
+      if (po.status !== 'all') {
         setView('list')
         setListStatusFilter('all')
       }
+    } else if (hasAdv) {
+      setFilter('all')
     }
-  }, [panelOptions?.status, panelOptions?.view])
+  }, [
+    panelOptions?.status,
+    panelOptions?.view,
+    panelOptions?.overdueFollowUp,
+    panelOptions?.followUpDue,
+    panelOptions?.closingThisWeek,
+    panelOptions?.smartTags,
+  ])
 
   const dealsStageLabel = useMemo(() => {
     if (dealsStage === 'all') return 'All open deals'
@@ -402,6 +434,9 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       tagMode: appliedAdvanced.tagMode,
       search: serverSidePipeline ? '' : appliedSearch,
       smartTags: appliedAdvanced.smartTags,
+      overdueFollowUp: appliedAdvanced.overdueFollowUp,
+      followUpDue: appliedAdvanced.followUpDue,
+      closingThisWeek: appliedAdvanced.closingThisWeek,
       ...smartViewFilters,
     })
   }, [

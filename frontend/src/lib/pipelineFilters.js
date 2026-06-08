@@ -19,6 +19,9 @@ export const DEFAULT_PIPELINE_FILTERS = {
   tagIds: [],
   tagMode: 'any',
   smartTags: [],
+  overdueFollowUp: false,
+  followUpDue: false,
+  closingThisWeek: false,
 }
 
 /** @deprecated use cities[] — kept for saved views migration */
@@ -140,6 +143,8 @@ export function applyPipelineFilters(
     minDealValue = null,
     staleDays = null,
     overdueFollowUp = false,
+    followUpDue = false,
+    closingThisWeek = false,
     tagIds = [],
     tagMode = 'any',
     smartTags = [],
@@ -193,6 +198,36 @@ export function applyPipelineFilters(
     list = list.filter((l) => {
       const at = l.crm?.nextFollowUpAt
       return at && new Date(at).getTime() < now
+    })
+  }
+
+  if (followUpDue) {
+    const endToday = new Date()
+    endToday.setHours(23, 59, 59, 999)
+    list = list.filter((l) => {
+      const at = l.crm?.nextFollowUpAt
+      return at && new Date(at).getTime() <= endToday.getTime()
+    })
+  }
+
+  if (closingThisWeek) {
+    const weekEnd = Date.now() + 7 * MS_DAY
+    const start = new Date()
+    start.setHours(0, 0, 0, 0)
+    list = list.filter((l) => {
+      const crm = l.crm || {}
+      for (const deal of crm.deals || []) {
+        if (deal.wonAt || deal.lostAt) continue
+        const close = deal.expectedCloseAt
+        if (!close) continue
+        const t = new Date(close).getTime()
+        if (t >= start.getTime() && t <= weekEnd) return true
+      }
+      if (crm.expectedCloseAt) {
+        const t = new Date(crm.expectedCloseAt).getTime()
+        if (t >= start.getTime() && t <= weekEnd) return true
+      }
+      return false
     })
   }
 
@@ -258,6 +293,9 @@ export function countActiveFilters(filters, search) {
   if (filters.contact && filters.contact !== 'any') n += 1
   if (filters.tagIds?.length) n += 1
   if (filters.smartTags?.length) n += 1
+  if (filters.overdueFollowUp) n += 1
+  if (filters.followUpDue) n += 1
+  if (filters.closingThisWeek) n += 1
   if (search?.trim()) n += 1
   return n
 }
