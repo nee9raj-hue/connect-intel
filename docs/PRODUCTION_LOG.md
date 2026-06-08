@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- cb3d8f6
+npm run prod:rollback -- 9b9d254
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- cb3d8f6
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `03674f8` |
-| Log updated (IST) | 08/06/2026, 21:10:47 |
+| Commit | `8e209f2` |
+| Log updated (IST) | 08/06/2026, 21:18:29 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- cb3d8f6
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 08/06/2026, 21:10:34 | `03674f8` | Add Phase 2 marketing: canvas automations, A/B, RSS, landing pages, exports. | [preview](https://connect-intel-4rjf31tdx-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 03674f8` | **← LIVE**
+| 08/06/2026, 21:18:15 | `8e209f2` | Fix Marketing Domains UX when work email is already connected. | [preview](https://connect-intel-ripu2i8s5-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8e209f2` | **← LIVE**
+| 08/06/2026, 21:11:29 | `9b9d254` | Update production log for 03674f8 Phase 2 marketing deploy. | [preview](https://connect-intel-f2eln6kna-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9b9d254` |
+| 08/06/2026, 21:10:34 | `03674f8` | Add Phase 2 marketing: canvas automations, A/B, RSS, landing pages, exports. | [preview](https://connect-intel-4rjf31tdx-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 03674f8` |
 | 08/06/2026, 21:02:31 | `cb3d8f6` | Update production log for 8c6ef7d email marketing deploy. | [preview](https://connect-intel-kbcvto2g4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- cb3d8f6` |
 | 08/06/2026, 21:01:33 | `8c6ef7d` | Add enterprise email marketing module inside CRM Marketing. | [preview](https://connect-intel-n568uqi1i-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8c6ef7d` |
 | 08/06/2026, 20:45:49 | `c16f247` | Update production log for ad3855c kanban bulk email fix deploy. | [preview](https://connect-intel-l6xuupsz1-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c16f247` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- cb3d8f6
 | 08/06/2026, 19:18:31 | `8d39bf2` | Fix Ludhiana textile search: ignore india keyword, restore live AI fallback. | [preview](https://connect-intel-38gtiwjs3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8d39bf2` |
 | 08/06/2026, 19:11:19 | `251c96d` | Fix search timeout by avoiding full-store quota reads/writes. | [preview](https://connect-intel-7vl9u70bk-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 251c96d` |
 | 08/06/2026, 17:10:29 | `7584d6b` | Log production deploy 328295d (AI search database-first). | [preview](https://connect-intel-kamnnmsfn-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7584d6b` |
-| 08/06/2026, 17:09:30 | `328295d` | Fix AI search timeouts by querying the database before live AI. | [preview](https://connect-intel-fo1odk44n-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 328295d` |
-| 08/06/2026, 17:03:38 | `b91ead0` | Log production deploy c87e73e (AI search dedupe and real DB results). | [preview](https://connect-intel-e562ipxpz-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b91ead0` |
 
 ---
 
