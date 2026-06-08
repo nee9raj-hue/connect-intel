@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 
-export default function OrgCrmEmailSetup() {
+export default function OrgCrmEmailSetup({ autoSetup = true, collapsed = false, title = 'Optional DNS sending' } = {}) {
   const { refreshSession } = useApp()
   const [status, setStatus] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -49,10 +49,10 @@ export default function OrgCrmEmailSetup() {
   }, [load])
 
   useEffect(() => {
-    if (loading || autoTried.current || !status || status.configured) return
+    if (!autoSetup || loading || autoTried.current || !status || status.configured) return
     autoTried.current = true
     runAutoSetup()
-  }, [status, loading, runAutoSetup])
+  }, [autoSetup, status, loading, runAutoSetup])
 
   const handleVerify = async () => {
     setBusy(true)
@@ -89,16 +89,12 @@ export default function OrgCrmEmailSetup() {
     )
   }
 
-  return (
-    <div className="rounded-lg border-2 border-[#FF773D] bg-[#fff4ee] px-4 py-4 text-sm space-y-3">
-      <div>
-        <p className="font-semibold text-[#242424]">Optional DNS sending</p>
-        <p className="text-xs text-[#FF773D] mt-1 leading-relaxed">
-          Only if you cannot use work email connect above. We register{' '}
-          <strong>{status?.domain || status?.inferredDomain || 'your company domain'}</strong> — add DNS once for all
-          reps on <strong>@{status?.domain || 'yourcompany.com'}</strong>.
-        </p>
-      </div>
+  const body = (
+    <div className="space-y-3">
+      <p className="text-xs text-[#FF773D] leading-relaxed">
+        Register <strong>{status?.domain || status?.inferredDomain || 'your company domain'}</strong> and add DNS once
+        so every teammate on <strong>@{status?.domain || 'yourcompany.com'}</strong> can send without connecting Gmail.
+      </p>
 
       {error && (
         <p className="text-xs text-red-800 bg-red-50 border border-red-200 rounded-lg px-2 py-1.5">{error}</p>
@@ -143,8 +139,26 @@ export default function OrgCrmEmailSetup() {
       )}
 
       <p className="text-xs text-gray-500 leading-relaxed">
-        Most teams should use <strong>Connect work email</strong> above instead of DNS.
+        Skip this if teammates already use <strong>Connect work email</strong> under Team &amp; email.
       </p>
+    </div>
+  )
+
+  if (collapsed) {
+    return (
+      <details className="rounded-lg border border-gray-200 bg-gray-50 text-sm">
+        <summary className="cursor-pointer px-4 py-3 font-semibold text-[#33475b]">{title}</summary>
+        <div className="px-4 pb-4 border-t border-gray-200">{body}</div>
+      </details>
+    )
+  }
+
+  return (
+    <div className="rounded-lg border-2 border-[#FF773D] bg-[#fff4ee] px-4 py-4 text-sm space-y-3">
+      <div>
+        <p className="font-semibold text-[#242424]">{title}</p>
+      </div>
+      {body}
     </div>
   )
 }
