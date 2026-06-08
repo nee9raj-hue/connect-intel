@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-08T15:15:20.449Z",
-  "updatedAtIst": "08/06/2026, 20:45:20",
+  "updatedAt": "2026-06-08T15:31:54.253Z",
+  "updatedAtIst": "08/06/2026, 21:01:54",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "ad3855c",
+  "currentProductionCommit": "8c6ef7d",
   "entries": [
+    {
+      "logId": "20260608-2101-8c6ef7d",
+      "commit": "8c6ef7d",
+      "commitFull": "8c6ef7d4b723b29a3f5db7894d5f72dea90dcaaf",
+      "message": "Add enterprise email marketing module inside CRM Marketing.",
+      "deployedAt": "2026-06-08T15:31:33.056Z",
+      "deployedAtIst": "08/06/2026, 21:01:33",
+      "committedAtIst": "08/06/2026, 21:01:02",
+      "vercelPreviewUrl": "https://connect-intel-n568uqi1i-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 8c6ef7d"
+    },
+    {
+      "logId": "20260608-2045-c16f247",
+      "commit": "c16f247",
+      "commitFull": "c16f24750d69ed8f8ccbc29997cf5aecb2b69b8b",
+      "message": "Update production log for ad3855c kanban bulk email fix deploy.",
+      "deployedAt": "2026-06-08T15:15:49.084Z",
+      "deployedAtIst": "08/06/2026, 20:45:49",
+      "committedAtIst": "08/06/2026, 20:45:23",
+      "vercelPreviewUrl": "https://connect-intel-l6xuupsz1-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- c16f247"
+    },
     {
       "logId": "20260608-2045-ad3855c",
       "commit": "ad3855c",
@@ -15,7 +43,7 @@
       "committedAtIst": "08/06/2026, 20:44:38",
       "vercelPreviewUrl": "https://connect-intel-c98uvv1jm-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- ad3855c"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- e2be456"
-    },
-    {
-      "logId": "20260608-1655-4899d0d",
-      "commit": "4899d0d",
-      "commitFull": "4899d0d6ab388c00cd6d77d9bcd800be7aacb702",
-      "message": "Fix master DB import timeouts and add duplicate cleanup.",
-      "deployedAt": "2026-06-08T11:25:06.932Z",
-      "deployedAtIst": "08/06/2026, 16:55:06",
-      "committedAtIst": "08/06/2026, 16:54:38",
-      "vercelPreviewUrl": "https://connect-intel-8btknavc4-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 4899d0d"
-    },
-    {
-      "logId": "20260608-1649-4b4d3d7",
-      "commit": "4b4d3d7",
-      "commitFull": "4b4d3d7ec32faf9febe89ac833fff0ea15f52152",
-      "message": "Log production deploy daa6f20 (chunked imports and operator console).",
-      "deployedAt": "2026-06-08T11:19:58.590Z",
-      "deployedAtIst": "08/06/2026, 16:49:58",
-      "committedAtIst": "08/06/2026, 16:49:28",
-      "vercelPreviewUrl": "https://connect-intel-5ywngeyt9-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 4b4d3d7"
     }
   ]
 }
