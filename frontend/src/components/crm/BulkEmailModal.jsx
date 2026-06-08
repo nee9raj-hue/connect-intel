@@ -1,23 +1,37 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { api } from '../../lib/api'
 import { leadHasSendableEmail } from '../../lib/emailUtils'
 import BulkEmailCompose from './BulkEmailCompose'
 
 export default function BulkEmailModal({ open, leadIds, leads, onClose, onDone }) {
+  const leadIdsKey = [...(leadIds || [])].sort().join(',')
+  const fallbackLeadsRef = useRef(leads)
+  fallbackLeadsRef.current = leads
+
   const [resolvedLeads, setResolvedLeads] = useState([])
   const [sendableIds, setSendableIds] = useState([])
   const [skipped, setSkipped] = useState([])
   const [resolving, setResolving] = useState(false)
   const [resolveError, setResolveError] = useState(null)
-  const leadIdsKey = useMemo(() => [...(leadIds || [])].sort().join(','), [leadIds])
+  const fetchedKeyRef = useRef('')
 
   useEffect(() => {
+    if (!open) {
+      fetchedKeyRef.current = ''
+      return undefined
+    }
+
     const ids = leadIdsKey ? leadIdsKey.split(',') : []
-    if (!open || !ids.length) {
+    if (!ids.length) {
       setResolvedLeads([])
       setSendableIds([])
       setSkipped([])
       setResolveError(null)
+      setResolving(false)
+      return undefined
+    }
+
+    if (fetchedKeyRef.current === leadIdsKey) {
       return undefined
     }
 
@@ -29,14 +43,16 @@ export default function BulkEmailModal({ open, leadIds, leads, onClose, onDone }
       .resolveBulkEmailRecipients(ids)
       .then((data) => {
         if (cancelled) return
+        fetchedKeyRef.current = leadIdsKey
         setResolvedLeads(data.leads || [])
         setSendableIds(data.sendableIds || [])
         setSkipped(data.skipped || [])
       })
       .catch((e) => {
         if (cancelled) return
+        fetchedKeyRef.current = leadIdsKey
         setResolveError(e.message)
-        const fallback = (leads || []).filter((l) => ids.includes(l.id))
+        const fallback = (fallbackLeadsRef.current || []).filter((l) => ids.includes(l.id))
         setResolvedLeads(fallback)
         setSendableIds(fallback.filter(leadHasSendableEmail).map((l) => l.id))
         setSkipped(
@@ -52,12 +68,18 @@ export default function BulkEmailModal({ open, leadIds, leads, onClose, onDone }
     return () => {
       cancelled = true
     }
-  }, [open, leadIdsKey, leads])
+  }, [open, leadIdsKey])
+
+  const composeLeads = useMemo(() => {
+    const idSet = new Set(sendableIds)
+    return resolvedLeads.filter((l) => idSet.has(l.id))
+  }, [resolvedLeads, sendableIds])
 
   if (!open) return null
 
   const noEmail = skipped.filter((s) => s.reason === 'no_email').length
   const notFound = skipped.filter((s) => s.reason === 'not_in_pipeline' || s.reason === 'not_loaded').length
+  const showLoading = resolving && fetchedKeyRef.current !== leadIdsKey
 
   return (
     <div
@@ -77,7 +99,7 @@ export default function BulkEmailModal({ open, leadIds, leads, onClose, onDone }
           </button>
         </header>
         <div className="crm-modal-body-fill">
-          {resolving ? (
+          {showLoading ? (
             <p className="px-5 py-4 text-sm text-[#516f90]">Loading recipients from pipeline…</p>
           ) : (
             <>
@@ -94,8 +116,9 @@ export default function BulkEmailModal({ open, leadIds, leads, onClose, onDone }
                 </p>
               )}
               <BulkEmailCompose
+                key={leadIdsKey}
                 leadIds={sendableIds}
-                leads={resolvedLeads.filter((l) => sendableIds.includes(l.id))}
+                leads={composeLeads}
                 skippedCount={skipped.length}
                 onDone={onDone}
                 compact

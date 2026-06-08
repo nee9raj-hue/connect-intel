@@ -10,6 +10,7 @@ export async function loadCrmMarketingTemplates() {
       id: `saved:${t.id}`,
       name: t.name || 'Untitled',
       subject: t.subject || '',
+      body: t.body || '',
       blocks: t.blocks || [],
       source: 'saved',
     }))
@@ -30,8 +31,9 @@ export async function loadCrmMarketingTemplates() {
 
 export function crmTemplateToComposeFields(template) {
   if (!template) return { subject: '', body: '' }
+  const fromBlocks = blocksToPlainText(template.blocks || []).trim()
   return {
     subject: template.subject || '',
-    body: blocksToPlainText(template.blocks || []),
+    body: fromBlocks || String(template.body || '').trim(),
   }
 }

@@ -23,6 +23,10 @@ export function RecipientEmailPreview({
     if (personalizeEach && aiPreview?.leadId === lead.id) {
       return { subject: aiPreview.subject || '', body: aiPreview.body || '' }
     }
+    const hasDraft = Boolean(subject?.trim() || body?.trim())
+    if (personalizeEach && !hasDraft) {
+      return { subject: '', body: '' }
+    }
     return mergeTemplateFields({ subject: subject || '', body: body || '' }, lead)
   }, [lead, subject, body, personalizeEach, aiPreview])
 
@@ -77,7 +81,10 @@ export function RecipientEmailPreview({
           {merged.subject || <span className="text-gray-400 font-normal">(no subject yet)</span>}
         </p>
         <pre className="text-xs text-[#516f90] whitespace-pre-wrap font-sans leading-relaxed max-h-40 overflow-y-auto">
-          {merged.body || (personalizeEach ? 'AI will write a unique message for each lead at send time.' : '(no body yet)')}
+          {merged.body ||
+            (personalizeEach && !subject?.trim() && !body?.trim()
+              ? 'AI will write a unique message for each lead at send time.'
+              : '(no body yet)')}
         </pre>
       </div>
 
@@ -93,13 +100,20 @@ export function RecipientEmailPreview({
 export function MarketingTemplatePicker({ templates, value, onChange, onApply, disabled }) {
   if (!templates.length) return null
 
+  const handleSelect = (nextId) => {
+    onChange(nextId)
+    if (!nextId) return
+    const template = templates.find((t) => t.id === nextId)
+    if (template) onApply?.(template)
+  }
+
   return (
     <div className="flex gap-2 items-end">
       <label className="flex-1 space-y-1">
         <span className="text-xs font-semibold uppercase text-gray-400">Marketing template</span>
         <select
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => handleSelect(e.target.value)}
           className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs"
           disabled={disabled}
         >
@@ -114,11 +128,14 @@ export function MarketingTemplatePicker({ templates, value, onChange, onApply, d
       </label>
       <button
         type="button"
-        onClick={onApply}
+        onClick={() => {
+          const template = templates.find((t) => t.id === value)
+          if (template) onApply?.(template)
+        }}
         disabled={disabled || !value}
         className="text-xs font-semibold px-3 py-1.5 bg-white border border-[#dfe3eb] rounded-lg disabled:opacity-50 whitespace-nowrap"
       >
-        Apply template
+        Apply again
       </button>
     </div>
   )

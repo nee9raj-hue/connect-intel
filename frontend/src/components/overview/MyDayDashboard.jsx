@@ -16,6 +16,7 @@ import {
   MyDaySkeleton,
 } from './MyDayCharts'
 import MyDayDetailDrawer from './MyDayDetailDrawer'
+import { useGreetingDayPart } from '../../hooks/useGreetingDayPart'
 
 function useIsMobile(bp = 768) {
   const [m, setM] = useState(() => (typeof window !== 'undefined' ? window.innerWidth < bp : false))
@@ -37,6 +38,7 @@ export default function MyDayDashboard({ onNavigate, isActive = true }) {
   const isMobile = useIsMobile()
 
   const firstName = user?.name?.split(' ')[0] || 'there'
+  const dayPart = useGreetingDayPart()
 
   const load = useCallback(async () => {
     setError(null)
@@ -207,7 +209,7 @@ export default function MyDayDashboard({ onNavigate, isActive = true }) {
       <header className="myday-header">
         <div>
           <p className="myday-header__eyebrow">My Day</p>
-          <h1 className="myday-header__title">Good {getDayPart()}, {firstName}</h1>
+          <h1 className="myday-header__title">Good {dayPart}, {firstName}</h1>
           <p className="myday-header__sub">
             {urgentCount > 0
               ? `${urgentCount} item${urgentCount === 1 ? '' : 's'} across your command bar`
@@ -363,9 +365,3 @@ export default function MyDayDashboard({ onNavigate, isActive = true }) {
   )
 }
 
-function getDayPart() {
-  const h = new Date().getHours()
-  if (h < 12) return 'morning'
-  if (h < 17) return 'afternoon'
-  return 'evening'
-}

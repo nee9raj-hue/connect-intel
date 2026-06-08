@@ -74,13 +74,21 @@ export default function BulkEmailCompose({
     [templates, templateId]
   )
 
-  const applySelectedTemplate = () => {
-    if (!selectedTemplate) return
-    const { subject: subj, body: text } = crmTemplateToComposeFields(selectedTemplate)
+  const applySelectedTemplate = (template = selectedTemplate) => {
+    if (!template) return
+    const { subject: subj, body: text } = crmTemplateToComposeFields(template)
+    if (!subj && !text) {
+      setError('This template has no subject or body content to apply.')
+      return
+    }
+    setComposeTab('manual')
+    setPersonalizeEach(false)
     setSubject(subj)
     setBody(text)
     setDraftAi(false)
-    setNotice(`Applied Marketing Hub template “${selectedTemplate.name}”. Edit or preview per recipient below.`)
+    setError(null)
+    setPreviewIndex(0)
+    setNotice(`Applied “${template.name}”. Preview each recipient below — merge fields fill in per lead.`)
     setAiPreview(null)
   }
 
@@ -264,7 +272,10 @@ export default function BulkEmailCompose({
           templates={templates}
           value={templateId}
           onChange={setTemplateId}
-          onApply={applySelectedTemplate}
+          onApply={(template) => {
+            setTemplateId(template.id)
+            applySelectedTemplate(template)
+          }}
           disabled={busy}
         />
 
