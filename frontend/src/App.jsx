@@ -19,7 +19,11 @@ function useInviteToken() {
       storeInviteToken(invite)
       const url = new URL(window.location.href)
       url.searchParams.delete('invite')
-      window.history.replaceState({}, '', url.pathname + url.search)
+      try {
+        window.history.replaceState({}, '', url.pathname + url.search)
+      } catch {
+        // ignore blocked history API
+      }
     }
   }, [])
 

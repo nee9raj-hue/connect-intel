@@ -60,6 +60,8 @@ export default function AppShell() {
   const applyingHistoryRef = useRef(false)
   const lastHistoryKeyRef = useRef('')
   const lastLeadIdRef = useRef(null)
+  const applyLocationRef = useRef(null)
+  const commitHistoryRef = useRef(null)
 
   const toggleSidebarCollapsed = useCallback(() => {
     setSidebarMode((prev) => {
@@ -160,6 +162,9 @@ export default function AppShell() {
     lastLeadIdRef.current = location?.leadId || null
   }, [])
 
+  applyLocationRef.current = applyLocation
+  commitHistoryRef.current = commitHistory
+
   useEffect(() => {
     if (!user) return undefined
 
@@ -169,15 +174,15 @@ export default function AppShell() {
       isPlatformAdmin: user.isPlatformAdmin,
     })
 
-    applyLocation(initial)
-    commitHistory(initial, { replace: true })
+    applyLocationRef.current?.(initial)
+    commitHistoryRef.current?.(initial, { replace: true })
     stripEphemeralQueryParams()
     historyReadyRef.current = true
 
     applyingHistoryRef.current = false
 
     return undefined
-  }, [user?.id, user?.isPlatformAdmin, applyLocation, commitHistory])
+  }, [user?.id, user?.isPlatformAdmin])
 
   useEffect(() => {
     const onPopState = () => {

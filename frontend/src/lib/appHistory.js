@@ -26,7 +26,14 @@ export function parseAppLocation(search = '') {
   if (params.get('activityType')) panelOptions.activityType = params.get('activityType')
   if (params.get('period')) panelOptions.period = params.get('period')
   if (params.get('userId')) panelOptions.userId = params.get('userId')
+  if (params.get('assigneeUserId')) panelOptions.assigneeUserId = params.get('assigneeUserId')
   if (params.get('adminTab')) panelOptions.tab = params.get('adminTab')
+  if (params.get('returnTo')) panelOptions.returnTo = params.get('returnTo')
+  if (params.get('followUpDue') === '1') panelOptions.followUpDue = true
+  if (params.get('overdueFollowUp') === '1') panelOptions.overdueFollowUp = true
+  if (params.get('closingThisWeek') === '1') panelOptions.closingThisWeek = true
+  const smartTags = params.getAll('smartTag').filter(Boolean)
+  if (smartTags.length) panelOptions.smartTags = smartTags
 
   const leadId = params.get('lead') || null
 
@@ -48,7 +55,13 @@ export function urlHasAppNavigation(search = '') {
     params.has('activityType') ||
     params.has('period') ||
     params.has('userId') ||
-    params.has('adminTab')
+    params.has('assigneeUserId') ||
+    params.has('adminTab') ||
+    params.has('returnTo') ||
+    params.has('followUpDue') ||
+    params.has('overdueFollowUp') ||
+    params.has('closingThisWeek') ||
+    params.has('smartTag')
   )
 }
 
@@ -117,6 +130,16 @@ export function serializeAppLocation({ panel = 'overview', panelOptions = {}, le
   if (panelOptions.activityType) params.set('activityType', panelOptions.activityType)
   if (panelOptions.period && panelOptions.period !== 'week') params.set('period', panelOptions.period)
   if (panelOptions.userId) params.set('userId', String(panelOptions.userId))
+  if (panelOptions.assigneeUserId) {
+    params.set('assigneeUserId', String(panelOptions.assigneeUserId))
+  }
+  if (panelOptions.returnTo) params.set('returnTo', String(panelOptions.returnTo))
+  if (panelOptions.followUpDue) params.set('followUpDue', '1')
+  if (panelOptions.overdueFollowUp) params.set('overdueFollowUp', '1')
+  if (panelOptions.closingThisWeek) params.set('closingThisWeek', '1')
+  for (const tag of panelOptions.smartTags || []) {
+    if (tag) params.append('smartTag', String(tag))
+  }
   if (
     panelOptions.tab &&
     (panel === 'admin-customers' || panel === 'admin-home') &&
@@ -144,13 +167,23 @@ export function appLocationUrl(location) {
   return `${window.location.pathname}${qs ? `?${qs}` : ''}`
 }
 
-export function pushAppLocation(location, { replace = false } = {}) {
-  persistAppLocation(location)
+function writeHistoryState(location, { replace = false } = {}) {
+  if (typeof window === 'undefined') return null
   const url = appLocationUrl(location)
   const state = { ciApp: 1, ...location }
-  if (replace) window.history.replaceState(state, '', url)
-  else window.history.pushState(state, '', url)
-  return url
+  try {
+    if (replace) window.history.replaceState(state, '', url)
+    else window.history.pushState(state, '', url)
+    return url
+  } catch {
+    // Blocked history API (sandboxed frame, strict browser policy, etc.)
+    return url
+  }
+}
+
+export function pushAppLocation(location, { replace = false } = {}) {
+  persistAppLocation(location)
+  return writeHistoryState(location, { replace })
 }
 
 /** Remove OAuth / invite params from the current URL without touching panel params. */
@@ -167,6 +200,10 @@ export function stripEphemeralQueryParams() {
   if (!changed) return false
   const qs = params.toString()
   const url = `${window.location.pathname}${qs ? `?${qs}` : ''}`
-  window.history.replaceState(window.history.state, '', url)
+  try {
+    window.history.replaceState(window.history.state, '', url)
+  } catch {
+    // ignore blocked history API
+  }
   return true
 }
