@@ -12,6 +12,29 @@ export const CONTACT_FILTER_OPTIONS = [
   { id: 'bounced_email', label: 'Bounced email' },
 ]
 
+export const HOT_LEAD_SCORE_MIN = 70
+
+/** Map smart tags / advanced filters to API query params (large pipelines filter server-side). */
+export function pipelineServerFilterExtras(adv = {}, smartView = {}) {
+  const smartTags = adv.smartTags || []
+  let minLeadScore = smartView.minLeadScore ?? null
+  if (smartTags.includes('hot_score')) {
+    minLeadScore =
+      minLeadScore != null && minLeadScore !== ''
+        ? Math.max(Number(minLeadScore) || 0, HOT_LEAD_SCORE_MIN)
+        : HOT_LEAD_SCORE_MIN
+  }
+  const min =
+    minLeadScore != null && minLeadScore !== '' && !Number.isNaN(Number(minLeadScore))
+      ? Number(minLeadScore)
+      : undefined
+  return {
+    minLeadScore: min,
+    followUpDue: adv.followUpDue ? '1' : undefined,
+    overdueFollowUp: adv.overdueFollowUp ? '1' : undefined,
+  }
+}
+
 export const DEFAULT_PIPELINE_FILTERS = {
   cities: [],
   states: [],
@@ -166,7 +189,7 @@ export function applyPipelineFilters(
     })
   }
   if (activeSmartTags.includes('hot_score')) {
-    list = list.filter((l) => (l.crm?.leadScore ?? 0) >= 70)
+    list = list.filter((l) => (l.crm?.leadScore ?? 0) >= HOT_LEAD_SCORE_MIN)
   }
 
   const filterTagIds = Array.isArray(tagIds) ? tagIds.filter(Boolean) : []

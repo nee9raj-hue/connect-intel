@@ -178,6 +178,9 @@ export const api = {
     states,
     assigneeUserId,
     tagIds,
+    minLeadScore,
+    followUpDue,
+    overdueFollowUp,
     silent = false,
   } = {}) => {
     const qs = new URLSearchParams({ limit: String(limit), offset: String(offset) })
@@ -191,6 +194,9 @@ export const api = {
     }
     if (assigneeUserId) qs.set('assigneeUserId', assigneeUserId)
     for (const id of tagIds || []) qs.append('tagId', id)
+    if (minLeadScore != null && minLeadScore !== '') qs.set('minLeadScore', String(minLeadScore))
+    if (followUpDue) qs.set('followUpDue', '1')
+    if (overdueFollowUp) qs.set('overdueFollowUp', '1')
     return request(`/api/pipeline/bootstrap?${qs}`, { timeoutMs: 60_000 }, { silent })
   },
 
@@ -217,6 +223,11 @@ export const api = {
     }
     if (params.assigneeUserId) qs.set('assigneeUserId', params.assigneeUserId)
     for (const id of params.tagIds || []) qs.append('tagId', id)
+    if (params.minLeadScore != null && params.minLeadScore !== '') {
+      qs.set('minLeadScore', String(params.minLeadScore))
+    }
+    if (params.followUpDue) qs.set('followUpDue', '1')
+    if (params.overdueFollowUp) qs.set('overdueFollowUp', '1')
     for (const [col, limit] of Object.entries(params.columnLimits || {})) {
       if (limit > 0) qs.set(`col_${col}`, String(limit))
     }
@@ -234,6 +245,9 @@ export const api = {
     states,
     assigneeUserId,
     tagIds,
+    minLeadScore,
+    followUpDue,
+    overdueFollowUp,
     silent = false,
   } = {}) => {
     const qs = new URLSearchParams({
@@ -251,6 +265,9 @@ export const api = {
     }
     if (assigneeUserId) qs.set('assigneeUserId', assigneeUserId)
     for (const id of tagIds || []) qs.append('tagId', id)
+    if (minLeadScore != null && minLeadScore !== '') qs.set('minLeadScore', String(minLeadScore))
+    if (followUpDue) qs.set('followUpDue', '1')
+    if (overdueFollowUp) qs.set('overdueFollowUp', '1')
     return request(`/api/saved-leads?${qs}`, { timeoutMs: 45_000 }, { silent })
   },
 

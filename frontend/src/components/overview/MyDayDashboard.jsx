@@ -61,13 +61,17 @@ export default function MyDayDashboard({ onNavigate, isActive = true }) {
       if (!action?.panel && !action?.leadId) return
       const panel = action.panel || 'pipeline'
       const options = { ...navTargetToOptions(action), returnTo: 'overview' }
+      if (panel === 'pipeline' && user?.id) {
+        options.userId = user.id
+        options.assigneeUserId = user.id
+      }
       if (action.leadId) {
         openPipelineLead(action.leadId, action.leadTab || 'overview')
       }
       onNavigate?.(panel, options)
       setDrawer(null)
     },
-    [onNavigate, openPipelineLead]
+    [onNavigate, openPipelineLead, user?.id]
   )
 
   const runAction = useCallback(
@@ -89,10 +93,15 @@ export default function MyDayDashboard({ onNavigate, isActive = true }) {
 
   const go = useCallback(
     (panel, opts = {}) => {
-      onNavigate?.(panel, { ...opts, returnTo: 'overview' })
+      const base = { ...opts, returnTo: 'overview' }
+      if (panel === 'pipeline' && user?.id) {
+        base.userId = user.id
+        base.assigneeUserId = user.id
+      }
+      onNavigate?.(panel, base)
       setDrawer(null)
     },
-    [onNavigate]
+    [onNavigate, user?.id]
   )
 
   const openPriority = useCallback(

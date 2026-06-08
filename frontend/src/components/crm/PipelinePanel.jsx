@@ -30,6 +30,7 @@ import {
   getFilterStates,
   leadMatchesAssignee,
   normalizeLocationKey,
+  pipelineServerFilterExtras,
 } from '../../lib/pipelineFilters'
 import { tagMapById } from '../../lib/orgLeadTags'
 import { leadHasCallablePhone } from '../../lib/phoneUtils'
@@ -335,8 +336,9 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       states: getFilterStates(adv).length ? getFilterStates(adv) : undefined,
       assigneeUserId: effectiveAssigneeFilter || undefined,
       tagIds: adv.tagIds?.length ? adv.tagIds : undefined,
+      ...pipelineServerFilterExtras(adv, smartViewFilters),
     }),
-    [filter, listStatusFilter, effectiveAssigneeFilter]
+    [filter, listStatusFilter, effectiveAssigneeFilter, smartViewFilters]
   )
 
   const serverFilters = useMemo(
@@ -352,7 +354,10 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
           serverFilters.q ||
           serverFilters.cities?.length ||
           serverFilters.states?.length ||
-          serverFilters.tagIds?.length
+          serverFilters.tagIds?.length ||
+          serverFilters.minLeadScore != null ||
+          serverFilters.followUpDue ||
+          serverFilters.overdueFollowUp
       ),
     [serverFilters]
   )
