@@ -14,6 +14,7 @@ export const ACTIVITY_LABELS = {
 }
 
 export const CALL_OUTCOMES = [
+  { id: 'incoming', label: 'Incoming call' },
   { id: 'connected', label: 'Connected' },
   { id: 'no_answer', label: 'No answer' },
   { id: 'voicemail', label: 'Left voicemail' },

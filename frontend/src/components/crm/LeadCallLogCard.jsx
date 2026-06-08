@@ -5,7 +5,7 @@ import { leadHasCallablePhone } from '../../lib/phoneUtils'
 import { CALL_OUTCOMES, fromDatetimeLocalValue } from '../../lib/crmUiConstants'
 
 /**
- * Log outbound calls on a lead: dial, outcome, notes, and callback follow-up date.
+ * Log calls on a lead: dial, outcome (including incoming), notes, and callback follow-up date.
  */
 export default function LeadCallLogCard({ lead, saving, onLog, onSuccess }) {
   const [outcome, setOutcome] = useState('connected')
@@ -19,9 +19,14 @@ export default function LeadCallLogCard({ lead, saving, onLog, onSuccess }) {
 
   const submitLog = async () => {
     const outcomeLabel = CALL_OUTCOMES.find((o) => o.id === outcome)?.label || outcome
-    const summary = notes.trim()
-      ? `Call (${outcomeLabel}): ${notes.trim()}`
-      : `Call — ${outcomeLabel}`
+    const inbound = outcome === 'incoming'
+    const summary = inbound
+      ? notes.trim()
+        ? `Incoming call: ${notes.trim()}`
+        : 'Incoming call'
+      : notes.trim()
+        ? `Call (${outcomeLabel}): ${notes.trim()}`
+        : `Call — ${outcomeLabel}`
 
     const body = {
       activity: {
@@ -29,7 +34,7 @@ export default function LeadCallLogCard({ lead, saving, onLog, onSuccess }) {
         summary,
         meta: {
           outcome,
-          direction: 'outbound',
+          direction: inbound ? 'inbound' : 'outbound',
           phone: phone || null,
         },
       },
@@ -62,7 +67,8 @@ export default function LeadCallLogCard({ lead, saving, onLog, onSuccess }) {
         ) : null}
       </div>
       <p className="lead-call-log-card__hint">
-        Record calls you make on this lead. Set a callback date so it appears on your calendar and dashboard.
+        Record outbound or incoming calls on this lead. Set a callback date so it appears on your calendar and
+        dashboard.
       </p>
 
       {phone ? (
