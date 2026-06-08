@@ -628,6 +628,7 @@ export function AppProvider({ children }) {
 
     const needsFullReload = Boolean(
       body?.contact ||
+        body?.deal ||
         (body?.crm &&
           Object.keys(body.crm).some((k) => !['status', 'responseReceived'].includes(k)))
     )
@@ -645,6 +646,14 @@ export function AppProvider({ children }) {
       }
       if (lead) {
         setSavedLeads((current) => mergeLeadInList(current, lead))
+      }
+      if (body?.deal) {
+        try {
+          const summary = await api.getPipelineSummary({ silent: true })
+          setPipelineSummary(normalizePipelineSummary(summary))
+        } catch {
+          // dashboard counts refresh is best-effort
+        }
       }
       return lead
     } catch (error) {
