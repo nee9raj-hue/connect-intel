@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-08T15:48:29.429Z",
-  "updatedAtIst": "08/06/2026, 21:18:29",
+  "updatedAt": "2026-06-08T16:02:05.743Z",
+  "updatedAtIst": "08/06/2026, 21:32:05",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "8e209f2",
+  "currentProductionCommit": "bfc34d4",
   "entries": [
+    {
+      "logId": "20260608-2131-bfc34d4",
+      "commit": "bfc34d4",
+      "commitFull": "bfc34d420375f2115eceb8f734021873b243de12",
+      "message": "Add CRM platform Phase 0: blueprint, command palette, and unified search.",
+      "deployedAt": "2026-06-08T16:01:50.437Z",
+      "deployedAtIst": "08/06/2026, 21:31:50",
+      "committedAtIst": "08/06/2026, 21:31:22",
+      "vercelPreviewUrl": "https://connect-intel-3wdssc8c9-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- bfc34d4"
+    },
+    {
+      "logId": "20260608-2119-789ff50",
+      "commit": "789ff50",
+      "commitFull": "789ff507fefe87e78b0e184406cd5459d00df3e5",
+      "message": "Update production log for 8e209f2 Marketing Domains UX fix.",
+      "deployedAt": "2026-06-08T15:49:00.077Z",
+      "deployedAtIst": "08/06/2026, 21:19:00",
+      "committedAtIst": "08/06/2026, 21:18:32",
+      "vercelPreviewUrl": "https://connect-intel-hy8y9pdez-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 789ff50"
+    },
     {
       "logId": "20260608-2118-8e209f2",
       "commit": "8e209f2",
@@ -15,7 +43,7 @@
       "committedAtIst": "08/06/2026, 21:17:47",
       "vercelPreviewUrl": "https://connect-intel-ripu2i8s5-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 8e209f2"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 8d39bf2"
-    },
-    {
-      "logId": "20260608-1911-251c96d",
-      "commit": "251c96d",
-      "commitFull": "251c96dc887cf738a092e1a0c6512535767f593c",
-      "message": "Fix search timeout by avoiding full-store quota reads/writes.",
-      "deployedAt": "2026-06-08T13:41:19.387Z",
-      "deployedAtIst": "08/06/2026, 19:11:19",
-      "committedAtIst": "08/06/2026, 19:10:51",
-      "vercelPreviewUrl": "https://connect-intel-7vl9u70bk-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 251c96d"
-    },
-    {
-      "logId": "20260608-1710-7584d6b",
-      "commit": "7584d6b",
-      "commitFull": "7584d6b10ef65eb99f5d5590df458a67579ec07d",
-      "message": "Log production deploy 328295d (AI search database-first).",
-      "deployedAt": "2026-06-08T11:40:29.876Z",
-      "deployedAtIst": "08/06/2026, 17:10:29",
-      "committedAtIst": "08/06/2026, 17:10:01",
-      "vercelPreviewUrl": "https://connect-intel-kamnnmsfn-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 7584d6b"
     }
   ]
 }
