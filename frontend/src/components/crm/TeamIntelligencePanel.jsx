@@ -32,6 +32,8 @@ import {
   TeamHoursBarChart,
 } from './TeamIntelligenceCharts'
 
+const TIMELINE_PAGE_SIZE = 5
+
 const TEAM_KPIS = [
   { key: 'hoursInApp', label: 'Hours in CRM', intelKey: 'hoursInApp', format: 'hours', icon: 'team' },
   { key: 'contactsOpened', label: 'Contacts worked', intelKey: 'contactsOpened', icon: 'people' },
@@ -46,6 +48,7 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
   const [period, setPeriod] = useState(panelOptions?.period || 'week')
   const [memberUserId, setMemberUserId] = useState(panelOptions?.userId || '')
   const [timelineFilter, setTimelineFilter] = useState(panelOptions?.timelineFilter || 'all')
+  const [timelineVisible, setTimelineVisible] = useState(TIMELINE_PAGE_SIZE)
   const [detailItem, setDetailItem] = useState(null)
   const scrollRef = useRef(null)
   const [data, setData] = useState(null)
@@ -128,6 +131,17 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
     const rows = data?.activityTimeline || []
     return rows.filter((item) => matchesTimelineFilter(item, timelineFilter))
   }, [data?.activityTimeline, timelineFilter])
+
+  const visibleTimeline = useMemo(
+    () => filteredTimeline.slice(0, timelineVisible),
+    [filteredTimeline, timelineVisible]
+  )
+
+  const timelineRemaining = Math.max(0, filteredTimeline.length - visibleTimeline.length)
+
+  useEffect(() => {
+    setTimelineVisible(TIMELINE_PAGE_SIZE)
+  }, [period, memberUserId, timelineFilter, data?.activityTimeline])
 
   const openInCrm = useCallback(
     (item, leadTab) => {
@@ -347,7 +361,7 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
                   </DashboardEmpty>
                 ) : (
                   <ul className="team-intel-timeline">
-                    {filteredTimeline.map((item) => (
+                    {visibleTimeline.map((item) => (
                       <li key={item.id} className={`team-intel-timeline__item team-intel-timeline__item--${item.kind}`}>
                         <button
                           type="button"
@@ -384,6 +398,24 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
                     ))}
                   </ul>
                 )}
+                {timelineRemaining > 0 ? (
+                  <div className="team-intel-timeline__more">
+                    <p className="team-intel-timeline__more-meta">
+                      Showing {visibleTimeline.length} of {filteredTimeline.length}
+                    </p>
+                    <button
+                      type="button"
+                      className="crm-btn crm-btn-secondary crm-btn-sm"
+                      onClick={() =>
+                        setTimelineVisible((n) =>
+                          Math.min(filteredTimeline.length, n + TIMELINE_PAGE_SIZE)
+                        )
+                      }
+                    >
+                      Load more ({timelineRemaining} remaining)
+                    </button>
+                  </div>
+                ) : null}
               </DashboardSection>
 
               <div className="intel-layout-main">

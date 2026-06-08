@@ -11080,6 +11080,23 @@ html[data-pipeline-mobile="1"] .ci-app-header-chip--secondary {
   color: #94a3b8;
 }
 
+.team-intel-timeline__more {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.team-intel-timeline__more-meta {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin: 0;
+}
+
 .team-intel-detail-modal {
   max-width: 36rem;
   width: calc(100% - 2rem);
