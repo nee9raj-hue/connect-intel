@@ -16,8 +16,19 @@ import { leadHasCallablePhone } from '../../lib/phoneUtils'
 import useIsMobile from '../../hooks/useIsMobile'
 import MarketingCampaignSetupFields from './MarketingCampaignSetupFields'
 import MarketingCampaignWizardModal from './MarketingCampaignWizardModal'
-import MarketingDashboard from './MarketingDashboard'
+import MarketingHubShell from './MarketingHubShell'
+import MarketingHubDashboard from './MarketingHubDashboard'
+import MarketingCampaignsHub from './MarketingCampaignsHub'
+import MarketingAnalyticsHub from './MarketingAnalyticsHub'
+import MarketingAudiencesHub from './MarketingAudiencesHub'
+import MarketingAssetsHub from './MarketingAssetsHub'
 import MarketingSegmentsPanel from './MarketingSegmentsPanel'
+import {
+  MARKETING_HUB_TABS,
+  MOBILE_HUB_TABS,
+  normalizeMarketingTab,
+  audienceTabFromPanelOptions,
+} from '../../lib/marketingHubNav'
 import MarketingSuppressionPanel from './MarketingSuppressionPanel'
 import MarketingDomainsPanel from './MarketingDomainsPanel'
 import MarketingAutomationsPanel from './MarketingAutomationsPanel'
@@ -29,25 +40,8 @@ import {
   marketingGuideStorageKey,
 } from '../../lib/guides/marketingGuide'
 
-const TABS = [
-  { id: 'dashboard', label: 'Dashboard', short: 'Dash' },
-  { id: 'campaigns', label: 'Campaigns', short: 'Camp' },
-  { id: 'segments', label: 'Segments', short: 'Seg' },
-  { id: 'lists', label: 'Lists', short: 'List' },
-  { id: 'reports', label: 'Reports', short: 'Rpt' },
-  { id: 'templates', label: 'Templates', short: 'Tpl' },
-  { id: 'forms', label: 'Forms', short: 'Form' },
-  { id: 'landing', label: 'Landing', short: 'Land' },
-  { id: 'feeds', label: 'RSS', short: 'RSS' },
-  { id: 'automations', label: 'Automations', short: 'Auto' },
-  { id: 'inbox', label: 'WA Inbox', short: 'WA' },
-  { id: 'suppressions', label: 'Suppressions', short: 'Sup' },
-  { id: 'domains', label: 'Domains', short: 'Dom' },
-]
-
-const MOBILE_TABS = TABS.filter(
-  (t) => !['templates', 'forms', 'landing', 'feeds', 'automations', 'suppressions', 'domains'].includes(t.id)
-)
+const TABS = MARKETING_HUB_TABS
+const MOBILE_TABS = MOBILE_HUB_TABS
 
 const EMPTY_TEMPLATE = {
   name: '',
@@ -94,7 +88,10 @@ const EMPTY_CAMPAIGN = {
 
 export default function MarketingPanel({ onNavigate, panelOptions, isActive = true }) {
   const { savedLeads, refreshSavedLeads, user, teamMembers, refreshTeam } = useApp()
-  const [tab, setTab] = useState(panelOptions?.tab || 'campaigns')
+  const [tab, setTab] = useState(normalizeMarketingTab(panelOptions?.tab || 'overview'))
+  const [hubPeriod, setHubPeriod] = useState('30d')
+  const [hubSearch, setHubSearch] = useState('')
+  const [audienceSubTab, setAudienceSubTab] = useState(audienceTabFromPanelOptions(panelOptions))
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState(null)
@@ -114,12 +111,12 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
   const guideStorageKey = marketingGuideStorageKey(user?.id)
   const [campaignSetupOpen, setCampaignSetupOpen] = useState(true)
   const [campaignWizardOpen, setCampaignWizardOpen] = useState(false)
-  const [campaignDesktopPhase, setCampaignDesktopPhase] = useState('setup')
+  const [campaignDesktopPhase, setCampaignDesktopPhase] = useState('list')
   const isMobile = useIsMobile()
 
   const isBuilderTab = tab === 'campaigns' || tab === 'templates'
   const hideMarketingKpis =
-    isBuilderTab || tab === 'reports' || tab === 'lists' || tab === 'dashboard' || tab === 'segments'
+    isBuilderTab || tab === 'analytics' || tab === 'audiences' || tab === 'overview' || tab === 'assets'
   const hideMarketingHeader =
     !isMobile &&
     (tab === 'templates' || (tab === 'campaigns' && campaignDesktopPhase === 'editor'))
@@ -163,21 +160,16 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
     setCampaignEmailStep(1)
     setCampaignSetupOpen(false)
     setCampaignWizardOpen(false)
-    setCampaignDesktopPhase('setup')
+    setCampaignDesktopPhase('list')
     setError(null)
   }, [])
 
   useEffect(() => {
-    if (isMobile || tab !== 'campaigns') return
-    setCampaignDesktopPhase('setup')
-  }, [tab, isMobile])
-
-  useEffect(() => {
     if (
       isMobile &&
-      ['templates', 'forms', 'landing', 'feeds', 'automations', 'suppressions', 'domains'].includes(tab)
+      ['templates', 'landing', 'assets', 'domains'].includes(tab)
     ) {
-      setTab('campaigns')
+      setTab('overview')
     }
   }, [isMobile, tab])
   const pipelineLeadsWithPhone = useMemo(
@@ -207,8 +199,11 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
   }, [])
 
   useEffect(() => {
-    if (panelOptions?.tab) setTab(panelOptions.tab)
-  }, [panelOptions?.tab])
+    if (panelOptions?.tab) setTab(normalizeMarketingTab(panelOptions.tab))
+    if (panelOptions?.audienceTab) setAudienceSubTab(panelOptions.audienceTab)
+    else if (panelOptions?.tab === 'lists') setAudienceSubTab('lists')
+    else if (panelOptions?.tab === 'segments') setAudienceSubTab('segments')
+  }, [panelOptions?.tab, panelOptions?.audienceTab])
 
   useEffect(() => {
     if (user?.accountType !== 'company') return
@@ -833,194 +828,316 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
     }
   }
 
+  const renderTemplatesTab = () => (
+    <div className="marketing-immersive-editor flex-1 min-h-0 flex flex-col bg-white">
+      <MarketingTemplateBuilder
+        studioMode
+        immersive
+        historyResetKey={templateForm.id || 'template-new'}
+        value={templateForm}
+        onChange={setTemplateForm}
+        onSave={saveTemplate}
+        onCancel={() => setTemplateForm({ ...EMPTY_TEMPLATE, design: { ...DEFAULT_THEME } })}
+        busy={busy}
+        templates={templates}
+        onEdit={editTemplate}
+        onDelete={deleteTemplate}
+        marketingForms={forms}
+      />
+    </div>
+  )
+
+  const renderCampaignsTab = () => {
+    if (isMobile) {
+      return (
+        <div className="marketing-mobile-home">
+          <div className="marketing-mobile-setup ci-card">
+            <div className="flex items-center justify-between gap-2 mb-1">
+              <h2 className="marketing-mobile-setup-title mb-0">New campaign</h2>
+              <button type="button" className="crm-btn crm-btn-secondary crm-btn-sm shrink-0" onClick={() => setGuideOpen(true)}>
+                Guide
+              </button>
+            </div>
+            <p className="marketing-mobile-setup-copy">
+              Pick channel, name, list, and an optional template. Continue opens the design wizard.
+            </p>
+            <MarketingCampaignSetupFields
+              campaignForm={campaignForm}
+              setCampaignForm={setCampaignForm}
+              lists={lists}
+              segments={segments}
+              templates={templates}
+              applyTemplate={applyTemplate}
+              user={user}
+              permissions={permissions}
+              onNavigate={onNavigate}
+              onTestSend={handleTestSend}
+              testSendBusy={busy}
+            />
+            <div className="marketing-mobile-setup-actions">
+              <button type="button" onClick={resetCampaignForm} className="crm-btn crm-btn-secondary">
+                Start fresh
+              </button>
+              <button
+                type="button"
+                disabled={!canOpenCampaignWizard}
+                onClick={() => {
+                  setCampaignEmailStep(1)
+                  setCampaignWizardOpen(true)
+                }}
+                className="crm-btn crm-btn-primary flex-1"
+              >
+                Continue
+              </button>
+            </div>
+            {!canOpenCampaignWizard && (
+              <p className="text-sm text-slate-500 mt-2">Enter a campaign name and choose a list to continue.</p>
+            )}
+          </div>
+          {needsWorkEmail && (
+            <div className="px-1">
+              <WorkEmailOptions onNavigate={onNavigate} compact />
+            </div>
+          )}
+          <details className="marketing-mobile-campaigns ci-card">
+            <summary className="marketing-mobile-campaigns-summary">Your campaigns ({campaigns.length})</summary>
+            <div className="px-3 pb-3 space-y-2">
+              {!campaigns.length ? (
+                <p className="text-xs text-gray-500 py-2">No campaigns yet.</p>
+              ) : (
+                campaigns.map((c) => (
+                  <CampaignCard
+                    key={c.id}
+                    campaign={c}
+                    busy={busy}
+                    onStart={startCampaign}
+                    onPause={pauseCampaign}
+                    onResume={continueCampaignSending}
+                    onStop={stopCampaign}
+                    onContinue={continueCampaignSending}
+                    onNavigate={onNavigate}
+                    showCreator={Boolean(user?.isOrgAdmin && user?.accountType === 'company')}
+                    permissions={permissions}
+                    onApprove={approveCampaign}
+                    onReject={rejectCampaign}
+                  />
+                ))
+              )}
+            </div>
+          </details>
+          {campaignWizardOpen && (
+            <MarketingCampaignWizardModal
+              open
+              onClose={() => setCampaignWizardOpen(false)}
+              campaignForm={campaignForm}
+              setCampaignForm={setCampaignForm}
+              setCampaignEmailStep={setCampaignEmailStep}
+              forms={forms}
+              lists={lists}
+              templates={templates}
+              busy={busy}
+              canSaveCampaignDraft={canSaveCampaignDraft}
+              saveHint={campaignSaveHint}
+              error={error}
+              notice={notice}
+              onSaveDraft={handleWizardSaveDraft}
+              onSend={handleWizardSend}
+              onSaveAsTemplate={saveCampaignAsTemplate}
+            />
+          )}
+        </div>
+      )
+    }
+
+    if (campaignDesktopPhase === 'list') {
+      return (
+        <MarketingCampaignsHub
+          campaigns={campaigns}
+          lists={lists}
+          busy={busy}
+          user={user}
+          permissions={permissions}
+          onNavigate={onNavigate}
+          onStart={startCampaign}
+          onPause={pauseCampaign}
+          onResume={continueCampaignSending}
+          onStop={stopCampaign}
+          onContinue={continueCampaignSending}
+          onApprove={approveCampaign}
+          onReject={rejectCampaign}
+          onCreate={() => {
+            resetCampaignForm()
+            setCampaignDesktopPhase('setup')
+          }}
+          onEdit={() => setCampaignDesktopPhase('setup')}
+        />
+      )
+    }
+
+    if (campaignDesktopPhase === 'setup') {
+      return (
+        <div className="marketing-campaign-setup-page flex-1 flex flex-col items-center justify-center p-6 sm:p-10 bg-white">
+          <div className="w-full max-w-lg">
+            <button type="button" className="mhub-link mb-4" onClick={() => setCampaignDesktopPhase('list')}>
+              ← All campaigns
+            </button>
+            <h2 className="text-xl font-bold text-[#17191c] tracking-tight">New campaign</h2>
+            <div className="mt-6">
+              <MarketingCampaignSetupFields
+                campaignForm={campaignForm}
+                setCampaignForm={setCampaignForm}
+                lists={lists}
+                segments={segments}
+                templates={templates}
+                applyTemplate={applyTemplate}
+                user={user}
+                permissions={permissions}
+                onNavigate={onNavigate}
+                onTestSend={handleTestSend}
+                testSendBusy={busy}
+              />
+            </div>
+            {campaignForm.useSequence && (
+              <div className="flex flex-wrap gap-2 mt-4">
+                {[
+                  { id: 1, label: 'Message 1' },
+                  { id: 2, label: 'Follow-up' },
+                ].map((step) => (
+                  <button
+                    key={step.id}
+                    type="button"
+                    onClick={() => setCampaignEmailStep(step.id)}
+                    className={`ci-btn !text-xs ${campaignEmailStep === step.id ? 'ci-btn-accent' : 'ci-btn-secondary'}`}
+                  >
+                    {step.label}
+                  </button>
+                ))}
+              </div>
+            )}
+            <button
+              type="button"
+              disabled={!canEnterCampaignEditor}
+              onClick={() => setCampaignDesktopPhase('editor')}
+              className="crm-btn crm-btn-primary w-full mt-6"
+            >
+              Continue to design
+            </button>
+            {!canEnterCampaignEditor && (
+              <p className="text-xs text-[#7c98b6] mt-2 text-center">
+                Enter name, list{campaignForm.channel === 'email' ? ', and subject' : ''} to continue.
+              </p>
+            )}
+          </div>
+        </div>
+      )
+    }
+
+    return (
+      <div className="marketing-immersive-editor flex-1 min-h-0 flex flex-col bg-white">
+        {campaignForm.useSequence && (
+          <div className="shrink-0 flex gap-2 px-3 py-2 border-b border-[#e8ecf1] bg-white">
+            {[
+              { id: 1, label: 'Message 1' },
+              { id: 2, label: 'Follow-up' },
+            ].map((step) => (
+              <button
+                key={step.id}
+                type="button"
+                onClick={() => setCampaignEmailStep(step.id)}
+                className={`ci-btn !text-xs ${campaignEmailStep === step.id ? 'ci-btn-accent' : 'ci-btn-secondary'}`}
+              >
+                {step.label}
+              </button>
+            ))}
+          </div>
+        )}
+        {(!campaignForm.useSequence || campaignEmailStep === 1) && (
+          <MarketingTemplateBuilder
+            embedded
+            studioMode
+            immersive
+            historyResetKey={`campaign-${campaignForm.channel}-1`}
+            showNameField={false}
+            showSavedTemplates={false}
+            value={{
+              subject: campaignForm.subject,
+              blocks: campaignForm.blocks,
+              design: campaignForm.design,
+              previewText: campaignForm.previewText,
+              body: campaignForm.body,
+            }}
+            onChange={(next) =>
+              setCampaignForm((p) => ({
+                ...p,
+                subject: next.subject ?? p.subject,
+                blocks: next.blocks ?? p.blocks,
+                design: next.design ?? p.design,
+                previewText: next.previewText ?? p.previewText,
+                body: next.body ?? p.body,
+              }))
+            }
+            onBack={() => setCampaignDesktopPhase('setup')}
+            onSaveDraft={async () => {
+              setError(null)
+              await createCampaign()
+            }}
+            onSaveAsTemplate={saveCampaignAsTemplate}
+            onSend={createAndStart}
+            sendDisabled={busy || !canSaveCampaignDraft}
+            draftDisabled={busy || !canSaveCampaignDraft}
+            busy={busy}
+            marketingForms={forms}
+          />
+        )}
+        {campaignForm.useSequence && campaignEmailStep === 2 && (
+          <MarketingTemplateBuilder
+            embedded
+            studioMode
+            immersive
+            historyResetKey={`campaign-${campaignForm.channel}-2`}
+            showNameField={false}
+            showSavedTemplates={false}
+            starterOptions={[{ id: 'followup', name: 'Follow-up check-in', ...FOLLOW_UP_STARTER }]}
+            value={{
+              subject: campaignForm.step2Subject,
+              blocks: campaignForm.step2Blocks,
+              design: campaignForm.step2Design,
+              previewText: campaignForm.step2PreviewText,
+              body: campaignForm.step2Body,
+            }}
+            onChange={(next) =>
+              setCampaignForm((p) => ({
+                ...p,
+                step2Subject: next.subject ?? p.step2Subject,
+                step2Blocks: next.blocks ?? p.step2Blocks,
+                step2Design: next.design ?? p.step2Design,
+                step2PreviewText: next.previewText ?? p.step2PreviewText,
+                step2Body: next.body ?? p.step2Body,
+              }))
+            }
+            onBack={() => setCampaignDesktopPhase('setup')}
+            onSaveDraft={async () => {
+              setError(null)
+              await createCampaign()
+            }}
+            onSaveAsTemplate={saveCampaignAsTemplate}
+            onSend={createAndStart}
+            sendDisabled={busy || !canSaveCampaignDraft}
+            draftDisabled={busy || !canSaveCampaignDraft}
+            busy={busy}
+            marketingForms={forms}
+          />
+        )}
+      </div>
+    )
+  }
+
   return (
     <div
       className={`crm-workspace flex h-full min-h-0 w-full overflow-hidden ${
         isBuilderTab ? 'marketing-campaigns-shell' : ''
       } ${hideMarketingHeader ? 'marketing-immersive-shell' : ''}`}
     >
-      {!hideMarketingHeader && (
-      <header className="crm-page-header shrink-0">
-        <div className="crm-page-header-top">
-          <div className="min-w-0 flex-1">
-            <h1 className="crm-page-title">Email marketing</h1>
-            <p className="crm-page-subtitle">
-              {hideMarketingKpis ? (
-                <>
-                  {tab === 'campaigns'
-                    ? 'Build and send campaigns — view stats under Reports.'
-                    : tab === 'lists'
-                      ? 'Build audience lists from your pipeline for email and WhatsApp.'
-                      : tab === 'inbox'
-                        ? 'WhatsApp replies from campaigns and pipeline outreach.'
-                        : 'Design reusable email templates for your team.'}
-                  {needsWorkEmail && tab === 'campaigns' && (
-                    <>
-                      {' '}
-                      <span className="text-amber-800 font-semibold">
-                        Connect work email to send.
-                      </span>
-                    </>
-                  )}
-                </>
-              ) : summary ? (
-                <span className="crm-marketing-kpis">
-                  <span>
-                    <strong>{summary.campaigns}</strong> campaigns
-                  </span>
-                  <span>
-                    <strong>{summary.enrolled}</strong> enrolled
-                  </span>
-                  <span>
-                    <strong>{summary.sent}</strong> sent
-                  </span>
-                  <span>
-                    <strong>{summary.opens}</strong> opens
-                  </span>
-                  <span>
-                    <strong>{summary.clicks}</strong> clicks
-                  </span>
-                </span>
-              ) : (
-                'Lists, templates, campaigns, and lead capture forms — logged on each lead in Pipeline.'
-              )}
-            </p>
-          </div>
-          <div className="crm-page-actions flex-wrap">
-            <button
-              type="button"
-              onClick={() => setGuideOpen(true)}
-              className="crm-btn crm-btn-secondary"
-            >
-              How to use
-            </button>
-            {(needsWorkEmail ||
-              (user?.accountType === 'company' && !isBuilderTab) ||
-              (user?.isOrgAdmin && user?.accountType === 'company')) && (
-              <button
-                type="button"
-                onClick={() => setMarketingTipsOpen((o) => !o)}
-                className="crm-btn crm-btn-ghost"
-              >
-                {marketingTipsOpen ? 'Hide tips' : 'Tips'}
-              </button>
-            )}
-            <div
-              className={`crm-view-tabs crm-view-tabs--mobile-scroll ${
-                isMobile ? 'marketing-mobile-tabs' : ''
-              }`}
-            >
-              {visibleTabs.map((t) => (
-                <button
-                  key={t.id}
-                  type="button"
-                  onClick={() => setTab(t.id)}
-                  className={`crm-view-tab crm-view-tab--short ${tab === t.id ? 'is-active' : ''}`}
-                >
-                  <span className="crm-view-tab-long">{t.label}</span>
-                  <span className="crm-view-tab-short">{t.short || t.label.slice(0, 3)}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {summary && !hideMarketingKpis && (
-          <div className="marketing-summary-strip">
-            <span className="marketing-summary-pill">
-              <strong>{summary.campaigns || 0}</strong> campaigns
-            </span>
-            <span className="marketing-summary-pill">
-              <strong>{summary.sent || 0}</strong> sent
-            </span>
-            <span className="marketing-summary-pill">
-              <strong>{summary.opens || 0}</strong> opens
-            </span>
-            <span className="marketing-summary-pill">
-              <strong>{summary.clicks || 0}</strong> clicks
-            </span>
-            <span className="marketing-summary-pill">
-              <strong>{lists.length || 0}</strong> lists
-            </span>
-            <span className="marketing-summary-pill">
-              <strong>{templates.length || 0}</strong> templates
-            </span>
-          </div>
-        )}
-
-        {guidePrompt && !hideMarketingHeader && (
-          <div className="panel-guide-prompt mx-4 sm:mx-6 mb-2">
-            <span>New to Marketing? Walk through lists, campaigns, and reports step by step.</span>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                className="crm-btn crm-btn-primary crm-btn-sm"
-                onClick={() => setGuideOpen(true)}
-              >
-                Open guide
-              </button>
-              <button
-                type="button"
-                className="crm-btn crm-btn-ghost crm-btn-sm"
-                onClick={() => {
-                  try {
-                    localStorage.setItem(guideStorageKey, new Date().toISOString())
-                  } catch {
-                    /* ignore */
-                  }
-                  setGuidePrompt(false)
-                }}
-              >
-                Dismiss
-              </button>
-            </div>
-          </div>
-        )}
-
-        {marketingTipsOpen && (
-          <div className="pb-3 space-y-2 max-h-[28vh] overflow-y-auto">
-            {(user?.isOrgAdmin || user?.orgRole === 'org_admin') && user?.accountType === 'company' ? (
-              <p className="crm-alert text-[#516f90] bg-[#f5f8fa] border-[#dfe3eb] mb-0">
-                Admins see all team campaigns. Reps only see their own assets.
-              </p>
-            ) : user?.accountType === 'company' ? (
-              <p className="crm-alert text-[#516f90] bg-[#f5f8fa] border-[#dfe3eb] mb-0">
-                Connect work Gmail under{' '}
-                <button type="button" onClick={() => onNavigate?.('my-email')} className="crm-link-btn p-0">
-                  Work email
-                </button>{' '}
-                before sending email campaigns.
-              </p>
-            ) : null}
-            {needsWorkEmail && (
-              <div className="max-w-xl">
-                <WorkEmailOptions onNavigate={onNavigate} compact />
-              </div>
-            )}
-            {user?.isOrgAdmin && user?.accountType === 'company' && !user?.whatsappAutoSendReady && (
-              <p className="crm-alert crm-alert-error mb-0">
-                WhatsApp API:{' '}
-                <button
-                  type="button"
-                  onClick={() => onNavigate?.('whatsapp-settings')}
-                  className="crm-link-btn p-0"
-                >
-                  Workspace → WhatsApp API
-                </button>
-              </p>
-            )}
-          </div>
-        )}
-      </header>
-      )}
-
-      {(error || notice) && !hideMarketingHeader && (
-        <div className={`shrink-0 px-4 sm:px-6 ${isBuilderTab ? 'pt-1.5' : 'pt-2'}`}>
-          {error && <p className="crm-alert crm-alert-error">{error}</p>}
-          {notice && <p className="crm-alert crm-alert-success mt-2">{notice}</p>}
-        </div>
-      )}
-
       {(error || notice) && hideMarketingHeader && (
         <div className="shrink-0 px-3 py-2 bg-white border-b border-[#e8ecf1]">
           {error && <p className="crm-alert crm-alert-error mb-0">{error}</p>}
@@ -1028,28 +1145,95 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
         </div>
       )}
 
-      <div
-        className={
-          hideMarketingHeader
-            ? 'marketing-immersive-body flex-1 min-h-0 flex flex-col bg-white'
-            : isBuilderTab
-              ? 'panel-body-scroll px-2 sm:px-3 py-1.5 pb-8 flex-1 min-h-0 bg-white'
-              : 'crm-page-body'
-        }
-      >
-        {loading ? (
-          <div className={isBuilderTab ? '' : 'crm-content-card crm-content-scroll'}>
+      {hideMarketingHeader ? (
+        <div className="marketing-immersive-body flex-1 min-h-0 flex flex-col bg-white">
+          {loading ? (
             <LoadingExperience message={LOADING_MESSAGES.marketing} />
-          </div>
-        ) : tab === 'dashboard' ? (
-          <div className="crm-content-card crm-content-scroll flex-1 min-h-0 p-4 sm:p-6">
-            <MarketingDashboard onNavigate={onNavigate} />
-          </div>
-        ) : tab === 'segments' ? (
-          <div className="crm-content-card crm-content-scroll flex-1 min-h-0 p-4 sm:p-6">
-            <MarketingSegmentsPanel
+          ) : tab === 'campaigns' ? (
+            renderCampaignsTab()
+          ) : tab === 'templates' ? (
+            renderTemplatesTab()
+          ) : null}
+        </div>
+      ) : (
+        <MarketingHubShell
+          tab={tab}
+          onTabChange={setTab}
+          onNavigate={onNavigate}
+          period={hubPeriod}
+          onPeriodChange={setHubPeriod}
+          searchValue={hubSearch}
+          onSearchChange={setHubSearch}
+          onCreateCampaign={() => {
+            setTab('campaigns')
+            setCampaignDesktopPhase('setup')
+            resetCampaignForm()
+          }}
+          onCreateAutomation={() => setTab('automations')}
+          onImportContacts={() => {
+            setTab('audiences')
+            setAudienceSubTab('lists')
+          }}
+          onCreateForm={() => setTab('forms')}
+          onCreateLanding={() => setTab('landing')}
+          alerts={
+            <>
+              {(error || notice) && (
+                <div className="mhub-alerts">
+                  {error && <p className="crm-alert crm-alert-error">{error}</p>}
+                  {notice && <p className="crm-alert crm-alert-success">{notice}</p>}
+                </div>
+              )}
+              {guidePrompt && (
+                <div className="panel-guide-prompt mhub-guide-prompt">
+                  <span>New to Marketing? Walk through the hub step by step.</span>
+                  <div className="flex gap-2">
+                    <button type="button" className="crm-btn crm-btn-primary crm-btn-sm" onClick={() => setGuideOpen(true)}>
+                      Open guide
+                    </button>
+                    <button
+                      type="button"
+                      className="crm-btn crm-btn-ghost crm-btn-sm"
+                      onClick={() => {
+                        try {
+                          localStorage.setItem(guideStorageKey, new Date().toISOString())
+                        } catch {
+                          /* ignore */
+                        }
+                        setGuidePrompt(false)
+                      }}
+                    >
+                      Dismiss
+                    </button>
+                  </div>
+                </div>
+              )}
+              {needsWorkEmail && (
+                <div className="mhub-alerts">
+                  <WorkEmailOptions onNavigate={onNavigate} compact />
+                </div>
+              )}
+            </>
+          }
+        >
+          {loading ? (
+            <LoadingExperience message={LOADING_MESSAGES.marketing} />
+          ) : tab === 'overview' ? (
+            <MarketingHubDashboard onNavigate={onNavigate} period={hubPeriod} onPeriodChange={setHubPeriod} />
+          ) : tab === 'campaigns' ? (
+            renderCampaignsTab()
+          ) : tab === 'audiences' ? (
+            <MarketingAudiencesHub
+              initialTab={audienceSubTab}
+              audienceStats={{
+                totalContacts: summary?.enrolled,
+                activeContacts: lists.reduce((n, l) => n + (l.memberCount || 0), 0),
+                listCount: lists.length,
+                segmentCount: segments.length,
+              }}
               user={user}
               teamMembers={teamMembers}
+              lists={lists}
               segments={segments}
               campaigns={reportCampaigns}
               onReload={load}
@@ -1058,359 +1242,47 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
               setError={setError}
               setNotice={setNotice}
             />
-          </div>
-        ) : tab === 'campaigns' ? (
-          isMobile ? (
-            <div className="marketing-mobile-home">
-              <div className="marketing-mobile-setup ci-card">
-                <div className="flex items-center justify-between gap-2 mb-1">
-                  <h2 className="marketing-mobile-setup-title mb-0">New campaign</h2>
-                  <button
-                    type="button"
-                    className="crm-btn crm-btn-secondary crm-btn-sm shrink-0"
-                    onClick={() => setGuideOpen(true)}
-                  >
-                    Guide
-                  </button>
-                </div>
-                <p className="marketing-mobile-setup-copy">
-                  Pick channel, name, list, and an optional template. Continue opens the design wizard.
-                </p>
-                <MarketingCampaignSetupFields
-                  campaignForm={campaignForm}
-                  setCampaignForm={setCampaignForm}
-                  lists={lists}
-                  segments={segments}
-                  templates={templates}
-                  applyTemplate={applyTemplate}
-                  user={user}
-                  permissions={permissions}
-                  onNavigate={onNavigate}
-                  onTestSend={handleTestSend}
-                  testSendBusy={busy}
-                />
-                <div className="marketing-mobile-setup-actions">
-                  <button
-                    type="button"
-                    onClick={resetCampaignForm}
-                    className="crm-btn crm-btn-secondary"
-                  >
-                    Start fresh
-                  </button>
-                  <button
-                    type="button"
-                    disabled={!canOpenCampaignWizard}
-                    onClick={() => {
-                      setCampaignEmailStep(1)
-                      setCampaignWizardOpen(true)
-                    }}
-                    className="crm-btn crm-btn-primary flex-1"
-                  >
-                    Continue
-                  </button>
-                </div>
-                {!canOpenCampaignWizard && (
-                  <p className="text-sm text-slate-500 mt-2">
-                    Enter a campaign name and choose a list to continue.
-                  </p>
-                )}
-              </div>
-
-              {needsWorkEmail && (
-                <div className="px-1">
-                  <WorkEmailOptions onNavigate={onNavigate} compact />
-                </div>
-              )}
-
-              <details className="marketing-mobile-campaigns ci-card">
-                <summary className="marketing-mobile-campaigns-summary">
-                  Your campaigns ({campaigns.length})
-                </summary>
-                <div className="px-3 pb-3 space-y-2">
-                  {!campaigns.length ? (
-                    <p className="text-xs text-gray-500 py-2">No campaigns yet.</p>
-                  ) : (
-                    campaigns.map((c) => (
-                      <CampaignCard
-                        key={c.id}
-                        campaign={c}
-                        busy={busy}
-                        onStart={startCampaign}
-                        onPause={pauseCampaign}
-                        onResume={continueCampaignSending}
-                        onStop={stopCampaign}
-                        onContinue={continueCampaignSending}
-                        onNavigate={onNavigate}
-                        showCreator={Boolean(user?.isOrgAdmin && user?.accountType === 'company')}
-                        permissions={permissions}
-                        onApprove={approveCampaign}
-                        onReject={rejectCampaign}
-                      />
-                    ))
-                  )}
-                </div>
-              </details>
-
-              {campaignWizardOpen && (
-                <MarketingCampaignWizardModal
-                  open
-                  onClose={() => setCampaignWizardOpen(false)}
-                  campaignForm={campaignForm}
-                  setCampaignForm={setCampaignForm}
-                  setCampaignEmailStep={setCampaignEmailStep}
-                  forms={forms}
-                  lists={lists}
-                  templates={templates}
-                  busy={busy}
-                  canSaveCampaignDraft={canSaveCampaignDraft}
-                  saveHint={campaignSaveHint}
-                  error={error}
-                  notice={notice}
-                  onSaveDraft={handleWizardSaveDraft}
-                  onSend={handleWizardSend}
-                  onSaveAsTemplate={saveCampaignAsTemplate}
-                />
-              )}
-            </div>
-          ) : campaignDesktopPhase === 'setup' ? (
-            <div className="marketing-campaign-setup-page flex-1 flex flex-col items-center justify-center p-6 sm:p-10 bg-white">
-              <div className="w-full max-w-lg">
-                <h2 className="text-xl font-bold text-[#17191c] tracking-tight">New campaign</h2>
-                <div className="mt-6">
-                <MarketingCampaignSetupFields
-                  campaignForm={campaignForm}
-                  setCampaignForm={setCampaignForm}
-                  lists={lists}
-                  segments={segments}
-                  templates={templates}
-                  applyTemplate={applyTemplate}
-                  user={user}
-                  permissions={permissions}
-                  onNavigate={onNavigate}
-                  onTestSend={handleTestSend}
-                  testSendBusy={busy}
-                />
-                </div>
-                {campaignForm.useSequence && (
-                  <div className="flex flex-wrap gap-2 mt-4">
-                    {[
-                      { id: 1, label: 'Message 1' },
-                      { id: 2, label: 'Follow-up' },
-                    ].map((step) => (
-                      <button
-                        key={step.id}
-                        type="button"
-                        onClick={() => setCampaignEmailStep(step.id)}
-                        className={`ci-btn !text-xs ${
-                          campaignEmailStep === step.id ? 'ci-btn-accent' : 'ci-btn-secondary'
-                        }`}
-                      >
-                        {step.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-                <button
-                  type="button"
-                  disabled={!canEnterCampaignEditor}
-                  onClick={() => setCampaignDesktopPhase('editor')}
-                  className="crm-btn crm-btn-primary w-full mt-6"
-                >
-                  Continue to design
-                </button>
-                {!canEnterCampaignEditor && (
-                  <p className="text-xs text-[#7c98b6] mt-2 text-center">
-                    Enter name, list{campaignForm.channel === 'email' ? ', and subject' : ''} to continue.
-                  </p>
-                )}
-              </div>
-            </div>
-          ) : (
-            <div className="marketing-immersive-editor flex-1 min-h-0 flex flex-col bg-white">
-              {campaignForm.useSequence && (
-                <div className="shrink-0 flex gap-2 px-3 py-2 border-b border-[#e8ecf1] bg-white">
-                  {[
-                    { id: 1, label: 'Message 1' },
-                    { id: 2, label: 'Follow-up' },
-                  ].map((step) => (
-                    <button
-                      key={step.id}
-                      type="button"
-                      onClick={() => setCampaignEmailStep(step.id)}
-                      className={`ci-btn !text-xs ${
-                        campaignEmailStep === step.id ? 'ci-btn-accent' : 'ci-btn-secondary'
-                      }`}
-                    >
-                      {step.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-              {(!campaignForm.useSequence || campaignEmailStep === 1) && (
-                <MarketingTemplateBuilder
-                  embedded
-                  studioMode
-                  immersive
-                  historyResetKey={`campaign-${campaignForm.channel}-1`}
-                  showNameField={false}
-                  showSavedTemplates={false}
-                  value={{
-                    subject: campaignForm.subject,
-                    blocks: campaignForm.blocks,
-                    design: campaignForm.design,
-                    previewText: campaignForm.previewText,
-                    body: campaignForm.body,
-                  }}
-                  onChange={(next) =>
-                    setCampaignForm((p) => ({
-                      ...p,
-                      subject: next.subject ?? p.subject,
-                      blocks: next.blocks ?? p.blocks,
-                      design: next.design ?? p.design,
-                      previewText: next.previewText ?? p.previewText,
-                      body: next.body ?? p.body,
-                    }))
-                  }
-                  onBack={() => setCampaignDesktopPhase('setup')}
-                  onSaveDraft={async () => {
-                    setError(null)
-                    await createCampaign()
-                  }}
-                  onSaveAsTemplate={saveCampaignAsTemplate}
-                  onSend={createAndStart}
-                  sendDisabled={busy || !canSaveCampaignDraft}
-                  draftDisabled={busy || !canSaveCampaignDraft}
-                  busy={busy}
-                  marketingForms={forms}
-                />
-              )}
-              {campaignForm.useSequence && campaignEmailStep === 2 && (
-                <MarketingTemplateBuilder
-                  embedded
-                  studioMode
-                  immersive
-                  historyResetKey={`campaign-${campaignForm.channel}-2`}
-                  showNameField={false}
-                  showSavedTemplates={false}
-                  starterOptions={[{ id: 'followup', name: 'Follow-up check-in', ...FOLLOW_UP_STARTER }]}
-                  value={{
-                    subject: campaignForm.step2Subject,
-                    blocks: campaignForm.step2Blocks,
-                    design: campaignForm.step2Design,
-                    previewText: campaignForm.step2PreviewText,
-                    body: campaignForm.step2Body,
-                  }}
-                  onChange={(next) =>
-                    setCampaignForm((p) => ({
-                      ...p,
-                      step2Subject: next.subject ?? p.step2Subject,
-                      step2Blocks: next.blocks ?? p.step2Blocks,
-                      step2Design: next.design ?? p.step2Design,
-                      step2PreviewText: next.previewText ?? p.step2PreviewText,
-                      step2Body: next.body ?? p.step2Body,
-                    }))
-                  }
-                  onBack={() => setCampaignDesktopPhase('setup')}
-                  onSaveDraft={async () => {
-                    setError(null)
-                    await createCampaign()
-                  }}
-                  onSaveAsTemplate={saveCampaignAsTemplate}
-                  onSend={createAndStart}
-                  sendDisabled={busy || !canSaveCampaignDraft}
-                  draftDisabled={busy || !canSaveCampaignDraft}
-                  busy={busy}
-                  marketingForms={forms}
-                />
-              )}
-            </div>
-          )
-        ) : tab === 'lists' ? (
-          <MarketingListsPanel
-            user={user}
-            teamMembers={teamMembers}
-            refreshTeam={refreshTeam}
-            savedLeads={savedLeads}
-            lists={lists}
-            setLists={setLists}
-            busy={busy}
-            setBusy={setBusy}
-            setError={setError}
-            setNotice={setNotice}
-            onListsReload={load}
-          />
-        ) : tab === 'landing' ? (
-          <div className="crm-content-card crm-content-scroll flex-1 min-h-0 p-4 sm:p-6">
-            <MarketingLandingPanel forms={forms} onReload={load} />
-          </div>
-        ) : tab === 'feeds' ? (
-          <div className="crm-content-card crm-content-scroll flex-1 min-h-0 p-4 sm:p-6">
-            <MarketingFeedsPanel
-              lists={lists}
-              segments={segments}
+          ) : tab === 'analytics' ? (
+            <MarketingAnalyticsHub
+              onNavigate={onNavigate}
+              period={hubPeriod}
+              onPeriodChange={setHubPeriod}
+              campaignId={panelOptions?.campaignId}
+              reportCampaigns={reportCampaigns}
+            />
+          ) : tab === 'assets' ? (
+            <MarketingAssetsHub
               templates={templates}
-              onReload={load}
+              onOpenTemplate={() => setTab('templates')}
+              onNavigate={onNavigate}
+              feedsPanelProps={{
+                lists,
+                segments,
+                templates,
+                onReload: load,
+              }}
             />
-          </div>
-        ) : tab === 'automations' ? (
-          <div className="crm-content-card crm-content-scroll flex-1 min-h-0 p-4 sm:p-6">
-            <MarketingAutomationsPanel
-              campaigns={reportCampaigns}
-              segments={segments}
-              lists={lists}
-              permissions={permissions}
-              onReload={load}
-            />
-          </div>
-        ) : tab === 'suppressions' ? (
-          <div className="crm-content-card crm-content-scroll flex-1 min-h-0 p-4 sm:p-6">
-            <MarketingSuppressionPanel user={user} permissions={permissions} />
-          </div>
-        ) : tab === 'domains' ? (
-          <div className="crm-content-card crm-content-scroll flex-1 min-h-0 p-4 sm:p-6">
-            <MarketingDomainsPanel user={user} />
-          </div>
-        ) : tab === 'inbox' ? (
-          <div className="crm-content-card crm-content-scroll flex-1 min-h-0">
-            <WhatsAppInboxPanel onNavigate={onNavigate} />
-          </div>
-        ) : tab === 'reports' ? (
-          <div className="crm-content-card crm-content-scroll flex-1 min-h-0">
-          <CampaignReportsView
-            campaigns={reportCampaigns}
-            onNavigate={onNavigate}
-            onDuplicate={duplicateCampaignForResend}
-            onReload={load}
-            onPause={pauseCampaign}
-            onResume={continueCampaignSending}
-            onStop={stopCampaign}
-            onContinue={continueCampaignSending}
-            busy={busy}
-            initialCampaignId={panelOptions?.campaignId}
-            showCreator={Boolean(user?.accountType === 'company')}
-          />
-          </div>
-        ) : tab === 'templates' ? (
-          <div className="marketing-immersive-editor flex-1 min-h-0 flex flex-col bg-white">
-            <MarketingTemplateBuilder
-              studioMode
-              immersive
-              historyResetKey={templateForm.id || 'template-new'}
-              value={templateForm}
-              onChange={setTemplateForm}
-              onSave={saveTemplate}
-              onCancel={() =>
-                setTemplateForm({ ...EMPTY_TEMPLATE, design: { ...DEFAULT_THEME } })
-              }
-              busy={busy}
-              templates={templates}
-              onEdit={editTemplate}
-              onDelete={deleteTemplate}
-              marketingForms={forms}
-            />
-          </div>
-        ) : (
-          <div className="crm-content-card crm-content-scroll">
+          ) : tab === 'landing' ? (
+            <div className="mhub-tab-pad">
+              <MarketingLandingPanel forms={forms} onReload={load} />
+            </div>
+          ) : tab === 'automations' ? (
+            <div className="mhub-tab-pad">
+              <MarketingAutomationsPanel
+                campaigns={reportCampaigns}
+                segments={segments}
+                lists={lists}
+                permissions={permissions}
+                onReload={load}
+              />
+            </div>
+          ) : tab === 'domains' ? (
+            <div className="mhub-tab-pad space-y-6">
+              <MarketingDomainsPanel user={user} />
+              <MarketingSuppressionPanel user={user} permissions={permissions} />
+            </div>
+          ) : tab === 'forms' ? (
+            <div className="mhub-tab-pad">
             <div className="grid lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
               <section className="space-y-3">
                 <div className="flex items-center justify-between gap-2">
@@ -1418,11 +1290,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
                     {formForm.id ? 'Edit form' : 'New capture form'}
                   </h2>
                   {formForm.id && (
-                    <button
-                      type="button"
-                      onClick={() => setFormForm({ ...EMPTY_FORM })}
-                      className="crm-link-btn"
-                    >
+                    <button type="button" onClick={() => setFormForm({ ...EMPTY_FORM })} className="crm-link-btn">
                       Cancel edit
                     </button>
                   )}
@@ -1455,19 +1323,9 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
                   />
                 </div>
                 <MarketingFormBuilder value={formForm} onChange={setFormForm} />
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={saveForm}
-                  className="crm-btn crm-btn-primary"
-                >
+                <button type="button" disabled={busy} onClick={saveForm} className="crm-btn crm-btn-primary">
                   {formForm.id ? 'Save form' : 'Create form'}
                 </button>
-                <p className="text-xs text-[#7c98b6] leading-relaxed">
-                  Build flexible questions like Google Forms. In campaigns, add a <strong>Form</strong> block to
-                  email. Responses appear on the lead in{' '}
-                  <strong>Pipeline → open lead → Notes &amp; log</strong>.
-                </p>
               </section>
               <section>
                 <h2 className="crm-section-title">Your forms</h2>
@@ -1481,22 +1339,11 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
                         <p className="text-xs text-[#516f90] mt-0.5">
                           {f.submissions || 0} submissions · slug {f.slug}
                         </p>
-                        {(f.responses || []).slice(0, 2).map((r) => (
-                          <p key={r.id} className="text-sm text-[#7c98b6] mt-1 line-clamp-2">
-                            {r.email || 'Anonymous'} ·{' '}
-                            {r.answers?.slice(0, 2).map((a) => `${a.label}: ${a.value}`).join(' · ') ||
-                              'Submitted'}
-                          </p>
-                        ))}
                         <div className="mt-2 flex flex-wrap gap-3">
                           <button type="button" onClick={() => editForm(f)} className="crm-link-btn p-0">
                             Edit fields
                           </button>
-                          <button
-                            type="button"
-                            onClick={() => copyFormLink(f.slug)}
-                            className="crm-link-btn p-0"
-                          >
+                          <button type="button" onClick={() => copyFormLink(f.slug)} className="crm-link-btn p-0">
                             Copy public link
                           </button>
                         </div>
@@ -1506,9 +1353,10 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
                 )}
               </section>
             </div>
-          </div>
-        )}
-      </div>
+            </div>
+          ) : null}
+        </MarketingHubShell>
+      )}
 
       {hideMarketingHeader && (
         <button
@@ -1521,6 +1369,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
           ?
         </button>
       )}
+
 
       <PanelGuideModal
         open={guideOpen}
@@ -1600,7 +1449,7 @@ function CampaignCard({
           campaign.status === 'stopped') && (
           <button
             type="button"
-            onClick={() => onNavigate?.('marketing', { tab: 'reports', campaignId: campaign.id })}
+            onClick={() => onNavigate?.('marketing', { tab: 'analytics', campaignId: campaign.id })}
             className="crm-link-btn p-0"
           >
             View report

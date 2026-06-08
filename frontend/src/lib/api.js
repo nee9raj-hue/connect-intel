@@ -501,6 +501,8 @@ export const api = {
     request(`/api/platform/search?q=${encodeURIComponent(q)}&limit=${limit}`),
   getMarketingDashboard: (period = '30d') =>
     request(`/api/marketing/dashboard?period=${encodeURIComponent(period)}`),
+  getMarketingHub: (period = '30d') =>
+    request(`/api/marketing/dashboard?hub=1&period=${encodeURIComponent(period)}`),
   listMarketingSegments: () => request('/api/marketing/segments'),
   previewMarketingSegment: (filterJson) =>
     request('/api/marketing/segments', { method: 'POST', body: { action: 'preview', filterJson } }),

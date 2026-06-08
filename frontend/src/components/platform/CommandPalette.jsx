@@ -109,7 +109,7 @@ export default function CommandPalette({
 
       if (item.kind === 'record') {
         if (item.type === 'campaign') {
-          onNavigate?.('marketing', { tab: 'reports', campaignId: item.id })
+          onNavigate?.('marketing', { tab: 'analytics', campaignId: item.id })
           return
         }
         if (item.leadId) {

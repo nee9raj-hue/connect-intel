@@ -69,6 +69,7 @@ export function navTargetToOptions(target = {}) {
   if (target.followUpDue) options.followUpDue = true
   if (target.closingThisWeek) options.closingThisWeek = true
   if (Array.isArray(target.smartTags) && target.smartTags.length) options.smartTags = [...target.smartTags]
+  if (target.audienceTab) options.audienceTab = target.audienceTab
   return options
 }
 
@@ -201,19 +202,16 @@ export function buildCustomerNavSections(
       ]
 
   const marketingChildren = [
-    { id: 'marketing-dashboard', label: 'Dashboard', panel: 'marketing', tab: 'dashboard' },
+    { id: 'marketing-overview', label: 'Overview', panel: 'marketing', tab: 'overview' },
     { id: 'marketing-campaigns', label: 'Campaigns', panel: 'marketing', tab: 'campaigns' },
-    { id: 'marketing-segments', label: 'Segments', panel: 'marketing', tab: 'segments' },
-    { id: 'marketing-inbox', label: 'WA Inbox', panel: 'marketing', tab: 'inbox' },
-    { id: 'marketing-lists', label: 'Lists', panel: 'marketing', tab: 'lists' },
-    { id: 'marketing-reports', label: 'Reports', panel: 'marketing', tab: 'reports' },
-    { id: 'marketing-templates', label: 'Templates', panel: 'marketing', tab: 'templates' },
-    { id: 'marketing-forms', label: 'Forms', panel: 'marketing', tab: 'forms' },
-    { id: 'marketing-landing', label: 'Landing', panel: 'marketing', tab: 'landing' },
-    { id: 'marketing-feeds', label: 'RSS', panel: 'marketing', tab: 'feeds' },
     { id: 'marketing-automations', label: 'Automations', panel: 'marketing', tab: 'automations' },
-    { id: 'marketing-suppressions', label: 'Suppressions', panel: 'marketing', tab: 'suppressions' },
+    { id: 'marketing-audiences', label: 'Audiences', panel: 'marketing', tab: 'audiences' },
+    { id: 'marketing-forms', label: 'Forms', panel: 'marketing', tab: 'forms' },
+    { id: 'marketing-landing', label: 'Landing Pages', panel: 'marketing', tab: 'landing' },
+    { id: 'marketing-templates', label: 'Templates', panel: 'marketing', tab: 'templates' },
+    { id: 'marketing-analytics', label: 'Analytics', panel: 'marketing', tab: 'analytics' },
     { id: 'marketing-domains', label: 'Domains', panel: 'marketing', tab: 'domains' },
+    { id: 'marketing-assets', label: 'Assets', panel: 'marketing', tab: 'assets' },
   ]
 
   const calendarChildren = [
@@ -405,7 +403,7 @@ export const MOBILE_NAV_PILL_PRIMARY_ITEMS = [
 
 /** Secondary mobile nav shortcuts — horizontal scroll beside primary row. */
 export const MOBILE_NAV_PILL_MORE_ITEMS = [
-  { id: 'marketing', label: 'Mail', panel: 'marketing', tab: 'campaigns', icon: 'mail' },
+  { id: 'marketing', label: 'Mail', panel: 'marketing', tab: 'overview', icon: 'mail' },
   { id: 'whatsapp', label: 'WA', panel: 'marketing', tab: 'inbox', icon: 'whatsapp' },
   { id: 'calendar', label: 'Meetings', panel: 'crm-calendar', upcomingOnly: true, icon: 'calendar' },
   { id: 'tasks', label: 'Tasks', panel: 'team-tasks', icon: 'task' },
@@ -421,7 +419,7 @@ export const MOBILE_NAV_PILL_ITEMS = [
 export const QUICK_NAV_TILES = [
   { id: 'pipeline', label: 'Pipeline', panel: 'pipeline', icon: 'pipeline', desc: 'Manage leads' },
   { id: 'search', label: 'AI search', panel: 'search', icon: 'spark', desc: 'Find prospects' },
-  { id: 'marketing', label: 'Marketing', panel: 'marketing', tab: 'campaigns', icon: 'mail', desc: 'Campaigns' },
+  { id: 'marketing', label: 'Marketing', panel: 'marketing', tab: 'overview', icon: 'mail', desc: 'Marketing Hub' },
   { id: 'contacts', label: 'Contacts', panel: 'contacts', icon: 'people', desc: 'Master records' },
   {
     id: 'calendar-upcoming',
