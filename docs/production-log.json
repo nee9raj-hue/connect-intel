@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-08T11:25:37.062Z",
-  "updatedAtIst": "08/06/2026, 16:55:37",
+  "updatedAt": "2026-06-08T11:33:11.056Z",
+  "updatedAtIst": "08/06/2026, 17:03:11",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "4899d0d",
+  "currentProductionCommit": "c87e73e",
   "entries": [
+    {
+      "logId": "20260608-1702-c87e73e",
+      "commit": "c87e73e",
+      "commitFull": "c87e73e7960b0d30c54165e9005fb9fde847ac2e",
+      "message": "Fix AI search showing one repeated mock lead instead of real database results.",
+      "deployedAt": "2026-06-08T11:32:40.348Z",
+      "deployedAtIst": "08/06/2026, 17:02:40",
+      "committedAtIst": "08/06/2026, 17:02:13",
+      "vercelPreviewUrl": "https://connect-intel-9y3kadio0-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- c87e73e"
+    },
+    {
+      "logId": "20260608-1656-e2be456",
+      "commit": "e2be456",
+      "commitFull": "e2be456a5135710dc81f78ca471510a33284eb00",
+      "message": "Log production deploy 4899d0d (import timeout and dedupe fixes).",
+      "deployedAt": "2026-06-08T11:26:08.621Z",
+      "deployedAtIst": "08/06/2026, 16:56:08",
+      "committedAtIst": "08/06/2026, 16:55:40",
+      "vercelPreviewUrl": "https://connect-intel-agi8927p6-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- e2be456"
+    },
     {
       "logId": "20260608-1655-4899d0d",
       "commit": "4899d0d",
@@ -15,7 +43,7 @@
       "committedAtIst": "08/06/2026, 16:54:38",
       "vercelPreviewUrl": "https://connect-intel-8btknavc4-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 4899d0d"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 7d42c26"
-    },
-    {
-      "logId": "20260607-1346-0b4706f",
-      "commit": "0b4706f",
-      "commitFull": "0b4706f43ee76ae9a00adc92d14908028f387f18",
-      "message": "Fix mobile WhatsApp share and prevent input zoom on tap.",
-      "deployedAt": "2026-06-07T08:16:53.583Z",
-      "deployedAtIst": "07/06/2026, 13:46:53",
-      "committedAtIst": "07/06/2026, 13:46:26",
-      "vercelPreviewUrl": "https://connect-intel-mfpl1byk2-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 0b4706f"
-    },
-    {
-      "logId": "20260607-1343-596d3e1",
-      "commit": "596d3e1",
-      "commitFull": "596d3e17362451e7abab7cffe9949d7710d39a72",
-      "message": "Log production deploy c7bb7f4 (auto deal names + duplicate).",
-      "deployedAt": "2026-06-07T08:13:34.242Z",
-      "deployedAtIst": "07/06/2026, 13:43:34",
-      "committedAtIst": "07/06/2026, 13:43:07",
-      "vercelPreviewUrl": "https://connect-intel-ax7cizqyt-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 596d3e1"
     }
   ]
 }

@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 4b4d3d7
+npm run prod:rollback -- e2be456
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 4b4d3d7
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `4899d0d` |
-| Log updated (IST) | 08/06/2026, 16:55:37 |
+| Commit | `c87e73e` |
+| Log updated (IST) | 08/06/2026, 17:03:11 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 4b4d3d7
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 08/06/2026, 16:55:06 | `4899d0d` | Fix master DB import timeouts and add duplicate cleanup. | [preview](https://connect-intel-8btknavc4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4899d0d` | **← LIVE**
+| 08/06/2026, 17:02:40 | `c87e73e` | Fix AI search showing one repeated mock lead instead of real database results. | [preview](https://connect-intel-9y3kadio0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c87e73e` | **← LIVE**
+| 08/06/2026, 16:56:08 | `e2be456` | Log production deploy 4899d0d (import timeout and dedupe fixes). | [preview](https://connect-intel-agi8927p6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e2be456` |
+| 08/06/2026, 16:55:06 | `4899d0d` | Fix master DB import timeouts and add duplicate cleanup. | [preview](https://connect-intel-8btknavc4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4899d0d` |
 | 08/06/2026, 16:49:58 | `4b4d3d7` | Log production deploy daa6f20 (chunked imports and operator console). | [preview](https://connect-intel-5ywngeyt9-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4b4d3d7` |
 | 08/06/2026, 16:48:54 | `daa6f20` | Fix large platform imports and expand operator admin console. | [preview](https://connect-intel-g49ihyidj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- daa6f20` |
 | 08/06/2026, 14:42:00 | `c61fe98` | Log production deploy 8d704f3 (navigation and reporting drill-downs). | [preview](https://connect-intel-ipgy2qk9f-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c61fe98` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 4b4d3d7
 | 08/06/2026, 11:03:18 | `db39a92` | Add delete option for deals and freight RFQs on leads. | [preview](https://connect-intel-5kemqs65k-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- db39a92` |
 | 08/06/2026, 10:14:36 | `8d3e043` | Fix bulk email timeouts when AI personalizes each lead. | [preview](https://connect-intel-dc45994im-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8d3e043` |
 | 07/06/2026, 13:53:08 | `7d42c26` | Keep users on their screen after reload and external app switches. | [preview](https://connect-intel-6oc17yum2-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7d42c26` |
-| 07/06/2026, 13:46:53 | `0b4706f` | Fix mobile WhatsApp share and prevent input zoom on tap. | [preview](https://connect-intel-mfpl1byk2-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0b4706f` |
-| 07/06/2026, 13:43:34 | `596d3e1` | Log production deploy c7bb7f4 (auto deal names + duplicate). | [preview](https://connect-intel-ax7cizqyt-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 596d3e1` |
 
 ---
 
