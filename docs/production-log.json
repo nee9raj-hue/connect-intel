@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-08T08:27:16.119Z",
-  "updatedAtIst": "08/06/2026, 13:57:16",
+  "updatedAt": "2026-06-08T08:36:28.902Z",
+  "updatedAtIst": "08/06/2026, 14:06:28",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "bd56469",
+  "currentProductionCommit": "0eecdb0",
   "entries": [
+    {
+      "logId": "20260608-1406-0eecdb0",
+      "commit": "0eecdb0",
+      "commitFull": "0eecdb0b1c33a7f18cc3c103cdcda4f96d170ed9",
+      "message": "Fix pipeline bulk email creating duplicate campaigns per batch.",
+      "deployedAt": "2026-06-08T08:36:11.725Z",
+      "deployedAtIst": "08/06/2026, 14:06:11",
+      "committedAtIst": "08/06/2026, 14:05:44",
+      "vercelPreviewUrl": "https://connect-intel-phn0l8g2k-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 0eecdb0"
+    },
+    {
+      "logId": "20260608-1357-c4a59d7",
+      "commit": "c4a59d7",
+      "commitFull": "c4a59d730b256f535f47cbdaa54c147b717844f9",
+      "message": "Log production deploy bd56469 (activity log dedupe fix).",
+      "deployedAt": "2026-06-08T08:27:53.615Z",
+      "deployedAtIst": "08/06/2026, 13:57:53",
+      "committedAtIst": "08/06/2026, 13:57:25",
+      "vercelPreviewUrl": "https://connect-intel-1ebulsvt1-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- c4a59d7"
+    },
     {
       "logId": "20260608-1357-bd56469",
       "commit": "bd56469",
@@ -15,7 +43,7 @@
       "committedAtIst": "08/06/2026, 13:56:34",
       "vercelPreviewUrl": "https://connect-intel-13g2yndve-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- bd56469"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 5265d4b"
-    },
-    {
-      "logId": "20260607-1311-6173cbf",
-      "commit": "6173cbf",
-      "commitFull": "6173cbf55602601b1c21ad0c937fa0a25cc80e8d",
-      "message": "Log production deploy 5041fa4 (freight deal types).",
-      "deployedAt": "2026-06-07T07:41:51.286Z",
-      "deployedAtIst": "07/06/2026, 13:11:51",
-      "committedAtIst": "07/06/2026, 13:11:24",
-      "vercelPreviewUrl": "https://connect-intel-2kj98s5qq-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 6173cbf"
-    },
-    {
-      "logId": "20260607-1311-5041fa4",
-      "commit": "5041fa4",
-      "commitFull": "5041fa4824fdf4c8e7facb84d674c89d101f1efb",
-      "message": "Add freight deal types with invoice vs freight charges split.",
-      "deployedAt": "2026-06-07T07:41:07.005Z",
-      "deployedAtIst": "07/06/2026, 13:11:07",
-      "committedAtIst": "07/06/2026, 13:10:40",
-      "vercelPreviewUrl": "https://connect-intel-kljczdt1j-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 5041fa4"
     }
   ]
 }
