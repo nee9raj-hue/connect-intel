@@ -5,6 +5,7 @@ import { defaultCrm } from '../lib/crmConstants'
 import { loadReadNotificationIds, saveReadNotificationIds } from '../lib/notificationStorage'
 import { getNotificationTarget } from '../lib/notificationNavigation'
 import { navTargetToOptions, normalizePipelineSummary } from '../lib/navConfig'
+import { bulkEmailChunkSize } from '../lib/bulkEmailLimits.js'
 import { withTimeout } from '../lib/fetchWithTimeout'
 
 const AppContext = createContext(null)
@@ -693,9 +694,10 @@ export function AppProvider({ children }) {
     return data
   }, [])
 
-  const sendBulkEmail = useCallback(async (payload) => {
+  const sendBulkEmail = useCallback(async (payload, { onProgress } = {}) => {
     const ids = [...new Set(Array.isArray(payload.leadIds) ? payload.leadIds : [])]
-    const CHUNK = 10
+    const CHUNK = bulkEmailChunkSize({ useAiPerLead: payload.useAiPerLead })
+    const totalChunks = Math.max(1, Math.ceil(ids.length / CHUNK))
     const aggregate = {
       sentCount: 0,
       failedCount: 0,
@@ -704,6 +706,13 @@ export function AppProvider({ children }) {
       leads: null,
     }
     for (let i = 0; i < ids.length; i += CHUNK) {
+      const chunkIndex = Math.floor(i / CHUNK) + 1
+      onProgress?.({
+        chunk: chunkIndex,
+        totalChunks,
+        sentSoFar: aggregate.sentCount,
+        total: ids.length,
+      })
       const chunkIds = ids.slice(i, i + CHUNK)
       const data = await api.sendBulkCrmEmail(
         { ...payload, leadIds: chunkIds },

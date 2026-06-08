@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { EMAIL_PURPOSES } from '../../lib/crmConstants'
 import { leadDisplayName, leadHasSendableEmail } from '../../lib/emailUtils'
+import { bulkEmailChunkSize } from '../../lib/bulkEmailLimits.js'
 
 const COMPOSE_TABS = [
   { id: 'ai', label: '✨ AI draft' },
@@ -22,6 +23,7 @@ export default function BulkEmailCompose({ leadIds, leads, onDone, compact = fal
   const [draftAi, setDraftAi] = useState(false)
   const [generating, setGenerating] = useState(false)
   const [busy, setBusy] = useState(false)
+  const [sendProgress, setSendProgress] = useState(null)
   const [error, setError] = useState(null)
   const [notice, setNotice] = useState(null)
   const [result, setResult] = useState(null)
@@ -93,27 +95,40 @@ export default function BulkEmailCompose({ leadIds, leads, onDone, compact = fal
     setError(null)
     setNotice(null)
     setResult(null)
+    setSendProgress(null)
     try {
-      const data = await sendBulkEmail({
-        leadIds: withEmail.map((l) => l.id),
-        cc: cc.trim(),
-        agenda: agenda.trim(),
-        keyPoints: keyPoints.trim(),
-        senderCompany: senderCompany.trim(),
-        purpose,
-        useAiPerLead,
-        subject: subject.trim(),
-        body: body.trim(),
-        aiGenerated: draftAi || useAiPerLead,
-      })
+      const data = await sendBulkEmail(
+        {
+          leadIds: withEmail.map((l) => l.id),
+          cc: cc.trim(),
+          agenda: agenda.trim(),
+          keyPoints: keyPoints.trim(),
+          senderCompany: senderCompany.trim(),
+          purpose,
+          useAiPerLead,
+          subject: subject.trim(),
+          body: body.trim(),
+          aiGenerated: draftAi || useAiPerLead,
+        },
+        { onProgress: setSendProgress }
+      )
       setResult(data)
       onDone?.(data)
     } catch (e) {
-      setError(e.message)
+      setError(
+        e.message?.includes('timed out') && useAiPerLead
+          ? `${e.message} AI personalization sends a few leads at a time — please try again; progress is saved for emails already sent.`
+          : e.message
+      )
     } finally {
       setBusy(false)
+      setSendProgress(null)
     }
   }
+
+  const useAiPerLead = composeTab === 'ai' && personalizeEach
+  const batchSize = bulkEmailChunkSize({ useAiPerLead })
+  const batchCount = Math.max(1, Math.ceil(withEmail.length / batchSize))
 
   const sendDisabled =
     busy ||
@@ -229,6 +244,12 @@ export default function BulkEmailCompose({ leadIds, leads, onDone, compact = fal
               />
               Personalize with AI for each recipient at send time (recommended)
             </label>
+            {personalizeEach && withEmail.length > batchSize && (
+              <p className="text-xs text-[#516f90] bg-[#f5f8fa] rounded-lg px-2 py-1.5">
+                Sends in {batchCount} small batches of up to {batchSize} (AI + email per lead). This may take a
+                few minutes for {withEmail.length} recipients — keep this tab open.
+              </p>
+            )}
 
             {notice && (
               <p className="text-xs text-green-800 bg-green-50 rounded-lg px-2 py-1.5">{notice}</p>
@@ -276,6 +297,12 @@ export default function BulkEmailCompose({ leadIds, leads, onDone, compact = fal
         )}
 
         {error && <p className="text-xs text-red-700 bg-red-50 rounded-lg px-2 py-1.5">{error}</p>}
+        {busy && sendProgress && (
+          <p className="text-xs text-[#33475b] bg-[#eaf0f6] rounded-lg px-2 py-1.5">
+            Sending batch {sendProgress.chunk} of {sendProgress.totalChunks}
+            {sendProgress.sentSoFar > 0 ? ` · ${sendProgress.sentSoFar} sent so far` : ''}…
+          </p>
+        )}
         {result && (
           <p className="text-xs text-green-800 bg-green-50 rounded-lg px-2 py-1.5">
             Sent {result.sentCount}, failed {result.failedCount}, skipped {result.skippedCount}
@@ -294,7 +321,9 @@ export default function BulkEmailCompose({ leadIds, leads, onDone, compact = fal
           onClick={submit}
           className="crm-btn crm-btn-primary w-full py-2.5 disabled:opacity-50"
         >
-          {busy ? 'Sending…' : `Send to ${withEmail.length} lead${withEmail.length === 1 ? '' : 's'}`}
+          {busy && sendProgress
+            ? `Sending ${sendProgress.chunk}/${sendProgress.totalChunks}…`
+            : `Send to ${withEmail.length} lead${withEmail.length === 1 ? '' : 's'}`}
         </button>
       </div>
     </div>
