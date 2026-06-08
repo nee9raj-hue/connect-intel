@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-08T19:38:12.728Z",
-  "updatedAtIst": "09/06/2026, 01:08:12",
+  "updatedAt": "2026-06-08T19:46:46.239Z",
+  "updatedAtIst": "09/06/2026, 01:16:46",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "62d2db8",
+  "currentProductionCommit": "8c80060",
   "entries": [
+    {
+      "logId": "20260609-0116-8c80060",
+      "commit": "8c80060",
+      "commitFull": "8c80060a35bd82c492cd5b5e0394c87f82506214",
+      "message": "Fix bulk email modal refresh loop and dashboard time greeting.",
+      "deployedAt": "2026-06-08T19:46:30.119Z",
+      "deployedAtIst": "09/06/2026, 01:16:30",
+      "committedAtIst": "09/06/2026, 01:15:58",
+      "vercelPreviewUrl": "https://connect-intel-8r9ipxjp5-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 8c80060"
+    },
+    {
+      "logId": "20260609-0108-4d4e084",
+      "commit": "4d4e084",
+      "commitFull": "4d4e0849a95713b2a7a74955555958084d26eee1",
+      "message": "Update production log for 62d2db8 bulk email deploy.",
+      "deployedAt": "2026-06-08T19:38:48.605Z",
+      "deployedAtIst": "09/06/2026, 01:08:48",
+      "committedAtIst": "09/06/2026, 01:08:21",
+      "vercelPreviewUrl": "https://connect-intel-4950t4ypr-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 4d4e084"
+    },
     {
       "logId": "20260609-0107-62d2db8",
       "commit": "62d2db8",
@@ -15,7 +43,7 @@
       "committedAtIst": "09/06/2026, 01:06:53",
       "vercelPreviewUrl": "https://connect-intel-ckhv4ddqx-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 62d2db8"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 9363474"
-    },
-    {
-      "logId": "20260608-2239-1ddcb03",
-      "commit": "1ddcb03",
-      "commitFull": "1ddcb03c4b4b1b4fd143ca1703f871fe6f072f19",
-      "message": "Fix My Day command bar navigation and deals closing count.",
-      "deployedAt": "2026-06-08T17:09:36.351Z",
-      "deployedAtIst": "08/06/2026, 22:39:36",
-      "committedAtIst": "08/06/2026, 22:39:06",
-      "vercelPreviewUrl": "https://connect-intel-1zmvd7fwg-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 1ddcb03"
-    },
-    {
-      "logId": "20260608-2234-d3711ad",
-      "commit": "d3711ad",
-      "commitFull": "d3711adac5c9a28a152b6519612901cd099dc201",
-      "message": "Update production log for a1a7f83 dashboard scroll fix.",
-      "deployedAt": "2026-06-08T17:04:45.774Z",
-      "deployedAtIst": "08/06/2026, 22:34:45",
-      "committedAtIst": "08/06/2026, 22:34:15",
-      "vercelPreviewUrl": "https://connect-intel-58d4ymt7x-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- d3711ad"
     }
   ]
 }
