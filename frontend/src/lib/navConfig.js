@@ -224,6 +224,9 @@ export function buildCustomerNavSections(
 
   const homeChildren = [
     { id: 'home-dashboard', label: 'Dashboard', panel: 'overview' },
+    ...(isCompany && hasWorkspaceFeature(user, 'homeTeamMetrics')
+      ? [{ id: 'home-team-intel', label: 'Team intelligence', panel: 'crm-dashboard' }]
+      : []),
     { id: 'home-activity', label: 'Activity log', panel: 'crm-log' },
   ]
 

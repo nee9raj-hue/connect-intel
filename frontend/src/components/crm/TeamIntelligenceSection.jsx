@@ -273,6 +273,20 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
               { value: 'month', label: 'This month' },
             ]}
           />
+          {isManagerView ? (
+            <button
+              type="button"
+              className="crm-btn crm-btn-secondary crm-btn-sm"
+              onClick={() =>
+                onNavigate?.('crm-dashboard', {
+                  period,
+                  userId: intelMemberId || undefined,
+                })
+              }
+            >
+              Full review
+            </button>
+          ) : null}
         </div>
       </div>
 

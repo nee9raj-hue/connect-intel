@@ -10740,3 +10740,311 @@ html[data-pipeline-mobile="1"] .ci-app-header-chip--secondary {
   line-height: 1.45;
   color: #475569;
 }
+
+/* Full-page team intelligence (manager review) */
+.team-intel-page__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #e2e8f0;
+  background: #fff;
+}
+
+.team-intel-page__title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.team-intel-page__subtitle {
+  margin-top: 0.25rem;
+  font-size: 0.8125rem;
+  color: #64748b;
+}
+
+.team-intel-page__header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.team-intel-page__body {
+  padding: 1rem 1.25rem 2rem;
+}
+
+.team-intel-page__layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+@media (min-width: 960px) {
+  .team-intel-page__layout {
+    grid-template-columns: 220px minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+.team-intel-roster {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 0.75rem;
+  position: sticky;
+  top: 0.5rem;
+}
+
+.team-intel-roster__title {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+  padding: 0 0.35rem;
+}
+
+.team-intel-roster__item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.55rem 0.6rem;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.team-intel-roster__item:hover {
+  background: #f8fafc;
+}
+
+.team-intel-roster__item.is-active {
+  background: #e6f7f5;
+  box-shadow: inset 0 0 0 1px #99d5df;
+}
+
+.team-intel-roster__name {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.team-intel-roster__meta {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.6875rem;
+  color: #64748b;
+}
+
+.team-intel-profile {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 1.1rem;
+  margin-bottom: 1rem;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #f0fdfa 0%, #fff 55%);
+  border: 1px solid #cce8ee;
+}
+
+.team-intel-profile__name {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.team-intel-profile__period {
+  font-size: 0.8125rem;
+  color: #475569;
+  margin-top: 0.15rem;
+}
+
+.team-intel-profile__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1rem;
+  font-size: 0.75rem;
+  color: #334155;
+}
+
+.team-intel-hint {
+  font-size: 0.8125rem;
+  color: #64748b;
+  margin-bottom: 1rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 10px;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+}
+
+.team-intel-page__kpis {
+  margin-bottom: 1.25rem;
+}
+
+.team-intel-usage-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 640px) {
+  .team-intel-usage-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.team-intel-usage-stat__label {
+  display: block;
+  font-size: 0.6875rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.team-intel-usage-stat__value {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.team-intel-usage-daily {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.team-intel-usage-daily__row {
+  display: grid;
+  grid-template-columns: 4.5rem 1fr 3rem;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: #475569;
+}
+
+.team-intel-usage-daily__bar-wrap {
+  height: 6px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+.team-intel-usage-daily__bar {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #00a4bd, #007a8c);
+}
+
+.team-intel-timeline-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.85rem;
+}
+
+.team-intel-timeline-filters__btn {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid #dbe3ec;
+  background: #fff;
+  color: #475569;
+  cursor: pointer;
+}
+
+.team-intel-timeline-filters__btn.is-active {
+  background: #00a4bd;
+  border-color: #00a4bd;
+  color: #fff;
+}
+
+.team-intel-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.team-intel-timeline__card {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.team-intel-timeline__card:hover {
+  border-color: #99d5df;
+  box-shadow: 0 4px 14px rgba(0, 164, 189, 0.08);
+}
+
+.team-intel-timeline__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.team-intel-timeline__type {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #007a8c;
+}
+
+.team-intel-timeline__item--deal .team-intel-timeline__type {
+  color: #c05621;
+}
+
+.team-intel-timeline__time {
+  font-size: 0.6875rem;
+  color: #94a3b8;
+}
+
+.team-intel-timeline__title {
+  margin-top: 0.35rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.team-intel-timeline__body {
+  margin-top: 0.35rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: #334155;
+}
+
+.team-intel-timeline__meta {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.team-intel-timeline__actor {
+  margin-top: 0.45rem;
+  font-size: 0.6875rem;
+  color: #94a3b8;
+}

@@ -1,10 +1,6 @@
-import { useEffect } from 'react'
+import TeamIntelligencePanel from './TeamIntelligencePanel'
 
-/** Legacy route — team intelligence now lives on the main Dashboard. */
-export default function TeamDashboardPanel({ onNavigate }) {
-  useEffect(() => {
-    onNavigate?.('overview')
-  }, [onNavigate])
-
-  return null
+/** Full-page team intelligence for managers and reps. */
+export default function TeamDashboardPanel(props) {
+  return <TeamIntelligencePanel {...props} />
 }
