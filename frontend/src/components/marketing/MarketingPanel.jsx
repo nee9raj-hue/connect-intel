@@ -16,6 +16,11 @@ import { leadHasCallablePhone } from '../../lib/phoneUtils'
 import useIsMobile from '../../hooks/useIsMobile'
 import MarketingCampaignSetupFields from './MarketingCampaignSetupFields'
 import MarketingCampaignWizardModal from './MarketingCampaignWizardModal'
+import MarketingDashboard from './MarketingDashboard'
+import MarketingSegmentsPanel from './MarketingSegmentsPanel'
+import MarketingSuppressionPanel from './MarketingSuppressionPanel'
+import MarketingDomainsPanel from './MarketingDomainsPanel'
+import MarketingAutomationsPanel from './MarketingAutomationsPanel'
 import PanelGuideModal from '../guides/PanelGuideModal'
 import {
   marketingGuideStepsForUser,
@@ -23,15 +28,22 @@ import {
 } from '../../lib/guides/marketingGuide'
 
 const TABS = [
+  { id: 'dashboard', label: 'Dashboard', short: 'Dash' },
   { id: 'campaigns', label: 'Campaigns', short: 'Camp' },
-  { id: 'inbox', label: 'WA Inbox', short: 'WA' },
+  { id: 'segments', label: 'Segments', short: 'Seg' },
   { id: 'lists', label: 'Lists', short: 'List' },
   { id: 'reports', label: 'Reports', short: 'Rpt' },
   { id: 'templates', label: 'Templates', short: 'Tpl' },
   { id: 'forms', label: 'Forms', short: 'Form' },
+  { id: 'automations', label: 'Automations', short: 'Auto' },
+  { id: 'inbox', label: 'WA Inbox', short: 'WA' },
+  { id: 'suppressions', label: 'Suppressions', short: 'Sup' },
+  { id: 'domains', label: 'Domains', short: 'Dom' },
 ]
 
-const MOBILE_TABS = TABS.filter((t) => !['templates', 'forms'].includes(t.id))
+const MOBILE_TABS = TABS.filter(
+  (t) => !['templates', 'forms', 'automations', 'suppressions', 'domains'].includes(t.id)
+)
 
 const EMPTY_TEMPLATE = {
   name: '',
@@ -67,6 +79,10 @@ const EMPTY_CAMPAIGN = {
   step2PreviewText: '',
   step2Delay: 3,
   useSequence: false,
+  segmentId: '',
+  audienceMode: 'list',
+  sendMode: 'immediate',
+  scheduledAt: '',
 }
 
 export default function MarketingPanel({ onNavigate, panelOptions, isActive = true }) {
@@ -78,6 +94,8 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
   const [notice, setNotice] = useState(null)
 
   const [lists, setLists] = useState([])
+  const [segments, setSegments] = useState([])
+  const [permissions, setPermissions] = useState(null)
   const [templates, setTemplates] = useState([])
   const [campaigns, setCampaigns] = useState([])
   const [reportCampaigns, setReportCampaigns] = useState([])
@@ -93,7 +111,8 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
   const isMobile = useIsMobile()
 
   const isBuilderTab = tab === 'campaigns' || tab === 'templates'
-  const hideMarketingKpis = isBuilderTab || tab === 'reports' || tab === 'lists'
+  const hideMarketingKpis =
+    isBuilderTab || tab === 'reports' || tab === 'lists' || tab === 'dashboard' || tab === 'segments'
   const hideMarketingHeader =
     !isMobile &&
     (tab === 'templates' || (tab === 'campaigns' && campaignDesktopPhase === 'editor'))
@@ -116,8 +135,12 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
     design: { ...DEFAULT_THEME },
     step2Design: { ...DEFAULT_THEME },
   })
+  const hasAudience =
+    Boolean(campaignForm.listId) ||
+    Boolean(campaignForm.segmentId) ||
+    (campaignForm.audienceMode === 'segment' && Boolean(campaignForm.segmentId))
   const canEnterCampaignEditor =
-    Boolean(campaignForm.listId) &&
+    hasAudience &&
     Boolean(campaignForm.name.trim()) &&
     (campaignForm.channel !== 'email' || Boolean(campaignForm.subject.trim()))
   const [campaignEmailStep, setCampaignEmailStep] = useState(1)
@@ -143,7 +166,10 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
   }, [tab, isMobile])
 
   useEffect(() => {
-    if (isMobile && (tab === 'templates' || tab === 'forms')) {
+    if (
+      isMobile &&
+      ['templates', 'forms', 'automations', 'suppressions', 'domains'].includes(tab)
+    ) {
       setTab('campaigns')
     }
   }, [isMobile, tab])
@@ -163,6 +189,8 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
       setReportCampaigns(all)
       setCampaigns(all.filter((c) => c.status !== 'archived'))
       setForms(data.forms || [])
+      setSegments(data.segments || [])
+      setPermissions(data.permissions || null)
       setSummary(data.summary || null)
     } catch (e) {
       setError(e.message || 'Could not load marketing')
@@ -357,15 +385,14 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
   }
 
   const canSaveCampaignDraft =
-    Boolean(campaignForm.listId) &&
+    hasAudience &&
     Boolean(campaignForm.name.trim()) &&
     (Boolean(campaignForm.body.trim()) || Boolean(campaignForm.blocks?.length))
 
-  const canOpenCampaignWizard =
-    Boolean(campaignForm.listId) && Boolean(campaignForm.name.trim())
+  const canOpenCampaignWizard = hasAudience && Boolean(campaignForm.name.trim())
 
   const campaignSaveHint = useMemo(() => {
-    if (!campaignForm.listId) return 'Choose a list before saving.'
+    if (!hasAudience) return 'Choose a list or segment before saving.'
     if (!campaignForm.name.trim()) return 'Enter a campaign name before saving.'
     if (!campaignForm.body.trim() && !campaignForm.blocks?.length) {
       return 'Go to Design and add at least one block.'
@@ -374,7 +401,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
       return 'Enter a subject line on the Design step.'
     }
     return null
-  }, [campaignForm])
+  }, [campaignForm, hasAudience])
 
   const saveCampaignAsTemplate = async () => {
     const isWa = campaignForm.channel === 'whatsapp'
@@ -406,7 +433,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
 
   const createCampaign = async () => {
     if (!campaignForm.name.trim()) return setError('Campaign name is required')
-    if (!campaignForm.listId) return setError('Choose a list')
+    if (!hasAudience) return setError('Choose a list or segment')
     const isWa = campaignForm.channel === 'whatsapp'
     if (!campaignForm.body.trim() && !campaignForm.blocks?.length) {
       return setError('Message content is required')
@@ -442,7 +469,13 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
       const data = await api.createMarketingCampaign({
         name: campaignForm.name.trim(),
         channel: campaignForm.channel,
-        listId: campaignForm.listId,
+        listId: campaignForm.audienceMode === 'segment' ? undefined : campaignForm.listId,
+        segmentId: campaignForm.audienceMode === 'segment' ? campaignForm.segmentId : undefined,
+        sendMode: campaignForm.sendMode,
+        scheduledAt:
+          campaignForm.sendMode === 'scheduled' && campaignForm.scheduledAt
+            ? new Date(campaignForm.scheduledAt).toISOString()
+            : undefined,
         templateId: campaignForm.templateId || undefined,
         type: steps.length > 1 ? 'sequence' : 'one_shot',
         subject: campaignForm.subject.trim(),
@@ -657,12 +690,44 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
     }
   }
 
-  const startCampaign = async (id) => {
+  const handleTestSend = async () => {
+    const id = await createCampaign()
+    if (!id) return
+    setBusy(true)
+    try {
+      const res = await api.testSendMarketingCampaign(id, [user?.email].filter(Boolean))
+      setNotice(`Test sent to ${res.sent || 0} address(es)`)
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const startCampaign = async (id, { scheduledAt } = {}) => {
     stopCampaignSendPoll()
     setBusy(true)
     setError(null)
     try {
-      const data = await api.startMarketingCampaign(id, { timeoutMs: 300_000 })
+      const scheduleIso =
+        scheduledAt ||
+        (campaignForm.sendMode === 'scheduled' && campaignForm.scheduledAt
+          ? new Date(campaignForm.scheduledAt).toISOString()
+          : undefined)
+      const data = scheduleIso
+        ? await api.scheduleMarketingCampaign(id, scheduleIso)
+        : await api.startMarketingCampaign(id, { timeoutMs: 300_000 })
+
+      if (data.submittedForApproval) {
+        setNotice(data.message || 'Submitted for approval')
+        await load()
+        return
+      }
+      if (data.scheduled) {
+        setNotice(data.message || 'Campaign scheduled')
+        await load()
+        return
+      }
       const isWa = data.campaign?.channel === 'whatsapp'
       const enrolled = data.enrolled || 0
       const initialSent = data.sendResult?.sent || 0
@@ -732,6 +797,32 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
     if (id) await startCampaign(id)
   }
 
+  const approveCampaign = async (id) => {
+    setBusy(true)
+    try {
+      await api.approveMarketingCampaign(id)
+      setNotice('Campaign approved — ready to send')
+      await load()
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const rejectCampaign = async (id) => {
+    setBusy(true)
+    try {
+      await api.rejectMarketingCampaign(id)
+      setNotice('Campaign rejected')
+      await load()
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
   return (
     <div
       className={`crm-workspace flex h-full min-h-0 w-full overflow-hidden ${
@@ -742,7 +833,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
       <header className="crm-page-header shrink-0">
         <div className="crm-page-header-top">
           <div className="min-w-0 flex-1">
-            <h1 className="crm-page-title">Marketing</h1>
+            <h1 className="crm-page-title">Email marketing</h1>
             <p className="crm-page-subtitle">
               {hideMarketingKpis ? (
                 <>
@@ -940,6 +1031,24 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
           <div className={isBuilderTab ? '' : 'crm-content-card crm-content-scroll'}>
             <LoadingExperience message={LOADING_MESSAGES.marketing} />
           </div>
+        ) : tab === 'dashboard' ? (
+          <div className="crm-content-card crm-content-scroll flex-1 min-h-0 p-4 sm:p-6">
+            <MarketingDashboard onNavigate={onNavigate} />
+          </div>
+        ) : tab === 'segments' ? (
+          <div className="crm-content-card crm-content-scroll flex-1 min-h-0 p-4 sm:p-6">
+            <MarketingSegmentsPanel
+              user={user}
+              teamMembers={teamMembers}
+              segments={segments}
+              campaigns={reportCampaigns}
+              onReload={load}
+              busy={busy}
+              setBusy={setBusy}
+              setError={setError}
+              setNotice={setNotice}
+            />
+          </div>
         ) : tab === 'campaigns' ? (
           isMobile ? (
             <div className="marketing-mobile-home">
@@ -961,10 +1070,14 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
                   campaignForm={campaignForm}
                   setCampaignForm={setCampaignForm}
                   lists={lists}
+                  segments={segments}
                   templates={templates}
                   applyTemplate={applyTemplate}
                   user={user}
+                  permissions={permissions}
                   onNavigate={onNavigate}
+                  onTestSend={handleTestSend}
+                  testSendBusy={busy}
                 />
                 <div className="marketing-mobile-setup-actions">
                   <button
@@ -1019,6 +1132,9 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
                         onContinue={continueCampaignSending}
                         onNavigate={onNavigate}
                         showCreator={Boolean(user?.isOrgAdmin && user?.accountType === 'company')}
+                        permissions={permissions}
+                        onApprove={approveCampaign}
+                        onReject={rejectCampaign}
                       />
                     ))
                   )}
@@ -1055,10 +1171,14 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
                   campaignForm={campaignForm}
                   setCampaignForm={setCampaignForm}
                   lists={lists}
+                  segments={segments}
                   templates={templates}
                   applyTemplate={applyTemplate}
                   user={user}
+                  permissions={permissions}
                   onNavigate={onNavigate}
+                  onTestSend={handleTestSend}
+                  testSendBusy={busy}
                 />
                 </div>
                 {campaignForm.useSequence && (
@@ -1209,6 +1329,24 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
             setNotice={setNotice}
             onListsReload={load}
           />
+        ) : tab === 'automations' ? (
+          <div className="crm-content-card crm-content-scroll flex-1 min-h-0 p-4 sm:p-6">
+            <MarketingAutomationsPanel
+              campaigns={reportCampaigns}
+              segments={segments}
+              lists={lists}
+              permissions={permissions}
+              onReload={load}
+            />
+          </div>
+        ) : tab === 'suppressions' ? (
+          <div className="crm-content-card crm-content-scroll flex-1 min-h-0 p-4 sm:p-6">
+            <MarketingSuppressionPanel user={user} permissions={permissions} />
+          </div>
+        ) : tab === 'domains' ? (
+          <div className="crm-content-card crm-content-scroll flex-1 min-h-0 p-4 sm:p-6">
+            <MarketingDomainsPanel user={user} />
+          </div>
         ) : tab === 'inbox' ? (
           <div className="crm-content-card crm-content-scroll flex-1 min-h-0">
             <WhatsAppInboxPanel onNavigate={onNavigate} />
@@ -1383,9 +1521,13 @@ function CampaignCard({
   onContinue,
   onNavigate,
   showCreator,
+  permissions,
+  onApprove,
+  onReject,
 }) {
   const statusClass = {
     draft: 'crm-status-draft',
+    scheduled: 'crm-status-active',
     active: 'crm-status-active',
     paused: 'crm-status-paused',
     completed: 'crm-status-completed',
@@ -1441,14 +1583,42 @@ function CampaignCard({
             View report
           </button>
         )}
-        {campaign.status === 'draft' && (
+        {campaign.approvalStatus === 'pending' && (
+          <span className="text-xs text-amber-800 font-medium">Pending approval</span>
+        )}
+        {campaign.approvalStatus === 'pending' && permissions?.canApprove && (
+          <>
+            <button
+              type="button"
+              disabled={busy}
+              className="crm-link-btn p-0"
+              onClick={() => onApprove?.(campaign.id)}
+            >
+              Approve
+            </button>
+            <button
+              type="button"
+              disabled={busy}
+              className="crm-link-btn p-0 text-red-800"
+              onClick={() => onReject?.(campaign.id)}
+            >
+              Reject
+            </button>
+          </>
+        )}
+        {campaign.status === 'scheduled' && (
+          <span className="text-xs text-blue-800">
+            Scheduled {campaign.scheduledAt ? new Date(campaign.scheduledAt).toLocaleString() : ''}
+          </span>
+        )}
+        {campaign.status === 'draft' && campaign.approvalStatus !== 'pending' && (
           <button
             type="button"
             disabled={busy}
             onClick={() => onStart(campaign.id)}
             className="crm-link-btn p-0 disabled:opacity-50"
           >
-            Start
+            {campaign.approvalStatus === 'approved' ? 'Send now' : 'Start'}
           </button>
         )}
         {campaign.status === 'active' && (

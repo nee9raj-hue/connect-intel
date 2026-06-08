@@ -11207,3 +11207,127 @@ html[data-pipeline-mobile="1"] .ci-app-header-chip--secondary {
   font-size: 0.75rem;
   color: #475569;
 }
+
+/* Email marketing dashboard + segments */
+.marketing-dashboard {
+  max-width: 72rem;
+}
+
+.marketing-dash-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+  gap: 0.75rem;
+}
+
+.marketing-dash-kpi {
+  background: #fff;
+  border: 1px solid #eaf0f6;
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.marketing-dash-kpi-label {
+  font-size: 0.7rem;
+  color: #64748b;
+  margin: 0 0 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.marketing-dash-kpi-value {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.marketing-dash-kpi-suffix {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-left: 0.1rem;
+}
+
+.marketing-dash-card {
+  background: #fff;
+  border: 1px solid #eaf0f6;
+  border-radius: 12px;
+  padding: 1rem 1.15rem;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.marketing-dash-card-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #33475b;
+  margin: 0 0 0.75rem;
+}
+
+.marketing-dash-trend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 14rem;
+  overflow-y: auto;
+}
+
+.marketing-dash-trend-row {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr 1fr 1fr;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: #516f90;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.marketing-dash-trend-date {
+  font-weight: 600;
+  color: #33475b;
+}
+
+.marketing-segment-builder,
+.marketing-segment-filters {
+  max-width: 40rem;
+}
+
+.marketing-segment-preview {
+  padding: 0.65rem 0.85rem;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 10px;
+}
+
+.marketing-auto-card {
+  background: #fff;
+  border: 1px solid #eaf0f6;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.marketing-auto-flow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.marketing-auto-node {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  background: #f1f5f9;
+  font-size: 0.7rem;
+  color: #33475b;
+  font-weight: 600;
+}
+
+.marketing-auto-node:not(:last-child)::after {
+  content: '→';
+  margin-left: 0.35rem;
+  color: #94a3b8;
+  font-weight: 400;
+}

@@ -495,6 +495,59 @@ export const api = {
   createMarketingForm: (payload) => request('/api/marketing/forms', { method: 'POST', body: payload }),
   updateMarketingForm: (payload) => request('/api/marketing/forms', { method: 'PATCH', body: payload }),
   deleteMarketingForm: (id) => request('/api/marketing/forms', { method: 'DELETE', body: { id } }),
+  getMarketingDashboard: (period = '30d') =>
+    request(`/api/marketing/dashboard?period=${encodeURIComponent(period)}`),
+  listMarketingSegments: () => request('/api/marketing/segments'),
+  previewMarketingSegment: (filterJson) =>
+    request('/api/marketing/segments', { method: 'POST', body: { action: 'preview', filterJson } }),
+  createMarketingSegment: (payload) =>
+    request('/api/marketing/segments', { method: 'POST', body: payload }),
+  refreshMarketingSegment: (id) =>
+    request('/api/marketing/segments', { method: 'PATCH', body: { id, action: 'refresh' } }),
+  deleteMarketingSegment: (id) =>
+    request('/api/marketing/segments', { method: 'DELETE', body: { id } }),
+  getMarketingSuppressions: (opts = {}) => {
+    const q = new URLSearchParams()
+    if (opts.search) q.set('search', opts.search)
+    if (opts.reason) q.set('reason', opts.reason)
+    const suffix = q.toString() ? `?${q}` : ''
+    return request(`/api/marketing/suppressions${suffix}`)
+  },
+  addMarketingSuppression: (payload) =>
+    request('/api/marketing/suppressions', { method: 'POST', body: payload }),
+  removeMarketingSuppression: (email) =>
+    request('/api/marketing/suppressions', { method: 'DELETE', body: { email } }),
+  getMarketingAutomations: () => request('/api/marketing/automations'),
+  createMarketingAutomation: (payload) =>
+    request('/api/marketing/automations', { method: 'POST', body: payload }),
+  updateMarketingAutomation: (payload) =>
+    request('/api/marketing/automations', { method: 'PATCH', body: payload }),
+  deleteMarketingAutomation: (id) =>
+    request('/api/marketing/automations', { method: 'DELETE', body: { id } }),
+  testSendMarketingCampaign: (id, emails) =>
+    request('/api/marketing/campaigns', {
+      method: 'POST',
+      body: { action: 'test_send', id, emails },
+      timeoutMs: 120_000,
+    }),
+  submitMarketingCampaignApproval: (id) =>
+    request('/api/marketing/campaigns', { method: 'POST', body: { action: 'submit_approval', id } }),
+  approveMarketingCampaign: (id, comment) =>
+    request('/api/marketing/campaigns', {
+      method: 'POST',
+      body: { action: 'approve', id, comment },
+    }),
+  rejectMarketingCampaign: (id, comment) =>
+    request('/api/marketing/campaigns', {
+      method: 'POST',
+      body: { action: 'reject', id, comment },
+    }),
+  scheduleMarketingCampaign: (id, scheduledAt) =>
+    request('/api/marketing/campaigns', {
+      method: 'POST',
+      body: { action: 'start', id, scheduledAt },
+      timeoutMs: 120_000,
+    }),
   getChithiSummary: () => request('/api/chithi?resource=summary', { timeoutMs: 25_000 }),
   markChithiSeen: () =>
     request('/api/chithi?resource=summary', { method: 'POST', body: { action: 'seen' }, timeoutMs: 25_000 }),

@@ -8,14 +8,21 @@ export default function MarketingCampaignSetupFields({
   campaignForm,
   setCampaignForm,
   lists,
+  segments = [],
   templates,
   applyTemplate,
   compact = false,
   showSequenceControls = true,
+  showScheduleControls = true,
   user,
+  permissions,
   onNavigate,
+  onTestSend,
+  testSendBusy,
 }) {
   const channelLists = lists.filter((l) => (l.channel || 'email') === campaignForm.channel)
+  const channelSegments = segments.filter((s) => (s.channel || 'email') === campaignForm.channel)
+  const audienceMode = campaignForm.audienceMode || (campaignForm.segmentId ? 'segment' : 'list')
 
   return (
     <div className={`space-y-3 ${compact ? '' : 'pt-1'}`}>
@@ -59,24 +66,115 @@ export default function MarketingCampaignSetupFields({
         />
       )}
 
-      <select
-        value={campaignForm.listId}
-        onChange={(e) => setCampaignForm((p) => ({ ...p, listId: e.target.value }))}
-        className="ci-input w-full"
-      >
-        <option value="">Choose audience list…</option>
-        {channelLists.map((l) => (
-          <option key={l.id} value={l.id}>
-            {marketingOptionLabel(l)} ({l.leadIds?.length || 0})
-          </option>
+      <div className="flex flex-wrap gap-2">
+        {[
+          { id: 'list', label: 'Static list' },
+          { id: 'segment', label: 'Dynamic segment' },
+        ].map((m) => (
+          <button
+            key={m.id}
+            type="button"
+            onClick={() =>
+              setCampaignForm((p) => ({
+                ...p,
+                audienceMode: m.id,
+                listId: m.id === 'list' ? p.listId : '',
+                segmentId: m.id === 'segment' ? p.segmentId : '',
+              }))
+            }
+            className={`ci-btn !text-xs flex-1 min-w-[7rem] ${
+              audienceMode === m.id ? 'ci-btn-accent' : 'ci-btn-secondary'
+            }`}
+          >
+            {m.label}
+          </button>
         ))}
-      </select>
+      </div>
 
-      {!channelLists.length && (
+      {audienceMode === 'segment' ? (
+        <select
+          value={campaignForm.segmentId || ''}
+          onChange={(e) =>
+            setCampaignForm((p) => ({ ...p, segmentId: e.target.value, listId: '' }))
+          }
+          className="ci-input w-full"
+        >
+          <option value="">Choose segment…</option>
+          {channelSegments.map((s) => (
+            <option key={s.id} value={s.id}>
+              {marketingOptionLabel(s)} ({s.memberCount ?? 0})
+            </option>
+          ))}
+        </select>
+      ) : (
+        <select
+          value={campaignForm.listId}
+          onChange={(e) =>
+            setCampaignForm((p) => ({ ...p, listId: e.target.value, segmentId: '' }))
+          }
+          className="ci-input w-full"
+        >
+          <option value="">Choose audience list…</option>
+          {channelLists.map((l) => (
+            <option key={l.id} value={l.id}>
+              {marketingOptionLabel(l)} ({l.leadIds?.length || 0})
+            </option>
+          ))}
+        </select>
+      )}
+
+      {audienceMode === 'list' && !channelLists.length && (
         <p className="text-xs text-amber-800 leading-relaxed">
           No {campaignForm.channel === 'whatsapp' ? 'WhatsApp' : 'email'} lists yet — create one under
           Lists.
         </p>
+      )}
+      {audienceMode === 'segment' && !channelSegments.length && (
+        <p className="text-xs text-amber-800 leading-relaxed">
+          No segments yet — create one under Segments.
+        </p>
+      )}
+
+      {showScheduleControls && campaignForm.channel === 'email' && (
+        <div className="space-y-2 rounded-xl border border-gray-100 bg-gray-50/80 p-3">
+          <label className="flex items-center gap-2 text-xs text-gray-700">
+            <input
+              type="checkbox"
+              checked={campaignForm.sendMode === 'scheduled'}
+              onChange={(e) =>
+                setCampaignForm((p) => ({
+                  ...p,
+                  sendMode: e.target.checked ? 'scheduled' : 'immediate',
+                  scheduledAt: e.target.checked ? p.scheduledAt : '',
+                }))
+              }
+            />
+            Schedule for later
+          </label>
+          {campaignForm.sendMode === 'scheduled' && (
+            <input
+              type="datetime-local"
+              value={campaignForm.scheduledAt || ''}
+              onChange={(e) => setCampaignForm((p) => ({ ...p, scheduledAt: e.target.value }))}
+              className="ci-input w-full"
+            />
+          )}
+          {permissions?.requiresApprovalToSend && (
+            <p className="text-xs text-amber-800">
+              Your role requires manager approval before campaigns send.
+            </p>
+          )}
+          {onTestSend && (
+            <button
+              type="button"
+              className="ci-btn ci-btn-secondary !text-xs"
+              disabled={testSendBusy}
+              onClick={onTestSend}
+            >
+              Send test to my email
+            </button>
+          )}
+        </div>
       )}
 
       <select

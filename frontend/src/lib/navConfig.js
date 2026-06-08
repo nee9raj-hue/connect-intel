@@ -196,12 +196,17 @@ export function buildCustomerNavSections(
       ]
 
   const marketingChildren = [
+    { id: 'marketing-dashboard', label: 'Dashboard', panel: 'marketing', tab: 'dashboard' },
     { id: 'marketing-campaigns', label: 'Campaigns', panel: 'marketing', tab: 'campaigns' },
+    { id: 'marketing-segments', label: 'Segments', panel: 'marketing', tab: 'segments' },
     { id: 'marketing-inbox', label: 'WA Inbox', panel: 'marketing', tab: 'inbox' },
     { id: 'marketing-lists', label: 'Lists', panel: 'marketing', tab: 'lists' },
-    { id: 'marketing-reports', label: 'Campaign reports', panel: 'marketing', tab: 'reports' },
+    { id: 'marketing-reports', label: 'Reports', panel: 'marketing', tab: 'reports' },
     { id: 'marketing-templates', label: 'Templates', panel: 'marketing', tab: 'templates' },
     { id: 'marketing-forms', label: 'Forms', panel: 'marketing', tab: 'forms' },
+    { id: 'marketing-automations', label: 'Automations', panel: 'marketing', tab: 'automations' },
+    { id: 'marketing-suppressions', label: 'Suppressions', panel: 'marketing', tab: 'suppressions' },
+    { id: 'marketing-domains', label: 'Domains', panel: 'marketing', tab: 'domains' },
   ]
 
   const calendarChildren = [
