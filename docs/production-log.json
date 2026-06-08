@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-08T06:30:35.624Z",
-  "updatedAtIst": "08/06/2026, 12:00:35",
+  "updatedAt": "2026-06-08T08:03:02.375Z",
+  "updatedAtIst": "08/06/2026, 13:33:02",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "439540d",
+  "currentProductionCommit": "14587f4",
   "entries": [
+    {
+      "logId": "20260608-1332-14587f4",
+      "commit": "14587f4",
+      "commitFull": "14587f47f3180314334e3091febc62b1ea0ccfd1",
+      "message": "Fix deleted deals reappearing after refresh on dashboard and pipeline.",
+      "deployedAt": "2026-06-08T08:02:39.821Z",
+      "deployedAtIst": "08/06/2026, 13:32:39",
+      "committedAtIst": "08/06/2026, 13:32:10",
+      "vercelPreviewUrl": "https://connect-intel-26jw26rpn-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 14587f4"
+    },
+    {
+      "logId": "20260608-1202-a8a204d",
+      "commit": "a8a204d",
+      "commitFull": "a8a204db047fb34c78ef0e4a7ee9f92c4e46ba47",
+      "message": "Log production deploy 439540d (incoming call outcome).",
+      "deployedAt": "2026-06-08T06:32:33.332Z",
+      "deployedAtIst": "08/06/2026, 12:02:33",
+      "committedAtIst": "08/06/2026, 12:02:05",
+      "vercelPreviewUrl": "https://connect-intel-9i4zlsbrg-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- a8a204d"
+    },
     {
       "logId": "20260608-1159-439540d",
       "commit": "439540d",
@@ -15,7 +43,7 @@
       "committedAtIst": "08/06/2026, 11:58:40",
       "vercelPreviewUrl": "https://connect-intel-nkgsm5nff-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 439540d"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 38bd279"
-    },
-    {
-      "logId": "20260607-1250-636afe1",
-      "commit": "636afe1",
-      "commitFull": "636afe1cf5f0d668c5d31b2b0690ff33885c1c9f",
-      "message": "Log production deploy 873c78e (freight deal pipeline nav).",
-      "deployedAt": "2026-06-07T07:20:51.975Z",
-      "deployedAtIst": "07/06/2026, 12:50:51",
-      "committedAtIst": "07/06/2026, 12:50:23",
-      "vercelPreviewUrl": "https://connect-intel-er91bkjol-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 636afe1"
-    },
-    {
-      "logId": "20260607-1250-873c78e",
-      "commit": "873c78e",
-      "commitFull": "873c78e777b820fc0b17ae0aaed5d23015adb83c",
-      "message": "Add freight deal pipeline nav, dashboard block, and transport mode.",
-      "deployedAt": "2026-06-07T07:20:04.300Z",
-      "deployedAtIst": "07/06/2026, 12:50:04",
-      "committedAtIst": "07/06/2026, 12:49:36",
-      "vercelPreviewUrl": "https://connect-intel-7gk6w4khj-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 873c78e"
     }
   ]
 }

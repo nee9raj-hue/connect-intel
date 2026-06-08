@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 4a4fad0
+npm run prod:rollback -- a8a204d
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 4a4fad0
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `439540d` |
-| Log updated (IST) | 08/06/2026, 12:00:35 |
+| Commit | `14587f4` |
+| Log updated (IST) | 08/06/2026, 13:33:02 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 4a4fad0
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 08/06/2026, 11:59:07 | `439540d` | Add incoming call option to lead call outcome logging. | [preview](https://connect-intel-nkgsm5nff-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 439540d` | **← LIVE**
+| 08/06/2026, 13:32:39 | `14587f4` | Fix deleted deals reappearing after refresh on dashboard and pipeline. | [preview](https://connect-intel-26jw26rpn-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 14587f4` | **← LIVE**
+| 08/06/2026, 12:02:33 | `a8a204d` | Log production deploy 439540d (incoming call outcome). | [preview](https://connect-intel-9i4zlsbrg-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a8a204d` |
+| 08/06/2026, 11:59:07 | `439540d` | Add incoming call option to lead call outcome logging. | [preview](https://connect-intel-nkgsm5nff-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 439540d` |
 | 08/06/2026, 11:18:45 | `4a4fad0` | Improve deals table layout and add bulk won/lost/delete actions. | [preview](https://connect-intel-3gxy07ktc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4a4fad0` |
 | 08/06/2026, 11:03:18 | `db39a92` | Add delete option for deals and freight RFQs on leads. | [preview](https://connect-intel-5kemqs65k-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- db39a92` |
 | 08/06/2026, 10:14:36 | `8d3e043` | Fix bulk email timeouts when AI personalizes each lead. | [preview](https://connect-intel-dc45994im-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8d3e043` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 4a4fad0
 | 07/06/2026, 13:07:47 | `cdc422b` | Fix collapsed pipeline flyouts and add RFQ incoterm fields. | [preview](https://connect-intel-4cte2giix-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- cdc422b` |
 | 07/06/2026, 13:01:16 | `c74a935` | Log production deploy 38bd279 (freight deal stages fix). | [preview](https://connect-intel-p1zw1iafa-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c74a935` |
 | 07/06/2026, 13:00:21 | `38bd279` | Use freight-specific deal stages instead of lead pipeline statuses. | [preview](https://connect-intel-mj8myxp8h-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 38bd279` |
-| 07/06/2026, 12:50:51 | `636afe1` | Log production deploy 873c78e (freight deal pipeline nav). | [preview](https://connect-intel-er91bkjol-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 636afe1` |
-| 07/06/2026, 12:50:04 | `873c78e` | Add freight deal pipeline nav, dashboard block, and transport mode. | [preview](https://connect-intel-7gk6w4khj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 873c78e` |
 
 ---
 
