@@ -1,4 +1,6 @@
 import { applyCors, handleOptions, sendJson } from '../lib/server/http.js'
+import { captureException } from '../lib/server/infra/sentry.js'
+import { observeHistogram } from '../lib/server/infra/metrics.js'
 
 /** Marketing/bulk sends may process several Gmail API calls per request. */
 export const config = {
@@ -8,6 +10,8 @@ export const config = {
 const ROUTES = {
   health: () => import('../lib/server/handlers/health.js'),
   metrics: () => import('../lib/server/handlers/metrics.js'),
+  'infra/capacity': () => import('../lib/server/handlers/infra-capacity.js'),
+  'client-error': () => import('../lib/server/handlers/client-error.js'),
   'workers/cron': () => import('../lib/server/handlers/workers-cron.js'),
   'campaign-send/status': () => import('../lib/server/handlers/campaign-send-status.js'),
   'supabase-diag': () => import('../lib/server/handlers/supabase-diag.js'),
@@ -120,6 +124,7 @@ export default async function handler(req, res) {
   applyCors(req, res)
 
   const pathKey = resolvePath(req)
+  const started = performance.now()
 
   try {
     const load = ROUTES[pathKey]
@@ -132,9 +137,16 @@ export default async function handler(req, res) {
     return await mod.default(req, res)
   } catch (error) {
     console.error(`API ${pathKey || '(empty)'} failed:`, error)
+    void captureException(error, { route: pathKey || '(empty)' })
     return sendJson(res, 500, {
       error: error?.message || 'Server error',
       route: pathKey || null,
     })
+  } finally {
+    observeHistogram(
+      'connectintel_api_request_duration_seconds',
+      (performance.now() - started) / 1000,
+      { route: pathKey || 'unknown' }
+    )
   }
 }

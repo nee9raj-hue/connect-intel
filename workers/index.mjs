@@ -20,6 +20,9 @@ const processorsUrl = pathToFileURL(join(ROOT, 'lib/server/queue/processors.js')
 
 const { processQueueJob } = await import(processorsUrl)
 const { QUEUE_NAMES } = await import(pathToFileURL(join(ROOT, 'lib/server/queue/names.js')).href)
+const { writeWorkerHeartbeat } = await import(
+  pathToFileURL(join(ROOT, 'lib/server/infra/workerHealth.js')).href
+)
 
 const redisUrl = process.env.REDIS_URL || process.env.UPSTASH_REDIS_URL
 if (!redisUrl) {
@@ -81,6 +84,11 @@ const workers = queues.map(({ name, concurrency }) => {
 })
 
 console.log(`Connect Intel workers started (${workers.length} queues) — ${redisUrl.replace(/:[^:@]+@/, ':***@')}`)
+
+await writeWorkerHeartbeat({ queues: queues.map((q) => q.name), startedAt: new Date().toISOString() })
+setInterval(() => {
+  void writeWorkerHeartbeat({ queues: queues.map((q) => q.name) })
+}, 30_000)
 
 async function shutdown() {
   await Promise.all(workers.map((w) => w.close()))

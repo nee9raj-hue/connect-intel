@@ -2,6 +2,8 @@
 
 Optional services that unlock enterprise scalability. **The app works without them** (in-memory fallbacks + existing JSON shards).
 
+**One-shot production setup:** see **`docs/PLATFORM_HARDENING.md`** (checklist + `npm run infra:verify`).
+
 ---
 
 ## 1. Redis (Upstash recommended)

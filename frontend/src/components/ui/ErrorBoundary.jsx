@@ -10,6 +10,19 @@ export default class ErrorBoundary extends Component {
     return { error }
   }
 
+  componentDidCatch(error, info) {
+    const payload = {
+      message: error?.message || 'React error',
+      stack: [error?.stack, info?.componentStack].filter(Boolean).join('\n'),
+      url: typeof window !== 'undefined' ? window.location.href : '',
+    }
+    fetch('/api/client-error', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }).catch(() => {})
+  }
+
   render() {
     if (this.state.error) {
       return (

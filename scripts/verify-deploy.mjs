@@ -29,6 +29,10 @@ const SERVER_IMPORTS = [
   'lib/server/handlers/crm-activity-log.js',
   'lib/server/handlers/crm-team-dashboard.js',
   'lib/server/handlers/crm-my-day.js',
+  'lib/server/handlers/infra-capacity.js',
+  'lib/server/handlers/client-error.js',
+  'lib/server/infra/workerHealth.js',
+  'lib/server/infra/queueStats.js',
 ]
 
 function fail(msg) {
