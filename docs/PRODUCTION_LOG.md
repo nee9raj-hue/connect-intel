@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 15148f3
+npm run prod:rollback -- a67c195
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 15148f3
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `e9b3f81` |
-| Log updated (IST) | 09/06/2026, 12:16:06 |
+| Commit | `21e1d2b` |
+| Log updated (IST) | 09/06/2026, 12:29:42 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 15148f3
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 09/06/2026, 12:15:35 | `e9b3f81` | Trigger queue drain on enqueue so email does not depend on Vercel cron. | [preview](https://connect-intel-gr88xgs9z-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e9b3f81` | **← LIVE**
+| 09/06/2026, 12:29:12 | `21e1d2b` | Add Email Infrastructure V2 for background campaign sending. | [preview](https://connect-intel-hnbphdgbm-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 21e1d2b` | **← LIVE**
+| 09/06/2026, 12:16:40 | `a67c195` | Update production log for e9b3f81 event-driven queue drain deploy. | [preview](https://connect-intel-j7f1h7m93-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a67c195` |
+| 09/06/2026, 12:15:35 | `e9b3f81` | Trigger queue drain on enqueue so email does not depend on Vercel cron. | [preview](https://connect-intel-gr88xgs9z-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e9b3f81` |
 | 09/06/2026, 12:09:59 | `15148f3` | Update production log for 60e303d infrastructure foundation deploy. | [preview](https://connect-intel-68p8rx983-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 15148f3` |
 | 09/06/2026, 12:08:49 | `60e303d` | Fix Vercel deploy: remove 5-minute cron blocked on Hobby plan. | [preview](https://connect-intel-jqqodkmbf-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 60e303d` |
 | 09/06/2026, 11:54:46 | `4afa293` | Update production log for afc084b async bulk email deploy. | [preview](https://connect-intel-6na0eilzg-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4afa293` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 15148f3
 | 09/06/2026, 00:28:12 | `c49d61c` | Update production log for 2c42b51 pipeline navigation fix deploy. | [preview](https://connect-intel-t2q7vujk0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c49d61c` |
 | 09/06/2026, 00:27:08 | `2c42b51` | Harden pipeline navigation history so dashboard pills do not crash the app. | [preview](https://connect-intel-b6a4g90ol-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2c42b51` |
 | 09/06/2026, 00:15:29 | `b925d6f` | Apply hot-lead and follow-up filters server-side for large pipelines. | [preview](https://connect-intel-4bag17t6o-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b925d6f` |
-| 09/06/2026, 00:07:02 | `2eaff40` | Fix marketing templates tab layout so marketplace renders in the hub shell. | [preview](https://connect-intel-klt89un76-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2eaff40` |
-| 08/06/2026, 23:43:14 | `547d176` | Update production log for 7fc22cf My Day dashboard fix deploy. | [preview](https://connect-intel-oawco41nm-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 547d176` |
 
 ---
 

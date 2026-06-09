@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-09T06:46:06.098Z",
-  "updatedAtIst": "09/06/2026, 12:16:06",
+  "updatedAt": "2026-06-09T06:59:42.433Z",
+  "updatedAtIst": "09/06/2026, 12:29:42",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "e9b3f81",
+  "currentProductionCommit": "21e1d2b",
   "entries": [
+    {
+      "logId": "20260609-1229-21e1d2b",
+      "commit": "21e1d2b",
+      "commitFull": "21e1d2b60a9590c00913a4231fe9719fdd4b165d",
+      "message": "Add Email Infrastructure V2 for background campaign sending.",
+      "deployedAt": "2026-06-09T06:59:12.544Z",
+      "deployedAtIst": "09/06/2026, 12:29:12",
+      "committedAtIst": "09/06/2026, 12:28:41",
+      "vercelPreviewUrl": "https://connect-intel-hnbphdgbm-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 21e1d2b"
+    },
+    {
+      "logId": "20260609-1216-a67c195",
+      "commit": "a67c195",
+      "commitFull": "a67c1958775ba8b52374f1c55676b53767e37b24",
+      "message": "Update production log for e9b3f81 event-driven queue drain deploy.",
+      "deployedAt": "2026-06-09T06:46:40.806Z",
+      "deployedAtIst": "09/06/2026, 12:16:40",
+      "committedAtIst": "09/06/2026, 12:16:10",
+      "vercelPreviewUrl": "https://connect-intel-j7f1h7m93-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- a67c195"
+    },
     {
       "logId": "20260609-1215-e9b3f81",
       "commit": "e9b3f81",
@@ -15,7 +43,7 @@
       "committedAtIst": "09/06/2026, 12:15:05",
       "vercelPreviewUrl": "https://connect-intel-gr88xgs9z-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- e9b3f81"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- b925d6f"
-    },
-    {
-      "logId": "20260609-0007-2eaff40",
-      "commit": "2eaff40",
-      "commitFull": "2eaff40bd5001b0fd11c889190b018fc49684d76",
-      "message": "Fix marketing templates tab layout so marketplace renders in the hub shell.",
-      "deployedAt": "2026-06-08T18:37:02.041Z",
-      "deployedAtIst": "09/06/2026, 00:07:02",
-      "committedAtIst": "09/06/2026, 00:06:33",
-      "vercelPreviewUrl": "https://connect-intel-klt89un76-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 2eaff40"
-    },
-    {
-      "logId": "20260608-2343-547d176",
-      "commit": "547d176",
-      "commitFull": "547d1768c84079cefb09e1f7b12c3221a1c9b657",
-      "message": "Update production log for 7fc22cf My Day dashboard fix deploy.",
-      "deployedAt": "2026-06-08T18:13:14.933Z",
-      "deployedAtIst": "08/06/2026, 23:43:14",
-      "committedAtIst": "08/06/2026, 23:42:43",
-      "vercelPreviewUrl": "https://connect-intel-oawco41nm-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 547d176"
     }
   ]
 }
