@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-09T18:30:07.143Z",
-  "updatedAtIst": "10/06/2026, 00:00:07",
+  "updatedAt": "2026-06-09T18:41:35.494Z",
+  "updatedAtIst": "10/06/2026, 00:11:35",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "6d96f1c",
+  "currentProductionCommit": "c3ede43",
   "entries": [
+    {
+      "logId": "20260610-0011-c3ede43",
+      "commit": "c3ede43",
+      "commitFull": "c3ede43398c35c16664c5c92d71dbb161104ebc2",
+      "message": "Add audience P0: cached recommendations, filter save, and refresh.",
+      "deployedAt": "2026-06-09T18:41:22.563Z",
+      "deployedAtIst": "10/06/2026, 00:11:22",
+      "committedAtIst": "10/06/2026, 00:10:42",
+      "vercelPreviewUrl": "https://connect-intel-oznk53i28-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- c3ede43"
+    },
+    {
+      "logId": "20260610-0000-86f07d6",
+      "commit": "86f07d6",
+      "commitFull": "86f07d66a50f40d2f84c23333f210ed19f8f80d5",
+      "message": "Update production log after audience-first Marketing Hub deploy.",
+      "deployedAt": "2026-06-09T18:30:56.033Z",
+      "deployedAtIst": "10/06/2026, 00:00:56",
+      "committedAtIst": "10/06/2026, 00:00:20",
+      "vercelPreviewUrl": "https://connect-intel-nvd7pospr-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 86f07d6"
+    },
     {
       "logId": "20260610-0000-6d96f1c",
       "commit": "6d96f1c",
@@ -15,7 +43,7 @@
       "committedAtIst": "09/06/2026, 23:59:19",
       "vercelPreviewUrl": "https://connect-intel-qi8ygt901-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 6d96f1c"
     },
@@ -158,20 +186,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 25e4065"
-    },
-    {
-      "logId": "20260609-2041-55fa443",
-      "commit": "55fa443",
-      "commitFull": "55fa4436faef080753118890e75fc3532b87b30c",
-      "message": "Speed up bulk email queue to prevent browser timeouts.",
-      "deployedAt": "2026-06-09T15:11:32.172Z",
-      "deployedAtIst": "09/06/2026, 20:41:32",
-      "committedAtIst": "09/06/2026, 20:40:19",
-      "vercelPreviewUrl": "https://connect-intel-afo4vtxpb-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 55fa443"
     }
   ]
 }
