@@ -748,11 +748,13 @@ export function AppProvider({ children }) {
         sentCount,
         failedCount,
         campaignId: queued.campaignId || aggregate.campaignId,
-        background: pendingSends > 0 || Boolean(queued.background),
+        mode: queued.mode || (pendingSends > 0 ? 'queued' : 'inline'),
+        background: queued.mode === 'queued' || pendingSends > 0 || Boolean(queued.background),
         sendStatus: queued.sendStatus || 'queued',
         pendingSends,
         done: queued.done ?? pendingSends <= 0,
         firstError: queued.firstError || null,
+        workerHint: queued.workerHint || null,
       }
     } catch (error) {
       error.bulkEmailProgress = {

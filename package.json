@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@sentry/node": "^9.47.1",
+    "@vercel/functions": "^2.2.13",
     "bullmq": "^5.40.0",
     "ioredis": "^5.4.2",
     "nodemailer": "^7.0.3",

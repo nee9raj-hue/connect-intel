@@ -1,5 +1,16 @@
 import { useCampaignSendProgress } from '../../hooks/useCampaignSendProgress.js'
 
+const STATUS_LABELS = {
+  queued: 'Queued',
+  preparing: 'Preparing',
+  sending: 'Sending',
+  completed: 'Completed',
+  failed: 'Failed',
+  cancelled: 'Cancelled',
+  paused: 'Paused',
+  draft: 'Draft',
+}
+
 function formatEta(ms) {
   if (!ms || ms <= 0) return null
   const min = Math.ceil(ms / 60_000)
@@ -17,6 +28,7 @@ export default function CampaignSendProgress({ campaignId, enabled = true, class
   if (!progress) return null
 
   const status = progress.sendStatus || 'queued'
+  const statusLabel = STATUS_LABELS[String(status).toLowerCase()] || status
   const pct =
     progress.total > 0
       ? Math.min(100, Math.round(((progress.sent + progress.failed) / progress.total) * 100))
@@ -25,7 +37,7 @@ export default function CampaignSendProgress({ campaignId, enabled = true, class
   return (
     <div className={`text-xs text-[#33475b] bg-[#eaf0f6] rounded-lg px-3 py-2 space-y-2 ${className}`}>
       <div className="flex flex-wrap gap-x-3 gap-y-1">
-        <span className="font-medium capitalize">{status}</span>
+        <span className="font-medium">{statusLabel}</span>
         {polling ? <span className="text-[#516f90]">Updating…</span> : null}
       </div>
       <div className="h-1.5 rounded-full bg-[#cbd6e2] overflow-hidden">
@@ -37,7 +49,7 @@ export default function CampaignSendProgress({ campaignId, enabled = true, class
         {progress.opened ? ` · ${progress.opened} opened` : ''}
         {progress.clicked ? ` · ${progress.clicked} clicked` : ''}
       </p>
-      {progress.backgroundEmailEnabled && progress.estimatedCompletionMs ? (
+      {(progress.mode === 'queued' || progress.background) && progress.estimatedCompletionMs ? (
         <p className="text-[#516f90]">
           Sending in the background — you can close this tab.
           {formatEta(progress.estimatedCompletionMs)

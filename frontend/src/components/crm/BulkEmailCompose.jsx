@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { EMAIL_PURPOSES } from '../../lib/crmConstants'
 import { leadDisplayName, leadHasSendableEmail } from '../../lib/emailUtils'
-import { bulkEmailChunkSize } from '../../lib/bulkEmailLimits.js'
+import { bulkEmailChunkSize, INLINE_EMAIL_MAX_RECIPIENTS } from '../../lib/bulkEmailLimits.js'
 import { crmTemplateToComposeFields, loadCrmMarketingTemplates } from '../../lib/crmMarketingTemplates.js'
 import { MarketingTemplatePicker, RecipientEmailPreview } from './MarketingEmailComposeTools'
 import CampaignSendProgress from '../marketing/CampaignSendProgress.jsx'
@@ -76,6 +76,11 @@ export default function BulkEmailCompose({
 
   const recipientSummary = useMemo(() => {
     const parts = [`${withEmail.length} recipient${withEmail.length === 1 ? '' : 's'}`]
+    if (withEmail.length > INLINE_EMAIL_MAX_RECIPIENTS) {
+      parts.push('queue + worker (close tab OK)')
+    } else {
+      parts.push('immediate send')
+    }
     if (skippedCount > 0) {
       parts.push(`${skippedCount} skipped`)
     } else if (missingEmail > 0) {
@@ -225,22 +230,22 @@ export default function BulkEmailCompose({
         const sent = data.sentCount ?? 0
         const failed = data.failedCount ?? 0
         const pending = data.pendingSends ?? 0
-        if (data.done || (sent > 0 && pending <= 0)) {
+        const isQueued = data.mode === 'queued'
+        if (data.done || (sent > 0 && pending <= 0 && !isQueued)) {
           setNotice(
-            `Done — ${sent} email${sent === 1 ? '' : 's'} sent${failed ? `, ${failed} failed` : ''}. Check the lead activity log; inbox delivery can take a few minutes.`
+            `Completed — ${sent} email${sent === 1 ? '' : 's'} sent${failed ? `, ${failed} failed` : ''}. Check activity log; inbox may take a few minutes.`
+          )
+        } else if (isQueued) {
+          setNotice(
+            data.workerHint ||
+              `Queued — ${withEmail.length} recipients. Status: Preparing → Sending. You can close this tab; track progress below or on the Pipeline banner.`
           )
         } else if (sent > 0 || pending > 0) {
-          setNotice(
-            `${sent} sent so far — ${pending} remaining. Progress below or on the Pipeline banner.`
-          )
+          setNotice(`${sent} sent — ${pending} remaining.`)
         } else if (data.firstError) {
           setError(data.firstError)
         } else {
-          setNotice(
-            data.timedOut
-              ? `Send may still be running — check the blue banner on Pipeline.`
-              : `Sending ${withEmail.length} email(s)… watch progress below.`
-          )
+          setNotice(`Sending ${withEmail.length} email(s)…`)
         }
       } else {
         setBackgroundCampaignId(null)
