@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-09T05:24:30.475Z",
-  "updatedAtIst": "09/06/2026, 10:54:30",
+  "updatedAt": "2026-06-09T06:24:07.949Z",
+  "updatedAtIst": "09/06/2026, 11:54:07",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "2e3c603",
+  "currentProductionCommit": "afc084b",
   "entries": [
+    {
+      "logId": "20260609-1153-afc084b",
+      "commit": "afc084b",
+      "commitFull": "afc084b1379d1315cb4d12f0304ac65e0eef9127",
+      "message": "Queue pipeline bulk email so campaigns no longer block PostgREST.",
+      "deployedAt": "2026-06-09T06:23:49.050Z",
+      "deployedAtIst": "09/06/2026, 11:53:49",
+      "committedAtIst": "09/06/2026, 11:53:12",
+      "vercelPreviewUrl": "https://connect-intel-8d8a5rl6c-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- afc084b"
+    },
+    {
+      "logId": "20260609-1054-184bd89",
+      "commit": "184bd89",
+      "commitFull": "184bd8956151092f4c262455bebcdc7a8c28e13c",
+      "message": "Update production log for 2e3c603 bulk email Supabase fix deploy.",
+      "deployedAt": "2026-06-09T05:24:59.011Z",
+      "deployedAtIst": "09/06/2026, 10:54:59",
+      "committedAtIst": "09/06/2026, 10:54:34",
+      "vercelPreviewUrl": "https://connect-intel-inmxv1ter-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 184bd89"
+    },
     {
       "logId": "20260609-1054-2e3c603",
       "commit": "2e3c603",
@@ -15,7 +43,7 @@
       "committedAtIst": "09/06/2026, 10:53:35",
       "vercelPreviewUrl": "https://connect-intel-b2idi16o6-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 2e3c603"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 92d8157"
-    },
-    {
-      "logId": "20260608-2309-397fd1c",
-      "commit": "397fd1c",
-      "commitFull": "397fd1cc76018dc1600b358384a5b3fb2a9ac15a",
-      "message": "Replace Marketing Hub forms with professional marketing workspaces.",
-      "deployedAt": "2026-06-08T17:39:45.639Z",
-      "deployedAtIst": "08/06/2026, 23:09:45",
-      "committedAtIst": "08/06/2026, 23:09:10",
-      "vercelPreviewUrl": "https://connect-intel-hl955qpes-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 397fd1c"
-    },
-    {
-      "logId": "20260608-2252-b234ec5",
-      "commit": "b234ec5",
-      "commitFull": "b234ec5757b19fafe4edc7c4639c6125df2c5f39",
-      "message": "Update production log for 21d4981 Marketing Hub V2 deploy.",
-      "deployedAt": "2026-06-08T17:22:58.518Z",
-      "deployedAtIst": "08/06/2026, 22:52:58",
-      "committedAtIst": "08/06/2026, 22:52:29",
-      "vercelPreviewUrl": "https://connect-intel-ao4e0nqwz-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- b234ec5"
     }
   ]
 }

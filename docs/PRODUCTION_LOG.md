@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- cebaa1c
+npm run prod:rollback -- 184bd89
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- cebaa1c
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `2e3c603` |
-| Log updated (IST) | 09/06/2026, 10:54:30 |
+| Commit | `afc084b` |
+| Log updated (IST) | 09/06/2026, 11:54:07 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- cebaa1c
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 09/06/2026, 10:54:05 | `2e3c603` | Prevent bulk email from overloading Supabase for the whole org. | [preview](https://connect-intel-b2idi16o6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2e3c603` | **← LIVE**
+| 09/06/2026, 11:53:49 | `afc084b` | Queue pipeline bulk email so campaigns no longer block PostgREST. | [preview](https://connect-intel-8d8a5rl6c-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- afc084b` | **← LIVE**
+| 09/06/2026, 10:54:59 | `184bd89` | Update production log for 2e3c603 bulk email Supabase fix deploy. | [preview](https://connect-intel-inmxv1ter-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 184bd89` |
+| 09/06/2026, 10:54:05 | `2e3c603` | Prevent bulk email from overloading Supabase for the whole org. | [preview](https://connect-intel-b2idi16o6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2e3c603` |
 | 09/06/2026, 01:17:23 | `cebaa1c` | Update production log for 8c80060 bulk email modal and greeting deploy. | [preview](https://connect-intel-qwl3frxn4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- cebaa1c` |
 | 09/06/2026, 01:16:30 | `8c80060` | Fix bulk email modal refresh loop and dashboard time greeting. | [preview](https://connect-intel-8r9ipxjp5-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8c80060` |
 | 09/06/2026, 01:08:48 | `4d4e084` | Update production log for 62d2db8 bulk email deploy. | [preview](https://connect-intel-4950t4ypr-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4d4e084` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- cebaa1c
 | 08/06/2026, 23:29:45 | `be4bc3c` | Update production log for b376c8d Chithi V2 deploy. | [preview](https://connect-intel-kcuoyre12-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- be4bc3c` |
 | 08/06/2026, 23:28:59 | `b376c8d` | Rebuild Chithi as CRM-native collaboration with context panels and activity feed. | [preview](https://connect-intel-77hynyxwq-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b376c8d` |
 | 08/06/2026, 23:10:46 | `92d8157` | Update production log for 397fd1c marketing workspaces deploy. | [preview](https://connect-intel-k5tr1wc3a-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 92d8157` |
-| 08/06/2026, 23:09:45 | `397fd1c` | Replace Marketing Hub forms with professional marketing workspaces. | [preview](https://connect-intel-hl955qpes-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 397fd1c` |
-| 08/06/2026, 22:52:58 | `b234ec5` | Update production log for 21d4981 Marketing Hub V2 deploy. | [preview](https://connect-intel-ao4e0nqwz-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b234ec5` |
 
 ---
 
