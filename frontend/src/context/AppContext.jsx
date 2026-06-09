@@ -711,7 +711,6 @@ export function AppProvider({ children }) {
       failedCount: 0,
       skippedCount: 0,
       results: [],
-      leads: null,
       campaignId: null,
     }
     let campaignId = payload.campaignId || null
@@ -760,7 +759,6 @@ export function AppProvider({ children }) {
         aggregate.failedCount += data.failedCount || 0
         aggregate.skippedCount += data.skippedCount || 0
         aggregate.results.push(...(data.results || []))
-        if (data.leads) aggregate.leads = data.leads
 
         onProgress?.({
           chunk: chunkIndex,
@@ -772,9 +770,7 @@ export function AppProvider({ children }) {
         })
       }
 
-      if (aggregate.leads) {
-        setSavedLeads(aggregate.leads)
-      } else if (aggregate.sentCount > 0) {
+      if (aggregate.sentCount > 0) {
         void refreshSavedLeads()
       }
       return aggregate
