@@ -216,8 +216,8 @@ export default function BulkEmailPanel() {
           <BulkEmailCompose
             leadIds={[...selectedIds]}
             leads={selectedLeads}
-            onDone={() => {
-              clearSelection()
+            onDone={(data) => {
+              if (!data?.campaignId) clearSelection()
             }}
           />
         )}

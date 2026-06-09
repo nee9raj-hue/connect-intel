@@ -121,6 +121,7 @@ export default function BulkEmailModal({ open, leadIds, leads, onClose, onDone }
                 leads={composeLeads}
                 skippedCount={skipped.length}
                 onDone={onDone}
+                onRequestClose={onClose}
                 compact
               />
             </>

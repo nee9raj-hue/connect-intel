@@ -7,6 +7,7 @@ import { crmTemplateToComposeFields, loadCrmMarketingTemplates } from '../../lib
 import { MarketingTemplatePicker, RecipientEmailPreview } from './MarketingEmailComposeTools'
 import CampaignSendProgress from '../marketing/CampaignSendProgress.jsx'
 import { useCampaignSendProgress } from '../../hooks/useCampaignSendProgress.js'
+import { saveActivePipelineEmailCampaign } from '../../lib/pipelineEmailCampaign.js'
 
 const TERMINAL_CAMPAIGN = new Set(['completed', 'failed', 'cancelled', 'stopped', 'archived'])
 
@@ -19,6 +20,7 @@ export default function BulkEmailCompose({
   leadIds,
   leads,
   onDone,
+  onRequestClose,
   compact = false,
   skippedCount = 0,
 }) {
@@ -217,20 +219,20 @@ export default function BulkEmailCompose({
       )
       setResult(data)
       setResumeCampaignId(null)
-      if (data.background && data.campaignId) {
+      if (data.campaignId) {
         setBackgroundCampaignId(data.campaignId)
+        saveActivePipelineEmailCampaign(data.campaignId)
         setNotice(
           data.timedOut
             ? `Queue may have timed out in the browser, but your campaign is saved — watch progress below.`
-            : `Campaign queued — ${data.pendingSends ?? withEmail.length} emails sending in the background. You can close this tab.`
+            : `Campaign queued — ${data.pendingSends ?? withEmail.length} email(s) sending. Keep this open or check the blue banner on Pipeline.`
         )
-      } else if (data.campaignId) {
-        setBackgroundCampaignId(data.campaignId)
-        setNotice(`Campaign saved — ${data.pendingSends ?? withEmail.length} email(s) in queue.`)
       } else {
         setBackgroundCampaignId(null)
       }
-      onDone?.(data)
+      if (!data.campaignId) {
+        onDone?.(data)
+      }
     } catch (e) {
       if (e.bulkEmailProgress?.campaignId) {
         setResumeCampaignId(e.bulkEmailProgress.campaignId)
@@ -493,6 +495,15 @@ export default function BulkEmailCompose({
           compact ? 'px-5 py-4 border-t border-[#dfe3eb] bg-[#f5f8fa]' : 'p-4 border-t border-[#dfe3eb] bg-white'
         }`}
       >
+        {backgroundCampaignId && !busy ? (
+          <button
+            type="button"
+            onClick={() => onRequestClose?.()}
+            className="crm-btn crm-btn-secondary w-full py-2.5 mb-2"
+          >
+            Close — track progress on Pipeline
+          </button>
+        ) : null}
         <button
           type="button"
           disabled={sendDisabled}
