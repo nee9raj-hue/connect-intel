@@ -446,6 +446,25 @@ export const api = {
       timeoutMs: opts.timeoutMs ?? 120_000,
       silent: opts.silent,
     }),
+  queueBulkCrmEmail: (payload, opts = {}) =>
+    request('/api/crm/bulk-email', {
+      method: 'POST',
+      body: { action: 'queue', ...payload },
+      timeoutMs: opts.timeoutMs ?? 60_000,
+      silent: opts.silent,
+    }),
+  drainBulkCrmEmail: (campaignId, opts = {}) =>
+    request('/api/crm/bulk-email', {
+      method: 'POST',
+      body: {
+        action: 'drain',
+        campaignId,
+        limit: opts.limit ?? 8,
+        maxMs: opts.maxMs,
+      },
+      timeoutMs: opts.timeoutMs ?? 120_000,
+      silent: opts.silent,
+    }),
   getMarketingOverview: (opts = {}) =>
     request(`/api/marketing/campaigns?overview=1${opts.light ? '&light=1' : ''}`, {
       timeoutMs: opts.timeoutMs ?? 60_000,

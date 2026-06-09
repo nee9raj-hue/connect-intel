@@ -421,9 +421,13 @@ export default function BulkEmailCompose({
         {busy && sendProgress && (
           <div className="text-xs text-[#33475b] bg-[#eaf0f6] rounded-lg px-2 py-2 space-y-1.5">
             <p>
-              Sending step {sendProgress.chunk} of {sendProgress.totalChunks}
-              {sendProgress.sentSoFar > 0 ? ` · ${sendProgress.sentSoFar} of ${sendProgress.total} sent` : ''}
-              {sendProgress.failedSoFar > 0 ? ` · ${sendProgress.failedSoFar} failed` : ''}…
+              {sendProgress.phase === 'queuing'
+                ? 'Queuing recipients…'
+                : `Sending${sendProgress.sentSoFar > 0 ? ` · ${sendProgress.sentSoFar} of ${sendProgress.total} sent` : ''}${
+                    sendProgress.failedSoFar > 0 ? ` · ${sendProgress.failedSoFar} failed` : ''
+                  }${sendProgress.pending > 0 ? ` · ${sendProgress.pending} in progress` : ''}${
+                    sendProgress.queued > sendProgress.pending ? ` · ${sendProgress.queued} queued` : ''
+                  }…`}
             </p>
             <div className="h-1.5 rounded-full bg-[#cbd6e2] overflow-hidden">
               <div
@@ -431,9 +435,11 @@ export default function BulkEmailCompose({
                 style={{
                   width: `${Math.min(
                     100,
-                    Math.round(
-                      ((sendProgress.sentSoFar + (sendProgress.failedSoFar || 0)) / sendProgress.total) * 100
-                    )
+                    sendProgress.phase === 'queuing'
+                      ? 8
+                      : Math.round(
+                          ((sendProgress.sentSoFar + (sendProgress.failedSoFar || 0)) / sendProgress.total) * 100
+                        )
                   )}%`,
                 }}
               />

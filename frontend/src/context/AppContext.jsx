@@ -5,7 +5,6 @@ import { defaultCrm } from '../lib/crmConstants'
 import { loadReadNotificationIds, saveReadNotificationIds } from '../lib/notificationStorage'
 import { getNotificationTarget } from '../lib/notificationNavigation'
 import { navTargetToOptions, normalizePipelineSummary } from '../lib/navConfig'
-import { bulkEmailChunkSize } from '../lib/bulkEmailLimits.js'
 import { withTimeout } from '../lib/fetchWithTimeout'
 
 const AppContext = createContext(null)
@@ -703,72 +702,91 @@ export function AppProvider({ children }) {
 
   const sendBulkEmail = useCallback(async (payload, { onProgress } = {}) => {
     const ids = [...new Set(Array.isArray(payload.leadIds) ? payload.leadIds : [])]
-    const CHUNK = bulkEmailChunkSize({ useAiPerLead: payload.useAiPerLead })
-    const totalChunks = Math.max(1, Math.ceil(ids.length / CHUNK))
-    const requestTimeoutMs = payload.useAiPerLead ? 280_000 : 180_000
     const aggregate = {
       sentCount: 0,
       failedCount: 0,
       skippedCount: 0,
-      results: [],
-      campaignId: null,
+      campaignId: payload.campaignId || null,
+      pendingSends: 0,
     }
-    let campaignId = payload.campaignId || null
 
-    const sendChunk = async (chunkIds, chunkIndex, isLast, enrollmentOffset) => {
-      return api.sendBulkCrmEmail(
-        {
-          ...payload,
-          leadIds: chunkIds,
-          campaignId: campaignId || undefined,
-          enrollmentOffset,
-          finalize: isLast,
-        },
-        { silent: chunkIndex > 1, timeoutMs: requestTimeoutMs }
-      )
-    }
+    onProgress?.({
+      phase: 'queuing',
+      total: ids.length,
+      sentSoFar: 0,
+      failedSoFar: 0,
+    })
 
     try {
-      for (let i = 0; i < ids.length; i += CHUNK) {
-        const chunkIndex = Math.floor(i / CHUNK) + 1
-        const isLast = i + CHUNK >= ids.length
-        const chunkIds = ids.slice(i, i + CHUNK)
+      const queued = await api.queueBulkCrmEmail({
+        ...payload,
+        leadIds: ids,
+      })
 
-        onProgress?.({
-          chunk: chunkIndex,
-          totalChunks,
-          sentSoFar: aggregate.sentCount,
-          failedSoFar: aggregate.failedCount,
-          total: ids.length,
-        })
+      aggregate.skippedCount = queued.skipped?.length || 0
+      aggregate.campaignId = queued.campaignId || aggregate.campaignId
 
-        let data
+      if (!queued.queued && !queued.campaignId) {
+        return { ...aggregate, results: [] }
+      }
+
+      let pending = queued.pendingSends ?? 0
+      let queuedTotal = queued.queuedSends ?? queued.pendingSends ?? ids.length
+
+      onProgress?.({
+        phase: 'sending',
+        total: ids.length,
+        sentSoFar: 0,
+        failedSoFar: 0,
+        pending,
+        queued: queuedTotal,
+      })
+
+      let guard = 0
+      while (guard < 60 && (pending > 0 || queuedTotal > pending)) {
+        guard += 1
+        let burst
         try {
-          data = await sendChunk(chunkIds, chunkIndex, isLast, i)
+          burst = await api.drainBulkCrmEmail(aggregate.campaignId, {
+            silent: guard > 1,
+            timeoutMs: payload.useAiPerLead ? 280_000 : 120_000,
+          })
         } catch (firstError) {
           try {
-            data = await sendChunk(chunkIds, chunkIndex, isLast, i)
+            burst = await api.drainBulkCrmEmail(aggregate.campaignId, {
+              silent: true,
+              timeoutMs: payload.useAiPerLead ? 280_000 : 120_000,
+            })
           } catch {
             throw firstError
           }
         }
 
-        if (data.campaignId && !campaignId) campaignId = data.campaignId
-        aggregate.campaignId = campaignId || data.campaignId || null
-        aggregate.sentCount += data.sentCount || 0
-        aggregate.failedCount += data.failedCount || 0
-        aggregate.skippedCount += data.skippedCount || 0
-        aggregate.results.push(...(data.results || []))
+        aggregate.sentCount += burst.sent || 0
+        aggregate.failedCount += burst.failed || 0
+        pending = burst.pendingSends ?? 0
+        queuedTotal = burst.queuedSends ?? queuedTotal
 
         onProgress?.({
-          chunk: chunkIndex,
-          totalChunks,
+          phase: 'sending',
+          total: ids.length,
           sentSoFar: aggregate.sentCount,
           failedSoFar: aggregate.failedCount,
-          total: ids.length,
-          done: isLast,
+          pending,
+          queued: queuedTotal,
         })
+
+        if ((burst.sent || 0) === 0 && (burst.failed || 0) === 0) {
+          if (queuedTotal > pending) {
+            await new Promise((r) => setTimeout(r, 2500))
+            continue
+          }
+          break
+        }
+        if (pending <= 0 && queuedTotal <= 0) break
       }
+
+      aggregate.pendingSends = pending
 
       if (aggregate.sentCount > 0) {
         void refreshSavedLeads()
@@ -776,7 +794,7 @@ export function AppProvider({ children }) {
       return aggregate
     } catch (error) {
       error.bulkEmailProgress = {
-        campaignId: aggregate.campaignId || campaignId,
+        campaignId: aggregate.campaignId,
         sentCount: aggregate.sentCount,
         failedCount: aggregate.failedCount,
         skippedCount: aggregate.skippedCount,
