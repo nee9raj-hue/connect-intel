@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-09T19:12:20.035Z",
-  "updatedAtIst": "10/06/2026, 00:42:20",
+  "updatedAt": "2026-06-09T19:22:49.105Z",
+  "updatedAtIst": "10/06/2026, 00:52:49",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "9b21c32",
+  "currentProductionCommit": "ba43195",
   "entries": [
+    {
+      "logId": "20260610-0052-ba43195",
+      "commit": "ba43195",
+      "commitFull": "ba43195eff956e1426a1872bc28f1d3c880b293c",
+      "message": "Use pipeline_leads table for CRM saves and paginated list loads.",
+      "deployedAt": "2026-06-09T19:22:37.179Z",
+      "deployedAtIst": "10/06/2026, 00:52:37",
+      "committedAtIst": "10/06/2026, 00:51:57",
+      "vercelPreviewUrl": "https://connect-intel-22q7iydd7-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- ba43195"
+    },
+    {
+      "logId": "20260610-0043-1cab8a6",
+      "commit": "1cab8a6",
+      "commitFull": "1cab8a689bf69faab2a521665ea209be6f2e5d55",
+      "message": "Update production log after CRM save performance deploy.",
+      "deployedAt": "2026-06-09T19:13:01.095Z",
+      "deployedAtIst": "10/06/2026, 00:43:01",
+      "committedAtIst": "10/06/2026, 00:42:25",
+      "vercelPreviewUrl": "https://connect-intel-9x3t89i58-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 1cab8a6"
+    },
     {
       "logId": "20260610-0042-9b21c32",
       "commit": "9b21c32",
@@ -15,7 +43,7 @@
       "committedAtIst": "10/06/2026, 00:41:35",
       "vercelPreviewUrl": "https://connect-intel-i6ou1oolw-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 9b21c32"
     },
@@ -228,20 +256,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- ef2a41f"
-    },
-    {
-      "logId": "20260609-2113-1306aba",
-      "commit": "1306aba",
-      "commitFull": "1306abae7a8bcf49cb391da7b2c246f9e5a2196e",
-      "message": "Implement dual-mode email: inline ≤10, queue+worker for bulk.",
-      "deployedAt": "2026-06-09T16:24:00.377Z",
-      "deployedAtIst": "09/06/2026, 21:54:00",
-      "committedAtIst": "09/06/2026, 21:12:08",
-      "vercelPreviewUrl": "https://connect-intel-6i7valyeo-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 1306aba"
     }
   ]
 }

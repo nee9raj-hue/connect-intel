@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 61e96a9
+npm run prod:rollback -- 1cab8a6
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 61e96a9
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `9b21c32` |
-| Log updated (IST) | 10/06/2026, 00:42:20 |
+| Commit | `ba43195` |
+| Log updated (IST) | 10/06/2026, 00:52:49 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 61e96a9
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 10/06/2026, 00:42:11 | `9b21c32` | Speed up CRM saves by deferring shard mirror and index rebuild. | [preview](https://connect-intel-i6ou1oolw-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9b21c32` | **← LIVE**
+| 10/06/2026, 00:52:37 | `ba43195` | Use pipeline_leads table for CRM saves and paginated list loads. | [preview](https://connect-intel-22q7iydd7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ba43195` | **← LIVE**
+| 10/06/2026, 00:43:01 | `1cab8a6` | Update production log after CRM save performance deploy. | [preview](https://connect-intel-9x3t89i58-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1cab8a6` |
+| 10/06/2026, 00:42:11 | `9b21c32` | Speed up CRM saves by deferring shard mirror and index rebuild. | [preview](https://connect-intel-i6ou1oolw-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9b21c32` |
 | 10/06/2026, 00:35:58 | `61e96a9` | Update production log after pipeline static batch lists deploy. | [preview](https://connect-intel-nqdkjd9a7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 61e96a9` |
 | 10/06/2026, 00:35:15 | `beb7258` | Add pipeline batch static list creation from bulk selection. | [preview](https://connect-intel-96491gw77-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- beb7258` |
 | 10/06/2026, 00:19:13 | `52f34e8` | Update production log after pipeline filter summary hotfix. | [preview](https://connect-intel-nqpkgx8w7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 52f34e8` |
@@ -60,7 +62,6 @@ npm run prod:rollback -- 61e96a9
 | 09/06/2026, 22:30:47 | `5ed3832` | Fix add-lead and bulk-assign false failures on large org pipelines. | [preview](https://connect-intel-fhdlanjwv-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5ed3832` |
 | 09/06/2026, 22:24:03 | `a5e6717` | Replace bulk email banner with compact draggable send dock. | [preview](https://connect-intel-mimas86ku-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a5e6717` |
 | 09/06/2026, 22:13:44 | `ef2a41f` | Improve bulk email progress UI and Railway worker deploy path. | [preview](https://connect-intel-6jmlm86yg-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ef2a41f` |
-| 09/06/2026, 21:54:00 | `1306aba` | Implement dual-mode email: inline ≤10, queue+worker for bulk. | [preview](https://connect-intel-6i7valyeo-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1306aba` |
 
 ---
 
