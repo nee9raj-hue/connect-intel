@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-09T06:39:23.338Z",
-  "updatedAtIst": "09/06/2026, 12:09:23",
+  "updatedAt": "2026-06-09T06:46:06.098Z",
+  "updatedAtIst": "09/06/2026, 12:16:06",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "60e303d",
+  "currentProductionCommit": "e9b3f81",
   "entries": [
+    {
+      "logId": "20260609-1215-e9b3f81",
+      "commit": "e9b3f81",
+      "commitFull": "e9b3f81ae299754c2581cd1721f9a09edf95cb58",
+      "message": "Trigger queue drain on enqueue so email does not depend on Vercel cron.",
+      "deployedAt": "2026-06-09T06:45:35.924Z",
+      "deployedAtIst": "09/06/2026, 12:15:35",
+      "committedAtIst": "09/06/2026, 12:15:05",
+      "vercelPreviewUrl": "https://connect-intel-gr88xgs9z-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- e9b3f81"
+    },
+    {
+      "logId": "20260609-1209-15148f3",
+      "commit": "15148f3",
+      "commitFull": "15148f359a3e8b1af14238e2bfa33c61a7ed5bfb",
+      "message": "Update production log for 60e303d infrastructure foundation deploy.",
+      "deployedAt": "2026-06-09T06:39:59.816Z",
+      "deployedAtIst": "09/06/2026, 12:09:59",
+      "committedAtIst": "09/06/2026, 12:09:28",
+      "vercelPreviewUrl": "https://connect-intel-68p8rx983-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 15148f3"
+    },
     {
       "logId": "20260609-1208-60e303d",
       "commit": "60e303d",
@@ -15,7 +43,7 @@
       "committedAtIst": "09/06/2026, 12:08:19",
       "vercelPreviewUrl": "https://connect-intel-jqqodkmbf-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 60e303d"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 547d176"
-    },
-    {
-      "logId": "20260608-2342-7fc22cf",
-      "commit": "7fc22cf",
-      "commitFull": "7fc22cf1ce2c511541363ba5a78a5babbaaaafaa",
-      "message": "Fix My Day command bar counts, preview drawers, and return navigation.",
-      "deployedAt": "2026-06-08T18:12:27.620Z",
-      "deployedAtIst": "08/06/2026, 23:42:27",
-      "committedAtIst": "08/06/2026, 23:41:57",
-      "vercelPreviewUrl": "https://connect-intel-39fgv936i-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 7fc22cf"
-    },
-    {
-      "logId": "20260608-2329-be4bc3c",
-      "commit": "be4bc3c",
-      "commitFull": "be4bc3caa6b532a03271072c07c57541634a5606",
-      "message": "Update production log for b376c8d Chithi V2 deploy.",
-      "deployedAt": "2026-06-08T17:59:45.199Z",
-      "deployedAtIst": "08/06/2026, 23:29:45",
-      "committedAtIst": "08/06/2026, 23:29:16",
-      "vercelPreviewUrl": "https://connect-intel-kcuoyre12-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- be4bc3c"
     }
   ]
 }
