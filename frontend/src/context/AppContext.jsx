@@ -730,21 +730,29 @@ export function AppProvider({ children }) {
         return { ...aggregate, results: [] }
       }
 
+      const sentCount = queued.sent ?? 0
+      const failedCount = queued.failed ?? 0
+      const pendingSends = queued.pendingSends ?? Math.max(0, ids.length - sentCount - failedCount)
+
       onProgress?.({
-        phase: queued.background ? 'background' : 'queued',
+        phase: pendingSends > 0 ? 'background' : 'done',
         total: ids.length,
-        sentSoFar: 0,
-        failedSoFar: 0,
+        sentSoFar: sentCount,
+        failedSoFar: failedCount,
         sendStatus: queued.sendStatus || 'queued',
-        pending: queued.pendingSends ?? ids.length,
+        pending: pendingSends,
       })
 
       return {
         ...aggregate,
+        sentCount,
+        failedCount,
         campaignId: queued.campaignId || aggregate.campaignId,
-        background: Boolean(queued.background),
+        background: pendingSends > 0 || Boolean(queued.background),
         sendStatus: queued.sendStatus || 'queued',
-        pendingSends: queued.pendingSends ?? ids.length,
+        pendingSends,
+        done: queued.done ?? pendingSends <= 0,
+        firstError: queued.firstError || null,
       }
     } catch (error) {
       error.bulkEmailProgress = {

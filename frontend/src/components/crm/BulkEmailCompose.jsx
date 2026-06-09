@@ -222,15 +222,30 @@ export default function BulkEmailCompose({
       if (data.campaignId) {
         setBackgroundCampaignId(data.campaignId)
         saveActivePipelineEmailCampaign(data.campaignId)
-        setNotice(
-          data.timedOut
-            ? `Queue may have timed out in the browser, but your campaign is saved — watch progress below.`
-            : `Campaign queued — ${data.pendingSends ?? withEmail.length} email(s) sending. Keep this open or check the blue banner on Pipeline.`
-        )
+        const sent = data.sentCount ?? 0
+        const failed = data.failedCount ?? 0
+        const pending = data.pendingSends ?? 0
+        if (data.done || (sent > 0 && pending <= 0)) {
+          setNotice(
+            `Done — ${sent} email${sent === 1 ? '' : 's'} sent${failed ? `, ${failed} failed` : ''}. Check the lead activity log; inbox delivery can take a few minutes.`
+          )
+        } else if (sent > 0 || pending > 0) {
+          setNotice(
+            `${sent} sent so far — ${pending} remaining. Progress below or on the Pipeline banner.`
+          )
+        } else if (data.firstError) {
+          setError(data.firstError)
+        } else {
+          setNotice(
+            data.timedOut
+              ? `Send may still be running — check the blue banner on Pipeline.`
+              : `Sending ${withEmail.length} email(s)… watch progress below.`
+          )
+        }
       } else {
         setBackgroundCampaignId(null)
       }
-      if (!data.campaignId) {
+      if (!data.campaignId || data.done) {
         onDone?.(data)
       }
     } catch (e) {
