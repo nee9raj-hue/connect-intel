@@ -753,6 +753,15 @@ export function AppProvider({ children }) {
         failedCount: aggregate.failedCount,
         skippedCount: aggregate.skippedCount,
       }
+      if (/timed out/i.test(error?.message || '') && aggregate.campaignId) {
+        return {
+          ...aggregate,
+          background: true,
+          sendStatus: 'queued',
+          pendingSends: ids.length,
+          timedOut: true,
+        }
+      }
       throw error
     }
   }, [])

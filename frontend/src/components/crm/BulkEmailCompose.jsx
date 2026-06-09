@@ -220,8 +220,13 @@ export default function BulkEmailCompose({
       if (data.background && data.campaignId) {
         setBackgroundCampaignId(data.campaignId)
         setNotice(
-          `Campaign queued — ${data.pendingSends ?? withEmail.length} emails sending in the background. You can close this tab.`
+          data.timedOut
+            ? `Queue may have timed out in the browser, but your campaign is saved — watch progress below.`
+            : `Campaign queued — ${data.pendingSends ?? withEmail.length} emails sending in the background. You can close this tab.`
         )
+      } else if (data.campaignId) {
+        setBackgroundCampaignId(data.campaignId)
+        setNotice(`Campaign saved — ${data.pendingSends ?? withEmail.length} email(s) in queue.`)
       } else {
         setBackgroundCampaignId(null)
       }

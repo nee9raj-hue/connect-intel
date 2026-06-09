@@ -456,7 +456,7 @@ export const api = {
     request('/api/crm/bulk-email', {
       method: 'POST',
       body: { action: 'queue', ...payload },
-      timeoutMs: opts.timeoutMs ?? 60_000,
+      timeoutMs: opts.timeoutMs ?? 120_000,
       silent: opts.silent,
     }),
   getCampaignSendStatus: (campaignId, opts = {}) =>
