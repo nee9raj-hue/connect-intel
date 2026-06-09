@@ -48,7 +48,8 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
   const [detailItem, setDetailItem] = useState(null)
   const scrollRef = useRef(null)
   const [data, setData] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [summaryLoading, setSummaryLoading] = useState(true)
+  const [timelineLoading, setTimelineLoading] = useState(false)
   const [error, setError] = useState(null)
   const isMobile = useIsMobile()
 
@@ -72,34 +73,62 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
     )
   }, [activeMemberId, memberOptions, intel?.members])
 
-  const load = useCallback(async () => {
-    setLoading(true)
+  const loadSummary = useCallback(async () => {
+    setSummaryLoading(true)
     setError(null)
     try {
-      const q = new URLSearchParams({ period, detailed: '1' })
+      const q = new URLSearchParams({ period })
       if (memberUserId) q.set('userId', memberUserId)
-      const res = await api.getCrmTeamDashboard(q.toString())
+      const res = await api.getCrmTeamMetrics(q.toString())
       setData(res)
     } catch (e) {
       setError(e.message || 'Could not load team intelligence')
     } finally {
-      setLoading(false)
+      setSummaryLoading(false)
+    }
+  }, [period, memberUserId])
+
+  const loadTimeline = useCallback(async () => {
+    setTimelineLoading(true)
+    try {
+      const q = new URLSearchParams({ period })
+      if (memberUserId) q.set('userId', memberUserId)
+      const res = await api.getCrmActivityTimeline(q.toString())
+      setData((prev) =>
+        prev
+          ? {
+              ...prev,
+              activityTimeline: res.activityTimeline || [],
+              recentActivities: res.recentActivities || prev.recentActivities,
+            }
+          : prev
+      )
+    } catch {
+      /* timeline is optional — summary still usable */
+    } finally {
+      setTimelineLoading(false)
     }
   }, [period, memberUserId])
 
   useEffect(() => {
     if (!isActive) return undefined
-    load()
-  }, [load, isActive])
+    setData(null)
+    loadSummary()
+  }, [loadSummary, isActive])
 
   useEffect(() => {
-    if (!isActive || loading || !panelOptions?.teamIntelScrollY || !scrollRef.current) return undefined
+    if (!isActive || summaryLoading || !data) return undefined
+    loadTimeline()
+  }, [isActive, summaryLoading, data, loadTimeline])
+
+  useEffect(() => {
+    if (!isActive || summaryLoading || !panelOptions?.teamIntelScrollY || !scrollRef.current) return undefined
     const y = panelOptions.teamIntelScrollY
     const t = requestAnimationFrame(() => {
       scrollRef.current.scrollTop = y
     })
     return () => cancelAnimationFrame(t)
-  }, [isActive, loading, panelOptions?.teamIntelScrollY, data])
+  }, [isActive, summaryLoading, panelOptions?.teamIntelScrollY, data])
 
   useEffect(() => {
     if (panelOptions?.userId !== undefined) setMemberUserId(panelOptions.userId ? String(panelOptions.userId) : '')
@@ -268,7 +297,7 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
           <p className="ti3-error">{error}</p>
         ) : null}
 
-        {loading && !data ? (
+        {summaryLoading && !data ? (
           <div className="ti3-cockpit ti3-cockpit--loading">
             <div className="ti3-cmd-strip">{[1, 2, 3, 4, 5, 6].map((i) => <SkeletonBlock key={i} className="ti3-skeleton--cmd" />)}</div>
             <SkeletonBlock className="ti3-skeleton--insights" />
@@ -289,7 +318,7 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
                 <h2>Insights</h2>
                 <span className="ti3-panel__tag">AI intelligence</span>
               </header>
-              {loading ? <SkeletonBlock className="ti3-skeleton--insights" /> : (
+              {summaryLoading ? <SkeletonBlock className="ti3-skeleton--insights" /> : (
                 <InsightsCarousel
                   insights={v3?.insights}
                   onSelect={(userId, action) => {
@@ -388,12 +417,16 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
                   ))}
                 </div>
               </header>
-              <ActivityFeed
-                items={visibleTimeline}
-                expandedId={expandedFeedId}
-                onToggle={(id) => setExpandedFeedId((cur) => (cur === id ? null : id))}
-                onOpen={(item) => setDetailItem(item)}
-              />
+              {timelineLoading && !filteredTimeline.length ? (
+                <SkeletonBlock className="ti3-skeleton--panel" />
+              ) : (
+                <ActivityFeed
+                  items={visibleTimeline}
+                  expandedId={expandedFeedId}
+                  onToggle={(id) => setExpandedFeedId((cur) => (cur === id ? null : id))}
+                  onOpen={(item) => setDetailItem(item)}
+                />
+              )}
               {timelineRemaining > 0 ? (
                 <button
                   type="button"
@@ -409,7 +442,7 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
       </div>
 
       {/* SECTION 9 — Sticky action center (mobile/PWA) */}
-      {!loading && (v3?.actionCenter?.length ?? 0) > 0 ? (
+      {!summaryLoading && (v3?.actionCenter?.length ?? 0) > 0 ? (
         <aside className="ti3-action-sheet" aria-label="Quick actions">
           <details className="ti3-action-sheet__details">
             <summary>

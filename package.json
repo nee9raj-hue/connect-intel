@@ -27,6 +27,7 @@
     "prod:ship": "node scripts/ship-production.mjs",
     "workers": "node workers/index.mjs",
     "meili:backfill": "node scripts/backfill-meilisearch.mjs",
+    "dash:warm": "node scripts/warm-dashboard-snapshots.mjs",
     "infra:verify": "node scripts/infra-verify.mjs",
     "build:standalone": "cd frontend && STANDALONE=1 npm run build",
     "open": "open index.html 2>/dev/null || xdg-open index.html 2>/dev/null || echo 'Open index.html in your browser'"

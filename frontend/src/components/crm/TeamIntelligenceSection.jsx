@@ -129,7 +129,7 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
     try {
       const q = new URLSearchParams({ period })
       if (memberUserId) q.set('userId', memberUserId)
-      const res = await api.getCrmTeamDashboard(q.toString())
+      const res = await api.getCrmTeamMetrics(q.toString())
       setData(res)
     } catch (e) {
       setError(e.message || 'Could not load team metrics')

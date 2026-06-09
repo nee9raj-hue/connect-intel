@@ -54,7 +54,7 @@ export default function MyDayDashboard({ onNavigate, isActive = true }) {
 
   useEffect(() => {
     if (!isActive) return undefined
-    setLoading(true)
+    if (!myDay) setLoading(true)
     load()
   }, [load, isActive])
 
@@ -224,6 +224,11 @@ export default function MyDayDashboard({ onNavigate, isActive = true }) {
       </header>
 
       {error ? <p className="myday-error">{error}</p> : null}
+      {myDay?._warming ? (
+        <p className="myday-header__sub" style={{ marginTop: 0 }}>
+          Refreshing your dashboard metrics…
+        </p>
+      ) : null}
 
       {loading && !myDay ? (
         <MyDaySkeleton />
