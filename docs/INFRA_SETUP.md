@@ -34,11 +34,18 @@ REDIS_URL=rediss://... npm run workers
 
 Queues: `ci-email`, `ci-automation`, `ci-import`, `ci-export`, `ci-analytics`, `ci-notification`, `ci-search-index`
 
-### Safety net (no dedicated worker)
+### Event-driven drain (Hobby-safe — no frequent cron)
 
-Daily marketing cron (`/api/marketing/cron` at 09:00 UTC) also drains one job per queue when Redis is enabled. For real-time sends, run `npm run workers` on Railway/Fly.
+After any Redis enqueue, the API **fire-and-forgets** `POST /api/workers/cron` (see `lib/server/queue/triggerDrain.js`). Email sends do **not** wait for Vercel cron.
 
-Manual drain: `POST /api/workers/cron` with `CRON_SECRET` (Hobby plan allows only one Vercel cron per day).
+Primary email path remains: **user clicks Send → enroll → browser `drain` loop** (`AppContext.sendBulkEmail`).
+
+### Safety net
+
+- Daily `marketing/cron` (09:00 UTC): catch-up enrollments (50), reminders, scheduled campaigns — **not** the primary send path.
+- Dedicated worker: `npm run workers` on Railway/Fly when `REDIS_URL` is set.
+
+See **`docs/CRON_AUDIT.md`** for full cron analysis.
 
 ---
 
