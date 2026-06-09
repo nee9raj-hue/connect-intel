@@ -75,14 +75,16 @@ export function PriorityList({ items = [], onOpen }) {
 
 export function PipelineMini({ snapshot, onOpen }) {
   if (!snapshot) return null
-  const max = Math.max(1, ...snapshot.stages.map((s) => s.count), snapshot.leadCount)
+  const stages = snapshot.stages || []
+  const leadCount = snapshot.leadCount ?? stages.reduce((n, s) => n + (s.count || 0), 0)
+  const max = Math.max(1, ...stages.map((s) => s.count || 0), leadCount)
 
   return (
     <div className="myday-pipeline">
       <div className="myday-pipeline__stats">
         <div>
           <span className="myday-stat-label">Leads</span>
-          <strong>{snapshot.leadCount}</strong>
+          <strong>{leadCount}</strong>
         </div>
         <div>
           <span className="myday-stat-label">Deal value</span>
@@ -98,7 +100,7 @@ export function PipelineMini({ snapshot, onOpen }) {
         </div>
       </div>
       <div className="myday-pipeline__stages">
-        {snapshot.stages.map((st) => (
+        {stages.map((st) => (
           <button
             key={st.id}
             type="button"
