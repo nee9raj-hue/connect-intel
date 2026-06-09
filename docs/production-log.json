@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-09T18:46:42.686Z",
-  "updatedAtIst": "10/06/2026, 00:16:42",
+  "updatedAt": "2026-06-09T18:48:33.753Z",
+  "updatedAtIst": "10/06/2026, 00:18:33",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "ab1da1f",
+  "currentProductionCommit": "e5fcb97",
   "entries": [
+    {
+      "logId": "20260610-0018-e5fcb97",
+      "commit": "e5fcb97",
+      "commitFull": "e5fcb97d494c835102a7c3920b3ae0f07143510a",
+      "message": "Fix pipeline crash from calling join on filter summary string.",
+      "deployedAt": "2026-06-09T18:48:26.975Z",
+      "deployedAtIst": "10/06/2026, 00:18:26",
+      "committedAtIst": "10/06/2026, 00:17:50",
+      "vercelPreviewUrl": "https://connect-intel-k9i8hzwxj-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- e5fcb97"
+    },
+    {
+      "logId": "20260610-0017-648926e",
+      "commit": "648926e",
+      "commitFull": "648926eaf5f5a832c9b88842fedc8631e8026715",
+      "message": "Update production log after Audience Studio hotfix deploy.",
+      "deployedAt": "2026-06-09T18:47:19.927Z",
+      "deployedAtIst": "10/06/2026, 00:17:19",
+      "committedAtIst": "10/06/2026, 00:16:46",
+      "vercelPreviewUrl": "https://connect-intel-7i847582l-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 648926e"
+    },
     {
       "logId": "20260610-0016-ab1da1f",
       "commit": "ab1da1f",
@@ -15,7 +43,7 @@
       "committedAtIst": "10/06/2026, 00:16:00",
       "vercelPreviewUrl": "https://connect-intel-b13yuecb3-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- ab1da1f"
     },
@@ -172,20 +200,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 609847f"
-    },
-    {
-      "logId": "20260609-2055-595f20e",
-      "commit": "595f20e",
-      "commitFull": "595f20eba338d8c24cea97a7f89f3b55488919ac",
-      "message": "Keep bulk email progress visible after the send popup closes.",
-      "deployedAt": "2026-06-09T15:25:01.532Z",
-      "deployedAtIst": "09/06/2026, 20:55:01",
-      "committedAtIst": "09/06/2026, 20:53:45",
-      "vercelPreviewUrl": "https://connect-intel-j9k2jnuax-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 595f20e"
     }
   ]
 }
