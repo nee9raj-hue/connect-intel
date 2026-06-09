@@ -36,7 +36,9 @@ Queues: `ci-email`, `ci-automation`, `ci-import`, `ci-export`, `ci-analytics`, `
 
 ### Safety net (no dedicated worker)
 
-Vercel cron hits `/api/workers/cron` every 5 minutes (requires `CRON_SECRET`).
+Daily marketing cron (`/api/marketing/cron` at 09:00 UTC) also drains one job per queue when Redis is enabled. For real-time sends, run `npm run workers` on Railway/Fly.
+
+Manual drain: `POST /api/workers/cron` with `CRON_SECRET` (Hobby plan allows only one Vercel cron per day).
 
 ---
 
