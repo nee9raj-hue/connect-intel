@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-09T06:24:07.949Z",
-  "updatedAtIst": "09/06/2026, 11:54:07",
+  "updatedAt": "2026-06-09T06:39:23.338Z",
+  "updatedAtIst": "09/06/2026, 12:09:23",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "afc084b",
+  "currentProductionCommit": "60e303d",
   "entries": [
+    {
+      "logId": "20260609-1208-60e303d",
+      "commit": "60e303d",
+      "commitFull": "60e303d3049f35bd64c32286220a1bdb1cd7f420",
+      "message": "Fix Vercel deploy: remove 5-minute cron blocked on Hobby plan.",
+      "deployedAt": "2026-06-09T06:38:49.431Z",
+      "deployedAtIst": "09/06/2026, 12:08:49",
+      "committedAtIst": "09/06/2026, 12:08:19",
+      "vercelPreviewUrl": "https://connect-intel-jqqodkmbf-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 60e303d"
+    },
+    {
+      "logId": "20260609-1154-4afa293",
+      "commit": "4afa293",
+      "commitFull": "4afa293528ec183e4be16c42618b35805940f72d",
+      "message": "Update production log for afc084b async bulk email deploy.",
+      "deployedAt": "2026-06-09T06:24:46.992Z",
+      "deployedAtIst": "09/06/2026, 11:54:46",
+      "committedAtIst": "09/06/2026, 11:54:19",
+      "vercelPreviewUrl": "https://connect-intel-6na0eilzg-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 4afa293"
+    },
     {
       "logId": "20260609-1153-afc084b",
       "commit": "afc084b",
@@ -15,7 +43,7 @@
       "committedAtIst": "09/06/2026, 11:53:12",
       "vercelPreviewUrl": "https://connect-intel-8d8a5rl6c-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- afc084b"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- be4bc3c"
-    },
-    {
-      "logId": "20260608-2328-b376c8d",
-      "commit": "b376c8d",
-      "commitFull": "b376c8d2ab2292d7b76e17192377d744b33a6921",
-      "message": "Rebuild Chithi as CRM-native collaboration with context panels and activity feed.",
-      "deployedAt": "2026-06-08T17:58:59.015Z",
-      "deployedAtIst": "08/06/2026, 23:28:59",
-      "committedAtIst": "08/06/2026, 23:28:29",
-      "vercelPreviewUrl": "https://connect-intel-77hynyxwq-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- b376c8d"
-    },
-    {
-      "logId": "20260608-2310-92d8157",
-      "commit": "92d8157",
-      "commitFull": "92d8157eb6390cd34fc09a7a399744cad0531b4a",
-      "message": "Update production log for 397fd1c marketing workspaces deploy.",
-      "deployedAt": "2026-06-08T17:40:46.410Z",
-      "deployedAtIst": "08/06/2026, 23:10:46",
-      "committedAtIst": "08/06/2026, 23:10:19",
-      "vercelPreviewUrl": "https://connect-intel-k5tr1wc3a-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 92d8157"
     }
   ]
 }
