@@ -285,7 +285,8 @@ export const api = {
   getSearchHistory: ({ silent = false } = {}) =>
     request('/api/search-history', { timeoutMs: 30_000 }, { silent }),
   saveLead: (lead) => request('/api/saved-leads', { method: 'POST', body: { lead } }),
-  addManualLead: (manual) => request('/api/saved-leads', { method: 'POST', body: { manual } }),
+  addManualLead: (manual) =>
+    request('/api/saved-leads', { method: 'POST', body: { manual }, timeoutMs: 90_000 }),
   removeLead: (leadId) => request('/api/saved-leads', { method: 'DELETE', body: { leadId } }),
   updateSavedLead: (leadId, body) =>
     request('/api/saved-leads', { method: 'PATCH', body: { leadId, ...body }, timeoutMs: 60_000 }),
@@ -672,7 +673,8 @@ export const api = {
   completeTeamTask: (id) => request('/api/team/tasks', { method: 'PATCH', body: { id, action: 'complete' } }),
   searchTeamMentionLeads: (q = '') =>
     request(`/api/team/mention-leads?q=${encodeURIComponent(q)}&limit=12`),
-  bulkUpdatePipeline: (payload) => request('/api/crm/bulk-update', { method: 'POST', body: payload }),
+  bulkUpdatePipeline: (payload) =>
+    request('/api/crm/bulk-update', { method: 'POST', body: payload, timeoutMs: 90_000 }),
   syncCrmEmailThread: (leadId) =>
     request('/api/crm/sync-email-thread', { method: 'POST', body: { leadId } }),
   logCrmEmailReply: (leadId, payload) =>

@@ -19,7 +19,7 @@ const EMPTY = {
 }
 
 export default function AddLeadModal({ open, onClose, onAdded }) {
-  const { user, teamMembers, addManualLead } = useApp()
+  const { user, teamMembers, addManualLead, refreshSavedLeads } = useApp()
   const [form, setForm] = useState({ ...EMPTY })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -45,7 +45,16 @@ export default function AddLeadModal({ open, onClose, onAdded }) {
       onAdded?.()
       onClose()
     } catch (err) {
-      setError(err.message)
+      if (/timed out/i.test(err?.message || '')) {
+        try {
+          await refreshSavedLeads()
+          setError('Save is still finishing — refresh the list. If the lead appears, it was added.')
+        } catch {
+          setError(err.message)
+        }
+      } else {
+        setError(err.message)
+      }
     } finally {
       setLoading(false)
     }

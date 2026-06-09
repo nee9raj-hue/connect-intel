@@ -703,7 +703,18 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       setBulkTagsOpen(false)
     } catch (e) {
       setBulkNotice(null)
-      window.alert(e.message || 'Bulk update failed')
+      if (/timed out/i.test(e?.message || '')) {
+        try {
+          await refreshSavedLeads()
+          window.alert(
+            'Update may still be processing. The list was refreshed — check if your changes applied.'
+          )
+        } catch {
+          window.alert(e.message || 'Bulk update failed')
+        }
+      } else {
+        window.alert(e.message || 'Bulk update failed')
+      }
     } finally {
       setBulkBusy(false)
     }
