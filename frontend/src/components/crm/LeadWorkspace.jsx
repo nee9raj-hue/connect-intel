@@ -332,8 +332,14 @@ export default function LeadWorkspace({
     }
   }
 
-  const saveNotes = async () => {
-    await runPatch({ crm: { notes } }, 'Notes saved')
+  const saveNotes = async ({ persistNoteActivity = false, showNotice = false } = {}) => {
+    const saved = lead.crm?.notes || ''
+    if (notes === saved) return
+    await runPatch(
+      { crm: { notes }, persistNoteActivity },
+      showNotice ? 'Notes saved' : null,
+      'notes'
+    )
   }
 
   useEffect(() => {
@@ -1060,7 +1066,7 @@ export default function LeadWorkspace({
                 onChange={(e) => setNotes(e.target.value)}
                 onBlur={() => {
                   if (notesSaveTimerRef.current) clearTimeout(notesSaveTimerRef.current)
-                  saveNotes()
+                  saveNotes({ persistNoteActivity: true, showNotice: true })
                 }}
                 rows={5}
                 placeholder="Requirements, pricing, decision makers…"

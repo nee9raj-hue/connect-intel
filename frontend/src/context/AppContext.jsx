@@ -620,14 +620,25 @@ export function AppProvider({ children }) {
     let previous = []
     setSavedLeads((current) => {
       previous = current
+      if (body?.crm && typeof body.crm === 'object') {
+        return current.map((lead) =>
+          lead.id === leadId ? { ...lead, crm: { ...(lead.crm || {}), ...body.crm } } : lead
+        )
+      }
       return current
     })
 
+    const CRM_PATCH_WITHOUT_RELOAD = new Set([
+      'status',
+      'responseReceived',
+      'notes',
+      'nextFollowUpAt',
+    ])
     const needsFullReload = Boolean(
       body?.contact ||
         body?.deal ||
         (body?.crm &&
-          Object.keys(body.crm).some((k) => !['status', 'responseReceived'].includes(k)))
+          Object.keys(body.crm).some((k) => !CRM_PATCH_WITHOUT_RELOAD.has(k)))
     )
 
     try {
