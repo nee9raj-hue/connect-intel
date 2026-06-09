@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-09T19:05:20.075Z",
-  "updatedAtIst": "10/06/2026, 00:35:20",
+  "updatedAt": "2026-06-09T19:12:20.035Z",
+  "updatedAtIst": "10/06/2026, 00:42:20",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "beb7258",
+  "currentProductionCommit": "9b21c32",
   "entries": [
+    {
+      "logId": "20260610-0042-9b21c32",
+      "commit": "9b21c32",
+      "commitFull": "9b21c32b666c29b3900270f6b3c48e4eea1cacd7",
+      "message": "Speed up CRM saves by deferring shard mirror and index rebuild.",
+      "deployedAt": "2026-06-09T19:12:11.963Z",
+      "deployedAtIst": "10/06/2026, 00:42:11",
+      "committedAtIst": "10/06/2026, 00:41:35",
+      "vercelPreviewUrl": "https://connect-intel-i6ou1oolw-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 9b21c32"
+    },
+    {
+      "logId": "20260610-0035-61e96a9",
+      "commit": "61e96a9",
+      "commitFull": "61e96a96215724ec340fb663d6dd2c079e075988",
+      "message": "Update production log after pipeline static batch lists deploy.",
+      "deployedAt": "2026-06-09T19:05:58.465Z",
+      "deployedAtIst": "10/06/2026, 00:35:58",
+      "committedAtIst": "10/06/2026, 00:35:25",
+      "vercelPreviewUrl": "https://connect-intel-nqdkjd9a7-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 61e96a9"
+    },
     {
       "logId": "20260610-0035-beb7258",
       "commit": "beb7258",
@@ -15,7 +43,7 @@
       "committedAtIst": "10/06/2026, 00:34:36",
       "vercelPreviewUrl": "https://connect-intel-96491gw77-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- beb7258"
     },

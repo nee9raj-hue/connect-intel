@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 52f34e8
+npm run prod:rollback -- 61e96a9
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 52f34e8
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `beb7258` |
-| Log updated (IST) | 10/06/2026, 00:35:20 |
+| Commit | `9b21c32` |
+| Log updated (IST) | 10/06/2026, 00:42:20 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 52f34e8
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 10/06/2026, 00:35:15 | `beb7258` | Add pipeline batch static list creation from bulk selection. | [preview](https://connect-intel-96491gw77-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- beb7258` | **← LIVE**
+| 10/06/2026, 00:42:11 | `9b21c32` | Speed up CRM saves by deferring shard mirror and index rebuild. | [preview](https://connect-intel-i6ou1oolw-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9b21c32` | **← LIVE**
+| 10/06/2026, 00:35:58 | `61e96a9` | Update production log after pipeline static batch lists deploy. | [preview](https://connect-intel-nqdkjd9a7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 61e96a9` |
+| 10/06/2026, 00:35:15 | `beb7258` | Add pipeline batch static list creation from bulk selection. | [preview](https://connect-intel-96491gw77-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- beb7258` |
 | 10/06/2026, 00:19:13 | `52f34e8` | Update production log after pipeline filter summary hotfix. | [preview](https://connect-intel-nqpkgx8w7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 52f34e8` |
 | 10/06/2026, 00:18:26 | `e5fcb97` | Fix pipeline crash from calling join on filter summary string. | [preview](https://connect-intel-k9i8hzwxj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e5fcb97` |
 | 10/06/2026, 00:17:19 | `648926e` | Update production log after Audience Studio hotfix deploy. | [preview](https://connect-intel-7i847582l-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 648926e` |
