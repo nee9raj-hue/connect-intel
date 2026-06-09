@@ -7,6 +7,8 @@
     "node": "22.x"
   },
   "dependencies": {
+    "bullmq": "^5.40.0",
+    "ioredis": "^5.4.2",
     "nodemailer": "^7.0.3",
     "web-push": "^3.6.7"
   },
@@ -22,6 +24,7 @@
     "prod:verify": "node scripts/verify-deploy.mjs",
     "prod:preview": "node scripts/verify-deploy.mjs && npm run preview --prefix frontend -- --host 127.0.0.1 --port 4173",
     "prod:ship": "node scripts/ship-production.mjs",
+    "workers": "node workers/index.mjs",
     "build:standalone": "cd frontend && STANDALONE=1 npm run build",
     "open": "open index.html 2>/dev/null || xdg-open index.html 2>/dev/null || echo 'Open index.html in your browser'"
   }

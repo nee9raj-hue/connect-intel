@@ -1,6 +1,6 @@
 # Connect Intel — Enterprise Scalability & System Resilience
 
-**Status:** Living architecture document (June 2026)  
+**Status:** Living architecture document (June 2026) — Phase 2 foundation **implemented** (feature-flagged; see `docs/INFRA_SETUP.md`)  
 **Incident driver:** ~200 pipeline bulk emails caused Supabase PostgREST `PGRST002` (unhealthy) and full-team CRM outage (Xindus org, ~6,600 pipeline rows).
 
 ---
@@ -13,14 +13,14 @@
 | **API runtime** | Vercel serverless, `maxDuration` 300s | Long requests block user perception; no process isolation |
 | **Email — Marketing Hub** | Async: enrollments + `process_sends` bursts + daily cron | ✅ Correct pattern (8/chunk, 90s burst) |
 | **Email — Pipeline bulk** | **Sync** in `crm-bulk-email` (was ~450+ PostgREST ops / 200 sends) | ❌ Root cause of outage; **Phase 1 moves to queue** |
-| **Job queue** | Store-backed enrollment shards only | No Redis/BullMQ; cron once/day (50 sends) insufficient alone |
+| **Job queue** | Store queue + optional **BullMQ** (`lib/server/queue/`) | Redis + `npm run workers` when `REDIS_URL` set |
 | **Pipeline UI** | Paginated bootstrap (100/page), server filters | ✅ Good; must never reload full shard client-side |
 | **Dashboard** | `pipeline_index_*` precomputed doc + 60s cache | ✅ Good direction; expand |
-| **Search** | Postgres/JSON scan + pipeline index | Will not scale to 100k; needs Meilisearch/Typesense |
+| **Search** | Postgres/JSON scan + optional **Meilisearch** (`lib/server/meilisearch/`) | Enable with `MEILI_HOST` + `MEILI_API_KEY` |
 | **Imports** | Admin chunked; org/user import sync in one request | Large imports can still spike DB |
 | **Automations** | Cron + inline triggers (20/run/day) | Needs dedicated worker queue |
-| **Caching** | In-memory shard cache (90s), dashboard cache (60s) | Per-instance only; no Redis |
-| **Monitoring** | Health endpoint, production log | No Prometheus/Grafana/OTel yet |
+| **Caching** | In-memory + optional **Redis SWR** (`lib/server/infra/cache.js`) | Dashboard cache key per org/user/period |
+| **Monitoring** | `/api/health` + optional `/api/metrics` (Prometheus) | Circuit breaker on Supabase client |
 
 ---
 
