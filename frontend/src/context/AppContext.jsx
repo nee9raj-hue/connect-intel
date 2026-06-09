@@ -730,6 +730,23 @@ export function AppProvider({ children }) {
         return { ...aggregate, results: [] }
       }
 
+      if (queued.background) {
+        onProgress?.({
+          phase: 'background',
+          total: ids.length,
+          sentSoFar: 0,
+          failedSoFar: 0,
+          sendStatus: queued.sendStatus || 'queued',
+        })
+        return {
+          ...aggregate,
+          campaignId: queued.campaignId || aggregate.campaignId,
+          background: true,
+          sendStatus: queued.sendStatus || 'queued',
+          pendingSends: queued.pendingSends ?? ids.length,
+        }
+      }
+
       let pending = queued.pendingSends ?? 0
       let queuedTotal = queued.queuedSends ?? queued.pendingSends ?? ids.length
 

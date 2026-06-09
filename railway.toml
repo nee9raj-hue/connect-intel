@@ -1,0 +1,8 @@
+[build]
+builder = "nixpacks"
+buildCommand = "npm ci"
+
+[deploy]
+startCommand = "npm run workers"
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 10

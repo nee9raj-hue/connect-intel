@@ -38,7 +38,7 @@ const workerConfig = {
 }
 
 const queues = [
-  { name: QUEUE_NAMES.EMAIL, concurrency: 2 },
+  { name: QUEUE_NAMES.EMAIL, concurrency: Number(process.env.EMAIL_WORKER_CONCURRENCY || 2) },
   { name: QUEUE_NAMES.AUTOMATION, concurrency: 3 },
   { name: QUEUE_NAMES.IMPORT, concurrency: 1 },
   { name: QUEUE_NAMES.EXPORT, concurrency: 1 },
@@ -56,8 +56,26 @@ const workers = queues.map(({ name, concurrency }) => {
   worker.on('completed', (job) => {
     console.log(`[${name}] completed ${job.id} (${job.name})`)
   })
-  worker.on('failed', (job, err) => {
+  worker.on('failed', async (job, err) => {
     console.error(`[${name}] failed ${job?.id}:`, err?.message || err)
+    if (name === QUEUE_NAMES.EMAIL && job?.attemptsMade >= (job?.opts?.attempts || 3)) {
+      try {
+        const { setCampaignSendStatus } = await import(
+          pathToFileURL(join(ROOT, 'lib/server/email/campaignLifecycle.js')).href
+        )
+        const campaignId = job?.data?.campaignId
+        if (campaignId) {
+          await setCampaignSendStatus(campaignId, 'failed', {
+            lastError: String(err?.message || 'Worker failed').slice(0, 240),
+          })
+        }
+        const { Queue } = await import('bullmq')
+        const dlq = new Queue(QUEUE_NAMES.EMAIL_DLQ, { connection })
+        await dlq.add(job.name || 'failed', job.data, { jobId: `dlq:${job.id}` })
+      } catch (e) {
+        console.error('[dlq] move failed:', e?.message || e)
+      }
+    }
   })
   return worker
 })

@@ -9,6 +9,7 @@ const ROUTES = {
   health: () => import('../lib/server/handlers/health.js'),
   metrics: () => import('../lib/server/handlers/metrics.js'),
   'workers/cron': () => import('../lib/server/handlers/workers-cron.js'),
+  'campaign-send/status': () => import('../lib/server/handlers/campaign-send-status.js'),
   'supabase-diag': () => import('../lib/server/handlers/supabase-diag.js'),
   'google/risc': () => import('../lib/server/handlers/google-risc.js'),
   'integrations/status': () => import('../lib/server/handlers/integrations-status.js'),

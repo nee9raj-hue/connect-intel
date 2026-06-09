@@ -5,6 +5,7 @@ import { leadDisplayName, leadHasSendableEmail } from '../../lib/emailUtils'
 import { bulkEmailChunkSize } from '../../lib/bulkEmailLimits.js'
 import { crmTemplateToComposeFields, loadCrmMarketingTemplates } from '../../lib/crmMarketingTemplates.js'
 import { MarketingTemplatePicker, RecipientEmailPreview } from './MarketingEmailComposeTools'
+import CampaignSendProgress from '../marketing/CampaignSendProgress.jsx'
 
 const COMPOSE_TABS = [
   { id: 'ai', label: '✨ AI draft' },
@@ -36,6 +37,7 @@ export default function BulkEmailCompose({
   const [notice, setNotice] = useState(null)
   const [result, setResult] = useState(null)
   const [resumeCampaignId, setResumeCampaignId] = useState(null)
+  const [backgroundCampaignId, setBackgroundCampaignId] = useState(null)
   const [previewIndex, setPreviewIndex] = useState(0)
   const [templates, setTemplates] = useState([])
   const [templateId, setTemplateId] = useState('')
@@ -204,6 +206,14 @@ export default function BulkEmailCompose({
       )
       setResult(data)
       setResumeCampaignId(null)
+      if (data.background && data.campaignId) {
+        setBackgroundCampaignId(data.campaignId)
+        setNotice(
+          `Campaign queued — ${data.pendingSends ?? withEmail.length} emails sending in the background. You can close this tab.`
+        )
+      } else {
+        setBackgroundCampaignId(null)
+      }
       onDone?.(data)
     } catch (e) {
       if (e.bulkEmailProgress?.campaignId) {
@@ -417,6 +427,9 @@ export default function BulkEmailCompose({
           />
         )}
 
+        {backgroundCampaignId ? (
+          <CampaignSendProgress campaignId={backgroundCampaignId} enabled className="mt-1" />
+        ) : null}
         {error && <p className="text-xs text-red-700 bg-red-50 rounded-lg px-2 py-1.5">{error}</p>}
         {busy && sendProgress && (
           <div className="text-xs text-[#33475b] bg-[#eaf0f6] rounded-lg px-2 py-2 space-y-1.5">

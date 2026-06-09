@@ -22,15 +22,21 @@ Verify: `GET /api/health` → `redis.ok: true`
 
 ---
 
-## 2. BullMQ workers
+## 2. BullMQ workers (required for background email)
 
-API enqueues jobs; **workers must run on a long-lived host** (not Vercel).
+Without Railway worker, sends still use **browser drain** (MVP). With worker, users can **close the tab**.
 
-### Railway / Fly / VPS
+### Railway (recommended)
+
+1. New Railway service → connect repo
+2. Set env: `REDIS_URL`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, Gmail/Resend vars same as Vercel
+3. Deploy uses `railway.toml` → `npm run workers`
 
 ```bash
 REDIS_URL=rediss://... npm run workers
 ```
+
+See **`docs/EMAIL_INFRASTRUCTURE_V2.md`** for full architecture.
 
 Queues: `ci-email`, `ci-automation`, `ci-import`, `ci-export`, `ci-analytics`, `ci-notification`, `ci-search-index`
 

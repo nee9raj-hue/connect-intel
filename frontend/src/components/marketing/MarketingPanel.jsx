@@ -766,6 +766,13 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
       const pending = data.pendingSends ?? 0
 
       if (!isWa && enrolled > 0) {
+        if (data.background && pending > 0) {
+          setNotice(
+            `Campaign queued — ${enrolled} recipients. Sending continues in the background; you can leave this page.`
+          )
+          await load()
+          return
+        }
         if (pending > 0) {
           setNotice(
             initialSent || initialFailed

@@ -453,6 +453,12 @@ export const api = {
       timeoutMs: opts.timeoutMs ?? 60_000,
       silent: opts.silent,
     }),
+  getCampaignSendStatus: (campaignId, opts = {}) =>
+    request(`/api/campaign-send/status?campaignId=${encodeURIComponent(campaignId)}`, {
+      silent: opts.silent,
+      timeoutMs: opts.timeoutMs ?? 30_000,
+    }),
+  getPublicConfig: () => request('/api/public-config', { silent: true }),
   drainBulkCrmEmail: (campaignId, opts = {}) =>
     request('/api/crm/bulk-email', {
       method: 'POST',
