@@ -405,8 +405,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   )
 
   const pipelineAudienceFilterSummary = useMemo(() => {
-    const parts = segmentFilterSummary(pipelineAudienceFilterJson)
-    return parts.length ? parts.join(' · ') : 'Pipeline filters applied'
+    const summary = segmentFilterSummary(pipelineAudienceFilterJson)
+    return summary === 'All pipeline contacts' ? 'Pipeline filters applied' : summary
   }, [pipelineAudienceFilterJson])
 
   const applyFilters = useCallback((opts) => {
