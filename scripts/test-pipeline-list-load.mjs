@@ -1,7 +1,5 @@
-import {
-  hasHeavyPipelineListFilters,
-  resolvePipelineTableScope,
-} from '../lib/server/pipelineListLoad.js'
+import { hasHeavyPipelineListFilters } from '../lib/server/pipelineListLoad.js'
+import { resolvePipelineTableScope } from '../lib/server/pipelineTableScope.js'
 import { buildPipelineLeadsScopedQuery } from '../lib/server/pipelineLeadsTable.js'
 
 const metaStore = {
