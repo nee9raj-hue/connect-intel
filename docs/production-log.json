@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-09T19:22:49.105Z",
-  "updatedAtIst": "10/06/2026, 00:52:49",
+  "updatedAt": "2026-06-09T19:29:43.934Z",
+  "updatedAtIst": "10/06/2026, 00:59:43",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "ba43195",
+  "currentProductionCommit": "a33037e",
   "entries": [
+    {
+      "logId": "20260610-0059-a33037e",
+      "commit": "a33037e",
+      "commitFull": "a33037e9e934e898c617133e852d36f6c4343b01",
+      "message": "Migrate board, deals, marketing, and dashboard reads to pipeline_leads.",
+      "deployedAt": "2026-06-09T19:29:15.686Z",
+      "deployedAtIst": "10/06/2026, 00:59:15",
+      "committedAtIst": "10/06/2026, 00:58:24",
+      "vercelPreviewUrl": "https://connect-intel-1e8vxg3k2-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- a33037e"
+    },
+    {
+      "logId": "20260610-0053-8145177",
+      "commit": "8145177",
+      "commitFull": "8145177e23d3bb6aa61c4bdf58e3849f55eac2fa",
+      "message": "Update production log after pipeline_leads table deploy.",
+      "deployedAt": "2026-06-09T19:23:36.627Z",
+      "deployedAtIst": "10/06/2026, 00:53:36",
+      "committedAtIst": "10/06/2026, 00:53:00",
+      "vercelPreviewUrl": "https://connect-intel-3emc8nqhq-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 8145177"
+    },
     {
       "logId": "20260610-0052-ba43195",
       "commit": "ba43195",
@@ -15,7 +43,7 @@
       "committedAtIst": "10/06/2026, 00:51:57",
       "vercelPreviewUrl": "https://connect-intel-22q7iydd7-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- ba43195"
     },
@@ -242,20 +270,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- a5e6717"
-    },
-    {
-      "logId": "20260609-2213-ef2a41f",
-      "commit": "ef2a41f",
-      "commitFull": "ef2a41f531c5bd51259cdafd427cc8ed6a6d9a63",
-      "message": "Improve bulk email progress UI and Railway worker deploy path.",
-      "deployedAt": "2026-06-09T16:43:44.732Z",
-      "deployedAtIst": "09/06/2026, 22:13:44",
-      "committedAtIst": "09/06/2026, 22:12:35",
-      "vercelPreviewUrl": "https://connect-intel-6jmlm86yg-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- ef2a41f"
     }
   ]
 }
