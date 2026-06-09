@@ -668,22 +668,16 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
       setBusy(true)
       setError(null)
       try {
-        const data = await api.resumeMarketingCampaign(id, { timeoutMs: 120_000, silent: true })
-        const enrolled = data.campaign?.stats?.enrolled || 0
-        await drainCampaignQueue(id, enrolled, {
-          sent: data.sendResult?.sent || 0,
-          failed: data.sendResult?.failed || 0,
-          pending: data.pendingSends ?? 0,
-          queued: data.queuedSends ?? 0,
-          lastError: data.firstError,
-        })
+        await api.resumeMarketingCampaign(id, { timeoutMs: 30_000, silent: true })
+        setNotice('Campaign resumed — workers continue sending in the background.')
+        await load()
       } catch (e) {
         setError(e.message)
       } finally {
         setBusy(false)
       }
     },
-    [drainCampaignQueue]
+    [load]
   )
 
   const pauseCampaign = async (id) => {
@@ -766,27 +760,13 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
       const pending = data.pendingSends ?? 0
 
       if (!isWa && enrolled > 0) {
-        if (data.background && pending > 0) {
+        if (pending > 0 || data.background) {
           setNotice(
-            `Campaign queued — ${enrolled} recipients. Sending continues in the background; you can leave this page.`
+            data.background
+              ? `Campaign queued — ${enrolled} recipients. Workers send in the background; you can close this tab.`
+              : `Campaign queued — ${enrolled} recipients. Ensure Railway workers are running (see System status).`
           )
           await load()
-          return
-        }
-        if (pending > 0) {
-          setNotice(
-            initialSent || initialFailed
-              ? `Campaign started — ${initialSent} sent, sending remaining recipients…`
-              : `Sending to ${enrolled} recipients…`
-          )
-          setBusy(false)
-          void drainCampaignQueue(id, enrolled, {
-            sent: initialSent,
-            failed: initialFailed,
-            pending,
-            queued: data.queuedSends ?? pending,
-            lastError: data.sendResult?.firstError || data.firstError,
-          })
           return
         } else if (initialSent === 0 && initialFailed > 0) {
           setError(

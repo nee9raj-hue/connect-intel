@@ -30,6 +30,8 @@ const SERVER_IMPORTS = [
   'lib/server/handlers/crm-team-dashboard.js',
   'lib/server/handlers/crm-my-day.js',
   'lib/server/handlers/infra-capacity.js',
+  'lib/server/handlers/infra-queue.js',
+  'lib/server/infra/emailWorkerPolicy.js',
   'lib/server/handlers/crm-dashboard-kpi.js',
   'lib/server/handlers/crm-team-metrics.js',
   'lib/server/handlers/crm-activity-timeline.js',

@@ -730,85 +730,22 @@ export function AppProvider({ children }) {
         return { ...aggregate, results: [] }
       }
 
-      if (queued.background) {
-        onProgress?.({
-          phase: 'background',
-          total: ids.length,
-          sentSoFar: 0,
-          failedSoFar: 0,
-          sendStatus: queued.sendStatus || 'queued',
-        })
-        return {
-          ...aggregate,
-          campaignId: queued.campaignId || aggregate.campaignId,
-          background: true,
-          sendStatus: queued.sendStatus || 'queued',
-          pendingSends: queued.pendingSends ?? ids.length,
-        }
-      }
-
-      let pending = queued.pendingSends ?? 0
-      let queuedTotal = queued.queuedSends ?? queued.pendingSends ?? ids.length
-
       onProgress?.({
-        phase: 'sending',
+        phase: queued.background ? 'background' : 'queued',
         total: ids.length,
         sentSoFar: 0,
         failedSoFar: 0,
-        pending,
-        queued: queuedTotal,
+        sendStatus: queued.sendStatus || 'queued',
+        pending: queued.pendingSends ?? ids.length,
       })
 
-      let guard = 0
-      while (guard < 60 && (pending > 0 || queuedTotal > pending)) {
-        guard += 1
-        let burst
-        try {
-          burst = await api.drainBulkCrmEmail(aggregate.campaignId, {
-            silent: guard > 1,
-            timeoutMs: payload.useAiPerLead ? 280_000 : 120_000,
-          })
-        } catch (firstError) {
-          try {
-            burst = await api.drainBulkCrmEmail(aggregate.campaignId, {
-              silent: true,
-              timeoutMs: payload.useAiPerLead ? 280_000 : 120_000,
-            })
-          } catch {
-            throw firstError
-          }
-        }
-
-        aggregate.sentCount += burst.sent || 0
-        aggregate.failedCount += burst.failed || 0
-        pending = burst.pendingSends ?? 0
-        queuedTotal = burst.queuedSends ?? queuedTotal
-
-        onProgress?.({
-          phase: 'sending',
-          total: ids.length,
-          sentSoFar: aggregate.sentCount,
-          failedSoFar: aggregate.failedCount,
-          pending,
-          queued: queuedTotal,
-        })
-
-        if ((burst.sent || 0) === 0 && (burst.failed || 0) === 0) {
-          if (queuedTotal > pending) {
-            await new Promise((r) => setTimeout(r, 2500))
-            continue
-          }
-          break
-        }
-        if (pending <= 0 && queuedTotal <= 0) break
+      return {
+        ...aggregate,
+        campaignId: queued.campaignId || aggregate.campaignId,
+        background: Boolean(queued.background),
+        sendStatus: queued.sendStatus || 'queued',
+        pendingSends: queued.pendingSends ?? ids.length,
       }
-
-      aggregate.pendingSends = pending
-
-      if (aggregate.sentCount > 0) {
-        void refreshSavedLeads()
-      }
-      return aggregate
     } catch (error) {
       error.bulkEmailProgress = {
         campaignId: aggregate.campaignId,
@@ -818,7 +755,7 @@ export function AppProvider({ children }) {
       }
       throw error
     }
-  }, [refreshSavedLeads])
+  }, [])
 
   const bulkUpdatePipeline = useCallback(async (leadIds, actions) => {
     const data = await api.bulkUpdatePipeline({ leadIds, ...actions })

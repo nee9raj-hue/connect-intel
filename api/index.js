@@ -11,6 +11,7 @@ const ROUTES = {
   health: () => import('../lib/server/handlers/health.js'),
   metrics: () => import('../lib/server/handlers/metrics.js'),
   'infra/capacity': () => import('../lib/server/handlers/infra-capacity.js'),
+  'infra/queue': () => import('../lib/server/handlers/infra-queue.js'),
   'client-error': () => import('../lib/server/handlers/client-error.js'),
   'workers/cron': () => import('../lib/server/handlers/workers-cron.js'),
   'campaign-send/status': () => import('../lib/server/handlers/campaign-send-status.js'),

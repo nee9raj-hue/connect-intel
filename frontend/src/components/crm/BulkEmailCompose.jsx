@@ -478,7 +478,9 @@ export default function BulkEmailCompose({
           className="crm-btn crm-btn-primary w-full py-2.5 disabled:opacity-50"
         >
           {busy && sendProgress
-            ? `Sending ${sendProgress.chunk}/${sendProgress.totalChunks}…`
+            ? sendProgress.phase === 'queuing'
+              ? 'Queuing…'
+              : `Sending · ${sendProgress.sentSoFar || 0} of ${sendProgress.total}…`
             : `Send to ${withEmail.length} lead${withEmail.length === 1 ? '' : 's'}`}
         </button>
       </div>

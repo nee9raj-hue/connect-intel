@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- a67c195
+npm run prod:rollback -- a535741
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- a67c195
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `21e1d2b` |
-| Log updated (IST) | 09/06/2026, 12:29:42 |
+| Commit | `6de7d78` |
+| Log updated (IST) | 09/06/2026, 16:10:22 |
 
 ---
 
@@ -44,7 +44,11 @@ npm run prod:rollback -- a67c195
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 09/06/2026, 12:29:12 | `21e1d2b` | Add Email Infrastructure V2 for background campaign sending. | [preview](https://connect-intel-hnbphdgbm-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 21e1d2b` | **← LIVE**
+| 09/06/2026, 15:37:59 | `6de7d78` | Fix dashboard crash and restore team intelligence when snapshots are cold. | [preview](https://connect-intel-2m24mi7jj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6de7d78` | **← LIVE**
+| 09/06/2026, 15:27:45 | `a535741` | Refactor dashboard to snapshot-first cache architecture. | [preview](https://connect-intel-nt4ya0l3v-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a535741` |
+| 09/06/2026, 13:02:20 | `33ebee0` | Add platform hardening for production CRM scale. | [preview](https://connect-intel-9t737d5zo-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 33ebee0` |
+| 09/06/2026, 12:30:28 | `4ccdf6f` | Update production log for 21e1d2b Email Infrastructure V2 deploy. | [preview](https://connect-intel-3fywpwh5x-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4ccdf6f` |
+| 09/06/2026, 12:29:12 | `21e1d2b` | Add Email Infrastructure V2 for background campaign sending. | [preview](https://connect-intel-hnbphdgbm-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 21e1d2b` |
 | 09/06/2026, 12:16:40 | `a67c195` | Update production log for e9b3f81 event-driven queue drain deploy. | [preview](https://connect-intel-j7f1h7m93-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a67c195` |
 | 09/06/2026, 12:15:35 | `e9b3f81` | Trigger queue drain on enqueue so email does not depend on Vercel cron. | [preview](https://connect-intel-gr88xgs9z-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e9b3f81` |
 | 09/06/2026, 12:09:59 | `15148f3` | Update production log for 60e303d infrastructure foundation deploy. | [preview](https://connect-intel-68p8rx983-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 15148f3` |
@@ -60,10 +64,6 @@ npm run prod:rollback -- a67c195
 | 09/06/2026, 00:48:30 | `4bc40c7` | Update production log for 6ad29db segment tag layout fix deploy. | [preview](https://connect-intel-ccn7pg5j5-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4bc40c7` |
 | 09/06/2026, 00:47:45 | `6ad29db` | Fix segment tag picker scroll jump and blank audiences layout. | [preview](https://connect-intel-lngf42az0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6ad29db` |
 | 09/06/2026, 00:39:08 | `48b515a` | Update production log for c8d12c4 smart list and tag filters deploy. | [preview](https://connect-intel-kes8q5xz9-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 48b515a` |
-| 09/06/2026, 00:38:22 | `c8d12c4` | Add smart list builder with tag filters and 200-contact send batches. | [preview](https://connect-intel-fnlozs59s-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c8d12c4` |
-| 09/06/2026, 00:28:12 | `c49d61c` | Update production log for 2c42b51 pipeline navigation fix deploy. | [preview](https://connect-intel-t2q7vujk0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c49d61c` |
-| 09/06/2026, 00:27:08 | `2c42b51` | Harden pipeline navigation history so dashboard pills do not crash the app. | [preview](https://connect-intel-b6a4g90ol-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2c42b51` |
-| 09/06/2026, 00:15:29 | `b925d6f` | Apply hot-lead and follow-up filters server-side for large pipelines. | [preview](https://connect-intel-4bag17t6o-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b925d6f` |
 
 ---
 

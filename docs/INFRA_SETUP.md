@@ -38,7 +38,7 @@ Without Railway worker, sends still use **browser drain** (MVP). With worker, us
 REDIS_URL=rediss://... npm run workers
 ```
 
-See **`docs/EMAIL_INFRASTRUCTURE_V2.md`** for full architecture.
+See **`docs/EMAIL_INFRASTRUCTURE_V3.md`** (current) and **`docs/EMAIL_INFRASTRUCTURE_V2.md`** for history.
 
 Queues: `ci-email`, `ci-automation`, `ci-import`, `ci-export`, `ci-analytics`, `ci-notification`, `ci-search-index`
 
