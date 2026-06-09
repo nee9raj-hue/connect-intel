@@ -1,4 +1,5 @@
 import { buildPipelineIndexDoc, applyPipelineSummaryForUser } from '../lib/server/pipelineIndex.js'
+import { applyIncrementalPipelineIndex } from '../lib/server/pipelineIndexDelta.js'
 import { CRM_STATUSES } from '../lib/server/crm.js'
 
 const entries = [
@@ -73,6 +74,26 @@ if (memberSummary.byStatus.find((r) => r.status === 'contacted')?.count !== 1) {
 }
 
 if (!CRM_STATUSES.length) {
+  process.exit(1)
+}
+
+const prevEntry = entries[0]
+const nextEntry = {
+  ...prevEntry,
+  crm: { ...prevEntry.crm, status: 'contacted' },
+  assignedToUserId: 'u2',
+}
+const incremental = applyIncrementalPipelineIndex(doc, prevEntry, nextEntry, { freightOrg: true })
+if (!incremental || incremental.byStatus.find((r) => r.status === 'new')?.count !== 1) {
+  console.error('Incremental byStatus new count wrong', incremental?.byStatus)
+  process.exit(1)
+}
+if (incremental.byStatus.find((r) => r.status === 'contacted')?.count !== 2) {
+  console.error('Incremental byStatus contacted count wrong', incremental?.byStatus)
+  process.exit(1)
+}
+if (!incremental.byAssignee.u2 || incremental.byAssignee.u2.total !== 2) {
+  console.error('Incremental assignee bucket wrong', incremental?.byAssignee)
   process.exit(1)
 }
 
