@@ -29,23 +29,27 @@ export default function CampaignSendProgress({ campaignId, enabled = true, class
 
   const status = progress.sendStatus || 'queued'
   const statusLabel = STATUS_LABELS[String(status).toLowerCase()] || status
-  const pct =
-    progress.total > 0
-      ? Math.min(100, Math.round(((progress.sent + progress.failed) / progress.total) * 100))
-      : 0
+  const total = progress.total || progress.enrolled || 0
+  const processed = (progress.sent || 0) + (progress.failed || 0)
+  const remaining = progress.remaining ?? Math.max(0, total - processed)
+  const pct = total > 0 ? Math.min(100, Math.round((processed / total) * 100)) : 0
 
   return (
     <div className={`text-xs text-[#33475b] bg-[#eaf0f6] rounded-lg px-3 py-2 space-y-2 ${className}`}>
-      <div className="flex flex-wrap gap-x-3 gap-y-1">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <span className="font-medium">{statusLabel}</span>
-        {polling ? <span className="text-[#516f90]">Updating…</span> : null}
+        <span className="text-sm font-semibold tabular-nums text-[#33475b]">
+          {processed} of {total || '—'} sent
+          {remaining > 0 ? ` · ${remaining} remaining` : ''}
+        </span>
       </div>
-      <div className="h-1.5 rounded-full bg-[#cbd6e2] overflow-hidden">
+      <div className="h-2 rounded-full bg-[#cbd6e2] overflow-hidden">
         <div className="h-full bg-[#00a4bd] transition-all duration-300" style={{ width: `${pct}%` }} />
       </div>
-      <p className="text-[#516f90]">
-        {progress.sent} sent · {progress.remaining} remaining
+      <p className="text-[#516f90] tabular-nums">
+        {progress.sent} delivered
         {progress.failed ? ` · ${progress.failed} failed` : ''}
+        {remaining > 0 ? ` · ${remaining} in queue` : ''}
         {progress.opened ? ` · ${progress.opened} opened` : ''}
         {progress.clicked ? ` · ${progress.clicked} clicked` : ''}
       </p>

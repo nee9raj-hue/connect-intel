@@ -2,6 +2,39 @@
 
 Bulk email (**>10 recipients**) and Marketing campaigns require a **24/7 worker** to process the Redis queue. Vercel only enqueues jobs.
 
+## Quick connect (automated)
+
+From the repo root (Vercel CLI logged in):
+
+```bash
+npx @railway/cli login              # or: login --browserless
+npm run railway:connect
+```
+
+This script:
+
+1. Pulls production env from Vercel
+2. Creates/links Railway project `connect-intel-workers`
+3. Sets worker env vars (`REDIS_URL`, Supabase, Gmail, etc.)
+4. Connects GitHub repo `nee9raj-hue/connect-intel`
+5. Deploys `npm run workers` (from `railway.toml`)
+
+Verify: `curl -s https://connectintel.net/api/health | jq '.worker, .emailV3'`
+
+### Sensitive secrets (one-time)
+
+Vercel marks `SUPABASE_SERVICE_ROLE_KEY`, `GOOGLE_*`, etc. as **Sensitive** — the CLI cannot re-export them.
+
+1. Copy `.env.railway.secrets.example` → `.env.railway.secrets`
+2. Fill from [Supabase API settings](https://supabase.com/dashboard/project/hkdrannqcnszfukcqchj/settings/api) and Google Cloud OAuth
+3. Re-run `npm run railway:connect` (syncs secrets + redeploys)
+
+Or paste in Railway → **email-worker** → **Variables**.
+
+---
+
+## Manual setup
+
 ## 1. Create Railway service
 
 1. Go to [railway.app](https://railway.app) → **New Project** → **Deploy from GitHub repo**

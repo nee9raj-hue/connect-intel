@@ -5,6 +5,7 @@ frontend/dist/
 .env
 .env.*
 !.env.example
+!.env.railway.secrets.example
 *.log
 
 # Built output (Vercel builds these on deploy)
@@ -32,3 +33,6 @@ android/build/
 android/app/build/
 android/local.properties
 android/captures/
+.env*.local
+.env.railway.secrets
+.env.railway.sync

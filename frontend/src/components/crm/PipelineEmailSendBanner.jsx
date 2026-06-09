@@ -17,8 +17,6 @@ export default function PipelineEmailSendBanner({ onNavigate }) {
     const status = String(progress?.sendStatus || '').toLowerCase()
     if (progress?.done || TERMINAL.has(status)) {
       clearActivePipelineEmailCampaign(campaignId)
-      const timer = setTimeout(() => setCampaignId(null), 12_000)
-      return () => clearTimeout(timer)
     }
     return undefined
   }, [campaignId, progress?.done, progress?.sendStatus])

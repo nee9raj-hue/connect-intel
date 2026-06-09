@@ -475,11 +475,9 @@ export default function BulkEmailCompose({
             <p>
               {sendProgress.phase === 'queuing'
                 ? 'Queuing recipients…'
-                : `Sending${sendProgress.sentSoFar > 0 ? ` · ${sendProgress.sentSoFar} of ${sendProgress.total} sent` : ''}${
-                    sendProgress.failedSoFar > 0 ? ` · ${sendProgress.failedSoFar} failed` : ''
-                  }${sendProgress.pending > 0 ? ` · ${sendProgress.pending} in progress` : ''}${
-                    sendProgress.queued > sendProgress.pending ? ` · ${sendProgress.queued} queued` : ''
-                  }…`}
+                : `${sendProgress.sentSoFar ?? 0} of ${sendProgress.total} sent · ${
+                    sendProgress.remaining ?? sendProgress.pending ?? Math.max(0, sendProgress.total - (sendProgress.sentSoFar ?? 0))
+                  } remaining${sendProgress.failedSoFar > 0 ? ` · ${sendProgress.failedSoFar} failed` : ''}…`}
             </p>
             <div className="h-1.5 rounded-full bg-[#cbd6e2] overflow-hidden">
               <div
@@ -504,8 +502,12 @@ export default function BulkEmailCompose({
             {(result.pendingSends ?? withEmail.length) === 1 ? '' : 's'} sending in the background.
           </p>
         ) : result ? (
-          <p className="text-xs text-green-800 bg-green-50 rounded-lg px-2 py-1.5">
-            Sent {result.sentCount}, failed {result.failedCount}, skipped {result.skippedCount}
+          <p className="text-xs text-green-800 bg-green-50 rounded-lg px-2 py-1.5 tabular-nums">
+            {result.sentCount ?? 0} of {withEmail.length} sent
+            {(result.pendingSends ?? 0) > 0 ? ` · ${result.pendingSends} remaining` : ''}
+            {(result.failedCount ?? 0) > 0 ? ` · ${result.failedCount} failed` : ''}
+            {(result.skippedCount ?? 0) > 0 ? ` · ${result.skippedCount} skipped` : ''}
+            {result.done ? ' · Completed' : ''}
           </p>
         ) : null}
       </div>

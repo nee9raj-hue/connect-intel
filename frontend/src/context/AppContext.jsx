@@ -741,6 +741,8 @@ export function AppProvider({ children }) {
         failedSoFar: failedCount,
         sendStatus: queued.sendStatus || 'queued',
         pending: pendingSends,
+        remaining: pendingSends,
+        queued: pendingSends,
       })
 
       return {
