@@ -53,7 +53,13 @@ import {
   ExportPrepareModal,
   PipelineEmailGuideModal,
 } from '../guardrails/ResourceProtectionModals.jsx'
-import { AudienceCreatedModal, CreateAudienceModal } from '../guardrails/CreateAudienceFlow.jsx'
+import {
+  AudienceCreatedModal,
+  CreateAudienceModal,
+  SaveFilterAudienceModal,
+} from '../guardrails/CreateAudienceFlow.jsx'
+import { serverFiltersToSegmentFilterJson, hasSavablePipelineAudienceFilter } from '../../../../lib/pipelineFilterToAudience.js'
+import { segmentFilterSummary } from '../../../../lib/marketingSegmentFilters.js'
 import EmailValidationIcon from './EmailValidationIcon'
 
 import { hasActiveTextSelection } from '../../lib/keyboardShortcuts'
@@ -138,6 +144,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const policies = useUsagePolicies()
   const [emailGuide, setEmailGuide] = useState({ open: false, variant: 'guide_marketing' })
   const [createAudienceOpen, setCreateAudienceOpen] = useState(false)
+  const [saveFilterAudienceOpen, setSaveFilterAudienceOpen] = useState(false)
   const [audienceCreated, setAudienceCreated] = useState(null)
   const [assignGuard, setAssignGuard] = useState({ open: false, variant: 'confirm', pending: null })
   const [editReview, setEditReview] = useState({
@@ -386,6 +393,21 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       ),
     [serverFilters]
   )
+
+  const canSaveAsAudience = useMemo(
+    () => hasSavablePipelineAudienceFilter(serverFilters, appliedAdvanced),
+    [serverFilters, appliedAdvanced]
+  )
+
+  const pipelineAudienceFilterJson = useMemo(
+    () => serverFiltersToSegmentFilterJson(serverFilters, appliedAdvanced),
+    [serverFilters, appliedAdvanced]
+  )
+
+  const pipelineAudienceFilterSummary = useMemo(() => {
+    const parts = segmentFilterSummary(pipelineAudienceFilterJson)
+    return parts.length ? parts.join(' · ') : 'Pipeline filters applied'
+  }, [pipelineAudienceFilterJson])
 
   const applyFilters = useCallback((opts) => {
     const nextAdv = opts?.advanced ? { ...opts.advanced } : { ...advancedFilters }
@@ -1066,6 +1088,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               stageListMode={stageListMode}
               onRemoveAppliedFilter={removeAppliedFilter}
               onOpenViewSettings={() => setViewSettingsOpen(true)}
+              canSaveAsAudience={canSaveAsAudience}
+              onSaveAsAudience={() => setSaveFilterAudienceOpen(true)}
             />
           )}
         </header>
@@ -1232,12 +1256,34 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
           setAudienceCreated(data)
         }}
       />
+      <SaveFilterAudienceModal
+        open={saveFilterAudienceOpen}
+        filterSummary={pipelineAudienceFilterSummary}
+        filterJson={pipelineAudienceFilterJson}
+        onClose={() => setSaveFilterAudienceOpen(false)}
+        onCreated={(data) => {
+          setSaveFilterAudienceOpen(false)
+          setAudienceCreated(data)
+        }}
+      />
       <AudienceCreatedModal
         open={Boolean(audienceCreated)}
         audience={audienceCreated?.audience || audienceCreated?.list}
         onLaunchCampaign={() => {
           const listId = audienceCreated?.list?.id || audienceCreated?.audience?.listId
-          if (listId) launchCampaignForAudience(listId)
+          const segmentId = audienceCreated?.segment?.id || audienceCreated?.audience?.segmentId
+          if (listId) {
+            launchCampaignForAudience(listId)
+            return
+          }
+          if (segmentId) {
+            setAudienceCreated(null)
+            onNavigate?.('marketing', {
+              tab: 'campaigns',
+              launchSegmentId: segmentId,
+              audienceTab: 'studio',
+            })
+          }
         }}
         onClose={() => setAudienceCreated(null)}
       />

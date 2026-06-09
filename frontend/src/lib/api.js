@@ -488,9 +488,18 @@ export const api = {
   duplicateMarketingCampaign: (id) =>
     request('/api/marketing/campaigns', { method: 'POST', body: { action: 'duplicate', id } }),
   listMarketingLists: () => request('/api/marketing/lists'),
-  getMarketingAudiences: () => request('/api/marketing/audiences'),
+  getMarketingAudiences: (params = {}) => {
+    const q = new URLSearchParams()
+    if (params.insightsFor) q.set('insightsFor', params.insightsFor)
+    const suffix = q.toString() ? `?${q}` : ''
+    return request(`/api/marketing/audiences${suffix}`)
+  },
   createAudienceFromLeads: (payload) =>
     request('/api/marketing/audiences', { method: 'POST', body: { action: 'create_from_leads', ...payload } }),
+  createAudienceFromFilter: (payload) =>
+    request('/api/marketing/audiences', { method: 'POST', body: { action: 'create_from_filter', ...payload } }),
+  refreshAudienceSnapshot: (payload) =>
+    request('/api/marketing/audiences', { method: 'POST', body: { action: 'refresh_snapshot', ...payload } }),
   createAudienceFromRecommendation: (payload) =>
     request('/api/marketing/audiences', {
       method: 'POST',

@@ -59,6 +59,8 @@ export default function PipelineFiltersBar({
   stageListMode = false,
   onRemoveAppliedFilter,
   onOpenViewSettings,
+  canSaveAsAudience = false,
+  onSaveAsAudience,
 }) {
   const [savedViews, setSavedViews] = useState([])
   const [advancedOpen, setAdvancedOpen] = useState(false)
@@ -664,6 +666,11 @@ export default function PipelineFiltersBar({
 
       {showActiveChips && (
         <div className="crm-active-filters crm-active-filters--hubspot">
+          {canSaveAsAudience ? (
+            <button type="button" className="crm-filter-link-btn" onClick={onSaveAsAudience}>
+              Save as audience
+            </button>
+          ) : null}
           {appliedSearch && (
             <FilterChipButton
               label={`Search: “${appliedSearch}”`}

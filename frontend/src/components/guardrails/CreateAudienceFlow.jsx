@@ -62,6 +62,66 @@ export function CreateAudienceModal({ open, count, leadIds, onClose, onCreated }
   )
 }
 
+export function SaveFilterAudienceModal({ open, filterSummary, filterJson, onClose, onCreated }) {
+  const [name, setName] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState(null)
+
+  if (!open) return null
+
+  const submit = async () => {
+    if (!name.trim()) {
+      setError('Give your audience a name')
+      return
+    }
+    setBusy(true)
+    setError(null)
+    try {
+      const data = await api.createAudienceFromFilter({
+        name: name.trim(),
+        filterJson,
+        channel: 'email',
+      })
+      onCreated?.(data)
+      setName('')
+    } catch (e) {
+      setError(e.message || 'Could not create audience')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <GuidanceModal open onClose={busy ? undefined : onClose}>
+      <GuidanceCard
+        icon="◎"
+        title="Save filter as audience"
+        message="For better tracking and deliverability, use Marketing Hub. Your current pipeline filters become a dynamic audience that refreshes automatically."
+        hint={filterSummary || 'Pipeline filters applied'}
+        primaryLabel={busy ? 'Saving…' : 'Create audience'}
+        onPrimary={busy ? undefined : submit}
+        secondaryLabel="Cancel"
+        onSecondary={busy ? undefined : onClose}
+      />
+      <div className="ci-create-audience-form">
+        <label className="ci-create-audience-form__label">
+          Audience name
+          <input
+            type="text"
+            value={name}
+            disabled={busy}
+            placeholder="e.g. Mumbai Follow Ups, Hot Leads"
+            onChange={(e) => setName(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && submit()}
+            className="ci-create-audience-form__input"
+          />
+        </label>
+        {error ? <p className="ci-create-audience-form__error">{error}</p> : null}
+      </div>
+    </GuidanceModal>
+  )
+}
+
 export function AudienceCreatedModal({ open, audience, onLaunchCampaign, onClose }) {
   if (!open || !audience) return null
   const count = audience.contactCount ?? audience.list?.leadIds?.length ?? 0

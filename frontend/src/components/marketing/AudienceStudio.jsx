@@ -1,11 +1,42 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { api } from '../../lib/api'
 import { formatDateTime } from '../../lib/crmUiConstants'
+import { getStatusMeta } from '../../lib/crmConstants'
 import { HubMetricTiles } from './MarketingHubCharts'
 import MarketingListsPanel from './MarketingListsPanel'
 import MarketingSegmentsPanel from './MarketingSegmentsPanel'
 
-function AudienceInsightPanel({ audience }) {
+function InsightBreakdown({ title, rows, labelKey }) {
+  if (!rows?.length) return null
+  const max = Math.max(...rows.map((r) => r.count), 1)
+  return (
+    <section className="audience-studio__breakdown">
+      <h4>{title}</h4>
+      <ul className="audience-studio__breakdown-list">
+        {rows.map((row) => {
+          const label =
+            labelKey === 'status'
+              ? getStatusMeta(row.status)?.label || row.status
+              : row[labelKey] || '—'
+          return (
+            <li key={`${labelKey}-${label}`}>
+              <span className="audience-studio__breakdown-label">{label}</span>
+              <span className="audience-studio__breakdown-bar-wrap">
+                <span
+                  className="audience-studio__breakdown-bar"
+                  style={{ width: `${Math.round((row.count / max) * 100)}%` }}
+                />
+              </span>
+              <span className="audience-studio__breakdown-count">{row.count.toLocaleString()}</span>
+            </li>
+          )
+        })}
+      </ul>
+    </section>
+  )
+}
+
+function AudienceInsightPanel({ audience, insights, insightsLoading, teamMembers, onRefresh, refreshing }) {
   if (!audience) {
     return (
       <div className="audience-studio__empty-insight">
@@ -13,6 +44,11 @@ function AudienceInsightPanel({ audience }) {
       </div>
     )
   }
+
+  const engaged =
+    insights?.engagedCount != null
+      ? insights.engagedCount
+      : Math.round((audience.contactCount || 0) * 0.22)
 
   return (
     <div className="audience-studio__insight">
@@ -24,9 +60,19 @@ function AudienceInsightPanel({ audience }) {
           <h2>{audience.name}</h2>
           {audience.description ? <p>{audience.description}</p> : null}
         </div>
-        <time className="audience-studio__updated">
-          Updated {audience.lastRefreshed ? formatDateTime(audience.lastRefreshed) : 'recently'}
-        </time>
+        <div className="audience-studio__insight-actions">
+          <button
+            type="button"
+            className="mkt-btn mkt-btn--ghost mkt-btn--sm"
+            disabled={refreshing}
+            onClick={onRefresh}
+          >
+            {refreshing ? 'Refreshing…' : 'Refresh audience'}
+          </button>
+          <time className="audience-studio__updated">
+            Updated {audience.lastRefreshed ? formatDateTime(audience.lastRefreshed) : 'recently'}
+          </time>
+        </div>
       </header>
       <HubMetricTiles
         tiles={[
@@ -35,16 +81,42 @@ function AudienceInsightPanel({ audience }) {
             label: 'Growth',
             value: `${(audience.growthPct || 0) >= 0 ? '+' : ''}${audience.growthPct || 0}%`,
           },
-          { label: 'Engaged', value: Math.round((audience.contactCount || 0) * 0.22).toLocaleString() },
-          { label: 'Deliverable', value: (audience.deliverableCount || audience.contactCount || 0).toLocaleString() },
+          { label: 'Engaged', value: engaged.toLocaleString() },
+          {
+            label: 'Deliverable',
+            value: (
+              insights?.deliverableCount ??
+              audience.deliverableCount ??
+              audience.contactCount ??
+              0
+            ).toLocaleString(),
+          },
         ]}
       />
-      <section className="audience-studio__segments-placeholder">
+      <section className="audience-studio__segments-preview">
         <h3>Segmentation preview</h3>
-        <p className="mhub-hint">
-          Stage, owner, industry, and country breakdowns populate as your audience grows. Use dynamic
-          segments for filters that refresh automatically.
-        </p>
+        {insightsLoading ? (
+          <p className="mhub-hint">Loading breakdown…</p>
+        ) : insights?.sampleSize ? (
+          <div className="audience-studio__breakdown-grid">
+            <InsightBreakdown title="By stage" rows={insights.byStage} labelKey="status" />
+            <InsightBreakdown title="By country" rows={insights.byCountry} labelKey="country" />
+            <InsightBreakdown
+              title="By owner"
+              rows={(insights.byOwner || []).map((row) => {
+                if (row.ownerId === '__unassigned__') return { ...row, owner: 'Unassigned' }
+                const member = teamMembers?.find((m) => m.id === row.ownerId)
+                return { ...row, owner: member?.name || 'Team member' }
+              })}
+              labelKey="owner"
+            />
+          </div>
+        ) : (
+          <p className="mhub-hint">
+            Stage, owner, and country breakdowns appear after the audience has contacts. Dynamic segments
+            refresh on a schedule or when you click Refresh.
+          </p>
+        )}
       </section>
     </div>
   )
@@ -90,6 +162,9 @@ export default function AudienceStudio({
   const [summary, setSummary] = useState(null)
   const [selectedId, setSelectedId] = useState(null)
   const [loadingAudiences, setLoadingAudiences] = useState(true)
+  const [insights, setInsights] = useState(null)
+  const [insightsLoading, setInsightsLoading] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
 
   const loadAudiences = useCallback(async () => {
     setLoadingAudiences(true)
@@ -114,6 +189,51 @@ export default function AudienceStudio({
     () => audiences.find((a) => a.id === selectedId) || audiences[0] || null,
     [audiences, selectedId]
   )
+
+  const loadInsights = useCallback(
+    async (audienceId) => {
+      if (!audienceId) {
+        setInsights(null)
+        return
+      }
+      setInsightsLoading(true)
+      try {
+        const data = await api.getMarketingAudiences({ insightsFor: audienceId })
+        setInsights(data.insights || null)
+      } catch {
+        setInsights(null)
+      } finally {
+        setInsightsLoading(false)
+      }
+    },
+    []
+  )
+
+  useEffect(() => {
+    if (subTab === 'studio' && selected?.id) loadInsights(selected.id)
+  }, [subTab, selected?.id, loadInsights])
+
+  const refreshSelected = async () => {
+    if (!selected) return
+    setRefreshing(true)
+    setError(null)
+    try {
+      const payload = selected.segmentId
+        ? { segmentId: selected.segmentId }
+        : { listId: selected.listId }
+      const data = await api.refreshAudienceSnapshot(payload)
+      if (data.audience) {
+        setAudiences((prev) => prev.map((a) => (a.id === data.audience.id ? data.audience : a)))
+      }
+      setInsights(data.insights || null)
+      setNotice?.('Audience refreshed')
+      onReload?.()
+    } catch (e) {
+      setError(e.message || 'Could not refresh audience')
+    } finally {
+      setRefreshing(false)
+    }
+  }
 
   const createFromRecommendation = async (item) => {
     setBusy(true)
@@ -221,7 +341,14 @@ export default function AudienceStudio({
               )}
             </aside>
             <main className="audience-studio__main">
-              <AudienceInsightPanel audience={selected} />
+              <AudienceInsightPanel
+                audience={selected}
+                insights={insights}
+                insightsLoading={insightsLoading}
+                teamMembers={teamMembers}
+                onRefresh={refreshSelected}
+                refreshing={refreshing}
+              />
               {selected ? (
                 <footer className="audience-studio__actions">
                   <button

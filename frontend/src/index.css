@@ -16327,6 +16327,70 @@ html[data-pipeline-mobile="1"] .ci-app-header-chip--secondary {
   font-weight: 600;
 }
 
+.audience-studio__insight-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.35rem;
+}
+
+.audience-studio__breakdown-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.audience-studio__breakdown h4 {
+  margin: 0 0 0.5rem;
+  font-size: 0.8125rem;
+  color: #516f90;
+  font-weight: 600;
+}
+
+.audience-studio__breakdown-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.audience-studio__breakdown-list li {
+  display: grid;
+  grid-template-columns: 1fr minmax(60px, 100px) 2.5rem;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+}
+
+.audience-studio__breakdown-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #33475b;
+}
+
+.audience-studio__breakdown-bar-wrap {
+  height: 6px;
+  background: #eaf0f6;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.audience-studio__breakdown-bar {
+  display: block;
+  height: 100%;
+  background: #ff7a59;
+  border-radius: 999px;
+}
+
+.audience-studio__breakdown-count {
+  text-align: right;
+  font-weight: 600;
+  color: #516f90;
+}
+
 .ci-create-audience-form {
   padding: 0 1.5rem 1.25rem;
 }
