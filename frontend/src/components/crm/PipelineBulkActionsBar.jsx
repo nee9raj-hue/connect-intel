@@ -28,6 +28,7 @@ export default function PipelineBulkActionsBar({
   onTags,
   onMarkReplied,
   onEmail,
+  onCreateBatchLists,
   onWhatsApp,
   emailCount = null,
   emailDisabled = false,
@@ -42,20 +43,26 @@ export default function PipelineBulkActionsBar({
   showMore = true,
 }) {
   const [moreOpen, setMoreOpen] = useState(false)
+  const [emailOpen, setEmailOpen] = useState(false)
   const moreRef = useRef(null)
+  const emailRef = useRef(null)
 
   useEffect(() => {
-    if (count < 1) setMoreOpen(false)
+    if (count < 1) {
+      setMoreOpen(false)
+      setEmailOpen(false)
+    }
   }, [count])
 
   useEffect(() => {
-    if (!moreOpen) return undefined
+    if (!moreOpen && !emailOpen) return undefined
     const onDoc = (e) => {
-      if (moreRef.current && !moreRef.current.contains(e.target)) setMoreOpen(false)
+      if (moreOpen && moreRef.current && !moreRef.current.contains(e.target)) setMoreOpen(false)
+      if (emailOpen && emailRef.current && !emailRef.current.contains(e.target)) setEmailOpen(false)
     }
     document.addEventListener('mousedown', onDoc)
     return () => document.removeEventListener('mousedown', onDoc)
-  }, [moreOpen])
+  }, [moreOpen, emailOpen])
 
   if (count < 1) return null
 
@@ -90,19 +97,53 @@ export default function PipelineBulkActionsBar({
         )}
 
         {showEmail && (
-        <button
-          type="button"
-          className="pipeline-bulk-hs-bar__btn"
-          disabled={busy || emailDisabled || (emailCount !== null && emailCount < 1)}
-          onClick={onEmail}
-          title={
-            emailDisabledTitle ||
-            (emailCount === 0 ? 'No selected leads have a sendable email' : undefined)
-          }
-        >
-          <MailIcon className="pipeline-bulk-hs-bar__icon" />
-          Email{emailCount != null && emailCount > 0 ? ` (${emailCount})` : ''}
-        </button>
+          <div className="pipeline-bulk-hs-bar__more" ref={emailRef}>
+            <button
+              type="button"
+              className="pipeline-bulk-hs-bar__btn"
+              disabled={busy || emailDisabled || (emailCount !== null && emailCount < 1)}
+              aria-expanded={emailOpen}
+              aria-haspopup="menu"
+              onClick={() => setEmailOpen((v) => !v)}
+              title={
+                emailDisabledTitle ||
+                (emailCount === 0 ? 'No selected leads have a sendable email' : undefined)
+              }
+            >
+              <MailIcon className="pipeline-bulk-hs-bar__icon" />
+              Email{emailCount != null && emailCount > 0 ? ` (${emailCount})` : ''}
+            </button>
+            {emailOpen && (
+              <div className="pipeline-bulk-hs-menu" role="menu">
+                <button
+                  type="button"
+                  role="menuitem"
+                  className="pipeline-bulk-hs-menu__item"
+                  disabled={busy || emailDisabled || (emailCount !== null && emailCount < 1)}
+                  onClick={() => {
+                    setEmailOpen(false)
+                    onEmail?.()
+                  }}
+                >
+                  Send email
+                </button>
+                {onCreateBatchLists ? (
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className="pipeline-bulk-hs-menu__item"
+                    disabled={busy || (emailCount !== null && emailCount < 1)}
+                    onClick={() => {
+                      setEmailOpen(false)
+                      onCreateBatchLists()
+                    }}
+                  >
+                    Create static lists (200 each)
+                  </button>
+                ) : null}
+              </div>
+            )}
+          </div>
         )}
 
         {showWhatsApp && (

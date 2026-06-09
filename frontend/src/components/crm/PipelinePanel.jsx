@@ -55,7 +55,9 @@ import {
 } from '../guardrails/ResourceProtectionModals.jsx'
 import {
   AudienceCreatedModal,
+  BatchListsCreatedModal,
   CreateAudienceModal,
+  CreateBatchListsModal,
   SaveFilterAudienceModal,
 } from '../guardrails/CreateAudienceFlow.jsx'
 import { serverFiltersToSegmentFilterJson, hasSavablePipelineAudienceFilter } from '../../../../lib/pipelineFilterToAudience.js'
@@ -145,6 +147,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const [emailGuide, setEmailGuide] = useState({ open: false, variant: 'guide_marketing' })
   const [createAudienceOpen, setCreateAudienceOpen] = useState(false)
   const [saveFilterAudienceOpen, setSaveFilterAudienceOpen] = useState(false)
+  const [batchListsOpen, setBatchListsOpen] = useState(false)
+  const [batchListsCreated, setBatchListsCreated] = useState(null)
   const [audienceCreated, setAudienceCreated] = useState(null)
   const [assignGuard, setAssignGuard] = useState({ open: false, variant: 'confirm', pending: null })
   const [editReview, setEditReview] = useState({
@@ -780,6 +784,11 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     setCreateAudienceOpen(true)
   }, [])
 
+  const openBatchListsFlow = useCallback(() => {
+    if (!selectedIds.size) return
+    setBatchListsOpen(true)
+  }, [selectedIds.size])
+
   const launchCampaignForAudience = useCallback(
     (listId) => {
       setAudienceCreated(null)
@@ -1114,6 +1123,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                 onTags={orgLeadTags?.length ? () => setBulkTagsOpen(true) : undefined}
                 onMarkReplied={() => runBulk({ markReplied: true })}
                 onEmail={openBulkEmail}
+                onCreateBatchLists={openBatchListsFlow}
                 onWhatsApp={() => setWaOpen(true)}
                 emailCount={selectedEmailCount}
                 phoneCount={selectedPhoneCount}
@@ -1265,6 +1275,33 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
           setSaveFilterAudienceOpen(false)
           setAudienceCreated(data)
         }}
+      />
+      <CreateBatchListsModal
+        open={batchListsOpen}
+        count={selectedIds.size}
+        leadIds={[...selectedIds]}
+        emailCount={selectedEmailCount}
+        onClose={() => setBatchListsOpen(false)}
+        onCreated={(data) => {
+          setBatchListsOpen(false)
+          setBatchListsCreated(data)
+          setBulkNotice(
+            `Created ${data.batchCount} static list(s) · ${data.totalLeads.toLocaleString()} contacts`
+          )
+        }}
+      />
+      <BatchListsCreatedModal
+        open={Boolean(batchListsCreated)}
+        result={batchListsCreated}
+        onViewLists={() => {
+          setBatchListsCreated(null)
+          onNavigate?.('marketing', { tab: 'audiences', audienceTab: 'lists' })
+        }}
+        onLaunchCampaign={(listId) => {
+          setBatchListsCreated(null)
+          launchCampaignForAudience(listId)
+        }}
+        onClose={() => setBatchListsCreated(null)}
       />
       <AudienceCreatedModal
         open={Boolean(audienceCreated)}

@@ -122,6 +122,92 @@ export function SaveFilterAudienceModal({ open, filterSummary, filterJson, onClo
   )
 }
 
+export function CreateBatchListsModal({ open, count, leadIds, emailCount, onClose, onCreated, onViewLists }) {
+  const [namePrefix, setNamePrefix] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState(null)
+
+  if (!open) return null
+
+  const eligible = emailCount != null ? emailCount : count
+  const batchCount = Math.ceil(eligible / 200) || 0
+
+  const submit = async () => {
+    if (!namePrefix.trim()) {
+      setError('Give your lists a name')
+      return
+    }
+    setBusy(true)
+    setError(null)
+    try {
+      const data = await api.createMarketingListBatchesFromSelection({
+        namePrefix: namePrefix.trim(),
+        leadIds,
+        channel: 'email',
+        batchSize: 200,
+      })
+      onCreated?.(data)
+      setNamePrefix('')
+    } catch (e) {
+      setError(e.message || 'Could not create lists')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <GuidanceModal open onClose={busy ? undefined : onClose}>
+      <GuidanceCard
+        icon="◎"
+        title="Create static lists"
+        message="Split your selection into static lists of up to 200 contacts each. Campaigns use these exact contacts — no full-database scan."
+        hint={`${eligible.toLocaleString()} emailable contact${eligible === 1 ? '' : 's'} → ${batchCount} list${batchCount === 1 ? '' : 's'}`}
+        primaryLabel={busy ? 'Creating…' : `Create ${batchCount} list${batchCount === 1 ? '' : 's'}`}
+        onPrimary={busy ? undefined : submit}
+        secondaryLabel="Cancel"
+        onSecondary={busy ? undefined : onClose}
+      />
+      <div className="ci-create-audience-form">
+        <label className="ci-create-audience-form__label">
+          List name prefix
+          <input
+            type="text"
+            value={namePrefix}
+            disabled={busy}
+            placeholder="e.g. Mumbai Exporters, June Follow Up"
+            onChange={(e) => setNamePrefix(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && submit()}
+            className="ci-create-audience-form__input"
+          />
+        </label>
+        <p className="ci-create-audience-form__hint mhub-hint">
+          Lists are named “{namePrefix.trim() || 'Your prefix'} — 01”, “— 02”, and so on. Delete any list anytime in Marketing Hub → Static lists.
+        </p>
+        {error ? <p className="ci-create-audience-form__error">{error}</p> : null}
+      </div>
+    </GuidanceModal>
+  )
+}
+
+export function BatchListsCreatedModal({ open, result, onViewLists, onLaunchCampaign, onClose }) {
+  if (!open || !result) return null
+  const lists = result.lists || []
+  return (
+    <GuidanceModal open onClose={onClose}>
+      <GuidanceCard
+        icon="✓"
+        title="Static lists created"
+        message={`${result.batchCount || lists.length} list(s) ready with ${(result.totalLeads || 0).toLocaleString()} contacts (${result.batchSize || 200} max per list).`}
+        hint="Each list is frozen at creation — campaigns send only to those contacts."
+        primaryLabel="Launch campaign"
+        onPrimary={() => onLaunchCampaign?.(lists[0]?.id)}
+        secondaryLabel="View lists"
+        onSecondary={onViewLists}
+      />
+    </GuidanceModal>
+  )
+}
+
 export function AudienceCreatedModal({ open, audience, onLaunchCampaign, onClose }) {
   if (!open || !audience) return null
   const count = audience.contactCount ?? audience.list?.leadIds?.length ?? 0

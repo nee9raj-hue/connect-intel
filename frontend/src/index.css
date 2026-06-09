@@ -16417,6 +16417,11 @@ html[data-pipeline-mobile="1"] .ci-app-header-chip--secondary {
   color: #b91c1c;
 }
 
+.ci-create-audience-form__hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.75rem;
+}
+
 .mkt-audience-card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));

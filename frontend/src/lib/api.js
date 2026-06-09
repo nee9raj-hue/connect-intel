@@ -508,6 +508,11 @@ export const api = {
   createMarketingList: (payload) => request('/api/marketing/lists', { method: 'POST', body: payload }),
   createMarketingListBatches: (payload) =>
     request('/api/marketing/lists', { method: 'POST', body: { action: 'create_batches', ...payload } }),
+  createMarketingListBatchesFromSelection: (payload) =>
+    request('/api/marketing/lists', {
+      method: 'POST',
+      body: { action: 'create_batches_from_selection', ...payload },
+    }),
   createMarketingListBatchesFromFilters: (payload) =>
     request('/api/marketing/lists', {
       method: 'POST',
