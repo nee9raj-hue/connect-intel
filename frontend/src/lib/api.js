@@ -448,14 +448,14 @@ export const api = {
   sendBulkCrmEmail: (payload, opts = {}) =>
     request('/api/crm/bulk-email', {
       method: 'POST',
-      body: payload,
+      body: { ...payload, action: 'queue' },
       timeoutMs: opts.timeoutMs ?? 120_000,
       silent: opts.silent,
     }),
   queueBulkCrmEmail: (payload, opts = {}) =>
     request('/api/crm/bulk-email', {
       method: 'POST',
-      body: { action: 'queue', ...payload },
+      body: { ...payload, action: 'queue' },
       timeoutMs: opts.timeoutMs ?? 120_000,
       silent: opts.silent,
     }),
