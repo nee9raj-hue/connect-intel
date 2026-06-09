@@ -74,7 +74,7 @@ const workers = queues.map(({ name, concurrency }) => {
         }
         const { Queue } = await import('bullmq')
         const dlq = new Queue(QUEUE_NAMES.EMAIL_DLQ, { connection })
-        await dlq.add(job.name || 'failed', job.data, { jobId: `dlq:${job.id}` })
+        await dlq.add(job.name || 'failed', job.data, { jobId: `dlq_${String(job.id).replace(/:/g, '_')}` })
       } catch (e) {
         console.error('[dlq] move failed:', e?.message || e)
       }
