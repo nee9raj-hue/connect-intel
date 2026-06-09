@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useUsagePolicies } from '../../hooks/useUsagePolicies.js'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { leadHasCallablePhone, openWhatsAppChat } from '../../lib/phoneUtils'
@@ -90,6 +91,8 @@ export default function LeadWorkspace({
     orgLeadTags,
     refreshPipelineLead,
   } = useApp()
+  const policies = useUsagePolicies()
+  const notesSaveTimerRef = useRef(null)
   const [tab, setTab] = useState('overview')
   const [notes, setNotes] = useState(lead.crm?.notes || '')
   const [status, setStatus] = useState(lead.crm?.status || 'new')
@@ -332,6 +335,19 @@ export default function LeadWorkspace({
   const saveNotes = async () => {
     await runPatch({ crm: { notes } }, 'Notes saved')
   }
+
+  useEffect(() => {
+    if (tab !== 'notes') return undefined
+    const saved = lead.crm?.notes || ''
+    if (notes === saved) return undefined
+    if (notesSaveTimerRef.current) clearTimeout(notesSaveTimerRef.current)
+    notesSaveTimerRef.current = setTimeout(() => {
+      saveNotes()
+    }, policies.notesAutosaveMs ?? 3000)
+    return () => {
+      if (notesSaveTimerRef.current) clearTimeout(notesSaveTimerRef.current)
+    }
+  }, [notes, tab, lead.crm?.notes, policies.notesAutosaveMs])
 
   const changeStatus = async (next) => {
     setStatus(next)
@@ -1042,7 +1058,10 @@ export default function LeadWorkspace({
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                onBlur={saveNotes}
+                onBlur={() => {
+                  if (notesSaveTimerRef.current) clearTimeout(notesSaveTimerRef.current)
+                  saveNotes()
+                }}
                 rows={5}
                 placeholder="Requirements, pricing, decision makers…"
                 className="w-full text-xs border rounded-lg px-2.5 py-1.5"

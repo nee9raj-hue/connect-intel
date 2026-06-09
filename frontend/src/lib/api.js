@@ -75,9 +75,10 @@ async function requestInner(path, options = {}, { retried = false, silent = fals
   }
 
   if (!response.ok) {
-    const message = data.error || data.hint || 'Request failed'
+    const message = data.message || data.error || data.hint || 'Request failed'
     const error = new Error(message)
     error.status = response.status
+    if (data.code) error.code = data.code
     if (data.blocked) error.blocked = data.blocked
     if (data.skippedUnsubscribed) error.skippedUnsubscribed = data.skippedUnsubscribed
 
@@ -557,7 +558,7 @@ export const api = {
   createMarketingForm: (payload) => request('/api/marketing/forms', { method: 'POST', body: payload }),
   updateMarketingForm: (payload) => request('/api/marketing/forms', { method: 'PATCH', body: payload }),
   deleteMarketingForm: (id) => request('/api/marketing/forms', { method: 'DELETE', body: { id } }),
-  platformSearch: (q, limit = 20) =>
+  platformSearch: (q, limit = 50) =>
     request(`/api/platform/search?q=${encodeURIComponent(q)}&limit=${limit}`),
   getMarketingDashboard: (period = '30d') =>
     request(`/api/marketing/dashboard?period=${encodeURIComponent(period)}`),

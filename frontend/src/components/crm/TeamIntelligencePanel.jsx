@@ -9,6 +9,8 @@ import {
 } from '../../lib/teamIntelligenceFilters'
 import { saveTeamIntelReturn } from '../../lib/teamIntelReturn'
 import TeamIntelligenceDetailModal from './TeamIntelligenceDetailModal'
+import { useUsagePolicies } from '../../hooks/useUsagePolicies.js'
+import { useThrottledRefresh } from '../../hooks/useThrottledRefresh.js'
 import {
   CommandBarMetric,
   InsightsCarousel,
@@ -23,7 +25,7 @@ import {
   SkeletonBlock,
 } from './TeamIntelligenceV3Charts'
 
-const TIMELINE_PAGE_SIZE = 8
+const DEFAULT_TIMELINE_PAGE = 20
 
 function useIsMobile(breakpoint = 768) {
   const [mobile, setMobile] = useState(() =>
@@ -39,16 +41,17 @@ function useIsMobile(breakpoint = 768) {
 
 export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, isActive = true }) {
   const { user, teamMembers, openPipelineLead, setPipelineAssigneeFilter } = useApp()
+  const policies = useUsagePolicies()
+  const timelinePageSize = policies.timelineInitial ?? DEFAULT_TIMELINE_PAGE
   const [period, setPeriod] = useState(panelOptions?.period || 'week')
   const [memberUserId, setMemberUserId] = useState(panelOptions?.userId || '')
   const [timelineFilter, setTimelineFilter] = useState(panelOptions?.timelineFilter || 'all')
-  const [timelineVisible, setTimelineVisible] = useState(TIMELINE_PAGE_SIZE)
+  const [timelineVisible, setTimelineVisible] = useState(timelinePageSize)
   const [expandedFeedId, setExpandedFeedId] = useState(null)
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false)
   const [detailItem, setDetailItem] = useState(null)
   const scrollRef = useRef(null)
   const [data, setData] = useState(null)
-  const [summaryLoading, setSummaryLoading] = useState(true)
   const [timelineLoading, setTimelineLoading] = useState(false)
   const [error, setError] = useState(null)
   const isMobile = useIsMobile()
@@ -74,19 +77,23 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
   }, [activeMemberId, memberOptions, intel?.members])
 
   const loadSummary = useCallback(async () => {
-    setSummaryLoading(true)
     setError(null)
     try {
       const q = new URLSearchParams({ period })
       if (memberUserId) q.set('userId', memberUserId)
       const res = await api.getCrmTeamMetrics(q.toString())
       setData(res)
+      return res
     } catch (e) {
       setError(e.message || 'Could not load team intelligence')
-    } finally {
-      setSummaryLoading(false)
+      return undefined
     }
   }, [period, memberUserId])
+
+  const { loading: summaryLoading, freshnessLabel } = useThrottledRefresh(loadSummary, {
+    enabled: isActive,
+    deps: [period, memberUserId],
+  })
 
   const loadTimeline = useCallback(async () => {
     setTimelineLoading(true)
@@ -109,12 +116,6 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
       setTimelineLoading(false)
     }
   }, [period, memberUserId])
-
-  useEffect(() => {
-    if (!isActive) return undefined
-    setData(null)
-    loadSummary()
-  }, [loadSummary, isActive])
 
   useEffect(() => {
     if (!isActive || summaryLoading || !data) return undefined
@@ -165,9 +166,9 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
   const timelineRemaining = Math.max(0, filteredTimeline.length - visibleTimeline.length)
 
   useEffect(() => {
-    setTimelineVisible(TIMELINE_PAGE_SIZE)
+    setTimelineVisible(timelinePageSize)
     setExpandedFeedId(null)
-  }, [period, memberUserId, timelineFilter, data?.activityTimeline])
+  }, [period, memberUserId, timelineFilter, data?.activityTimeline, timelinePageSize])
 
   const openInCrm = useCallback(
     (item, leadTab) => {
@@ -280,6 +281,7 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
             <p className={`ti3-chrome__pulse${winning ? ' is-winning' : ' is-risk'}`}>
               {winning ? 'On target' : 'Needs attention'}
               {activeMemberId && memberName ? ` · ${memberName}` : ''}
+              {freshnessLabel ? ` · ${freshnessLabel}` : ''}
             </p>
           </div>
           <div className="ti3-chrome__controls ti3-chrome__controls--desktop">{filterControls}</div>
@@ -431,9 +433,11 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
                 <button
                   type="button"
                   className="ti3-load-more"
-                  onClick={() => setTimelineVisible((n) => Math.min(filteredTimeline.length, n + TIMELINE_PAGE_SIZE))}
+                  onClick={() =>
+                    setTimelineVisible((n) => Math.min(filteredTimeline.length, n + timelinePageSize))
+                  }
                 >
-                  Load {Math.min(TIMELINE_PAGE_SIZE, timelineRemaining)} more
+                  Load {Math.min(timelinePageSize, timelineRemaining)} more
                 </button>
               ) : null}
             </section>

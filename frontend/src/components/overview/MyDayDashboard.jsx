@@ -17,6 +17,7 @@ import {
 } from './MyDayCharts'
 import MyDayDetailDrawer from './MyDayDetailDrawer'
 import { useGreetingDayPart } from '../../hooks/useGreetingDayPart'
+import { useThrottledRefresh } from '../../hooks/useThrottledRefresh.js'
 
 function useIsMobile(bp = 768) {
   const [m, setM] = useState(() => (typeof window !== 'undefined' ? window.innerWidth < bp : false))
@@ -31,7 +32,6 @@ function useIsMobile(bp = 768) {
 export default function MyDayDashboard({ onNavigate, isActive = true }) {
   const { user, openPipelineLead, unreadNotificationCount, notifications, navigateToNotification } = useApp()
   const [myDay, setMyDay] = useState(null)
-  const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [fabOpen, setFabOpen] = useState(false)
   const [drawer, setDrawer] = useState(null)
@@ -45,18 +45,14 @@ export default function MyDayDashboard({ onNavigate, isActive = true }) {
     try {
       const data = await api.getCrmMyDay()
       setMyDay(data.myDay)
+      return data.myDay
     } catch (e) {
       setError(e.message || 'Could not load your day')
-    } finally {
-      setLoading(false)
+      return undefined
     }
   }, [])
 
-  useEffect(() => {
-    if (!isActive) return undefined
-    if (!myDay) setLoading(true)
-    load()
-  }, [load, isActive])
+  const { loading, freshnessLabel } = useThrottledRefresh(load, { enabled: isActive })
 
   const navigateWithReturn = useCallback(
     (action = {}) => {
@@ -211,9 +207,10 @@ export default function MyDayDashboard({ onNavigate, isActive = true }) {
           <p className="myday-header__eyebrow">My Day</p>
           <h1 className="myday-header__title">Good {dayPart}, {firstName}</h1>
           <p className="myday-header__sub">
-            {urgentCount > 0
-              ? `${urgentCount} item${urgentCount === 1 ? '' : 's'} across your command bar`
-              : myDay?.greeting || 'What should you do next?'}
+            {freshnessLabel ||
+              (urgentCount > 0
+                ? `${urgentCount} item${urgentCount === 1 ? '' : 's'} across your command bar`
+                : myDay?.greeting || 'What should you do next?')}
           </p>
         </div>
         {myDay?.teamIntelLink ? (

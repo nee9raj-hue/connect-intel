@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { api } from '../../lib/api'
+import { useUsagePolicies } from '../../hooks/useUsagePolicies.js'
 import { buildCustomerNavSections } from '../../lib/navConfig'
 import { flattenNavSections, filterNavItems, QUICK_ACTIONS } from '../../lib/platformNav'
 
@@ -11,7 +12,7 @@ const TYPE_LABELS = {
   deal: 'Deal',
 }
 
-function useDebounced(value, ms = 220) {
+function useDebounced(value, ms = 500) {
   const [debounced, setDebounced] = useState(value)
   useEffect(() => {
     const t = setTimeout(() => setDebounced(value), ms)
@@ -32,7 +33,10 @@ export default function CommandPalette({
   const [searching, setSearching] = useState(false)
   const [activeIndex, setActiveIndex] = useState(0)
   const inputRef = useRef(null)
-  const debouncedQuery = useDebounced(query)
+  const policies = useUsagePolicies()
+  const debouncedQuery = useDebounced(query, policies.searchDebounceMs ?? 500)
+  const searchMinLength = policies.searchMinLength ?? 2
+  const searchMaxResults = policies.searchMaxResults ?? 50
 
   const navItems = useMemo(() => {
     if (!user) return []
@@ -77,7 +81,7 @@ export default function CommandPalette({
   }, [query, recordResults.length])
 
   useEffect(() => {
-    if (!open || debouncedQuery.trim().length < 2) {
+    if (!open || debouncedQuery.trim().length < searchMinLength) {
       setRecordResults([])
       setSearching(false)
       return undefined
@@ -86,9 +90,9 @@ export default function CommandPalette({
     let cancelled = false
     setSearching(true)
     api
-      .platformSearch(debouncedQuery.trim())
+      .platformSearch(debouncedQuery.trim(), searchMaxResults)
       .then((data) => {
-        if (!cancelled) setRecordResults(data.results || [])
+        if (!cancelled) setRecordResults((data.results || []).slice(0, searchMaxResults))
       })
       .catch(() => {
         if (!cancelled) setRecordResults([])
@@ -100,7 +104,7 @@ export default function CommandPalette({
     return () => {
       cancelled = true
     }
-  }, [open, debouncedQuery])
+  }, [open, debouncedQuery, searchMinLength, searchMaxResults])
 
   const runItem = useCallback(
     (item) => {

@@ -16037,3 +16037,142 @@ html[data-pipeline-mobile="1"] .ci-app-header-chip--secondary {
   .chithi2-body--mobile-chat .chithi2-rail { display: none; }
   .chithi2-home-panel, .chithi2-home-panel--wide { grid-column: span 12; }
 }
+
+/* Connect Intel — resource protection guidance cards */
+.ci-guidance-modal {
+  max-width: 28rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.ci-guidance-card {
+  padding: 1.75rem 1.5rem 1.5rem;
+  text-align: center;
+  background: linear-gradient(180deg, #fff 0%, #f8fafc 100%);
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.12);
+}
+
+.ci-guidance-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  margin-bottom: 0.75rem;
+  border-radius: 999px;
+  background: #fff4ee;
+  color: #ff7a59;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.ci-guidance-card__title {
+  margin: 0 0 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #33475b;
+  letter-spacing: -0.01em;
+}
+
+.ci-guidance-card__message {
+  margin: 0 0 0.75rem;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: #516f90;
+}
+
+.ci-guidance-card__hint {
+  margin: 0 0 1.25rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: #7c98b6;
+}
+
+.ci-guidance-review-row {
+  display: block;
+  margin-top: 0.35rem;
+}
+
+.ci-guidance-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.ci-guidance-link {
+  display: block;
+  width: 100%;
+  margin-top: 0.75rem;
+  padding: 0.35rem;
+  border: none;
+  background: none;
+  color: #0091ae;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.ci-guidance-link:hover {
+  color: #007a8c;
+}
+
+.usage-policies-form .usage-policy-section__title {
+  margin: 0 0 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #516f90;
+}
+
+.usage-policy-section__grid,
+.usage-policy-role__grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+}
+
+.usage-policy-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.usage-policy-field__label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #33475b;
+}
+
+.usage-policy-field__hint {
+  font-size: 0.75rem;
+  color: #7c98b6;
+}
+
+.usage-policy-field__input {
+  border: 1px solid #cbd6e2;
+  border-radius: 8px;
+  padding: 0.45rem 0.6rem;
+  font-size: 0.875rem;
+}
+
+.usage-policy-role {
+  margin: 0.75rem 0 0;
+  padding: 0.75rem;
+  border: 1px solid #eaf0f6;
+  border-radius: 10px;
+}
+
+.usage-policy-role legend {
+  padding: 0 0.25rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #33475b;
+}

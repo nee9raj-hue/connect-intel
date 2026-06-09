@@ -39,8 +39,20 @@ import { leadHasSendableEmail, getLeadEmail } from '../../lib/emailUtils'
 import { getLeadCity, getLeadState } from '../../lib/pipelineFilters'
 import PipelineDealsView from './PipelineDealsView'
 import { isFreightDealOrg } from '../../lib/freightDeal'
-import { BULK_EMAIL_MAX } from '../../lib/bulkEmailLimits.js'
 import { getDealStageMeta } from '../../lib/crmConstants'
+import {
+  evaluateBulkAssign,
+  evaluateBulkEdit,
+  evaluateExport,
+  evaluatePipelineEmail,
+} from '../../lib/resourceProtection.js'
+import { useUsagePolicies } from '../../hooks/useUsagePolicies.js'
+import {
+  BulkAssignConfirmModal,
+  BulkEditReviewModal,
+  ExportPrepareModal,
+  PipelineEmailGuideModal,
+} from '../guardrails/ResourceProtectionModals.jsx'
 import EmailValidationIcon from './EmailValidationIcon'
 
 import { hasActiveTextSelection } from '../../lib/keyboardShortcuts'
@@ -122,6 +134,16 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const [waOpen, setWaOpen] = useState(false)
   const [bulkBusy, setBulkBusy] = useState(false)
   const [bulkNotice, setBulkNotice] = useState(null)
+  const policies = useUsagePolicies()
+  const [emailGuide, setEmailGuide] = useState({ open: false, variant: 'guide_marketing' })
+  const [assignGuard, setAssignGuard] = useState({ open: false, variant: 'confirm', pending: null })
+  const [editReview, setEditReview] = useState({
+    open: false,
+    actions: null,
+    currentLabel: '',
+    targetLabel: '',
+  })
+  const [exportGuard, setExportGuard] = useState({ open: false, mode: 'instant', preparing: false })
 
   const canAssign = Boolean(
     (user?.isOrgAdmin || user?.orgRole === 'org_admin') && user?.accountType === 'company'
@@ -547,8 +569,6 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     [selectedLeads]
   )
 
-  const bulkEmailOverLimit = selectedIds.size > BULK_EMAIL_MAX
-
   const hasMoreLeads =
     pipelineLoad.hasMore ||
     (pipelineLoad.total > pipelineLoad.loaded && pipelineLoad.loaded > 0)
@@ -720,8 +740,62 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     }
   }
 
-  const exportVisibleLeads = useCallback(() => {
-    const rows = filtered
+  const openBulkEmail = useCallback(() => {
+    const count = selectedIds.size
+    const verdict = evaluatePipelineEmail(count, user, policies)
+    if (verdict === 'allow') {
+      setBulkOpen(true)
+      return
+    }
+    setEmailGuide({ open: true, variant: verdict })
+  }, [selectedIds.size, user, policies])
+
+  const goMarketingHub = useCallback(() => {
+    setEmailGuide({ open: false })
+    onNavigate?.('marketing', { tab: 'campaigns' })
+  }, [onNavigate])
+
+  const openBulkAssign = useCallback(() => {
+    const verdict = evaluateBulkAssign(selectedIds.size, user, policies)
+    if (verdict === 'manager_required') {
+      setAssignGuard({ open: true, variant: 'manager_required', pending: null })
+      return
+    }
+    setBulkAssignOpen(true)
+  }, [selectedIds.size, user, policies])
+
+  const submitBulkAssign = useCallback(
+    (assignToUserId) => {
+      const verdict = evaluateBulkAssign(selectedIds.size, user, policies)
+      if (verdict === 'manager_required') {
+        setAssignGuard({ open: true, variant: 'manager_required', pending: assignToUserId })
+        return
+      }
+      if (verdict === 'confirm') {
+        setAssignGuard({ open: true, variant: 'confirm', pending: assignToUserId })
+        return
+      }
+      runBulk({ assignToUserId })
+    },
+    [selectedIds.size, user, policies, runBulk]
+  )
+
+  const submitBulkEdit = useCallback(
+    (actions) => {
+      if (actions.status && evaluateBulkEdit(selectedIds.size, policies) === 'review') {
+        const statuses = new Set(selectedLeads.map((l) => l.crm?.status || 'new'))
+        const currentLabel =
+          statuses.size === 1 ? getStatusMeta([...statuses][0]).label : 'Mixed stages'
+        const targetLabel = getStatusMeta(actions.status).label
+        setEditReview({ open: true, actions, currentLabel, targetLabel })
+        return
+      }
+      runBulk(actions)
+    },
+    [selectedIds.size, selectedLeads, policies, runBulk]
+  )
+
+  const downloadLeadsCsv = useCallback((rows) => {
     if (!rows.length) return
     const headers = ['Name', 'Email', 'Phone', 'Company', 'Status', 'City', 'State']
     const escape = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`
@@ -748,7 +822,38 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     a.download = 'pipeline-leads.csv'
     a.click()
     URL.revokeObjectURL(url)
-  }, [filtered])
+  }, [])
+
+  const exportVisibleLeads = useCallback(() => {
+    const rows = filtered
+    if (!rows.length) return
+    const mode = evaluateExport(rows.length, user, policies)
+    if (mode === 'instant') {
+      downloadLeadsCsv(rows)
+      return
+    }
+    setExportGuard({ open: true, mode, preparing: mode === 'background' })
+  }, [filtered, user, policies, downloadLeadsCsv])
+
+  const runProtectedExport = useCallback(() => {
+    const rows = filtered
+    const mode = exportGuard.mode
+    if (mode === 'prepare') {
+      setExportGuard((g) => ({ ...g, preparing: true }))
+      window.setTimeout(() => {
+        downloadLeadsCsv(rows)
+        setExportGuard({ open: false, mode: 'instant', preparing: false })
+      }, 600)
+      return
+    }
+    if (mode === 'background') {
+      window.setTimeout(() => {
+        downloadLeadsCsv(rows)
+        setExportGuard({ open: false, mode: 'instant', preparing: false })
+        setBulkNotice('Your export is ready — check your downloads.')
+      }, 1200)
+    }
+  }, [filtered, exportGuard.mode, downloadLeadsCsv])
 
   const listOrStageView = view === 'list' || stageListMode
   const useHubSpotList = listOrStageView
@@ -965,23 +1070,14 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                 count={selectedIds.size}
                 canAssign={canAssign}
                 busy={bulkBusy}
-                onAssign={() => setBulkAssignOpen(true)}
+                onAssign={openBulkAssign}
                 onEdit={() => setBulkEditOpen(true)}
                 onTags={orgLeadTags?.length ? () => setBulkTagsOpen(true) : undefined}
                 onMarkReplied={() => runBulk({ markReplied: true })}
-                onEmail={() => {
-                  if (bulkEmailOverLimit) return
-                  setBulkOpen(true)
-                }}
+                onEmail={openBulkEmail}
                 onWhatsApp={() => setWaOpen(true)}
                 emailCount={selectedEmailCount}
                 phoneCount={selectedPhoneCount}
-                emailDisabled={bulkEmailOverLimit}
-                emailDisabledTitle={
-                  bulkEmailOverLimit
-                    ? `Bulk email supports up to ${BULK_EMAIL_MAX} leads — narrow your selection`
-                    : undefined
-                }
                 onClear={() => setSelectedIds(new Set())}
               />
             )}
@@ -1105,11 +1201,55 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
           setImportOpen(false)
         }}
       />
+      <PipelineEmailGuideModal
+        open={emailGuide.open}
+        variant={emailGuide.variant}
+        onMarketingHub={goMarketingHub}
+        onClose={() => setEmailGuide({ open: false, variant: 'guide_marketing' })}
+      />
+      <BulkAssignConfirmModal
+        open={assignGuard.open}
+        count={selectedIds.size}
+        variant={assignGuard.variant}
+        onContinue={() => {
+          const pending = assignGuard.pending
+          setAssignGuard({ open: false, variant: 'confirm', pending: null })
+          if (pending !== null) runBulk({ assignToUserId: pending })
+        }}
+        onReview={() => {
+          setAssignGuard({ open: false, variant: 'confirm', pending: null })
+          setSelectedIds(new Set())
+        }}
+        onClose={() => setAssignGuard({ open: false, variant: 'confirm', pending: null })}
+      />
+      <BulkEditReviewModal
+        open={editReview.open}
+        count={selectedIds.size}
+        currentStageLabel={editReview.currentLabel}
+        targetStageLabel={editReview.targetLabel}
+        onConfirm={() => {
+          const actions = editReview.actions
+          setEditReview({ open: false, actions: null, currentLabel: '', targetLabel: '' })
+          if (actions) runBulk(actions)
+        }}
+        onClose={() =>
+          setEditReview({ open: false, actions: null, currentLabel: '', targetLabel: '' })
+        }
+      />
+      <ExportPrepareModal
+        open={exportGuard.open}
+        count={filtered.length}
+        mode={exportGuard.mode}
+        preparing={exportGuard.preparing}
+        onContinue={runProtectedExport}
+        onClose={() => setExportGuard({ open: false, mode: 'instant', preparing: false })}
+      />
       <BulkEmailModal
         open={bulkOpen}
         leadIds={[...selectedIds]}
         leads={selectedLeads}
         onClose={() => setBulkOpen(false)}
+        onNavigate={onNavigate}
         onDone={() => {
           refreshSavedLeads()
         }}
@@ -1123,7 +1263,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
         canAssign={canAssign}
         busy={bulkBusy}
         onClose={() => setBulkAssignOpen(false)}
-        onSubmit={(assignToUserId) => runBulk({ assignToUserId })}
+        onSubmit={submitBulkAssign}
       />
       <PipelineBulkEditModal
         open={bulkEditOpen}
@@ -1133,7 +1273,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
         canAssign={canAssign}
         busy={bulkBusy}
         onClose={() => setBulkEditOpen(false)}
-        onSubmit={(actions) => runBulk(actions)}
+        onSubmit={submitBulkEdit}
       />
       <BulkLeadTagsModal
         open={bulkTagsOpen}
