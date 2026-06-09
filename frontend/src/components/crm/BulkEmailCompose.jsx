@@ -6,6 +6,9 @@ import { bulkEmailChunkSize } from '../../lib/bulkEmailLimits.js'
 import { crmTemplateToComposeFields, loadCrmMarketingTemplates } from '../../lib/crmMarketingTemplates.js'
 import { MarketingTemplatePicker, RecipientEmailPreview } from './MarketingEmailComposeTools'
 import CampaignSendProgress from '../marketing/CampaignSendProgress.jsx'
+import { useCampaignSendProgress } from '../../hooks/useCampaignSendProgress.js'
+
+const TERMINAL_CAMPAIGN = new Set(['completed', 'failed', 'cancelled', 'stopped', 'archived'])
 
 const COMPOSE_TABS = [
   { id: 'ai', label: '✨ AI draft' },
@@ -38,6 +41,14 @@ export default function BulkEmailCompose({
   const [result, setResult] = useState(null)
   const [resumeCampaignId, setResumeCampaignId] = useState(null)
   const [backgroundCampaignId, setBackgroundCampaignId] = useState(null)
+  const { progress: backgroundProgress } = useCampaignSendProgress(backgroundCampaignId, {
+    enabled: Boolean(backgroundCampaignId),
+  })
+  const campaignSending =
+    backgroundCampaignId &&
+    backgroundProgress &&
+    !backgroundProgress.done &&
+    !TERMINAL_CAMPAIGN.has(String(backgroundProgress.sendStatus || '').toLowerCase())
   const [previewIndex, setPreviewIndex] = useState(0)
   const [templates, setTemplates] = useState([])
   const [templateId, setTemplateId] = useState('')
@@ -240,6 +251,7 @@ export default function BulkEmailCompose({
 
   const sendDisabled =
     busy ||
+    campaignSending ||
     !withEmail.length ||
     (composeTab === 'ai' && personalizeEach && agenda.trim().length < 8) ||
     (composeTab === 'manual' && (!subject.trim() || !body.trim())) ||
@@ -459,11 +471,16 @@ export default function BulkEmailCompose({
             </div>
           </div>
         )}
-        {result && (
+        {result && result.background ? (
+          <p className="text-xs text-green-800 bg-green-50 rounded-lg px-2 py-1.5">
+            Campaign queued — {result.pendingSends ?? withEmail.length} email
+            {(result.pendingSends ?? withEmail.length) === 1 ? '' : 's'} sending in the background.
+          </p>
+        ) : result ? (
           <p className="text-xs text-green-800 bg-green-50 rounded-lg px-2 py-1.5">
             Sent {result.sentCount}, failed {result.failedCount}, skipped {result.skippedCount}
           </p>
-        )}
+        ) : null}
       </div>
 
       <div
@@ -481,7 +498,9 @@ export default function BulkEmailCompose({
             ? sendProgress.phase === 'queuing'
               ? 'Queuing…'
               : `Sending · ${sendProgress.sentSoFar || 0} of ${sendProgress.total}…`
-            : `Send to ${withEmail.length} lead${withEmail.length === 1 ? '' : 's'}`}
+            : campaignSending
+              ? `Sending · ${backgroundProgress.sent || 0} of ${backgroundProgress.total || withEmail.length}…`
+              : `Send to ${withEmail.length} lead${withEmail.length === 1 ? '' : 's'}`}
         </button>
       </div>
     </div>
