@@ -2,13 +2,13 @@
 
 export const MARKETING_HUB_TABS = [
   { id: 'overview', label: 'Overview', short: 'Home' },
+  { id: 'audiences', label: 'Audiences', short: 'Aud' },
   { id: 'campaigns', label: 'Campaigns', short: 'Camp' },
   { id: 'automations', label: 'Automations', short: 'Auto' },
-  { id: 'audiences', label: 'Audiences', short: 'Aud' },
-  { id: 'forms', label: 'Forms', short: 'Form' },
-  { id: 'landing', label: 'Landing Pages', short: 'Land' },
   { id: 'templates', label: 'Templates', short: 'Tpl' },
   { id: 'analytics', label: 'Analytics', short: 'Stats' },
+  { id: 'forms', label: 'Forms', short: 'Form' },
+  { id: 'landing', label: 'Landing Pages', short: 'Land' },
   { id: 'domains', label: 'Domains', short: 'Dom' },
   { id: 'assets', label: 'Assets', short: 'Ast' },
 ]

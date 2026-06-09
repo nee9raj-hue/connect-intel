@@ -84,9 +84,58 @@ export default function MarketingCampaignWizardStudio({
   const channelLists = lists.filter((l) => (l.channel || 'email') === campaignForm.channel)
   const channelSegments = segments.filter((s) => (s.channel || 'email') === campaignForm.channel)
 
+  const audienceCards = useMemo(() => {
+    const cards = []
+    for (const l of channelLists) {
+      cards.push({
+        key: `list-${l.id}`,
+        type: 'list',
+        id: l.id,
+        name: marketingOptionLabel(l),
+        count: l.snapshot?.contactCount ?? l.leadIds?.length ?? l.memberCount ?? 0,
+        growth: l.snapshot?.growthPct ?? 0,
+        lastRefreshed: l.snapshot?.lastRefreshed ?? l.updatedAt,
+      })
+    }
+    for (const s of channelSegments) {
+      cards.push({
+        key: `seg-${s.id}`,
+        type: 'segment',
+        id: s.id,
+        name: marketingOptionLabel(s),
+        count: s.snapshot?.contactCount ?? s.memberCount ?? 0,
+        growth: s.snapshot?.growthPct ?? 0,
+        lastRefreshed: s.snapshot?.lastRefreshed ?? s.updatedAt,
+      })
+    }
+    return cards.sort((a, b) => (b.count || 0) - (a.count || 0))
+  }, [channelLists, channelSegments])
+
+  const selectAudienceCard = (card) => {
+    if (card.type === 'segment') {
+      setAudienceMode('segment')
+      setCampaignForm((p) => ({
+        ...p,
+        audienceMode: 'segment',
+        segmentId: card.id,
+        listId: '',
+        name: p.name || `${card.name} campaign`,
+      }))
+    } else {
+      setAudienceMode('list')
+      setCampaignForm((p) => ({
+        ...p,
+        audienceMode: 'list',
+        listId: card.id,
+        segmentId: '',
+        name: p.name || `${card.name} campaign`,
+      }))
+    }
+  }
+
   const canNext = () => {
-    if (step === 0) return Boolean(campaignForm.goal)
-    if (step === 1) return Boolean(campaignForm.listId || campaignForm.segmentId)
+    if (step === 0) return Boolean(campaignForm.listId || campaignForm.segmentId)
+    if (step === 1) return Boolean(campaignForm.goal)
     if (step === 2) return Boolean(campaignForm.blocks?.length || campaignForm.body)
     if (step === 3) return Boolean(campaignForm.blocks?.length)
     if (step === 4) return Boolean(campaignForm.name?.trim() && campaignForm.subject?.trim())
@@ -138,8 +187,62 @@ export default function MarketingCampaignWizardStudio({
       <div className="mkt-wizard__body">
         {step === 0 && (
           <section className="mkt-wizard-panel">
+            <h2>Choose your audience</h2>
+            <p>Start with a saved audience — campaigns perform best when built on reusable lists.</p>
+            <div className="mkt-audience-card-grid">
+              {audienceCards.map((card) => {
+                const selected =
+                  (card.type === 'list' && campaignForm.listId === card.id) ||
+                  (card.type === 'segment' && campaignForm.segmentId === card.id)
+                return (
+                  <button
+                    key={card.key}
+                    type="button"
+                    className={`mkt-audience-pick-card${selected ? ' is-selected' : ''}`}
+                    onClick={() => selectAudienceCard(card)}
+                  >
+                    <span className="mkt-audience-pick-card__badge">
+                      {card.type === 'segment' ? 'Dynamic' : 'Static'}
+                    </span>
+                    <strong>{card.name}</strong>
+                    <span className="mkt-audience-pick-card__count">
+                      {(card.count || 0).toLocaleString()} contacts
+                    </span>
+                    <span className="mkt-audience-pick-card__meta">
+                      {(card.growth || 0) >= 0 ? '+' : ''}
+                      {card.growth || 0}% · Updated{' '}
+                      {card.lastRefreshed ? new Date(card.lastRefreshed).toLocaleDateString() : 'recently'}
+                    </span>
+                  </button>
+                )
+              })}
+              {!audienceCards.length ? (
+                <p className="mhub-hint">No audiences yet — save a selection from Pipeline first.</p>
+              ) : null}
+            </div>
+            <aside className="mkt-audience-stats mkt-audience-stats--inline">
+              <div className="mkt-stat-card">
+                <span>Audience size</span>
+                <strong>{reach.toLocaleString()}</strong>
+              </div>
+              <div className="mkt-stat-card">
+                <span>Estimated reach</span>
+                <strong>{Math.round(reach * 0.98).toLocaleString()}</strong>
+              </div>
+            </aside>
+          </section>
+        )}
+
+        {step === 1 && (
+          <section className="mkt-wizard-panel">
             <h2>What are you creating?</h2>
             <p>Choose a campaign goal — we&apos;ll tailor templates and messaging.</p>
+            <input
+              className="mkt-input mkt-input--mb"
+              value={campaignForm.name}
+              onChange={(e) => setCampaignForm((p) => ({ ...p, name: e.target.value }))}
+              placeholder="Campaign name"
+            />
             <div className="mkt-goal-grid">
               {CAMPAIGN_GOALS.map((g) => (
                 <button
@@ -155,93 +258,6 @@ export default function MarketingCampaignWizardStudio({
                 </button>
               ))}
             </div>
-          </section>
-        )}
-
-        {step === 1 && (
-          <section className="mkt-wizard-panel mkt-wizard-panel--split">
-            <div>
-              <h2>Who will receive it?</h2>
-              <p>Pick a list or segment — see reach before you send.</p>
-              <div className="mkt-audience-toggle">
-                {[
-                  { id: 'list', label: 'Static list' },
-                  { id: 'segment', label: 'Dynamic segment' },
-                ].map((m) => (
-                  <button
-                    key={m.id}
-                    type="button"
-                    className={`mkt-cat-pill${audienceMode === m.id ? ' is-active' : ''}`}
-                    onClick={() => {
-                      setAudienceMode(m.id)
-                      setCampaignForm((p) => ({
-                        ...p,
-                        audienceMode: m.id,
-                        listId: m.id === 'list' ? p.listId : '',
-                        segmentId: m.id === 'segment' ? p.segmentId : '',
-                      }))
-                    }}
-                  >
-                    {m.label}
-                  </button>
-                ))}
-              </div>
-              {audienceMode === 'segment' ? (
-                <select
-                  className="mkt-input"
-                  value={campaignForm.segmentId || ''}
-                  onChange={(e) =>
-                    setCampaignForm((p) => ({ ...p, segmentId: e.target.value, listId: '', audienceMode: 'segment' }))
-                  }
-                >
-                  <option value="">Choose segment…</option>
-                  {channelSegments.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {marketingOptionLabel(s)} ({s.memberCount ?? 0})
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <select
-                  className="mkt-input"
-                  value={campaignForm.listId || ''}
-                  onChange={(e) =>
-                    setCampaignForm((p) => ({ ...p, listId: e.target.value, segmentId: '', audienceMode: 'list' }))
-                  }
-                >
-                  <option value="">Choose audience…</option>
-                  {channelLists.map((l) => (
-                    <option key={l.id} value={l.id}>
-                      {marketingOptionLabel(l)} ({l.leadIds?.length || l.memberCount || 0})
-                    </option>
-                  ))}
-                </select>
-              )}
-              <input
-                className="mkt-input mkt-input--mt"
-                value={campaignForm.name}
-                onChange={(e) => setCampaignForm((p) => ({ ...p, name: e.target.value }))}
-                placeholder="Campaign name"
-              />
-            </div>
-            <aside className="mkt-audience-stats">
-              <div className="mkt-stat-card">
-                <span>Audience size</span>
-                <strong>{reach.toLocaleString()}</strong>
-              </div>
-              <div className="mkt-stat-card">
-                <span>Estimated reach</span>
-                <strong>{Math.round(reach * 0.98).toLocaleString()}</strong>
-              </div>
-              <div className="mkt-stat-card">
-                <span>Growth trend</span>
-                <strong>{summary?.audienceGrowth > 0 ? `+${summary.audienceGrowth}%` : 'Stable'}</strong>
-              </div>
-              <div className="mkt-stat-card mkt-stat-card--wide">
-                <span>Segment preview</span>
-                <p>{reach ? `${reach} contacts match your selection` : 'Select an audience to preview reach'}</p>
-              </div>
-            </aside>
           </section>
         )}
 

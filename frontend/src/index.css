@@ -16176,3 +16176,246 @@ html[data-pipeline-mobile="1"] .ci-app-header-chip--secondary {
   font-weight: 700;
   color: #33475b;
 }
+
+/* Audience Studio */
+.audience-studio__page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.audience-studio__layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) 1fr;
+  gap: 1rem;
+  min-height: 360px;
+}
+
+.audience-studio__sidebar {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 0.75rem;
+}
+
+.audience-studio__sidebar-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #516f90;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.audience-studio__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.audience-studio__list-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  text-align: left;
+  padding: 0.65rem 0.75rem;
+  margin-bottom: 0.35rem;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: #f8fafc;
+  cursor: pointer;
+}
+
+.audience-studio__list-item.is-active {
+  border-color: #ff7a59;
+  background: #fff7ed;
+}
+
+.audience-studio__list-item strong {
+  font-size: 0.875rem;
+  color: #33475b;
+}
+
+.audience-studio__list-item span {
+  font-size: 0.75rem;
+  color: #7c98b6;
+}
+
+.audience-studio__list-growth {
+  color: #0091ae !important;
+  font-weight: 600;
+}
+
+.audience-studio__main {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.audience-studio__insight-head h2 {
+  margin: 0.35rem 0 0;
+  font-size: 1.25rem;
+}
+
+.audience-studio__type {
+  display: inline-block;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #4338ca;
+}
+
+.audience-studio__type--dynamic {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.audience-studio__recs {
+  margin-bottom: 1.25rem;
+}
+
+.audience-studio__recs-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.audience-studio__rec {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: linear-gradient(180deg, #fff 0%, #f8fafc 100%);
+}
+
+.audience-studio__rec h4 {
+  margin: 0 0 0.35rem;
+  font-size: 0.9375rem;
+}
+
+.audience-studio__rec p {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: #516f90;
+}
+
+.audience-studio__rec-detail {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  color: #0091ae;
+  font-weight: 600;
+}
+
+.ci-create-audience-form {
+  padding: 0 1.5rem 1.25rem;
+}
+
+.ci-create-audience-form__label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #33475b;
+}
+
+.ci-create-audience-form__input {
+  border: 1px solid #cbd6e2;
+  border-radius: 8px;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.ci-create-audience-form__error {
+  margin: 0.5rem 0 0;
+  font-size: 0.8125rem;
+  color: #b91c1c;
+}
+
+.mkt-audience-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.mkt-audience-pick-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.mkt-audience-pick-card.is-selected {
+  border-color: #ff7a59;
+  box-shadow: 0 0 0 2px rgba(255, 122, 89, 0.2);
+}
+
+.mkt-audience-pick-card__badge {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #0091ae;
+  margin-bottom: 0.35rem;
+}
+
+.mkt-audience-pick-card__count {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #33475b;
+  margin-top: 0.25rem;
+}
+
+.mkt-audience-pick-card__meta {
+  font-size: 0.75rem;
+  color: #7c98b6;
+  margin-top: 0.25rem;
+}
+
+.mkt-audience-badge {
+  display: inline-block;
+  margin-right: 0.35rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: #fff4ee;
+  color: #c2410c;
+  vertical-align: middle;
+}
+
+.mkt-input--mb { margin-bottom: 0.75rem; }
+.mkt-audience-stats--inline { display: flex; flex-wrap: wrap; gap: 0.65rem; margin-top: 0.5rem; }
+
+@media (max-width: 768px) {
+  .audience-studio__layout { grid-template-columns: 1fr; }
+}

@@ -23,7 +23,7 @@ import MarketingCampaignWizardStudio from './MarketingCampaignWizardStudio'
 import MarketingTemplateMarketplace from './MarketingTemplateMarketplace'
 import MarketingBrandKit, { mergeBrandKit } from './MarketingBrandKit'
 import MarketingAnalyticsHub from './MarketingAnalyticsHub'
-import MarketingAudiencesHub from './MarketingAudiencesHub'
+import AudienceStudio from './AudienceStudio'
 import MarketingAssetsHub from './MarketingAssetsHub'
 import MarketingSegmentsPanel from './MarketingSegmentsPanel'
 import {
@@ -215,7 +215,19 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
     if (panelOptions?.audienceTab) setAudienceSubTab(panelOptions.audienceTab)
     else if (panelOptions?.tab === 'lists') setAudienceSubTab('lists')
     else if (panelOptions?.tab === 'segments') setAudienceSubTab('segments')
-  }, [panelOptions?.tab, panelOptions?.audienceTab])
+    if (panelOptions?.launchListId) {
+      setTab('campaigns')
+      setCampaignDesktopPhase('wizard')
+      setCampaignWizardStep(0)
+      setCampaignForm((p) => ({
+        ...p,
+        listId: String(panelOptions.launchListId),
+        segmentId: '',
+        audienceMode: 'list',
+        name: panelOptions.audienceName || p.name,
+      }))
+    }
+  }, [panelOptions?.tab, panelOptions?.audienceTab, panelOptions?.launchListId, panelOptions?.audienceName])
 
   useEffect(() => {
     if (user?.accountType !== 'company') return
@@ -992,6 +1004,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
         <MarketingCampaignStudio
           campaigns={campaigns}
           lists={lists}
+          segments={segments}
           summary={summary}
           busy={busy}
           user={user}
@@ -1252,11 +1265,11 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
           ) : tab === 'templates' ? (
             renderTemplatesTab()
           ) : tab === 'audiences' ? (
-            <MarketingAudiencesHub
+            <AudienceStudio
               initialTab={audienceSubTab}
               audienceStats={{
                 totalContacts: summary?.enrolled,
-                activeContacts: lists.reduce((n, l) => n + (l.memberCount || 0), 0),
+                activeContacts: lists.reduce((n, l) => n + (l.memberCount || l.leadIds?.length || 0), 0),
                 listCount: lists.length,
                 segmentCount: segments.length,
               }}
@@ -1270,6 +1283,18 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
               segments={segments}
               campaigns={reportCampaigns}
               onReload={load}
+              onLaunchCampaign={({ listId, segmentId, audienceName }) => {
+                setTab('campaigns')
+                setCampaignDesktopPhase('wizard')
+                setCampaignWizardStep(0)
+                setCampaignForm((p) => ({
+                  ...p,
+                  listId: listId || '',
+                  segmentId: segmentId || '',
+                  audienceMode: segmentId ? 'segment' : 'list',
+                  name: audienceName ? `${audienceName} campaign` : p.name,
+                }))
+              }}
               busy={busy}
               setBusy={setBusy}
               setError={setError}

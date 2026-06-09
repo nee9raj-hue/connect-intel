@@ -488,6 +488,14 @@ export const api = {
   duplicateMarketingCampaign: (id) =>
     request('/api/marketing/campaigns', { method: 'POST', body: { action: 'duplicate', id } }),
   listMarketingLists: () => request('/api/marketing/lists'),
+  getMarketingAudiences: () => request('/api/marketing/audiences'),
+  createAudienceFromLeads: (payload) =>
+    request('/api/marketing/audiences', { method: 'POST', body: { action: 'create_from_leads', ...payload } }),
+  createAudienceFromRecommendation: (payload) =>
+    request('/api/marketing/audiences', {
+      method: 'POST',
+      body: { action: 'create_from_recommendation', ...payload },
+    }),
   createMarketingList: (payload) => request('/api/marketing/lists', { method: 'POST', body: payload }),
   createMarketingListBatches: (payload) =>
     request('/api/marketing/lists', { method: 'POST', body: { action: 'create_batches', ...payload } }),

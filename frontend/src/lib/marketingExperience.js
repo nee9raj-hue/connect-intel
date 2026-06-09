@@ -11,8 +11,8 @@ export const CAMPAIGN_GOALS = [
 ]
 
 export const WIZARD_STEPS = [
-  { id: 'goal', label: 'Goal' },
   { id: 'audience', label: 'Audience' },
+  { id: 'goal', label: 'Goal' },
   { id: 'template', label: 'Template' },
   { id: 'design', label: 'Design' },
   { id: 'review', label: 'Review' },

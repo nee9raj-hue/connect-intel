@@ -133,10 +133,10 @@ export default function BulkEmailModal({ open, leadIds, leads, onClose, onDone, 
     return resolvedLeads.filter((l) => idSet.has(l.id))
   }, [resolvedLeads, activeSendableIds])
 
-  const goMarketingHub = () => {
+  const goCreateAudience = () => {
     setEmailGuide({ open: false })
     onClose?.()
-    onNavigate?.('marketing', { tab: 'campaigns' })
+    onNavigate?.('marketing', { tab: 'audiences', audienceTab: 'lists', createFromPipeline: true })
   }
 
   if (!open) return null
@@ -151,7 +151,7 @@ export default function BulkEmailModal({ open, leadIds, leads, onClose, onDone, 
       <PipelineEmailGuideModal
         open={emailGuide.open}
         variant={emailGuide.variant}
-        onMarketingHub={goMarketingHub}
+        onCreateAudience={goCreateAudience}
         onClose={() => {
           setEmailGuide({ open: false })
           onClose?.()

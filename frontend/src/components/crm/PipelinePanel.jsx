@@ -53,6 +53,7 @@ import {
   ExportPrepareModal,
   PipelineEmailGuideModal,
 } from '../guardrails/ResourceProtectionModals.jsx'
+import { AudienceCreatedModal, CreateAudienceModal } from '../guardrails/CreateAudienceFlow.jsx'
 import EmailValidationIcon from './EmailValidationIcon'
 
 import { hasActiveTextSelection } from '../../lib/keyboardShortcuts'
@@ -136,6 +137,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const [bulkNotice, setBulkNotice] = useState(null)
   const policies = useUsagePolicies()
   const [emailGuide, setEmailGuide] = useState({ open: false, variant: 'guide_marketing' })
+  const [createAudienceOpen, setCreateAudienceOpen] = useState(false)
+  const [audienceCreated, setAudienceCreated] = useState(null)
   const [assignGuard, setAssignGuard] = useState({ open: false, variant: 'confirm', pending: null })
   const [editReview, setEditReview] = useState({
     open: false,
@@ -750,10 +753,22 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     setEmailGuide({ open: true, variant: verdict })
   }, [selectedIds.size, user, policies])
 
-  const goMarketingHub = useCallback(() => {
+  const openCreateAudienceFlow = useCallback(() => {
     setEmailGuide({ open: false })
-    onNavigate?.('marketing', { tab: 'campaigns' })
-  }, [onNavigate])
+    setCreateAudienceOpen(true)
+  }, [])
+
+  const launchCampaignForAudience = useCallback(
+    (listId) => {
+      setAudienceCreated(null)
+      onNavigate?.('marketing', {
+        tab: 'campaigns',
+        launchListId: listId,
+        audienceTab: 'studio',
+      })
+    },
+    [onNavigate]
+  )
 
   const openBulkAssign = useCallback(() => {
     const verdict = evaluateBulkAssign(selectedIds.size, user, policies)
@@ -1204,8 +1219,27 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       <PipelineEmailGuideModal
         open={emailGuide.open}
         variant={emailGuide.variant}
-        onMarketingHub={goMarketingHub}
+        onCreateAudience={openCreateAudienceFlow}
         onClose={() => setEmailGuide({ open: false, variant: 'guide_marketing' })}
+      />
+      <CreateAudienceModal
+        open={createAudienceOpen}
+        count={selectedIds.size}
+        leadIds={[...selectedIds]}
+        onClose={() => setCreateAudienceOpen(false)}
+        onCreated={(data) => {
+          setCreateAudienceOpen(false)
+          setAudienceCreated(data)
+        }}
+      />
+      <AudienceCreatedModal
+        open={Boolean(audienceCreated)}
+        audience={audienceCreated?.audience || audienceCreated?.list}
+        onLaunchCampaign={() => {
+          const listId = audienceCreated?.list?.id || audienceCreated?.audience?.listId
+          if (listId) launchCampaignForAudience(listId)
+        }}
+        onClose={() => setAudienceCreated(null)}
       />
       <BulkAssignConfirmModal
         open={assignGuard.open}

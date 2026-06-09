@@ -48,7 +48,10 @@ function CampaignGalleryCard({
             <MarketingCreatorBadge item={campaign} compact />
           ) : null}
         </div>
-        <p className="mkt-campaign-card__audience">{audience}</p>
+        <p className="mkt-campaign-card__audience">
+          <span className="mkt-audience-badge">Audience</span>
+          {audience}
+        </p>
         <div className="mkt-campaign-card__metrics">
           <div>
             <strong>{stats.openRate || 0}%</strong>
@@ -113,6 +116,7 @@ function CampaignGalleryCard({
 export default function MarketingCampaignStudio({
   campaigns = [],
   lists = [],
+  segments = [],
   summary,
   busy,
   user,
@@ -130,7 +134,12 @@ export default function MarketingCampaignStudio({
 }) {
   const [query, setQuery] = useState('')
 
-  const listById = useMemo(() => Object.fromEntries((lists || []).map((l) => [l.id, l.name])), [lists])
+  const audienceById = useMemo(() => {
+    const map = {}
+    for (const l of lists || []) map[l.id] = l.name
+    for (const s of segments || []) map[s.id] = s.name
+    return map
+  }, [lists, segments])
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -199,7 +208,7 @@ export default function MarketingCampaignStudio({
           <CampaignGalleryCard
             key={c.id}
             campaign={c}
-            audience={listById[c.listId] || c.segmentName || 'Audience'}
+            audience={audienceById[c.listId] || audienceById[c.segmentId] || c.segmentName || 'Audience'}
             busy={busy}
             user={user}
             permissions={permissions}

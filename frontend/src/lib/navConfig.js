@@ -205,9 +205,9 @@ export function buildCustomerNavSections(
 
   const marketingChildren = [
     { id: 'marketing-overview', label: 'Overview', panel: 'marketing', tab: 'overview' },
+    { id: 'marketing-audiences', label: 'Audiences', panel: 'marketing', tab: 'audiences' },
     { id: 'marketing-campaigns', label: 'Campaigns', panel: 'marketing', tab: 'campaigns' },
     { id: 'marketing-automations', label: 'Automations', panel: 'marketing', tab: 'automations' },
-    { id: 'marketing-audiences', label: 'Audiences', panel: 'marketing', tab: 'audiences' },
     { id: 'marketing-forms', label: 'Forms', panel: 'marketing', tab: 'forms' },
     { id: 'marketing-landing', label: 'Landing Pages', panel: 'marketing', tab: 'landing' },
     { id: 'marketing-templates', label: 'Templates', panel: 'marketing', tab: 'templates' },

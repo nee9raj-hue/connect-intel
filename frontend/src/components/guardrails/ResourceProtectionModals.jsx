@@ -1,21 +1,21 @@
 import GuidanceCard, { GuidanceModal } from './GuidanceCard.jsx'
 
-export function PipelineEmailGuideModal({ open, variant, onMarketingHub, onClose }) {
+export function PipelineEmailGuideModal({ open, variant, onCreateAudience, onClose }) {
   if (!open) return null
   const isBlock = variant === 'block_large'
   return (
     <GuidanceModal open onClose={onClose}>
       <GuidanceCard
         icon="✉"
-        title={isBlock ? 'Campaigns work best here' : 'Recommended for larger outreach'}
+        title={isBlock ? 'Save as audience first' : 'Recommended for larger outreach'}
         message={
           isBlock
-            ? 'Large audience outreach is managed through Marketing Hub Campaigns.'
-            : 'For larger outreach, use Marketing Hub Campaigns for better tracking, deliverability, and reporting.'
+            ? 'Large audience outreach works best as an audience and campaign in Marketing Hub.'
+            : 'For better tracking and deliverability, save this selection as an audience — then launch a campaign.'
         }
-        hint="Marketing Hub is built for campaigns — pipeline email shines for personal 1-to-1 follow-ups."
-        primaryLabel={isBlock ? 'Open Marketing Hub' : 'Move to Marketing Hub'}
-        onPrimary={onMarketingHub}
+        hint="Pipeline email shines for personal 1-to-1 follow-ups. Audiences keep bulk outreach organized and measurable."
+        primaryLabel="Create audience"
+        onPrimary={onCreateAudience}
         secondaryLabel="Cancel"
         onSecondary={onClose}
       />

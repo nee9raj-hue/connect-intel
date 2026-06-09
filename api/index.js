@@ -90,6 +90,7 @@ const ROUTES = {
   'invite/accept': () => import('../lib/server/handlers/invite-accept.js'),
   'auth/session': () => import('../lib/server/handlers/auth-session.js'),
   'marketing/lists': () => import('../lib/server/handlers/marketing-lists.js'),
+  'marketing/audiences': () => import('../lib/server/handlers/marketing-audiences.js'),
   'marketing/templates': () => import('../lib/server/handlers/marketing-templates.js'),
   'marketing/campaigns': () => import('../lib/server/handlers/marketing-campaigns.js'),
   'marketing/unsubscribe': () => import('../lib/server/handlers/marketing-unsubscribe.js'),
