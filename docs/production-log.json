@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-09T18:11:23.170Z",
-  "updatedAtIst": "09/06/2026, 23:41:23",
+  "updatedAt": "2026-06-09T18:30:07.143Z",
+  "updatedAtIst": "10/06/2026, 00:00:07",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "e30d656",
+  "currentProductionCommit": "6d96f1c",
   "entries": [
+    {
+      "logId": "20260610-0000-6d96f1c",
+      "commit": "6d96f1c",
+      "commitFull": "6d96f1cbfd81dea739b4b66fe2c74b898af81d44",
+      "message": "Shift Marketing Hub to audience-first workflows with Audience Studio and snapshots.",
+      "deployedAt": "2026-06-09T18:30:01.943Z",
+      "deployedAtIst": "10/06/2026, 00:00:01",
+      "committedAtIst": "09/06/2026, 23:59:19",
+      "vercelPreviewUrl": "https://connect-intel-qi8ygt901-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 6d96f1c"
+    },
+    {
+      "logId": "20260609-2342-e81c6e4",
+      "commit": "e81c6e4",
+      "commitFull": "e81c6e48528471b363298ae6ea800003ad544f19",
+      "message": "Update production log after resource protection deploy.",
+      "deployedAt": "2026-06-09T18:12:20.227Z",
+      "deployedAtIst": "09/06/2026, 23:42:20",
+      "committedAtIst": "09/06/2026, 23:41:43",
+      "vercelPreviewUrl": "https://connect-intel-5783p9oq7-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- e81c6e4"
+    },
     {
       "logId": "20260609-2341-e30d656",
       "commit": "e30d656",
@@ -15,7 +43,7 @@
       "committedAtIst": "09/06/2026, 23:40:37",
       "vercelPreviewUrl": "https://connect-intel-plno4jrwz-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- e30d656"
     },
@@ -144,20 +172,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 55fa443"
-    },
-    {
-      "logId": "20260609-2032-4e75772",
-      "commit": "4e75772",
-      "commitFull": "4e757720062f306631bbdceae2348dc34aeeeb9e",
-      "message": "Fix BullMQ job ids that contained colons.",
-      "deployedAt": "2026-06-09T15:02:34.346Z",
-      "deployedAtIst": "09/06/2026, 20:32:34",
-      "committedAtIst": "09/06/2026, 20:31:20",
-      "vercelPreviewUrl": "https://connect-intel-5cufjts9f-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 4e75772"
     }
   ]
 }

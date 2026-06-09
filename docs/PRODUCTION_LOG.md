@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- a47a03a
+npm run prod:rollback -- e81c6e4
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- a47a03a
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `e30d656` |
-| Log updated (IST) | 09/06/2026, 23:41:23 |
+| Commit | `6d96f1c` |
+| Log updated (IST) | 10/06/2026, 00:00:07 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- a47a03a
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 09/06/2026, 23:41:21 | `e30d656` | Add resource protection guardrails that guide large CRM actions toward Marketing Hub. | [preview](https://connect-intel-plno4jrwz-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e30d656` | **← LIVE**
+| 10/06/2026, 00:00:01 | `6d96f1c` | Shift Marketing Hub to audience-first workflows with Audience Studio and snapshots. | [preview](https://connect-intel-qi8ygt901-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6d96f1c` | **← LIVE**
+| 09/06/2026, 23:42:20 | `e81c6e4` | Update production log after resource protection deploy. | [preview](https://connect-intel-5783p9oq7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e81c6e4` |
+| 09/06/2026, 23:41:21 | `e30d656` | Add resource protection guardrails that guide large CRM actions toward Marketing Hub. | [preview](https://connect-intel-plno4jrwz-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e30d656` |
 | 09/06/2026, 23:07:20 | `a47a03a` | Cut bulk email PostgREST load with Phase A send session and deferred CRM sync. | [preview](https://connect-intel-d7ht3rway-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a47a03a` |
 | 09/06/2026, 22:30:47 | `5ed3832` | Fix add-lead and bulk-assign false failures on large org pipelines. | [preview](https://connect-intel-fhdlanjwv-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5ed3832` |
 | 09/06/2026, 22:24:03 | `a5e6717` | Replace bulk email banner with compact draggable send dock. | [preview](https://connect-intel-mimas86ku-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a5e6717` |
@@ -54,7 +56,6 @@ npm run prod:rollback -- a47a03a
 | 09/06/2026, 20:55:01 | `595f20e` | Keep bulk email progress visible after the send popup closes. | [preview](https://connect-intel-j9k2jnuax-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 595f20e` |
 | 09/06/2026, 20:46:24 | `25e4065` | Route legacy bulk email requests to background queue under Email V3. | [preview](https://connect-intel-q1sy9i6t0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 25e4065` |
 | 09/06/2026, 20:41:32 | `55fa443` | Speed up bulk email queue to prevent browser timeouts. | [preview](https://connect-intel-afo4vtxpb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 55fa443` |
-| 09/06/2026, 20:32:34 | `4e75772` | Fix BullMQ job ids that contained colons. | [preview](https://connect-intel-5cufjts9f-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4e75772` |
 
 ---
 
