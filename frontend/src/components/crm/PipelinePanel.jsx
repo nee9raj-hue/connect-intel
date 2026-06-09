@@ -12,7 +12,6 @@ import { PipelineIcon, PlusIcon, UploadIcon } from '../ui/icons'
 import LeadWorkspace from './LeadWorkspace'
 import PipelineImportModal from './PipelineImportModal'
 import BulkEmailModal from './BulkEmailModal'
-import PipelineEmailSendBanner from './PipelineEmailSendBanner'
 import AddLeadModal from './AddLeadModal'
 import PipelineBulkActionsBar from './PipelineBulkActionsBar'
 import { PipelineBulkAssignModal, PipelineBulkEditModal } from './PipelineBulkModals'
@@ -778,7 +777,6 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
         } ${useHubSpotList ? 'pipeline-list-workspace' : ''}`}
       >
         <MyDayReturnBar panelOptions={panelOptions} onNavigate={onNavigate} />
-        <PipelineEmailSendBanner onNavigate={onNavigate} />
         <header className="crm-page-header pipeline-page-header">
           <div
             className={`crm-page-header-top pipeline-page-header-top ${

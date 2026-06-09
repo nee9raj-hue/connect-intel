@@ -4,6 +4,7 @@ export function saveActivePipelineEmailCampaign(campaignId) {
   if (!campaignId) return
   try {
     sessionStorage.setItem(STORAGE_KEY, String(campaignId))
+    window.dispatchEvent(new CustomEvent('ci:pipeline-email-campaign', { detail: { campaignId } }))
   } catch {
     // ignore
   }

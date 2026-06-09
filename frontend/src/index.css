@@ -3982,6 +3982,196 @@ button.ci-lead-tag:disabled {
   }
 }
 
+/* Bulk email send dock — compact, draggable; docks left below sidebar when collapsed */
+.email-send-dock {
+  position: fixed;
+  z-index: 94;
+  box-sizing: border-box;
+  user-select: none;
+  font-size: 0.6875rem;
+  letter-spacing: -0.02em;
+}
+
+.email-send-dock--docked {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  width: 52px;
+  padding: 0.45rem 0.35rem;
+  border: 1px solid #cbd6e2;
+  border-radius: 12px;
+  background: rgb(255 255 255 / 0.97);
+  box-shadow: 0 6px 18px rgb(15 36 56 / 0.12);
+  backdrop-filter: blur(8px);
+  color: #33475b;
+  cursor: pointer;
+}
+
+.email-send-dock--docked:hover {
+  border-color: #00a4bd;
+  box-shadow: 0 8px 22px rgb(0 164 189 / 0.18);
+}
+
+.email-send-dock--expanded {
+  display: none;
+  align-items: center;
+  gap: 0.35rem;
+  width: 228px;
+  padding: 0.35rem 0.45rem 0.35rem 0.25rem;
+  border: 1px solid #cbd6e2;
+  border-radius: 12px;
+  background: rgb(255 255 255 / 0.97);
+  box-shadow: 0 8px 24px rgb(15 36 56 / 0.14);
+  backdrop-filter: blur(10px);
+}
+
+.email-send-dock--expanded.is-active {
+  border-color: rgb(0 164 189 / 0.45);
+}
+
+.email-send-dock--expanded.is-finished {
+  border-color: #b8c9d9;
+}
+
+.email-send-dock__drag {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  flex-shrink: 0;
+  cursor: grab;
+  color: #7c98b6;
+  border-radius: 6px;
+}
+
+.email-send-dock__drag:active {
+  cursor: grabbing;
+}
+
+.email-send-dock__grip {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+.email-send-dock__mail-icon {
+  width: 0.95rem;
+  height: 0.95rem;
+  flex-shrink: 0;
+  color: #00a4bd;
+}
+
+.email-send-dock__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+}
+
+.email-send-dock__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.35rem;
+}
+
+.email-send-dock__status {
+  font-weight: 700;
+  color: #33475b;
+  text-transform: uppercase;
+  font-size: 0.625rem;
+}
+
+.email-send-dock__count {
+  font-weight: 700;
+  color: #0091ae;
+  font-size: 0.6875rem;
+}
+
+.email-send-dock__bar {
+  height: 3px;
+  border-radius: 999px;
+  background: #cbd6e2;
+  overflow: hidden;
+}
+
+.email-send-dock__bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: #00a4bd;
+  transition: width 0.3s ease;
+}
+
+.email-send-dock__hint {
+  font-size: 0.6rem;
+  color: #7c98b6;
+}
+
+.email-send-dock__mini-count {
+  font-weight: 700;
+  font-size: 0.6rem;
+  color: #0091ae;
+  line-height: 1;
+}
+
+.email-send-dock__mini-bar {
+  display: block;
+  width: 100%;
+  height: 3px;
+  border-radius: 999px;
+  background: #cbd6e2;
+  overflow: hidden;
+}
+
+.email-send-dock__mini-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: #00a4bd;
+  transition: width 0.3s ease;
+}
+
+.email-send-dock__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.1rem;
+  flex-shrink: 0;
+}
+
+.email-send-dock__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.35rem;
+  height: 1.35rem;
+  padding: 0 0.2rem;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #7c98b6;
+  font-size: 0.625rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.email-send-dock__btn:hover {
+  background: #eaf0f6;
+  color: #33475b;
+}
+
+.email-send-dock__btn--dismiss {
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+@media (min-width: 768px) {
+  .email-send-dock--docked,
+  .email-send-dock--expanded {
+    display: flex;
+  }
+}
+
 /* Full-height app panels: chrome on top, scrollable body fills remaining space */
 .panel-shell {
   display: flex;

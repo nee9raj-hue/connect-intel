@@ -26,6 +26,7 @@ import ConnectAssistant from '../assistant/ConnectAssistant'
 import CommandPalette from '../platform/CommandPalette'
 import MobileNavPill from './MobileNavPill'
 import DesktopNavPill from './DesktopNavPill'
+import EmailSendDock from '../crm/EmailSendDock'
 import NotificationBell from './NotificationBell'
 import useIsMobile from '../../hooks/useIsMobile'
 import useMobileNavGenie from '../../hooks/useMobileNavGenie'
@@ -401,6 +402,9 @@ export default function AppShell() {
         panelOptions={panelOptions}
         onNavigate={navigate}
       />
+      {user && !user.isPlatformAdmin && !needsOnboarding && (
+        <EmailSendDock sidebarMode={sidebarMode} onNavigate={navigate} />
+      )}
       {needsOnboarding && <OnboardingModal />}
       {needsGmailSetup && !needsOnboarding && (
         <GmailSetupModal onDone={() => setNeedsGmailSetup(false)} />
