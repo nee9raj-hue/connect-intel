@@ -31,6 +31,7 @@ const SERVER_IMPORTS = [
   'lib/server/handlers/crm-my-day.js',
   'lib/server/handlers/infra-capacity.js',
   'lib/server/handlers/infra-queue.js',
+  'lib/server/handlers/infra-bootstrap.js',
   'lib/server/infra/emailWorkerPolicy.js',
   'lib/server/pipelineLeadsBackfill.js',
   'lib/server/handlers/crm-dashboard-kpi.js',
