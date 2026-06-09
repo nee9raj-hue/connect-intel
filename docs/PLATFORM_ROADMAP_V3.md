@@ -38,7 +38,7 @@ Tables: `pipeline_leads`, `pipeline_deals`, `pipeline_notes`, `pipeline_tasks`, 
 
 **Zero downtime:** dual-write → backfill → dual-read → cutover. See migration file comments.
 
-Script needed: `npm run pipeline:backfill` (TODO).
+Backfill: `npm run pipeline:backfill` (see `docs/INFRA_SETUP.md`).
 
 ---
 

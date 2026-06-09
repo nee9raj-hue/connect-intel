@@ -98,6 +98,17 @@ USE_PIPELINE_LEADS_TABLE=true
 
 CRM batch patches use `pipeline_leads` rows instead of full shard rewrites.
 
+Backfill existing shards (run once from a machine with Supabase env vars):
+
+```bash
+npm run pipeline:backfill              # all org + user shards
+npm run pipeline:backfill -- --org=ORG_ID   # Xindus only
+npm run pipeline:backfill -- --dry-run      # count only
+npm run pipeline:backfill -- --verify       # confirm table matches shards
+```
+
+Then enable `USE_PIPELINE_LEADS_TABLE=true` and redeploy.
+
 **Backfill** (future script): copy each `pipeline_org_*` shard into `pipeline_leads` before cutting over reads.
 
 ---
