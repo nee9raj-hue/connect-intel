@@ -9,7 +9,7 @@
 -- Prereqs: auth.users optional until Auth cutover; Vercel uses SUPABASE_SERVICE_ROLE_KEY (bypasses RLS).
 
 -- ─── Extensions ─────────────────────────────────────────────────────────────
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
+CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA extensions;
 CREATE EXTENSION IF NOT EXISTS supabase_vault CASCADE;
 
 -- ─── 1. Organizations ─────────────────────────────────────────────────────
@@ -68,7 +68,7 @@ CREATE OR REPLACE FUNCTION public.seal_lead_pii(plaintext TEXT)
 RETURNS TEXT
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public, extensions, vault
 AS $$
 DECLARE
   key_material TEXT;
@@ -90,7 +90,7 @@ CREATE OR REPLACE FUNCTION public.open_lead_pii(sealed TEXT)
 RETURNS TEXT
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public, extensions, vault
 AS $$
 DECLARE
   key_material TEXT;
