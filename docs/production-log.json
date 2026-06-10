@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-10T11:03:54.322Z",
-  "updatedAtIst": "10/06/2026, 16:33:54",
+  "updatedAt": "2026-06-10T11:18:04.447Z",
+  "updatedAtIst": "10/06/2026, 16:48:04",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "517219f",
+  "currentProductionCommit": "db3b924",
   "entries": [
+    {
+      "logId": "20260610-1648-db3b924",
+      "commit": "db3b924",
+      "commitFull": "db3b924d93067b83fe66dcf2f94624ccc9273e4c",
+      "message": "Fix team hierarchy assignment and speed up settings loads.",
+      "deployedAt": "2026-06-10T11:18:00.579Z",
+      "deployedAtIst": "10/06/2026, 16:48:00",
+      "committedAtIst": "10/06/2026, 16:47:20",
+      "vercelPreviewUrl": "https://connect-intel-6th7nwwei-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- db3b924"
+    },
+    {
+      "logId": "20260610-1634-38357bc",
+      "commit": "38357bc",
+      "commitFull": "38357bc0a9463e69ca03edb9b1b94a33659f4b0b",
+      "message": "Update production log after settings hub deploy.",
+      "deployedAt": "2026-06-10T11:04:35.720Z",
+      "deployedAtIst": "10/06/2026, 16:34:35",
+      "committedAtIst": "10/06/2026, 16:33:59",
+      "vercelPreviewUrl": "https://connect-intel-224pgdf4j-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 38357bc"
+    },
     {
       "logId": "20260610-1633-517219f",
       "commit": "517219f",
@@ -15,7 +43,7 @@
       "committedAtIst": "10/06/2026, 16:33:08",
       "vercelPreviewUrl": "https://connect-intel-d8kf35eny-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 517219f"
     },
@@ -242,34 +270,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 98eebc1"
-    },
-    {
-      "logId": "20260610-1144-f056207",
-      "commit": "f056207",
-      "commitFull": "f056207a6a7e84ea77886d27d2f4b60b2c1a21ee",
-      "message": "Fix replaceState loop that blocked app load on history sync.",
-      "deployedAt": "2026-06-10T06:14:31.156Z",
-      "deployedAtIst": "10/06/2026, 11:44:31",
-      "committedAtIst": "10/06/2026, 11:43:55",
-      "vercelPreviewUrl": "https://connect-intel-48uu81fom-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- f056207"
-    },
-    {
-      "logId": "20260610-1137-0097a17",
-      "commit": "0097a17",
-      "commitFull": "0097a17bd5f71cc63e6ed3842d13233226e937ef",
-      "message": "Add Vault-backed auto-encrypt trigger sync for enterprise leads PII.",
-      "deployedAt": "2026-06-10T06:07:44.548Z",
-      "deployedAtIst": "10/06/2026, 11:37:44",
-      "committedAtIst": "10/06/2026, 11:37:05",
-      "vercelPreviewUrl": "https://connect-intel-h8qznbzp3-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 0097a17"
     }
   ]
 }
