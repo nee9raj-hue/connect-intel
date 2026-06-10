@@ -78,13 +78,15 @@ export default function AppShell() {
   const needsOnboarding = user && !user.onboardingComplete && !user.isPlatformAdmin
   const { needed: needsGmailSetup, setNeeded: setNeedsGmailSetup } = useGmailSetupNeeded(user)
   const chithiFocus = isChithiPanel(activePanel)
+  const marketingFocus = activePanel === 'marketing' || activePanel === 'bulk-email'
   const showMobileNavPill =
     isMobile &&
     user &&
     !user.isPlatformAdmin &&
     !needsOnboarding &&
     !pipelineLeadId &&
-    !chithiFocus
+    !chithiFocus &&
+    !marketingFocus
   const mobilePillVisible = useMobileNavGenie(showMobileNavPill)
   usePanelPreferences(user?.id)
   useChithiAlerts({
@@ -324,10 +326,14 @@ export default function AppShell() {
         chithiOpen={chithiFocus}
         className={chithiFocus ? 'ci-chithi-focus__crm-sidebar' : ''}
       />
-      <main className="ci-app-main flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden">
+      <main
+        className={`ci-app-main flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden${
+          marketingFocus ? ' marketing-focus' : ''
+        }`}
+      >
         <div
           className={`ci-mobile-top-bar md:hidden shrink-0 flex items-center gap-1.5 border-b border-[#e5e9ee] bg-white px-2.5 py-2 ${
-            chithiFocus ? 'hidden' : ''
+            chithiFocus || marketingFocus ? 'hidden' : ''
           }`}
         >
           <button
@@ -367,7 +373,7 @@ export default function AppShell() {
           <EmailOAuthNotice onOpenSystemStatus={() => navigate('integrations')} />
         )}
         <MobileRequiredModal />
-        {!user?.isPlatformAdmin && !chithiFocus && (
+        {!user?.isPlatformAdmin && !chithiFocus && !marketingFocus && (
           <AppHeader
             onNavigate={navigate}
             onOpenCommandPalette={() => setCommandOpen(true)}
@@ -388,10 +394,10 @@ export default function AppShell() {
         <SessionReconnectBanner />
         <PwaUpdateBanner />
         {user && !user.isPlatformAdmin && !needsOnboarding && (
-          <PwaInstallBanner enabled={!chithiFocus} />
+          <PwaInstallBanner enabled={!chithiFocus && !marketingFocus} />
         )}
         {user && !user.isPlatformAdmin && !needsOnboarding && user?.accountType === 'company' && (
-          <ChithiPushBanner enabled={!chithiFocus} />
+          <ChithiPushBanner enabled={!chithiFocus && !marketingFocus} />
         )}
         {liveToast && (
           <div

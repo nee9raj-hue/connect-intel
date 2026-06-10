@@ -3,7 +3,6 @@ import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { DEFAULT_THEME } from '../../lib/marketingEmailDesign'
 import MarketingTemplateBuilder, { FOLLOW_UP_STARTER } from './MarketingTemplateBuilder'
-import MarketingFormBuilder from './MarketingFormBuilder'
 import { DEFAULT_FORM_FIELDS, DEFAULT_FORM_THEME } from '../../../../lib/marketingFormSchema.js'
 import LoadingExperience from '../ui/LoadingExperience'
 import CampaignReportsView, { campaignToForm } from './CampaignReportsView'
@@ -17,13 +16,17 @@ import useIsMobile from '../../hooks/useIsMobile'
 import MarketingCampaignSetupFields from './MarketingCampaignSetupFields'
 import MarketingCampaignWizardModal from './MarketingCampaignWizardModal'
 import MarketingHubShell from './MarketingHubShell'
-import MarketingCommandCenter from './MarketingCommandCenter'
+import MarketingOverviewTab from './MarketingOverviewTab'
+import MarketingBulkEmailTab from './MarketingBulkEmailTab'
 import MarketingCampaignStudio from './MarketingCampaignStudio'
 import MarketingCampaignWizardStudio from './MarketingCampaignWizardStudio'
 import MarketingTemplateMarketplace from './MarketingTemplateMarketplace'
 import MarketingBrandKit, { mergeBrandKit } from './MarketingBrandKit'
 import MarketingAnalyticsHub from './MarketingAnalyticsHub'
-import AudienceStudio from './AudienceStudio'
+import MarketingAudiencesHub from './MarketingAudiencesHub'
+import MarketingFormsHub from './MarketingFormsHub'
+import MarketingLandingHub from './MarketingLandingHub'
+import MarketingAutomationsHub from './MarketingAutomationsHub'
 import MarketingAssetsHub from './MarketingAssetsHub'
 import MarketingSegmentsPanel from './MarketingSegmentsPanel'
 import {
@@ -32,10 +35,7 @@ import {
   normalizeMarketingTab,
   audienceTabFromPanelOptions,
 } from '../../lib/marketingHubNav'
-import MarketingSuppressionPanel from './MarketingSuppressionPanel'
 import MarketingDomainsPanel from './MarketingDomainsPanel'
-import MarketingAutomationsPanel from './MarketingAutomationsPanel'
-import MarketingLandingPanel from './MarketingLandingPanel'
 import MarketingFeedsPanel from './MarketingFeedsPanel'
 import PanelGuideModal from '../guides/PanelGuideModal'
 import {
@@ -89,9 +89,11 @@ const EMPTY_CAMPAIGN = {
   emailProvider: 'auto',
 }
 
-export default function MarketingPanel({ onNavigate, panelOptions, isActive = true }) {
+export default function MarketingPanel({ onNavigate, panelOptions, activePanel, isActive = true }) {
   const { savedLeads, refreshSavedLeads, user, teamMembers, refreshTeam, orgLeadTags } = useApp()
-  const [tab, setTab] = useState(normalizeMarketingTab(panelOptions?.tab || 'overview'))
+  const [tab, setTab] = useState(() =>
+    activePanel === 'bulk-email' ? 'bulk-email' : normalizeMarketingTab(panelOptions?.tab || 'overview')
+  )
   const [hubPeriod, setHubPeriod] = useState('30d')
   const [hubSearch, setHubSearch] = useState('')
   const [audienceSubTab, setAudienceSubTab] = useState(audienceTabFromPanelOptions(panelOptions))
@@ -211,7 +213,8 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
   }, [])
 
   useEffect(() => {
-    if (panelOptions?.tab) setTab(normalizeMarketingTab(panelOptions.tab))
+    if (activePanel === 'bulk-email') setTab('bulk-email')
+    else if (panelOptions?.tab) setTab(normalizeMarketingTab(panelOptions.tab))
     if (panelOptions?.audienceTab) setAudienceSubTab(panelOptions.audienceTab)
     else if (panelOptions?.tab === 'lists') setAudienceSubTab('lists')
     else if (panelOptions?.tab === 'segments') setAudienceSubTab('segments')
@@ -227,7 +230,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
         name: panelOptions.audienceName || p.name,
       }))
     }
-  }, [panelOptions?.tab, panelOptions?.audienceTab, panelOptions?.launchListId, panelOptions?.audienceName])
+  }, [activePanel, panelOptions?.tab, panelOptions?.audienceTab, panelOptions?.launchListId, panelOptions?.audienceName])
 
   useEffect(() => {
     if (user?.accountType !== 'company') return
@@ -890,8 +893,10 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
     if (templatePhase === 'marketplace') {
       return (
         <>
+          <div className="mhub-v3-page">
           <MarketingTemplateMarketplace
             templates={templates}
+            savedTemplates={templates}
             onSelect={openTemplateFromMarketplace}
             onCreateBlank={() => {
               setTemplateForm({ ...EMPTY_TEMPLATE, design: mergeBrandKit({ ...DEFAULT_THEME }) })
@@ -899,6 +904,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
             }}
             onOpenBrandKit={() => setBrandKitOpen(true)}
           />
+          </div>
           <MarketingBrandKit
             open={brandKitOpen}
             onClose={() => setBrandKitOpen(false)}
@@ -1231,10 +1237,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
           tab={tab}
           onTabChange={handleMarketingTabChange}
           onNavigate={onNavigate}
-          period={hubPeriod}
-          onPeriodChange={setHubPeriod}
-          searchValue={hubSearch}
-          onSearchChange={setHubSearch}
+          orgName={user?.organizationName}
           onCreateCampaign={() => {
             setTab('campaigns')
             resetCampaignForm()
@@ -1292,13 +1295,21 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
           {loading ? (
             <LoadingExperience message={LOADING_MESSAGES.marketing} />
           ) : tab === 'overview' ? (
-            <MarketingCommandCenter onNavigate={onNavigate} period={hubPeriod} onPeriodChange={setHubPeriod} />
+            <MarketingOverviewTab
+              onNavigate={onNavigate}
+              period={hubPeriod}
+              reportCampaigns={reportCampaigns}
+              forms={forms}
+              onOpenCampaign={(c) => onNavigate?.('marketing', { tab: 'analytics', campaignId: c.id })}
+            />
+          ) : tab === 'bulk-email' ? (
+            <MarketingBulkEmailTab lists={lists} onNavigate={onNavigate} />
           ) : tab === 'campaigns' ? (
             renderCampaignsTab()
           ) : tab === 'templates' ? (
             renderTemplatesTab()
           ) : tab === 'audiences' ? (
-            <AudienceStudio
+            <MarketingAudiencesHub
               initialTab={audienceSubTab}
               audienceStats={{
                 totalContacts: summary?.enrolled,
@@ -1354,97 +1365,17 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
               }}
             />
           ) : tab === 'landing' ? (
-            <div className="mhub-tab-pad">
-              <MarketingLandingPanel forms={forms} onReload={load} />
-            </div>
+            <MarketingLandingHub forms={forms} onReload={load} />
           ) : tab === 'automations' ? (
-            <div className="mhub-tab-pad">
-              <MarketingAutomationsPanel
-                campaigns={reportCampaigns}
-                segments={segments}
-                lists={lists}
-                permissions={permissions}
-                onReload={load}
-              />
-            </div>
+            <MarketingAutomationsHub
+              campaigns={reportCampaigns}
+              permissions={permissions}
+              onReload={load}
+            />
           ) : tab === 'domains' ? (
-            <div className="mhub-tab-pad space-y-6">
-              <MarketingDomainsPanel user={user} />
-              <MarketingSuppressionPanel user={user} permissions={permissions} />
-            </div>
+            <MarketingDomainsPanel user={user} />
           ) : tab === 'forms' ? (
-            <div className="mhub-tab-pad">
-            <div className="grid lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
-              <section className="space-y-3">
-                <div className="flex items-center justify-between gap-2">
-                  <h2 className="crm-section-title mb-0">
-                    {formForm.id ? 'Edit form' : 'New capture form'}
-                  </h2>
-                  {formForm.id && (
-                    <button type="button" onClick={() => setFormForm({ ...EMPTY_FORM })} className="crm-link-btn">
-                      Cancel edit
-                    </button>
-                  )}
-                </div>
-                <div className="crm-form-grid">
-                  <input
-                    value={formForm.name}
-                    onChange={(e) => setFormForm((p) => ({ ...p, name: e.target.value }))}
-                    placeholder="Internal name"
-                    className="crm-input"
-                  />
-                  <input
-                    value={formForm.title}
-                    onChange={(e) => setFormForm((p) => ({ ...p, title: e.target.value }))}
-                    placeholder="Public title (optional)"
-                    className="crm-input"
-                  />
-                  <textarea
-                    value={formForm.description}
-                    onChange={(e) => setFormForm((p) => ({ ...p, description: e.target.value }))}
-                    rows={2}
-                    placeholder="Short description on the form page"
-                    className="crm-input"
-                  />
-                  <input
-                    value={formForm.submitLabel}
-                    onChange={(e) => setFormForm((p) => ({ ...p, submitLabel: e.target.value }))}
-                    placeholder="Submit button label"
-                    className="crm-input"
-                  />
-                </div>
-                <MarketingFormBuilder value={formForm} onChange={setFormForm} />
-                <button type="button" disabled={busy} onClick={saveForm} className="crm-btn crm-btn-primary">
-                  {formForm.id ? 'Save form' : 'Create form'}
-                </button>
-              </section>
-              <section>
-                <h2 className="crm-section-title">Your forms</h2>
-                {!forms.length ? (
-                  <p className="text-sm text-[#516f90]">No forms yet.</p>
-                ) : (
-                  <div className="space-y-2">
-                    {forms.map((f) => (
-                      <div key={f.id} className="crm-campaign-card text-sm">
-                        <p className="font-semibold text-[#33475b]">{f.name}</p>
-                        <p className="text-xs text-[#516f90] mt-0.5">
-                          {f.submissions || 0} submissions · slug {f.slug}
-                        </p>
-                        <div className="mt-2 flex flex-wrap gap-3">
-                          <button type="button" onClick={() => editForm(f)} className="crm-link-btn p-0">
-                            Edit fields
-                          </button>
-                          <button type="button" onClick={() => copyFormLink(f.slug)} className="crm-link-btn p-0">
-                            Copy public link
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </section>
-            </div>
-            </div>
+            <MarketingFormsHub teamMembers={teamMembers} onReload={load} />
           ) : null}
         </MarketingHubShell>
       )}

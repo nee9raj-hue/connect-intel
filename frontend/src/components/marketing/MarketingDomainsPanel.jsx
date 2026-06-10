@@ -1,32 +1,50 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '../../lib/api'
 import CrmGmailConnectCard from '../team/CrmGmailConnectCard'
-import OrgCrmEmailSetup from '../team/OrgCrmEmailSetup'
 
-const PROVIDERS = [
-  { id: 'auto', label: 'Auto (Resend → Gmail fallback)' },
-  { id: 'resend', label: 'Resend (primary)' },
-  { id: 'gmail', label: 'Gmail (user mailbox)' },
-  { id: 'ses', label: 'Amazon SES' },
-  { id: 'sendgrid', label: 'SendGrid' },
-]
+function DnsRecordBlock({ title, type, name, value }) {
+  const copy = () => {
+    void navigator.clipboard.writeText(value)
+  }
+  return (
+    <div className="mhub-v3-dns-block">
+      <h4>{title}</h4>
+      <div className="mhub-v3-dns-row">
+        <span style={{ color: '#999', minWidth: 48 }}>Type:</span>
+        <code>{type}</code>
+      </div>
+      <div className="mhub-v3-dns-row">
+        <span style={{ color: '#999', minWidth: 48 }}>Name:</span>
+        <code>{name}</code>
+        <button type="button" className="mhub-v3-copy-btn" onClick={() => navigator.clipboard.writeText(name)}>
+          Copy
+        </button>
+      </div>
+      <div className="mhub-v3-dns-row">
+        <span style={{ color: '#999', minWidth: 48 }}>Value:</span>
+        <code>{value}</code>
+        <button type="button" className="mhub-v3-copy-btn" onClick={copy}>
+          Copy
+        </button>
+      </div>
+    </div>
+  )
+}
 
 export default function MarketingDomainsPanel({ user }) {
   const isAdmin = Boolean(user?.isOrgAdmin)
-  const [provider, setProvider] = useState('auto')
   const [busy, setBusy] = useState(false)
   const [notice, setNotice] = useState(null)
+  const [error, setError] = useState(null)
   const [gmailStatus, setGmailStatus] = useState(null)
   const [orgEmail, setOrgEmail] = useState(null)
 
   const load = useCallback(async () => {
     try {
-      const [dash, gmail, domain] = await Promise.all([
-        api.getMarketingDashboard('30d'),
+      const [gmail, domain] = await Promise.all([
         api.getCrmGmailStatus().catch(() => null),
         api.getOrgEmailDomain().catch(() => null),
       ])
-      setProvider(dash?.orgSettings?.emailProvider || 'auto')
       setGmailStatus(gmail)
       setOrgEmail(domain)
     } catch {
@@ -38,15 +56,34 @@ export default function MarketingDomainsPanel({ user }) {
     if (user?.accountType === 'company') load()
   }, [user, load])
 
-  const saveProvider = async (next) => {
-    setProvider(next)
+  const handleVerify = async () => {
     setBusy(true)
+    setError(null)
     setNotice(null)
     try {
-      await api.updateMarketingOrgSettings({ emailProvider: next })
-      setNotice('Default email provider saved for new campaigns.')
+      const data = await api.setupOrgEmailDomain({ action: 'verify' })
+      setOrgEmail(data)
+      if (data.verified) {
+        setNotice('Domain verified — teammates can send without connecting Gmail individually.')
+      } else {
+        setNotice('DNS not verified yet. Changes can take up to 48 hours to propagate.')
+      }
     } catch (e) {
-      setNotice(e.message || 'Could not save')
+      setError(e.message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const handleAutoSetup = async () => {
+    setBusy(true)
+    setError(null)
+    try {
+      const data = await api.setupOrgEmailDomain({ action: 'auto_setup' })
+      setOrgEmail(data)
+      setNotice(data.justCreated ? `Domain ${data.domain} registered — add DNS records below.` : 'Domain setup refreshed.')
+    } catch (e) {
+      setError(e.message)
     } finally {
       setBusy(false)
     }
@@ -54,98 +91,116 @@ export default function MarketingDomainsPanel({ user }) {
 
   const gmailConnected = Boolean(gmailStatus?.connected)
   const dnsVerified = Boolean(orgEmail?.verified || orgEmail?.userCanSend)
-  const sendingReady = gmailConnected || dnsVerified
+  const domain = orgEmail?.domain || user?.orgEmailDomain || 'yourcompany.com'
+  const dkimRecord = orgEmail?.records?.find((r) => /dkim/i.test(r.purpose || ''))
+  const spfRecord = orgEmail?.records?.find((r) => /spf|mx|send/i.test(r.purpose || r.type || ''))
+
+  if (user?.accountType !== 'company') {
+    return (
+      <div className="mhub-v3-page">
+        <p className="mhub-v3-empty">Company email domains are available on team accounts.</p>
+      </div>
+    )
+  }
 
   return (
-    <div className="space-y-4 max-w-2xl">
-      <div>
-        <h2 className="crm-section-title mb-1">Sender setup</h2>
-        <p className="text-xs text-[#516f90]">
-          Marketing can send through a connected work mailbox or through your company domain (DNS). You only need one
-          path — not both.
-        </p>
-      </div>
+    <div className="mhub-v3-page" style={{ maxWidth: 720 }}>
+      <section className="mhub-v3-card mhub-v3-domain-section">
+        <h3>Work email</h3>
+        <p>Send campaigns using your connected Google Workspace email.</p>
 
-      {user?.accountType !== 'company' ? (
-        <p className="text-sm text-gray-600">
-          Company email domains are available on team accounts. Connect work Gmail under Tips for individual sends.
+        <p className={`mhub-v3-status-dot${gmailConnected ? ' is-ok' : ''}`} style={{ marginBottom: 8 }}>
+          {gmailConnected ? 'Connected' : 'Not connected'}
+          {gmailConnected ? ` · ${gmailStatus.mailbox}` : ''}
         </p>
-      ) : isAdmin ? (
-        <>
-          {sendingReady ? (
-            <div className="space-y-3">
-              {gmailConnected && (
-                <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-900 space-y-1">
-                  <p className="font-semibold">Sending via connected work email</p>
-                  <p className="text-xs leading-relaxed">
-                    Campaigns send from <strong>{gmailStatus.mailbox}</strong>. Manage this under{' '}
-                    <strong>Team &amp; email</strong> — DNS setup below is optional.
-                  </p>
-                </div>
-              )}
-              {dnsVerified && (
-                <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-900 space-y-1">
-                  <p className="font-semibold">Company domain verified</p>
-                  <p className="text-xs leading-relaxed">
-                    All reps on <strong>@{orgEmail.domain}</strong> can send without connecting Gmail individually.
-                  </p>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="space-y-3">
-              <p className="text-sm text-[#33475b]">
-                Connect work email under <strong>Team &amp; email</strong>, or finish company DNS below so campaigns can
-                send.
-              </p>
-              <CrmGmailConnectCard compact />
-            </div>
+
+        {gmailConnected && (
+          <p style={{ fontSize: 12, color: '#666', marginBottom: 12 }}>Replies sync to CRM: ✓</p>
+        )}
+
+        {gmailStatus?.verificationPending && (
+          <div className="mhub-v3-info-banner">
+            Google verification pending — reconnect actions paused.
+          </div>
+        )}
+
+        {!gmailConnected && (
+          <div style={{ marginBottom: 12 }}>
+            <CrmGmailConnectCard compact />
+          </div>
+        )}
+
+        <p style={{ fontSize: 12, color: '#999', lineHeight: 1.5 }}>
+          Note: Work email is for individual sends. For team-wide sending, set up company DNS below.
+        </p>
+      </section>
+
+      {isAdmin && (
+        <section className="mhub-v3-card mhub-v3-domain-section">
+          <h3>Company domain DNS setup</h3>
+          <p>
+            Register <strong>{domain}</strong> so any teammate @{domain} can send without connecting Gmail individually.
+          </p>
+
+          <p className={`mhub-v3-status-dot${dnsVerified ? ' is-ok' : ' is-warn'}`} style={{ marginBottom: 12 }}>
+            {dnsVerified ? 'Verified' : 'Not verified'}
+          </p>
+
+          {error && <p style={{ fontSize: 12, color: '#dc2626', marginBottom: 8 }}>{error}</p>}
+          {notice && <p style={{ fontSize: 12, color: '#27500a', marginBottom: 8 }}>{notice}</p>}
+
+          {!orgEmail?.configured && (
+            <button type="button" className="mhub-v3-btn mhub-v3-btn--primary" disabled={busy} onClick={handleAutoSetup} style={{ marginBottom: 12 }}>
+              {busy ? 'Working…' : 'Register sending domain'}
+            </button>
           )}
 
-          {!dnsVerified && (
-            <OrgCrmEmailSetup
-              autoSetup={!gmailConnected}
-              collapsed={gmailConnected}
-              title="Advanced: company DNS (optional)"
+          <p style={{ fontSize: 12, color: '#666', marginBottom: 10 }}>Add these records at your domain host:</p>
+
+          {dkimRecord ? (
+            <DnsRecordBlock title="DKIM" type={dkimRecord.type} name={dkimRecord.host} value={dkimRecord.value} />
+          ) : (
+            <DnsRecordBlock
+              title="DKIM"
+              type="TXT"
+              name={`resend._domainkey.${domain}`}
+              value="(generated after domain registration)"
             />
           )}
 
-          <div className="marketing-auto-card space-y-2">
-            <h3 className="text-sm font-semibold text-[#33475b]">Default email provider</h3>
-            <p className="text-xs text-[#516f90]">
-              Resend and Gmail remain primary. SES and SendGrid are optional when API keys are configured server-side.
-            </p>
-            <select
-              className="ci-input w-full"
-              value={provider}
-              disabled={busy}
-              onChange={(e) => saveProvider(e.target.value)}
-            >
-              {PROVIDERS.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.label}
-                </option>
-              ))}
-            </select>
-            {notice && <p className="text-xs text-[#516f90]">{notice}</p>}
-          </div>
-        </>
-      ) : (
-        <div className="crm-content-card p-4 text-sm text-[#33475b] space-y-3">
-          {gmailConnected ? (
-            <p className="text-green-800 font-medium">
-              Your work email is connected — campaigns send from <strong>{gmailStatus.mailbox}</strong>.
-            </p>
-          ) : user?.orgOutboundEmailReady ? (
-            <p className="text-green-700 font-medium">
-              Your company domain is verified — you can send campaigns from @{user?.orgEmailDomain}.
-            </p>
+          {spfRecord ? (
+            <DnsRecordBlock title="SPF / MX" type={spfRecord.type} name={spfRecord.host} value={spfRecord.value} />
+          ) : orgEmail?.records?.length ? (
+            orgEmail.records.map((r, i) => (
+              <DnsRecordBlock key={i} title={r.purpose || r.type} type={r.type} name={r.host} value={r.value} />
+            ))
           ) : (
-            <p>
-              Ask your admin to connect work email under <strong>Team &amp; email</strong>, or finish DNS domain setup.
-            </p>
+            <DnsRecordBlock
+              title="SPF"
+              type="MX"
+              name="send"
+              value="feedback-smtp.us-east-1.amazonses.com"
+            />
           )}
-        </div>
+
+          <button
+            type="button"
+            className="mhub-v3-btn mhub-v3-btn--primary"
+            disabled={busy || !orgEmail?.configured}
+            onClick={handleVerify}
+            style={{ marginTop: 8 }}
+          >
+            {busy ? 'Checking…' : 'Check DNS verification'}
+          </button>
+
+          <p style={{ fontSize: 11, color: '#999', marginTop: 12 }}>
+            DNS changes can take up to 48 hours to propagate.
+          </p>
+        </section>
+      )}
+
+      {!isAdmin && !dnsVerified && !gmailConnected && (
+        <p className="mhub-v3-empty">Ask your admin to connect work email or finish DNS domain setup.</p>
       )}
     </div>
   )

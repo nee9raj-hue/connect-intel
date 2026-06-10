@@ -1,7 +1,7 @@
 import { formatDealValue } from '../../lib/crmTimeline'
 import { formatDateTime } from '../../lib/crmUiConstants'
 
-const ORANGE = '#FF773D'
+const ACCENT = '#3730a3'
 
 export function HubCommandBar({ items = [], onAction }) {
   return (
@@ -173,4 +173,4 @@ export function HubMetricTiles({ tiles = [] }) {
   )
 }
 
-export const MHUB_ACCENT = ORANGE
+export const MHUB_ACCENT = ACCENT

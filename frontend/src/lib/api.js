@@ -614,6 +614,34 @@ export const api = {
     request(`/api/marketing/dashboard?period=${encodeURIComponent(period)}`),
   getMarketingHub: (period = '30d') =>
     request(`/api/marketing/dashboard?hub=1&period=${encodeURIComponent(period)}`),
+  getMarketingHubOverview: (period = '30d') =>
+    request(`/api/marketing/overview?period=${encodeURIComponent(period)}`),
+  getMarketingAnalytics: (period = '30d', sections) => {
+    const q = new URLSearchParams({ period })
+    if (sections) q.set('sections', sections)
+    return request(`/api/marketing/analytics?${q}`)
+  },
+  getMarketingDomains: () => request('/api/marketing/domains'),
+  verifyMarketingDomain: (action = 'verify') =>
+    request('/api/marketing/domains', { method: 'POST', body: { action } }),
+  getMarketingBulkSends: () => request('/api/marketing/bulk-sends'),
+  createMarketingBulkSend: (payload) =>
+    request('/api/marketing/bulk-sends', { method: 'POST', body: payload }),
+  updateMarketingBulkSend: (payload) =>
+    request(`/api/marketing/bulk-sends?id=${encodeURIComponent(payload.id)}`, { method: 'PATCH', body: payload }),
+  attachBulkRecipients: (id, payload) =>
+    request(`/api/marketing/bulk-sends?id=${encodeURIComponent(id)}&action=recipients`, {
+      method: 'POST',
+      body: payload,
+    }),
+  sendMarketingBulkSend: (id) =>
+    request(`/api/marketing/bulk-sends?id=${encodeURIComponent(id)}&action=send`, {
+      method: 'POST',
+      body: { sendNow: true },
+      timeoutMs: 120_000,
+    }),
+  previewMarketingAudience: (payload) =>
+    request('/api/marketing/audiences-preview', { method: 'POST', body: payload }),
   listMarketingSegments: () => request('/api/marketing/segments'),
   previewMarketingSegment: (filterJson, { channel = 'email' } = {}) =>
     request('/api/marketing/segments', {

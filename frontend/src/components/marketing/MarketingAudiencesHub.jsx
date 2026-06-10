@@ -1,110 +1,168 @@
-import { useState } from 'react'
-import { HubMetricTiles } from './MarketingHubCharts'
+import { useEffect, useState } from 'react'
+import { api } from '../../lib/api'
+import { LineChart } from './MarketingSimpleCharts'
 import MarketingListsPanel from './MarketingListsPanel'
 import MarketingSegmentsPanel from './MarketingSegmentsPanel'
 
-export default function MarketingAudiencesHub({
-  initialTab = 'overview',
-  audienceStats,
-  user,
-  teamMembers,
-  lists,
-  setLists,
-  savedLeads,
-  refreshTeam,
-  orgLeadTags,
-  segments,
-  campaigns,
-  onReload,
-  busy,
-  setBusy,
-  setError,
-  setNotice,
-}) {
-  const [subTab, setSubTab] = useState(initialTab === 'segments' ? 'segments' : initialTab === 'lists' ? 'lists' : 'overview')
+const SUB_TABS = [
+  { id: 'overview', label: 'Overview' },
+  { id: 'lists', label: 'Lists' },
+  { id: 'segments', label: 'Segments' },
+]
 
-  const stats = audienceStats || {}
+export default function MarketingAudiencesHub(props) {
+  const {
+    initialTab = 'overview',
+    audienceStats = {},
+    user,
+    teamMembers,
+    lists,
+    setLists,
+    segments,
+    savedLeads,
+    orgLeadTags,
+    campaigns,
+    onReload,
+    onLaunchCampaign,
+    busy,
+    setBusy,
+    setError,
+    setNotice,
+    refreshTeam,
+  } = props
 
-  return (
-    <div className="mhub-audiences-page mhub-tab-pad">
-      <header className="mhub-audiences-page__head">
-        <div>
-          <h2>Audiences</h2>
-          <p>Insights first — contacts second</p>
-        </div>
-        <div className="mhub-subnav">
-          {[
-            { id: 'overview', label: 'Overview' },
-            { id: 'lists', label: 'Lists' },
-            { id: 'segments', label: 'Segments' },
-          ].map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              className={`mhub-subnav__btn${subTab === t.id ? ' is-active' : ''}`}
-              onClick={() => setSubTab(t.id)}
-            >
+  const [subTab, setSubTab] = useState(initialTab === 'studio' ? 'overview' : initialTab)
+  const [growth, setGrowth] = useState([])
+  const [previewCount, setPreviewCount] = useState(null)
+  const [segmentFilters, setSegmentFilters] = useState([{ field: 'lead_status', op: 'is', value: 'new' }])
+
+  useEffect(() => {
+    api.getMarketingHub('30d').then((res) => {
+      setGrowth(res.hub?.analyticsTrend || res.hub?.trend || [])
+    }).catch(() => {})
+  }, [])
+
+  useEffect(() => {
+    if (subTab !== 'segments') return undefined
+    const t = setTimeout(async () => {
+      try {
+        const res = await api.previewMarketingAudience({ filters: segmentFilters })
+        setPreviewCount(res.count ?? res)
+      } catch {
+        setPreviewCount(null)
+      }
+    }, 500)
+    return () => clearTimeout(t)
+  }, [subTab, segmentFilters])
+
+  if (subTab === 'lists') {
+    return (
+      <div className="mhub-v3-page">
+        <nav className="mhub-v3-periods" style={{ marginBottom: 12 }}>
+          {SUB_TABS.map((t) => (
+            <button key={t.id} type="button" className={`mhub-v3-period${subTab === t.id ? ' is-active' : ''}`} onClick={() => setSubTab(t.id)}>
               {t.label}
             </button>
           ))}
-        </div>
-      </header>
-
-      {subTab === 'overview' ? (
-        <div className="mhub-audiences-overview">
-          <section className="mhub-section">
-            <div className="mhub-section__head">
-              <h2>Audience health</h2>
-            </div>
-            <HubMetricTiles
-              tiles={[
-                { label: 'Active contacts', value: stats.activeContacts ?? 0 },
-                { label: 'Total contacts', value: stats.totalContacts ?? 0 },
-                { label: 'Lists', value: stats.listCount ?? 0 },
-                { label: 'Segments', value: stats.segmentCount ?? 0 },
-                { label: 'Growth', value: `${stats.growthPct >= 0 ? '+' : ''}${stats.growthPct ?? 0}%` },
-                { label: 'Suppressions', value: stats.suppressionCount ?? 0 },
-              ]}
-            />
-          </section>
-          <p className="mhub-hint">
-            Use <strong>Lists → + List → Smart list</strong> for one-click audiences split into 200-contact
-            send batches. Use <strong>Segments</strong> for live audiences that refresh in campaigns.
-          </p>
-        </div>
-      ) : null}
-
-      {subTab === 'lists' ? (
+        </nav>
         <MarketingListsPanel
-          user={user}
-          teamMembers={teamMembers}
-          refreshTeam={refreshTeam}
-          savedLeads={savedLeads}
           lists={lists}
           setLists={setLists}
-          onListsReload={onReload}
-          orgLeadTags={orgLeadTags}
-          busy={busy}
-          setBusy={setBusy}
-          setError={setError}
-          setNotice={setNotice}
-        />
-      ) : null}
-
-      {subTab === 'segments' ? (
-        <MarketingSegmentsPanel
+          savedLeads={savedLeads}
           user={user}
           teamMembers={teamMembers}
-          segments={segments}
-          campaigns={campaigns}
-          onReload={onReload}
           orgLeadTags={orgLeadTags}
           busy={busy}
           setBusy={setBusy}
           setError={setError}
           setNotice={setNotice}
+          onReload={onReload}
+          onLaunchCampaign={onLaunchCampaign}
         />
-      ) : null}
+      </div>
+    )
+  }
+
+  if (subTab === 'segments') {
+    return (
+      <div className="mhub-v3-page">
+        <nav className="mhub-v3-periods" style={{ marginBottom: 12 }}>
+          {SUB_TABS.map((t) => (
+            <button key={t.id} type="button" className={`mhub-v3-period${subTab === t.id ? ' is-active' : ''}`} onClick={() => setSubTab(t.id)}>
+              {t.label}
+            </button>
+          ))}
+        </nav>
+        <div className="mhub-v3-card" style={{ marginBottom: 12 }}>
+          <p className="mhub-v3-eyebrow">Live segment preview</p>
+          {segmentFilters.map((f, i) => (
+            <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+              <input className="mhub-v3-input" value={f.field} onChange={(e) => {
+                const next = [...segmentFilters]
+                next[i] = { ...next[i], field: e.target.value }
+                setSegmentFilters(next)
+              }} />
+              <select className="mhub-v3-input" value={f.op} onChange={(e) => {
+                const next = [...segmentFilters]
+                next[i] = { ...next[i], op: e.target.value }
+                setSegmentFilters(next)
+              }}>
+                <option value="is">is</option>
+                <option value="contains">contains</option>
+              </select>
+              <input className="mhub-v3-input" value={f.value} onChange={(e) => {
+                const next = [...segmentFilters]
+                next[i] = { ...next[i], value: e.target.value }
+                setSegmentFilters(next)
+              }} />
+            </div>
+          ))}
+          <p style={{ fontSize: 12 }}>Live count: <strong>{previewCount ?? '…'}</strong> contacts match</p>
+        </div>
+        <MarketingSegmentsPanel
+          segments={segments}
+          lists={lists}
+          savedLeads={savedLeads}
+          user={user}
+          campaigns={campaigns}
+          busy={busy}
+          setBusy={setBusy}
+          setError={setError}
+          onReload={onReload}
+          onLaunchCampaign={onLaunchCampaign}
+        />
+      </div>
+    )
+  }
+
+  return (
+    <div className="mhub-v3-page">
+      <nav className="mhub-v3-periods" style={{ marginBottom: 12 }}>
+        {SUB_TABS.map((t) => (
+          <button key={t.id} type="button" className={`mhub-v3-period${subTab === t.id ? ' is-active' : ''}`} onClick={() => setSubTab(t.id)}>
+            {t.label}
+          </button>
+        ))}
+      </nav>
+      <div className="mhub-v3-stat-row" style={{ gridTemplateColumns: 'repeat(6, 1fr)' }}>
+        {[
+          { label: 'Active contacts', value: audienceStats.activeContacts ?? 0 },
+          { label: 'Total contacts', value: audienceStats.totalContacts ?? 0 },
+          { label: 'Lists', value: audienceStats.listCount ?? lists?.length ?? 0 },
+          { label: 'Segments', value: audienceStats.segmentCount ?? segments?.length ?? 0 },
+          { label: 'Growth', value: '0%' },
+          { label: 'Suppressions', value: 0 },
+        ].map((s) => (
+          <div key={s.label} className="mhub-v3-stat">
+            <span className="mhub-v3-stat__label">{s.label}</span>
+            <span className="mhub-v3-stat__value">{s.value}</span>
+          </div>
+        ))}
+      </div>
+      <div className="mhub-v3-card">
+        <h3 className="mhub-v3-card__title">Audience health</h3>
+        <LineChart data={growth} valueKey="events" labelKey="date" />
+      </div>
     </div>
   )
 }

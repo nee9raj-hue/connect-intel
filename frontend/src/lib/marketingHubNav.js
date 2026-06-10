@@ -1,20 +1,20 @@
-/** Marketing Hub V2 — navigation IA */
+/** Marketing Hub V3 — navigation IA */
 
 export const MARKETING_HUB_TABS = [
   { id: 'overview', label: 'Overview', short: 'Home' },
-  { id: 'audiences', label: 'Audiences', short: 'Aud' },
   { id: 'campaigns', label: 'Campaigns', short: 'Camp' },
+  { id: 'bulk-email', label: 'Bulk email', short: 'Bulk' },
   { id: 'automations', label: 'Automations', short: 'Auto' },
+  { id: 'audiences', label: 'Audiences', short: 'Aud' },
+  { id: 'forms', label: 'Forms', short: 'Form' },
+  { id: 'landing', label: 'Landing pages', short: 'Land' },
   { id: 'templates', label: 'Templates', short: 'Tpl' },
   { id: 'analytics', label: 'Analytics', short: 'Stats' },
-  { id: 'forms', label: 'Forms', short: 'Form' },
-  { id: 'landing', label: 'Landing Pages', short: 'Land' },
   { id: 'domains', label: 'Domains', short: 'Dom' },
-  { id: 'assets', label: 'Assets', short: 'Ast' },
 ]
 
 export const MOBILE_HUB_TABS = MARKETING_HUB_TABS.filter(
-  (t) => !['templates', 'landing', 'assets', 'domains'].includes(t.id)
+  (t) => !['templates', 'landing', 'domains'].includes(t.id)
 )
 
 const TAB_ALIASES = {
@@ -23,8 +23,10 @@ const TAB_ALIASES = {
   segments: 'audiences',
   reports: 'analytics',
   feeds: 'assets',
+  assets: 'templates',
   suppressions: 'domains',
   inbox: 'campaigns',
+  'bulk email': 'bulk-email',
 }
 
 export function normalizeMarketingTab(tab) {
