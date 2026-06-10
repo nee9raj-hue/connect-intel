@@ -30,21 +30,24 @@ export default function OrgAdminPanel({
 
   return (
     <>
-      <div className="flex flex-wrap gap-1 border-b border-gray-200 pb-0 mb-4 -mx-1 px-1 overflow-x-auto">
-        {TABS.map((tab) => (
-          <button
-            key={tab.id}
-            type="button"
-            onClick={() => setTab(tab.id)}
-            className={`shrink-0 px-3 py-2 text-sm font-semibold rounded-t-lg border-b-2 transition-colors ${
-              activeTab === tab.id
-                ? 'border-[#FF773D] text-gray-900'
-                : 'border-transparent text-gray-500 hover:text-gray-800'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
+      <div className="sticky top-0 z-10 -mx-1 px-1 mb-4 bg-white/95 backdrop-blur-sm border-b border-gray-200">
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-400 pt-1 px-1">Organization setup</p>
+        <div className="flex gap-1 overflow-x-auto pb-0 scrollbar-thin">
+          {TABS.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setTab(tab.id)}
+              className={`shrink-0 px-3 py-2.5 text-sm font-semibold rounded-t-lg border-b-2 transition-colors whitespace-nowrap ${
+                activeTab === tab.id
+                  ? 'border-[#FF773D] text-gray-900 bg-[#FFF7F2]/80'
+                  : 'border-transparent text-gray-500 hover:text-gray-800 hover:bg-gray-50'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <SqlInfraBanner />

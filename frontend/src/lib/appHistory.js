@@ -64,6 +64,7 @@ export function parseAppLocation(search = '', pathname = '/') {
   if (params.get('userId')) panelOptions.userId = params.get('userId')
   if (params.get('assigneeUserId')) panelOptions.assigneeUserId = params.get('assigneeUserId')
   if (params.get('adminTab')) panelOptions.tab = params.get('adminTab')
+  if (params.get('teamTab')) panelOptions.teamTab = params.get('teamTab')
   if (params.get('returnTo')) panelOptions.returnTo = params.get('returnTo')
   if (params.get('followUpDue') === '1') panelOptions.followUpDue = true
   if (params.get('overdueFollowUp') === '1') panelOptions.overdueFollowUp = true
@@ -95,6 +96,7 @@ export function urlHasAppNavigation(search = '', pathname = '/') {
     params.has('userId') ||
     params.has('assigneeUserId') ||
     params.has('adminTab') ||
+    params.has('teamTab') ||
     params.has('returnTo') ||
     params.has('followUpDue') ||
     params.has('overdueFollowUp') ||
@@ -222,6 +224,9 @@ export function serializeAppLocation({ panel = 'overview', panelOptions = {}, le
     !['notes', 'tasks', 'meetings', 'campaigns', 'reports', 'lists'].includes(panelOptions.tab)
   ) {
     params.set('adminTab', panelOptions.tab)
+  }
+  if (panel === 'team' && panelOptions.teamTab && panelOptions.teamTab !== 'team') {
+    params.set('teamTab', panelOptions.teamTab)
   }
   const normalizedLeadId = normalizeLeadId(leadId)
   if (normalizedLeadId) params.set('lead', normalizedLeadId)

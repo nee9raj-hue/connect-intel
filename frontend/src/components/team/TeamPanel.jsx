@@ -23,7 +23,17 @@ function memberInitials(name, email) {
   return String(email || '?').slice(0, 2).toUpperCase()
 }
 
-export default function TeamPanel({ onNavigate }) {
+const TEAM_TAB_LABELS = {
+  team: 'Members & invites',
+  hierarchy: 'Departments & teams',
+  permissions: 'Roles & permissions',
+  import: 'Import',
+  branding: 'Branding',
+  integrations: 'Integrations',
+}
+
+export default function TeamPanel({ onNavigate, panelOptions = {} }) {
+  const teamTab = panelOptions.teamTab || 'team'
   const {
     user,
     teamMembers,
@@ -261,9 +271,13 @@ export default function TeamPanel({ onNavigate }) {
       <header className="shrink-0 bg-white border-b border-gray-200/90 px-5 py-4 md:px-6">
         <div className="max-w-6xl mx-auto flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h1 className="text-lg md:text-xl font-semibold text-gray-900 tracking-tight">Team & workspace</h1>
+            <h1 className="text-lg md:text-xl font-semibold text-gray-900 tracking-tight">
+              {TEAM_TAB_LABELS[teamTab] || 'Team & workspace'}
+            </h1>
             <p className="text-xs text-gray-500 mt-1 max-w-xl leading-relaxed">
-              Manage people, email, branding, tags, and imports — expand each section as you need it.
+              {teamTab === 'hierarchy'
+                ? 'Organize reps into departments and teams for pipeline scoping and reporting.'
+                : 'Manage people, email, branding, tags, and imports — expand each section as you need it.'}
             </p>
           </div>
           {user?.organizationLogoUrl ? (
@@ -334,10 +348,29 @@ export default function TeamPanel({ onNavigate }) {
           <OrgAdminPanel
             user={user}
             teamMembers={teamMembers}
+            activeTab={teamTab}
+            onTabChange={(tab) => onNavigate?.('team', { teamTab: tab }, { replace: true })}
             onMembersChanged={refreshTeam}
             childrenByTab={{
               team: (
                 <>
+          {teamTab === 'team' && (
+            <div className="mb-4 rounded-xl border border-[#FF773D]/30 bg-[#FFF7F2] px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold text-gray-900">Departments & teams</p>
+                <p className="text-xs text-gray-600 mt-0.5">
+                  Group reps by department and team for scoped pipeline views and manager rollups.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => onNavigate?.('team', { teamTab: 'hierarchy' })}
+                className="shrink-0 px-3 py-2 text-sm font-semibold rounded-lg bg-[#FF773D] text-[#242424] hover:bg-[#e5652f]"
+              >
+                Open departments
+              </button>
+            </div>
+          )}
           <OrgWorkspaceSettings user={user} onUserUpdated={updateUser} />
           <UsagePoliciesSettings user={user} onUserUpdated={updateUser} />
           <FieldVisitExpenseSettings

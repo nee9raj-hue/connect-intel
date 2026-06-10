@@ -72,6 +72,7 @@ export function navTargetToOptions(target = {}) {
   if (target.audienceTab) options.audienceTab = target.audienceTab
   if (target.returnTo) options.returnTo = target.returnTo
   if (target.leadTab) options.leadTab = target.leadTab
+  if (target.teamTab) options.teamTab = target.teamTab
   return options
 }
 
@@ -107,6 +108,11 @@ export function isNavTargetActive(activePanel, panelOptions, target) {
   if (target.panel === 'crm-calendar') {
     const upcoming = Boolean(panelOptions?.upcomingOnly)
     return target.upcomingOnly ? upcoming : !upcoming
+  }
+  if (target.panel === 'team') {
+    const currentTab = panelOptions?.teamTab || 'team'
+    if (target.teamTab) return currentTab === target.teamTab
+    return currentTab === 'team'
   }
   return true
 }
@@ -377,7 +383,16 @@ export function buildCustomerNavSections(
     sections.push({
       title: 'Workspace',
       groups: [
-        { id: 'team', label: 'Team & email', icon: 'team', panel: 'team' },
+        {
+          id: 'team',
+          label: 'Team & email',
+          icon: 'team',
+          children: [
+            { id: 'team-members', label: 'Members & invites', panel: 'team', teamTab: 'team' },
+            { id: 'team-hierarchy', label: 'Departments & teams', panel: 'team', teamTab: 'hierarchy' },
+            { id: 'team-permissions', label: 'Roles & permissions', panel: 'team', teamTab: 'permissions' },
+          ],
+        },
         { id: 'whatsapp-settings', label: 'WhatsApp API', icon: 'whatsapp', panel: 'whatsapp-settings' },
       ],
     })
