@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 9ae193f
+npm run prod:rollback -- 39e86d9
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 9ae193f
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `281694a` |
-| Log updated (IST) | 10/06/2026, 17:24:38 |
+| Commit | `e569c84` |
+| Log updated (IST) | 10/06/2026, 17:42:11 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 9ae193f
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 10/06/2026, 17:24:30 | `281694a` | Rebuild Marketing Hub with indigo v3 UI and new APIs. | [preview](https://connect-intel-g8drpaq1a-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 281694a` | **← LIVE**
+| 10/06/2026, 17:41:52 | `e569c84` | fix: Marketing Hub timeouts, reports, overview data, and bulk email manual entry | [preview](https://connect-intel-pbsp0kiuh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e569c84` | **← LIVE**
+| 10/06/2026, 17:25:23 | `39e86d9` | chore: production log after Marketing Hub deploy | [preview](https://connect-intel-ag600twcn-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 39e86d9` |
+| 10/06/2026, 17:24:30 | `281694a` | Rebuild Marketing Hub with indigo v3 UI and new APIs. | [preview](https://connect-intel-g8drpaq1a-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 281694a` |
 | 10/06/2026, 16:56:32 | `9ae193f` | chore: production log after useEffect fix deploy | [preview](https://connect-intel-kyqg17mym-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9ae193f` |
 | 10/06/2026, 16:55:15 | `1be5e79` | fix: import useEffect in TeamMembersTab to stop runtime crash | [preview](https://connect-intel-cnecxk3z8-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1be5e79` |
 | 10/06/2026, 16:48:46 | `0fad84b` | Update production log after team hierarchy fix deploy. | [preview](https://connect-intel-4iz84gtqb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0fad84b` |
@@ -61,8 +63,6 @@ npm run prod:rollback -- 9ae193f
 | 10/06/2026, 13:51:56 | `352fb9a` | Allow marketing bulk email via browser drain when Redis is off. | [preview](https://connect-intel-4nzpxvkm7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 352fb9a` |
 | 10/06/2026, 13:25:04 | `246e238` | Fix marketing template saves timing out on large org stores. | [preview](https://connect-intel-4ha2mjqt2-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 246e238` |
 | 10/06/2026, 13:08:10 | `d4e9c16` | Restructure sidebar into Home, CRM/Sales, and Analytics sections. | [preview](https://connect-intel-10vx0iqkb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d4e9c16` |
-| 10/06/2026, 12:38:01 | `18f6ddb` | Harden activity-log bootstrap when pipeline_activities table is missing. | [preview](https://connect-intel-9o788ufkg-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 18f6ddb` |
-| 10/06/2026, 12:32:47 | `f88341a` | Add production bootstrap actions for activity log backfill and snapshot warm. | [preview](https://connect-intel-osx5oguh7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f88341a` |
 
 ---
 
