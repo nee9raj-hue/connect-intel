@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- ea59b80
+npm run prod:rollback -- bf41817
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- ea59b80
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `7059942` |
-| Log updated (IST) | 10/06/2026, 16:18:40 |
+| Commit | `517219f` |
+| Log updated (IST) | 10/06/2026, 16:33:54 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- ea59b80
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 10/06/2026, 16:18:34 | `7059942` | Surface Departments & teams in sidebar with URL deep links. | [preview](https://connect-intel-1sokgx894-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7059942` | **← LIVE**
+| 10/06/2026, 16:33:49 | `517219f` | Rebuild Team settings as HubSpot-style tabbed admin hub. | [preview](https://connect-intel-d8kf35eny-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 517219f` | **← LIVE**
+| 10/06/2026, 16:19:29 | `bf41817` | Update production log after departments nav deploy. | [preview](https://connect-intel-5qualwjb6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- bf41817` |
+| 10/06/2026, 16:18:34 | `7059942` | Surface Departments & teams in sidebar with URL deep links. | [preview](https://connect-intel-1sokgx894-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7059942` |
 | 10/06/2026, 16:13:28 | `ea59b80` | Polish Org Admin: member roles, moves, deactivate, and import stats. | [preview](https://connect-intel-fduehr25f-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ea59b80` |
 | 10/06/2026, 16:09:01 | `0349be6` | Add Org Admin hub with departments, teams, and permissions matrix. | [preview](https://connect-intel-bdrik1uy9-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0349be6` |
 | 10/06/2026, 16:01:47 | `e7961d6` | Add pipeline keyset pagination and Sprint 1 performance reliability. | [preview](https://connect-intel-aozpg6zbp-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e7961d6` |
@@ -61,8 +63,6 @@ npm run prod:rollback -- ea59b80
 | 10/06/2026, 11:54:26 | `98eebc1` | Wire enterprise leads read/write through decrypted_leads and encrypted_* sync. | [preview](https://connect-intel-2004nyomj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 98eebc1` |
 | 10/06/2026, 11:44:31 | `f056207` | Fix replaceState loop that blocked app load on history sync. | [preview](https://connect-intel-48uu81fom-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f056207` |
 | 10/06/2026, 11:37:44 | `0097a17` | Add Vault-backed auto-encrypt trigger sync for enterprise leads PII. | [preview](https://connect-intel-h8qznbzp3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0097a17` |
-| 10/06/2026, 11:25:56 | `e741acc` | Add decrypted_leads SECURITY INVOKER view for Vault PII reads. | [preview](https://connect-intel-gn16zj2qz-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e741acc` |
-| 10/06/2026, 11:21:09 | `5a89d8d` | Add security-definer RLS policies for enterprise leads table. | [preview](https://connect-intel-1qteoelts-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5a89d8d` |
 
 ---
 

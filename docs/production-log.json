@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-10T10:48:40.994Z",
-  "updatedAtIst": "10/06/2026, 16:18:40",
+  "updatedAt": "2026-06-10T11:03:54.322Z",
+  "updatedAtIst": "10/06/2026, 16:33:54",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "7059942",
+  "currentProductionCommit": "517219f",
   "entries": [
+    {
+      "logId": "20260610-1633-517219f",
+      "commit": "517219f",
+      "commitFull": "517219f9b5724fb7518da4ed7d606f4f4efc4a8b",
+      "message": "Rebuild Team settings as HubSpot-style tabbed admin hub.",
+      "deployedAt": "2026-06-10T11:03:49.428Z",
+      "deployedAtIst": "10/06/2026, 16:33:49",
+      "committedAtIst": "10/06/2026, 16:33:08",
+      "vercelPreviewUrl": "https://connect-intel-d8kf35eny-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 517219f"
+    },
+    {
+      "logId": "20260610-1619-bf41817",
+      "commit": "bf41817",
+      "commitFull": "bf418177d372faed3fa6446e2c4f800d508c34ba",
+      "message": "Update production log after departments nav deploy.",
+      "deployedAt": "2026-06-10T10:49:29.185Z",
+      "deployedAtIst": "10/06/2026, 16:19:29",
+      "committedAtIst": "10/06/2026, 16:18:52",
+      "vercelPreviewUrl": "https://connect-intel-5qualwjb6-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- bf41817"
+    },
     {
       "logId": "20260610-1618-7059942",
       "commit": "7059942",
@@ -15,7 +43,7 @@
       "committedAtIst": "10/06/2026, 16:17:56",
       "vercelPreviewUrl": "https://connect-intel-1sokgx894-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 7059942"
     },
@@ -242,34 +270,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 0097a17"
-    },
-    {
-      "logId": "20260610-1125-e741acc",
-      "commit": "e741acc",
-      "commitFull": "e741acc6e31549fc50f4baf63f3370e492d41be1",
-      "message": "Add decrypted_leads SECURITY INVOKER view for Vault PII reads.",
-      "deployedAt": "2026-06-10T05:55:56.464Z",
-      "deployedAtIst": "10/06/2026, 11:25:56",
-      "committedAtIst": "10/06/2026, 11:25:22",
-      "vercelPreviewUrl": "https://connect-intel-gn16zj2qz-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- e741acc"
-    },
-    {
-      "logId": "20260610-1121-5a89d8d",
-      "commit": "5a89d8d",
-      "commitFull": "5a89d8dd47419f3bb329001fc1a5924b6fe9727a",
-      "message": "Add security-definer RLS policies for enterprise leads table.",
-      "deployedAt": "2026-06-10T05:51:09.045Z",
-      "deployedAtIst": "10/06/2026, 11:21:09",
-      "committedAtIst": "10/06/2026, 11:20:35",
-      "vercelPreviewUrl": "https://connect-intel-1qteoelts-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 5a89d8d"
     }
   ]
 }
