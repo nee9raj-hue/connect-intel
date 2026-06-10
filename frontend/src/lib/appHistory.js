@@ -2,6 +2,12 @@
 
 const OAUTH_QUERY_KEYS = ['email_oauth', 'crm_gmail', 'mailbox', 'invite']
 const LAST_LOCATION_KEY = 'ci_last_app_location'
+let lastWrittenHistoryUrl = ''
+
+export function normalizeLeadId(leadId) {
+  if (leadId == null || leadId === '') return null
+  return String(leadId)
+}
 
 export function parseAppLocation(search = '') {
   const params = new URLSearchParams(search)
@@ -35,7 +41,7 @@ export function parseAppLocation(search = '') {
   const smartTags = params.getAll('smartTag').filter(Boolean)
   if (smartTags.length) panelOptions.smartTags = smartTags
 
-  const leadId = params.get('lead') || null
+  const leadId = normalizeLeadId(params.get('lead'))
 
   return { panel, panelOptions, leadId }
 }
@@ -73,7 +79,7 @@ export function persistAppLocation(location) {
       JSON.stringify({
         panel: location.panel || 'overview',
         panelOptions: location.panelOptions || {},
-        leadId: location.leadId || null,
+        leadId: normalizeLeadId(location.leadId),
       })
     )
   } catch {
@@ -147,7 +153,8 @@ export function serializeAppLocation({ panel = 'overview', panelOptions = {}, le
   ) {
     params.set('adminTab', panelOptions.tab)
   }
-  if (leadId) params.set('lead', String(leadId))
+  const normalizedLeadId = normalizeLeadId(leadId)
+  if (normalizedLeadId) params.set('lead', normalizedLeadId)
 
   return params.toString()
 }
@@ -157,7 +164,7 @@ export function appLocationKey(location) {
   return JSON.stringify({
     panel: panel || 'overview',
     panelOptions: panelOptions || {},
-    leadId: leadId || null,
+    leadId: normalizeLeadId(leadId),
   })
 }
 
@@ -169,14 +176,20 @@ export function appLocationUrl(location) {
 
 function writeHistoryState(location, { replace = false } = {}) {
   if (typeof window === 'undefined') return null
-  const url = appLocationUrl(location)
-  const state = { ciApp: 1, ...location }
+  const normalized = {
+    ...location,
+    leadId: normalizeLeadId(location?.leadId),
+  }
+  const url = appLocationUrl(normalized)
+  if (url === lastWrittenHistoryUrl) return url
+  const state = { ciApp: 1, ...normalized }
   try {
     if (replace) window.history.replaceState(state, '', url)
     else window.history.pushState(state, '', url)
+    lastWrittenHistoryUrl = url
     return url
   } catch {
-    // Blocked history API (sandboxed frame, strict browser policy, etc.)
+    // Blocked history API (sandboxed frame, strict browser policy, rate limit, etc.)
     return url
   }
 }
@@ -200,8 +213,10 @@ export function stripEphemeralQueryParams() {
   if (!changed) return false
   const qs = params.toString()
   const url = `${window.location.pathname}${qs ? `?${qs}` : ''}`
+  if (url === lastWrittenHistoryUrl) return true
   try {
     window.history.replaceState(window.history.state, '', url)
+    lastWrittenHistoryUrl = url
   } catch {
     // ignore blocked history API
   }

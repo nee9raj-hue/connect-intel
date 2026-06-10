@@ -3,6 +3,7 @@ import { cycleSidebarMode, loadSidebarMode, saveSidebarMode } from '../../lib/si
 import { isChithiPanel } from '../../lib/chithiNav'
 import {
   appLocationKey,
+  normalizeLeadId,
   parseAppLocation,
   pushAppLocation,
   resolveInitialAppLocation,
@@ -63,6 +64,7 @@ export default function AppShell() {
   const lastLeadIdRef = useRef(null)
   const applyLocationRef = useRef(null)
   const commitHistoryRef = useRef(null)
+  const resolvePanelOptionsRef = useRef(null)
 
   const toggleSidebarCollapsed = useCallback(() => {
     setSidebarMode((prev) => {
@@ -149,22 +151,28 @@ export default function AppShell() {
       setMobileNavOpen(false)
       const assigneeId = resolved.assigneeUserId || resolved.userId
       if (assigneeId) setPipelineAssigneeFilter(assigneeId)
-      if (leadId) openPipelineLead(leadId)
+      const normalizedLeadId = normalizeLeadId(leadId)
+      if (normalizedLeadId) openPipelineLead(normalizedLeadId)
       else setPipelineLeadId(null)
     },
     [openPipelineLead, setPipelineLeadId, setPipelineAssigneeFilter, resolvePanelOptions]
   )
 
   const commitHistory = useCallback((location, { replace = false } = {}) => {
-    const key = appLocationKey(location)
-    if (!replace && lastHistoryKeyRef.current === key) return
-    pushAppLocation(location, { replace })
+    const normalized = {
+      ...location,
+      leadId: normalizeLeadId(location?.leadId),
+    }
+    const key = appLocationKey(normalized)
+    if (lastHistoryKeyRef.current === key) return
+    pushAppLocation(normalized, { replace })
     lastHistoryKeyRef.current = key
-    lastLeadIdRef.current = location?.leadId || null
+    lastLeadIdRef.current = normalized.leadId
   }, [])
 
   applyLocationRef.current = applyLocation
   commitHistoryRef.current = commitHistory
+  resolvePanelOptionsRef.current = resolvePanelOptions
 
   useEffect(() => {
     if (!user) return undefined
@@ -174,9 +182,15 @@ export default function AppShell() {
     const initial = resolveInitialAppLocation(window.location.search, {
       isPlatformAdmin: user.isPlatformAdmin,
     })
+    const panel = initial.panel || 'overview'
+    const resolved = {
+      panel,
+      panelOptions: resolvePanelOptionsRef.current(panel, initial.panelOptions || {}),
+      leadId: normalizeLeadId(initial.leadId),
+    }
 
-    applyLocationRef.current?.(initial)
-    commitHistoryRef.current?.(initial, { replace: true })
+    applyLocationRef.current?.(resolved)
+    commitHistoryRef.current?.(resolved, { replace: true })
     stripEphemeralQueryParams()
     historyReadyRef.current = true
 
@@ -191,7 +205,7 @@ export default function AppShell() {
       const loc = parseAppLocation(window.location.search)
       applyLocation(loc)
       lastHistoryKeyRef.current = appLocationKey(loc)
-      lastLeadIdRef.current = loc.leadId
+      lastLeadIdRef.current = normalizeLeadId(loc.leadId)
       applyingHistoryRef.current = false
     }
     window.addEventListener('popstate', onPopState)
@@ -204,11 +218,12 @@ export default function AppShell() {
     if (!oauth) return
     if (oauth === 'connected' || oauth === 'error') {
       const panel = user?.isPlatformAdmin ? 'integrations' : 'team'
-      applyLocation({ panel, panelOptions: {}, leadId: null })
-      commitHistory({ panel, panelOptions: {}, leadId: null }, { replace: true })
+      const loc = { panel, panelOptions: {}, leadId: null }
+      applyLocationRef.current?.(loc)
+      commitHistoryRef.current?.(loc, { replace: true })
       stripEphemeralQueryParams()
     }
-  }, [user?.isPlatformAdmin, applyLocation, commitHistory])
+  }, [user?.isPlatformAdmin])
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -246,13 +261,23 @@ export default function AppShell() {
 
   useEffect(() => {
     if (!historyReadyRef.current || applyingHistoryRef.current) return undefined
-    if (lastLeadIdRef.current === pipelineLeadId) return undefined
 
-    const hadLead = Boolean(lastLeadIdRef.current)
-    const hasLead = Boolean(pipelineLeadId)
-    lastLeadIdRef.current = pipelineLeadId
+    const nextLeadId = normalizeLeadId(pipelineLeadId)
+    const prevLeadId = normalizeLeadId(lastLeadIdRef.current)
+    if (prevLeadId === nextLeadId) return undefined
 
-    const loc = { panel: activePanel, panelOptions, leadId: pipelineLeadId }
+    const hadLead = Boolean(prevLeadId)
+    const hasLead = Boolean(nextLeadId)
+
+    // History may already include ?lead= while React state is still catching up on first paint.
+    if (!hasLead && hadLead) {
+      const urlLead = normalizeLeadId(new URLSearchParams(window.location.search).get('lead'))
+      if (urlLead && urlLead === prevLeadId) return undefined
+    }
+
+    lastLeadIdRef.current = nextLeadId
+
+    const loc = { panel: activePanel, panelOptions, leadId: nextLeadId }
     if (hasLead && !hadLead) commitHistory(loc)
     else if (!hasLead && hadLead) commitHistory(loc, { replace: true })
 
