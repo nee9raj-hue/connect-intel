@@ -29,6 +29,7 @@
     "workers": "node workers/index.mjs",
     "meili:backfill": "node scripts/backfill-meilisearch.mjs",
     "pipeline:backfill": "node scripts/backfill-pipeline-leads.mjs",
+    "enterprise:backfill": "node scripts/backfill-enterprise-crm.mjs",
     "dash:warm": "node scripts/warm-dashboard-snapshots.mjs",
     "infra:verify": "node scripts/infra-verify.mjs",
     "railway:connect": "node scripts/railway-connect.mjs",
