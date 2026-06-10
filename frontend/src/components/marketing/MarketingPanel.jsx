@@ -1292,18 +1292,34 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
             </>
           }
         >
-          {loading ? (
-            <LoadingExperience message={LOADING_MESSAGES.marketing} />
-          ) : tab === 'overview' ? (
+          {tab === 'overview' ? (
             <MarketingOverviewTab
               onNavigate={onNavigate}
-              period={hubPeriod}
+              summary={summary}
               reportCampaigns={reportCampaigns}
               forms={forms}
+              lists={lists}
+              segments={segments}
+              dataLoading={loading}
               onOpenCampaign={(c) => onNavigate?.('marketing', { tab: 'analytics', campaignId: c.id })}
             />
           ) : tab === 'bulk-email' ? (
             <MarketingBulkEmailTab lists={lists} onNavigate={onNavigate} />
+          ) : tab === 'analytics' ? (
+            <MarketingAnalyticsHub
+              onNavigate={onNavigate}
+              period={hubPeriod}
+              onPeriodChange={setHubPeriod}
+              campaignId={panelOptions?.campaignId}
+              reportCampaigns={reportCampaigns}
+              summary={summary}
+            />
+          ) : tab === 'forms' ? (
+            <MarketingFormsHub teamMembers={teamMembers} onReload={load} />
+          ) : tab === 'domains' ? (
+            <MarketingDomainsPanel user={user} />
+          ) : loading ? (
+            <LoadingExperience message={LOADING_MESSAGES.marketing} />
           ) : tab === 'campaigns' ? (
             renderCampaignsTab()
           ) : tab === 'templates' ? (
@@ -1344,14 +1360,6 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
               setError={setError}
               setNotice={setNotice}
             />
-          ) : tab === 'analytics' ? (
-            <MarketingAnalyticsHub
-              onNavigate={onNavigate}
-              period={hubPeriod}
-              onPeriodChange={setHubPeriod}
-              campaignId={panelOptions?.campaignId}
-              reportCampaigns={reportCampaigns}
-            />
           ) : tab === 'assets' ? (
             <MarketingAssetsHub
               templates={templates}
@@ -1372,10 +1380,6 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
               permissions={permissions}
               onReload={load}
             />
-          ) : tab === 'domains' ? (
-            <MarketingDomainsPanel user={user} />
-          ) : tab === 'forms' ? (
-            <MarketingFormsHub teamMembers={teamMembers} onReload={load} />
           ) : null}
         </MarketingHubShell>
       )}

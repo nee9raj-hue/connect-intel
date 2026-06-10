@@ -512,7 +512,9 @@ export const api = {
       timeoutMs: opts.timeoutMs ?? 60_000,
     }),
   getMarketingCampaignReport: (campaignId) =>
-    request(`/api/marketing/campaigns?campaignId=${encodeURIComponent(campaignId)}`),
+    request(`/api/marketing/campaigns?campaignId=${encodeURIComponent(campaignId)}`, {
+      timeoutMs: 90_000,
+    }),
   duplicateMarketingCampaign: (id) =>
     request('/api/marketing/campaigns', { method: 'POST', body: { action: 'duplicate', id } }),
   listMarketingLists: () => request('/api/marketing/lists'),
@@ -611,15 +613,15 @@ export const api = {
   platformSearch: (q, limit = 50) =>
     request(`/api/platform/search?q=${encodeURIComponent(q)}&limit=${limit}`),
   getMarketingDashboard: (period = '30d') =>
-    request(`/api/marketing/dashboard?period=${encodeURIComponent(period)}`),
+    request(`/api/marketing/dashboard?period=${encodeURIComponent(period)}`, { timeoutMs: 60_000 }),
   getMarketingHub: (period = '30d') =>
-    request(`/api/marketing/dashboard?hub=1&period=${encodeURIComponent(period)}`),
+    request(`/api/marketing/dashboard?hub=1&period=${encodeURIComponent(period)}`, { timeoutMs: 60_000 }),
   getMarketingHubOverview: (period = '30d') =>
-    request(`/api/marketing/overview?period=${encodeURIComponent(period)}`),
+    request(`/api/marketing/overview?period=${encodeURIComponent(period)}`, { timeoutMs: 60_000 }),
   getMarketingAnalytics: (period = '30d', sections) => {
     const q = new URLSearchParams({ period })
     if (sections) q.set('sections', sections)
-    return request(`/api/marketing/analytics?${q}`)
+    return request(`/api/marketing/analytics?${q}`, { timeoutMs: 60_000 })
   },
   getMarketingDomains: () => request('/api/marketing/domains'),
   verifyMarketingDomain: (action = 'verify') =>
@@ -633,6 +635,7 @@ export const api = {
     request(`/api/marketing/bulk-sends?id=${encodeURIComponent(id)}&action=recipients`, {
       method: 'POST',
       body: payload,
+      timeoutMs: 60_000,
     }),
   sendMarketingBulkSend: (id) =>
     request(`/api/marketing/bulk-sends?id=${encodeURIComponent(id)}&action=send`, {

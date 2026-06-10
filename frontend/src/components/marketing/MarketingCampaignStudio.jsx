@@ -60,7 +60,7 @@ function CampaignGalleryCard({ campaign, audience, busy, user, permissions, onOp
           {campaign.status === 'paused' && (
             <button type="button" className="mhub-v3-btn mhub-v3-btn--primary" disabled={busy} onClick={() => onResume?.(campaign.id)}>Resume</button>
           )}
-          {stats.sent > 0 && (
+          {(stats.sent > 0 || campaign.status === 'completed' || campaign.status === 'active') && (
             <button type="button" className="mhub-v3-btn" onClick={() => onNavigate?.('marketing', { tab: 'analytics', campaignId: campaign.id })}>Report</button>
           )}
           {campaign.status === 'pending_approval' && permissions?.canApprove && (

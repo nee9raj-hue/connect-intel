@@ -54,17 +54,18 @@ export default function MarketingAnalyticsHub({
   onPeriodChange,
   campaignId,
   reportCampaigns = [],
+  summary = null,
 }) {
   const [period, setPeriod] = useState(externalPeriod || '30d')
-  const [hub, setHub] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [analytics, setAnalytics] = useState(null)
+  const [loading, setLoading] = useState(!campaignId)
   const [error, setError] = useState(null)
 
   const load = useCallback(async () => {
     setError(null)
     try {
-      const res = await api.getMarketingHub(period)
-      setHub(res.hub)
+      const res = await api.getMarketingAnalytics(period)
+      setAnalytics(res)
     } catch (e) {
       setError(e.message || 'Could not load analytics')
     } finally {
@@ -73,20 +74,32 @@ export default function MarketingAnalyticsHub({
   }, [period])
 
   useEffect(() => {
+    if (campaignId) return undefined
     setLoading(true)
     load()
-  }, [load])
+  }, [load, campaignId])
 
   const runAction = (action) => {
     if (!action) return
     onNavigate?.('marketing', { tab: action.tab || 'campaigns', ...action })
   }
 
-  if (campaignId && reportCampaigns.length) {
+  if (campaignId) {
+    const hasCampaign = reportCampaigns.some((c) => c.id === campaignId)
+    const campaignsForReport = hasCampaign
+      ? reportCampaigns
+      : [
+          ...reportCampaigns,
+          {
+            id: campaignId,
+            name: reportCampaigns.find((c) => c.id === campaignId)?.name || 'Campaign report',
+            status: 'completed',
+          },
+        ]
     return (
       <div className="mhub-v3-page">
         <CampaignReportsView
-          campaigns={reportCampaigns}
+          campaigns={campaignsForReport}
           initialCampaignId={campaignId}
           onNavigate={onNavigate}
         />
@@ -94,9 +107,28 @@ export default function MarketingAnalyticsHub({
     )
   }
 
+  const hub = analytics
+    ? {
+        kpis: analytics.campaign_stats || {},
+        insights: analytics.insights,
+        trend: analytics.campaign_stats?.trend,
+        analyticsTrend: analytics.growth_chart,
+        topCampaigns: analytics.campaign_stats?.topCampaigns,
+        audienceGrowth: analytics.audience_stats,
+        revenue: analytics.revenue_attribution,
+        automationHealth: analytics.automation_stats,
+        deliverability: analytics.deliverability,
+      }
+    : null
+
   if (loading && !hub) return <div className="mhub-v3-page"><HubSkeleton /></div>
 
-  const kpis = hub?.kpis || {}
+  const kpis = hub?.kpis || {
+    emailsSent: summary?.sent ?? 0,
+    openRate: summary?.sent ? Math.round(((summary.opens || 0) / summary.sent) * 100) : 0,
+    clickRate: summary?.sent ? Math.round(((summary.clicks || 0) / summary.sent) * 100) : 0,
+    campaignsSent: summary?.campaigns ?? 0,
+  }
   const audience = hub?.audienceGrowth || {}
   const automations = hub?.automationHealth || {}
   const deliverability = hub?.deliverability || {}

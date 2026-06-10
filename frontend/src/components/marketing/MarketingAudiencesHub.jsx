@@ -37,10 +37,18 @@ export default function MarketingAudiencesHub(props) {
   const [segmentFilters, setSegmentFilters] = useState([{ field: 'lead_status', op: 'is', value: 'new' }])
 
   useEffect(() => {
-    api.getMarketingHub('30d').then((res) => {
-      setGrowth(res.hub?.analyticsTrend || res.hub?.trend || [])
-    }).catch(() => {})
-  }, [])
+    if (subTab !== 'overview') return undefined
+    let cancelled = false
+    api
+      .getMarketingAnalytics('30d', 'audience')
+      .then((res) => {
+        if (!cancelled) setGrowth(res.growth_chart || [])
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [subTab])
 
   useEffect(() => {
     if (subTab !== 'segments') return undefined

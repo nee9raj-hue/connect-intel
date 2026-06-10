@@ -14,9 +14,10 @@ export default function MarketingBulkEmailTab({ lists = [], onNavigate }) {
   const [sendId, setSendId] = useState(null)
   const [recipientInfo, setRecipientInfo] = useState(null)
 
-  const [source, setSource] = useState('csv')
+  const [source, setSource] = useState('paste')
   const [csvText, setCsvText] = useState('')
   const [emailsText, setEmailsText] = useState('')
+  const [manualEmail, setManualEmail] = useState('')
   const [listId, setListId] = useState('')
 
   const [form, setForm] = useState({
@@ -48,12 +49,33 @@ export default function MarketingBulkEmailTab({ lists = [], onNavigate }) {
   }, [load])
 
   const attachRecipients = async () => {
-    setBusy(true)
     setError(null)
+
+    if (source === 'paste' && !emailsText.trim()) {
+      setError('Paste at least one email address.')
+      return
+    }
+    if (source === 'csv' && !csvText.trim()) {
+      setError('Paste CSV content or switch to paste emails.')
+      return
+    }
+    if (source === 'manual' && !manualEmail.trim().includes('@')) {
+      setError('Enter a valid email address.')
+      return
+    }
+    if (source === 'list' && !listId) {
+      setError('Select a CRM list.')
+      return
+    }
+
+    setBusy(true)
     try {
       let id = sendId
       if (!id) {
-        const created = await api.createMarketingBulkSend({ name: form.name || 'Bulk send', subject: form.subject || 'Draft' })
+        const created = await api.createMarketingBulkSend({
+          name: form.name || 'Bulk send',
+          subject: form.subject || 'Draft',
+        })
         id = created.send?.id
         setSendId(id)
       }
@@ -61,12 +83,17 @@ export default function MarketingBulkEmailTab({ lists = [], onNavigate }) {
         source,
         csvText: source === 'csv' ? csvText : undefined,
         emailsText: source === 'paste' ? emailsText : undefined,
+        manualEmail: source === 'manual' ? manualEmail : undefined,
         listId: source === 'list' ? listId : undefined,
       })
+      if (!res.recipientCount) {
+        setError('No valid emails found. Check your input and try again.')
+        return
+      }
       setRecipientInfo(res)
       setStep(1)
     } catch (e) {
-      setError(e.message)
+      setError(e.message || 'Could not add recipients')
     } finally {
       setBusy(false)
     }
@@ -97,6 +124,10 @@ export default function MarketingBulkEmailTab({ lists = [], onNavigate }) {
   }
 
   const send = async () => {
+    if (!sendId) {
+      setError('No recipients loaded — go back to step 1.')
+      return
+    }
     setBusy(true)
     setError(null)
     try {
@@ -104,6 +135,9 @@ export default function MarketingBulkEmailTab({ lists = [], onNavigate }) {
       setStep(0)
       setSendId(null)
       setRecipientInfo(null)
+      setEmailsText('')
+      setManualEmail('')
+      setCsvText('')
       await load()
     } catch (e) {
       setError(e.message)
@@ -118,7 +152,7 @@ export default function MarketingBulkEmailTab({ lists = [], onNavigate }) {
         <div className="mhub-v3-card mhub-v3-bulk-wizard">
           <div className="mhub-v3-bulk-steps">
             {STEPS.map((s, i) => (
-              <span key={s} className={i === step ? 'is-active' : i < step ? 'is-done' : ''}>
+              <span key={s} className={i === step ? 'is-active' : i < step ? ' is-done' : ''}>
                 {i + 1}. {s}
               </span>
             ))}
@@ -127,21 +161,37 @@ export default function MarketingBulkEmailTab({ lists = [], onNavigate }) {
           {step === 0 && (
             <div>
               <p style={{ fontSize: 13, marginBottom: 12 }}>How do you want to add recipients?</p>
+
               <label className="mhub-v3-radio-block">
-                <input type="radio" checked={source === 'csv'} onChange={() => setSource('csv')} />
+                <input
+                  type="radio"
+                  name="bulk-src"
+                  checked={source === 'manual'}
+                  onChange={() => setSource('manual')}
+                />
                 <span>
-                  <strong>Upload CSV file</strong>
-                  <textarea
+                  <strong>Add email manually</strong>
+                  <input
+                    type="email"
                     className="mhub-v3-input"
-                    rows={5}
-                    placeholder="email,first_name,last_name,company"
-                    value={csvText}
-                    onChange={(e) => setCsvText(e.target.value)}
+                    placeholder="name@company.com"
+                    value={manualEmail}
+                    onFocus={() => setSource('manual')}
+                    onChange={(e) => {
+                      setSource('manual')
+                      setManualEmail(e.target.value)
+                    }}
                   />
                 </span>
               </label>
+
               <label className="mhub-v3-radio-block">
-                <input type="radio" checked={source === 'paste'} onChange={() => setSource('paste')} />
+                <input
+                  type="radio"
+                  name="bulk-src"
+                  checked={source === 'paste'}
+                  onChange={() => setSource('paste')}
+                />
                 <span>
                   <strong>Paste emails</strong>
                   <textarea
@@ -149,31 +199,81 @@ export default function MarketingBulkEmailTab({ lists = [], onNavigate }) {
                     rows={4}
                     placeholder="One email per line or comma-separated"
                     value={emailsText}
-                    onChange={(e) => setEmailsText(e.target.value)}
+                    onFocus={() => setSource('paste')}
+                    onChange={(e) => {
+                      setSource('paste')
+                      setEmailsText(e.target.value)
+                    }}
                   />
                 </span>
               </label>
+
               <label className="mhub-v3-radio-block">
-                <input type="radio" checked={source === 'list'} onChange={() => setSource('list')} />
+                <input
+                  type="radio"
+                  name="bulk-src"
+                  checked={source === 'csv'}
+                  onChange={() => setSource('csv')}
+                />
+                <span>
+                  <strong>Upload CSV file</strong>
+                  <textarea
+                    className="mhub-v3-input"
+                    rows={5}
+                    placeholder="email,first_name,last_name,company"
+                    value={csvText}
+                    onFocus={() => setSource('csv')}
+                    onChange={(e) => {
+                      setSource('csv')
+                      setCsvText(e.target.value)
+                    }}
+                  />
+                </span>
+              </label>
+
+              <label className="mhub-v3-radio-block">
+                <input
+                  type="radio"
+                  name="bulk-src"
+                  checked={source === 'list'}
+                  onChange={() => setSource('list')}
+                />
                 <span>
                   <strong>Use CRM audience</strong>
-                  <select className="mhub-v3-input" value={listId} onChange={(e) => setListId(e.target.value)}>
+                  <select
+                    className="mhub-v3-input"
+                    value={listId}
+                    onFocus={() => setSource('list')}
+                    onChange={(e) => {
+                      setSource('list')
+                      setListId(e.target.value)
+                    }}
+                  >
                     <option value="">Select list…</option>
                     {lists.map((l) => (
                       <option key={l.id} value={l.id}>
-                        {l.name}
+                        {l.name} ({l.leadIds?.length || l.memberCount || 0})
                       </option>
                     ))}
                   </select>
                 </span>
               </label>
+
               {recipientInfo ? (
                 <p style={{ fontSize: 12, color: '#22a06b' }}>
                   ✓ {recipientInfo.recipientCount} emails loaded
-                  {recipientInfo.duplicatesRemoved ? ` · ${recipientInfo.duplicatesRemoved} duplicates removed` : ''}
+                  {recipientInfo.duplicatesRemoved
+                    ? ` · ${recipientInfo.duplicatesRemoved} duplicates removed`
+                    : ''}
                 </p>
               ) : null}
-              <button type="button" className="mhub-v3-btn mhub-v3-btn--primary" disabled={busy} onClick={attachRecipients}>
+
+              <button
+                type="button"
+                className="mhub-v3-btn mhub-v3-btn--primary"
+                disabled={busy}
+                onClick={attachRecipients}
+              >
                 Continue →
               </button>
             </div>
@@ -181,12 +281,43 @@ export default function MarketingBulkEmailTab({ lists = [], onNavigate }) {
 
           {step === 1 && (
             <div className="mhub-v3-form-stack">
-              <input className="mhub-v3-input" placeholder="Campaign name" value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} />
-              <input className="mhub-v3-input" placeholder="From name" value={form.fromName} onChange={(e) => setForm((p) => ({ ...p, fromName: e.target.value }))} />
-              <input className="mhub-v3-input" placeholder="From email" value={form.fromEmail} onChange={(e) => setForm((p) => ({ ...p, fromEmail: e.target.value }))} />
-              <input className="mhub-v3-input" placeholder="Subject" value={form.subject} onChange={(e) => setForm((p) => ({ ...p, subject: e.target.value }))} />
-              <input className="mhub-v3-input" placeholder="Preview text" value={form.previewText} onChange={(e) => setForm((p) => ({ ...p, previewText: e.target.value }))} />
-              <textarea className="mhub-v3-input" rows={6} placeholder="Email body (use {{first_name}} etc.)" value={form.body} onChange={(e) => setForm((p) => ({ ...p, body: e.target.value }))} />
+              <input
+                className="mhub-v3-input"
+                placeholder="Campaign name"
+                value={form.name}
+                onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
+              />
+              <input
+                className="mhub-v3-input"
+                placeholder="From name"
+                value={form.fromName}
+                onChange={(e) => setForm((p) => ({ ...p, fromName: e.target.value }))}
+              />
+              <input
+                className="mhub-v3-input"
+                placeholder="From email"
+                value={form.fromEmail}
+                onChange={(e) => setForm((p) => ({ ...p, fromEmail: e.target.value }))}
+              />
+              <input
+                className="mhub-v3-input"
+                placeholder="Subject"
+                value={form.subject}
+                onChange={(e) => setForm((p) => ({ ...p, subject: e.target.value }))}
+              />
+              <input
+                className="mhub-v3-input"
+                placeholder="Preview text"
+                value={form.previewText}
+                onChange={(e) => setForm((p) => ({ ...p, previewText: e.target.value }))}
+              />
+              <textarea
+                className="mhub-v3-input"
+                rows={6}
+                placeholder="Email body (use {{first_name}} etc.)"
+                value={form.body}
+                onChange={(e) => setForm((p) => ({ ...p, body: e.target.value }))}
+              />
               <div style={{ display: 'flex', gap: 8 }}>
                 <button type="button" className="mhub-v3-btn" onClick={() => setStep(0)}>
                   ← Back
@@ -212,7 +343,11 @@ export default function MarketingBulkEmailTab({ lists = [], onNavigate }) {
                 </p>
               </div>
               <label style={{ display: 'flex', gap: 8, fontSize: 12, marginBottom: 12 }}>
-                <input type="checkbox" checked={form.captureAsLead} onChange={(e) => setForm((p) => ({ ...p, captureAsLead: e.target.checked }))} />
+                <input
+                  type="checkbox"
+                  checked={form.captureAsLead}
+                  onChange={(e) => setForm((p) => ({ ...p, captureAsLead: e.target.checked }))}
+                />
                 Convert replies/clicks to leads in pipeline
               </label>
               <div style={{ display: 'flex', gap: 8 }}>
