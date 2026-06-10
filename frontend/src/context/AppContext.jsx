@@ -6,6 +6,7 @@ import { loadReadNotificationIds, saveReadNotificationIds } from '../lib/notific
 import { getNotificationTarget } from '../lib/notificationNavigation'
 import { navTargetToOptions, normalizePipelineSummary } from '../lib/navConfig'
 import { withTimeout } from '../lib/fetchWithTimeout'
+import { clearAppNavigationState, preparePostLoginNavigation } from '../lib/appHistory'
 
 const AppContext = createContext(null)
 
@@ -524,6 +525,7 @@ export function AppProvider({ children }) {
       )
       if (session.token) storeSessionToken(session.token)
       setUser(session.user)
+      preparePostLoginNavigation()
       setScreen('app')
       void acceptPendingInvite()
       return session.user
@@ -539,6 +541,7 @@ export function AppProvider({ children }) {
       // Keep the client state moving even if the network call fails.
     }
     storeSessionToken(null)
+    clearAppNavigationState()
     setUser(null)
     setSessionError(null)
     setSavedLeads([])
@@ -552,6 +555,8 @@ export function AppProvider({ children }) {
     const data = await api.completeOnboarding(payload)
     if (data.token) storeSessionToken(data.token)
     setUser(data.user)
+    preparePostLoginNavigation()
+    panelNavigateRef.current?.('overview', {}, { replace: true })
     return data.user
   }, [])
 

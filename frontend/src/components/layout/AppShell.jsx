@@ -181,6 +181,7 @@ export default function AppShell() {
 
     const initial = resolveInitialAppLocation(window.location.search, {
       isPlatformAdmin: user.isPlatformAdmin,
+      pathname: window.location.pathname,
     })
     const panel = initial.panel || 'overview'
     const resolved = {
@@ -202,7 +203,7 @@ export default function AppShell() {
   useEffect(() => {
     const onPopState = () => {
       applyingHistoryRef.current = true
-      const loc = parseAppLocation(window.location.search)
+      const loc = parseAppLocation(window.location.search, window.location.pathname)
       applyLocation(loc)
       lastHistoryKeyRef.current = appLocationKey(loc)
       lastLeadIdRef.current = normalizeLeadId(loc.leadId)

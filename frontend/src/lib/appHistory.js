@@ -2,16 +2,46 @@
 
 const OAUTH_QUERY_KEYS = ['email_oauth', 'crm_gmail', 'mailbox', 'invite']
 const LAST_LOCATION_KEY = 'ci_last_app_location'
+const POST_LOGIN_NAV_KEY = 'ci_post_login_nav'
+
+export const DASHBOARD_PATH = '/home/dashboard'
+
+const PATH_TO_PANEL = {
+  [DASHBOARD_PATH]: 'overview',
+}
+
+const PANEL_TO_PATH = {
+  overview: DASHBOARD_PATH,
+}
+
 let lastWrittenHistoryUrl = ''
+
+function normalizePathname(pathname = '/') {
+  const p = String(pathname || '/').replace(/\/+$/, '') || '/'
+  return p
+}
+
+export function panelFromPathname(pathname = '/') {
+  return PATH_TO_PANEL[normalizePathname(pathname)] || null
+}
+
+export function pathnameForPanel(panel = 'overview') {
+  return PANEL_TO_PATH[panel] || '/'
+}
+
+export function defaultDashboardLocation() {
+  return { panel: 'overview', panelOptions: {}, leadId: null }
+}
 
 export function normalizeLeadId(leadId) {
   if (leadId == null || leadId === '') return null
   return String(leadId)
 }
 
-export function parseAppLocation(search = '') {
+export function parseAppLocation(search = '', pathname = '/') {
   const params = new URLSearchParams(search)
-  let panel = String(params.get('panel') || 'overview').trim() || 'overview'
+  const pathPanel = panelFromPathname(pathname)
+  let panel = pathPanel || String(params.get('panel') || 'overview').trim() || 'overview'
   const panelOptions = {}
 
   if (panel === 'team-notes' || panel === 'team-hub') {
@@ -46,7 +76,9 @@ export function parseAppLocation(search = '') {
   return { panel, panelOptions, leadId }
 }
 
-export function urlHasAppNavigation(search = '') {
+export function urlHasAppNavigation(search = '', pathname = '/') {
+  if (panelFromPathname(pathname)) return true
+
   const params = new URLSearchParams(search)
   return (
     params.has('panel') ||
@@ -104,10 +136,48 @@ export function loadPersistedAppLocation() {
   }
 }
 
+/** Mark the next app shell mount to open the dashboard (post sign-in / onboarding). */
+export function preparePostLoginNavigation() {
+  if (typeof window === 'undefined') return
+  try {
+    sessionStorage.setItem(POST_LOGIN_NAV_KEY, '1')
+    sessionStorage.removeItem(LAST_LOCATION_KEY)
+  } catch {
+    // ignore private mode
+  }
+}
+
+function consumePostLoginNavigation() {
+  if (typeof window === 'undefined') return false
+  try {
+    if (sessionStorage.getItem(POST_LOGIN_NAV_KEY) === '1') {
+      sessionStorage.removeItem(POST_LOGIN_NAV_KEY)
+      return true
+    }
+  } catch {
+    // ignore private mode
+  }
+  return false
+}
+
+export function clearAppNavigationState() {
+  if (typeof window === 'undefined') return
+  try {
+    sessionStorage.removeItem(LAST_LOCATION_KEY)
+    sessionStorage.removeItem(POST_LOGIN_NAV_KEY)
+  } catch {
+    // ignore private mode
+  }
+}
+
 /** Prefer URL state; fall back to last session location when URL is bare (e.g. PWA reopen). */
-export function resolveInitialAppLocation(search = '', { isPlatformAdmin = false } = {}) {
-  if (urlHasAppNavigation(search)) {
-    return parseAppLocation(search)
+export function resolveInitialAppLocation(search = '', { isPlatformAdmin = false, pathname = '/' } = {}) {
+  if (urlHasAppNavigation(search, pathname)) {
+    return parseAppLocation(search, pathname)
+  }
+
+  if (consumePostLoginNavigation()) {
+    return defaultDashboardLocation()
   }
 
   const persisted = loadPersistedAppLocation()
@@ -117,7 +187,7 @@ export function resolveInitialAppLocation(search = '', { isPlatformAdmin = false
     return { panel: 'admin-home', panelOptions: {}, leadId: null }
   }
 
-  return parseAppLocation(search)
+  return defaultDashboardLocation()
 }
 
 export function serializeAppLocation({ panel = 'overview', panelOptions = {}, leadId = null } = {}) {
@@ -169,9 +239,11 @@ export function appLocationKey(location) {
 }
 
 export function appLocationUrl(location) {
-  if (typeof window === 'undefined') return '/'
+  if (typeof window === 'undefined') return DASHBOARD_PATH
+  const panel = location?.panel || 'overview'
+  const pathname = pathnameForPanel(panel)
   const qs = serializeAppLocation(location)
-  return `${window.location.pathname}${qs ? `?${qs}` : ''}`
+  return `${pathname}${qs ? `?${qs}` : ''}`
 }
 
 function writeHistoryState(location, { replace = false } = {}) {
