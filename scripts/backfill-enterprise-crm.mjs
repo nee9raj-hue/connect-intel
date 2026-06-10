@@ -11,20 +11,14 @@
  *   node scripts/backfill-enterprise-crm.mjs [--dry-run] [--org-id org_xxx]
  */
 
-import crypto from 'node:crypto'
 import { readStore } from '../lib/server/store.js'
 import { isSupabaseEnabled, supabaseRest } from '../lib/server/supabaseClient.js'
-import { CRM_STATUSES } from '../lib/server/crm.js'
+import { buildEnterpriseLeadRow } from '../lib/server/enterpriseLeadsTable.js'
 
 const args = process.argv.slice(2)
 const dryRun = args.includes('--dry-run')
 const orgIdFlag = args.find((a) => a.startsWith('--org-id='))
 const onlyOrgId = orgIdFlag ? orgIdFlag.split('=')[1] : null
-
-function normStatus(status) {
-  const s = String(status || 'new').trim()
-  return CRM_STATUSES.includes(s) ? s : 'new'
-}
 
 function mapRole(membership) {
   const role = String(membership?.role || 'member').toLowerCase()
@@ -32,21 +26,6 @@ function mapRole(membership) {
   if (role === 'org_admin' || role === 'admin') return 'admin'
   if (pipelineRole === 'manager') return 'manager'
   return 'rep'
-}
-
-function hashPii(value) {
-  const v = String(value || '').trim().toLowerCase()
-  if (!v) return null
-  return crypto.createHash('sha256').update(v).digest('hex')
-}
-
-async function sealPii(value) {
-  if (!value) return null
-  const rows = await supabaseRest('rpc/seal_lead_pii', {
-    method: 'POST',
-    body: JSON.stringify({ plaintext: value }),
-  })
-  return typeof rows === 'string' ? rows : rows?.seal_lead_pii || rows || null
 }
 
 async function upsertOrg(org) {
@@ -109,38 +88,12 @@ async function upsertLead(entry, orgUuid, profileByLegacyUser) {
 
   const assigneeLegacy = entry.assignedToUserId || entry.savedByUserId || entry.userId
   const assignedProfile = assigneeLegacy ? profileByLegacyUser.get(assigneeLegacy) : null
-  const crm = entry.crm || {}
 
-  const firstName = lead.firstName || null
-  const lastName = lead.lastName || null
-  const email = lead.email || null
-  const phone = lead.phone || null
-
-  const payload = {
-    legacy_lead_id: String(legacyLeadId),
-    organization_id: orgUuid,
-    assigned_to: assignedProfile?.id || null,
-    lead_status: normStatus(crm.status),
-    lead_source: lead.source || null,
-    lead_score: Number(crm.leadScore) || null,
-    company_name: lead.company || null,
-    city: lead.city || null,
-    state: lead.state || null,
-    country: lead.country || null,
-    email_hash: hashPii(email),
-    phone_hash: hashPii(phone?.replace(/\D/g, '')),
-    encrypted_first_name: dryRun ? '[dry-run]' : await sealPii(firstName),
-    encrypted_last_name: dryRun ? '[dry-run]' : await sealPii(lastName),
-    encrypted_email: dryRun ? '[dry-run]' : await sealPii(email),
-    encrypted_phone: dryRun ? '[dry-run]' : await sealPii(phone),
-    crm_payload: {
-      tagIds: crm.tagIds || [],
-      nextFollowUpAt: crm.nextFollowUpAt || null,
-      dealCount: Array.isArray(crm.deals) ? crm.deals.length : 0,
-    },
-    saved_at: entry.savedAt || null,
-    updated_at: entry.updatedAt || entry.savedAt || new Date().toISOString(),
-  }
+  const payload = buildEnterpriseLeadRow(entry, {
+    organizationUuid: orgUuid,
+    assignedProfileId: assignedProfile?.id || null,
+  })
+  if (!payload) return null
 
   if (dryRun) return payload
 
