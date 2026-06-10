@@ -31,6 +31,7 @@ const SERVER_IMPORTS = [
   'lib/server/marketingEmailQueue.js',
   'lib/server/marketingEmailQueueWorker.js',
   'lib/server/pipelineScopedQuery.js',
+  'lib/server/pipelineKeyset.js',
   'lib/server/pipelineLeadCounts.js',
   'lib/server/pipelineHierarchyProfile.js',
   'lib/server/handlers/pipeline-scoped-leads-example.js',

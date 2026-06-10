@@ -172,6 +172,8 @@ export const api = {
   getPipelineBootstrap: ({
     offset = 0,
     limit = 100,
+    cursor,
+    summaryOnly = false,
     status,
     q,
     city,
@@ -186,6 +188,8 @@ export const api = {
     silent = false,
   } = {}) => {
     const qs = new URLSearchParams({ limit: String(limit), offset: String(offset) })
+    if (cursor) qs.set('cursor', cursor)
+    if (summaryOnly) qs.set('summaryOnly', '1')
     if (status && status !== 'all') qs.set('status', status)
     if (q) qs.set('q', q)
     for (const c of cities || (city ? [city] : [])) {
@@ -239,6 +243,7 @@ export const api = {
   fetchPipelineLeads: ({
     offset = 0,
     limit = 100,
+    cursor,
     status,
     q,
     city,
@@ -254,9 +259,10 @@ export const api = {
   } = {}) => {
     const qs = new URLSearchParams({
       limit: String(limit),
-      offset: String(offset),
+      offset: cursor ? '0' : String(offset),
       light: '1',
     })
+    if (cursor) qs.set('cursor', cursor)
     if (status && status !== 'all') qs.set('status', status)
     if (q) qs.set('q', q)
     for (const c of cities || (city ? [city] : [])) {

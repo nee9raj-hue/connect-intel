@@ -11,6 +11,7 @@ import OrgWorkspaceSettings from './OrgWorkspaceSettings'
 import UsagePoliciesSettings from './UsagePoliciesSettings'
 import FieldVisitExpenseSettings from './FieldVisitExpenseSettings'
 import { hasWorkspaceFeature } from '../../lib/workspaceFeatures'
+import SqlInfraBanner from './SqlInfraBanner'
 
 function memberInitials(name, email) {
   const n = String(name || '').trim()
@@ -251,6 +252,7 @@ export default function TeamPanel({ onNavigate }) {
 
       <div className="panel-body-scroll">
         <div className="max-w-6xl mx-auto p-4 md:p-6 space-y-4">
+          <SqlInfraBanner />
           {(notice || error) && (
             <div className="space-y-2">
               {notice && (

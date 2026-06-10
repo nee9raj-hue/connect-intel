@@ -189,6 +189,7 @@ export function AppProvider({ children }) {
   }, [user?.accountType, user?.organizationId])
 
   const loadedCountRef = useRef(0)
+  const pipelineCursorRef = useRef(null)
   const pipelineLoadRef = useRef(pipelineLoad)
   useEffect(() => {
     pipelineLoadRef.current = pipelineLoad
@@ -196,15 +197,18 @@ export function AppProvider({ children }) {
 
   const loadPipelineList = useCallback(async (filters = {}, { append = false, silent = false } = {}) => {
     const offset = append ? loadedCountRef.current : 0
+    const cursor = append ? pipelineCursorRef.current : null
     const data = await api.fetchPipelineLeads({
       offset,
+      cursor,
       limit: 100,
       silent,
       ...filters,
     })
     const leads = data.leads || []
-    const newLoaded = append ? offset + leads.length : leads.length
+    const newLoaded = append ? loadedCountRef.current + leads.length : leads.length
     loadedCountRef.current = newLoaded
+    pipelineCursorRef.current = data.nextCursor || null
     setSavedLeads((prev) => (append ? [...prev, ...leads] : leads))
     setPipelineLoad({
       total: data.total ?? data.pipelineTotal ?? 0,
@@ -246,6 +250,7 @@ export function AppProvider({ children }) {
           loadingMore: false,
         })
         loadedCountRef.current = leads.length
+        pipelineCursorRef.current = bootstrap.nextCursor || null
         workspaceLoadedAtRef.current = Date.now()
         return leads
       } catch (error) {
@@ -459,6 +464,7 @@ export function AppProvider({ children }) {
             loadingMore: false,
           })
           loadedCountRef.current = leads.length
+          pipelineCursorRef.current = bootstrap.nextCursor || null
           workspaceLoadedAtRef.current = Date.now()
           setSessionError(null)
 
@@ -492,6 +498,23 @@ export function AppProvider({ children }) {
       cancelled = true
     }
   }, [user?.id, user?.organizationId, user?.accountType])
+
+  /** Sidebar counts only — no lead list reload (60s). */
+  useEffect(() => {
+    if (!user?.id) return
+    const refreshCounts = () => {
+      api
+        .getPipelineBootstrap({ summaryOnly: true, silent: true })
+        .then((data) => {
+          if (data?.summary) {
+            setPipelineSummary(normalizePipelineSummary(data.summary))
+          }
+        })
+        .catch(() => {})
+    }
+    const timer = setInterval(refreshCounts, 60_000)
+    return () => clearInterval(timer)
+  }, [user?.id])
 
   useEffect(() => {
     if (!user?.id || !pipelineAssigneeFilter) return

@@ -1,6 +1,31 @@
 import { applyCors, handleOptions, sendJson } from '../lib/server/http.js'
 import { captureException } from '../lib/server/infra/sentry.js'
 import { observeHistogram } from '../lib/server/infra/metrics.js'
+import {
+  isMarketingSqlQueueEnabled,
+  isPipelineHierarchyRbacEnabled,
+  isPipelineLeadsTableEnabled,
+} from '../lib/server/infra/config.js'
+
+let prodSqlFlagsWarned = false
+
+function warnProductionSqlFlags() {
+  if (prodSqlFlagsWarned) return
+  if (process.env.VERCEL_ENV !== 'production') return
+
+  const disabled = []
+  if (!isPipelineLeadsTableEnabled()) disabled.push('USE_PIPELINE_LEADS_TABLE')
+  if (!isPipelineHierarchyRbacEnabled()) disabled.push('USE_PIPELINE_HIERARCHY_RBAC')
+  if (!isMarketingSqlQueueEnabled()) disabled.push('USE_MARKETING_SQL_QUEUE')
+
+  if (disabled.length) {
+    console.warn(
+      '[Connect Intel] Production SQL flags disabled — pipeline/marketing may load JSON shards:',
+      disabled.join(', ')
+    )
+  }
+  prodSqlFlagsWarned = true
+}
 
 /** Marketing/bulk sends may process several Gmail API calls per request. */
 export const config = {
@@ -130,6 +155,7 @@ function resolvePath(req) {
 export default async function handler(req, res) {
   if (handleOptions(req, res)) return
   applyCors(req, res)
+  warnProductionSqlFlags()
 
   const pathKey = resolvePath(req)
   const started = performance.now()
