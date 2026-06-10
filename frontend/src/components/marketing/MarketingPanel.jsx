@@ -782,6 +782,15 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
       const pending = data.pendingSends ?? 0
 
       if (!isWa && enrolled > 0) {
+        const sqlQueue = data.mode === 'sql_queue'
+        if (sqlQueue && pending > 0) {
+          setNotice(
+            data.workerHint ||
+              `Campaign queued — ${enrolled} recipients. Emails send in the background; you can close this tab.`
+          )
+          await load()
+          return
+        }
         const browserDrain =
           data.mode === 'browser_drain' || (pending > 0 && !data.background && data.mode !== 'queued')
         if (browserDrain && pending > 0) {
