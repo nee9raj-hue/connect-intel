@@ -11,7 +11,7 @@ import OrgWorkspaceSettings from './OrgWorkspaceSettings'
 import UsagePoliciesSettings from './UsagePoliciesSettings'
 import FieldVisitExpenseSettings from './FieldVisitExpenseSettings'
 import { hasWorkspaceFeature } from '../../lib/workspaceFeatures'
-import SqlInfraBanner from './SqlInfraBanner'
+import OrgAdminPanel from './OrgAdminPanel'
 
 function memberInitials(name, email) {
   const n = String(name || '').trim()
@@ -252,7 +252,6 @@ export default function TeamPanel({ onNavigate }) {
 
       <div className="panel-body-scroll">
         <div className="max-w-6xl mx-auto p-4 md:p-6 space-y-4">
-          <SqlInfraBanner />
           {(notice || error) && (
             <div className="space-y-2">
               {notice && (
@@ -302,38 +301,18 @@ export default function TeamPanel({ onNavigate }) {
             />
           </div>
 
+          <OrgAdminPanel
+            user={user}
+            teamMembers={teamMembers}
+            childrenByTab={{
+              team: (
+                <>
           <OrgWorkspaceSettings user={user} onUserUpdated={updateUser} />
           <UsagePoliciesSettings user={user} onUserUpdated={updateUser} />
           <FieldVisitExpenseSettings
             user={user}
             featureEnabled={hasWorkspaceFeature(user, 'fieldVisitExpenses')}
           />
-
-          <div className="grid sm:grid-cols-2 gap-2">
-            {hasWorkspaceFeature(user, 'panelActiveCustomers') && (
-            <TeamQuickLink
-              icon={ChartIcon}
-              title="Active trading customers"
-              description="Upload shipment data · CRM dashboard"
-              accent="teal"
-              onClick={() => onNavigate?.('active-customers')}
-            />
-            )}
-            <TeamQuickLink
-              icon={WhatsAppIcon}
-              title="WhatsApp API"
-              description="Meta Cloud API for outbound & inbox"
-              accent="whatsapp"
-              onClick={() => onNavigate?.('whatsapp-settings')}
-            />
-            <TeamQuickLink
-              icon={WalletIcon}
-              title="Team & billing"
-              description="Company details, recharge, invoices"
-              accent="amber"
-              onClick={() => onNavigate?.('org-billing')}
-            />
-          </div>
 
           <div className="grid lg:grid-cols-2 gap-4 items-start">
             <div className="space-y-4">
@@ -522,18 +501,39 @@ export default function TeamPanel({ onNavigate }) {
                 </div>
               </TeamSettingsSection>
             </div>
-
-            <div className="space-y-4">
-              <TeamSettingsSection
-                id="workspace"
-                icon={BuildingIcon}
-                title="Company workspace"
-                description="Branding shown in the app and lead tags for your team"
-                defaultOpen={false}
-              >
-                <div className="space-y-6 pt-1">
+          </div>
+                </>
+              ),
+              import: (
+                <div className="space-y-4">
+                  <OrgPipelineImport
+                    embedded
+                    onImported={async () => {
+                      await refreshSavedLeads()
+                      setNotice('Pipeline import complete — open Pipeline to follow up.')
+                    }}
+                  />
+                  {hasWorkspaceFeature(user, 'activeTradingImport') && (
+                    <div className="rounded-xl border border-gray-200 p-4">
+                      <p className="text-sm font-semibold text-gray-900">Shipment / active customer import</p>
+                      <p className="text-xs text-gray-500 mt-1 mb-3">
+                        For logistics workspaces — match trading activity to pipeline leads.
+                      </p>
+                      <button
+                        type="button"
+                        className="crm-btn crm-btn-secondary crm-btn-sm"
+                        onClick={() => onNavigate?.('active-customers')}
+                      >
+                        Open active customers import
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ),
+              branding: (
+                <div className="space-y-6">
                   <form onSubmit={handleBranding} className="space-y-3">
-                    <p className="text-xs font-semibold text-gray-700">Branding</p>
+                    <p className="text-sm font-semibold text-gray-900">Company branding</p>
                     <div className="grid sm:grid-cols-2 gap-3">
                       <input
                         value={companyName}
@@ -556,52 +556,38 @@ export default function TeamPanel({ onNavigate }) {
                       {brandingLoading ? 'Saving…' : 'Save branding'}
                     </button>
                   </form>
-
-                  <div className="border-t border-gray-100 pt-5">
-                    <OrgLeadTagsPanel embedded onTagsChange={refreshOrgLeadTags} />
-                  </div>
+                  <OrgLeadTagsPanel embedded onTagsChange={refreshOrgLeadTags} />
                 </div>
-              </TeamSettingsSection>
-
-              <TeamSettingsSection
-                id="data"
-                icon={UploadIcon}
-                title="Pipeline import"
-                description="Bulk upload leads from CSV or Excel"
-                defaultOpen={false}
-              >
-                <OrgPipelineImport
-                  embedded
-                  onImported={async () => {
-                    await refreshSavedLeads()
-                    setNotice('Pipeline import complete — open Pipeline to follow up.')
-                  }}
-                />
-              </TeamSettingsSection>
-
-              {hasWorkspaceFeature(user, 'activeTradingImport') && (
-              <TeamSettingsSection
-                id="active-trading-import"
-                icon={ChartIcon}
-                title="Shipment / active customer import"
-                description="Match trading activity to pipeline leads by mobile"
-                defaultOpen={false}
-              >
-                <p className="text-xs text-[#516f90] mb-3 leading-relaxed">
-                  For logistics and trading workspaces. Disable under Workspace modules if your team does not
-                  track shipments.
-                </p>
-                <button
-                  type="button"
-                  className="crm-btn crm-btn-secondary crm-btn-sm"
-                  onClick={() => onNavigate?.('active-customers')}
-                >
-                  Open active customers import
-                </button>
-              </TeamSettingsSection>
-              )}
-            </div>
-          </div>
+              ),
+              integrations: (
+                <div className="grid sm:grid-cols-2 gap-2">
+                  {hasWorkspaceFeature(user, 'panelActiveCustomers') && (
+                    <TeamQuickLink
+                      icon={ChartIcon}
+                      title="Active trading customers"
+                      description="Upload shipment data · CRM dashboard"
+                      accent="teal"
+                      onClick={() => onNavigate?.('active-customers')}
+                    />
+                  )}
+                  <TeamQuickLink
+                    icon={WhatsAppIcon}
+                    title="WhatsApp API"
+                    description="Meta Cloud API for outbound & inbox"
+                    accent="whatsapp"
+                    onClick={() => onNavigate?.('whatsapp-settings')}
+                  />
+                  <TeamQuickLink
+                    icon={WalletIcon}
+                    title="Team & billing"
+                    description="Company details, recharge, invoices"
+                    accent="amber"
+                    onClick={() => onNavigate?.('org-billing')}
+                  />
+                </div>
+              ),
+            }}
+          />
         </div>
       </div>
     </div>

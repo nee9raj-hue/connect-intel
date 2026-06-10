@@ -431,12 +431,30 @@ export const api = {
   researchLeads: (filters, count = 10) =>
     request('/api/admin/research-leads', { method: 'POST', body: { filters, count } }),
   getOrgImportOverview: () => request('/api/org/imports'),
-  importOrgPipeline: ({ datasetType, rows, addToPipeline = true, tagIds = [] }) =>
+  getOrgImportStatus: (jobId) =>
+    request(`/api/org/import-status?${new URLSearchParams({ id: jobId })}`, { silent: true }),
+  importOrgPipeline: ({ datasetType, rows, addToPipeline = true, tagIds = [], filename } = {}) =>
     request('/api/org/imports', {
       method: 'POST',
-      body: { datasetType, rows, addToPipeline, tagIds },
+      body: { datasetType, rows, addToPipeline, tagIds, filename },
       timeoutMs: 120_000,
     }),
+  getOrgHierarchy: () => request('/api/org/departments'),
+  createOrgDepartment: (body) =>
+    request('/api/org/departments', { method: 'POST', body }),
+  updateOrgDepartment: (body) =>
+    request('/api/org/departments', { method: 'PATCH', body }),
+  deleteOrgDepartment: (id) =>
+    request(`/api/org/departments?id=${encodeURIComponent(id)}`, { method: 'DELETE' }),
+  createOrgTeam: (body) => request('/api/org/teams', { method: 'POST', body }),
+  updateOrgTeam: (body) => request('/api/org/teams', { method: 'PATCH', body }),
+  deleteOrgTeam: (id) =>
+    request(`/api/org/teams?id=${encodeURIComponent(id)}`, { method: 'DELETE' }),
+  assignOrgMemberHierarchy: (body) =>
+    request('/api/org/member-hierarchy', { method: 'PATCH', body }),
+  getOrgPermissions: () => request('/api/org/permissions'),
+  updateOrgPermission: (body) =>
+    request('/api/org/permissions', { method: 'PUT', body }),
   getActiveTradingOverview: () => request('/api/org/active-trading'),
   importActiveTrading: (body) =>
     request('/api/org/active-trading', { method: 'POST', body }),
