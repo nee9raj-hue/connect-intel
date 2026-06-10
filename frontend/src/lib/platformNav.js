@@ -20,6 +20,18 @@ export function flattenNavSections(sections = []) {
       }
 
       for (const child of group.children || []) {
+        if (child.children?.length) {
+          for (const nested of child.children) {
+            items.push({
+              id: nested.id,
+              label: `${child.label} · ${nested.label}`,
+              group: `${section.title} · ${group.label}`,
+              panel: nested.panel,
+              options: navTargetToOptions(nested),
+            })
+          }
+          continue
+        }
         items.push({
           id: child.id,
           label: child.label,

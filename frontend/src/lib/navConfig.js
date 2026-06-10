@@ -182,6 +182,74 @@ function buildFreightPipelineChildren(columns, pipelineCounts, openDealCounts = 
   return items
 }
 
+function buildStandardPipelineChildren(
+  columns,
+  pipelineCounts,
+  openDealCounts = {},
+  allDealCounts = {}
+) {
+  const open = openDealCounts || {}
+  const all = allDealCounts || {}
+  const leadColumns = columns.filter(
+    (col) => col.id !== 'active_trading' && col.id !== 'won' && col.id !== 'lost'
+  )
+
+  return [
+    {
+      id: 'pipeline-leads-group',
+      label: 'Leads',
+      children: [
+        {
+          id: 'pipeline-all',
+          label: 'All leads',
+          panel: 'pipeline',
+          status: 'all',
+          view: 'leads',
+          badge: pipelineCounts.all,
+        },
+        ...leadColumns.map((col) => ({
+          id: `pipeline-${col.id}-leads`,
+          label: col.label,
+          panel: 'pipeline',
+          status: col.id,
+          view: 'leads',
+          badge: pipelineCounts[col.id] || 0,
+        })),
+      ],
+    },
+    {
+      id: 'pipeline-deals-group',
+      label: 'Deals',
+      children: [
+        {
+          id: 'pipeline-all-deals',
+          label: 'All open',
+          panel: 'pipeline',
+          view: 'deals',
+          dealStage: 'all',
+          badge: open.all || null,
+        },
+        {
+          id: 'pipeline-won-deals',
+          label: 'Won',
+          panel: 'pipeline',
+          view: 'deals',
+          dealStage: 'won',
+          badge: all.won || null,
+        },
+        {
+          id: 'pipeline-lost-deals',
+          label: 'Lost',
+          panel: 'pipeline',
+          view: 'deals',
+          dealStage: 'lost',
+          badge: all.lost || null,
+        },
+      ],
+    },
+  ]
+}
+
 export function buildCustomerNavSections(
   user,
   { pipelineCounts = {}, upcomingCount = 0, dealCounts = null, allDealCounts = null } = {}
@@ -192,16 +260,12 @@ export function buildCustomerNavSections(
 
   const pipelineChildren = freightOrg
     ? buildFreightPipelineChildren(columns, pipelineCounts, dealCounts || {}, allDealCounts || {})
-    : [
-        { id: 'pipeline-all', label: 'All leads', panel: 'pipeline', status: 'all', badge: pipelineCounts.all },
-        ...columns.map((col) => ({
-          id: `pipeline-${col.id}`,
-          label: col.label,
-          panel: 'pipeline',
-          status: col.id,
-          badge: pipelineCounts[col.id] || 0,
-        })),
-      ]
+    : buildStandardPipelineChildren(
+        columns,
+        pipelineCounts,
+        dealCounts || {},
+        allDealCounts || {}
+      )
 
   const marketingChildren = [
     { id: 'marketing-overview', label: 'Overview', panel: 'marketing', tab: 'overview' },
@@ -234,21 +298,27 @@ export function buildCustomerNavSections(
       : []),
   ]
 
-  const homeChildren = [
-    { id: 'home-dashboard', label: 'Dashboard', panel: 'overview' },
+  const analyticsGroups = [
     ...(isCompany && hasWorkspaceFeature(user, 'homeTeamMetrics')
-      ? [{ id: 'home-team-intel', label: 'Team intelligence', panel: 'crm-dashboard' }]
+      ? [
+          {
+            id: 'team-intelligence',
+            label: 'Team intelligence',
+            icon: 'chart',
+            panel: 'crm-dashboard',
+          },
+        ]
       : []),
-    { id: 'home-activity', label: 'Activity log', panel: 'crm-log' },
+    { id: 'activity-log', label: 'Activity log', icon: 'log', panel: 'crm-log' },
   ]
 
   const sections = [
     {
       title: 'Home',
-      groups: [{ id: 'home', label: 'Home', icon: 'home', children: homeChildren }],
+      groups: [{ id: 'home-dashboard', label: 'Dashboard', icon: 'home', panel: 'overview' }],
     },
     {
-      title: 'CRM',
+      title: 'CRM / Sales',
       groups: [
         { id: 'pipeline', label: 'Pipeline', icon: 'pipeline', children: pipelineChildren },
         ...(isCompany
@@ -267,6 +337,10 @@ export function buildCustomerNavSections(
           ? [{ id: 'field-expenses', label: 'Field expenses', icon: 'route', panel: 'field-expenses' }]
           : []),
       ],
+    },
+    {
+      title: 'Analytics & reports',
+      groups: analyticsGroups,
     },
     {
       title: 'Collaboration',
@@ -384,7 +458,10 @@ export function getDesktopPillSubmenuTargets(pillItem, sections = []) {
     return groupChildren((g) => g.id === 'calendar')
   }
   if (pillItem.panel === 'overview') {
-    return groupChildren((g) => g.id === 'home')
+    return []
+  }
+  if (pillItem.panel === 'crm-dashboard' || pillItem.panel === 'crm-log') {
+    return []
   }
   if (pillItem.panel === 'chithi' || pillItem.panel === 'team-tasks' || pillItem.panel === 'team-notes') {
     return [

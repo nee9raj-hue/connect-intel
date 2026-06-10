@@ -133,17 +133,20 @@ export default function Sidebar({
     setExpanded((prev) => {
       const next = { ...prev }
       for (const section of sections) {
-      for (const group of section.groups) {
-        if (group.children?.some((child) => isTargetActive(child))) {
-          next[group.id] = true
-        }
-        for (const child of group.children || []) {
-          if (child.children?.some((nested) => isTargetActive(nested))) {
+        for (const group of section.groups) {
+          if (group.panel && isTargetActive({ panel: group.panel, tab: group.tab })) {
             next[group.id] = true
-            next[`stage:${child.id}`] = true
+          }
+          if (group.children?.some((child) => navChildIsActive(child, isTargetActive))) {
+            next[group.id] = true
+          }
+          for (const child of group.children || []) {
+            if (child.children?.some((nested) => isTargetActive(nested))) {
+              next[group.id] = true
+              next[`stage:${child.id}`] = true
+            }
           }
         }
-      }
       }
       return next
     })
