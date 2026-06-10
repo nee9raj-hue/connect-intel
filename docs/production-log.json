@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-10T11:18:04.447Z",
-  "updatedAtIst": "10/06/2026, 16:48:04",
+  "updatedAt": "2026-06-10T11:25:38.099Z",
+  "updatedAtIst": "10/06/2026, 16:55:38",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "db3b924",
+  "currentProductionCommit": "1be5e79",
   "entries": [
+    {
+      "logId": "20260610-1655-1be5e79",
+      "commit": "1be5e79",
+      "commitFull": "1be5e792549f3160e3cd2daeec743b8527caa8ec",
+      "message": "fix: import useEffect in TeamMembersTab to stop runtime crash",
+      "deployedAt": "2026-06-10T11:25:15.831Z",
+      "deployedAtIst": "10/06/2026, 16:55:15",
+      "committedAtIst": "10/06/2026, 16:54:26",
+      "vercelPreviewUrl": "https://connect-intel-cnecxk3z8-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 1be5e79"
+    },
+    {
+      "logId": "20260610-1648-0fad84b",
+      "commit": "0fad84b",
+      "commitFull": "0fad84b35a4843322b1f4fb6835cf0c276f36fa1",
+      "message": "Update production log after team hierarchy fix deploy.",
+      "deployedAt": "2026-06-10T11:18:46.035Z",
+      "deployedAtIst": "10/06/2026, 16:48:46",
+      "committedAtIst": "10/06/2026, 16:48:09",
+      "vercelPreviewUrl": "https://connect-intel-4iz84gtqb-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 0fad84b"
+    },
     {
       "logId": "20260610-1648-db3b924",
       "commit": "db3b924",
@@ -15,7 +43,7 @@
       "committedAtIst": "10/06/2026, 16:47:20",
       "vercelPreviewUrl": "https://connect-intel-6th7nwwei-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- db3b924"
     },
@@ -242,34 +270,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- e6df7b6"
-    },
-    {
-      "logId": "20260610-1202-adc124a",
-      "commit": "adc124a",
-      "commitFull": "adc124afd896441a4e70a09cd1cdce7f5940c667",
-      "message": "Harden sign-in against Supabase 521 timeouts and Redis quota outages.",
-      "deployedAt": "2026-06-10T06:32:30.453Z",
-      "deployedAtIst": "10/06/2026, 12:02:30",
-      "committedAtIst": "10/06/2026, 12:01:54",
-      "vercelPreviewUrl": "https://connect-intel-n6efhvuat-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- adc124a"
-    },
-    {
-      "logId": "20260610-1154-98eebc1",
-      "commit": "98eebc1",
-      "commitFull": "98eebc1bd4e58c15fd95153700b76988b02b6b78",
-      "message": "Wire enterprise leads read/write through decrypted_leads and encrypted_* sync.",
-      "deployedAt": "2026-06-10T06:24:26.359Z",
-      "deployedAtIst": "10/06/2026, 11:54:26",
-      "committedAtIst": "10/06/2026, 11:53:43",
-      "vercelPreviewUrl": "https://connect-intel-2004nyomj-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 98eebc1"
     }
   ]
 }

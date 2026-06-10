@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 38357bc
+npm run prod:rollback -- 0fad84b
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 38357bc
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `db3b924` |
-| Log updated (IST) | 10/06/2026, 16:48:04 |
+| Commit | `1be5e79` |
+| Log updated (IST) | 10/06/2026, 16:55:38 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 38357bc
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 10/06/2026, 16:48:00 | `db3b924` | Fix team hierarchy assignment and speed up settings loads. | [preview](https://connect-intel-6th7nwwei-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- db3b924` | **← LIVE**
+| 10/06/2026, 16:55:15 | `1be5e79` | fix: import useEffect in TeamMembersTab to stop runtime crash | [preview](https://connect-intel-cnecxk3z8-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1be5e79` | **← LIVE**
+| 10/06/2026, 16:48:46 | `0fad84b` | Update production log after team hierarchy fix deploy. | [preview](https://connect-intel-4iz84gtqb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0fad84b` |
+| 10/06/2026, 16:48:00 | `db3b924` | Fix team hierarchy assignment and speed up settings loads. | [preview](https://connect-intel-6th7nwwei-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- db3b924` |
 | 10/06/2026, 16:34:35 | `38357bc` | Update production log after settings hub deploy. | [preview](https://connect-intel-224pgdf4j-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 38357bc` |
 | 10/06/2026, 16:33:49 | `517219f` | Rebuild Team settings as HubSpot-style tabbed admin hub. | [preview](https://connect-intel-d8kf35eny-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 517219f` |
 | 10/06/2026, 16:19:29 | `bf41817` | Update production log after departments nav deploy. | [preview](https://connect-intel-5qualwjb6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- bf41817` |
@@ -61,8 +63,6 @@ npm run prod:rollback -- 38357bc
 | 10/06/2026, 12:32:47 | `f88341a` | Add production bootstrap actions for activity log backfill and snapshot warm. | [preview](https://connect-intel-osx5oguh7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f88341a` |
 | 10/06/2026, 12:29:21 | `fa5d86c` | Speed up activity log with indexed queries and snapshot reads. | [preview](https://connect-intel-ecefxax7v-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- fa5d86c` |
 | 10/06/2026, 12:19:07 | `e6df7b6` | Route post-login users to /home/dashboard by default. | [preview](https://connect-intel-dx13ig39x-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e6df7b6` |
-| 10/06/2026, 12:02:30 | `adc124a` | Harden sign-in against Supabase 521 timeouts and Redis quota outages. | [preview](https://connect-intel-n6efhvuat-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- adc124a` |
-| 10/06/2026, 11:54:26 | `98eebc1` | Wire enterprise leads read/write through decrypted_leads and encrypted_* sync. | [preview](https://connect-intel-2004nyomj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 98eebc1` |
 
 ---
 
