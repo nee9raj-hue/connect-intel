@@ -680,16 +680,26 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
       setBusy(true)
       setError(null)
       try {
-        await api.resumeMarketingCampaign(id, { timeoutMs: 30_000, silent: true })
-        setNotice('Campaign resumed — workers continue sending in the background.')
-        await load()
+        const c = campaigns.find((row) => row.id === id)
+        const enrolled = c?.stats?.enrolled ?? 0
+        const sent = c?.stats?.sent ?? 0
+        const pending = Math.max(0, enrolled - sent)
+        if (c?.status === 'paused') {
+          await api.resumeMarketingCampaign(id, { timeoutMs: 30_000, silent: true })
+        }
+        if (pending > 0) {
+          await drainCampaignQueue(id, enrolled, { sent, pending, queued: pending })
+        } else {
+          setNotice('Nothing left to send for this campaign.')
+          await load()
+        }
       } catch (e) {
         setError(e.message)
       } finally {
         setBusy(false)
       }
     },
-    [load]
+    [campaigns, drainCampaignQueue, load]
   )
 
   const pauseCampaign = async (id) => {
@@ -772,6 +782,20 @@ export default function MarketingPanel({ onNavigate, panelOptions, isActive = tr
       const pending = data.pendingSends ?? 0
 
       if (!isWa && enrolled > 0) {
+        const browserDrain =
+          data.mode === 'browser_drain' || (pending > 0 && !data.background && data.mode !== 'queued')
+        if (browserDrain && pending > 0) {
+          setNotice(`Sending to ${enrolled} recipients — keep this tab open.`)
+          await load()
+          await drainCampaignQueue(id, enrolled, {
+            sent: initialSent,
+            failed: initialFailed,
+            pending,
+            queued: data.queuedSends ?? pending,
+            lastError: data.firstError || data.sendResult?.firstError,
+          })
+          return
+        }
         if (pending > 0 || data.background) {
           setNotice(
             data.background
