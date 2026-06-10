@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- cafcbd6
+npm run prod:rollback -- ea59b80
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- cafcbd6
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `c4ace06` |
-| Log updated (IST) | 10/06/2026, 10:29:04 |
+| Commit | `7059942` |
+| Log updated (IST) | 10/06/2026, 16:18:40 |
 
 ---
 
@@ -44,26 +44,25 @@ npm run prod:rollback -- cafcbd6
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 10/06/2026, 10:28:48 | `c4ace06` | Add enterprise Supabase schema for orgs, profiles, and encrypted leads. | [preview](https://connect-intel-nt9kmjsda-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c4ace06` | **← LIVE**
-| 10/06/2026, 01:00:25 | `cafcbd6` | Update production log after pipeline table read migration deploy. | [preview](https://connect-intel-r3o5cxl26-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- cafcbd6` |
-| 10/06/2026, 00:59:15 | `a33037e` | Migrate board, deals, marketing, and dashboard reads to pipeline_leads. | [preview](https://connect-intel-1e8vxg3k2-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a33037e` |
-| 10/06/2026, 00:53:36 | `8145177` | Update production log after pipeline_leads table deploy. | [preview](https://connect-intel-3emc8nqhq-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8145177` |
-| 10/06/2026, 00:52:37 | `ba43195` | Use pipeline_leads table for CRM saves and paginated list loads. | [preview](https://connect-intel-22q7iydd7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ba43195` |
-| 10/06/2026, 00:43:01 | `1cab8a6` | Update production log after CRM save performance deploy. | [preview](https://connect-intel-9x3t89i58-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1cab8a6` |
-| 10/06/2026, 00:42:11 | `9b21c32` | Speed up CRM saves by deferring shard mirror and index rebuild. | [preview](https://connect-intel-i6ou1oolw-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9b21c32` |
-| 10/06/2026, 00:35:58 | `61e96a9` | Update production log after pipeline static batch lists deploy. | [preview](https://connect-intel-nqdkjd9a7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 61e96a9` |
-| 10/06/2026, 00:35:15 | `beb7258` | Add pipeline batch static list creation from bulk selection. | [preview](https://connect-intel-96491gw77-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- beb7258` |
-| 10/06/2026, 00:19:13 | `52f34e8` | Update production log after pipeline filter summary hotfix. | [preview](https://connect-intel-nqpkgx8w7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 52f34e8` |
-| 10/06/2026, 00:18:26 | `e5fcb97` | Fix pipeline crash from calling join on filter summary string. | [preview](https://connect-intel-k9i8hzwxj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e5fcb97` |
-| 10/06/2026, 00:17:19 | `648926e` | Update production log after Audience Studio hotfix deploy. | [preview](https://connect-intel-7i847582l-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 648926e` |
-| 10/06/2026, 00:16:36 | `ab1da1f` | Fix Audience Studio crash from wrong campaign filter args. | [preview](https://connect-intel-b13yuecb3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ab1da1f` |
-| 10/06/2026, 00:11:22 | `c3ede43` | Add audience P0: cached recommendations, filter save, and refresh. | [preview](https://connect-intel-oznk53i28-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c3ede43` |
-| 10/06/2026, 00:00:56 | `86f07d6` | Update production log after audience-first Marketing Hub deploy. | [preview](https://connect-intel-nvd7pospr-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 86f07d6` |
-| 10/06/2026, 00:00:01 | `6d96f1c` | Shift Marketing Hub to audience-first workflows with Audience Studio and snapshots. | [preview](https://connect-intel-qi8ygt901-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6d96f1c` |
-| 09/06/2026, 23:42:20 | `e81c6e4` | Update production log after resource protection deploy. | [preview](https://connect-intel-5783p9oq7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e81c6e4` |
-| 09/06/2026, 23:41:21 | `e30d656` | Add resource protection guardrails that guide large CRM actions toward Marketing Hub. | [preview](https://connect-intel-plno4jrwz-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e30d656` |
-| 09/06/2026, 23:07:20 | `a47a03a` | Cut bulk email PostgREST load with Phase A send session and deferred CRM sync. | [preview](https://connect-intel-d7ht3rway-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a47a03a` |
-| 09/06/2026, 22:30:47 | `5ed3832` | Fix add-lead and bulk-assign false failures on large org pipelines. | [preview](https://connect-intel-fhdlanjwv-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5ed3832` |
+| 10/06/2026, 16:18:34 | `7059942` | Surface Departments & teams in sidebar with URL deep links. | [preview](https://connect-intel-1sokgx894-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7059942` | **← LIVE**
+| 10/06/2026, 16:13:28 | `ea59b80` | Polish Org Admin: member roles, moves, deactivate, and import stats. | [preview](https://connect-intel-fduehr25f-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ea59b80` |
+| 10/06/2026, 16:09:01 | `0349be6` | Add Org Admin hub with departments, teams, and permissions matrix. | [preview](https://connect-intel-bdrik1uy9-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0349be6` |
+| 10/06/2026, 16:01:47 | `e7961d6` | Add pipeline keyset pagination and Sprint 1 performance reliability. | [preview](https://connect-intel-aozpg6zbp-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e7961d6` |
+| 10/06/2026, 15:20:51 | `409bd68` | Add DB-level team hierarchy RBAC for pipeline scoping and sidebar counts. | [preview](https://connect-intel-4gr87irfw-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 409bd68` |
+| 10/06/2026, 14:22:06 | `c80f60a` | Add SQL-backed marketing email queue and analytics snapshots. | [preview](https://connect-intel-m0i6u6x23-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c80f60a` |
+| 10/06/2026, 13:51:56 | `352fb9a` | Allow marketing bulk email via browser drain when Redis is off. | [preview](https://connect-intel-4nzpxvkm7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 352fb9a` |
+| 10/06/2026, 13:25:04 | `246e238` | Fix marketing template saves timing out on large org stores. | [preview](https://connect-intel-4ha2mjqt2-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 246e238` |
+| 10/06/2026, 13:08:10 | `d4e9c16` | Restructure sidebar into Home, CRM/Sales, and Analytics sections. | [preview](https://connect-intel-10vx0iqkb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d4e9c16` |
+| 10/06/2026, 12:38:01 | `18f6ddb` | Harden activity-log bootstrap when pipeline_activities table is missing. | [preview](https://connect-intel-9o788ufkg-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 18f6ddb` |
+| 10/06/2026, 12:32:47 | `f88341a` | Add production bootstrap actions for activity log backfill and snapshot warm. | [preview](https://connect-intel-osx5oguh7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f88341a` |
+| 10/06/2026, 12:29:21 | `fa5d86c` | Speed up activity log with indexed queries and snapshot reads. | [preview](https://connect-intel-ecefxax7v-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- fa5d86c` |
+| 10/06/2026, 12:19:07 | `e6df7b6` | Route post-login users to /home/dashboard by default. | [preview](https://connect-intel-dx13ig39x-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e6df7b6` |
+| 10/06/2026, 12:02:30 | `adc124a` | Harden sign-in against Supabase 521 timeouts and Redis quota outages. | [preview](https://connect-intel-n6efhvuat-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- adc124a` |
+| 10/06/2026, 11:54:26 | `98eebc1` | Wire enterprise leads read/write through decrypted_leads and encrypted_* sync. | [preview](https://connect-intel-2004nyomj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 98eebc1` |
+| 10/06/2026, 11:44:31 | `f056207` | Fix replaceState loop that blocked app load on history sync. | [preview](https://connect-intel-48uu81fom-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f056207` |
+| 10/06/2026, 11:37:44 | `0097a17` | Add Vault-backed auto-encrypt trigger sync for enterprise leads PII. | [preview](https://connect-intel-h8qznbzp3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0097a17` |
+| 10/06/2026, 11:25:56 | `e741acc` | Add decrypted_leads SECURITY INVOKER view for Vault PII reads. | [preview](https://connect-intel-gn16zj2qz-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e741acc` |
+| 10/06/2026, 11:21:09 | `5a89d8d` | Add security-definer RLS policies for enterprise leads table. | [preview](https://connect-intel-1qteoelts-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5a89d8d` |
 
 ---
 
