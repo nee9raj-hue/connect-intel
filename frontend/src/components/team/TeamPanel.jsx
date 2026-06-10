@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
-import { TEAM_PIPELINE_ROLES } from '../../lib/crmConstants'
+import { HIERARCHY_SQL_ROLES, TEAM_PIPELINE_ROLES } from '../../lib/crmConstants'
 import OrgPipelineImport from './OrgPipelineImport'
 import OrgLeadTagsPanel from './OrgLeadTagsPanel'
 import InviteEmailSetup from './InviteEmailSetup'
@@ -226,6 +226,36 @@ export default function TeamPanel({ onNavigate }) {
     }
   }
 
+  const changeSqlRole = async (member, sqlRole) => {
+    try {
+      await updateMemberPermissions({
+        userId: member.userId,
+        sqlRole,
+        teamId: member.teamId,
+        departmentId: member.departmentId,
+      })
+      setNotice(`Data scope updated for ${member.name}`)
+      await refreshTeam()
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
+  const toggleMemberStatus = async (member) => {
+    const next = member.status === 'inactive' ? 'active' : 'inactive'
+    const label = next === 'inactive' ? 'deactivate' : 'reactivate'
+    if (next === 'inactive' && !window.confirm(`Deactivate ${member.name}? They will lose workspace access.`)) {
+      return
+    }
+    try {
+      await updateMemberPermissions({ userId: member.userId, status: next })
+      setNotice(`${member.name} ${label}d`)
+      await refreshTeam()
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
   return (
     <div className="panel-shell">
       <header className="shrink-0 bg-white border-b border-gray-200/90 px-5 py-4 md:px-6">
@@ -304,6 +334,7 @@ export default function TeamPanel({ onNavigate }) {
           <OrgAdminPanel
             user={user}
             teamMembers={teamMembers}
+            onMembersChanged={refreshTeam}
             childrenByTab={{
               team: (
                 <>
@@ -335,17 +366,26 @@ export default function TeamPanel({ onNavigate }) {
                     {teamMembers.map((m) => (
                       <li
                         key={m.userId}
-                        className="flex flex-wrap items-center gap-3 px-3 py-3 bg-white hover:bg-gray-50/80 transition-colors"
+                        className={`flex flex-wrap items-center gap-3 px-3 py-3 transition-colors ${
+                          m.status === 'inactive'
+                            ? 'bg-gray-50 opacity-70'
+                            : 'bg-white hover:bg-gray-50/80'
+                        }`}
                       >
                         <span className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 text-white text-xs font-bold flex items-center justify-center shrink-0">
                           {memberInitials(m.name, m.email)}
                         </span>
                         <div className="flex-1 min-w-[140px]">
-                          <p className="text-sm font-medium text-gray-900 truncate flex items-center gap-1.5">
+                          <p className="text-sm font-medium text-gray-900 truncate flex items-center gap-1.5 flex-wrap">
                             {m.name}
                             {m.role === 'org_admin' && (
                               <span className="text-xs font-bold uppercase tracking-wide text-[#8a6600] bg-[#fff4ee] px-1.5 py-0.5 rounded">
                                 Admin
+                              </span>
+                            )}
+                            {m.status === 'inactive' && (
+                              <span className="text-xs font-semibold text-gray-500 bg-gray-200 px-1.5 py-0.5 rounded">
+                                Inactive
                               </span>
                             )}
                           </p>
@@ -354,9 +394,22 @@ export default function TeamPanel({ onNavigate }) {
                         {m.role !== 'org_admin' && (
                           <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto sm:justify-end">
                             <select
+                              value={m.sqlRole || 'rep'}
+                              onChange={(e) => changeSqlRole(m, e.target.value)}
+                              className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 bg-white"
+                              title="Pipeline data scope"
+                            >
+                              {HIERARCHY_SQL_ROLES.map((r) => (
+                                <option key={r.id} value={r.id}>
+                                  {r.label}
+                                </option>
+                              ))}
+                            </select>
+                            <select
                               value={m.pipelineRole || 'member'}
                               onChange={(e) => changePipelineRole(m, e.target.value)}
                               className="text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 bg-white"
+                              title="Kanban columns visible"
                             >
                               {TEAM_PIPELINE_ROLES.map((r) => (
                                 <option key={r.id} value={r.id}>
@@ -375,6 +428,13 @@ export default function TeamPanel({ onNavigate }) {
                             >
                               <SearchIcon className="w-3.5 h-3.5" />
                               {m.canSearch ? 'Search on' : 'Search off'}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => toggleMemberStatus(m)}
+                              className="text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50"
+                            >
+                              {m.status === 'inactive' ? 'Reactivate' : 'Deactivate'}
                             </button>
                           </div>
                         )}

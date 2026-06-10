@@ -17,6 +17,7 @@ export default function OrgAdminPanel({
   teamMembers,
   activeTab: controlledTab,
   onTabChange,
+  onMembersChanged,
   childrenByTab = {},
 }) {
   const [internalTab, setInternalTab] = useState('team')
@@ -49,7 +50,9 @@ export default function OrgAdminPanel({
       <SqlInfraBanner />
 
       {activeTab === 'team' && childrenByTab.team}
-      {activeTab === 'hierarchy' && <OrgHierarchyPanel teamMembers={teamMembers} />}
+      {activeTab === 'hierarchy' && (
+        <OrgHierarchyPanel teamMembers={teamMembers} onMembersChanged={onMembersChanged} />
+      )}
       {activeTab === 'permissions' && <OrgPermissionsPanel />}
       {activeTab === 'import' && childrenByTab.import}
       {activeTab === 'branding' && childrenByTab.branding}

@@ -33,6 +33,7 @@ const SERVER_IMPORTS = [
   'lib/server/pipelineScopedQuery.js',
   'lib/server/pipelineKeyset.js',
   'lib/server/orgHierarchy.js',
+  'lib/server/memberHierarchySync.js',
   'lib/server/rolePermissions.js',
   'lib/server/leadImportJobs.js',
   'lib/server/handlers/org-departments.js',

@@ -55,6 +55,13 @@ export const TEAM_PIPELINE_ROLES = [
   { id: 'sales', label: 'Sales rep', description: 'Early funnel only' },
 ]
 
+/** SQL hierarchy roles (profiles.role) — drives pipeline data scoping. */
+export const HIERARCHY_SQL_ROLES = [
+  { id: 'rep', label: 'Rep', description: 'Own leads only' },
+  { id: 'manager', label: 'Manager', description: 'Team pipeline' },
+  { id: 'admin', label: 'Admin', description: 'Full organization' },
+]
+
 export function getVisiblePipelineColumns(user) {
   if (!user || user.accountType !== 'company') return CRM_STATUSES
   if (user.isOrgAdmin || user.orgRole === 'org_admin' || user.isPlatformAdmin) return CRM_STATUSES

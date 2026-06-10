@@ -13,6 +13,41 @@ const DATASET_OPTIONS = [
   { id: 'general', label: 'General' },
 ]
 
+function ImportResultCard({ stats, job, fileLabel }) {
+  if (!stats && !job) return null
+  const created = job?.createdCount ?? stats?.pipelineAdded ?? 0
+  const updated = job?.updatedCount ?? stats?.pipelineUpdated ?? 0
+  const skipped = job?.skippedCount ?? stats?.pipelineSkipped ?? 0
+  const errors = job?.errorCount ?? stats?.rejectedRows ?? 0
+
+  return (
+    <div className="rounded-xl border border-emerald-200 bg-emerald-50/80 px-4 py-3 space-y-2">
+      <p className="text-sm font-semibold text-emerald-950">Import complete{fileLabel ? ` — ${fileLabel}` : ''}</p>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
+        <div className="rounded-lg bg-white/80 px-2 py-2">
+          <p className="text-lg font-bold text-gray-900 tabular-nums">{created}</p>
+          <p className="text-[10px] uppercase tracking-wide text-gray-500">Created</p>
+        </div>
+        <div className="rounded-lg bg-white/80 px-2 py-2">
+          <p className="text-lg font-bold text-gray-900 tabular-nums">{updated}</p>
+          <p className="text-[10px] uppercase tracking-wide text-gray-500">Updated</p>
+        </div>
+        <div className="rounded-lg bg-white/80 px-2 py-2">
+          <p className="text-lg font-bold text-gray-900 tabular-nums">{skipped}</p>
+          <p className="text-[10px] uppercase tracking-wide text-gray-500">Skipped</p>
+        </div>
+        <div className="rounded-lg bg-white/80 px-2 py-2">
+          <p className="text-lg font-bold text-gray-900 tabular-nums">{errors}</p>
+          <p className="text-[10px] uppercase tracking-wide text-gray-500">Errors</p>
+        </div>
+      </div>
+      {job?.id && (
+        <p className="text-[10px] text-gray-500 font-mono">Job {job.id.slice(0, 8)}… · {job.status}</p>
+      )}
+    </div>
+  )
+}
+
 export default function OrgPipelineImport({ onImported, embedded = false }) {
   const { orgLeadTags, refreshOrgLeadTags } = useApp()
   const [datasetType, setDatasetType] = useState('exporters')
@@ -24,6 +59,7 @@ export default function OrgPipelineImport({ onImported, embedded = false }) {
   const [error, setError] = useState('')
   const [addToPipeline, setAddToPipeline] = useState(true)
   const [importTagIds, setImportTagIds] = useState([])
+  const [lastResult, setLastResult] = useState(null)
 
   const loadOverview = async () => {
     try {
@@ -47,6 +83,7 @@ export default function OrgPipelineImport({ onImported, embedded = false }) {
     if (!file) return
     setError('')
     setMessage('')
+    setLastResult(null)
     try {
       const parsedRows = await parseUploadFile(file)
       const summary = summarizeImportRows(parsedRows)
@@ -77,6 +114,8 @@ export default function OrgPipelineImport({ onImported, embedded = false }) {
     setLoading(true)
     setError('')
     setMessage('')
+    setLastResult(null)
+    const importedFileName = fileName
     try {
       const importRows = rows.filter((r) =>
         Boolean(String(r.company || r.business_name || r.company_name || '').trim())
@@ -86,10 +125,23 @@ export default function OrgPipelineImport({ onImported, embedded = false }) {
         rows: importRows,
         addToPipeline,
         tagIds: importTagIds,
+        filename: importedFileName || 'pipeline-import.csv',
       })
       setOverview(data)
       setRows([])
       setFileName('')
+
+      let job = null
+      if (data.jobId) {
+        try {
+          const statusRes = await api.getOrgImportStatus(data.jobId)
+          job = statusRes.job
+        } catch {
+          // job row optional
+        }
+      }
+
+      setLastResult({ stats: data.stats, job, fileName: importedFileName })
       setMessage(data.message || 'Import complete.')
       onImported?.(data)
     } catch (err) {
@@ -122,6 +174,10 @@ export default function OrgPipelineImport({ onImported, embedded = false }) {
           <p className="text-xs text-gray-600">
             <strong>{overview.pipelineCount?.toLocaleString() || 0}</strong> leads in your pipeline
           </p>
+        )}
+
+        {lastResult && (
+          <ImportResultCard stats={lastResult.stats} job={lastResult.job} fileLabel={lastResult.fileName} />
         )}
 
         <div className="flex flex-wrap items-center gap-3">
