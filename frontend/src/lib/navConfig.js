@@ -110,9 +110,14 @@ export function isNavTargetActive(activePanel, panelOptions, target) {
     return target.upcomingOnly ? upcoming : !upcoming
   }
   if (target.panel === 'team') {
-    const currentTab = panelOptions?.teamTab || 'team'
-    if (target.teamTab) return currentTab === target.teamTab
-    return currentTab === 'team'
+    const normalize = (t) => {
+      if (!t || t === 'team') return 'members'
+      if (t === 'hierarchy') return 'teams'
+      return t
+    }
+    const currentTab = normalize(panelOptions?.teamTab)
+    if (target.teamTab) return currentTab === normalize(target.teamTab)
+    return currentTab === 'members'
   }
   return true
 }
@@ -388,9 +393,9 @@ export function buildCustomerNavSections(
           label: 'Team & email',
           icon: 'team',
           children: [
-            { id: 'team-members', label: 'Members & invites', panel: 'team', teamTab: 'team' },
-            { id: 'team-hierarchy', label: 'Departments & teams', panel: 'team', teamTab: 'hierarchy' },
-            { id: 'team-permissions', label: 'Roles & permissions', panel: 'team', teamTab: 'permissions' },
+            { id: 'team-members', label: 'Team members', panel: 'team', teamTab: 'members' },
+            { id: 'team-hierarchy', label: 'Teams & departments', panel: 'team', teamTab: 'teams' },
+            { id: 'team-permissions', label: 'Permissions', panel: 'team', teamTab: 'permissions' },
           ],
         },
         { id: 'whatsapp-settings', label: 'WhatsApp API', icon: 'whatsapp', panel: 'whatsapp-settings' },

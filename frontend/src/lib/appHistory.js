@@ -225,7 +225,7 @@ export function serializeAppLocation({ panel = 'overview', panelOptions = {}, le
   ) {
     params.set('adminTab', panelOptions.tab)
   }
-  if (panel === 'team' && panelOptions.teamTab && panelOptions.teamTab !== 'team') {
+  if (panel === 'team' && panelOptions.teamTab && panelOptions.teamTab !== 'members') {
     params.set('teamTab', panelOptions.teamTab)
   }
   const normalizedLeadId = normalizeLeadId(leadId)
