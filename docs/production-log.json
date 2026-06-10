@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-09T19:29:43.934Z",
-  "updatedAtIst": "10/06/2026, 00:59:43",
+  "updatedAt": "2026-06-10T04:59:04.863Z",
+  "updatedAtIst": "10/06/2026, 10:29:04",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "a33037e",
+  "currentProductionCommit": "c4ace06",
   "entries": [
+    {
+      "logId": "20260610-1028-c4ace06",
+      "commit": "c4ace06",
+      "commitFull": "c4ace06bcae8ba1b4a8e88948e08dab7f0af6847",
+      "message": "Add enterprise Supabase schema for orgs, profiles, and encrypted leads.",
+      "deployedAt": "2026-06-10T04:58:48.228Z",
+      "deployedAtIst": "10/06/2026, 10:28:48",
+      "committedAtIst": "10/06/2026, 10:28:14",
+      "vercelPreviewUrl": "https://connect-intel-nt9kmjsda-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- c4ace06"
+    },
+    {
+      "logId": "20260610-0100-cafcbd6",
+      "commit": "cafcbd6",
+      "commitFull": "cafcbd60184d16422938dd986c960976c23faa8b",
+      "message": "Update production log after pipeline table read migration deploy.",
+      "deployedAt": "2026-06-09T19:30:25.364Z",
+      "deployedAtIst": "10/06/2026, 01:00:25",
+      "committedAtIst": "10/06/2026, 00:59:48",
+      "vercelPreviewUrl": "https://connect-intel-r3o5cxl26-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- cafcbd6"
+    },
     {
       "logId": "20260610-0059-a33037e",
       "commit": "a33037e",
@@ -15,7 +43,7 @@
       "committedAtIst": "10/06/2026, 00:58:24",
       "vercelPreviewUrl": "https://connect-intel-1e8vxg3k2-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- a33037e"
     },
@@ -256,20 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 5ed3832"
-    },
-    {
-      "logId": "20260609-2224-a5e6717",
-      "commit": "a5e6717",
-      "commitFull": "a5e67175c5d9d4c71aa54c39a70a2ed16999bc35",
-      "message": "Replace bulk email banner with compact draggable send dock.",
-      "deployedAt": "2026-06-09T16:54:03.325Z",
-      "deployedAtIst": "09/06/2026, 22:24:03",
-      "committedAtIst": "09/06/2026, 22:22:51",
-      "vercelPreviewUrl": "https://connect-intel-mimas86ku-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- a5e6717"
     }
   ]
 }

@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 8145177
+npm run prod:rollback -- cafcbd6
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 8145177
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `a33037e` |
-| Log updated (IST) | 10/06/2026, 00:59:43 |
+| Commit | `c4ace06` |
+| Log updated (IST) | 10/06/2026, 10:29:04 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 8145177
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 10/06/2026, 00:59:15 | `a33037e` | Migrate board, deals, marketing, and dashboard reads to pipeline_leads. | [preview](https://connect-intel-1e8vxg3k2-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a33037e` | **← LIVE**
+| 10/06/2026, 10:28:48 | `c4ace06` | Add enterprise Supabase schema for orgs, profiles, and encrypted leads. | [preview](https://connect-intel-nt9kmjsda-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c4ace06` | **← LIVE**
+| 10/06/2026, 01:00:25 | `cafcbd6` | Update production log after pipeline table read migration deploy. | [preview](https://connect-intel-r3o5cxl26-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- cafcbd6` |
+| 10/06/2026, 00:59:15 | `a33037e` | Migrate board, deals, marketing, and dashboard reads to pipeline_leads. | [preview](https://connect-intel-1e8vxg3k2-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a33037e` |
 | 10/06/2026, 00:53:36 | `8145177` | Update production log after pipeline_leads table deploy. | [preview](https://connect-intel-3emc8nqhq-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8145177` |
 | 10/06/2026, 00:52:37 | `ba43195` | Use pipeline_leads table for CRM saves and paginated list loads. | [preview](https://connect-intel-22q7iydd7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ba43195` |
 | 10/06/2026, 00:43:01 | `1cab8a6` | Update production log after CRM save performance deploy. | [preview](https://connect-intel-9x3t89i58-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1cab8a6` |
@@ -62,7 +64,6 @@ npm run prod:rollback -- 8145177
 | 09/06/2026, 23:41:21 | `e30d656` | Add resource protection guardrails that guide large CRM actions toward Marketing Hub. | [preview](https://connect-intel-plno4jrwz-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e30d656` |
 | 09/06/2026, 23:07:20 | `a47a03a` | Cut bulk email PostgREST load with Phase A send session and deferred CRM sync. | [preview](https://connect-intel-d7ht3rway-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a47a03a` |
 | 09/06/2026, 22:30:47 | `5ed3832` | Fix add-lead and bulk-assign false failures on large org pipelines. | [preview](https://connect-intel-fhdlanjwv-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5ed3832` |
-| 09/06/2026, 22:24:03 | `a5e6717` | Replace bulk email banner with compact draggable send dock. | [preview](https://connect-intel-mimas86ku-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a5e6717` |
 
 ---
 
