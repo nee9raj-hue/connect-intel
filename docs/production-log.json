@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-10T12:12:11.886Z",
-  "updatedAtIst": "10/06/2026, 17:42:11",
+  "updatedAt": "2026-06-10T12:15:25.768Z",
+  "updatedAtIst": "10/06/2026, 17:45:25",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "e569c84",
+  "currentProductionCommit": "39bbe33",
   "entries": [
+    {
+      "logId": "20260610-1745-39bbe33",
+      "commit": "39bbe33",
+      "commitFull": "39bbe33f222d4bb833255249c550ec49274a1864",
+      "message": "fix: import useEffect in TeamMembersTab to stop Team members crash",
+      "deployedAt": "2026-06-10T12:15:14.377Z",
+      "deployedAtIst": "10/06/2026, 17:45:14",
+      "committedAtIst": "10/06/2026, 17:44:36",
+      "vercelPreviewUrl": "https://connect-intel-h6svnc1tt-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 39bbe33"
+    },
+    {
+      "logId": "20260610-1743-c625be4",
+      "commit": "c625be4",
+      "commitFull": "c625be40a4785ef73ec4e92cd7ded0552a77b42e",
+      "message": "chore: production log after Marketing Hub performance fix deploy",
+      "deployedAt": "2026-06-10T12:13:03.954Z",
+      "deployedAtIst": "10/06/2026, 17:43:03",
+      "committedAtIst": "10/06/2026, 17:42:26",
+      "vercelPreviewUrl": "https://connect-intel-q9s84lmta-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- c625be4"
+    },
     {
       "logId": "20260610-1741-e569c84",
       "commit": "e569c84",
@@ -15,7 +43,7 @@
       "committedAtIst": "10/06/2026, 17:41:11",
       "vercelPreviewUrl": "https://connect-intel-pbsp0kiuh-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- e569c84"
     },
@@ -256,20 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 246e238"
-    },
-    {
-      "logId": "20260610-1245-d4e9c16",
-      "commit": "d4e9c16",
-      "commitFull": "d4e9c16c962c9b7f23b4a01d02d5df7a52ebc438",
-      "message": "Restructure sidebar into Home, CRM/Sales, and Analytics sections.",
-      "deployedAt": "2026-06-10T07:38:10.771Z",
-      "deployedAtIst": "10/06/2026, 13:08:10",
-      "committedAtIst": "10/06/2026, 12:44:59",
-      "vercelPreviewUrl": "https://connect-intel-10vx0iqkb-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- d4e9c16"
     }
   ]
 }
