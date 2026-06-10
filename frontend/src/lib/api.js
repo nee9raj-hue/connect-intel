@@ -164,6 +164,7 @@ export const api = {
   deleteOrgLeadTag: (id) => request('/api/org/lead-tags', { method: 'DELETE', body: { id } }),
   updateMemberPermissions: (payload) =>
     request('/api/team/permissions', { method: 'PATCH', body: payload }),
+  // Pipeline leads: server reads PII from decrypted_leads; writes sync to leads (encrypted_*).
   getPipelineSummary: ({ silent = false } = {}) =>
     request('/api/saved-leads?summary=1&light=1', { timeoutMs: 45_000 }, { silent }),
 
