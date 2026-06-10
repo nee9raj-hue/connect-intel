@@ -20,7 +20,7 @@ export default function PwaUpdateBanner() {
     >
       <div className="flex flex-wrap items-center gap-2">
         <p className="text-xs font-semibold text-[#33475b] flex-1 min-w-[12rem]">
-          A new version is ready. Refresh when you are done with your current task.
+          A new version is ready. Click refresh to load the latest Connect Intel.
         </p>
         <button
           type="button"

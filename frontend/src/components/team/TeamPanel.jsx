@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useApp } from '../../context/AppContext'
+import { api } from '../../lib/api'
 import {
   C,
   SETTINGS_TABS,
@@ -14,6 +15,25 @@ import IntegrationsTab from './settings/IntegrationsTab'
 import ImportLeadsTab from './settings/ImportLeadsTab'
 import BillingTab from './settings/BillingTab'
 
+function buildTeamMap(departments) {
+  const map = new Map()
+  for (const d of departments || []) {
+    for (const t of d.teams || []) {
+      map.set(t.id, `${d.name} — ${t.name}`)
+    }
+  }
+  return map
+}
+
+function buildTeamOptions(departments) {
+  return (departments || []).flatMap((d) =>
+    (d.teams || []).map((t) => ({
+      key: `${t.id}|${d.id}`,
+      label: `${d.name} → ${t.name}`,
+    }))
+  )
+}
+
 export default function TeamPanel({ onNavigate, panelOptions = {} }) {
   const activeTab = normalizeSettingsTab(panelOptions.teamTab)
   const {
@@ -22,23 +42,59 @@ export default function TeamPanel({ onNavigate, panelOptions = {} }) {
     orgLeadTags,
     refreshTeam,
     refreshSavedLeads,
-    refreshOrgLeadTags,
     inviteTeamMember,
     updateMemberPermissions,
   } = useApp()
 
   const [inviteOpen, setInviteOpen] = useState(false)
   const [toast, setToast] = useState(null)
-
-  useEffect(() => {
-    refreshTeam()
-    refreshOrgLeadTags?.()
-  }, [refreshTeam, refreshOrgLeadTags])
+  const [hierarchy, setHierarchy] = useState({ departments: [], sql: true })
+  const [hierarchyLoading, setHierarchyLoading] = useState(false)
+  const [hierarchyError, setHierarchyError] = useState(null)
+  const hierarchyLoadedRef = useRef(false)
 
   const showToast = useCallback((message, type = 'success') => {
     setToast({ message, type })
     setTimeout(() => setToast(null), 4000)
   }, [])
+
+  const loadHierarchy = useCallback(async ({ force = false, silent = true } = {}) => {
+    if (hierarchyLoadedRef.current && !force && hierarchy.departments?.length) return hierarchy
+    setHierarchyLoading(true)
+    setHierarchyError(null)
+    try {
+      const data = await api.getOrgHierarchy({ skipLeadCounts: true, silent })
+      setHierarchy(data)
+      hierarchyLoadedRef.current = true
+      if (data.sql === false) {
+        setHierarchyError('SQL hierarchy is not enabled for this workspace.')
+      }
+      return data
+    } catch (err) {
+      setHierarchyError(err.message || 'Could not load departments')
+      throw err
+    } finally {
+      setHierarchyLoading(false)
+    }
+  }, [hierarchy.departments?.length])
+
+  useEffect(() => {
+    if (!user?.isOrgAdmin || user?.accountType !== 'company') return
+    api.getTeamMembers({ silent: true }).then((data) => {
+      if (data?.members?.length) return
+      refreshTeam()
+    }).catch(() => refreshTeam())
+  }, [user?.isOrgAdmin, user?.accountType, refreshTeam])
+
+  useEffect(() => {
+    if (!user?.isOrgAdmin || user?.accountType !== 'company') return
+    if (activeTab === 'members' || activeTab === 'teams') {
+      loadHierarchy()
+    }
+  }, [activeTab, user?.isOrgAdmin, user?.accountType, loadHierarchy])
+
+  const teamMap = useMemo(() => buildTeamMap(hierarchy.departments), [hierarchy.departments])
+  const teamOptions = useMemo(() => buildTeamOptions(hierarchy.departments), [hierarchy.departments])
 
   const setTab = (tab) => {
     onNavigate?.('team', { teamTab: tab }, { replace: true })
@@ -159,14 +215,31 @@ export default function TeamPanel({ onNavigate, panelOptions = {} }) {
               user={user}
               teamMembers={teamMembers}
               orgLeadTags={orgLeadTags}
+              teamMap={teamMap}
+              teamOptions={teamOptions}
               refreshTeam={refreshTeam}
               updateMemberPermissions={updateMemberPermissions}
               onInviteClick={() => setInviteOpen(true)}
               onNavigateTab={setTab}
+              onNotice={showToast}
             />
           )}
           {activeTab === 'teams' && (
-            <TeamsDepartmentsTab teamMembers={teamMembers} onMembersChanged={refreshTeam} />
+            <TeamsDepartmentsTab
+              hierarchy={hierarchy}
+              loading={hierarchyLoading}
+              error={hierarchyError}
+              sql={hierarchy.sql}
+              teamMembers={teamMembers}
+              onRefresh={() => loadHierarchy({ force: true })}
+              onHierarchyChange={setHierarchy}
+              updateMemberPermissions={updateMemberPermissions}
+              onMembersChanged={async () => {
+                await refreshTeam()
+                await loadHierarchy({ force: true })
+              }}
+              onNotice={showToast}
+            />
           )}
           {activeTab === 'permissions' && (
             <PermissionsTab teamMembers={teamMembers} />
@@ -191,9 +264,12 @@ export default function TeamPanel({ onNavigate, panelOptions = {} }) {
         open={inviteOpen}
         onClose={() => setInviteOpen(false)}
         user={user}
+        teamOptions={teamOptions}
         inviteTeamMember={inviteTeamMember}
-        onSuccess={() => {
-          refreshTeam()
+        updateMemberPermissions={updateMemberPermissions}
+        onSuccess={async () => {
+          await refreshTeam()
+          await loadHierarchy({ force: true })
           showToast('Invite sent successfully')
         }}
       />

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { api } from '../../../lib/api'
 import { C, inviteDomainFromUser } from './settingsTheme'
 import { PrimaryButton, SettingsInput, SettingsSelect } from './SettingsUi'
@@ -10,30 +10,24 @@ const INVITE_ROLES = [
   { id: 'marketing_manager', sqlRole: 'manager', marketingRole: 'manager', label: 'Marketing manager' },
 ]
 
-export default function InviteMemberDrawer({ open, onClose, user, inviteTeamMember, onSuccess }) {
+export default function InviteMemberDrawer({
+  open,
+  onClose,
+  user,
+  teamOptions = [],
+  inviteTeamMember,
+  updateMemberPermissions,
+  onSuccess,
+}) {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [roleId, setRoleId] = useState('rep')
   const [teamKey, setTeamKey] = useState('')
   const [allowExternal, setAllowExternal] = useState(false)
-  const [teams, setTeams] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
   const domain = inviteDomainFromUser(user)
-
-  useEffect(() => {
-    if (!open) return
-    api.getOrgHierarchy().then((data) => {
-      const opts = (data?.departments || []).flatMap((d) =>
-        (d.teams || []).map((t) => ({
-          key: `${t.id}|${d.id}`,
-          label: `${d.name} → ${t.name}`,
-        }))
-      )
-      setTeams(opts)
-    }).catch(() => setTeams([]))
-  }, [open])
 
   const role = useMemo(() => INVITE_ROLES.find((r) => r.id === roleId) || INVITE_ROLES[0], [roleId])
 
@@ -51,19 +45,19 @@ export default function InviteMemberDrawer({ open, onClose, user, inviteTeamMemb
     setLoading(true)
     setError(null)
     try {
-      const data = await inviteTeamMember({
+      await inviteTeamMember({
         email: email.trim(),
         name: name.trim() || undefined,
         canSearch: false,
         pipelineRole: role.pipelineRole,
         marketingRole: role.marketingRole,
       })
-      if (teamKey) {
+      if (teamKey && updateMemberPermissions) {
         const [teamId, departmentId] = teamKey.split('|')
-        const members = data?.members || (await api.getTeamMembers()).members
-        const invited = members.find((m) => m.email?.toLowerCase() === email.trim().toLowerCase())
+        const { members } = await api.getTeamMembers({ silent: true })
+        const invited = (members || []).find((m) => m.email?.toLowerCase() === email.trim().toLowerCase())
         if (invited?.userId) {
-          await api.updateMemberPermissions({
+          await updateMemberPermissions({
             userId: invited.userId,
             sqlRole: role.sqlRole,
             teamId,
@@ -163,7 +157,7 @@ export default function InviteMemberDrawer({ open, onClose, user, inviteTeamMemb
             <span style={{ fontSize: 12, color: C.textSecondary }}>Team</span>
             <SettingsSelect value={teamKey} onChange={(e) => setTeamKey(e.target.value)}>
               <option value="">No team yet</option>
-              {teams.map((t) => (
+              {teamOptions.map((t) => (
                 <option key={t.key} value={t.key}>{t.label}</option>
               ))}
             </SettingsSelect>

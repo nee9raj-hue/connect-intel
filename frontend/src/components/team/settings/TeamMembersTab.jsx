@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { api } from '../../../lib/api'
 import {
   AVATAR_BY_ROLE,
@@ -125,12 +125,14 @@ export default function TeamMembersTab({
   user,
   teamMembers,
   orgLeadTags,
+  teamMap = new Map(),
+  teamOptions = [],
   refreshTeam,
   updateMemberPermissions,
   onInviteClick,
   onNavigateTab,
+  onNotice,
 }) {
-  const [teamMap, setTeamMap] = useState(new Map())
   const [search, setSearch] = useState('')
   const [roleFilter, setRoleFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -138,29 +140,6 @@ export default function TeamMembersTab({
   const [busyId, setBusyId] = useState(null)
   const [roleModal, setRoleModal] = useState(null)
   const [teamModal, setTeamModal] = useState(null)
-  const [teamOptions, setTeamOptions] = useState([])
-
-  const loadHierarchy = useCallback(async () => {
-    try {
-      const data = await api.getOrgHierarchy()
-      setTeamMap(buildTeamMap(data.departments))
-      const opts = (data.departments || []).flatMap((d) =>
-        (d.teams || []).map((t) => ({
-          key: `${t.id}|${d.id}`,
-          label: `${d.name} → ${t.name}`,
-        }))
-      )
-      setTeamOptions(opts)
-    } catch {
-      setTeamMap(new Map())
-      setTeamOptions([])
-    }
-  }, [])
-
-  useEffect(() => {
-    loadHierarchy()
-  }, [loadHierarchy])
-
   const stats = useMemo(() => {
     let admins = 0
     let managers = 0
@@ -247,7 +226,10 @@ export default function TeamMembersTab({
     try {
       await updateMemberPermissions(payload)
       await refreshTeam()
+      onNotice?.(`Role updated for ${member.name}`)
       setRoleModal(null)
+    } catch (err) {
+      onNotice?.(err.message || 'Could not update role', 'error')
     } finally {
       setBusyId(null)
     }
@@ -258,10 +240,17 @@ export default function TeamMembersTab({
     const [teamId, departmentId] = teamKey.split('|')
     setBusyId(member.userId)
     try {
-      await api.assignOrgMemberHierarchy({ userId: member.userId, teamId, departmentId })
+      await updateMemberPermissions({
+        userId: member.userId,
+        sqlRole: member.sqlRole || 'rep',
+        teamId,
+        departmentId,
+      })
       await refreshTeam()
-      await loadHierarchy()
+      onNotice?.(`Team updated for ${member.name}`)
       setTeamModal(null)
+    } catch (err) {
+      onNotice?.(err.message || 'Could not assign team', 'error')
     } finally {
       setBusyId(null)
     }

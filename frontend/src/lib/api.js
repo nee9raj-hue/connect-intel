@@ -439,7 +439,10 @@ export const api = {
       body: { datasetType, rows, addToPipeline, tagIds, filename },
       timeoutMs: 120_000,
     }),
-  getOrgHierarchy: () => request('/api/org/departments'),
+  getOrgHierarchy: ({ skipLeadCounts = false, silent = false } = {}) => {
+    const qs = skipLeadCounts ? '?skipLeadCounts=1' : ''
+    return request(`/api/org/departments${qs}`, {}, { silent })
+  },
   createOrgDepartment: (body) =>
     request('/api/org/departments', { method: 'POST', body }),
   updateOrgDepartment: (body) =>

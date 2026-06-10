@@ -29,7 +29,7 @@ export default defineConfig({
       ? [viteSingleFile(), pwaStubPlugin()]
       : [
           VitePWA({
-            registerType: 'prompt',
+            registerType: 'autoUpdate',
             includeAssets: [
               'connect-intel-hero-logo.png',
               'connect-intel-logo-icon-light.png',
@@ -72,6 +72,9 @@ export default defineConfig({
               ],
             },
             workbox: {
+              skipWaiting: true,
+              clientsClaim: true,
+              cleanupOutdatedCaches: true,
               globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff2}'],
               importScripts: ['chithi-push-sw.js'],
               navigateFallback: '/index.html',
