@@ -29,6 +29,8 @@
     "workers": "node workers/index.mjs",
     "meili:backfill": "node scripts/backfill-meilisearch.mjs",
     "pipeline:backfill": "node scripts/backfill-pipeline-leads.mjs",
+    "activities:backfill": "node scripts/backfill-pipeline-activities.mjs",
+    "activities:indexes": "node scripts/apply-activities-indexes.mjs",
     "enterprise:backfill": "node scripts/backfill-enterprise-crm.mjs",
     "enterprise:setup": "node scripts/run-enterprise-setup.mjs",
     "dash:warm": "node scripts/warm-dashboard-snapshots.mjs",

@@ -29,7 +29,7 @@ export default function CrmActivityLogPanel({ onNavigate, panelOptions = {}, isA
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [expandedFeedId, setExpandedFeedId] = useState(null)
-  const [visibleCount, setVisibleCount] = useState(20)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false)
   const hub = payload?.hub
   const activities = payload?.activities || []
@@ -53,12 +53,11 @@ export default function CrmActivityLogPanel({ onNavigate, panelOptions = {}, isA
     setLoading(true)
     setError(null)
     try {
-      const q = new URLSearchParams({ period })
+      const q = new URLSearchParams({ period, limit: '50', offset: '0' })
       if (memberUserId) q.set('userId', memberUserId)
       if (activityType) q.set('type', activityType)
       const data = await api.getCrmActivityLog(q.toString())
       setPayload(data)
-      setVisibleCount(20)
       setExpandedFeedId(null)
     } catch (err) {
       setError(err.message || 'Could not load activity log')
@@ -66,6 +65,31 @@ export default function CrmActivityLogPanel({ onNavigate, panelOptions = {}, isA
       setLoading(false)
     }
   }, [memberUserId, activityType, period])
+
+  const loadMore = useCallback(async () => {
+    if (loadingMore || !payload?.pagination?.hasMore) return
+    setLoadingMore(true)
+    try {
+      const nextOffset = (payload?.activities?.length || 0)
+      const q = new URLSearchParams({
+        period,
+        limit: '50',
+        offset: String(nextOffset),
+      })
+      if (memberUserId) q.set('userId', memberUserId)
+      if (activityType) q.set('type', activityType)
+      const data = await api.getCrmActivityLog(q.toString())
+      setPayload((prev) => ({
+        ...data,
+        activities: [...(prev?.activities || []), ...(data.activities || [])],
+        hub: prev?.hub || data.hub,
+      }))
+    } catch (err) {
+      setError(err.message || 'Could not load more activity')
+    } finally {
+      setLoadingMore(false)
+    }
+  }, [loadingMore, payload, memberUserId, activityType, period])
 
   useEffect(() => {
     if (!isActive) return undefined
@@ -114,7 +138,7 @@ export default function CrmActivityLogPanel({ onNavigate, panelOptions = {}, isA
   )
 
   const feedItems = useMemo(() => {
-    return activities.slice(0, visibleCount).map((act) => ({
+    return activities.map((act) => ({
       id: act.id || `act-${act.leadId}-${act.createdAt}`,
       kind: 'activity',
       type: act.type,
@@ -126,7 +150,11 @@ export default function CrmActivityLogPanel({ onNavigate, panelOptions = {}, isA
       leadId: act.leadId,
       meta: { typeLabel: ACTIVITY_LABELS[act.type] || act.type },
     }))
-  }, [activities, visibleCount])
+  }, [activities])
+
+  const pagination = payload?.pagination
+  const totalEvents = pagination?.total ?? activities.length
+  const hasMore = pagination?.hasMore ?? false
 
   const filterControls = (
     <>
@@ -271,7 +299,8 @@ export default function CrmActivityLogPanel({ onNavigate, panelOptions = {}, isA
                 <div>
                   <h2>Activity feed</h2>
                   <p>
-                    {activities.length.toLocaleString()} events · {hub?.periodLabel || period}
+                    {totalEvents.toLocaleString()} events · {hub?.periodLabel || period}
+                    {payload?.warming ? ' · refreshing metrics…' : ''}
                   </p>
                 </div>
                 <button type="button" className="ti3-dash-link-btn" onClick={() => navigateHub('pipeline')}>
@@ -289,13 +318,16 @@ export default function CrmActivityLogPanel({ onNavigate, panelOptions = {}, isA
                   }
                 }}
               />
-              {activities.length > visibleCount ? (
+              {hasMore ? (
                 <button
                   type="button"
                   className="ti3-load-more"
-                  onClick={() => setVisibleCount((n) => n + 20)}
+                  onClick={() => void loadMore()}
+                  disabled={loadingMore}
                 >
-                  Load more ({activities.length - visibleCount} remaining)
+                  {loadingMore
+                    ? 'Loading…'
+                    : `Load more (${Math.max(0, totalEvents - activities.length).toLocaleString()} remaining)`}
                 </button>
               ) : null}
             </section>
