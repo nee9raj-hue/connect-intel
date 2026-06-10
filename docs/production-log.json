@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-10T11:25:38.099Z",
-  "updatedAtIst": "10/06/2026, 16:55:38",
+  "updatedAt": "2026-06-10T11:54:38.706Z",
+  "updatedAtIst": "10/06/2026, 17:24:38",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "1be5e79",
+  "currentProductionCommit": "281694a",
   "entries": [
+    {
+      "logId": "20260610-1724-281694a",
+      "commit": "281694a",
+      "commitFull": "281694a35d9fcc1da318de0d823aceea7f76caee",
+      "message": "Rebuild Marketing Hub with indigo v3 UI and new APIs.",
+      "deployedAt": "2026-06-10T11:54:30.893Z",
+      "deployedAtIst": "10/06/2026, 17:24:30",
+      "committedAtIst": "10/06/2026, 17:23:47",
+      "vercelPreviewUrl": "https://connect-intel-g8drpaq1a-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 281694a"
+    },
+    {
+      "logId": "20260610-1656-9ae193f",
+      "commit": "9ae193f",
+      "commitFull": "9ae193f1e02085a8b600503c8cba6a0269811a8b",
+      "message": "chore: production log after useEffect fix deploy",
+      "deployedAt": "2026-06-10T11:26:32.861Z",
+      "deployedAtIst": "10/06/2026, 16:56:32",
+      "committedAtIst": "10/06/2026, 16:55:53",
+      "vercelPreviewUrl": "https://connect-intel-kyqg17mym-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 9ae193f"
+    },
     {
       "logId": "20260610-1655-1be5e79",
       "commit": "1be5e79",
@@ -15,7 +43,7 @@
       "committedAtIst": "10/06/2026, 16:54:26",
       "vercelPreviewUrl": "https://connect-intel-cnecxk3z8-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 1be5e79"
     },
@@ -242,34 +270,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- f88341a"
-    },
-    {
-      "logId": "20260610-1229-fa5d86c",
-      "commit": "fa5d86c",
-      "commitFull": "fa5d86cf08b702ea7873a817f84531aa17126dbc",
-      "message": "Speed up activity log with indexed queries and snapshot reads.",
-      "deployedAt": "2026-06-10T06:59:21.051Z",
-      "deployedAtIst": "10/06/2026, 12:29:21",
-      "committedAtIst": "10/06/2026, 12:28:39",
-      "vercelPreviewUrl": "https://connect-intel-ecefxax7v-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- fa5d86c"
-    },
-    {
-      "logId": "20260610-1219-e6df7b6",
-      "commit": "e6df7b6",
-      "commitFull": "e6df7b6dbf2250dae06a3cba40ecf8974d2400f0",
-      "message": "Route post-login users to /home/dashboard by default.",
-      "deployedAt": "2026-06-10T06:49:07.613Z",
-      "deployedAtIst": "10/06/2026, 12:19:07",
-      "committedAtIst": "10/06/2026, 12:18:27",
-      "vercelPreviewUrl": "https://connect-intel-dx13ig39x-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- e6df7b6"
     }
   ]
 }

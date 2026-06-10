@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 0fad84b
+npm run prod:rollback -- 9ae193f
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 0fad84b
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `1be5e79` |
-| Log updated (IST) | 10/06/2026, 16:55:38 |
+| Commit | `281694a` |
+| Log updated (IST) | 10/06/2026, 17:24:38 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 0fad84b
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 10/06/2026, 16:55:15 | `1be5e79` | fix: import useEffect in TeamMembersTab to stop runtime crash | [preview](https://connect-intel-cnecxk3z8-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1be5e79` | **← LIVE**
+| 10/06/2026, 17:24:30 | `281694a` | Rebuild Marketing Hub with indigo v3 UI and new APIs. | [preview](https://connect-intel-g8drpaq1a-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 281694a` | **← LIVE**
+| 10/06/2026, 16:56:32 | `9ae193f` | chore: production log after useEffect fix deploy | [preview](https://connect-intel-kyqg17mym-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9ae193f` |
+| 10/06/2026, 16:55:15 | `1be5e79` | fix: import useEffect in TeamMembersTab to stop runtime crash | [preview](https://connect-intel-cnecxk3z8-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1be5e79` |
 | 10/06/2026, 16:48:46 | `0fad84b` | Update production log after team hierarchy fix deploy. | [preview](https://connect-intel-4iz84gtqb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0fad84b` |
 | 10/06/2026, 16:48:00 | `db3b924` | Fix team hierarchy assignment and speed up settings loads. | [preview](https://connect-intel-6th7nwwei-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- db3b924` |
 | 10/06/2026, 16:34:35 | `38357bc` | Update production log after settings hub deploy. | [preview](https://connect-intel-224pgdf4j-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 38357bc` |
@@ -61,8 +63,6 @@ npm run prod:rollback -- 0fad84b
 | 10/06/2026, 13:08:10 | `d4e9c16` | Restructure sidebar into Home, CRM/Sales, and Analytics sections. | [preview](https://connect-intel-10vx0iqkb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d4e9c16` |
 | 10/06/2026, 12:38:01 | `18f6ddb` | Harden activity-log bootstrap when pipeline_activities table is missing. | [preview](https://connect-intel-9o788ufkg-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 18f6ddb` |
 | 10/06/2026, 12:32:47 | `f88341a` | Add production bootstrap actions for activity log backfill and snapshot warm. | [preview](https://connect-intel-osx5oguh7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f88341a` |
-| 10/06/2026, 12:29:21 | `fa5d86c` | Speed up activity log with indexed queries and snapshot reads. | [preview](https://connect-intel-ecefxax7v-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- fa5d86c` |
-| 10/06/2026, 12:19:07 | `e6df7b6` | Route post-login users to /home/dashboard by default. | [preview](https://connect-intel-dx13ig39x-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e6df7b6` |
 
 ---
 
