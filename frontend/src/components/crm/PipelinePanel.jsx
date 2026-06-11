@@ -437,14 +437,14 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     return 'Team member'
   }, [effectiveAssigneeFilter, teamMembers, user?.id, user?.name, user?.email])
 
-  const canFilterByOwner =
-    user?.accountType === 'company' && (isOrgAdmin || isTeamManager || teamMembers.length > 0)
+  const canFilterByOwner = isOrgAdmin || isTeamManager
 
   const handleOwnerFilter = useCallback(
     (userId) => {
-      setPipelineAssigneeFilter?.(userId ? String(userId) : null)
+      if (!canFilterByOwner) return
+      setPipelineAssigneeFilter?.(String(userId))
     },
-    [setPipelineAssigneeFilter]
+    [canFilterByOwner, setPipelineAssigneeFilter]
   )
 
   const scopedLeads = useMemo(() => {
