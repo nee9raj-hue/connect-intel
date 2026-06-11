@@ -5,10 +5,14 @@
   --dash-card: #ffffff;
   --dash-border: #e8edf2;
   --dash-border-soft: #f1f5f9;
-  --dash-accent: #ff773d;
   --dash-text: #0f172a;
   --dash-muted: #64748b;
   --dash-secondary: #94a3b8;
+  --dash-link: #516f90;
+  --dash-link-hover: #33475b;
+  --dash-primary: #17191c;
+  --dash-primary-hover: #2b2928;
+  --dash-brand: #ff773d;
   --dash-card-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
   --dash-card-shadow-hover: 0 6px 20px rgba(15, 23, 42, 0.08);
   background: var(--dash-bg);
@@ -142,8 +146,8 @@
 }
 
 .dash-v4-freight__deal:hover {
-  border-color: #ffd4b8;
-  background: #fff4ee;
+  border-color: #cbd5e1;
+  background: #f8fafc;
 }
 
 .dash-v4-freight__deal-title {
@@ -164,15 +168,15 @@
   border: none;
   padding: 0;
   font: inherit;
-  color: inherit;
+  color: var(--dash-link);
   cursor: pointer;
   text-decoration: underline;
-  text-decoration-color: rgba(255, 119, 61, 0.35);
+  text-decoration-color: rgba(100, 116, 139, 0.35);
   text-underline-offset: 2px;
 }
 
 .dash-v4__table-cell-btn:hover {
-  color: var(--dash-accent);
+  color: var(--dash-link-hover);
 }
 
 .dash-v4__stat-row {
@@ -211,7 +215,7 @@
 }
 
 .dash-v4__stat.is-hot {
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06), inset 0 0 0 1px #ffd4b8;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06), inset 0 0 0 1px #cbd5e1;
 }
 
 .dash-v4__stat-label {
@@ -232,17 +236,17 @@
 }
 
 .dash-v4__stat-value.is-hot {
-  color: var(--dash-accent);
+  color: var(--dash-text);
 }
 
 .dash-v4__stat-link {
   font-size: 0.75rem;
-  color: var(--dash-accent);
+  color: var(--dash-link);
   background: none;
   border: none;
   padding: 0;
   cursor: pointer;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .dash-v4__grid {
@@ -290,15 +294,16 @@
 
 .dash-v4__link {
   font-size: 0.75rem;
-  color: var(--dash-accent);
+  color: var(--dash-link);
   background: none;
   border: none;
   padding: 0;
   cursor: pointer;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .dash-v4__link:hover {
+  color: var(--dash-link-hover);
   text-decoration: underline;
 }
 
@@ -319,14 +324,14 @@
 }
 
 .dash-v4__btn--primary {
-  background: var(--dash-accent);
-  border-color: var(--dash-accent);
+  background: var(--dash-primary);
+  border-color: var(--dash-primary);
   color: #fff;
 }
 
 .dash-v4__btn--primary:hover {
-  background: #e5652f;
-  border-color: #e5652f;
+  background: var(--dash-primary-hover);
+  border-color: var(--dash-primary-hover);
 }
 
 .dash-v4__quick-row {
@@ -377,8 +382,8 @@
 }
 
 .dash-v4__badge--follow_up {
-  background: #fff4ee;
-  color: #c05621;
+  background: #fef3c7;
+  color: #92400e;
 }
 
 .dash-v4__stage-row {
@@ -405,19 +410,29 @@
 .dash-v4__stage-fill {
   height: 100%;
   border-radius: 99px;
+  background: #94a3b8;
 }
 
 .dash-v4__stage-fill--new {
-  background: #ff773d;
-}
-.dash-v4__stage-fill--contacted {
   background: #64748b;
 }
+.dash-v4__stage-fill--contacted {
+  background: #3b82f6;
+}
 .dash-v4__stage-fill--follow_up {
-  background: #e5652f;
+  background: #f59e0b;
 }
 .dash-v4__stage-fill--replied {
-  background: #94a3b8;
+  background: #8b5cf6;
+}
+.dash-v4__stage-fill--won {
+  background: #10b981;
+}
+.dash-v4__stage-fill--active_trading {
+  background: #14b8a6;
+}
+.dash-v4__stage-fill--lost {
+  background: #cbd5e1;
 }
 
 .dash-v4__table {
@@ -488,7 +503,7 @@
   width: 72px;
   height: 72px;
   border-radius: 50%;
-  background: conic-gradient(var(--dash-accent) 0 var(--pct), #f1f5f9 var(--pct) 100%);
+  background: conic-gradient(#475569 0 var(--pct), #f1f5f9 var(--pct) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -516,9 +531,9 @@
 }
 
 .dash-v4__insight--opportunity {
-  background: #fff4ee;
-  color: #c05621;
-  border: 1px solid #ffd4b8;
+  background: #f0f9ff;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
 }
 
 .dash-v4__insight--warning {
