@@ -331,11 +331,16 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
   )
 
   useEffect(() => {
-    if (!isMobile || !sidebarOpen) return undefined
+    if (!isMobile || !sidebarOpen) {
+      document.documentElement.removeAttribute('data-gcal-drawer')
+      return undefined
+    }
+    document.documentElement.setAttribute('data-gcal-drawer', 'open')
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     return () => {
       document.body.style.overflow = prev
+      document.documentElement.removeAttribute('data-gcal-drawer')
     }
   }, [isMobile, sidebarOpen])
 
@@ -645,7 +650,7 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
       {isMobile &&
         sidebarOpen &&
         createPortal(
-          <>
+          <div className="gcal-mobile-drawer-layer" role="presentation">
             <button
               type="button"
               className="gcal-sidebar-backdrop gcal-sidebar-backdrop--portal gcal-sidebar-backdrop--visible"
@@ -655,7 +660,7 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
             <aside className="gcal-sidebar gcal-sidebar--drawer gcal-sidebar--portal gcal-sidebar--open">
               {sidebarContent}
             </aside>
-          </>,
+          </div>,
           document.body
         )}
 

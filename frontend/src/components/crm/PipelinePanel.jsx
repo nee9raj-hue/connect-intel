@@ -68,7 +68,6 @@ import { hasActiveTextSelection } from '../../lib/keyboardShortcuts'
 import useIsMobile from '../../hooks/useIsMobile'
 import usePipelineFilterMobile, { usePipelineNarrowViewport } from '../../hooks/usePipelineFilterMobile'
 import MyDayReturnBar from '../overview/MyDayReturnBar'
-import { describeDashboardFilter } from '../../lib/dashboardNavigation'
 import { buildPipelineBreadcrumb, pipelineFilterParts } from '../../lib/pipelineListBreadcrumb'
 import {
   loadPipelineColumnPrefs,
@@ -253,8 +252,6 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const freightOrg = isFreightDealOrg(user)
   const isDealsView = freightOrg && panelOptions?.view === 'deals'
   const dealsStage = panelOptions?.dealStage || 'all'
-
-  const dashboardFilterLabel = useMemo(() => describeDashboardFilter(panelOptions), [panelOptions])
 
   const teamMemberIdsForFilter = useMemo(() => {
     const teamId = panelOptions?.teamId
@@ -720,10 +717,10 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   }, [serverSidePipeline, view, stageListMode, serverFilters, boardColumnLimits])
 
   const filtered = useMemo(() => {
-    const base = serverSidePipeline ? pipelineScopedLeads : scopedLeads
+    const base = scopedLeads
     const closingThisMonth = panelOptions?.closing === 'this-month'
     return applyPipelineFilters(base, {
-      status: serverSidePipeline ? 'all' : pipelineStatusFilter,
+      status: pipelineStatusFilter,
       cities: serverSidePipeline ? [] : getFilterCities(appliedAdvanced),
       states: serverSidePipeline ? [] : getFilterStates(appliedAdvanced),
       contact: appliedAdvanced.contact,
@@ -760,8 +757,6 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     appliedAdvanced,
     appliedSearch,
     smartViewFilters,
-    serverSidePipeline,
-    pipelineScopedLeads,
     effectiveAssigneeFilter,
     panelOptions?.assignedAfter,
     panelOptions?.lastActivity,
@@ -836,12 +831,16 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     const paginated =
       pipelineLoad.hasMore ||
       (pipelineLoad.total > pipelineLoad.loaded && pipelineLoad.loaded > 0)
+    const matchTotal =
+      serverSidePipeline && hasFilters
+        ? pipelineLoad.total ?? showing
+        : showing
     return buildPipelineBreadcrumb({
       total,
       showing: paginated ? 0 : Math.min(showing, pipelineLoad.loaded || showing),
       parts,
       hasActiveFilters: hasFilters,
-      filteredTotal: hasFilters ? showing : null,
+      filteredTotal: hasFilters ? matchTotal : null,
     })
   }, [
     listStatusFilter,
@@ -857,6 +856,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     pipelineLoad.hasMore,
     pipelineLoad.total,
     activeFilterCount,
+    serverSidePipeline,
   ])
 
   const handleLeadStatusChange = useCallback(
@@ -1255,17 +1255,6 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
         } ${useHubSpotList ? 'pipeline-list-workspace' : ''}`}
       >
         <MyDayReturnBar panelOptions={panelOptions} onNavigate={onNavigate} />
-        {dashboardFilterLabel ? (
-          <div className="dash-v4__pipeline-filter" role="status">
-            <span>
-              {panelOptions?.returnTo === 'marketing' ? 'Marketing filter' : 'Dashboard filter'}:{' '}
-              {dashboardFilterLabel}
-            </span>
-            <span className="dash-v4__pipeline-filter-count">
-              {filtered.length.toLocaleString()} lead{filtered.length === 1 ? '' : 's'}
-            </span>
-          </div>
-        ) : null}
         <header className="crm-page-header pipeline-page-header pipeline-v2-header">
           <div className="pipeline-v2-header__row">
             {!usePipelineNarrow && !isDealsView ? (
@@ -1376,11 +1365,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               statusOptions={columns}
               resultCount={filtered.length}
               totalCount={
-                serverSidePipeline &&
-                (appliedSearch ||
-                  getFilterCities(appliedAdvanced).length ||
-                  getFilterStates(appliedAdvanced).length ||
-                  effectiveAssigneeFilter)
+                serverSidePipeline && hasActiveServerFilters
                   ? pipelineLoad.total || filtered.length
                   : scopedLeads.length
               }
