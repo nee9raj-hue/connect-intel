@@ -4,7 +4,10 @@ import {
   locationMatchesField,
   normalizeLocationKey,
 } from '../../../lib/pipelineLeadLocation.js'
-import { leadHasCallablePhone } from './phoneUtils'
+import {
+  pipelineEntryMatchesOwnerFilter,
+  pipelineOwnerUserId,
+} from '../../../lib/pipelineOwner.js'
 import { leadHasSendableEmail, leadDisplayName, leadEmailBounced } from './emailUtils'
 
 export const CONTACT_FILTER_OPTIONS = [
@@ -84,12 +87,14 @@ export function getFilterStates(filters) {
 }
 
 /**
- * Match a lead to the pipeline Owner filter (assigned rep shown in the table).
+ * Match a lead to the pipeline Owner filter (assignee when set, else saver).
  */
+export function leadOwnerUserId(lead) {
+  return pipelineOwnerUserId(lead)
+}
+
 export function leadMatchesAssignee(lead, assigneeUserId) {
-  if (!assigneeUserId) return true
-  if (assigneeUserId === '__unassigned__') return !lead?.assignedToUserId
-  return String(lead?.assignedToUserId || '') === String(assigneeUserId)
+  return pipelineEntryMatchesOwnerFilter(lead, assigneeUserId)
 }
 
 function matchesAnyLocationField(value, filterList) {

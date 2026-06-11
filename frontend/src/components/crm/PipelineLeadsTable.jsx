@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { formatCrmDate, getStatusMeta } from '../../lib/crmConstants'
 import { formatDateTime } from '../../lib/crmUiConstants'
-import { getLeadCity, getLeadState } from '../../lib/pipelineFilters'
+import { getLeadCity, getLeadState, leadOwnerUserId } from '../../lib/pipelineFilters'
 import { hasActiveTextSelection } from '../../lib/keyboardShortcuts'
 import { getLeadEmail, leadHasSendableEmail } from '../../lib/emailUtils'
 import LeadPhoneCall from './LeadPhoneCall'
@@ -32,7 +32,7 @@ function resolveLeadTags(lead, tagById) {
 }
 
 function resolveOwnerName(lead, teamMembers) {
-  const id = lead.assignedToUserId
+  const id = leadOwnerUserId(lead)
   if (!id) return 'No owner'
   const m = (teamMembers || []).find((t) => t.userId === id)
   return m?.name || 'Team member'
@@ -402,14 +402,15 @@ function renderPipelineCell(colId, lead, ctx) {
           )}
         </td>
       )
-    case 'owner':
+    case 'owner': {
+      const ownerId = leadOwnerUserId(lead)
       return (
         <td key={colId} className="pipeline-hs-td pipeline-hs-td--owner">
-          {canFilterByOwner && lead.assignedToUserId ? (
+          {canFilterByOwner && ownerId ? (
             <button
               type="button"
               className="pipeline-owner-cell pipeline-owner-cell--link"
-              onClick={() => onOwnerFilter?.(lead.assignedToUserId)}
+              onClick={() => onOwnerFilter?.(ownerId)}
             >
               <span className="pipeline-owner-avatar" aria-hidden>
                 {initialsFor(ownerName)}
@@ -421,15 +422,14 @@ function renderPipelineCell(colId, lead, ctx) {
               <span className="pipeline-owner-avatar" aria-hidden>
                 {initialsFor(ownerName)}
               </span>
-              <span
-                className={`pipeline-hs-cell-text ${lead.assignedToUserId ? '' : 'pipeline-hs-muted'}`}
-              >
+              <span className={`pipeline-hs-cell-text ${ownerId ? '' : 'pipeline-hs-muted'}`}>
                 {ownerName}
               </span>
             </span>
           )}
         </td>
       )
+    }
     case 'activity':
       return (
         <td key={colId} className="pipeline-hs-td pipeline-hs-td--activity">
