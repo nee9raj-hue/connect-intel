@@ -1,7 +1,7 @@
 import { formatDealValue } from '../../lib/crmTimeline'
 import { formatDateTime } from '../../lib/crmUiConstants'
 
-const ACCENT = '#3730a3'
+const ACCENT = '#FF773D'
 
 export function HubCommandBar({ items = [], onAction }) {
   return (

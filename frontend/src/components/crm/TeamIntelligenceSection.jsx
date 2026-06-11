@@ -571,7 +571,7 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
                             {m.tasksCompleted ? ` / ${m.tasksCompleted}✓` : ''}
                           </td>
                           <td className="tabular">{m.meetings}</td>
-                          <td className="tabular font-semibold text-[#00a4bd]">{m.activitiesTotal}</td>
+                          <td className="tabular font-semibold text-[#FF773D]">{m.activitiesTotal}</td>
                           <td className="text-[0.75rem]">{formatShortDate(m.lastActiveAt)}</td>
                         </tr>
                         {expandedMember === m.userId ? (

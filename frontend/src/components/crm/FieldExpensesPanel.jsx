@@ -225,7 +225,7 @@ export default function FieldExpensesPanel({ onNavigate }) {
                     <td>
                       <button
                         type="button"
-                        className="text-[#0091ae] hover:underline text-left"
+                        className="text-[#FF773D] hover:underline text-left"
                         onClick={() => openPipelineLead?.(v.leadId, 'schedule')}
                       >
                         {v.leadName}
@@ -248,7 +248,7 @@ export default function FieldExpensesPanel({ onNavigate }) {
                     <td className="text-right">
                       <button
                         type="button"
-                        className="text-xs font-semibold text-[#0091ae] hover:underline"
+                        className="text-xs font-semibold text-[#FF773D] hover:underline"
                         onClick={() => openEdit(v)}
                       >
                         Edit

@@ -537,7 +537,7 @@ function wrapInteractiveCanvasRow(trHtml, blockIndex, block, renderOpts) {
   const selected = renderOpts.selectedBlockIndex === blockIndex
   const blockLabel = CANVAS_BLOCK_LABELS[block?.type] || block?.type || 'Section'
   const selStyle = selected
-    ? 'outline:2px solid #0d9488;outline-offset:-2px;background-color:rgba(13,148,136,0.1);'
+    ? 'outline:2px solid #FF773D;outline-offset:-2px;background-color:rgba(255,119,61,0.1);'
     : ''
   const attrs = `data-ci-block-index="${blockIndex}" data-ci-block-label="${escapeHtml(blockLabel)}" data-ci-block-selectable="true" title="Click to edit ${escapeHtml(blockLabel)}"`
   const cls = `ci-canvas-block-row${selected ? ' is-selected' : ''}`

@@ -31,7 +31,7 @@ export function mergeBrandKit(design = {}) {
 export default function MarketingBrandKit({ open, onClose, onSave }) {
   const [kit, setKit] = useState({
     logoUrl: '',
-    primaryColor: '#3730a3',
+    primaryColor: '#FF773D',
     backgroundColor: '#f4f6f8',
     contentBackground: '#ffffff',
     fontFamily: 'Helvetica, Arial, sans-serif',

@@ -1,13 +1,13 @@
-/* Connect Intel — Home Dashboard v4 (indigo, role-aware) */
+/* Connect Intel — Home Dashboard v4 (orange + slate brand) */
 
 .dash-v4 {
-  --dash-bg: #f5f5f3;
+  --dash-bg: #f5f8fa;
   --dash-card: #ffffff;
   --dash-border: rgba(0, 0, 0, 0.09);
-  --dash-accent: #3730a3;
-  --dash-text: #111111;
-  --dash-muted: #999999;
-  --dash-secondary: #666666;
+  --dash-accent: #ff773d;
+  --dash-text: #33475b;
+  --dash-muted: #64748b;
+  --dash-secondary: #516f90;
   background: var(--dash-bg);
   min-height: 100%;
   color: var(--dash-text);
@@ -67,11 +67,11 @@
   gap: 12px;
   margin: 0 0 8px;
   padding: 8px 12px;
-  background: #eef2ff;
-  border: 0.5px solid rgba(55, 48, 163, 0.2);
+  background: #fff4ee;
+  border: 0.5px solid rgba(255, 119, 61, 0.25);
   border-radius: 8px;
   font-size: 12px;
-  color: #3730a3;
+  color: #ff773d;
 }
 
 .dash-v4__pipeline-filter-count {
@@ -376,7 +376,7 @@
 .dash-v4__stage-bar {
   height: 8px;
   border-radius: 4px;
-  background: #eeedfe;
+  background: #f1f5f9;
   overflow: hidden;
 }
 
@@ -386,16 +386,16 @@
 }
 
 .dash-v4__stage-fill--new {
-  background: #3730a3;
+  background: #ff773d;
 }
 .dash-v4__stage-fill--contacted {
-  background: #0d9488;
+  background: #64748b;
 }
 .dash-v4__stage-fill--follow_up {
-  background: #f59e0b;
+  background: #e5652f;
 }
 .dash-v4__stage-fill--replied {
-  background: #7c3aed;
+  background: #94a3b8;
 }
 
 .dash-v4__table {
@@ -441,8 +441,8 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: #eeedfe;
-  color: #3c3489;
+  background: #f1f5f9;
+  color: #64748b;
   font-size: 10px;
   font-weight: 500;
   display: flex;
@@ -488,8 +488,8 @@
 }
 
 .dash-v4__insight--opportunity {
-  background: #eeedfe;
-  color: #3c3489;
+  background: #fff4ee;
+  color: #c05621;
 }
 
 .dash-v4__insight--warning {

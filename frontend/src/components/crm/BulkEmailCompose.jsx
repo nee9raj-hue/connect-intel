@@ -481,7 +481,7 @@ export default function BulkEmailCompose({
             </p>
             <div className="h-1.5 rounded-full bg-[#cbd6e2] overflow-hidden">
               <div
-                className="h-full bg-[#00a4bd] transition-all duration-300"
+                className="h-full bg-[#FF773D] transition-all duration-300"
                 style={{
                   width: `${Math.min(
                     100,

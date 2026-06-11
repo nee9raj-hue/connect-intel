@@ -309,7 +309,7 @@ function RecipientRow({ row, expanded, onToggle, onOpenLead }) {
             <button
               type="button"
               onClick={onToggle}
-              className="font-semibold text-blue-700 hover:underline"
+              className="font-semibold text-[#FF773D] hover:underline"
             >
               {row.clicks}
             </button>
@@ -410,7 +410,7 @@ function KpiRecipientsPopup({
         <button
           type="button"
           onClick={() => onViewInPipeline(filter, filtered.map((r) => r.leadId).filter(Boolean))}
-          className="w-full text-xs font-semibold py-2 bg-[#3730a3] text-white rounded-lg hover:bg-[#312e81]"
+          className="w-full text-xs font-semibold py-2 bg-[#FF773D] text-white rounded-lg hover:bg-[#e5652f]"
         >
           View in pipeline ({filtered.length})
         </button>
@@ -743,7 +743,7 @@ function CampaignDetailReport({
             <KpiTile
               label={`Clicked${stats.clickRate ? ` (${stats.clickRate}%)` : ''}`}
               value={stats.uniqueClicks ?? 0}
-              accent="text-blue-700"
+              accent="text-[#FF773D]"
               active={filter === 'clicked'}
               onClick={() => openKpi('clicked', 'Clicked')}
             />

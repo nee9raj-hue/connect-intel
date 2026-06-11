@@ -256,7 +256,7 @@ export default function MarketingSmartListBuilder({
 
           <button
             type="button"
-            className="text-xs font-semibold text-[#0091ae] hover:underline"
+            className="text-xs font-semibold text-[#FF773D] hover:underline"
             onClick={() => setShowAdvanced((v) => !v)}
           >
             {showAdvanced ? 'Hide custom rules' : 'Customize rules'}

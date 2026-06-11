@@ -126,7 +126,7 @@ function DraggableBlockCard({
       onDragEnd={onDragEnd}
       className={`ci-card p-3 transition-colors ${
         isDragging ? 'opacity-50' : ''
-      } ${isDropTarget ? 'ring-2 ring-[#0d9488] ring-offset-2' : ''}`}
+      } ${isDropTarget ? 'ring-2 ring-[#FF773D] ring-offset-2' : ''}`}
     >
       <div className="flex items-center justify-between gap-2 mb-2">
         <div className="flex items-center gap-2 min-w-0">

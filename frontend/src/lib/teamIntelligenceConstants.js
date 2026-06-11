@@ -1,14 +1,14 @@
 import { formatDate } from './dateLocale.js'
 
 export const INTEL_CHART_COLORS = [
-  '#00a4bd',
-  '#ff7a59',
+  '#FF773D',
+  '#64748B',
+  '#e5652f',
+  '#94a3b8',
   '#516f90',
-  '#25d366',
-  '#f5c518',
-  '#7c3aed',
-  '#647185',
-  '#e85d75',
+  '#ffd4b8',
+  '#475569',
+  '#cbd5e1',
 ]
 
 export function formatDelta(delta) {

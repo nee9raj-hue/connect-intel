@@ -44,7 +44,7 @@ export default function CampaignSendProgress({ campaignId, enabled = true, class
         </span>
       </div>
       <div className="h-2 rounded-full bg-[#cbd6e2] overflow-hidden">
-        <div className="h-full bg-[#00a4bd] transition-all duration-300" style={{ width: `${pct}%` }} />
+        <div className="h-full bg-[#FF773D] transition-all duration-300" style={{ width: `${pct}%` }} />
       </div>
       <p className="text-[#516f90] tabular-nums">
         {progress.sent} delivered

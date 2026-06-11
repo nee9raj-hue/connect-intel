@@ -1,6 +1,6 @@
 /** CSS/SVG charts — avoids recharts bundler breakage with Vite 8 / Rolldown. */
 
-const MIX_COLORS = ['#00a4bd', '#ff7a59', '#516f90', '#25d366', '#f5c518', '#7c3aed', '#647185', '#e85d75']
+const MIX_COLORS = ['#FF773D', '#64748B', '#e5652f', '#94a3b8', '#516f90', '#ffd4b8', '#475569', '#cbd5e1']
 
 export function ActivityMixPie({ data = [] }) {
   if (!data.length) {
@@ -51,12 +51,12 @@ export function ActivityTrendChart({ data = [] }) {
     <div className="intel-stacked-chart">
       {data.map((day) => {
         const segments = [
-          { key: 'email', val: day.email, color: '#00a4bd' },
-          { key: 'call', val: day.call, color: '#ff7a59' },
-          { key: 'whatsapp', val: day.whatsapp, color: '#25d366' },
-          { key: 'meeting', val: day.meeting, color: '#516f90' },
-          { key: 'task', val: day.task, color: '#f5c518' },
-          { key: 'note', val: day.note, color: '#7c3aed' },
+          { key: 'email', val: day.email, color: '#64748B' },
+          { key: 'call', val: day.call, color: '#FF773D' },
+          { key: 'whatsapp', val: day.whatsapp, color: '#e5652f' },
+          { key: 'meeting', val: day.meeting, color: '#94a3b8' },
+          { key: 'task', val: day.task, color: '#516f90' },
+          { key: 'note', val: day.note, color: '#ffd4b8' },
         ].filter((s) => s.val > 0)
         const barH = Math.max(day.count ? 8 : 2, (day.count / max) * 100)
         return (
@@ -146,7 +146,7 @@ export function PipelineFunnelChart({ rows = [], onClick }) {
   )
 }
 
-export function Sparkline({ data = [], color = '#00a4bd', height = 32, className = '' }) {
+export function Sparkline({ data = [], color = '#FF773D', height = 32, className = '' }) {
   const values = (data || []).map((d) => Number(d.value ?? d) || 0)
   if (!values.length) {
     return <svg className={`ti2-sparkline ti2-sparkline--empty ${className}`.trim()} height={height} aria-hidden />
@@ -185,7 +185,7 @@ export function HealthRadial({ score = 0, size = 140, factors = [] }) {
   const r = (size - 12) / 2
   const c = 2 * Math.PI * r
   const offset = c - (pct / 100) * c
-  const tone = pct >= 75 ? '#00a4bd' : pct >= 50 ? '#f5a623' : '#e85d75'
+  const tone = pct >= 75 ? '#FF773D' : pct >= 50 ? '#64748B' : '#e5652f'
 
   return (
     <div className="ti2-health-radial">
@@ -227,7 +227,7 @@ export function HealthRadial({ score = 0, size = 140, factors = [] }) {
   )
 }
 
-export function TrendLineChart({ data = [], color = '#00a4bd', label = 'Activity' }) {
+export function TrendLineChart({ data = [], color = '#FF773D', label = 'Activity' }) {
   if (!data.length) return <p className="dashboard-empty">No trend data yet.</p>
   const values = data.map((d) => Number(d.value) || 0)
   const max = Math.max(1, ...values)

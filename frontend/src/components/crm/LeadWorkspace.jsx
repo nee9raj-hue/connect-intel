@@ -851,8 +851,8 @@ export default function LeadWorkspace({
             )}
 
             {lead.tradingProfile?.firstShipmentAt || lead.tradingProfile?.active ? (
-              <section className="rounded-xl border border-teal-100 bg-teal-50/50 p-3 space-y-2">
-                <h3 className="text-xs font-semibold uppercase text-teal-800">Active trading</h3>
+              <section className="rounded-xl border border-[#ffd4b8] bg-[#fff4ee]/80 p-3 space-y-2">
+                <h3 className="text-xs font-semibold uppercase text-[#c05621]">Active trading</h3>
                 <div className="grid grid-cols-2 gap-2 text-xs text-gray-700">
                   <div>
                     <span className="text-gray-500 block">First shipment</span>
@@ -899,7 +899,7 @@ export default function LeadWorkspace({
                   <button
                     type="button"
                     onClick={() => onNavigate('active-customers')}
-                    className="text-xs font-semibold text-teal-800 underline"
+                    className="text-xs font-semibold text-[#FF773D] underline"
                   >
                     Active customers dashboard
                   </button>
@@ -1329,7 +1329,7 @@ export default function LeadWorkspace({
                       <button
                         type="button"
                         onClick={() => setEditingVisitMeetingId(m.id)}
-                        className="mt-1 text-[#0091ae] font-semibold hover:underline"
+                        className="mt-1 text-[#FF773D] font-semibold hover:underline"
                       >
                         Edit visit & travel
                       </button>

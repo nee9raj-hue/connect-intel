@@ -279,7 +279,7 @@ export default function FieldVisitRecordForm({
                 <button
                   type="button"
                   onClick={() => setDistanceHint(null)}
-                  className="text-[10px] font-semibold text-[#0091ae] hover:underline"
+                  className="text-[10px] font-semibold text-[#FF773D] hover:underline"
                 >
                   Dismiss
                 </button>

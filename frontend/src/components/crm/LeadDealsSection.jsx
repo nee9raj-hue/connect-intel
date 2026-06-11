@@ -76,7 +76,7 @@ function DealRow({
               {meta.label}
             </span>
             {freightOrg && deal.freight?.customerType && deal.freight.customerType !== 'spot_rfq' && (
-              <span className="inline-block px-1.5 py-0.5 rounded border text-[10px] font-semibold uppercase bg-teal-50 text-teal-800 border-teal-200">
+              <span className="inline-block px-1.5 py-0.5 rounded border text-[10px] font-semibold uppercase bg-[#fff4ee] text-[#c05621] border-[#ffd4b8]">
                 {typeMeta.shortLabel}
               </span>
             )}

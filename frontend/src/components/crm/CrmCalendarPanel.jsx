@@ -472,7 +472,7 @@ function MonthView({ anchor, events, onSelect, onSelectDay }) {
                   <button
                     type="button"
                     onClick={() => onSelectDay(day, dayEvents)}
-                    className="text-xs font-semibold text-[#0091ae] hover:underline px-1"
+                    className="text-xs font-semibold text-[#FF773D] hover:underline px-1"
                   >
                     +{dayEvents.length - 3} more
                   </button>
@@ -513,7 +513,7 @@ function StatusPill({ status }) {
   const map = {
     upcoming: 'bg-emerald-100 text-emerald-800',
     past: 'bg-gray-200 text-gray-600',
-    completed: 'bg-blue-100 text-blue-800',
+    completed: 'bg-[#f1f5f9] text-[#64748B]',
   }
   return (
     <span className={`text-xs font-bold uppercase px-1.5 py-0.5 rounded-full ${map[status] || map.past}`}>

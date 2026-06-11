@@ -221,7 +221,7 @@ export default function ContactDetailEditor({
                       <p className="text-xs text-[#516f90] mt-0.5">
                         {[match.title, match.company].filter(Boolean).join(' · ') || '—'}
                       </p>
-                      <p className="text-xs text-[#0091ae] truncate mt-1">{match.linkedin}</p>
+                      <p className="text-xs text-[#FF773D] truncate mt-1">{match.linkedin}</p>
                       {match.reason && (
                         <p className="text-xs text-[#7c98b6] mt-1 leading-snug">{match.reason}</p>
                       )}

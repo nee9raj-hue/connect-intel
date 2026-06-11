@@ -160,7 +160,7 @@ function RepView({ data, onAction, onLead }) {
                 {data.thisWeek?.achieved || 0} / {data.thisWeek?.target || 25}
               </div>
               {data.thisWeek?.vsLastWeekPct != null ? (
-                <div style={{ fontSize: 11, color: '#3730a3' }}>+{data.thisWeek.vsLastWeekPct}% vs last week</div>
+                <div style={{ fontSize: 11, color: '#FF773D' }}>+{data.thisWeek.vsLastWeekPct}% vs last week</div>
               ) : null}
             </div>
           </div>

@@ -1,14 +1,14 @@
-/** Marketing Hub V3 — design tokens (indigo, no orange). */
+/** Marketing Hub V3 — design tokens (orange + slate brand). */
 
 export const MH = {
-  pageBg: '#f5f5f3',
+  pageBg: '#f5f8fa',
   cardBg: '#ffffff',
   border: 'rgba(0, 0, 0, 0.09)',
-  accent: '#3730a3',
-  accentTint: '#eeedfe',
-  text: '#111111',
-  textSecondary: '#666666',
-  textMuted: '#999999',
+  accent: '#FF773D',
+  accentTint: '#fff4ee',
+  text: '#33475b',
+  textSecondary: '#64748b',
+  textMuted: '#94a3b8',
   danger: '#dc2626',
   topBarH: 52,
   tabBarH: 40,
@@ -19,14 +19,14 @@ export const CAMPAIGN_STATUS = {
   scheduled: { bg: '#e6f1fb', color: '#0c447c', label: 'Scheduled' },
   draft: { bg: '#f0f0ee', color: '#666666', label: 'Draft' },
   stopped: { bg: '#fcebeb', color: '#791f1f', label: 'Stopped' },
-  active: { bg: '#eeedfe', color: '#3c3489', label: 'Active' },
+  active: { bg: '#fff4ee', color: '#c05621', label: 'Active' },
   sent: { bg: '#eaf3de', color: '#27500a', label: 'Completed' },
 }
 
 export const CAMPAIGN_ICON_TINTS = [
-  { bg: '#eeedfe', color: '#3c3489' },
-  { bg: '#e6f1fb', color: '#0c447c' },
-  { bg: '#e1f5ee', color: '#085041' },
+  { bg: '#fff4ee', color: '#c05621' },
+  { bg: '#f1f5f9', color: '#64748b' },
+  { bg: '#fff4ee', color: '#FF773D' },
 ]
 
 export function campaignInitials(name) {

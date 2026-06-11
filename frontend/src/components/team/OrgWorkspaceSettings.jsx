@@ -162,7 +162,7 @@ export default function OrgWorkspaceSettings({ user, onUserUpdated }) {
                     <span className="text-sm font-semibold text-[#33475b]">
                       {def.label}
                       {customized ? (
-                        <span className="ml-2 text-xs font-medium text-[#0091ae] uppercase">
+                        <span className="ml-2 text-xs font-medium text-[#FF773D] uppercase">
                           Custom
                         </span>
                       ) : null}
@@ -180,7 +180,7 @@ export default function OrgWorkspaceSettings({ user, onUserUpdated }) {
             type="button"
             disabled={saving || !Object.keys(overrides).length}
             onClick={resetOverrides}
-            className="mt-3 text-xs font-semibold text-[#0091ae] hover:underline disabled:opacity-40"
+            className="mt-3 text-xs font-semibold text-[#FF773D] hover:underline disabled:opacity-40"
           >
             Reset to preset defaults
           </button>
