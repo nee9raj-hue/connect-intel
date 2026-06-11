@@ -177,7 +177,8 @@ export default function LeadWorkspace({
     setError(null)
     setNotice(null)
     const pendingTab = consumePendingLeadTab(lead.id)
-    setTab(pendingTab || 'overview')
+    const validTab = TABS.some((t) => t.id === pendingTab) ? pendingTab : null
+    setTab(validTab || 'overview')
     setSenderCompany(user?.organizationName || user?.company || '')
   }, [lead.id, user?.organizationName, user?.company, consumePendingLeadTab])
 

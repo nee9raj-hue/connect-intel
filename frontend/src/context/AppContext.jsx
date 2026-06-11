@@ -889,7 +889,7 @@ export function AppProvider({ children }) {
 
   const consumePendingLeadTab = useCallback((leadId) => {
     const pending = pendingLeadOpenRef.current
-    if (pending.leadId === leadId && pending.tab) {
+    if (pending.leadId != null && String(pending.leadId) === String(leadId) && pending.tab) {
       pendingLeadOpenRef.current = { leadId: null, tab: null }
       return pending.tab
     }

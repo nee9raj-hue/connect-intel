@@ -147,8 +147,8 @@ function matchesContactFilter(lead, contact) {
   }
 }
 
-export function leadMatchesSearch(lead, query) {
-  const raw = String(query || '').trim()
+function leadMatchesSearchTerm(lead, rawTerm) {
+  const raw = String(rawTerm || '').trim()
   if (!raw) return true
 
   const q = raw.toLowerCase()
@@ -166,6 +166,24 @@ export function leadMatchesSearch(lead, query) {
   if (city.includes(q) || state.includes(q) || title.includes(q)) return true
   if (qDigits.length >= 4 && phoneDigits.includes(qDigits)) return true
   return false
+}
+
+/** Match one query string, or any comma-separated name/term (OR). */
+export function leadMatchesSearch(lead, query) {
+  const raw = String(query || '').trim()
+  if (!raw) return true
+
+  if (raw.includes(',')) {
+    const terms = raw
+      .split(',')
+      .map((t) => t.trim())
+      .filter(Boolean)
+    if (terms.length > 1) {
+      return terms.some((term) => leadMatchesSearchTerm(lead, term))
+    }
+  }
+
+  return leadMatchesSearchTerm(lead, raw)
 }
 
 const MS_DAY = 86400000

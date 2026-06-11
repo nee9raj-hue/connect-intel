@@ -162,9 +162,11 @@
 
 .pipeline-hs-name-stack {
   min-width: 0;
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  position: relative;
 }
 
 .pipeline-hs-row--v2 .pipeline-hs-td {
@@ -180,8 +182,9 @@
 }
 
 .pipeline-hs-table-wrap--v2 .pipeline-hs-td--name {
-  width: 22%;
-  min-width: 200px;
+  width: 16%;
+  min-width: 150px;
+  max-width: 220px;
 }
 
 .pipeline-hs-table-wrap--v2 .pipeline-hs-th--company,
@@ -205,31 +208,44 @@
 }
 
 .pipeline-hs-name-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  position: relative;
   min-width: 0;
-  min-height: 1.35rem;
+  width: 100%;
+  min-height: 1.25rem;
 }
 
 .pipeline-hs-name-row .pipeline-hs-name-link {
-  flex: 1;
-  min-width: 0;
+  display: inline-block;
+  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   text-align: left;
+  vertical-align: top;
 }
 
 .pipeline-row-hover-actions {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 1px);
+  z-index: 5;
   display: flex;
   align-items: center;
   gap: 2px;
-  flex-shrink: 0;
+  flex-wrap: nowrap;
   visibility: hidden;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.12s ease;
+  background: #f5f8fa;
+  border: 1px solid #eaf0f6;
+  border-radius: 4px;
+  padding: 2px 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.pipeline-hs-row--v2:hover {
+  z-index: 2;
 }
 
 .pipeline-hs-row--v2:hover .pipeline-row-hover-actions {

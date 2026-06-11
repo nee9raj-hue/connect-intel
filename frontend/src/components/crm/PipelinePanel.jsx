@@ -416,6 +416,14 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
 
   const [workspaceLead, setWorkspaceLead] = useState(null)
 
+  const openPipelineLeadRow = useCallback(
+    (lead, tab = null) => {
+      if (lead) setWorkspaceLead(lead)
+      openPipelineLead(lead?.id, tab)
+    },
+    [openPipelineLead]
+  )
+
   useEffect(() => {
     if (!bulkNotice) return
     const timer = setTimeout(() => setBulkNotice(null), 5000)
@@ -475,17 +483,19 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const findLeadInLists = useCallback(
     (leadId) => {
       if (!leadId) return null
-      const fromSaved = savedLeads.find((l) => l.id === leadId)
-      if (fromSaved) return fromSaved
+      const id = String(leadId)
+      const match = (l) => String(l?.id) === id
+      const fromScoped = pipelineScopedLeads.find(match)
+      if (fromScoped) return fromScoped
       if (boardLeadsByStatus) {
         for (const leads of Object.values(boardLeadsByStatus)) {
-          const found = (leads || []).find((l) => l.id === leadId)
+          const found = (leads || []).find(match)
           if (found) return found
         }
       }
       return null
     },
-    [savedLeads, boardLeadsByStatus]
+    [pipelineScopedLeads, boardLeadsByStatus]
   )
 
   const listLead = useMemo(
@@ -1471,7 +1481,10 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               leads={filtered}
               selectedId={pipelineLeadId}
               selectedIds={selectedIds}
-              onSelect={openPipelineLead}
+              onSelect={(leadId) => {
+                const lead = findLeadInLists(leadId) || filtered.find((l) => String(l.id) === String(leadId))
+                openPipelineLeadRow(lead || { id: leadId })
+              }}
               onToggleSelect={toggleSelect}
               onSelectAllVisible={selectAllVisible}
               visibleColumns={tableColumns}
@@ -1481,10 +1494,10 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               onStatusChange={handleLeadStatusChange}
               onOwnerFilter={handleOwnerFilter}
               canFilterByOwner={canFilterByOwner}
-              onQuickCall={(lead) => openPipelineLead(lead.id, 'calls')}
-              onQuickEmail={(lead) => openPipelineLead(lead.id, 'emails')}
-              onQuickTask={(lead) => openPipelineLead(lead.id, 'tasks')}
-              onQuickWhatsApp={(lead) => openPipelineLead(lead.id, 'whatsapp')}
+              onQuickCall={(lead) => openPipelineLeadRow(lead, 'overview')}
+              onQuickEmail={(lead) => openPipelineLeadRow(lead, 'email')}
+              onQuickTask={(lead) => openPipelineLeadRow(lead, 'schedule')}
+              onQuickWhatsApp={(lead) => openPipelineLeadRow(lead, 'whatsapp')}
               canAssign={canAssign}
               onDeleteLead={async (lead) => {
                 if (!window.confirm(`Remove ${lead.firstName || lead.company || 'this lead'} from pipeline?`)) {
