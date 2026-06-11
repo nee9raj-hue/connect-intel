@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { formatDateTime } from '../../lib/crmUiConstants'
@@ -14,7 +14,9 @@ import {
   calendarRangeForView,
   formatDayKey,
   formatEventTime,
+  formatEventTimeRange,
   getMiniMonthGrid,
+  personInitials,
   getMonthGrid,
   getWeekDays,
   groupEventsByDay,
@@ -28,10 +30,10 @@ import { clearCalendarCache, getCalendarCache, setCalendarCache } from '../../li
 import MyDayReturnBar from '../overview/MyDayReturnBar'
 
 const VIEW_OPTIONS = [
-  { id: 'schedule', label: 'Schedule' },
-  { id: 'day', label: 'Day' },
-  { id: 'week', label: 'Week' },
-  { id: 'month', label: 'Month' },
+  { id: 'schedule', label: 'Schedule', mobileIcon: 'schedule' },
+  { id: 'day', label: 'Day', mobileIcon: 'day' },
+  { id: 'week', label: 'Week', mobileIcon: 'week' },
+  { id: 'month', label: 'Month', mobileIcon: 'month' },
 ]
 
 const WEEKDAY_LABELS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
@@ -48,7 +50,7 @@ function kindColor(kind) {
 }
 
 export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
-  const { openPipelineLead, calendarFocus, clearCalendarFocus } = useApp()
+  const { openPipelineLead, calendarFocus, clearCalendarFocus, user } = useApp()
   const isMobile = useIsMobile()
   const upcomingOnly = Boolean(panelOptions?.upcomingOnly)
 
@@ -66,12 +68,22 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [createOpen, setCreateOpen] = useState(false)
   const [viewMenuOpen, setViewMenuOpen] = useState(false)
+  const [monthPickerOpen, setMonthPickerOpen] = useState(false)
+  const [syncOpen, setSyncOpen] = useState(false)
   const [kindFilters, setKindFilters] = useState(() =>
     Object.fromEntries(CALENDAR_FILTER_OPTIONS.map((o) => [o.id, true]))
   )
 
   const createRef = useRef(null)
   const viewMenuRef = useRef(null)
+  const monthPickerRef = useRef(null)
+  const syncRef = useRef(null)
+  const fabRef = useRef(null)
+
+  const userInitial = useMemo(
+    () => personInitials(user?.name || user?.email?.split('@')[0]),
+    [user?.name, user?.email]
+  )
 
   useEffect(() => {
     if (panelOptions?.upcomingOnly || panelOptions?.focusToday) {
@@ -116,6 +128,11 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
     const onDocClick = (e) => {
       if (createRef.current && !createRef.current.contains(e.target)) setCreateOpen(false)
       if (viewMenuRef.current && !viewMenuRef.current.contains(e.target)) setViewMenuOpen(false)
+      if (monthPickerRef.current && !monthPickerRef.current.contains(e.target)) setMonthPickerOpen(false)
+      if (syncRef.current && !syncRef.current.contains(e.target)) setSyncOpen(false)
+      if (fabRef.current && !fabRef.current.contains(e.target) && createRef.current && !createRef.current.contains(e.target)) {
+        setCreateOpen(false)
+      }
     }
     document.addEventListener('mousedown', onDocClick)
     return () => document.removeEventListener('mousedown', onDocClick)
@@ -301,76 +318,134 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
     onNavigate?.('pipeline')
   }
 
+  const monthPickerOptions = useMemo(() => {
+    const base = new Date(anchor.getFullYear(), anchor.getMonth(), 1)
+    return Array.from({ length: 12 }, (_, i) => {
+      const d = new Date(base.getFullYear(), base.getMonth() + i - 4, 1)
+      return d
+    })
+  }, [anchor])
+
   return (
-    <div className="panel-shell crm-calendar-panel gcal-root relative">
+    <div className={`panel-shell crm-calendar-panel gcal-root relative${isMobile ? ' gcal-root--mobile' : ''}`}>
       <MyDayReturnBar panelOptions={panelOptions} onNavigate={onNavigate} />
 
-      <header className="gcal-toolbar">
-        <div className="gcal-toolbar__brand">
-          <button
-            type="button"
-            className="gcal-toolbar__menu-btn"
-            aria-label="Open menu"
-            onClick={() => setSidebarOpen(true)}
-          >
-            ☰
-          </button>
-          <div className="gcal-logo">
-            <span className="gcal-logo__icon" aria-hidden>
-              {anchor.getDate()}
-            </span>
-            <span className="gcal-logo__text">Calendar</span>
-          </div>
-        </div>
-
-        <button type="button" className="gcal-btn-today" onClick={goToday}>
-          Today
-        </button>
-
-        <div className="gcal-nav">
-          <button type="button" className="gcal-nav__btn" aria-label="Previous" onClick={() => shiftAnchor(-1)}>
-            ‹
-          </button>
-          <button type="button" className="gcal-nav__btn" aria-label="Next" onClick={() => shiftAnchor(1)}>
-            ›
-          </button>
-        </div>
-
-        <h1 className="gcal-toolbar__title">{headerLabel}</h1>
-
-        <div className="gcal-toolbar__spacer" />
-
-        {!upcomingOnly && (
-          <div className="gcal-view-select" ref={viewMenuRef}>
+      <header className={`gcal-toolbar${isMobile ? ' gcal-toolbar--mobile' : ''}`}>
+        {isMobile ? (
+          <>
             <button
               type="button"
-              className="gcal-view-select__btn"
-              onClick={() => setViewMenuOpen((o) => !o)}
-              aria-expanded={viewMenuOpen}
+              className="gcal-toolbar__menu-btn"
+              aria-label="Open menu"
+              onClick={() => setSidebarOpen(true)}
             >
-              {viewLabel} ▾
+              ☰
             </button>
-            {viewMenuOpen && (
-              <div className="gcal-view-select__menu" role="menu">
-                {VIEW_OPTIONS.map((v) => (
-                  <button
-                    key={v.id}
-                    type="button"
-                    role="menuitem"
-                    className={`gcal-view-select__item${effectiveView === v.id ? ' gcal-view-select__item--active' : ''}`}
-                    onClick={() => {
-                      setView(v.id)
-                      setViewMenuOpen(false)
-                    }}
-                  >
-                    {v.label}
-                  </button>
-                ))}
+            <div className="gcal-mobile-month-picker" ref={monthPickerRef}>
+              <button
+                type="button"
+                className="gcal-mobile-month-btn"
+                onClick={() => setMonthPickerOpen((o) => !o)}
+                aria-expanded={monthPickerOpen}
+              >
+                {anchor.toLocaleDateString(undefined, { month: 'long' })} ▾
+              </button>
+              {monthPickerOpen && (
+                <div className="gcal-mobile-month-menu" role="menu">
+                  {monthPickerOptions.map((d) => (
+                    <button
+                      key={d.toISOString()}
+                      type="button"
+                      role="menuitem"
+                      className={`gcal-mobile-month-menu__item${
+                        d.getMonth() === anchor.getMonth() && d.getFullYear() === anchor.getFullYear()
+                          ? ' gcal-mobile-month-menu__item--active'
+                          : ''
+                      }`}
+                      onClick={() => {
+                        setAnchor(d)
+                        setMonthPickerOpen(false)
+                      }}
+                    >
+                      {d.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="gcal-toolbar__spacer" />
+            <button type="button" className="gcal-mobile-today-btn" onClick={goToday} aria-label="Go to today">
+              <span className="gcal-mobile-today-btn__icon">{new Date().getDate()}</span>
+            </button>
+            <span className="gcal-mobile-avatar" aria-hidden>
+              {userInitial}
+            </span>
+          </>
+        ) : (
+          <>
+            <div className="gcal-toolbar__brand">
+              <div className="gcal-logo">
+                <span className="gcal-logo__icon" aria-hidden>
+                  {anchor.getDate()}
+                </span>
+                <span className="gcal-logo__text">Calendar</span>
+              </div>
+            </div>
+
+            <button type="button" className="gcal-btn-today" onClick={goToday}>
+              Today
+            </button>
+
+            <div className="gcal-nav">
+              <button type="button" className="gcal-nav__btn" aria-label="Previous" onClick={() => shiftAnchor(-1)}>
+                ‹
+              </button>
+              <button type="button" className="gcal-nav__btn" aria-label="Next" onClick={() => shiftAnchor(1)}>
+                ›
+              </button>
+            </div>
+
+            <h1 className="gcal-toolbar__title">{headerLabel}</h1>
+
+            <div className="gcal-toolbar__spacer" />
+
+            {!upcomingOnly && (
+              <div className="gcal-view-select" ref={viewMenuRef}>
+                <button
+                  type="button"
+                  className="gcal-view-select__btn"
+                  onClick={() => setViewMenuOpen((o) => !o)}
+                  aria-expanded={viewMenuOpen}
+                >
+                  {viewLabel} ▾
+                </button>
+                {viewMenuOpen && (
+                  <div className="gcal-view-select__menu" role="menu">
+                    {VIEW_OPTIONS.map((v) => (
+                      <button
+                        key={v.id}
+                        type="button"
+                        role="menuitem"
+                        className={`gcal-view-select__item${effectiveView === v.id ? ' gcal-view-select__item--active' : ''}`}
+                        onClick={() => {
+                          setView(v.id)
+                          setViewMenuOpen(false)
+                        }}
+                      >
+                        {v.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
-          </div>
+          </>
         )}
       </header>
+
+      {isMobile && effectiveView === 'month' && !upcomingOnly && (
+        <MobileMonthStrip anchor={anchor} onSelect={setAnchor} />
+      )}
 
       <div className="gcal-layout">
         <button
@@ -380,30 +455,52 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
           onClick={() => setSidebarOpen(false)}
         />
 
-        <aside className={`gcal-sidebar${sidebarOpen ? ' gcal-sidebar--open' : ''}`}>
-          <div className="gcal-create-wrap" ref={createRef}>
-            <button type="button" className="gcal-create-btn" onClick={() => setCreateOpen((o) => !o)}>
-              <span className="gcal-create-btn__plus">+</span>
-              Create
-            </button>
-            {createOpen && (
-              <div className="gcal-create-menu">
-                <button type="button" className="gcal-create-menu__item" onClick={handleCreatePipeline}>
-                  Task or meeting in pipeline
-                </button>
-                {!googleCal?.calendarScope && (
-                  <button type="button" className="gcal-create-menu__item" onClick={connectGoogleCalendar}>
-                    Connect Google Calendar
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
+        <aside className={`gcal-sidebar${sidebarOpen ? ' gcal-sidebar--open' : ''}${isMobile ? ' gcal-sidebar--drawer' : ''}`}>
+          {isMobile && (
+            <div className="gcal-drawer-head">
+              <span className="gcal-drawer-head__logo">Calendar</span>
+            </div>
+          )}
 
-          <MiniCalendar anchor={anchor} onPickDay={goToDay} onMonthChange={setAnchor} />
+          {isMobile && !upcomingOnly && (
+            <div className="gcal-drawer-views">
+              {VIEW_OPTIONS.map((v) => (
+                <button
+                  key={v.id}
+                  type="button"
+                  className={`gcal-drawer-view${effectiveView === v.id ? ' gcal-drawer-view--active' : ''}`}
+                  onClick={() => {
+                    setView(v.id)
+                    setSidebarOpen(false)
+                  }}
+                >
+                  <ViewIcon type={v.mobileIcon} />
+                  <span>{v.label}</span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {!isMobile && (
+            <div className="gcal-create-wrap" ref={createRef}>
+              <button type="button" className="gcal-create-btn" onClick={() => setCreateOpen((o) => !o)}>
+                <span className="gcal-create-btn__plus">+</span>
+                Create
+              </button>
+              {createOpen && (
+                <div className="gcal-create-menu">
+                  <button type="button" className="gcal-create-menu__item" onClick={handleCreatePipeline}>
+                    Task or meeting in pipeline
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {!isMobile && <MiniCalendar anchor={anchor} onPickDay={goToDay} onMonthChange={setAnchor} />}
 
           <div className="gcal-sidebar__section">
-            <p className="gcal-sidebar__heading">My calendars</p>
+            <p className="gcal-sidebar__heading">{isMobile ? user?.email || 'My calendars' : 'My calendars'}</p>
             {CALENDAR_FILTER_OPTIONS.map((opt) => {
               const colors = kindColor(opt.id)
               return (
@@ -419,32 +516,6 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
               )
             })}
           </div>
-
-          {!upcomingOnly && (
-            <div className="gcal-google-sync">
-              {googleCal?.calendarScope ? (
-                <>
-                  <p>Google Calendar connected. CRM meetings sync to Google.</p>
-                  <button type="button" disabled={googleBusy} onClick={syncGoogleCalendar}>
-                    {googleBusy ? 'Syncing…' : 'Sync now'}
-                  </button>
-                  {googleCal.lastSyncAt && (
-                    <p style={{ marginTop: 8, marginBottom: 0, fontSize: 11 }}>
-                      Last sync {formatDateTime(googleCal.lastSyncAt)}
-                    </p>
-                  )}
-                </>
-              ) : (
-                <>
-                  <p>Import Gmail Calendar events and push CRM meetings to Google.</p>
-                  <button type="button" disabled={googleBusy} onClick={connectGoogleCalendar}>
-                    {googleBusy ? 'Connecting…' : 'Connect Google'}
-                  </button>
-                </>
-              )}
-              {googleNotice && <p style={{ marginTop: 8, marginBottom: 0 }}>{googleNotice}</p>}
-            </div>
-          )}
         </aside>
 
         <main className="gcal-main">
@@ -465,7 +536,13 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
           ) : (
             <>
               {effectiveView === 'schedule' && (
-                <ScheduleView events={filteredEvents} onSelect={openEvent} upcomingOnly={upcomingOnly} />
+                <ScheduleView
+                  events={filteredEvents}
+                  onSelect={openEvent}
+                  upcomingOnly={upcomingOnly}
+                  mobile={isMobile}
+                  memberName={memberName}
+                />
               )}
               {effectiveView === 'month' && (
                 <MonthView
@@ -474,6 +551,7 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
                   onSelect={openEvent}
                   onSelectDay={openDay}
                   onGoToDay={goToDay}
+                  mobile={isMobile}
                 />
               )}
               {effectiveView === 'week' && (
@@ -499,14 +577,41 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
         </main>
       </div>
 
-      <button
-        type="button"
-        className="gcal-fab"
-        aria-label="Create"
-        onClick={() => (isMobile ? setSidebarOpen(true) : setCreateOpen(true))}
-      >
-        +
-      </button>
+      {!upcomingOnly && (
+        <GoogleSyncFloater
+          ref={syncRef}
+          open={syncOpen}
+          onToggle={() => setSyncOpen((o) => !o)}
+          googleCal={googleCal}
+          googleBusy={googleBusy}
+          googleNotice={googleNotice}
+          onConnect={connectGoogleCalendar}
+          onSync={syncGoogleCalendar}
+        />
+      )}
+
+      <div className="gcal-fab-wrap" ref={fabRef}>
+        {createOpen && isMobile && (
+          <div className="gcal-create-menu gcal-create-menu--fab">
+            <button type="button" className="gcal-create-menu__item" onClick={handleCreatePipeline}>
+              Task or meeting
+            </button>
+            {!googleCal?.calendarScope && (
+              <button type="button" className="gcal-create-menu__item" onClick={connectGoogleCalendar}>
+                Connect Google
+              </button>
+            )}
+          </div>
+        )}
+        <button
+          type="button"
+          className="gcal-fab"
+          aria-label="Create"
+          onClick={() => setCreateOpen((o) => !o)}
+        >
+          +
+        </button>
+      </div>
 
       {selectedDay && selectedDayEvents.length > 0 && (
         <DayEventsDrawer
@@ -534,6 +639,104 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
     </div>
   )
 }
+
+function ViewIcon({ type }) {
+  return (
+    <span className={`gcal-view-icon gcal-view-icon--${type}`} aria-hidden>
+      {type === 'schedule' && (
+        <>
+          <i />
+          <i />
+        </>
+      )}
+      {type === 'day' && <i />}
+      {type === 'week' && (
+        <>
+          <i />
+          <i />
+          <i />
+        </>
+      )}
+      {type === 'month' && (
+        <>
+          <i />
+          <i />
+          <i />
+          <i />
+        </>
+      )}
+    </span>
+  )
+}
+
+function MobileMonthStrip({ anchor, onSelect }) {
+  const months = useMemo(() => {
+    const base = new Date(anchor.getFullYear(), anchor.getMonth(), 1)
+    return Array.from({ length: 7 }, (_, i) => new Date(base.getFullYear(), base.getMonth() + i - 3, 1))
+  }, [anchor])
+
+  return (
+    <div className="gcal-month-strip">
+      {months.map((d) => {
+        const active = d.getMonth() === anchor.getMonth() && d.getFullYear() === anchor.getFullYear()
+        return (
+          <button
+            key={d.toISOString()}
+            type="button"
+            className={`gcal-month-strip__chip${active ? ' gcal-month-strip__chip--active' : ''}`}
+            onClick={() => onSelect(d)}
+          >
+            {d.toLocaleDateString(undefined, { month: 'short' })}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+const GoogleSyncFloater = forwardRef(function GoogleSyncFloater(
+  { open, onToggle, googleCal, googleBusy, googleNotice, onConnect, onSync },
+  ref
+) {
+  const connected = Boolean(googleCal?.calendarScope)
+  return (
+    <div className="gcal-sync-float" ref={ref}>
+      <button
+        type="button"
+        className={`gcal-sync-float__btn${connected ? ' gcal-sync-float__btn--on' : ''}`}
+        onClick={onToggle}
+        aria-label={connected ? 'Google Calendar connected' : 'Connect Google Calendar'}
+        title={connected ? 'Google Calendar' : 'Connect Google'}
+      >
+        <span className="gcal-sync-float__g">G</span>
+        {connected && <span className="gcal-sync-float__dot" />}
+      </button>
+      {open && (
+        <div className="gcal-sync-float__pop">
+          {connected ? (
+            <>
+              <p className="gcal-sync-float__title">Google connected</p>
+              <button type="button" disabled={googleBusy} onClick={onSync}>
+                {googleBusy ? 'Syncing…' : 'Sync now'}
+              </button>
+              {googleCal?.lastSyncAt && (
+                <p className="gcal-sync-float__meta">Last {formatDateTime(googleCal.lastSyncAt)}</p>
+              )}
+            </>
+          ) : (
+            <>
+              <p className="gcal-sync-float__title">Google Calendar</p>
+              <button type="button" disabled={googleBusy} onClick={onConnect}>
+                {googleBusy ? '…' : 'Connect'}
+              </button>
+            </>
+          )}
+          {googleNotice && <p className="gcal-sync-float__notice">{googleNotice}</p>}
+        </div>
+      )}
+    </div>
+  )
+})
 
 function MiniCalendar({ anchor, onPickDay, onMonthChange }) {
   const grid = getMiniMonthGrid(anchor)
@@ -595,13 +798,13 @@ function MiniCalendar({ anchor, onPickDay, onMonthChange }) {
   )
 }
 
-function MonthView({ anchor, eventsByDay, onSelect, onSelectDay, onGoToDay }) {
+function MonthView({ anchor, eventsByDay, onSelect, onSelectDay, onGoToDay, mobile = false }) {
   const grid = getMonthGrid(anchor)
   const month = anchor.getMonth()
-  const maxVisible = 3
+  const maxVisible = mobile ? 2 : 3
 
   return (
-    <div className="gcal-month">
+    <div className={`gcal-month${mobile ? ' gcal-month--mobile' : ''}`}>
       <div className="gcal-month__head">
         {WEEKDAY_LABELS.map((d) => (
           <div key={d} className="gcal-month__head-cell">
@@ -632,7 +835,7 @@ function MonthView({ anchor, eventsByDay, onSelect, onSelectDay, onGoToDay }) {
               </div>
               <div className="gcal-month__events">
                 {dayEvents.slice(0, maxVisible).map((ev) => (
-                  <MonthEventChip key={ev.id} event={ev} onSelect={onSelect} />
+                  <MonthEventChip key={ev.id} event={ev} onSelect={onSelect} mobile={mobile} />
                 ))}
                 {dayEvents.length > maxVisible && (
                   <button
@@ -661,8 +864,25 @@ function MonthView({ anchor, eventsByDay, onSelect, onSelectDay, onGoToDay }) {
   )
 }
 
-function MonthEventChip({ event, onSelect }) {
+function MonthEventChip({ event, onSelect, mobile = false }) {
   const colors = kindColor(event.kind)
+  if (mobile) {
+    const filled = event.kind === 'meeting' || event.kind === 'google'
+    return (
+      <button
+        type="button"
+        className={`gcal-mobile-month-pill${filled ? ' gcal-mobile-month-pill--fill' : ''}`}
+        style={{
+          borderColor: colors.border,
+          color: filled ? '#fff' : colors.border,
+          background: filled ? colors.dot : '#fff',
+        }}
+        onClick={() => onSelect(event)}
+      >
+        {event.title}
+      </button>
+    )
+  }
   return (
     <button type="button" className="gcal-month__event" onClick={() => onSelect(event)}>
       <span className="gcal-month__event-dot" style={{ background: colors.dot }} />
@@ -783,59 +1003,115 @@ function TimeGridView({ mode, anchor, eventsByDay, onSelect, onGoToDay }) {
   )
 }
 
-function ScheduleView({ events, onSelect, upcomingOnly }) {
+function weekHeaderLabel(day) {
+  const week = getWeekDays(day)
+  const a = week[0]
+  const b = week[6]
+  const fmt = (d, opts) => d.toLocaleDateString(undefined, opts).toUpperCase()
+  if (a.getMonth() === b.getMonth()) {
+    return `${fmt(a, { month: 'long' })} ${a.getDate()} – ${b.getDate()}`
+  }
+  return `${fmt(a, { month: 'short', day: 'numeric' })} – ${fmt(b, { month: 'short', day: 'numeric' })}`
+}
+
+function ScheduleView({ events, onSelect, upcomingOnly, mobile = false, memberName }) {
   const grouped = groupEventsByDay(events)
   const keys = [...grouped.keys()].sort()
   const todayKey = new Intl.DateTimeFormat('en-CA').format(new Date())
+  let lastWeekKey = ''
 
   if (!keys.length) return null
 
   return (
-    <div className="gcal-schedule">
+    <div className={`gcal-schedule${mobile ? ' gcal-schedule--mobile' : ''}`}>
       {keys.map((key) => {
         const day = new Date(`${key}T12:00:00`)
         const isToday = key === todayKey
         const dayEvents = sortEventsByTime(grouped.get(key))
+        const weekKey = formatDayKey(getWeekDays(day)[0])
+        const showWeekHeader = mobile && weekKey !== lastWeekKey
+        if (showWeekHeader) lastWeekKey = weekKey
+
+        const pendingTasks = dayEvents.filter((e) => e.kind === 'task' && e.timeStatus !== 'completed')
 
         return (
-          <section key={key} className="gcal-schedule__day">
-            <div className="gcal-schedule__day-label">
-              <span className="gcal-schedule__weekday">
-                {day.toLocaleDateString(undefined, { weekday: 'short' })}
-              </span>
-              <span className={`gcal-schedule__dom${isToday ? ' gcal-schedule__dom--today' : ''}`}>
-                {day.getDate()}
-              </span>
-            </div>
-            <div className="gcal-schedule__events">
-              {dayEvents.map((ev) => {
-                const colors = kindColor(ev.kind)
-                return (
-                  <button
-                    key={ev.id}
-                    type="button"
-                    className="gcal-schedule__event"
-                    onClick={() => onSelect(ev)}
-                  >
-                    <span className="gcal-schedule__event-bar" style={{ background: colors.dot }} />
-                    <span className="gcal-schedule__event-time">
-                      {upcomingOnly && isToday && new Date(ev.scheduledAt).getTime() < Date.now()
-                        ? 'Now'
-                        : formatEventTime(ev.scheduledAt)}
-                    </span>
-                    <span className="gcal-schedule__event-body">
-                      <span className="gcal-schedule__event-title">{ev.title}</span>
-                      <span className="gcal-schedule__event-meta">
-                        {ev.kind === 'google'
-                          ? 'Google Calendar'
-                          : [ev.leadName, ev.company].filter(Boolean).join(' · ') || kindColor(ev.kind).label}
-                      </span>
-                    </span>
+          <div key={key}>
+            {showWeekHeader && <p className="gcal-schedule__week-head">{weekHeaderLabel(day)}</p>}
+            <section className="gcal-schedule__day">
+              <div className="gcal-schedule__day-label">
+                <span className={`gcal-schedule__weekday${isToday ? ' gcal-schedule__weekday--today' : ''}`}>
+                  {day.toLocaleDateString(undefined, { weekday: 'short' })}
+                </span>
+                <span className={`gcal-schedule__dom${isToday ? ' gcal-schedule__dom--today' : ''}`}>
+                  {isToday ? <span className="gcal-schedule__dom-circle">{day.getDate()}</span> : day.getDate()}
+                </span>
+              </div>
+              <div className="gcal-schedule__events">
+                {isToday && mobile && <div className="gcal-schedule__now-line" aria-hidden />}
+                {mobile && pendingTasks.length > 0 && (
+                  <button type="button" className="gcal-schedule__tasks-pill" onClick={() => onSelect(pendingTasks[0])}>
+                    ✓ {pendingTasks.length} pending task{pendingTasks.length === 1 ? '' : 's'}
                   </button>
-                )
-              })}
-            </div>
-          </section>
+                )}
+                {dayEvents.map((ev) => {
+                  const colors = kindColor(ev.kind)
+                  const avatarName =
+                    ev.kind === 'google'
+                      ? 'G'
+                      : memberName?.(ev.assignedToUserId) || ev.leadName || colors.label
+
+                  if (mobile) {
+                    return (
+                      <button
+                        key={ev.id}
+                        type="button"
+                        className="gcal-schedule__card"
+                        style={{ borderColor: colors.border }}
+                        onClick={() => onSelect(ev)}
+                      >
+                        <div className="gcal-schedule__card-body">
+                          <span className="gcal-schedule__card-title" style={{ color: colors.border }}>
+                            {ev.title}
+                          </span>
+                          <span className="gcal-schedule__card-time">
+                            {formatEventTimeRange(ev)}
+                            {ev.location ? ` · ${ev.location}` : ''}
+                          </span>
+                        </div>
+                        <span className="gcal-schedule__card-avatar" style={{ background: colors.dot }}>
+                          {personInitials(avatarName)}
+                        </span>
+                      </button>
+                    )
+                  }
+
+                  return (
+                    <button
+                      key={ev.id}
+                      type="button"
+                      className="gcal-schedule__event"
+                      onClick={() => onSelect(ev)}
+                    >
+                      <span className="gcal-schedule__event-bar" style={{ background: colors.dot }} />
+                      <span className="gcal-schedule__event-time">
+                        {upcomingOnly && isToday && new Date(ev.scheduledAt).getTime() < Date.now()
+                          ? 'Now'
+                          : formatEventTime(ev.scheduledAt)}
+                      </span>
+                      <span className="gcal-schedule__event-body">
+                        <span className="gcal-schedule__event-title">{ev.title}</span>
+                        <span className="gcal-schedule__event-meta">
+                          {ev.kind === 'google'
+                            ? 'Google Calendar'
+                            : [ev.leadName, ev.company].filter(Boolean).join(' · ') || colors.label}
+                        </span>
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+            </section>
+          </div>
         )
       })}
     </div>

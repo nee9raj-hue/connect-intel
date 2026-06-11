@@ -54,6 +54,26 @@ export function formatEventTime(iso) {
   return new Date(iso).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
 }
 
+export function formatEventTimeRange(event) {
+  if (!event?.scheduledAt) return ''
+  const start = new Date(event.scheduledAt)
+  const end = event.endAt ? new Date(event.endAt) : new Date(start.getTime() + eventDurationMs(event))
+  const fmt = (d) => d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
+  const a = fmt(start)
+  const b = fmt(end)
+  return a === b ? a : `${a} – ${b}`
+}
+
+export function personInitials(name) {
+  const parts = String(name || '')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+  if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
+  if (parts[0]) return parts[0].slice(0, 2).toUpperCase()
+  return '?'
+}
+
 export function eventDurationMs(event) {
   if (event?.endAt) {
     const ms = new Date(event.endAt).getTime() - new Date(event.scheduledAt).getTime()
