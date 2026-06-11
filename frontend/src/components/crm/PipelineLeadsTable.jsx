@@ -18,12 +18,6 @@ function initialsFor(name) {
   return (parts[0]?.[0] || '?').toUpperCase()
 }
 
-function avatarHue(name) {
-  let h = 0
-  for (let i = 0; i < (name || '').length; i++) h = (h + name.charCodeAt(i) * 17) % 360
-  return h
-}
-
 function resolveOwnerName(lead, teamMembers) {
   const id = lead.assignedToUserId
   if (!id) return 'No owner'
@@ -277,7 +271,6 @@ export default function PipelineLeadsTable({
             const tagIds = lead.crm?.tagIds || []
             const tags = tagIds.map((id) => tagById?.[id]).filter(Boolean)
             const nameStr = displayName(lead)
-            const hue = avatarHue(nameStr)
 
             return (
               <tr
@@ -299,11 +292,7 @@ export default function PipelineLeadsTable({
                 {col('name') && (
                   <td className="pipeline-hs-td">
                     <div className="pipeline-hs-name-cell pipeline-hs-name-cell--v2">
-                      <span
-                        className="pipeline-hs-avatar"
-                        style={{ background: `hsl(${hue} 45% 90%)`, color: `hsl(${hue} 40% 35%)` }}
-                        aria-hidden
-                      >
+                      <span className="pipeline-hs-avatar" aria-hidden>
                         {(lead.firstName?.[0] || lead.company?.[0] || '?').toUpperCase()}
                       </span>
                       <div className="pipeline-hs-name-stack">
