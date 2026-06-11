@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-11T16:21:00.953Z",
-  "updatedAtIst": "11/06/2026, 21:51:00",
+  "updatedAt": "2026-06-11T16:28:14.443Z",
+  "updatedAtIst": "11/06/2026, 21:58:14",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "599c342",
+  "currentProductionCommit": "90a26a5",
   "entries": [
+    {
+      "logId": "20260611-2158-90a26a5",
+      "commit": "90a26a5",
+      "commitFull": "90a26a5ae5d66b870dbaa6b9ef8318f1b72ff2f7",
+      "message": "style: unify app UI to orange and slate brand colors",
+      "deployedAt": "2026-06-11T16:28:06.782Z",
+      "deployedAtIst": "11/06/2026, 21:58:06",
+      "committedAtIst": "11/06/2026, 21:57:25",
+      "vercelPreviewUrl": "https://connect-intel-oeg92ksxp-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 90a26a5"
+    },
+    {
+      "logId": "20260611-2151-1c36138",
+      "commit": "1c36138",
+      "commitFull": "1c361382a71191a51a83de0e6b874c3da6dfa186",
+      "message": "chore: production log after pipeline hover and filter fixes deploy",
+      "deployedAt": "2026-06-11T16:21:53.287Z",
+      "deployedAtIst": "11/06/2026, 21:51:53",
+      "committedAtIst": "11/06/2026, 21:51:14",
+      "vercelPreviewUrl": "https://connect-intel-5t8k9sado-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 1c36138"
+    },
     {
       "logId": "20260611-2150-599c342",
       "commit": "599c342",
@@ -15,7 +43,7 @@
       "committedAtIst": "11/06/2026, 21:50:12",
       "vercelPreviewUrl": "https://connect-intel-fxce4uln8-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 599c342"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- e89345d"
-    },
-    {
-      "logId": "20260610-1745-39bbe33",
-      "commit": "39bbe33",
-      "commitFull": "39bbe33f222d4bb833255249c550ec49274a1864",
-      "message": "fix: import useEffect in TeamMembersTab to stop Team members crash",
-      "deployedAt": "2026-06-10T12:15:14.377Z",
-      "deployedAtIst": "10/06/2026, 17:45:14",
-      "committedAtIst": "10/06/2026, 17:44:36",
-      "vercelPreviewUrl": "https://connect-intel-h6svnc1tt-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 39bbe33"
-    },
-    {
-      "logId": "20260610-1743-c625be4",
-      "commit": "c625be4",
-      "commitFull": "c625be40a4785ef73ec4e92cd7ded0552a77b42e",
-      "message": "chore: production log after Marketing Hub performance fix deploy",
-      "deployedAt": "2026-06-10T12:13:03.954Z",
-      "deployedAtIst": "10/06/2026, 17:43:03",
-      "committedAtIst": "10/06/2026, 17:42:26",
-      "vercelPreviewUrl": "https://connect-intel-q9s84lmta-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- c625be4"
     }
   ]
 }
