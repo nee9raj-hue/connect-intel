@@ -73,6 +73,21 @@ export function navTargetToOptions(target = {}) {
   if (target.returnTo) options.returnTo = target.returnTo
   if (target.leadTab) options.leadTab = target.leadTab
   if (target.teamTab) options.teamTab = target.teamTab
+  if (target.scopeOwner === 'me') options.scopeOwner = 'me'
+  if (target.hierarchyTeam) options.hierarchyTeam = target.hierarchyTeam
+  if (target.scope === 'all') options.scope = 'all'
+  if (target.stuck) options.stuck = true
+  if (target.scoreMin != null && target.scoreMin !== '') options.scoreMin = Number(target.scoreMin)
+  if (target.closing) options.closing = target.closing
+  if (target.due) options.due = target.due
+  if (target.assignedAfter) options.assignedAfter = target.assignedAfter
+  if (target.lastActivity) options.lastActivity = target.lastActivity
+  if (target.activityFilter) options.activityFilter = target.activityFilter
+  if (target.teamId) options.teamId = target.teamId
+  if (target.wonThisMonth) options.wonThisMonth = true
+  if (target.tasksDueToday) options.tasksDueToday = true
+  if (target.unreadOnly) options.unreadOnly = true
+  if (Array.isArray(target.leadIds) && target.leadIds.length) options.leadIds = [...target.leadIds]
   return options
 }
 

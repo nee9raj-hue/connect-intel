@@ -60,6 +60,117 @@
   align-items: center;
 }
 
+.dash-v4__pipeline-filter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 8px;
+  padding: 8px 12px;
+  background: #eef2ff;
+  border: 0.5px solid rgba(55, 48, 163, 0.2);
+  border-radius: 8px;
+  font-size: 12px;
+  color: #3730a3;
+}
+
+.dash-v4__pipeline-filter-count {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.dash-v4-freight {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 20px 24px;
+}
+
+.dash-v4-freight__grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 1100px) {
+  .dash-v4-freight__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.dash-v4-freight__kpi {
+  background: #fff;
+  border: 0.5px solid var(--dash-border);
+  border-radius: 10px;
+  padding: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dash-v4-freight__kpi:disabled {
+  cursor: default;
+  opacity: 0.85;
+}
+
+.dash-v4-freight__kpi-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--dash-muted);
+  margin: 0 0 4px;
+}
+
+.dash-v4-freight__kpi-value {
+  font-size: 20px;
+  font-weight: 500;
+  margin: 0;
+}
+
+.dash-v4-freight__deal {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: #fafafa;
+  border: 0.5px solid var(--dash-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.dash-v4-freight__deal:hover {
+  border-color: rgba(55, 48, 163, 0.35);
+  background: #fff;
+}
+
+.dash-v4-freight__deal-title {
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.dash-v4-freight__deal-meta {
+  font-size: 11px;
+  color: var(--dash-secondary);
+  margin-bottom: 6px;
+}
+
+.dash-v4__table-cell-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: rgba(55, 48, 163, 0.35);
+  text-underline-offset: 2px;
+}
+
+.dash-v4__table-cell-btn:hover {
+  color: var(--dash-accent);
+}
+
 .dash-v4__stat-row {
   display: grid;
   grid-template-columns: repeat(6, 1fr);

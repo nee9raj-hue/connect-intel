@@ -78,6 +78,13 @@ export function parseAppLocation(search = '', pathname = '/') {
   if (params.get('due')) panelOptions.due = params.get('due')
   if (params.get('closing')) panelOptions.closing = params.get('closing')
   if (params.get('filter')) panelOptions.activityFilter = params.get('filter')
+  if (params.get('team_id')) panelOptions.teamId = params.get('team_id')
+  if (params.get('won_month') === '1') panelOptions.wonThisMonth = true
+  if (params.get('tasks_due') === 'today') panelOptions.tasksDueToday = true
+  if (params.get('unread') === '1') panelOptions.unreadOnly = true
+  if (params.get('last_activity')) panelOptions.lastActivity = params.get('last_activity')
+  const leadIds = params.getAll('leadId').filter(Boolean)
+  if (leadIds.length) panelOptions.leadIds = leadIds
   if (params.get('date')) panelOptions.calendarDate = params.get('date')
   const smartTags = params.getAll('smartTag').filter(Boolean)
   if (smartTags.length) panelOptions.smartTags = smartTags
@@ -236,6 +243,14 @@ export function serializeAppLocation({ panel = 'overview', panelOptions = {}, le
   if (panelOptions.due) params.set('due', String(panelOptions.due))
   if (panelOptions.closing) params.set('closing', String(panelOptions.closing))
   if (panelOptions.activityFilter) params.set('filter', String(panelOptions.activityFilter))
+  if (panelOptions.teamId) params.set('team_id', String(panelOptions.teamId))
+  if (panelOptions.wonThisMonth) params.set('won_month', '1')
+  if (panelOptions.tasksDueToday) params.set('tasks_due', 'today')
+  if (panelOptions.unreadOnly) params.set('unread', '1')
+  if (panelOptions.lastActivity) params.set('last_activity', String(panelOptions.lastActivity))
+  for (const id of panelOptions.leadIds || []) {
+    if (id) params.append('leadId', String(id))
+  }
   if (panelOptions.calendarDate) params.set('date', String(panelOptions.calendarDate))
   for (const tag of panelOptions.smartTags || []) {
     if (tag) params.append('smartTag', String(tag))

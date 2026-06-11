@@ -156,6 +156,47 @@ export function leadMatchesSearch(lead, query) {
 
 const MS_DAY = 86400000
 
+function matchesAssignedAfter(lead, assignedAfter) {
+  if (!assignedAfter) return true
+  const savedAt = lead.savedAt || lead.crm?.savedAt
+  if (!savedAt) return false
+  const savedMs = new Date(savedAt).getTime()
+  if (assignedAfter === 'yesterday') {
+    return savedMs >= Date.now() - MS_DAY
+  }
+  const afterMs = new Date(assignedAfter).getTime()
+  return Number.isFinite(afterMs) ? savedMs >= afterMs : true
+}
+
+function matchesLastActivity(lead, lastActivity) {
+  if (!lastActivity) return true
+  if (lastActivity === 'never') {
+    return !lead.crm?.lastCommunicationAt && !lead.crm?.lastEmailSentAt
+  }
+  return true
+}
+
+function matchesWonThisMonth(lead) {
+  const crm = lead.crm || {}
+  if (crm.status !== 'won') return false
+  const monthStart = new Date()
+  monthStart.setDate(1)
+  monthStart.setHours(0, 0, 0, 0)
+  const wonAt = crm.updatedAt || crm.lastCommunicationAt || crm.wonAt
+  return wonAt ? new Date(wonAt) >= monthStart : true
+}
+
+function matchesTasksDueToday(lead) {
+  const endToday = new Date()
+  endToday.setHours(23, 59, 59, 999)
+  for (const task of lead.crm?.tasks || []) {
+    if (task.status === 'done') continue
+    const due = task.dueAt ? new Date(task.dueAt).getTime() : null
+    if (due && due <= endToday.getTime()) return true
+  }
+  return false
+}
+
 export function applyPipelineFilters(
   leads,
   {
@@ -172,9 +213,16 @@ export function applyPipelineFilters(
     overdueFollowUp = false,
     followUpDue = false,
     closingThisWeek = false,
+    closingThisMonth = false,
     tagIds = [],
     tagMode = 'any',
     smartTags = [],
+    assignedAfter = null,
+    lastActivity = null,
+    wonThisMonth = false,
+    tasksDueToday = false,
+    leadIds = null,
+    teamMemberIds = null,
   } = {}
 ) {
   let list = leads || []
@@ -240,10 +288,12 @@ export function applyPipelineFilters(
     })
   }
 
-  if (closingThisWeek) {
-    const weekEnd = Date.now() + 7 * MS_DAY
+  if (closingThisWeek || closingThisMonth) {
     const start = new Date()
     start.setHours(0, 0, 0, 0)
+    const endMs = closingThisMonth
+      ? new Date(start.getFullYear(), start.getMonth() + 1, 0, 23, 59, 59, 999).getTime()
+      : Date.now() + 7 * MS_DAY
     list = list.filter((l) => {
       const crm = l.crm || {}
       for (const deal of crm.deals || []) {
@@ -251,14 +301,45 @@ export function applyPipelineFilters(
         const close = deal.expectedCloseDate || deal.expectedCloseAt
         if (!close) continue
         const t = new Date(close).getTime()
-        if (t >= start.getTime() && t <= weekEnd) return true
+        if (t >= start.getTime() && t <= endMs) return true
       }
       const legacyClose = crm.expectedCloseDate || crm.expectedCloseAt
       if (legacyClose) {
         const t = new Date(legacyClose).getTime()
-        if (t >= start.getTime() && t <= weekEnd) return true
+        if (t >= start.getTime() && t <= endMs) return true
       }
       return false
+    })
+  }
+
+  if (assignedAfter) {
+    list = list.filter((l) => matchesAssignedAfter(l, assignedAfter))
+  }
+
+  if (lastActivity) {
+    list = list.filter((l) => matchesLastActivity(l, lastActivity))
+  }
+
+  if (wonThisMonth) {
+    list = list.filter((l) => matchesWonThisMonth(l))
+  }
+
+  if (tasksDueToday) {
+    list = list.filter((l) => matchesTasksDueToday(l))
+  }
+
+  const idFilter = Array.isArray(leadIds) ? leadIds.map(String).filter(Boolean) : []
+  if (idFilter.length) {
+    const allowed = new Set(idFilter)
+    list = list.filter((l) => allowed.has(String(l.id)))
+  }
+
+  const teamIds = Array.isArray(teamMemberIds) ? teamMemberIds.map(String).filter(Boolean) : []
+  if (teamIds.length) {
+    const allowed = new Set(teamIds)
+    list = list.filter((l) => {
+      const owner = l.assignedToUserId || l.savedByUserId || l.userId
+      return owner != null && allowed.has(String(owner))
     })
   }
 

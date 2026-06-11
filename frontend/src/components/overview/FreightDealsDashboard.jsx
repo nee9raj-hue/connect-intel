@@ -11,7 +11,7 @@ import {
   sumDealAmounts,
   transportModeLabel,
 } from '../../lib/freightDeals'
-import { DashboardSection, DashboardListRow, DashboardKpiCard } from '../dashboard/dashboardUi'
+import { dashboardNavOptions } from '../../lib/dashboardNavigation'
 
 function formatWeight(kg) {
   if (kg == null || kg === '') return '—'
@@ -19,51 +19,26 @@ function formatWeight(kg) {
   return Number.isFinite(n) ? `${n} kg` : '—'
 }
 
-function DealListBlock({ title, deals, emptyHint, freightOrg, onOpenDeal, onViewAll, viewAllLabel }) {
+function DealRow({ deal, leadId, leadName, company, onOpenDeal }) {
+  const meta = getDealStageMeta(deal.stage, { freightOrg: true })
+  const freight = deal.freight
+  const metaLine = [
+    leadName,
+    company && company !== leadName ? company : null,
+    transportModeLabel(freight?.transportMode),
+    formatWeight(freight?.grossWeightKg),
+    freightRouteLabel(freight),
+    formatDealValue(deal.amount, deal.currency),
+  ]
+    .filter(Boolean)
+    .join(' · ')
+
   return (
-    <div className="space-y-1.5">
-      <div className="flex items-center justify-between gap-2">
-        <h3 className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">{title}</h3>
-        {onViewAll && deals.length > 0 ? (
-          <button
-            type="button"
-            onClick={onViewAll}
-            className="text-[10px] font-semibold text-indigo-700 hover:underline"
-          >
-            {viewAllLabel || 'View all'}
-          </button>
-        ) : null}
-      </div>
-      {deals.length === 0 ? (
-        <p className="text-xs text-gray-500 py-3 border rounded-lg bg-gray-50 px-3">{emptyHint}</p>
-      ) : (
-        <ul className="space-y-1">
-          {deals.map(({ deal, leadId, leadName, company }) => {
-            const meta = getDealStageMeta(deal.stage, { freightOrg: true })
-            const freight = deal.freight
-            const metaLine = [
-              leadName,
-              company && company !== leadName ? company : null,
-              transportModeLabel(freight?.transportMode),
-              formatWeight(freight?.grossWeightKg),
-              freightRouteLabel(freight),
-              formatDealValue(deal.amount, deal.currency),
-            ]
-              .filter(Boolean)
-              .join(' · ')
-            return (
-              <DashboardListRow
-                key={deal.id}
-                title={deal.name}
-                meta={metaLine}
-                badge={meta.label}
-                onClick={() => onOpenDeal(leadId)}
-              />
-            )
-          })}
-        </ul>
-      )}
-    </div>
+    <button type="button" className="dash-v4-freight__deal" onClick={() => onOpenDeal(leadId)}>
+      <div className="dash-v4-freight__deal-title">{deal.name}</div>
+      <div className="dash-v4-freight__deal-meta">{metaLine}</div>
+      <span className="dash-v4__badge dash-v4__badge--follow_up">{meta.label}</span>
+    </button>
   )
 }
 
@@ -107,11 +82,17 @@ export default function FreightDealsDashboard({ user, pipelineSummary, onNavigat
   if (!freightOrg) return null
 
   const goDeals = (dealStage = 'all') => {
-    onNavigate?.('pipeline', { view: 'deals', dealStage })
+    onNavigate?.(
+      'pipeline',
+      dashboardNavOptions({ panel: 'pipeline', view: 'deals', dealStage, returnTo: 'overview' }, user)
+    )
   }
 
   const openDeal = (leadId) => {
-    onNavigate?.('pipeline', { view: 'deals' })
+    onNavigate?.(
+      'pipeline',
+      dashboardNavOptions({ panel: 'pipeline', view: 'deals', returnTo: 'overview' }, user)
+    )
     openPipelineLead(leadId, 'deals')
   }
 
@@ -130,64 +111,93 @@ export default function FreightDealsDashboard({ user, pipelineSummary, onNavigat
   )
 
   return (
-    <DashboardSection
-      title="Freight deals"
-      subtitle="Open RFQs, pipeline value, and closed deals"
-      actionLabel="All open deals"
-      onAction={() => goDeals('all')}
-    >
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 mb-3">
-        <DashboardKpiCard label="Open RFQs" value={rfqCount} onClick={() => goDeals('rfq')} />
-        <DashboardKpiCard label="All open deals" value={openCount} onClick={() => goDeals('all')} />
-        <DashboardKpiCard label="Won deals" value={wonCount} onClick={() => goDeals('won')} />
-        <DashboardKpiCard label="Lost deals" value={lostCount} onClick={() => goDeals('lost')} />
-        <DashboardKpiCard label="Open pipeline value" value={formatDealValue(openValue || 0)} />
-        <DashboardKpiCard
-          label="Won value"
-          value={wonValue > 0 ? formatDealValue(wonValue) : '—'}
-          onClick={wonCount > 0 ? () => goDeals('won') : undefined}
-        />
-      </div>
-
-      {totalWeight > 0 && (
-        <p className="text-[11px] text-gray-500 mb-3">
-          Open RFQ gross weight (loaded deals): {Math.round(totalWeight)} kg
-        </p>
-      )}
-
-      {loading && <p className="text-xs text-gray-500 py-4">Loading deals…</p>}
-
-      {!loading && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <DealListBlock
-            title="Open deals"
-            deals={recentOpen}
-            freightOrg={freightOrg}
-            onOpenDeal={openDeal}
-            onViewAll={openCount > recentOpen.length ? () => goDeals('all') : undefined}
-            viewAllLabel={`View all ${openCount}`}
-            emptyHint="No open freight deals yet. Open a lead → Deals tab → Create deal."
-          />
-          <DealListBlock
-            title="Won deals"
-            deals={recentWon}
-            freightOrg={freightOrg}
-            onOpenDeal={openDeal}
-            onViewAll={wonCount > recentWon.length ? () => goDeals('won') : undefined}
-            viewAllLabel={`View all ${wonCount}`}
-            emptyHint="No won deals yet."
-          />
-          <DealListBlock
-            title="Lost deals"
-            deals={recentLost}
-            freightOrg={freightOrg}
-            onOpenDeal={openDeal}
-            onViewAll={lostCount > recentLost.length ? () => goDeals('lost') : undefined}
-            viewAllLabel={`View all ${lostCount}`}
-            emptyHint="No lost deals yet."
-          />
+    <section className="dash-v4-freight">
+      <div className="dash-v4__card">
+        <div className="dash-v4__card-head">
+          <div>
+            <h3 className="dash-v4__card-title">Freight deals</h3>
+            <p className="dash-v4__card-sub">Open RFQs, pipeline value, and closed deals</p>
+          </div>
+          <button type="button" className="dash-v4__link" onClick={() => goDeals('all')}>
+            All open deals →
+          </button>
         </div>
-      )}
-    </DashboardSection>
+
+        <div className="dash-v4-freight__grid">
+          <button type="button" className="dash-v4-freight__kpi" onClick={() => goDeals('rfq')}>
+            <p className="dash-v4-freight__kpi-label">Open RFQs</p>
+            <p className="dash-v4-freight__kpi-value">{rfqCount}</p>
+          </button>
+          <button type="button" className="dash-v4-freight__kpi" onClick={() => goDeals('all')}>
+            <p className="dash-v4-freight__kpi-label">All open deals</p>
+            <p className="dash-v4-freight__kpi-value">{openCount}</p>
+          </button>
+          <button type="button" className="dash-v4-freight__kpi" onClick={() => goDeals('won')}>
+            <p className="dash-v4-freight__kpi-label">Won deals</p>
+            <p className="dash-v4-freight__kpi-value">{wonCount}</p>
+          </button>
+          <button type="button" className="dash-v4-freight__kpi" onClick={() => goDeals('lost')}>
+            <p className="dash-v4-freight__kpi-label">Lost deals</p>
+            <p className="dash-v4-freight__kpi-value">{lostCount}</p>
+          </button>
+          <button type="button" className="dash-v4-freight__kpi" onClick={() => goDeals('all')}>
+            <p className="dash-v4-freight__kpi-label">Open pipeline value</p>
+            <p className="dash-v4-freight__kpi-value">{formatDealValue(openValue || 0)}</p>
+          </button>
+          <button
+            type="button"
+            className="dash-v4-freight__kpi"
+            onClick={wonCount > 0 ? () => goDeals('won') : undefined}
+            disabled={wonCount <= 0}
+          >
+            <p className="dash-v4-freight__kpi-label">Won value</p>
+            <p className="dash-v4-freight__kpi-value">{wonValue > 0 ? formatDealValue(wonValue) : '—'}</p>
+          </button>
+        </div>
+
+        {totalWeight > 0 ? (
+          <p className="dash-v4__scope" style={{ marginBottom: 12 }}>
+            Open RFQ gross weight (loaded deals): {Math.round(totalWeight)} kg
+          </p>
+        ) : null}
+
+        {loading ? <p className="dash-v4__empty">Loading deals…</p> : null}
+
+        {!loading ? (
+          <div className="dash-v4__grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+            {[
+              { title: 'Open deals', deals: recentOpen, total: openCount, stage: 'all', empty: 'No open freight deals yet.' },
+              { title: 'Won deals', deals: recentWon, total: wonCount, stage: 'won', empty: 'No won deals yet.' },
+              { title: 'Lost deals', deals: recentLost, total: lostCount, stage: 'lost', empty: 'No lost deals yet.' },
+            ].map((col) => (
+              <div key={col.title}>
+                <div className="dash-v4__card-head" style={{ marginBottom: 8 }}>
+                  <h4 className="dash-v4__card-title" style={{ fontSize: 13 }}>{col.title}</h4>
+                  {col.deals.length < col.total ? (
+                    <button type="button" className="dash-v4__link" onClick={() => goDeals(col.stage)}>
+                      View all {col.total} →
+                    </button>
+                  ) : null}
+                </div>
+                {col.deals.length === 0 ? (
+                  <p className="dash-v4__empty">{col.empty}</p>
+                ) : (
+                  col.deals.map(({ deal, leadId, leadName, company }) => (
+                    <DealRow
+                      key={deal.id}
+                      deal={deal}
+                      leadId={leadId}
+                      leadName={leadName}
+                      company={company}
+                      onOpenDeal={openDeal}
+                    />
+                  ))
+                )}
+              </div>
+            ))}
+          </div>
+        ) : null}
+      </div>
+    </section>
   )
 }

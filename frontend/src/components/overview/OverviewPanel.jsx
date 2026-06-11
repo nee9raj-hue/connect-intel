@@ -13,9 +13,7 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
       <div className="panel-body-scroll">
         <HomeDashboard onNavigate={onNavigate} isActive={isActive} />
         {isFreightDealOrg(user) ? (
-          <div className="myday-freight-addon">
-            <FreightDealsDashboard user={user} pipelineSummary={pipelineSummary} onNavigate={onNavigate} />
-          </div>
+          <FreightDealsDashboard user={user} pipelineSummary={pipelineSummary} onNavigate={onNavigate} />
         ) : null}
       </div>
     </div>

@@ -68,6 +68,7 @@ import { hasActiveTextSelection } from '../../lib/keyboardShortcuts'
 import useIsMobile from '../../hooks/useIsMobile'
 import usePipelineFilterMobile, { usePipelineNarrowViewport } from '../../hooks/usePipelineFilterMobile'
 import MyDayReturnBar from '../overview/MyDayReturnBar'
+import { describeDashboardFilter } from '../../lib/dashboardNavigation'
 
 export default function PipelinePanel({ onNavigate, panelOptions }) {
   const {
@@ -90,6 +91,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     refreshTeam,
     bulkUpdatePipeline,
     orgLeadTags,
+    notifications,
   } = useApp()
 
   const [crmSettings, setCrmSettings] = useState(null)
@@ -238,6 +240,28 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const isDealsView = freightOrg && panelOptions?.view === 'deals'
   const dealsStage = panelOptions?.dealStage || 'all'
 
+  const dashboardFilterLabel = useMemo(() => describeDashboardFilter(panelOptions), [panelOptions])
+
+  const teamMemberIdsForFilter = useMemo(() => {
+    const teamId = panelOptions?.teamId
+    if (!teamId) return null
+    const ids = (teamMembers || [])
+      .filter((m) => String(m.teamId) === String(teamId))
+      .map((m) => String(m.userId))
+    return ids.length ? ids : null
+  }, [panelOptions?.teamId, teamMembers])
+
+  const unreadLeadIds = useMemo(() => {
+    if (!panelOptions?.unreadOnly && panelOptions?.activityFilter !== 'unread') return null
+    const ids = [...new Set((notifications || []).filter((n) => n.unread && n.leadId).map((n) => String(n.leadId)))]
+    return ids.length ? ids : ['__none__']
+  }, [notifications, panelOptions?.unreadOnly, panelOptions?.activityFilter])
+
+  const dashboardLeadIds = useMemo(() => {
+    if (panelOptions?.leadIds?.length) return panelOptions.leadIds.map(String)
+    return unreadLeadIds
+  }, [panelOptions?.leadIds, unreadLeadIds])
+
   useEffect(() => {
     const po = panelOptions || {}
     if (po.view === 'deals') {
@@ -253,6 +277,16 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     if (po.scoreMin != null && po.scoreMin !== '') adv.minLeadScore = Number(po.scoreMin)
     if (po.smartTags?.length) adv.smartTags = po.smartTags
 
+    const hasDashExtras =
+      po.assignedAfter ||
+      po.lastActivity ||
+      po.wonThisMonth ||
+      po.tasksDueToday ||
+      po.unreadOnly ||
+      po.activityFilter === 'unread' ||
+      po.teamId ||
+      po.leadIds?.length
+
     const hasAdv =
       po.overdueFollowUp ||
       po.followUpDue ||
@@ -260,15 +294,25 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       po.closing === 'this-month' ||
       po.stuck ||
       po.scoreMin != null ||
-      (po.smartTags?.length > 0)
+      (po.smartTags?.length > 0) ||
+      hasDashExtras
 
     if (hasAdv) {
       setSmartViewId(null)
-      setSmartViewFilters({})
+      const smartExtras = {}
+      if (adv.staleDays != null) smartExtras.staleDays = adv.staleDays
+      if (adv.minLeadScore != null) smartExtras.minLeadScore = adv.minLeadScore
+      setSmartViewFilters(smartExtras)
       setAdvancedFilters(adv)
       setAppliedAdvanced(adv)
       setView('list')
       setListStatusFilter('all')
+    }
+
+    if (po.tasksDueToday || (po.view === 'tasks' && po.due === 'today')) {
+      setView('list')
+      setListStatusFilter('all')
+      setFilter('all')
     }
 
     if (po.status) {
@@ -283,6 +327,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   }, [
     panelOptions?.status,
     panelOptions?.view,
+    panelOptions?.due,
     panelOptions?.overdueFollowUp,
     panelOptions?.followUpDue,
     panelOptions?.closingThisWeek,
@@ -290,6 +335,14 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     panelOptions?.stuck,
     panelOptions?.scoreMin,
     panelOptions?.smartTags,
+    panelOptions?.assignedAfter,
+    panelOptions?.lastActivity,
+    panelOptions?.wonThisMonth,
+    panelOptions?.tasksDueToday,
+    panelOptions?.unreadOnly,
+    panelOptions?.activityFilter,
+    panelOptions?.teamId,
+    panelOptions?.leadIds,
   ])
 
   const dealsStageLabel = useMemo(() => {
@@ -437,10 +490,11 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       cities: getFilterCities(adv).length ? getFilterCities(adv) : undefined,
       states: getFilterStates(adv).length ? getFilterStates(adv) : undefined,
       assigneeUserId: effectiveAssigneeFilter || undefined,
+      teamId: panelOptions?.teamId || undefined,
       tagIds: adv.tagIds?.length ? adv.tagIds : undefined,
       ...pipelineServerFilterExtras(adv, smartViewFilters),
     }),
-    [filter, listStatusFilter, effectiveAssigneeFilter, smartViewFilters]
+    [filter, listStatusFilter, effectiveAssigneeFilter, smartViewFilters, panelOptions?.teamId]
   )
 
   const serverFilters = useMemo(
@@ -452,6 +506,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     () =>
       Boolean(
         serverFilters.assigneeUserId ||
+          serverFilters.teamId ||
           serverFilters.status ||
           serverFilters.q ||
           serverFilters.cities?.length ||
@@ -564,6 +619,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
         : serverSidePipeline
           ? pipelineScopedLeads
           : scopedLeads
+    const closingThisMonth = panelOptions?.closing === 'this-month'
     return applyPipelineFilters(base, {
       status: serverSidePipeline ? 'all' : pipelineStatusFilter,
       cities: serverSidePipeline ? [] : getFilterCities(appliedAdvanced),
@@ -575,7 +631,18 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       smartTags: appliedAdvanced.smartTags,
       overdueFollowUp: appliedAdvanced.overdueFollowUp,
       followUpDue: appliedAdvanced.followUpDue,
-      closingThisWeek: appliedAdvanced.closingThisWeek,
+      closingThisWeek: appliedAdvanced.closingThisWeek && !closingThisMonth,
+      closingThisMonth,
+      minLeadScore: appliedAdvanced.minLeadScore ?? smartViewFilters.minLeadScore,
+      staleDays: appliedAdvanced.staleDays ?? smartViewFilters.staleDays,
+      assignedAfter: panelOptions?.assignedAfter || null,
+      lastActivity: panelOptions?.lastActivity || null,
+      wonThisMonth: Boolean(panelOptions?.wonThisMonth),
+      tasksDueToday: Boolean(
+        panelOptions?.tasksDueToday || (panelOptions?.view === 'tasks' && panelOptions?.due === 'today')
+      ),
+      leadIds: dashboardLeadIds,
+      teamMemberIds: teamMemberIdsForFilter,
       ...smartViewFilters,
     })
   }, [
@@ -587,6 +654,15 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     serverSidePipeline,
     pipelineScopedLeads,
     effectiveAssigneeFilter,
+    panelOptions?.assignedAfter,
+    panelOptions?.lastActivity,
+    panelOptions?.wonThisMonth,
+    panelOptions?.tasksDueToday,
+    panelOptions?.view,
+    panelOptions?.due,
+    panelOptions?.closing,
+    dashboardLeadIds,
+    teamMemberIdsForFilter,
   ])
 
   const applySmartView = useCallback((view) => {
@@ -1005,6 +1081,14 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
         } ${useHubSpotList ? 'pipeline-list-workspace' : ''}`}
       >
         <MyDayReturnBar panelOptions={panelOptions} onNavigate={onNavigate} />
+        {dashboardFilterLabel ? (
+          <div className="dash-v4__pipeline-filter" role="status">
+            <span>Dashboard filter: {dashboardFilterLabel}</span>
+            <span className="dash-v4__pipeline-filter-count">
+              {filtered.length.toLocaleString()} lead{filtered.length === 1 ? '' : 's'}
+            </span>
+          </div>
+        ) : null}
         <header className="crm-page-header pipeline-page-header">
           <div
             className={`crm-page-header-top pipeline-page-header-top ${

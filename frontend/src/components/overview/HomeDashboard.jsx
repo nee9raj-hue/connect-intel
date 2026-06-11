@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
-import { navTargetToOptions } from '../../lib/navConfig'
+import { dashboardNavOptions } from '../../lib/dashboardNavigation'
 import { formatDateTime } from '../../lib/crmUiConstants'
 import '../../styles/dashboard-v4.css'
 
@@ -171,7 +171,7 @@ function RepView({ data, onAction, onLead }) {
           <p className="dash-v4__card-sub">Where to spend time</p>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 12 }}>
             {[
-              { label: 'New leads', value: data.leadFocus?.newLeads, action: data.leadFocusActions?.hot },
+              { label: 'New leads', value: data.leadFocus?.newLeads, action: data.leadFocusActions?.newLeads || { panel: 'pipeline', status: 'new', scopeOwner: 'me', returnTo: 'overview' } },
               { label: 'Hot leads', value: data.leadFocus?.hotLeads, action: { panel: 'pipeline', scoreMin: 70, scopeOwner: 'me', returnTo: 'overview' } },
               { label: 'Uncontacted', value: data.leadFocus?.uncontacted, action: data.leadFocusActions?.uncontacted },
               { label: 'Follow-up due', value: data.leadFocus?.followUpDue, action: data.leadFocusActions?.followUp },
@@ -233,17 +233,35 @@ function ManagerView({ data, onAction, onLead }) {
             </thead>
             <tbody>
               {(data.repPerformance || []).map((r) => (
-                <tr key={r.userId} onClick={() => onAction(r.action)}>
+                <tr key={r.userId}>
                   <td>
-                    <span className="dash-v4__avatar" style={{ display: 'inline-flex', marginRight: 6, width: 24, height: 24, fontSize: 9 }}>
-                      {initials(r.name)}
-                    </span>
-                    {r.name}
+                    <button type="button" className="dash-v4__table-cell-btn" onClick={() => onAction(r.cellActions?.open || r.action)}>
+                      <span className="dash-v4__avatar" style={{ display: 'inline-flex', marginRight: 6, width: 24, height: 24, fontSize: 9 }}>
+                        {initials(r.name)}
+                      </span>
+                      {r.name}
+                    </button>
                   </td>
-                  <td>{r.open}</td>
-                  <td>{r.followups}</td>
-                  <td>{r.activities7d}</td>
-                  <td>{r.wonMonth}</td>
+                  <td>
+                    <button type="button" className="dash-v4__table-cell-btn" onClick={() => onAction(r.cellActions?.open || r.action)}>
+                      {r.open}
+                    </button>
+                  </td>
+                  <td>
+                    <button type="button" className="dash-v4__table-cell-btn" onClick={() => onAction(r.cellActions?.followups || { ...r.action, status: 'follow_up', followUpDue: true })}>
+                      {r.followups}
+                    </button>
+                  </td>
+                  <td>
+                    <button type="button" className="dash-v4__table-cell-btn" onClick={() => onAction(r.cellActions?.activities || { panel: 'crm-log', userId: r.userId, period: 'week', returnTo: 'overview' })}>
+                      {r.activities7d}
+                    </button>
+                  </td>
+                  <td>
+                    <button type="button" className="dash-v4__table-cell-btn" onClick={() => onAction(r.cellActions?.won || { ...r.action, status: 'won', wonThisMonth: true })}>
+                      {r.wonMonth}
+                    </button>
+                  </td>
                   <td>{relTime(r.lastActiveAt)}</td>
                 </tr>
               ))}
@@ -344,12 +362,28 @@ function AdminView({ data, onAction, onLead }) {
               </thead>
               <tbody>
                 {(data.teamLeaderboard || []).map((t, i) => (
-                  <tr key={t.teamId} onClick={() => onAction(t.action)}>
+                  <tr key={t.teamId}>
                     <td>{i + 1}. {t.teamName}</td>
-                    <td>{t.openLeads}</td>
-                    <td>{t.followups}</td>
-                    <td>{t.activities7d}</td>
-                    <td>{t.wonMonth}</td>
+                    <td>
+                      <button type="button" className="dash-v4__table-cell-btn" onClick={() => onAction(t.cellActions?.openLeads || t.action)}>
+                        {t.openLeads}
+                      </button>
+                    </td>
+                    <td>
+                      <button type="button" className="dash-v4__table-cell-btn" onClick={() => onAction(t.cellActions?.followups || { panel: 'pipeline', status: 'follow_up', followUpDue: true, teamId: t.teamId, scope: 'all', returnTo: 'overview' })}>
+                        {t.followups}
+                      </button>
+                    </td>
+                    <td>
+                      <button type="button" className="dash-v4__table-cell-btn" onClick={() => onAction(t.cellActions?.activities || { panel: 'crm-log', period: 'week', teamId: t.teamId, returnTo: 'overview' })}>
+                        {t.activities7d}
+                      </button>
+                    </td>
+                    <td>
+                      <button type="button" className="dash-v4__table-cell-btn" onClick={() => onAction(t.cellActions?.wonMonth || { panel: 'pipeline', status: 'won', wonThisMonth: true, teamId: t.teamId, scope: 'all', returnTo: 'overview' })}>
+                        {t.wonMonth}
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -432,7 +466,7 @@ function MarketingView({ data, onAction }) {
 }
 
 export default function HomeDashboard({ onNavigate, isActive = true }) {
-  const { user, openPipelineLead, unreadNotificationCount } = useApp()
+  const { user, openPipelineLead, unreadNotificationCount, notifications, navigateToNotification } = useApp()
   const [data, setData] = useState(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -445,13 +479,7 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
     setError(null)
     try {
       const res = await api.getDashboardBootstrap()
-      const dash = res.dashboard
-      if (dash?.statStrip && unreadNotificationCount != null) {
-        dash.statStrip = dash.statStrip.map((s) =>
-          s.id === 'unread_updates' ? { ...s, count: unreadNotificationCount, highlight: unreadNotificationCount > 0 } : s
-        )
-      }
-      setData(dash)
+      setData(res.dashboard)
       setLastFetch(Date.now())
     } catch (e) {
       setError(e.message || 'Could not load dashboard')
@@ -459,14 +487,27 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
       setLoading(false)
       setRefreshing(false)
     }
-  }, [unreadNotificationCount])
+  }, [])
 
   useEffect(() => {
     if (!isActive) return undefined
     load()
-    const t = setInterval(() => load(true), 60_000)
+    const t = setInterval(() => load(true), 90_000)
     return () => clearInterval(t)
   }, [isActive, load])
+
+  const displayData = useMemo(() => {
+    if (!data) return null
+    if (unreadNotificationCount == null) return data
+    return {
+      ...data,
+      statStrip: (data.statStrip || []).map((s) =>
+        s.id === 'unread_updates'
+          ? { ...s, count: unreadNotificationCount, highlight: unreadNotificationCount > 0 }
+          : s
+      ),
+    }
+  }, [data, unreadNotificationCount])
 
   const freshnessLabel = useMemo(() => {
     if (!lastFetch) return ''
@@ -479,26 +520,27 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
   const runAction = useCallback(
     (action = {}) => {
       if (!action?.panel && !action?.leadId) return
-      const opts = { ...navTargetToOptions(action), returnTo: 'overview' }
-      if (action.scopeOwner === 'me' && user?.id) {
-        opts.userId = user.id
-        opts.assigneeUserId = user.id
+
+      if (action.panel === 'notifications' || action.unreadOnly) {
+        const unread = (notifications || []).filter((n) => n.unread)
+        const leadIds = [...new Set(unread.map((n) => n.leadId).filter(Boolean))]
+        if (leadIds.length === 1) {
+          navigateToNotification(unread.find((n) => n.leadId === leadIds[0]))
+          return
+        }
+        if (leadIds.length > 1) {
+          onNavigate?.('pipeline', dashboardNavOptions({ panel: 'pipeline', unreadOnly: true, ...action }, user))
+          return
+        }
+        onNavigate?.('crm-log', dashboardNavOptions({ panel: 'crm-log', period: 'day', returnTo: 'overview' }, user))
+        return
       }
-      if (action.hierarchyTeam === 'mine') {
-        opts.hierarchyTeam = 'mine'
-        delete opts.userId
-        delete opts.assigneeUserId
-      }
-      if (action.scope === 'all') {
-        delete opts.userId
-        delete opts.assigneeUserId
-      }
-      if (action.leadId) {
-        openPipelineLead(action.leadId)
-      }
+
+      const opts = dashboardNavOptions({ ...action, returnTo: action.returnTo || 'overview' }, user)
+      if (action.leadId) openPipelineLead(action.leadId)
       onNavigate?.(action.panel || 'pipeline', opts)
     },
-    [onNavigate, openPipelineLead, user?.id]
+    [onNavigate, openPipelineLead, user, notifications, navigateToNotification]
   )
 
   const onLead = useCallback(
@@ -510,13 +552,15 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
     [openPipelineLead, onNavigate]
   )
 
+  const viewData = displayData || data
+
   const primaryAction = useMemo(() => {
-    if (!data?.role) return null
-    if (data.role === 'org_admin') return { label: 'Org report', action: { panel: 'crm-dashboard', returnTo: 'overview' } }
-    if (data.role === 'manager') return { label: 'Team pipeline', action: { panel: 'pipeline', hierarchyTeam: 'mine', returnTo: 'overview' } }
-    if (data.role === 'marketing_manager') return { label: 'Create campaign', action: { panel: 'marketing', tab: 'campaigns', returnTo: 'overview' } }
+    if (!viewData?.role) return null
+    if (viewData.role === 'org_admin') return { label: 'Org report', action: { panel: 'crm-dashboard', returnTo: 'overview' } }
+    if (viewData.role === 'manager') return { label: 'Team pipeline', action: { panel: 'pipeline', hierarchyTeam: 'mine', returnTo: 'overview' } }
+    if (viewData.role === 'marketing_manager') return { label: 'Create campaign', action: { panel: 'marketing', tab: 'campaigns', returnTo: 'overview' } }
     return { label: '+ New lead', action: { panel: 'pipeline', returnTo: 'overview' } }
-  }, [data?.role])
+  }, [viewData?.role])
 
   if (loading && !data) {
     return (
@@ -544,12 +588,12 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
           <div>
             <p className="dash-v4__eyebrow">My day</p>
             <h1 className="dash-v4__title">
-              {data.greeting}, {data.user?.firstName || 'there'}
+              {viewData.greeting}, {viewData.user?.firstName || 'there'}
             </h1>
             <p className="dash-v4__sub">
               Updated {freshnessLabel}
               {refreshing ? ' · refreshing…' : ''}
-              {data.scopeLabel ? ` · ${data.scopeLabel}` : ''}
+              {viewData.scopeLabel ? ` · ${viewData.scopeLabel}` : ''}
               <button type="button" className="dash-v4__link" style={{ marginLeft: 8 }} onClick={() => load(true)} aria-label="Refresh">
                 ↺
               </button>
@@ -564,9 +608,9 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
           </div>
         </header>
 
-        {data.quickActions?.length ? (
+        {viewData.quickActions?.length ? (
           <div className="dash-v4__quick-row">
-            {data.quickActions.map((q) => (
+            {viewData.quickActions.map((q) => (
               <button key={q.id} type="button" className="dash-v4__btn" onClick={() => runAction(q.action)}>
                 {q.label}
               </button>
@@ -574,12 +618,12 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
           </div>
         ) : null}
 
-        <StatStrip items={data.statStrip || []} onAction={runAction} />
+        <StatStrip items={viewData.statStrip || []} onAction={runAction} />
 
-        {data.role === 'rep' ? <RepView data={data} onAction={runAction} onLead={onLead} /> : null}
-        {data.role === 'manager' ? <ManagerView data={data} onAction={runAction} onLead={onLead} /> : null}
-        {data.role === 'org_admin' ? <AdminView data={data} onAction={runAction} onLead={onLead} /> : null}
-        {data.role === 'marketing_manager' ? <MarketingView data={data} onAction={runAction} /> : null}
+        {viewData.role === 'rep' ? <RepView data={viewData} onAction={runAction} onLead={onLead} /> : null}
+        {viewData.role === 'manager' ? <ManagerView data={viewData} onAction={runAction} onLead={onLead} /> : null}
+        {viewData.role === 'org_admin' ? <AdminView data={viewData} onAction={runAction} onLead={onLead} /> : null}
+        {viewData.role === 'marketing_manager' ? <MarketingView data={viewData} onAction={runAction} /> : null}
       </div>
     </div>
   )

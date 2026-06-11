@@ -255,6 +255,7 @@ export const api = {
     minLeadScore,
     followUpDue,
     overdueFollowUp,
+    teamId,
     silent = false,
   } = {}) => {
     const qs = new URLSearchParams({
@@ -276,6 +277,7 @@ export const api = {
     if (minLeadScore != null && minLeadScore !== '') qs.set('minLeadScore', String(minLeadScore))
     if (followUpDue) qs.set('followUpDue', '1')
     if (overdueFollowUp) qs.set('overdueFollowUp', '1')
+    if (teamId) qs.set('teamId', String(teamId))
     return request(`/api/saved-leads?${qs}`, { timeoutMs: 45_000 }, { silent })
   },
 
