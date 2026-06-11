@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-11T16:55:14.670Z",
-  "updatedAtIst": "11/06/2026, 22:25:14",
+  "updatedAt": "2026-06-11T17:03:44.844Z",
+  "updatedAtIst": "11/06/2026, 22:33:44",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "eeec0da",
+  "currentProductionCommit": "b177859",
   "entries": [
+    {
+      "logId": "20260611-2233-b177859",
+      "commit": "b177859",
+      "commitFull": "b17785932fecf1b4bf9f51a15957c2396f211960",
+      "message": "fix: revert pipeline leads view; keep toolbar popups with Esc only",
+      "deployedAt": "2026-06-11T17:03:42.637Z",
+      "deployedAtIst": "11/06/2026, 22:33:42",
+      "committedAtIst": "11/06/2026, 22:32:54",
+      "vercelPreviewUrl": "https://connect-intel-fumguf03q-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- b177859"
+    },
+    {
+      "logId": "20260611-2226-54e8529",
+      "commit": "54e8529",
+      "commitFull": "54e852953861e26fb5e5d0f5eb3c63cab1423503",
+      "message": "chore: production log after pipeline filter popup deploy",
+      "deployedAt": "2026-06-11T16:56:01.009Z",
+      "deployedAtIst": "11/06/2026, 22:26:01",
+      "committedAtIst": "11/06/2026, 22:25:22",
+      "vercelPreviewUrl": "https://connect-intel-fiznx70hh-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 54e8529"
+    },
     {
       "logId": "20260611-2224-eeec0da",
       "commit": "eeec0da",
@@ -15,7 +43,7 @@
       "committedAtIst": "11/06/2026, 22:24:14",
       "vercelPreviewUrl": "https://connect-intel-1ta6oncjm-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- eeec0da"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 4e94f86"
-    },
-    {
-      "logId": "20260611-1253-b92be6e",
-      "commit": "b92be6e",
-      "commitFull": "b92be6e9d76437e4e3260ec1a50506c8272a1110",
-      "message": "chore: production log after dashboard filter drill-down deploy",
-      "deployedAt": "2026-06-11T07:23:50.857Z",
-      "deployedAtIst": "11/06/2026, 12:53:50",
-      "committedAtIst": "11/06/2026, 12:53:15",
-      "vercelPreviewUrl": "https://connect-intel-cvpgxqe4j-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- b92be6e"
-    },
-    {
-      "logId": "20260611-1252-c78111f",
-      "commit": "c78111f",
-      "commitFull": "c78111f23841f22beaa33316b4a4f1cb667586ef",
-      "message": "fix: wire dashboard drill-downs to filtered pipeline views and speed up bootstrap",
-      "deployedAt": "2026-06-11T07:22:51.272Z",
-      "deployedAtIst": "11/06/2026, 12:52:51",
-      "committedAtIst": "11/06/2026, 12:52:14",
-      "vercelPreviewUrl": "https://connect-intel-fxbpsqecl-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- c78111f"
     }
   ]
 }

@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 32288b9
+npm run prod:rollback -- 54e8529
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 32288b9
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `eeec0da` |
-| Log updated (IST) | 11/06/2026, 22:25:14 |
+| Commit | `b177859` |
+| Log updated (IST) | 11/06/2026, 22:33:44 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 32288b9
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 11/06/2026, 22:24:58 | `eeec0da` | fix: pipeline filter toolbar popups with owner filter and Esc support | [preview](https://connect-intel-1ta6oncjm-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- eeec0da` | **← LIVE**
+| 11/06/2026, 22:33:42 | `b177859` | fix: revert pipeline leads view; keep toolbar popups with Esc only | [preview](https://connect-intel-fumguf03q-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b177859` | **← LIVE**
+| 11/06/2026, 22:26:01 | `54e8529` | chore: production log after pipeline filter popup deploy | [preview](https://connect-intel-fiznx70hh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 54e8529` |
+| 11/06/2026, 22:24:58 | `eeec0da` | fix: pipeline filter toolbar popups with owner filter and Esc support | [preview](https://connect-intel-1ta6oncjm-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- eeec0da` |
 | 11/06/2026, 22:16:31 | `32288b9` | chore: production log after marketing pipeline drill-down deploy | [preview](https://connect-intel-dnde73g2o-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 32288b9` |
 | 11/06/2026, 22:15:58 | `1ea89a3` | fix: restore intentional dark left sidebar chrome | [preview](https://connect-intel-pijs795kz-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1ea89a3` |
 | 11/06/2026, 22:15:25 | `6812480` | fix: marketing campaign reports drill to filtered pipeline with accurate stats | [preview](https://connect-intel-mwszfe8nl-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6812480` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 32288b9
 | 11/06/2026, 20:51:48 | `339ec1e` | feat: pipeline list polish with brand tokens and board UX | [preview](https://connect-intel-6lxd7t1x9-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 339ec1e` |
 | 11/06/2026, 13:14:45 | `5a8c263` | chore: production log after marketing pipeline drill-down deploy | [preview](https://connect-intel-ezysxu8ci-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5a8c263` |
 | 11/06/2026, 13:13:00 | `4e94f86` | feat: marketing campaign metrics drill down to filtered pipeline | [preview](https://connect-intel-o5w3wsj8v-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4e94f86` |
-| 11/06/2026, 12:53:50 | `b92be6e` | chore: production log after dashboard filter drill-down deploy | [preview](https://connect-intel-cvpgxqe4j-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b92be6e` |
-| 11/06/2026, 12:52:51 | `c78111f` | fix: wire dashboard drill-downs to filtered pipeline views and speed up bootstrap | [preview](https://connect-intel-fxbpsqecl-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c78111f` |
 
 ---
 
