@@ -2423,9 +2423,10 @@ textarea {
 
 .pipeline-list-workspace .crm-content-scroll {
   padding: 0;
+  min-width: 0;
   overflow-x: hidden;
   overflow-y: auto;
-  scrollbar-gutter: stable;
+  -webkit-overflow-scrolling: touch;
 }
 
 .pipeline-hs-table-wrap {

@@ -135,9 +135,13 @@
 }
 
 .pipeline-hs-table-wrap--v2 {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  flex: 0 0 auto;
   overflow-x: auto;
-  overflow-y: hidden;
-  scrollbar-gutter: stable;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
 }
 
 .pipeline-hs-table-wrap--v2 .pipeline-hs-table {
@@ -168,10 +172,6 @@
   min-width: 0;
   flex: 1 1 0;
   overflow: hidden;
-}
-
-.pipeline-hs-row--v2 {
-  contain: layout style;
 }
 
 .pipeline-hs-row--v2 .pipeline-hs-td {
@@ -1065,21 +1065,51 @@
   border-top: 1px solid #eaf0f6;
 }
 
-.pipeline-load-more-wrap {
-  padding: 10px 16px 16px;
-  text-align: center;
+.pipeline-load-more-foot {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  padding: 2px 8px;
+  border-top: 1px solid #eaf0f6;
+  background: #fff;
 }
 
 .pipeline-load-more-bar {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 6px;
+  min-height: 1.5rem;
+  line-height: 1.2;
 }
 
 .pipeline-load-more-bar__meta {
-  font-size: 12px;
+  font-size: 10px;
   color: #7c98b6;
+  white-space: nowrap;
+}
+
+.pipeline-load-more-bar__btn {
+  border: none;
+  background: transparent;
+  padding: 0 2px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #ff773d;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.pipeline-load-more-bar__btn:hover:not(:disabled) {
+  color: #e5652f;
+  text-decoration: underline;
+}
+
+.pipeline-load-more-bar__btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
 }
 
 /* Mobile list — sticky checkbox + name, tight columns, single horizontal scroll */
@@ -1088,9 +1118,9 @@
     display: block;
     width: 100%;
     max-width: 100%;
+    min-width: 0;
     overflow-x: auto;
-    overflow-y: hidden;
-    scrollbar-gutter: stable;
+    overflow-y: visible;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-x: contain;
   }
@@ -1197,7 +1227,19 @@
   transition: color 0.12s ease, background-color 0.12s ease;
 }
 
+.pipeline-list-workspace .crm-content-card--pipeline-table {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
 .pipeline-list-workspace .crm-content-scroll.pipeline-scroll-area {
+  flex: 1 1 0;
+  min-height: 0;
+  min-width: 0;
+  display: block;
   overflow-x: hidden;
-  scrollbar-gutter: stable;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }

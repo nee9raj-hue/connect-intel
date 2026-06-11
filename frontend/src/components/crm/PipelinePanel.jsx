@@ -1555,11 +1555,12 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               }}
             />
           )}
+          </div>
           {(view === 'list' || stageListMode) &&
             filtered.length > 0 &&
             hasMoreLeads &&
             serverSidePipeline && (
-              <div className="pipeline-load-more-wrap">
+              <div className="pipeline-load-more-foot">
                 <PipelineLoadMoreBar
                   loaded={pipelineLoad.loaded}
                   total={pipelineLoad.total || pipelineSummary.total}
@@ -1568,7 +1569,6 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                 />
               </div>
             )}
-          </div>
           </div>
         </div>
       </div>
@@ -1825,10 +1825,10 @@ function PipelineLoadMoreBar({ loaded, total, loading, onLoadMore }) {
   return (
     <div className="pipeline-load-more-bar">
       <span className="pipeline-load-more-bar__meta">
-        {loaded.toLocaleString()} of {total.toLocaleString()}
+        {loaded.toLocaleString()} / {total.toLocaleString()}
       </span>
-      <button type="button" disabled={loading} onClick={onLoadMore} className="crm-filter-link-btn">
-        {loading ? 'Loading…' : 'View more'}
+      <button type="button" disabled={loading} onClick={onLoadMore} className="pipeline-load-more-bar__btn">
+        {loading ? '…' : 'More'}
       </button>
     </div>
   )
