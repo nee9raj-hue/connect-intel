@@ -79,14 +79,15 @@ export default function AppShell() {
   const { needed: needsGmailSetup, setNeeded: setNeedsGmailSetup } = useGmailSetupNeeded(user)
   const chithiFocus = isChithiPanel(activePanel)
   const marketingFocus = activePanel === 'marketing' || activePanel === 'bulk-email'
+  const calendarImmersive = activePanel === 'crm-calendar'
+  const hideMobileFloatingChrome =
+    calendarImmersive || chithiFocus || marketingFocus || Boolean(pipelineLeadId)
   const showMobileNavPill =
     isMobile &&
     user &&
     !user.isPlatformAdmin &&
     !needsOnboarding &&
-    !pipelineLeadId &&
-    !chithiFocus &&
-    !marketingFocus
+    !hideMobileFloatingChrome
   const mobilePillVisible = useMobileNavGenie(showMobileNavPill)
   usePanelPreferences(user?.id)
   useChithiAlerts({
@@ -441,7 +442,7 @@ export default function AppShell() {
       {needsGmailSetup && !needsOnboarding && (
         <GmailSetupModal onDone={() => setNeedsGmailSetup(false)} />
       )}
-      {user && !needsOnboarding && (
+      {user && !needsOnboarding && !(isMobile && hideMobileFloatingChrome) && (
         <ConnectAssistant
           onNavigate={navigate}
           fabAboveMobilePill={showMobileNavPill && mobilePillVisible}

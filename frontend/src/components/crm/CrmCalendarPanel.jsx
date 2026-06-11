@@ -1,4 +1,5 @@
 import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { formatDateTime } from '../../lib/crmUiConstants'
@@ -318,6 +319,26 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
     onNavigate?.('pipeline')
   }
 
+  const pickView = useCallback(
+    (viewId) => {
+      setView(viewId)
+      setSidebarOpen(false)
+      if (upcomingOnly && viewId !== 'schedule') {
+        onNavigate?.('crm-calendar', {})
+      }
+    },
+    [upcomingOnly, onNavigate]
+  )
+
+  useEffect(() => {
+    if (!isMobile || !sidebarOpen) return undefined
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = prev
+    }
+  }, [isMobile, sidebarOpen])
+
   const monthPickerOptions = useMemo(() => {
     const base = new Date(anchor.getFullYear(), anchor.getMonth(), 1)
     return Array.from({ length: 12 }, (_, i) => {
@@ -326,8 +347,96 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
     })
   }, [anchor])
 
+  const sidebarContent = (
+    <>
+      {isMobile && (
+        <div className="gcal-drawer-head">
+          <span className="gcal-drawer-head__logo">Calendar</span>
+          <button
+            type="button"
+            className="gcal-drawer-head__close"
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Close menu"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
+      {isMobile && (
+        <div className="gcal-drawer-views">
+          {VIEW_OPTIONS.map((v) => (
+            <button
+              key={v.id}
+              type="button"
+              className={`gcal-drawer-view${view === v.id ? ' gcal-drawer-view--active' : ''}`}
+              onClick={() => pickView(v.id)}
+            >
+              <ViewIcon type={v.mobileIcon} />
+              <span>{v.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {!isMobile && (
+        <div className="gcal-create-wrap" ref={createRef}>
+          <button type="button" className="gcal-create-btn" onClick={() => setCreateOpen((o) => !o)}>
+            <span className="gcal-create-btn__plus">+</span>
+            Create
+          </button>
+          {createOpen && (
+            <div className="gcal-create-menu">
+              <button type="button" className="gcal-create-menu__item" onClick={handleCreatePipeline}>
+                Task or meeting in pipeline
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {!isMobile && <MiniCalendar anchor={anchor} onPickDay={goToDay} onMonthChange={setAnchor} />}
+
+      <div className="gcal-sidebar__section">
+        <p className="gcal-sidebar__heading">{isMobile ? user?.email || 'My calendars' : 'My calendars'}</p>
+        {CALENDAR_FILTER_OPTIONS.map((opt) => {
+          const colors = kindColor(opt.id)
+          return (
+            <label key={opt.id} className="gcal-cal-toggle">
+              <input
+                type="checkbox"
+                checked={kindFilters[opt.id] !== false}
+                onChange={() => toggleKind(opt.id)}
+              />
+              <span className="gcal-cal-toggle__dot" style={{ background: colors.dot }} />
+              {opt.label}
+            </label>
+          )
+        })}
+      </div>
+
+      {isMobile && (
+        <div className="gcal-drawer-sync">
+          <GoogleSyncControl
+            ref={syncRef}
+            variant="drawer"
+            open={syncOpen}
+            onToggle={() => setSyncOpen((o) => !o)}
+            googleCal={googleCal}
+            googleBusy={googleBusy}
+            googleNotice={googleNotice}
+            onConnect={connectGoogleCalendar}
+            onSync={syncGoogleCalendar}
+          />
+        </div>
+      )}
+    </>
+  )
+
   return (
-    <div className={`panel-shell crm-calendar-panel gcal-root relative${isMobile ? ' gcal-root--mobile' : ''}`}>
+    <div
+      className={`panel-shell crm-calendar-panel gcal-root relative${isMobile ? ' gcal-root--mobile gcal-root--immersive' : ''}`}
+    >
       <MyDayReturnBar panelOptions={panelOptions} onNavigate={onNavigate} />
 
       <header className={`gcal-toolbar${isMobile ? ' gcal-toolbar--mobile' : ''}`}>
@@ -439,6 +548,20 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
                 )}
               </div>
             )}
+
+            {!upcomingOnly && (
+              <GoogleSyncControl
+                ref={syncRef}
+                variant="toolbar"
+                open={syncOpen}
+                onToggle={() => setSyncOpen((o) => !o)}
+                googleCal={googleCal}
+                googleBusy={googleBusy}
+                googleNotice={googleNotice}
+                onConnect={connectGoogleCalendar}
+                onSync={syncGoogleCalendar}
+              />
+            )}
           </>
         )}
       </header>
@@ -448,75 +571,17 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
       )}
 
       <div className="gcal-layout">
-        <button
-          type="button"
-          className={`gcal-sidebar-backdrop${sidebarOpen ? ' gcal-sidebar-backdrop--visible' : ''}`}
-          aria-label="Close menu"
-          onClick={() => setSidebarOpen(false)}
-        />
-
-        <aside className={`gcal-sidebar${sidebarOpen ? ' gcal-sidebar--open' : ''}${isMobile ? ' gcal-sidebar--drawer' : ''}`}>
-          {isMobile && (
-            <div className="gcal-drawer-head">
-              <span className="gcal-drawer-head__logo">Calendar</span>
-            </div>
-          )}
-
-          {isMobile && !upcomingOnly && (
-            <div className="gcal-drawer-views">
-              {VIEW_OPTIONS.map((v) => (
-                <button
-                  key={v.id}
-                  type="button"
-                  className={`gcal-drawer-view${effectiveView === v.id ? ' gcal-drawer-view--active' : ''}`}
-                  onClick={() => {
-                    setView(v.id)
-                    setSidebarOpen(false)
-                  }}
-                >
-                  <ViewIcon type={v.mobileIcon} />
-                  <span>{v.label}</span>
-                </button>
-              ))}
-            </div>
-          )}
-
-          {!isMobile && (
-            <div className="gcal-create-wrap" ref={createRef}>
-              <button type="button" className="gcal-create-btn" onClick={() => setCreateOpen((o) => !o)}>
-                <span className="gcal-create-btn__plus">+</span>
-                Create
-              </button>
-              {createOpen && (
-                <div className="gcal-create-menu">
-                  <button type="button" className="gcal-create-menu__item" onClick={handleCreatePipeline}>
-                    Task or meeting in pipeline
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-
-          {!isMobile && <MiniCalendar anchor={anchor} onPickDay={goToDay} onMonthChange={setAnchor} />}
-
-          <div className="gcal-sidebar__section">
-            <p className="gcal-sidebar__heading">{isMobile ? user?.email || 'My calendars' : 'My calendars'}</p>
-            {CALENDAR_FILTER_OPTIONS.map((opt) => {
-              const colors = kindColor(opt.id)
-              return (
-                <label key={opt.id} className="gcal-cal-toggle">
-                  <input
-                    type="checkbox"
-                    checked={kindFilters[opt.id] !== false}
-                    onChange={() => toggleKind(opt.id)}
-                  />
-                  <span className="gcal-cal-toggle__dot" style={{ background: colors.dot }} />
-                  {opt.label}
-                </label>
-              )
-            })}
-          </div>
-        </aside>
+        {!isMobile && (
+          <>
+            <button
+              type="button"
+              className={`gcal-sidebar-backdrop${sidebarOpen ? ' gcal-sidebar-backdrop--visible' : ''}`}
+              aria-label="Close menu"
+              onClick={() => setSidebarOpen(false)}
+            />
+            <aside className={`gcal-sidebar${sidebarOpen ? ' gcal-sidebar--open' : ''}`}>{sidebarContent}</aside>
+          </>
+        )}
 
         <main className="gcal-main">
           {showLoading ? (
@@ -577,18 +642,22 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
         </main>
       </div>
 
-      {!upcomingOnly && (
-        <GoogleSyncFloater
-          ref={syncRef}
-          open={syncOpen}
-          onToggle={() => setSyncOpen((o) => !o)}
-          googleCal={googleCal}
-          googleBusy={googleBusy}
-          googleNotice={googleNotice}
-          onConnect={connectGoogleCalendar}
-          onSync={syncGoogleCalendar}
-        />
-      )}
+      {isMobile &&
+        sidebarOpen &&
+        createPortal(
+          <>
+            <button
+              type="button"
+              className="gcal-sidebar-backdrop gcal-sidebar-backdrop--portal gcal-sidebar-backdrop--visible"
+              aria-label="Close menu"
+              onClick={() => setSidebarOpen(false)}
+            />
+            <aside className="gcal-sidebar gcal-sidebar--drawer gcal-sidebar--portal gcal-sidebar--open">
+              {sidebarContent}
+            </aside>
+          </>,
+          document.body
+        )}
 
       <div className="gcal-fab-wrap" ref={fabRef}>
         {createOpen && isMobile && (
@@ -694,46 +763,63 @@ function MobileMonthStrip({ anchor, onSelect }) {
   )
 }
 
-const GoogleSyncFloater = forwardRef(function GoogleSyncFloater(
-  { open, onToggle, googleCal, googleBusy, googleNotice, onConnect, onSync },
+const GoogleSyncControl = forwardRef(function GoogleSyncControl(
+  { variant, open, onToggle, googleCal, googleBusy, googleNotice, onConnect, onSync },
   ref
 ) {
   const connected = Boolean(googleCal?.calendarScope)
+  const popover = open ? (
+    <div className="gcal-sync-pop" role="dialog" aria-label="Google Calendar sync">
+      {connected ? (
+        <>
+          <p className="gcal-sync-pop__title">Google connected</p>
+          <button type="button" disabled={googleBusy} onClick={onSync}>
+            {googleBusy ? 'Syncing…' : 'Sync now'}
+          </button>
+          {googleCal?.lastSyncAt && (
+            <p className="gcal-sync-pop__meta">Last {formatDateTime(googleCal.lastSyncAt)}</p>
+          )}
+        </>
+      ) : (
+        <>
+          <p className="gcal-sync-pop__title">Google Calendar</p>
+          <button type="button" disabled={googleBusy} onClick={onConnect}>
+            {googleBusy ? 'Connecting…' : 'Connect Google'}
+          </button>
+        </>
+      )}
+      {googleNotice && <p className="gcal-sync-pop__notice">{googleNotice}</p>}
+    </div>
+  ) : null
+
+  if (variant === 'drawer') {
+    return (
+      <div className="gcal-sync-drawer-row" ref={ref}>
+        <button type="button" className="gcal-sync-drawer-row__btn" onClick={onToggle}>
+          <span className="gcal-sync-drawer-row__g">G</span>
+          <span>{connected ? 'Google Calendar · Sync' : 'Connect Google Calendar'}</span>
+          {connected && <span className="gcal-sync-drawer-row__dot" />}
+        </button>
+        {popover}
+      </div>
+    )
+  }
+
+  if (variant === 'inline') return null
+
   return (
-    <div className="gcal-sync-float" ref={ref}>
+    <div className="gcal-toolbar-sync" ref={ref}>
       <button
         type="button"
-        className={`gcal-sync-float__btn${connected ? ' gcal-sync-float__btn--on' : ''}`}
+        className={`gcal-icon-btn gcal-toolbar-sync__btn${connected ? ' gcal-toolbar-sync__btn--on' : ''}`}
         onClick={onToggle}
         aria-label={connected ? 'Google Calendar connected' : 'Connect Google Calendar'}
         title={connected ? 'Google Calendar' : 'Connect Google'}
       >
-        <span className="gcal-sync-float__g">G</span>
-        {connected && <span className="gcal-sync-float__dot" />}
+        <span className="gcal-toolbar-sync__g">G</span>
+        {connected && <span className="gcal-toolbar-sync__dot" />}
       </button>
-      {open && (
-        <div className="gcal-sync-float__pop">
-          {connected ? (
-            <>
-              <p className="gcal-sync-float__title">Google connected</p>
-              <button type="button" disabled={googleBusy} onClick={onSync}>
-                {googleBusy ? 'Syncing…' : 'Sync now'}
-              </button>
-              {googleCal?.lastSyncAt && (
-                <p className="gcal-sync-float__meta">Last {formatDateTime(googleCal.lastSyncAt)}</p>
-              )}
-            </>
-          ) : (
-            <>
-              <p className="gcal-sync-float__title">Google Calendar</p>
-              <button type="button" disabled={googleBusy} onClick={onConnect}>
-                {googleBusy ? '…' : 'Connect'}
-              </button>
-            </>
-          )}
-          {googleNotice && <p className="gcal-sync-float__notice">{googleNotice}</p>}
-        </div>
-      )}
+      {popover}
     </div>
   )
 })
