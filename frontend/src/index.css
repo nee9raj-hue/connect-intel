@@ -13,8 +13,8 @@
   --color-ci-yellow: #ff773d;
   --color-ci-yellow-hover: #e5652f;
   --color-ci-dark: #17191c;
-  --color-ci-nav: #64748b;
-  --color-ci-sidebar: #64748b;
+  --color-ci-nav: #1f1d1c;
+  --color-ci-sidebar: #2b2928;
   --color-ci-border: #d7dde5;
   --color-ci-muted: #5f6d80;
   --color-ci-surface: #ffffff;
@@ -38,7 +38,7 @@
   --color-apollo-yellow: #ff773d;
   --color-apollo-yellow-hover: #e5652f;
   --color-apollo-dark: #17191c;
-  --color-apollo-sidebar: #64748b;
+  --color-apollo-sidebar: #2b2928;
   --color-apollo-border: #d7dde5;
   --color-apollo-muted: #5f6d80;
   --color-apollo-surface: #f7f9fb;

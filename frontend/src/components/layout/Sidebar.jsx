@@ -13,6 +13,8 @@ import { BRAND_LOGO_ICON_TRANSPARENT, BRAND_LOGO_ICON_CLASS } from '../../lib/br
 import { isChithiPanel } from '../../lib/chithiNav'
 import SidebarToggleButton from './SidebarToggleButton'
 import ChithiMenuIcon from '../ui/ChithiMenuIcon'
+
+/** Left nav uses intentional dark chrome (#2b2928) — not brand slate; do not swap for #64748B. */
 import {
   BoltIcon,
   CalendarIcon,
@@ -211,12 +213,12 @@ export default function Sidebar({
         />
       )}
       <aside
-        className={`ci-sidebar fixed md:static z-50 shrink-0 h-full bg-[#64748B] border-r border-[#475569] flex flex-col overflow-hidden transition-[width] duration-200 ease-in-out max-md:transition-transform text-[12px] ${
+        className={`ci-sidebar fixed md:static z-50 shrink-0 h-full bg-[#2b2928] border-r border-[#3a3836] flex flex-col overflow-hidden transition-[width] duration-200 ease-in-out max-md:transition-transform text-[12px] ${
           mobileOpen ? 'max-md:translate-x-0' : 'max-md:-translate-x-full'
         } w-[272px] ${railMode ? 'md:w-16' : 'md:w-[248px]'} ${classNameProp}`.trim()}
       >
         <div
-          className={`min-h-[60px] flex items-center border-b border-[#475569] shrink-0 ${
+          className={`min-h-[60px] flex items-center border-b border-[#3a3836] shrink-0 ${
             railMode ? 'justify-center px-2 md:px-0' : 'gap-2.5 px-4'
           }`}
         >
@@ -308,7 +310,7 @@ export default function Sidebar({
 
         </nav>
 
-        <div className={`shrink-0 border-t border-[#475569] ${railMode ? 'p-2.5' : 'p-3'}`}>
+        <div className={`shrink-0 border-t border-[#3a3836] ${railMode ? 'p-2.5' : 'p-3'}`}>
           {railMode ? (
             <SidebarToggleButton
               mode={sidebarMode}
@@ -618,7 +620,7 @@ function RailFlyoutAnchor({
         ref={flyoutRef}
         role={hasMenu ? 'menu' : 'dialog'}
         aria-label={label}
-        className={`sidebar-rail-flyout fixed z-[250] rounded-2xl border border-[#475569] bg-[#64748B] py-1 shadow-[0_16px_40px_rgba(0,0,0,0.45)] ${
+        className={`sidebar-rail-flyout fixed z-[250] rounded-2xl border border-[#3a3836] bg-[#2b2928] py-1 shadow-[0_16px_40px_rgba(0,0,0,0.45)] ${
           leaf ? 'min-w-[188px] max-w-[220px]' : 'min-w-[204px] max-w-[240px]'
         }`}
         style={{ top: flyoutPos.top, left: flyoutPos.left }}
@@ -628,7 +630,7 @@ function RailFlyoutAnchor({
           if (e.target.closest('button')) closeNow()
         }}
       >
-        <p className="sidebar-rail-flyout__title border-b border-[#475569] px-2.5 py-1.5 font-semibold tracking-[-0.02em] text-white">
+        <p className="sidebar-rail-flyout__title border-b border-[#3a3836] px-2.5 py-1.5 font-semibold tracking-[-0.02em] text-white">
           {label}
         </p>
         {leaf ? (
