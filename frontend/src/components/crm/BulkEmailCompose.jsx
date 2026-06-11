@@ -209,6 +209,14 @@ export default function BulkEmailCompose({
       const data = await sendBulkEmail(
         {
           leadIds: withEmail.map((l) => l.id),
+          resolvedRecipients: withEmail.map((l) => ({
+            leadId: l.id,
+            email: l.email,
+            firstName: l.firstName,
+            lastName: l.lastName,
+            company: l.company,
+            title: l.title,
+          })),
           campaignId: resumeCampaignId || undefined,
           cc: cc.trim(),
           agenda: agenda.trim(),

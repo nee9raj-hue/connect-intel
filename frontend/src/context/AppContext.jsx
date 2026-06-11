@@ -760,6 +760,9 @@ export function AppProvider({ children }) {
       const queued = await api.queueBulkCrmEmail({
         ...payload,
         leadIds: ids,
+        resolvedRecipients: Array.isArray(payload.resolvedRecipients)
+          ? payload.resolvedRecipients
+          : undefined,
       })
 
       aggregate.skippedCount = queued.skipped?.length || 0

@@ -476,20 +476,21 @@ export const api = {
     request('/api/crm/bulk-email', {
       method: 'POST',
       body: { action: 'resolve', leadIds },
+      timeoutMs: 90_000,
       silent: true,
     }),
   sendBulkCrmEmail: (payload, opts = {}) =>
     request('/api/crm/bulk-email', {
       method: 'POST',
       body: { ...payload, action: 'queue' },
-      timeoutMs: opts.timeoutMs ?? 120_000,
+      timeoutMs: opts.timeoutMs ?? 180_000,
       silent: opts.silent,
     }),
   queueBulkCrmEmail: (payload, opts = {}) =>
     request('/api/crm/bulk-email', {
       method: 'POST',
       body: { ...payload, action: 'queue' },
-      timeoutMs: opts.timeoutMs ?? 120_000,
+      timeoutMs: opts.timeoutMs ?? 180_000,
       silent: opts.silent,
     }),
   getCampaignSendStatus: (campaignId, opts = {}) =>

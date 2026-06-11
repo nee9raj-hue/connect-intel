@@ -1,7 +1,12 @@
 import { useEffect } from 'react'
 import { SettingsGearIcon } from '../ui/icons'
 import { createPortal } from 'react-dom'
-import { PIPELINE_TABLE_COLUMNS } from '../../lib/pipelineColumnPrefs'
+import {
+  movePipelineColumn,
+  normalizePipelineColumnOrder,
+  pipelineColumnMeta,
+  pipelineColumnSettingsRows,
+} from '../../lib/pipelineColumnPrefs'
 
 export default function PipelineViewSettings({
   open,
@@ -11,7 +16,7 @@ export default function PipelineViewSettings({
   stageListMode = false,
   visibleColumns = [],
   onColumnsChange,
-  hoverActionsEnabled = true,
+  hoverActionsEnabled = false,
   onHoverActionsChange,
   onExport,
   onResetFilters,
@@ -29,15 +34,20 @@ export default function PipelineViewSettings({
     }
   }, [open, onClose])
 
+  const orderedVisible = normalizePipelineColumnOrder(visibleColumns)
+
   const toggleColumn = (id, checked) => {
-    const col = PIPELINE_TABLE_COLUMNS.find((c) => c.id === id)
+    const col = pipelineColumnMeta(id)
     if (col?.locked) return
-    let next = checked
-      ? [...visibleColumns, id]
-      : visibleColumns.filter((c) => c !== id)
-    if (!next.includes('name')) next = ['name', ...next]
-    onColumnsChange?.(next)
+    let next = checked ? [...orderedVisible, id] : orderedVisible.filter((c) => c !== id)
+    onColumnsChange?.(normalizePipelineColumnOrder(next))
   }
+
+  const moveColumn = (id, direction) => {
+    onColumnsChange?.(movePipelineColumn(orderedVisible, id, direction))
+  }
+
+  const columnRows = pipelineColumnSettingsRows(orderedVisible)
 
   if (!open) return null
 
@@ -108,17 +118,60 @@ export default function PipelineViewSettings({
 
           <section className="hs-view-settings__section">
             <p className="hs-view-settings__section-label">Columns</p>
-            {PIPELINE_TABLE_COLUMNS.map((col) => (
-              <label key={col.id} className="hs-view-settings__row hs-view-settings__row--check">
-                <span>{col.label}</span>
-                <input
-                  type="checkbox"
-                  checked={visibleColumns.includes(col.id)}
-                  disabled={col.locked}
-                  onChange={(e) => toggleColumn(col.id, e.target.checked)}
-                />
-              </label>
-            ))}
+            <p className="hs-view-settings__hint px-0 pb-2">
+              Name stays first. Use arrows to reorder visible columns.
+            </p>
+            {columnRows.map((id) => {
+              const col = pipelineColumnMeta(id)
+              if (!col) return null
+              const isVisible = orderedVisible.includes(id)
+              const visibleIndex = orderedVisible.indexOf(id)
+              const canMoveUp = isVisible && !col.locked && visibleIndex > 1
+              const canMoveDown = isVisible && !col.locked && visibleIndex >= 1 && visibleIndex < orderedVisible.length - 1
+
+              return (
+                <div
+                  key={id}
+                  className={`hs-view-settings__column-row${isVisible ? '' : ' hs-view-settings__column-row--hidden'}`}
+                >
+                  <label className="hs-view-settings__row hs-view-settings__row--check hs-view-settings__column-check">
+                    <span>{col.label}</span>
+                    <input
+                      type="checkbox"
+                      checked={isVisible}
+                      disabled={col.locked}
+                      onChange={(e) => toggleColumn(id, e.target.checked)}
+                    />
+                  </label>
+                  {isVisible && !col.locked ? (
+                    <div className="hs-view-settings__column-move">
+                      <button
+                        type="button"
+                        className="hs-view-settings__column-move-btn"
+                        disabled={!canMoveUp}
+                        aria-label={`Move ${col.label} up`}
+                        onClick={() => moveColumn(id, 'up')}
+                      >
+                        ↑
+                      </button>
+                      <button
+                        type="button"
+                        className="hs-view-settings__column-move-btn"
+                        disabled={!canMoveDown}
+                        aria-label={`Move ${col.label} down`}
+                        onClick={() => moveColumn(id, 'down')}
+                      >
+                        ↓
+                      </button>
+                    </div>
+                  ) : col.locked ? (
+                    <span className="hs-view-settings__column-pinned" title="Always first">
+                      Pinned
+                    </span>
+                  ) : null}
+                </div>
+              )
+            })}
           </section>
 
           <section className="hs-view-settings__section">

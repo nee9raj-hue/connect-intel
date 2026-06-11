@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { formatCrmDate, getStatusMeta } from '../../lib/crmConstants'
 import { formatDateTime } from '../../lib/crmUiConstants'
 import { getLeadCity, getLeadState } from '../../lib/pipelineFilters'
@@ -8,6 +8,7 @@ import LeadPhoneCall from './LeadPhoneCall'
 import LeadTagDots from './LeadTagDots'
 import LeadTag from '../ui/LeadTag'
 import { leadHasCallablePhone } from '../../lib/phoneUtils'
+import { normalizePipelineColumnOrder } from '../../lib/pipelineColumnPrefs'
 import PipelineRowActionsMenu from './PipelineRowActionsMenu'
 
 function displayName(lead) {
@@ -126,6 +127,357 @@ function SortHeader({ label, sortKey, activeKey, sortDir, onSort, className = ''
   )
 }
 
+function renderPipelineHeader(colId, { sortKey, sortDir, onSort }) {
+  switch (colId) {
+    case 'name':
+      return (
+        <SortHeader
+          key={colId}
+          label="Name"
+          sortKey="name"
+          activeKey={sortKey}
+          sortDir={sortDir}
+          onSort={onSort}
+          className="pipeline-hs-th pipeline-hs-th--name"
+        />
+      )
+    case 'status':
+      return (
+        <th key={colId} scope="col" className="pipeline-hs-th">
+          Status
+        </th>
+      )
+    case 'company':
+      return (
+        <SortHeader
+          key={colId}
+          label="Company"
+          sortKey="company"
+          activeKey={sortKey}
+          sortDir={sortDir}
+          onSort={onSort}
+          className="pipeline-hs-th pipeline-hs-th--company"
+        />
+      )
+    case 'phone':
+      return (
+        <th key={colId} scope="col" className="pipeline-hs-th pipeline-hs-th--phone">
+          Phone
+        </th>
+      )
+    case 'owner':
+      return (
+        <th key={colId} scope="col" className="pipeline-hs-th pipeline-hs-th--owner">
+          Lead owner
+        </th>
+      )
+    case 'activity':
+      return (
+        <SortHeader
+          key={colId}
+          label="Last activity"
+          sortKey="activity"
+          activeKey={sortKey}
+          sortDir={sortDir}
+          onSort={onSort}
+          className="pipeline-hs-th pipeline-hs-th--activity"
+        />
+      )
+    case 'tags':
+      return (
+        <th key={colId} scope="col" className="pipeline-hs-th">
+          Tags
+        </th>
+      )
+    case 'email':
+      return (
+        <th key={colId} scope="col" className="pipeline-hs-th pipeline-hs-th--email">
+          Email
+        </th>
+      )
+    case 'notes':
+      return (
+        <th key={colId} scope="col" className="pipeline-hs-th pipeline-hs-th--notes">
+          Notes
+        </th>
+      )
+    case 'created':
+      return (
+        <SortHeader
+          key={colId}
+          label="Create date"
+          sortKey="created"
+          activeKey={sortKey}
+          sortDir={sortDir}
+          onSort={onSort}
+          className="pipeline-hs-th pipeline-hs-th--created"
+        />
+      )
+    default:
+      return null
+  }
+}
+
+function renderPipelineCell(colId, lead, ctx) {
+  const {
+    meta,
+    email,
+    loc,
+    ownerName,
+    activityAt,
+    activityType,
+    rel,
+    stale,
+    tags,
+    nameStr,
+    showHoverActions,
+    onSelect,
+    onQuickCall,
+    onQuickEmail,
+    onQuickTask,
+    onQuickWhatsApp,
+    onStatusChange,
+    onOwnerFilter,
+    canFilterByOwner,
+    statusOptions,
+    tagById,
+    canAssign,
+    onDeleteLead,
+    onChangeOwner,
+    onChangeStatus,
+  } = ctx
+
+  switch (colId) {
+    case 'name':
+      return (
+        <td key={colId} className="pipeline-hs-td pipeline-hs-td--name">
+          <div className="pipeline-hs-name-cell pipeline-hs-name-cell--v2">
+            <span className="pipeline-hs-avatar" aria-hidden>
+              {(lead.firstName?.[0] || lead.company?.[0] || '?').toUpperCase()}
+            </span>
+            <div className="pipeline-hs-name-stack">
+              <div className="pipeline-hs-name-row">
+                <button
+                  type="button"
+                  className="pipeline-hs-name-link pipeline-hs-primary-text ci-selectable-text"
+                  onClick={() => {
+                    if (hasActiveTextSelection()) return
+                    onSelect(lead.id)
+                  }}
+                >
+                  {nameStr}
+                </button>
+              </div>
+              {loc ? <span className="pipeline-hs-sub">{loc}</span> : null}
+              <LeadTagDots lead={lead} tagById={tagById} className="pipeline-hs-tags" max={4} />
+            </div>
+            {showHoverActions ? (
+              <span className="pipeline-row-hover-actions" aria-label="Quick actions">
+                {leadHasCallablePhone(lead) ? (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onQuickCall?.(lead)
+                    }}
+                  >
+                    Call
+                  </button>
+                ) : null}
+                {email ? (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onQuickEmail?.(lead)
+                    }}
+                  >
+                    Email
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onQuickTask?.(lead)
+                  }}
+                >
+                  Task
+                </button>
+                {lead.phone && onQuickWhatsApp ? (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onQuickWhatsApp?.(lead)
+                    }}
+                  >
+                    WhatsApp
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onSelect(lead.id)
+                  }}
+                >
+                  Open →
+                </button>
+              </span>
+            ) : null}
+          </div>
+        </td>
+      )
+    case 'status':
+      return (
+        <td key={colId} className="pipeline-hs-td">
+          <StatusBadge
+            status={lead.crm?.status}
+            label={meta.label}
+            colorClass={meta.color}
+            statusOptions={statusOptions}
+            onChange={(next) => onStatusChange?.(lead.id, next)}
+          />
+        </td>
+      )
+    case 'company':
+      return (
+        <td key={colId} className="pipeline-hs-td pipeline-hs-td--company">
+          {lead.company ? (
+            <span className="pipeline-hs-cell-text" title={lead.company}>
+              {lead.company}
+            </span>
+          ) : (
+            <span className="pipeline-hs-muted">—</span>
+          )}
+        </td>
+      )
+    case 'phone':
+      return (
+        <td key={colId} className="pipeline-hs-td pipeline-hs-td--phone">
+          {lead.phone ? (
+            <LeadPhoneCall
+              phone={lead.phone}
+              leadId={lead.id}
+              numberClassName="pipeline-hs-cell-text"
+              pipelineCallIcon
+            />
+          ) : (
+            <span className="pipeline-hs-muted">—</span>
+          )}
+        </td>
+      )
+    case 'owner':
+      return (
+        <td key={colId} className="pipeline-hs-td pipeline-hs-td--owner">
+          {canFilterByOwner && lead.assignedToUserId ? (
+            <button
+              type="button"
+              className="pipeline-owner-cell pipeline-owner-cell--link"
+              onClick={() => onOwnerFilter?.(lead.assignedToUserId)}
+            >
+              <span className="pipeline-owner-avatar" aria-hidden>
+                {initialsFor(ownerName)}
+              </span>
+              <span className="pipeline-hs-cell-text">{ownerName}</span>
+            </button>
+          ) : (
+            <span className="pipeline-owner-cell">
+              <span className="pipeline-owner-avatar" aria-hidden>
+                {initialsFor(ownerName)}
+              </span>
+              <span
+                className={`pipeline-hs-cell-text ${lead.assignedToUserId ? '' : 'pipeline-hs-muted'}`}
+              >
+                {ownerName}
+              </span>
+            </span>
+          )}
+        </td>
+      )
+    case 'activity':
+      return (
+        <td key={colId} className="pipeline-hs-td pipeline-hs-td--activity">
+          {activityAt ? (
+            <button
+              type="button"
+              className={`pipeline-activity-cell ${stale ? 'is-stale' : ''}`}
+              onClick={() => onSelect(lead.id, 'activity')}
+              title={formatDateTime(activityAt)}
+            >
+              <span aria-hidden>{ACTIVITY_ICONS[activityType] || '·'}</span>
+              {rel}
+            </button>
+          ) : (
+            <span className="pipeline-activity-cell is-none">No activity</span>
+          )}
+        </td>
+      )
+    case 'tags':
+      return (
+        <td key={colId} className="pipeline-hs-td">
+          {tags.length ? (
+            <>
+              {tags.slice(0, 3).map((t) => (
+                <LeadTag key={t.id} name={t.name} title={t.name} />
+              ))}
+              {tags.length > 3 ? (
+                <span className="pipeline-tag-overflow" title={tags.map((t) => t.name).join(', ')}>
+                  +{tags.length - 3}
+                </span>
+              ) : null}
+            </>
+          ) : (
+            <span className="pipeline-hs-muted">—</span>
+          )}
+        </td>
+      )
+    case 'email':
+      return (
+        <td key={colId} className="pipeline-hs-td pipeline-hs-td--email">
+          {email ? (
+            leadHasSendableEmail(lead) ? (
+              <a
+                href={`mailto:${encodeURIComponent(email)}`}
+                className="pipeline-hs-cell-text"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {email}
+              </a>
+            ) : (
+              <span className="pipeline-hs-cell-text">{email}</span>
+            )
+          ) : (
+            <span className="pipeline-hs-muted">—</span>
+          )}
+        </td>
+      )
+    case 'notes': {
+      const notes = String(lead.crm?.notes || '').trim()
+      return (
+        <td key={colId} className="pipeline-hs-td pipeline-hs-td--notes">
+          {notes ? (
+            <span className="pipeline-hs-cell-text pipeline-hs-notes-preview" title={notes}>
+              {notes.length > 80 ? `${notes.slice(0, 80)}…` : notes}
+            </span>
+          ) : (
+            <span className="pipeline-hs-muted">—</span>
+          )}
+        </td>
+      )
+    }
+    case 'created':
+      return (
+        <td key={colId} className="pipeline-hs-td">
+          <span className="pipeline-hs-date">{formatCrmDate(lead.savedAt || lead.createdAt)}</span>
+        </td>
+      )
+    default:
+      return null
+  }
+}
+
 function StatusBadge({ status, label, colorClass, onChange, statusOptions = [] }) {
   const [open, setOpen] = useState(false)
   return (
@@ -164,7 +516,7 @@ function StatusBadge({ status, label, colorClass, onChange, statusOptions = [] }
 
 export default function PipelineLeadsTable({
   leads,
-  showHoverActions = true,
+  showHoverActions = false,
   selectedId,
   selectedIds,
   onSelect,
@@ -189,7 +541,10 @@ export default function PipelineLeadsTable({
   const [sortKey, setSortKey] = useState('created')
   const [sortDir, setSortDir] = useState('desc')
 
-  const col = useCallback((id) => visibleColumns.includes(id), [visibleColumns])
+  const orderedColumns = useMemo(
+    () => normalizePipelineColumnOrder(visibleColumns),
+    [visibleColumns]
+  )
 
   const sorted = useMemo(() => sortLeads(leads, sortKey, sortDir), [leads, sortKey, sortDir])
 
@@ -223,58 +578,8 @@ export default function PipelineLeadsTable({
                 className="pipeline-hs-checkbox"
               />
             </th>
-            {col('name') && (
-              <SortHeader
-                label="Name"
-                sortKey="name"
-                activeKey={sortKey}
-                sortDir={sortDir}
-                onSort={onSort}
-                className="pipeline-hs-th pipeline-hs-th--name"
-              />
-            )}
-            {col('status') && <th scope="col" className="pipeline-hs-th">Status</th>}
-            {col('company') && (
-              <SortHeader
-                label="Company"
-                sortKey="company"
-                activeKey={sortKey}
-                sortDir={sortDir}
-                onSort={onSort}
-                className="pipeline-hs-th pipeline-hs-th--company"
-              />
-            )}
-            {col('phone') && (
-              <th scope="col" className="pipeline-hs-th pipeline-hs-th--phone">
-                Phone
-              </th>
-            )}
-            {col('owner') && (
-              <th scope="col" className="pipeline-hs-th pipeline-hs-th--owner">
-                Lead owner
-              </th>
-            )}
-            {col('activity') && (
-              <SortHeader
-                label="Last activity"
-                sortKey="activity"
-                activeKey={sortKey}
-                sortDir={sortDir}
-                onSort={onSort}
-                className="pipeline-hs-th pipeline-hs-th--activity"
-              />
-            )}
-            {col('tags') && <th scope="col" className="pipeline-hs-th">Tags</th>}
-            {col('email') && <th scope="col" className="pipeline-hs-th pipeline-hs-th--email">Email</th>}
-            {col('created') && (
-              <SortHeader
-                label="Create date"
-                sortKey="created"
-                activeKey={sortKey}
-                sortDir={sortDir}
-                onSort={onSort}
-                className="pipeline-hs-th pipeline-hs-th--created"
-              />
+            {orderedColumns.map((colId) =>
+              renderPipelineHeader(colId, { sortKey, sortDir, onSort })
             )}
             <th scope="col" className="pipeline-hs-th pipeline-hs-th--actions" aria-label="Actions" />
           </tr>
@@ -311,207 +616,34 @@ export default function PipelineLeadsTable({
                     className="pipeline-hs-checkbox"
                   />
                 </td>
-                {col('name') && (
-                  <td className="pipeline-hs-td pipeline-hs-td--name">
-                    <div className="pipeline-hs-name-cell pipeline-hs-name-cell--v2">
-                      <span className="pipeline-hs-avatar" aria-hidden>
-                        {(lead.firstName?.[0] || lead.company?.[0] || '?').toUpperCase()}
-                      </span>
-                      <div className="pipeline-hs-name-stack">
-                        <div className="pipeline-hs-name-row">
-                          <button
-                            type="button"
-                            className="pipeline-hs-name-link pipeline-hs-primary-text ci-selectable-text"
-                            onClick={() => {
-                              if (hasActiveTextSelection()) return
-                              onSelect(lead.id)
-                            }}
-                          >
-                            {nameStr}
-                          </button>
-                        </div>
-                        {loc ? <span className="pipeline-hs-sub">{loc}</span> : null}
-                        <LeadTagDots lead={lead} tagById={tagById} className="pipeline-hs-tags" max={4} />
-                      </div>
-                      {showHoverActions ? (
-                        <span className="pipeline-row-hover-actions" aria-label="Quick actions">
-                          {leadHasCallablePhone(lead) ? (
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                onQuickCall?.(lead)
-                              }}
-                            >
-                              Call
-                            </button>
-                          ) : null}
-                          {email ? (
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                onQuickEmail?.(lead)
-                              }}
-                            >
-                              Email
-                            </button>
-                          ) : null}
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              onQuickTask?.(lead)
-                            }}
-                          >
-                            Task
-                          </button>
-                          {lead.phone && onQuickWhatsApp ? (
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                onQuickWhatsApp?.(lead)
-                              }}
-                            >
-                              WhatsApp
-                            </button>
-                          ) : null}
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              onSelect(lead.id)
-                            }}
-                          >
-                            Open →
-                          </button>
-                        </span>
-                      ) : null}
-                    </div>
-                  </td>
-                )}
-                {col('status') && (
-                  <td className="pipeline-hs-td">
-                    <StatusBadge
-                      status={lead.crm?.status}
-                      label={meta.label}
-                      colorClass={meta.color}
-                      statusOptions={statusOptions}
-                      onChange={(next) => onStatusChange?.(lead.id, next)}
-                    />
-                  </td>
-                )}
-                {col('company') && (
-                  <td className="pipeline-hs-td pipeline-hs-td--company">
-                    {lead.company ? (
-                      <span className="pipeline-hs-cell-text" title={lead.company}>
-                        {lead.company}
-                      </span>
-                    ) : (
-                      <span className="pipeline-hs-muted">—</span>
-                    )}
-                  </td>
-                )}
-                {col('phone') && (
-                  <td className="pipeline-hs-td pipeline-hs-td--phone">
-                    {lead.phone ? (
-                      <LeadPhoneCall
-                        phone={lead.phone}
-                        leadId={lead.id}
-                        numberClassName="pipeline-hs-cell-text"
-                        pipelineCallIcon
-                      />
-                    ) : (
-                      <span className="pipeline-hs-muted">—</span>
-                    )}
-                  </td>
-                )}
-                {col('owner') && (
-                  <td className="pipeline-hs-td pipeline-hs-td--owner">
-                    {canFilterByOwner && lead.assignedToUserId ? (
-                      <button
-                        type="button"
-                        className="pipeline-owner-cell pipeline-owner-cell--link"
-                        onClick={() => onOwnerFilter?.(lead.assignedToUserId)}
-                      >
-                        <span className="pipeline-owner-avatar" aria-hidden>
-                          {initialsFor(ownerName)}
-                        </span>
-                        <span className="pipeline-hs-cell-text">{ownerName}</span>
-                      </button>
-                    ) : (
-                      <span className="pipeline-owner-cell">
-                        <span className="pipeline-owner-avatar" aria-hidden>
-                          {initialsFor(ownerName)}
-                        </span>
-                        <span
-                          className={`pipeline-hs-cell-text ${lead.assignedToUserId ? '' : 'pipeline-hs-muted'}`}
-                        >
-                          {ownerName}
-                        </span>
-                      </span>
-                    )}
-                  </td>
-                )}
-                {col('activity') && (
-                  <td className="pipeline-hs-td pipeline-hs-td--activity">
-                    {activityAt ? (
-                      <button
-                        type="button"
-                        className={`pipeline-activity-cell ${stale ? 'is-stale' : ''}`}
-                        onClick={() => onSelect(lead.id, 'activity')}
-                        title={formatDateTime(activityAt)}
-                      >
-                        <span aria-hidden>{ACTIVITY_ICONS[activityType] || '·'}</span>
-                        {rel}
-                      </button>
-                    ) : (
-                      <span className="pipeline-activity-cell is-none">No activity</span>
-                    )}
-                  </td>
-                )}
-                {col('tags') && (
-                  <td className="pipeline-hs-td">
-                    {tags.length ? (
-                      <>
-                        {tags.slice(0, 3).map((t) => (
-                          <LeadTag key={t.id} name={t.name} title={t.name} />
-                        ))}
-                        {tags.length > 3 ? (
-                          <span className="pipeline-tag-overflow" title={tags.map((t) => t.name).join(', ')}>
-                            +{tags.length - 3}
-                          </span>
-                        ) : null}
-                      </>
-                    ) : (
-                      <span className="pipeline-hs-muted">—</span>
-                    )}
-                  </td>
-                )}
-                {col('email') && (
-                  <td className="pipeline-hs-td pipeline-hs-td--email">
-                    {email ? (
-                      leadHasSendableEmail(lead) ? (
-                        <a
-                          href={`mailto:${encodeURIComponent(email)}`}
-                          className="pipeline-hs-cell-text"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          {email}
-                        </a>
-                      ) : (
-                        <span className="pipeline-hs-cell-text">{email}</span>
-                      )
-                    ) : (
-                      <span className="pipeline-hs-muted">—</span>
-                    )}
-                  </td>
-                )}
-                {col('created') && (
-                  <td className="pipeline-hs-td">
-                    <span className="pipeline-hs-date">{formatCrmDate(lead.savedAt || lead.createdAt)}</span>
-                  </td>
+                {orderedColumns.map((colId) =>
+                  renderPipelineCell(colId, lead, {
+                    meta,
+                    email,
+                    loc,
+                    ownerName,
+                    activityAt,
+                    activityType,
+                    rel,
+                    stale,
+                    tags,
+                    nameStr,
+                    showHoverActions,
+                    onSelect,
+                    onQuickCall,
+                    onQuickEmail,
+                    onQuickTask,
+                    onQuickWhatsApp,
+                    onStatusChange,
+                    onOwnerFilter,
+                    canFilterByOwner,
+                    statusOptions,
+                    tagById,
+                    canAssign,
+                    onDeleteLead,
+                    onChangeOwner,
+                    onChangeStatus,
+                  })
                 )}
                 <td className="pipeline-hs-td pipeline-hs-td--actions">
                   <PipelineRowActionsMenu
