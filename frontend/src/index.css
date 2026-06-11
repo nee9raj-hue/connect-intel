@@ -86,8 +86,6 @@ html {
 
 .pipeline-hs-name-link:hover {
   color: #1e2f3d;
-  text-decoration: underline;
-  text-underline-offset: 2px;
 }
 
 /* Brand logos — PNG with transparency; do not add fill/background behind icon */
@@ -2566,8 +2564,6 @@ textarea {
 .pipeline-hs-name-btn:hover .pipeline-hs-primary-text,
 .pipeline-hs-company-btn:hover .pipeline-hs-primary-text {
   color: #1e2f3d;
-  text-decoration: underline;
-  text-underline-offset: 2px;
 }
 
 .pipeline-hs-td--email a.pipeline-hs-primary-text:hover {

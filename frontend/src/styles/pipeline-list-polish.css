@@ -155,11 +155,13 @@
 
 .pipeline-hs-name-cell--v2 {
   display: inline-flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 0.5rem;
+  width: 100%;
   max-width: 100%;
+  min-height: 1.5rem;
   position: relative;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .pipeline-hs-name-stack {
@@ -188,7 +190,7 @@
   width: 16%;
   min-width: 150px;
   max-width: 220px;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .pipeline-hs-table-wrap--v2 .pipeline-hs-th--company,
@@ -229,48 +231,31 @@
 
 .pipeline-row-hover-actions {
   position: absolute;
-  left: 2rem;
-  top: 0.2rem;
-  z-index: 6;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
   display: flex;
   align-items: center;
   gap: 2px;
   flex-wrap: nowrap;
   width: max-content;
-  max-width: min(28rem, calc(100vw - 6rem));
+  max-width: min(20rem, 100%);
   visibility: hidden;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.12s ease;
-  background: #f5f8fa;
-  border: 1px solid #eaf0f6;
-  border-radius: 4px;
-  padding: 2px 4px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-.pipeline-hs-row--v2:hover {
-  position: relative;
-  z-index: 4;
-}
-
-.pipeline-hs-row--v2:hover .pipeline-hs-td--name,
-.pipeline-hs-row--v2:hover .pipeline-hs-td--company {
-  overflow: visible;
-}
-
-.pipeline-hs-row--v2:hover .pipeline-hs-name-link {
-  visibility: hidden;
+  transition: opacity 0.12s ease, visibility 0.12s ease;
+  background: linear-gradient(90deg, transparent 0, #f5f8fa 0.65rem, #f5f8fa 100%);
+  border: none;
+  border-radius: 0;
+  padding: 0 0 0 0.65rem;
+  box-shadow: none;
 }
 
 .pipeline-hs-row--v2:hover .pipeline-row-hover-actions {
   visibility: visible;
   opacity: 1;
   pointer-events: auto;
-}
-
-.pipeline-hs-table-wrap--no-hover-actions .pipeline-hs-row--v2:hover .pipeline-hs-name-link {
-  visibility: visible;
 }
 
 .pipeline-row-hover-actions button {
@@ -312,9 +297,9 @@
   text-overflow: ellipsis;
 }
 
-.pipeline-hs-name-link:hover {
+.pipeline-hs-table-wrap--v2 .pipeline-hs-name-link:hover {
   color: #1e2f3d;
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 .pipeline-hs-status {
@@ -381,7 +366,7 @@
 
 .pipeline-owner-cell--link:hover .pipeline-hs-cell-text {
   color: #ff773d;
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 .pipeline-activity-cell {
@@ -610,6 +595,7 @@
 .hs-view-settings__column-move-btn {
   width: 1.65rem;
   height: 1.35rem;
+  box-sizing: border-box;
   border: 1px solid var(--color-hs-border, #cbd6e2);
   border-radius: 3px;
   background: var(--color-hs-canvas, #f5f8fa);
@@ -617,11 +603,13 @@
   font-size: 0.7rem;
   line-height: 1;
   cursor: pointer;
+  transition: color 0.12s ease, border-color 0.12s ease, background-color 0.12s ease;
 }
 
 .hs-view-settings__column-move-btn:hover:not(:disabled) {
   border-color: var(--brand-primary, #ff773d);
   color: var(--brand-primary, #ff773d);
+  background: var(--color-hs-canvas, #f5f8fa);
 }
 
 .hs-view-settings__column-move-btn:disabled {
@@ -1171,8 +1159,36 @@
   .pipeline-hs-row--v2 .pipeline-row-hover-actions {
     display: none;
   }
+}
 
-  .pipeline-hs-row--v2:hover .pipeline-hs-name-link {
-    visibility: visible;
-  }
+/* Pipeline list hovers: color only — no scale, shadow, or layout shift */
+.pipeline-hs-table-wrap--v2 .pipeline-hs-th-btn {
+  transition: color 0.12s ease, background-color 0.12s ease;
+}
+
+.pipeline-hs-table-wrap--v2 .pipeline-hs-th-btn:hover,
+.pipeline-hs-table-wrap--v2 .pipeline-hs-th-btn.is-active {
+  background: #eaf0f6;
+}
+
+.pipeline-hs-table-wrap--v2 .lead-phone-call__btn {
+  transition: color 0.12s ease, opacity 0.12s ease;
+}
+
+.pipeline-hs-table-wrap--v2 .lead-phone-call__btn:hover:not(:disabled) {
+  transform: none;
+  box-shadow: none;
+}
+
+.pipeline-hs-table-wrap--v2 .pipeline-row-actions-btn {
+  transition: color 0.12s ease, background-color 0.12s ease;
+}
+
+.pipeline-hs-table-wrap--v2 .pipeline-row-actions-btn:hover {
+  background: #eaf0f6;
+  color: #33475b;
+}
+
+.pipeline-hs-table-wrap--v2 .pipeline-row-hover-actions button {
+  transition: color 0.12s ease, background-color 0.12s ease;
 }
