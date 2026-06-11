@@ -88,6 +88,12 @@ export function navTargetToOptions(target = {}) {
   if (target.tasksDueToday) options.tasksDueToday = true
   if (target.unreadOnly) options.unreadOnly = true
   if (Array.isArray(target.leadIds) && target.leadIds.length) options.leadIds = [...target.leadIds]
+  if (target.campaignId) options.campaignId = target.campaignId
+  if (target.campaignRecipientFilter) options.campaignRecipientFilter = target.campaignRecipientFilter
+  if (target.campaignName) options.campaignName = target.campaignName
+  if (target.openedCampaignId) options.openedCampaignId = target.openedCampaignId
+  if (target.clickedCampaignId) options.clickedCampaignId = target.clickedCampaignId
+  if (target.marketingTab) options.marketingTab = target.marketingTab
   return options
 }
 

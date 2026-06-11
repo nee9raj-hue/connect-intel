@@ -5,6 +5,7 @@ import { formatDateTime } from '../../lib/crmUiConstants'
 import { HubSkeleton } from './MarketingHubCharts'
 import { BarChart, LineChart, ReputationBar } from './MarketingSimpleCharts'
 import CampaignReportsView from './CampaignReportsView'
+import { marketingPipelineOptions } from '../../lib/marketingNavigation'
 
 const PERIODS = [
   { id: '7d', label: '7d' },
@@ -82,6 +83,19 @@ export default function MarketingAnalyticsHub({
   const runAction = (action) => {
     if (!action) return
     onNavigate?.('marketing', { tab: action.tab || 'campaigns', ...action })
+  }
+
+  const goToCampaignPipeline = (campaign, filter) => {
+    if (!campaign?.id) return
+    onNavigate?.(
+      'pipeline',
+      marketingPipelineOptions({
+        campaignId: campaign.id,
+        filter,
+        campaignName: campaign.name,
+        returnTo: 'marketing',
+      })
+    )
   }
 
   if (campaignId) {
@@ -211,23 +225,65 @@ export default function MarketingAnalyticsHub({
               </tr>
             </thead>
             <tbody>
-              {topCampaigns.map((c) => (
-                <tr
-                  key={c.id}
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => runAction({ tab: 'analytics', campaignId: c.id })}
-                  onKeyDown={(e) => e.key === 'Enter' && runAction({ tab: 'analytics', campaignId: c.id })}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <td>{c.name}</td>
-                  <td>{c.sent ?? c.stats?.sent ?? '—'}</td>
-                  <td>{c.openRate ?? c.stats?.openRate ?? 0}%</td>
-                  <td>{c.clickRate ?? c.ctr ?? c.stats?.clickRate ?? 0}%</td>
-                  <td>{c.revenue ? formatDealValue(c.revenue) : '—'}</td>
-                  <td>{c.startedAt ? formatDateTime(c.startedAt) : '—'}</td>
-                </tr>
-              ))}
+              {topCampaigns.map((c) => {
+                const sent = c.sent ?? c.stats?.sent ?? c.stats?.recipientsSent ?? 0
+                const opens = c.stats?.uniqueOpens ?? c.opens ?? 0
+                const clicks = c.stats?.uniqueClicks ?? c.clicks ?? 0
+                return (
+                  <tr key={c.id}>
+                    <td>
+                      <button
+                        type="button"
+                        className="mhub-v3-link"
+                        onClick={() => runAction({ tab: 'analytics', campaignId: c.id })}
+                      >
+                        {c.name}
+                      </button>
+                    </td>
+                    <td>
+                      {sent > 0 ? (
+                        <button
+                          type="button"
+                          className="mhub-v3-link"
+                          onClick={() => goToCampaignPipeline(c, 'sent')}
+                        >
+                          {sent}
+                        </button>
+                      ) : (
+                        '—'
+                      )}
+                    </td>
+                    <td>
+                      {opens > 0 ? (
+                        <button
+                          type="button"
+                          className="mhub-v3-link"
+                          onClick={() => goToCampaignPipeline(c, 'opened')}
+                        >
+                          {c.openRate ?? c.stats?.openRate ?? 0}%
+                        </button>
+                      ) : (
+                        `${c.openRate ?? c.stats?.openRate ?? 0}%`
+                      )}
+                    </td>
+                    <td>
+                      {clicks > 0 ? (
+                        <button
+                          type="button"
+                          className="mhub-v3-link"
+                          onClick={() => goToCampaignPipeline(c, 'clicked')}
+                        >
+                          {c.clickRate ?? c.ctr ?? c.stats?.clickRate ?? 0}%
+                        </button>
+                      ) : (
+                        `${c.clickRate ?? c.ctr ?? c.stats?.clickRate ?? 0}%`
+                      )}
+                    </td>
+                    <td>{c.revenue ? formatDealValue(c.revenue) : '—'}</td>
+                    <td>{c.startedAt ? formatDateTime(c.startedAt) : '—'}</td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         ) : (

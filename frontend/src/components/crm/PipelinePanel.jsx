@@ -257,10 +257,51 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     return ids.length ? ids : ['__none__']
   }, [notifications, panelOptions?.unreadOnly, panelOptions?.activityFilter])
 
+  const marketingCampaignFilter = useMemo(() => {
+    const po = panelOptions || {}
+    const campaignId = po.campaignId || po.openedCampaignId || po.clickedCampaignId
+    if (!campaignId) return null
+    const filter =
+      po.campaignRecipientFilter ||
+      (po.openedCampaignId ? 'opened' : po.clickedCampaignId ? 'clicked' : 'all')
+    if (filter === 'all' && !po.campaignRecipientFilter && !po.openedCampaignId && !po.clickedCampaignId) {
+      return null
+    }
+    return { campaignId, filter }
+  }, [panelOptions])
+
+  const [marketingLeadIds, setMarketingLeadIds] = useState(null)
+
+  useEffect(() => {
+    if (!marketingCampaignFilter || panelOptions?.leadIds?.length) {
+      setMarketingLeadIds(null)
+      return undefined
+    }
+    let cancelled = false
+    api
+      .getMarketingCampaignRecipientLeadIds(
+        marketingCampaignFilter.campaignId,
+        marketingCampaignFilter.filter,
+        { silent: true }
+      )
+      .then((data) => {
+        if (cancelled) return
+        const ids = (data?.leadIds || []).map(String)
+        setMarketingLeadIds(ids.length ? ids : ['__none__'])
+      })
+      .catch(() => {
+        if (!cancelled) setMarketingLeadIds(['__none__'])
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [marketingCampaignFilter, panelOptions?.leadIds])
+
   const dashboardLeadIds = useMemo(() => {
     if (panelOptions?.leadIds?.length) return panelOptions.leadIds.map(String)
+    if (marketingLeadIds?.length) return marketingLeadIds
     return unreadLeadIds
-  }, [panelOptions?.leadIds, unreadLeadIds])
+  }, [panelOptions?.leadIds, marketingLeadIds, unreadLeadIds])
 
   useEffect(() => {
     const po = panelOptions || {}
@@ -277,6 +318,12 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     if (po.scoreMin != null && po.scoreMin !== '') adv.minLeadScore = Number(po.scoreMin)
     if (po.smartTags?.length) adv.smartTags = po.smartTags
 
+    const hasMarketingFilter =
+      po.campaignId ||
+      po.openedCampaignId ||
+      po.clickedCampaignId ||
+      po.campaignRecipientFilter
+
     const hasDashExtras =
       po.assignedAfter ||
       po.lastActivity ||
@@ -285,7 +332,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       po.unreadOnly ||
       po.activityFilter === 'unread' ||
       po.teamId ||
-      po.leadIds?.length
+      po.leadIds?.length ||
+      hasMarketingFilter
 
     const hasAdv =
       po.overdueFollowUp ||
@@ -1083,7 +1131,10 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
         <MyDayReturnBar panelOptions={panelOptions} onNavigate={onNavigate} />
         {dashboardFilterLabel ? (
           <div className="dash-v4__pipeline-filter" role="status">
-            <span>Dashboard filter: {dashboardFilterLabel}</span>
+            <span>
+              {panelOptions?.returnTo === 'marketing' ? 'Marketing filter' : 'Dashboard filter'}:{' '}
+              {dashboardFilterLabel}
+            </span>
             <span className="dash-v4__pipeline-filter-count">
               {filtered.length.toLocaleString()} lead{filtered.length === 1 ? '' : 's'}
             </span>

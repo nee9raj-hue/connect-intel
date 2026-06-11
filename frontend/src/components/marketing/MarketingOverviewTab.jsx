@@ -7,6 +7,7 @@ import {
   campaignInitials,
   formatPct,
 } from './marketingTheme'
+import { marketingPipelineOptions } from '../../lib/marketingNavigation'
 
 function StatusBadge({ status }) {
   const key = String(status || 'draft').toLowerCase()
@@ -97,6 +98,19 @@ export default function MarketingOverviewTab({
     onNavigate?.('marketing', { tab: action.tab || 'overview', ...action })
   }
 
+  const goToCampaignPipeline = (campaign, filter) => {
+    if (!campaign?.id) return
+    onNavigate?.(
+      'pipeline',
+      marketingPipelineOptions({
+        campaignId: campaign.id,
+        filter,
+        campaignName: campaign.name,
+        returnTo: 'marketing',
+      })
+    )
+  }
+
   if (dataLoading && !reportCampaigns.length && !summary) {
     return (
       <div className="mhub-v3-page">
@@ -161,40 +175,51 @@ export default function MarketingOverviewTab({
               const tint = campaignIconTint(i)
               const openRate = c.openRate ?? c.stats?.openRate ?? 0
               const clickRate = c.clickRate ?? c.ctr ?? c.stats?.clickRate ?? 0
+              const opens = c.stats?.uniqueOpens ?? c.opens ?? 0
+              const clicks = c.stats?.uniqueClicks ?? c.clicks ?? 0
               return (
-                <button
-                  key={c.id}
-                  type="button"
-                  className="mhub-v3-campaign-row"
-                  onClick={() =>
-                    onOpenCampaign ? onOpenCampaign(c) : runAction({ tab: 'analytics', campaignId: c.id })
-                  }
-                >
+                <div key={c.id} className="mhub-v3-campaign-row">
                   <span className="mhub-v3-campaign-icon" style={{ background: tint.bg, color: tint.color }}>
                     {campaignInitials(c.name)}
                   </span>
-                  <span>
+                  <button
+                    type="button"
+                    className="mhub-v3-campaign-row__name"
+                    onClick={() =>
+                      onOpenCampaign ? onOpenCampaign(c) : runAction({ tab: 'analytics', campaignId: c.id })
+                    }
+                  >
                     <span className="mhub-v3-campaign-name">{c.name}</span>
                     <span className="mhub-v3-campaign-meta">
                       {c.ownerName || c.createdByName || 'Owner'} ·{' '}
                       {c.listName || c.segmentName || c.audience || 'Audience'} ·{' '}
                       {c.startedAt || c.sentAt ? formatDateTime(c.startedAt || c.sentAt) : '—'}
                     </span>
-                  </span>
-                  <span className="mhub-v3-metric-col">
+                  </button>
+                  <button
+                    type="button"
+                    className="mhub-v3-metric-col mhub-v3-metric-col--link"
+                    disabled={opens <= 0}
+                    onClick={() => goToCampaignPipeline(c, 'opened')}
+                  >
                     <strong>{formatPct(openRate)}</strong>
                     <span>Opens</span>
-                  </span>
-                  <span className="mhub-v3-metric-col">
+                  </button>
+                  <button
+                    type="button"
+                    className="mhub-v3-metric-col mhub-v3-metric-col--link"
+                    disabled={clicks <= 0}
+                    onClick={() => goToCampaignPipeline(c, 'clicked')}
+                  >
                     <strong>{formatPct(clickRate)}</strong>
                     <span>Clicks</span>
-                  </span>
+                  </button>
                   <span className="mhub-v3-metric-col">
                     <strong>{c.revenue ? formatDealValue(c.revenue) : '—'}</strong>
                     <span>Rev</span>
                   </span>
                   <StatusBadge status={c.status} />
-                </button>
+                </div>
               )
             })
           )}

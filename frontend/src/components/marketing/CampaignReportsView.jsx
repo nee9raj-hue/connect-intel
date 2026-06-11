@@ -10,6 +10,12 @@ import {
   exportCampaignReportExcel,
   exportCampaignReportPdf,
 } from '../../lib/marketingReportExport'
+import {
+  CAMPAIGN_RECIPIENT_FILTERS,
+  filterCampaignRecipients,
+  campaignRecipientFilterLabel,
+} from '../../../../lib/marketingCampaignRecipientFilter.js'
+import { marketingPipelineOptions } from '../../lib/marketingNavigation'
 
 const PAGE_SIZE = 100
 
@@ -73,19 +79,36 @@ function formatShortDate(iso) {
 }
 
 function campaignStats(campaign) {
-  return campaign?.stats || campaign?.analytics || {}
+  const stats = campaign?.stats || {}
+  const analytics = campaign?.analytics || {}
+  return { ...analytics, ...stats }
 }
 
-const FILTERS = [
-  { id: 'all', label: 'All recipients' },
-  { id: 'sent', label: 'Sent' },
-  { id: 'delivered', label: 'Delivered' },
-  { id: 'opened', label: 'Opened' },
-  { id: 'clicked', label: 'Clicked' },
-  { id: 'bounced', label: 'Bounced' },
-  { id: 'failed', label: 'Failed' },
-  { id: 'unsubscribed', label: 'Unsubscribed' },
-]
+function CampaignMetricButton({ value, sub, onClick, className = '' }) {
+  if (!onClick) {
+    return (
+      <td className={`px-4 py-3 tabular-nums text-right ${className}`}>
+        {value}
+        {sub != null ? <span className="block text-xs text-gray-400">{sub}</span> : null}
+      </td>
+    )
+  }
+  return (
+    <td className={`px-4 py-3 tabular-nums text-right ${className}`}>
+      <button
+        type="button"
+        onClick={onClick}
+        className="text-left w-full hover:bg-[#fff4ee] rounded-md px-1 -mx-1 py-0.5 transition-colors"
+        title="View in pipeline"
+      >
+        {value}
+        {sub != null ? <span className="block text-xs text-[#FF773D]">{sub} · pipeline</span> : null}
+      </button>
+    </td>
+  )
+}
+
+const FILTERS = CAMPAIGN_RECIPIENT_FILTERS.filter((f) => f.id !== 'pending')
 
 const STATUS_STYLES = {
   delivered: 'bg-slate-100 text-[#64748B] border-slate-200',
@@ -118,23 +141,6 @@ export function campaignToForm(campaign) {
     step2PreviewText: s1?.previewText || '',
     step2Delay: s1?.delayDays ?? 3,
   }
-}
-
-function filterRecipients(rows, filter) {
-  if (filter === 'sent')
-    return rows.filter((r) => (r.sentCount || 0) > 0 || r.deliveryStatus === 'delivered')
-  if (filter === 'delivered') return rows.filter((r) => r.deliveryStatus === 'delivered')
-  if (filter === 'pending')
-    return rows.filter((r) => r.deliveryStatus === 'pending' || (r.sentCount || 0) === 0)
-  if (filter === 'opened') return rows.filter((r) => r.opens > 0)
-  if (filter === 'clicked') return rows.filter((r) => r.clicks > 0)
-  if (filter === 'bounced') return rows.filter((r) => r.deliveryStatus === 'bounced')
-  if (filter === 'failed')
-    return rows.filter(
-      (r) => r.deliveryStatus === 'failed' || r.deliveryStatus === 'unsubscribed'
-    )
-  if (filter === 'unsubscribed') return rows.filter((r) => r.deliveryStatus === 'unsubscribed')
-  return rows
 }
 
 function recipientEngagementLabel(row) {
@@ -352,10 +358,11 @@ function KpiRecipientsPopup({
   isWhatsApp,
   onClose,
   onShowInTable,
+  onViewInPipeline,
   onOpenLead,
 }) {
   const [visible, setVisible] = useState(PAGE_SIZE)
-  const filtered = useMemo(() => filterRecipients(recipients, filter), [recipients, filter])
+  const filtered = useMemo(() => filterCampaignRecipients(recipients, filter), [recipients, filter])
   const shown = filtered.slice(0, visible)
   const hasMore = visible < filtered.length
 
@@ -399,13 +406,22 @@ function KpiRecipientsPopup({
           Load more ({filtered.length - visible} remaining)
         </button>
       )}
-      <button
-        type="button"
-        onClick={() => onShowInTable(filter)}
-        className="mt-3 w-full text-xs font-semibold py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800"
-      >
-        Show in recipient table
-      </button>
+      <div className="mt-3 flex flex-col gap-2">
+        <button
+          type="button"
+          onClick={() => onViewInPipeline(filter, filtered.map((r) => r.leadId).filter(Boolean))}
+          className="w-full text-xs font-semibold py-2 bg-[#3730a3] text-white rounded-lg hover:bg-[#312e81]"
+        >
+          View in pipeline ({filtered.length})
+        </button>
+        <button
+          type="button"
+          onClick={() => onShowInTable(filter)}
+          className="w-full text-xs font-semibold py-2 border border-gray-200 rounded-lg hover:bg-gray-50"
+        >
+          Show in recipient table
+        </button>
+      </div>
     </ReportOverlay>
   )
 }
@@ -455,8 +471,28 @@ function CampaignDetailReport({
   const goToLead = (leadId) => {
     if (!leadId) return
     onClose?.()
-    onNavigate?.('pipeline')
+    onNavigate?.('pipeline', { returnTo: 'marketing', marketingTab: 'analytics' })
     openPipelineLead(leadId, 'overview')
+  }
+
+  const goToPipeline = (recipientFilter, leadIds = null) => {
+    const rows = leadIds?.length
+      ? leadIds
+      : filterCampaignRecipients(report?.recipients || [], recipientFilter)
+          .map((r) => r.leadId)
+          .filter(Boolean)
+    if (!rows.length && recipientFilter !== 'all') return
+    onClose?.()
+    onNavigate?.(
+      'pipeline',
+      marketingPipelineOptions({
+        campaignId,
+        filter: recipientFilter,
+        campaignName: report?.campaign?.name || campaignName,
+        leadIds: rows.length ? rows : undefined,
+        returnTo: 'marketing',
+      })
+    )
   }
 
   const markWhatsAppSent = async (enrollmentId) => {
@@ -475,7 +511,7 @@ function CampaignDetailReport({
   const sentKpi = stats.recipientsSent ?? stats.sent ?? 0
   const allRecipients = report?.recipients || []
   const recipients = useMemo(() => {
-    let rows = filterRecipients(allRecipients, filter)
+    let rows = filterCampaignRecipients(allRecipients, filter)
     const q = search.trim().toLowerCase()
     if (q) {
       rows = rows.filter(
@@ -492,6 +528,12 @@ function CampaignDetailReport({
   const shownRecipients = recipients.slice(0, listVisible)
   const hasMoreRecipients = listVisible < recipients.length
 
+  const exportReport = useMemo(() => {
+    if (!report) return null
+    if (filter === 'all' && !search.trim()) return report
+    return { ...report, recipients }
+  }, [report, recipients, filter, search])
+
   const showInTable = (nextFilter) => {
     setFilter(nextFilter)
     setKpiPopup(null)
@@ -500,7 +542,24 @@ function CampaignDetailReport({
     })
   }
 
+  const kpiCountForFilter = (nextFilter) => {
+    if (nextFilter === 'all') return stats.enrolled ?? allRecipients.length
+    if (nextFilter === 'sent') return sentKpi
+    if (nextFilter === 'opened') return stats.uniqueOpens ?? 0
+    if (nextFilter === 'clicked') return stats.uniqueClicks ?? 0
+    if (nextFilter === 'bounced') return stats.bounced ?? 0
+    if (nextFilter === 'failed') return stats.failed ?? 0
+    if (nextFilter === 'unsubscribed') return stats.unsubscribed ?? 0
+    if (nextFilter === 'pending') return stats.pending ?? 0
+    return filterCampaignRecipients(allRecipients, nextFilter).length
+  }
+
   const openKpi = (nextFilter, label) => {
+    const count = kpiCountForFilter(nextFilter)
+    if (count > 0 && nextFilter !== 'all') {
+      goToPipeline(nextFilter)
+      return
+    }
     setKpiPopup({ filter: nextFilter, label })
   }
 
@@ -534,6 +593,7 @@ function CampaignDetailReport({
           isWhatsApp={isWhatsApp}
           onClose={() => setKpiPopup(null)}
           onShowInTable={showInTable}
+          onViewInPipeline={goToPipeline}
           onOpenLead={goToLead}
         />
       )}
@@ -560,7 +620,7 @@ function CampaignDetailReport({
             <p className="text-xs text-[#516f90] mt-1 leading-relaxed max-w-2xl">
               {report?.reportScope === 'org_member'
                 ? 'Team view: all enrolled recipients and engagement for org campaigns you can open. Click a KPI to drill down; expand a row for link activity.'
-                : 'Click a KPI to filter recipients. Expand a row for delivery details and clicked links.'}
+                : 'Click a KPI to open those leads in Pipeline (filtered). Expand a row for link activity.'}
               {sentKpi > 0 && stats.uniqueOpens === 0 && stats.uniqueClicks === 0 && (
                 <span className="block mt-1 text-amber-800">
                   Opens/clicks appear after recipients load images or click tracked links (some mail clients block
@@ -588,21 +648,25 @@ function CampaignDetailReport({
           </button>
           <button
             type="button"
-            onClick={() => exportCampaignReportCsv(report, `${campaignName || 'campaign'}.csv`)}
+            onClick={() =>
+              exportCampaignReportCsv(exportReport || report, `${campaignName || 'campaign'}.csv`)
+            }
             className="text-xs font-semibold px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50"
           >
             CSV
           </button>
           <button
             type="button"
-            onClick={() => exportCampaignReportExcel(report, `${campaignName || 'campaign'}.xlsx`)}
+            onClick={() =>
+              exportCampaignReportExcel(exportReport || report, `${campaignName || 'campaign'}.xlsx`)
+            }
             className="text-xs font-semibold px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50"
           >
             Excel
           </button>
           <button
             type="button"
-            onClick={() => exportCampaignReportPdf(report)}
+            onClick={() => exportCampaignReportPdf(exportReport || report)}
             className="text-xs font-semibold px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50"
           >
             PDF
@@ -975,6 +1039,22 @@ export default function CampaignReportsView({
   const archiveOnly = folder === 'archive'
   const controlBusy = busy || actionBusy
 
+  const goToCampaignPipeline = useCallback(
+    (campaign, filter) => {
+      if (!campaign?.id || !onNavigate) return
+      onNavigate(
+        'pipeline',
+        marketingPipelineOptions({
+          campaignId: campaign.id,
+          filter,
+          campaignName: campaign.name,
+          returnTo: 'marketing',
+        })
+      )
+    },
+    [onNavigate]
+  )
+
   const handlePause =
     onPause ||
     (async (id) => {
@@ -1233,7 +1313,7 @@ export default function CampaignReportsView({
             <p className="text-xs text-gray-500 mt-0.5">
               {folder === 'archive'
                 ? 'Restore is not available — delete permanently when you are sure.'
-                : 'Mailchimp-style metrics for sent campaigns. Click View report for recipient-level detail.'}
+                : 'Click a metric to open those leads in Pipeline, or View report for full detail.'}
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -1353,26 +1433,72 @@ export default function CampaignReportsView({
                         <td className="px-4 py-3 text-gray-600 whitespace-nowrap">
                           {formatShortDate(sendDate)}
                         </td>
-                        <td className="px-4 py-3 tabular-nums text-right">{enrolled || sentCount}</td>
-                        <td className="px-4 py-3 tabular-nums text-right">
-                          <span className="font-medium text-gray-900">{stats.openRate || 0}%</span>
-                          <span className="block text-xs text-gray-400">{opens} opened</span>
-                        </td>
-                        <td className="px-4 py-3 tabular-nums text-right">
-                          <span className="font-medium text-gray-900">{stats.clickRate || 0}%</span>
-                          <span className="block text-xs text-gray-400">{clicks} clicked</span>
-                        </td>
-                        <td className="px-4 py-3 tabular-nums text-right text-amber-900">
-                          <span className="font-medium">{unsubs}</span>
-                          {sentCount > 0 && stats.unsubscribeRate != null ? (
-                            <span className="block text-xs text-gray-400">
-                              {stats.unsubscribeRate}%
-                            </span>
-                          ) : null}
-                        </td>
-                        <td className="px-4 py-3 tabular-nums text-right text-red-700">
-                          {stats.bounced || 0}
-                        </td>
+                        <CampaignMetricButton
+                          value={enrolled || sentCount}
+                          onClick={
+                            sentCount > 0 || enrolled > 0
+                              ? (e) => {
+                                  e.stopPropagation()
+                                  goToCampaignPipeline(c, 'sent')
+                                }
+                              : null
+                          }
+                        />
+                        <CampaignMetricButton
+                          className="text-gray-900"
+                          value={<span className="font-medium">{stats.openRate || 0}%</span>}
+                          sub={opens > 0 ? `${opens} opened` : null}
+                          onClick={
+                            opens > 0
+                              ? (e) => {
+                                  e.stopPropagation()
+                                  goToCampaignPipeline(c, 'opened')
+                                }
+                              : null
+                          }
+                        />
+                        <CampaignMetricButton
+                          className="text-gray-900"
+                          value={<span className="font-medium">{stats.clickRate || 0}%</span>}
+                          sub={clicks > 0 ? `${clicks} clicked` : null}
+                          onClick={
+                            clicks > 0
+                              ? (e) => {
+                                  e.stopPropagation()
+                                  goToCampaignPipeline(c, 'clicked')
+                                }
+                              : null
+                          }
+                        />
+                        <CampaignMetricButton
+                          className="text-amber-900"
+                          value={<span className="font-medium">{unsubs}</span>}
+                          sub={
+                            sentCount > 0 && stats.unsubscribeRate != null
+                              ? `${stats.unsubscribeRate}%`
+                              : null
+                          }
+                          onClick={
+                            unsubs > 0
+                              ? (e) => {
+                                  e.stopPropagation()
+                                  goToCampaignPipeline(c, 'unsubscribed')
+                                }
+                              : null
+                          }
+                        />
+                        <CampaignMetricButton
+                          className="text-red-700"
+                          value={stats.bounced || 0}
+                          onClick={
+                            (stats.bounced || 0) > 0
+                              ? (e) => {
+                                  e.stopPropagation()
+                                  goToCampaignPipeline(c, 'bounced')
+                                }
+                              : null
+                          }
+                        />
                         <td className="px-4 py-3 text-right">
                           <div className="mc-reports-actions">
                             <button

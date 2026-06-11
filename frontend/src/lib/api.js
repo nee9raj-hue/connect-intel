@@ -518,6 +518,11 @@ export const api = {
     request(`/api/marketing/campaigns?campaignId=${encodeURIComponent(campaignId)}`, {
       timeoutMs: 90_000,
     }),
+  getMarketingCampaignRecipientLeadIds: (campaignId, recipientFilter, { silent = false } = {}) =>
+    request(
+      `/api/marketing/campaigns?campaignId=${encodeURIComponent(campaignId)}&recipientFilter=${encodeURIComponent(recipientFilter)}`,
+      { timeoutMs: 60_000, silent }
+    ),
   duplicateMarketingCampaign: (id) =>
     request('/api/marketing/campaigns', { method: 'POST', body: { action: 'duplicate', id } }),
   listMarketingLists: () => request('/api/marketing/lists'),

@@ -325,7 +325,6 @@
   border: none;
   border-bottom: 0.5px solid var(--mh-border);
   background: transparent;
-  cursor: pointer;
 }
 
 .mhub-v3 .mhub-v3-campaign-row:last-child {
@@ -334,6 +333,27 @@
 
 .mhub-v3 .mhub-v3-campaign-row:hover {
   background: rgba(0, 0, 0, 0.02);
+}
+
+.mhub-v3 .mhub-v3-campaign-row__name,
+.mhub-v3 .mhub-v3-metric-col--link {
+  border: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
+.mhub-v3 .mhub-v3-metric-col--link:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.mhub-v3 .mhub-v3-metric-col--link:not(:disabled):hover strong {
+  color: var(--mh-accent, #ff773d);
 }
 
 .mhub-v3 .mhub-v3-campaign-icon {

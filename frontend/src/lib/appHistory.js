@@ -66,6 +66,7 @@ export function parseAppLocation(search = '', pathname = '/') {
   if (params.get('adminTab')) panelOptions.tab = params.get('adminTab')
   if (params.get('teamTab')) panelOptions.teamTab = params.get('teamTab')
   if (params.get('returnTo')) panelOptions.returnTo = params.get('returnTo')
+  if (params.get('marketing_tab')) panelOptions.marketingTab = params.get('marketing_tab')
   if (params.get('followUpDue') === '1') panelOptions.followUpDue = true
   if (params.get('overdueFollowUp') === '1') panelOptions.overdueFollowUp = true
   if (params.get('closingThisWeek') === '1') panelOptions.closingThisWeek = true
@@ -85,6 +86,11 @@ export function parseAppLocation(search = '', pathname = '/') {
   if (params.get('last_activity')) panelOptions.lastActivity = params.get('last_activity')
   const leadIds = params.getAll('leadId').filter(Boolean)
   if (leadIds.length) panelOptions.leadIds = leadIds
+  if (params.get('campaign')) panelOptions.campaignId = params.get('campaign')
+  if (params.get('campaign_filter')) panelOptions.campaignRecipientFilter = params.get('campaign_filter')
+  if (params.get('campaign_name')) panelOptions.campaignName = params.get('campaign_name')
+  if (params.get('opened_campaign')) panelOptions.openedCampaignId = params.get('opened_campaign')
+  if (params.get('clicked_campaign')) panelOptions.clickedCampaignId = params.get('clicked_campaign')
   if (params.get('date')) panelOptions.calendarDate = params.get('date')
   const smartTags = params.getAll('smartTag').filter(Boolean)
   if (smartTags.length) panelOptions.smartTags = smartTags
@@ -229,6 +235,7 @@ export function serializeAppLocation({ panel = 'overview', panelOptions = {}, le
     params.set('assigneeUserId', String(panelOptions.assigneeUserId))
   }
   if (panelOptions.returnTo) params.set('returnTo', String(panelOptions.returnTo))
+  if (panelOptions.marketingTab) params.set('marketing_tab', String(panelOptions.marketingTab))
   if (panelOptions.followUpDue) params.set('followUpDue', '1')
   if (panelOptions.overdueFollowUp) params.set('overdueFollowUp', '1')
   if (panelOptions.closingThisWeek) params.set('closingThisWeek', '1')
@@ -250,6 +257,17 @@ export function serializeAppLocation({ panel = 'overview', panelOptions = {}, le
   if (panelOptions.lastActivity) params.set('last_activity', String(panelOptions.lastActivity))
   for (const id of panelOptions.leadIds || []) {
     if (id) params.append('leadId', String(id))
+  }
+  if (panelOptions.campaignId) params.set('campaign', String(panelOptions.campaignId))
+  if (panelOptions.campaignRecipientFilter) {
+    params.set('campaign_filter', String(panelOptions.campaignRecipientFilter))
+  }
+  if (panelOptions.campaignName) params.set('campaign_name', String(panelOptions.campaignName))
+  if (panelOptions.openedCampaignId) {
+    params.set('opened_campaign', String(panelOptions.openedCampaignId))
+  }
+  if (panelOptions.clickedCampaignId) {
+    params.set('clicked_campaign', String(panelOptions.clickedCampaignId))
   }
   if (panelOptions.calendarDate) params.set('date', String(panelOptions.calendarDate))
   for (const tag of panelOptions.smartTags || []) {

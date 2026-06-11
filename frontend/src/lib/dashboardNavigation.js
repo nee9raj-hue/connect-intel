@@ -1,4 +1,5 @@
 import { navTargetToOptions } from './navConfig'
+import { describeMarketingPipelineFilter } from './marketingNavigation'
 
 /** Map dashboard drill-down actions to panelOptions (preserves all filter fields). */
 export function dashboardNavOptions(action = {}, user = null) {
@@ -48,6 +49,9 @@ export function dashboardNavOptions(action = {}, user = null) {
 }
 
 export function describeDashboardFilter(panelOptions = {}) {
+  const marketing = describeMarketingPipelineFilter(panelOptions)
+  if (marketing) return marketing
+
   const parts = []
   const po = panelOptions || {}
 
