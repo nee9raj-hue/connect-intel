@@ -14,6 +14,7 @@ export default function FullScreenDetailModal({
   footer = null,
   closeOnBackdrop = false,
   ariaLabel,
+  modalClassName = '',
 }) {
   useEffect(() => {
     if (!open) return undefined
@@ -41,7 +42,7 @@ export default function FullScreenDetailModal({
         if (closeOnBackdrop && e.target === e.currentTarget) onClose?.()
       }}
     >
-      <div className="crm-fullscreen-modal" onClick={(e) => e.stopPropagation()}>
+      <div className={`crm-fullscreen-modal ${modalClassName}`.trim()} onClick={(e) => e.stopPropagation()}>
         <header className="crm-fullscreen-modal-header">
           <div className="min-w-0 flex-1 pr-2">
             {title ? <h2 className="crm-fullscreen-modal-title">{title}</h2> : null}

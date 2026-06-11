@@ -79,6 +79,10 @@ export default function FilterDropdown({
 
   useEffect(() => {
     if (!open) return undefined
+    const onKey = (e) => {
+      if (e.key === 'Escape') close()
+    }
+    window.addEventListener('keydown', onKey)
     const onDoc = (e) => {
       if (Date.now() - openedAtRef.current < 320) return
       const t = e.target
@@ -92,6 +96,7 @@ export default function FilterDropdown({
     }, 280)
     return () => {
       window.clearTimeout(timer)
+      window.removeEventListener('keydown', onKey)
       document.removeEventListener('mousedown', onDoc, true)
       document.removeEventListener('touchstart', onDoc, true)
     }

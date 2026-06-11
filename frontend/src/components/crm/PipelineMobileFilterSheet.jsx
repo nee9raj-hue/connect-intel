@@ -105,6 +105,7 @@ export default function PipelineMobileFilterSheet({
   onSave,
   children,
   saveLabel = 'Apply filters',
+  narrow = false,
 }) {
   return (
     <FullScreenDetailModal
@@ -113,6 +114,7 @@ export default function PipelineMobileFilterSheet({
       title={title}
       subtitle={subtitle}
       ariaLabel={title}
+      modalClassName={narrow ? 'crm-fullscreen-modal--filter-narrow' : ''}
       footer={
         <div className="flex items-center justify-between gap-3 w-full">
           <button type="button" className="crm-btn crm-btn-ghost shrink-0" onClick={onClose}>

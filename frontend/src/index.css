@@ -482,6 +482,11 @@ textarea {
     box-shadow: 0 16px 48px rgb(15 23 42 / 0.2);
   }
 
+  .crm-fullscreen-modal--filter-narrow {
+    max-width: 22rem;
+    max-height: min(88dvh, 640px);
+  }
+
   .crm-fullscreen-modal-footer .crm-btn {
     flex: 0 1 auto;
     min-width: 8rem;
