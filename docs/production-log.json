@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-11T07:02:40.691Z",
-  "updatedAtIst": "11/06/2026, 12:32:40",
+  "updatedAt": "2026-06-11T07:23:03.087Z",
+  "updatedAtIst": "11/06/2026, 12:53:03",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "6951eb2",
+  "currentProductionCommit": "c78111f",
   "entries": [
+    {
+      "logId": "20260611-1252-c78111f",
+      "commit": "c78111f",
+      "commitFull": "c78111f23841f22beaa33316b4a4f1cb667586ef",
+      "message": "fix: wire dashboard drill-downs to filtered pipeline views and speed up bootstrap",
+      "deployedAt": "2026-06-11T07:22:51.272Z",
+      "deployedAtIst": "11/06/2026, 12:52:51",
+      "committedAtIst": "11/06/2026, 12:52:14",
+      "vercelPreviewUrl": "https://connect-intel-fxbpsqecl-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- c78111f"
+    },
+    {
+      "logId": "20260611-1233-4474efe",
+      "commit": "4474efe",
+      "commitFull": "4474efe91a0c4e95dfd01a0434e446bfe01e7548",
+      "message": "chore: production log after home dashboard rebuild deploy",
+      "deployedAt": "2026-06-11T07:03:29.671Z",
+      "deployedAtIst": "11/06/2026, 12:33:29",
+      "committedAtIst": "11/06/2026, 12:32:52",
+      "vercelPreviewUrl": "https://connect-intel-el5ox16u4-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 4474efe"
+    },
     {
       "logId": "20260611-1232-6951eb2",
       "commit": "6951eb2",
@@ -15,7 +43,7 @@
       "committedAtIst": "11/06/2026, 12:31:50",
       "vercelPreviewUrl": "https://connect-intel-97vtz0e7v-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 6951eb2"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- ea59b80"
-    },
-    {
-      "logId": "20260610-1609-0349be6",
-      "commit": "0349be6",
-      "commitFull": "0349be6caaef7542a55a377fee48e61d6d5418be",
-      "message": "Add Org Admin hub with departments, teams, and permissions matrix.",
-      "deployedAt": "2026-06-10T10:39:01.408Z",
-      "deployedAtIst": "10/06/2026, 16:09:01",
-      "committedAtIst": "10/06/2026, 16:08:25",
-      "vercelPreviewUrl": "https://connect-intel-bdrik1uy9-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 0349be6"
-    },
-    {
-      "logId": "20260610-1601-e7961d6",
-      "commit": "e7961d6",
-      "commitFull": "e7961d6ab956036362d19dd53ae698345c32f2d0",
-      "message": "Add pipeline keyset pagination and Sprint 1 performance reliability.",
-      "deployedAt": "2026-06-10T10:31:47.311Z",
-      "deployedAtIst": "10/06/2026, 16:01:47",
-      "committedAtIst": "10/06/2026, 16:00:59",
-      "vercelPreviewUrl": "https://connect-intel-aozpg6zbp-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- e7961d6"
     }
   ]
 }

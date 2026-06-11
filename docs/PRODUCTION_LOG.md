@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- cf5c8fa
+npm run prod:rollback -- 4474efe
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- cf5c8fa
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `6951eb2` |
-| Log updated (IST) | 11/06/2026, 12:32:40 |
+| Commit | `c78111f` |
+| Log updated (IST) | 11/06/2026, 12:53:03 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- cf5c8fa
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 11/06/2026, 12:32:29 | `6951eb2` | feat: rebuild home dashboard with role-aware bootstrap API and indigo v4 UI | [preview](https://connect-intel-97vtz0e7v-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6951eb2` | **← LIVE**
+| 11/06/2026, 12:52:51 | `c78111f` | fix: wire dashboard drill-downs to filtered pipeline views and speed up bootstrap | [preview](https://connect-intel-fxbpsqecl-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c78111f` | **← LIVE**
+| 11/06/2026, 12:33:29 | `4474efe` | chore: production log after home dashboard rebuild deploy | [preview](https://connect-intel-el5ox16u4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4474efe` |
+| 11/06/2026, 12:32:29 | `6951eb2` | feat: rebuild home dashboard with role-aware bootstrap API and indigo v4 UI | [preview](https://connect-intel-97vtz0e7v-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6951eb2` |
 | 11/06/2026, 12:17:17 | `cf5c8fa` | chore: production log after Manager team scope fix deploy | [preview](https://connect-intel-6o9cmfc2r-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- cf5c8fa` |
 | 11/06/2026, 12:16:18 | `79b554b` | fix: scope Manager pipeline visibility to their team only | [preview](https://connect-intel-4bxsry3tt-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 79b554b` |
 | 10/06/2026, 17:46:15 | `e89345d` | chore: production log after Team members tab fix deploy | [preview](https://connect-intel-od495iml7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e89345d` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- cf5c8fa
 | 10/06/2026, 16:19:29 | `bf41817` | Update production log after departments nav deploy. | [preview](https://connect-intel-5qualwjb6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- bf41817` |
 | 10/06/2026, 16:18:34 | `7059942` | Surface Departments & teams in sidebar with URL deep links. | [preview](https://connect-intel-1sokgx894-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7059942` |
 | 10/06/2026, 16:13:28 | `ea59b80` | Polish Org Admin: member roles, moves, deactivate, and import stats. | [preview](https://connect-intel-fduehr25f-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ea59b80` |
-| 10/06/2026, 16:09:01 | `0349be6` | Add Org Admin hub with departments, teams, and permissions matrix. | [preview](https://connect-intel-bdrik1uy9-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0349be6` |
-| 10/06/2026, 16:01:47 | `e7961d6` | Add pipeline keyset pagination and Sprint 1 performance reliability. | [preview](https://connect-intel-aozpg6zbp-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e7961d6` |
 
 ---
 
