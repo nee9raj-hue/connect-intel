@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-11T16:04:11.980Z",
-  "updatedAtIst": "11/06/2026, 21:34:11",
+  "updatedAt": "2026-06-11T16:21:00.953Z",
+  "updatedAtIst": "11/06/2026, 21:51:00",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "d439ffa",
+  "currentProductionCommit": "599c342",
   "entries": [
+    {
+      "logId": "20260611-2150-599c342",
+      "commit": "599c342",
+      "commitFull": "599c342a337126d0b77c917e3f1859f134e6d8cb",
+      "message": "fix: pipeline hover actions, HubSpot filters, and comma name search",
+      "deployedAt": "2026-06-11T16:20:56.708Z",
+      "deployedAtIst": "11/06/2026, 21:50:56",
+      "committedAtIst": "11/06/2026, 21:50:12",
+      "vercelPreviewUrl": "https://connect-intel-fxce4uln8-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 599c342"
+    },
+    {
+      "logId": "20260611-2135-1395be7",
+      "commit": "1395be7",
+      "commitFull": "1395be7934605595956362f72dda0a009ba31708",
+      "message": "chore: production log after pipeline list stability deploy",
+      "deployedAt": "2026-06-11T16:05:01.454Z",
+      "deployedAtIst": "11/06/2026, 21:35:01",
+      "committedAtIst": "11/06/2026, 21:34:25",
+      "vercelPreviewUrl": "https://connect-intel-9ojcex78r-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 1395be7"
+    },
     {
       "logId": "20260611-2134-d439ffa",
       "commit": "d439ffa",
@@ -15,7 +43,7 @@
       "committedAtIst": "11/06/2026, 21:33:12",
       "vercelPreviewUrl": "https://connect-intel-9yv36uu5q-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- d439ffa"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- c625be4"
-    },
-    {
-      "logId": "20260610-1741-e569c84",
-      "commit": "e569c84",
-      "commitFull": "e569c848187d3798475eff136a83cd6d625d8eb8",
-      "message": "fix: Marketing Hub timeouts, reports, overview data, and bulk email manual entry",
-      "deployedAt": "2026-06-10T12:11:52.279Z",
-      "deployedAtIst": "10/06/2026, 17:41:52",
-      "committedAtIst": "10/06/2026, 17:41:11",
-      "vercelPreviewUrl": "https://connect-intel-pbsp0kiuh-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- e569c84"
-    },
-    {
-      "logId": "20260610-1725-39e86d9",
-      "commit": "39e86d9",
-      "commitFull": "39e86d9123fabcb2a2f2871cdf8f2e0969b3111c",
-      "message": "chore: production log after Marketing Hub deploy",
-      "deployedAt": "2026-06-10T11:55:23.044Z",
-      "deployedAtIst": "10/06/2026, 17:25:23",
-      "committedAtIst": "10/06/2026, 17:24:47",
-      "vercelPreviewUrl": "https://connect-intel-ag600twcn-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 39e86d9"
     }
   ]
 }
