@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-10T12:15:25.768Z",
-  "updatedAtIst": "10/06/2026, 17:45:25",
+  "updatedAt": "2026-06-11T06:46:36.464Z",
+  "updatedAtIst": "11/06/2026, 12:16:36",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "39bbe33",
+  "currentProductionCommit": "79b554b",
   "entries": [
+    {
+      "logId": "20260611-1216-79b554b",
+      "commit": "79b554b",
+      "commitFull": "79b554bd9410123f8c860c972f5adde22181b161",
+      "message": "fix: scope Manager pipeline visibility to their team only",
+      "deployedAt": "2026-06-11T06:46:18.995Z",
+      "deployedAtIst": "11/06/2026, 12:16:18",
+      "committedAtIst": "11/06/2026, 12:15:44",
+      "vercelPreviewUrl": "https://connect-intel-4bxsry3tt-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 79b554b"
+    },
+    {
+      "logId": "20260610-1746-e89345d",
+      "commit": "e89345d",
+      "commitFull": "e89345dcf55b169cfaa85aca8bb3328f26d1be7b",
+      "message": "chore: production log after Team members tab fix deploy",
+      "deployedAt": "2026-06-10T12:16:15.827Z",
+      "deployedAtIst": "10/06/2026, 17:46:15",
+      "committedAtIst": "10/06/2026, 17:45:39",
+      "vercelPreviewUrl": "https://connect-intel-od495iml7-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- e89345d"
+    },
     {
       "logId": "20260610-1745-39bbe33",
       "commit": "39bbe33",
@@ -15,7 +43,7 @@
       "committedAtIst": "10/06/2026, 17:44:36",
       "vercelPreviewUrl": "https://connect-intel-h6svnc1tt-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 39bbe33"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- c80f60a"
-    },
-    {
-      "logId": "20260610-1351-352fb9a",
-      "commit": "352fb9a",
-      "commitFull": "352fb9a5b2a4620a6f21ccb321a614fb194627fa",
-      "message": "Allow marketing bulk email via browser drain when Redis is off.",
-      "deployedAt": "2026-06-10T08:21:56.399Z",
-      "deployedAtIst": "10/06/2026, 13:51:56",
-      "committedAtIst": "10/06/2026, 13:51:21",
-      "vercelPreviewUrl": "https://connect-intel-4nzpxvkm7-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 352fb9a"
-    },
-    {
-      "logId": "20260610-1325-246e238",
-      "commit": "246e238",
-      "commitFull": "246e23861c42fc821ea5f908469668adce4d9fc6",
-      "message": "Fix marketing template saves timing out on large org stores.",
-      "deployedAt": "2026-06-10T07:55:04.530Z",
-      "deployedAtIst": "10/06/2026, 13:25:04",
-      "committedAtIst": "10/06/2026, 13:24:28",
-      "vercelPreviewUrl": "https://connect-intel-4ha2mjqt2-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 246e238"
     }
   ]
 }
