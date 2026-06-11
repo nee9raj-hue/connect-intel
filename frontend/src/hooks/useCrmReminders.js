@@ -17,7 +17,14 @@ export function useCrmReminders(enabled) {
 
     const tick = async () => {
       try {
-        const data = await api.getCrmCalendar('', { silent: true })
+        const from = new Date().toISOString()
+        const to = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+        const q = new URLSearchParams({
+          from,
+          to,
+          includeReminders: '1',
+        }).toString()
+        const data = await api.getCrmCalendar(q, { silent: true })
         const now = Date.now()
 
         for (const item of data.reminders || []) {

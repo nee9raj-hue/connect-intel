@@ -12,17 +12,19 @@ import {
   KIND_COLORS,
   addDays,
   calendarRangeForView,
-  eventsForDay,
+  formatDayKey,
   formatEventTime,
   getMiniMonthGrid,
   getMonthGrid,
   getWeekDays,
   groupEventsByDay,
+  indexEventsByDay,
   layoutTimedEvents,
   sameDay,
   sortEventsByTime,
   startOfDay,
 } from '../../lib/calendarUtils'
+import { clearCalendarCache, getCalendarCache, setCalendarCache } from '../../lib/calendarCache'
 import MyDayReturnBar from '../overview/MyDayReturnBar'
 
 const VIEW_OPTIONS = [
@@ -126,35 +128,57 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
 
   const effectiveView = upcomingOnly ? 'schedule' : view
 
+  const buildQuery = useCallback(() => {
+    const params = new URLSearchParams({ includeReminders: '0' })
+    if (upcomingOnly) {
+      const from = startOfDay(new Date())
+      const to = addDays(from, 60)
+      params.set('from', from.toISOString())
+      params.set('to', to.toISOString())
+    } else {
+      const range = calendarRangeForView(effectiveView, anchor)
+      params.set('from', range.from)
+      params.set('to', range.to)
+    }
+    return params.toString()
+  }, [effectiveView, anchor, upcomingOnly])
+
+  const applyCalendarPayload = useCallback((data) => {
+    setEvents(data.events || [])
+    setMembers(data.members || [])
+    setGoogleCal(data.googleCalendar || null)
+  }, [])
+
   const load = useCallback(
     async ({ silent = false } = {}) => {
-      if (!silent) setLoading(true)
+      const q = buildQuery()
+      const cached = getCalendarCache(q)
+      if (cached) {
+        applyCalendarPayload(cached)
+        setLoading(false)
+      } else if (!silent) {
+        setLoading(true)
+      }
+
       try {
-        let q
-        if (upcomingOnly) {
-          const from = startOfDay(new Date())
-          const to = addDays(from, 90)
-          q = new URLSearchParams({ from: from.toISOString(), to: to.toISOString() }).toString()
-        } else {
-          const range = calendarRangeForView(effectiveView, anchor)
-          q = new URLSearchParams({ from: range.from, to: range.to }).toString()
-        }
         const data = await api.getCrmCalendar(q, { silent: true })
-        setEvents(data.events || [])
-        setMembers(data.members || [])
-        setGoogleCal(data.googleCalendar || null)
+        setCalendarCache(q, data)
+        applyCalendarPayload(data)
       } catch {
-        if (!silent) setEvents([])
+        if (!cached && !silent) setEvents([])
       } finally {
-        if (!silent) setLoading(false)
+        setLoading(false)
       }
     },
-    [effectiveView, anchor, upcomingOnly]
+    [applyCalendarPayload, buildQuery]
   )
 
   useEffect(() => {
     load()
-    const timer = setInterval(() => load({ silent: true }), 45_000)
+    const tick = () => {
+      if (document.visibilityState === 'visible') load({ silent: true })
+    }
+    const timer = setInterval(tick, 90_000)
     return () => clearInterval(timer)
   }, [load])
 
@@ -166,6 +190,9 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
     }
     return list
   }, [events, kindFilters, upcomingOnly])
+
+  const eventsByDay = useMemo(() => indexEventsByDay(filteredEvents), [filteredEvents])
+  const showLoading = loading && events.length === 0
 
   const openDay = useCallback((day, dayEvents) => {
     if (!dayEvents?.length) return
@@ -209,6 +236,7 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
       await api.setCrmGoogleCalendarSync(true)
       const data = await api.syncCrmGoogleCalendar()
       setGoogleNotice(`Synced ${data.imported || 0} Google events`)
+      clearCalendarCache()
       load()
     } catch (e) {
       setGoogleNotice(e.message || 'Sync failed')
@@ -420,7 +448,7 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
         </aside>
 
         <main className="gcal-main">
-          {loading ? (
+          {showLoading ? (
             <LoadingExperience
               message={LOADING_MESSAGES.calendar}
               fill={false}
@@ -442,17 +470,29 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
               {effectiveView === 'month' && (
                 <MonthView
                   anchor={anchor}
-                  events={filteredEvents}
+                  eventsByDay={eventsByDay}
                   onSelect={openEvent}
                   onSelectDay={openDay}
                   onGoToDay={goToDay}
                 />
               )}
               {effectiveView === 'week' && (
-                <TimeGridView mode="week" anchor={anchor} events={filteredEvents} onSelect={openEvent} onGoToDay={goToDay} />
+                <TimeGridView
+                  mode="week"
+                  anchor={anchor}
+                  eventsByDay={eventsByDay}
+                  onSelect={openEvent}
+                  onGoToDay={goToDay}
+                />
               )}
               {effectiveView === 'day' && (
-                <TimeGridView mode="day" anchor={anchor} events={filteredEvents} onSelect={openEvent} onGoToDay={goToDay} />
+                <TimeGridView
+                  mode="day"
+                  anchor={anchor}
+                  eventsByDay={eventsByDay}
+                  onSelect={openEvent}
+                  onGoToDay={goToDay}
+                />
               )}
             </>
           )}
@@ -555,7 +595,7 @@ function MiniCalendar({ anchor, onPickDay, onMonthChange }) {
   )
 }
 
-function MonthView({ anchor, events, onSelect, onSelectDay, onGoToDay }) {
+function MonthView({ anchor, eventsByDay, onSelect, onSelectDay, onGoToDay }) {
   const grid = getMonthGrid(anchor)
   const month = anchor.getMonth()
   const maxVisible = 3
@@ -571,7 +611,7 @@ function MonthView({ anchor, events, onSelect, onSelectDay, onGoToDay }) {
       </div>
       <div className="gcal-month__grid">
         {grid.map((day) => {
-          const dayEvents = sortEventsByTime(eventsForDay(events, day))
+          const dayEvents = eventsByDay.get(formatDayKey(day)) || []
           const inMonth = day.getMonth() === month
           const isToday = sameDay(day, new Date())
           const pendingTasks = dayEvents.filter((e) => e.kind === 'task' && e.timeStatus !== 'completed')
@@ -633,10 +673,22 @@ function MonthEventChip({ event, onSelect }) {
   )
 }
 
-function TimeGridView({ mode, anchor, events, onSelect, onGoToDay }) {
+function TimeGridView({ mode, anchor, eventsByDay, onSelect, onGoToDay }) {
   const scrollRef = useRef(null)
-  const days = mode === 'day' ? [startOfDay(anchor)] : getWeekDays(anchor)
+  const days = useMemo(
+    () => (mode === 'day' ? [startOfDay(anchor)] : getWeekDays(anchor)),
+    [mode, anchor]
+  )
   const today = new Date()
+
+  const layoutsByDay = useMemo(() => {
+    const map = new Map()
+    for (const day of days) {
+      const dayEvents = eventsByDay.get(formatDayKey(day)) || []
+      map.set(formatDayKey(day), layoutTimedEvents(dayEvents))
+    }
+    return map
+  }, [days, eventsByDay])
 
   useEffect(() => {
     const el = scrollRef.current
@@ -687,7 +739,7 @@ function TimeGridView({ mode, anchor, events, onSelect, onGoToDay }) {
         </div>
         <div className="gcal-timegrid__cols" style={{ gridTemplateColumns: `repeat(${days.length}, 1fr)` }}>
           {days.map((day) => {
-            const layouts = layoutTimedEvents(events, day)
+            const layouts = layoutsByDay.get(formatDayKey(day)) || []
             const isToday = sameDay(day, today)
             return (
               <div key={day.toISOString()} className="gcal-timegrid__col">

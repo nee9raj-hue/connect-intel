@@ -69,9 +69,10 @@ export function sortEventsByTime(events) {
   )
 }
 
-/** Position timed events on a day column (top/height in px). */
-export function layoutTimedEvents(events, day) {
-  return sortEventsByTime(eventsForDay(events, day)).map((ev) => {
+/** Position timed events on a day column (top/height in px). Pass `day` to filter, or omit when pre-grouped. */
+export function layoutTimedEvents(events, day = null) {
+  const list = day != null ? eventsForDay(events, day) : sortEventsByTime(events || [])
+  return list.map((ev) => {
     const start = new Date(ev.scheduledAt)
     const startMinutes = start.getHours() * 60 + start.getMinutes()
     const durationMin = eventDurationMs(ev) / 60000
@@ -99,10 +100,33 @@ export function calendarRangeForView(view, anchor) {
       to: addDays(grid[grid.length - 1], 1).toISOString(),
     }
   }
-  return {
-    from: new Date(now - 90 * MS_DAY).toISOString(),
-    to: new Date(now + 365 * MS_DAY).toISOString(),
+  if (view === 'schedule') {
+    const monthStart = new Date(anchor.getFullYear(), anchor.getMonth(), 1)
+    const monthEnd = new Date(anchor.getFullYear(), anchor.getMonth() + 1, 1)
+    return {
+      from: startOfDay(monthStart).toISOString(),
+      to: monthEnd.toISOString(),
+    }
   }
+  return {
+    from: new Date(now - 14 * MS_DAY).toISOString(),
+    to: new Date(now + 60 * MS_DAY).toISOString(),
+  }
+}
+
+/** O(1) day lookups for month/week grids. */
+export function indexEventsByDay(events) {
+  const map = new Map()
+  for (const e of events || []) {
+    if (!e?.scheduledAt) continue
+    const key = formatDayKey(new Date(e.scheduledAt))
+    if (!map.has(key)) map.set(key, [])
+    map.get(key).push(e)
+  }
+  for (const list of map.values()) {
+    list.sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime())
+  }
+  return map
 }
 
 export function eventsForDay(events, day) {

@@ -11,7 +11,7 @@ import OverviewPanel from '../overview/OverviewPanel'
 import PlatformCustomersPanel from '../admin/PlatformCustomersPanel'
 import AdminPanel from '../admin/AdminPanel'
 import CrmActivityLogPanel from '../crm/CrmActivityLogPanel'
-import CrmCalendarPanel from '../crm/CrmCalendarPanel'
+const CrmCalendarPanel = lazy(() => import('../crm/CrmCalendarPanel'))
 import MarketingPanel from '../marketing/MarketingPanel'
 import ChithiPanel from '../chithi/ChithiPanel'
 import TeamNotesPanel from '../team/TeamNotesPanel'
@@ -77,7 +77,7 @@ function PanelLoader() {
 }
 
 function renderPanel(panelId, Panel, props) {
-  if (panelId === 'crm-dashboard' || panelId === 'pipeline') {
+  if (panelId === 'crm-dashboard' || panelId === 'pipeline' || panelId === 'crm-calendar') {
     return (
       <Suspense fallback={<PanelLoader />}>
         <Panel {...props} />
