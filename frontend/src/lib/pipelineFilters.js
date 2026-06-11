@@ -1,3 +1,9 @@
+import {
+  getLeadCityFromFields,
+  getLeadStateFromFields,
+  locationMatchesField,
+  normalizeLocationKey,
+} from '../../../lib/pipelineLeadLocation.js'
 import { leadHasCallablePhone } from './phoneUtils'
 import { leadHasSendableEmail, leadDisplayName, leadEmailBounced } from './emailUtils'
 
@@ -97,32 +103,14 @@ function matchesAnyLocationField(value, filterList) {
 }
 
 export function getLeadCity(lead) {
-  const city = String(lead?.city || '').trim()
-  if (city) return city
-  const loc = String(lead?.location || '').split(',')[0]?.trim()
-  return loc || ''
+  return getLeadCityFromFields(lead)
 }
 
 export function getLeadState(lead) {
-  return String(lead?.state || '').trim()
+  return getLeadStateFromFields(lead)
 }
 
-export function normalizeLocationKey(value) {
-  return String(value || '')
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, ' ')
-}
-
-/** Case-insensitive; treats MUMBAI and Mumbai as the same when matching. */
-export function locationMatchesField(value, filter) {
-  const v = normalizeLocationKey(value)
-  const f = normalizeLocationKey(filter)
-  if (!f) return true
-  if (!v) return false
-  if (v === f) return true
-  return v.includes(f) || f.includes(v)
-}
+export { normalizeLocationKey, locationMatchesField }
 
 function matchesContactFilter(lead, contact) {
   const hasEmail = leadHasSendableEmail(lead)

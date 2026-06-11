@@ -492,8 +492,8 @@ export default function PipelineFiltersBar({
           icon={MapPinIcon}
           label="City"
           showLabel
-          active={activeFilter?.type === 'city' || (filters.cities?.length || 0) > 0}
-          badge={(filters.cities?.length || 0) > 0}
+          active={activeFilter?.type === 'city' || appliedCities.length > 0}
+          badge={appliedCities.length > 0}
           aria-expanded={activeFilter?.type === 'city'}
           onClick={() => openFilter('city')}
         />
@@ -501,13 +501,13 @@ export default function PipelineFiltersBar({
         <PipelineFilterToolbarButton
           label="City"
           displayValue={
-            (filters.cities?.length || 0) > 0
-              ? filters.cities.length === 1
-                ? filters.cities[0]
-                : `${filters.cities.length} selected`
+            appliedCities.length > 0
+              ? appliedCities.length === 1
+                ? appliedCities[0]
+                : `${appliedCities.length} selected`
               : undefined
           }
-          active={(filters.cities?.length || 0) > 0}
+          active={appliedCities.length > 0}
           aria-expanded={activeFilter?.type === 'city'}
           onClick={() => openFilter('city')}
         />
@@ -518,8 +518,8 @@ export default function PipelineFiltersBar({
           icon={MapIcon}
           label="State"
           showLabel
-          active={activeFilter?.type === 'state' || (filters.states?.length || 0) > 0}
-          badge={(filters.states?.length || 0) > 0}
+          active={activeFilter?.type === 'state' || appliedStates.length > 0}
+          badge={appliedStates.length > 0}
           aria-expanded={activeFilter?.type === 'state'}
           onClick={() => openFilter('state')}
         />
@@ -527,13 +527,13 @@ export default function PipelineFiltersBar({
         <PipelineFilterToolbarButton
           label="State"
           displayValue={
-            (filters.states?.length || 0) > 0
-              ? filters.states.length === 1
-                ? filters.states[0]
-                : `${filters.states.length} selected`
+            appliedStates.length > 0
+              ? appliedStates.length === 1
+                ? appliedStates[0]
+                : `${appliedStates.length} selected`
               : undefined
           }
-          active={(filters.states?.length || 0) > 0}
+          active={appliedStates.length > 0}
           aria-expanded={activeFilter?.type === 'state'}
           onClick={() => openFilter('state')}
         />
