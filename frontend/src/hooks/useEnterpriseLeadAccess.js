@@ -22,10 +22,11 @@ export function useEnterpriseLeadAccess() {
       isRep,
       /** When set, managers filter pipeline/dashboard to this rep's leads. */
       assigneeUserId: isManager ? pipelineAssigneeFilter || null : null,
-      /** Reps always see only their own pipeline slice. */
-      effectiveAssigneeUserId: isRep ? user?.id : pipelineAssigneeFilter || null,
+      /** Reps see assigned leads plus the org unassigned pool (null = combined view). */
+      effectiveAssigneeUserId: isRep ? pipelineAssigneeFilter || null : pipelineAssigneeFilter || null,
       canViewOrgWide: isManager,
       canAssignLeads: isManager,
+      canClaimUnassigned: isCompany && !isManager,
     }
   }, [user, pipelineAssigneeFilter])
 }

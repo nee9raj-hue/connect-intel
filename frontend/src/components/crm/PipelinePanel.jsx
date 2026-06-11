@@ -236,7 +236,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     }
     if (panelOptions?.scopeOwner === 'me' && user?.id) return String(user.id)
     if (isTeamManager) return null
-    if (user?.accountType === 'company' && !isOrgAdmin && user?.id) return String(user.id)
+    // Reps: null = my assigned leads + team unassigned pool (server-scoped)
     return null
   }, [
     pipelineAssigneeFilter,
@@ -442,7 +442,17 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     return 'Team member'
   }, [effectiveAssigneeFilter, teamMembers, user?.id, user?.name, user?.email])
 
-  const canFilterByOwner = isOrgAdmin || isTeamManager
+  const canFilterByOwner = user?.accountType === 'company'
+
+  const ownerFilterOptions = useMemo(() => {
+    if (!canFilterByOwner) return teamMembers
+    const unassigned = { userId: '__unassigned__', name: 'Unassigned leads' }
+    if (isOrgAdmin || isTeamManager) return [unassigned, ...teamMembers]
+    const me = user?.id
+      ? [{ userId: user.id, name: user.name ? `${user.name} (me)` : 'My leads' }]
+      : []
+    return [unassigned, ...me]
+  }, [canFilterByOwner, isOrgAdmin, isTeamManager, teamMembers, user?.id, user?.name])
 
   const handleOwnerFilter = useCallback(
     (userId) => {
@@ -1388,7 +1398,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               onSaveAsAudience={() => setSaveFilterAudienceOpen(true)}
               canShowOwnerFilter={canFilterByOwner}
               ownerFilter={effectiveAssigneeFilter}
-              ownerOptions={teamMembers}
+              ownerOptions={ownerFilterOptions}
               onOwnerFilterChange={(id) => setPipelineAssigneeFilter?.(id)}
               statusCounts={pipelineSummary?.byStatus?.reduce?.((acc, row) => {
                 if (row?.status) acc[row.status] = row.count

@@ -103,7 +103,10 @@ export default function PipelineFiltersBar({
     value: s.id,
   }))
   const ownerSelectOptions = ownerOptions.map((m) => ({
-    label: m.name || m.email || 'Team member',
+    label:
+      m.userId === '__unassigned__'
+        ? m.name || 'Unassigned leads'
+        : m.name || m.email || 'Team member',
     value: m.userId,
   }))
   const contactOptions = CONTACT_FILTER_OPTIONS.filter((o) => o.id !== 'any').map((o) => ({

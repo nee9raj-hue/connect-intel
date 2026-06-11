@@ -155,9 +155,11 @@ export default function LeadWorkspace({
   const [marketingTimeline, setMarketingTimeline] = useState([])
 
   const isManager = user?.isOrgAdmin || user?.orgRole === 'org_admin'
+  const isUnassignedLead = !lead?.assignedToUserId
   const canAssignThisLead =
     isManager ||
-    (user?.accountType === 'company' && String(lead.assignedToUserId || '') === String(user?.id || ''))
+    (user?.accountType === 'company' &&
+      (isUnassignedLead || String(lead.assignedToUserId || '') === String(user?.id || '')))
   const canScheduleForTeam = isManager || canAssignThisLead
   const fieldVisitExpensesEnabled = hasWorkspaceFeature(user, 'fieldVisitExpenses')
   const crm = lead.crm || {}
@@ -974,29 +976,54 @@ export default function LeadWorkspace({
 
             {canAssignThisLead && user?.accountType === 'company' && teamMembers.length > 0 && (
               <section>
-                <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Transfer / assign lead</h3>
-                <select
-                  value={String(lead.assignedToUserId || '')}
-                  onChange={async (e) => {
-                    setError(null)
-                    try {
-                      await assignLead(lead.id, e.target.value || null)
-                      setNotice(
-                        e.target.value ? 'Contact assigned successfully.' : 'Contact unassigned.'
-                      )
-                    } catch (err) {
-                      setError(err.message)
-                    }
-                  }}
-                  className="w-full text-xs border rounded-lg px-2.5 py-1.5"
-                >
-                  <option value="">Unassigned</option>
-                  {teamMembers.map((m) => (
-                    <option key={m.userId} value={String(m.userId)}>
-                      {m.name}
-                    </option>
-                  ))}
-                </select>
+                <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">
+                  {isUnassignedLead ? 'Claim lead' : 'Transfer / assign lead'}
+                </h3>
+                {isUnassignedLead && !isManager && (
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setError(null)
+                      try {
+                        await assignLead(lead.id, user.id)
+                        setNotice('Lead assigned to you — you can now work it in pipeline.')
+                      } catch (err) {
+                        setError(err.message)
+                      }
+                    }}
+                    className="mb-2 w-full py-2 text-xs font-semibold rounded-lg bg-[#1a73e8] text-white"
+                  >
+                    Assign to me
+                  </button>
+                )}
+                {isManager || !isUnassignedLead ? (
+                  <select
+                    value={String(lead.assignedToUserId || '')}
+                    onChange={async (e) => {
+                      setError(null)
+                      try {
+                        await assignLead(lead.id, e.target.value || null)
+                        setNotice(
+                          e.target.value ? 'Contact assigned successfully.' : 'Contact unassigned.'
+                        )
+                      } catch (err) {
+                        setError(err.message)
+                      }
+                    }}
+                    className="w-full text-xs border rounded-lg px-2.5 py-1.5"
+                  >
+                    <option value="">Unassigned</option>
+                    {teamMembers.map((m) => (
+                      <option key={m.userId} value={String(m.userId)}>
+                        {m.name}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <p className="text-xs text-gray-500 leading-relaxed">
+                    Unassigned leads are visible to the whole team. Assign to yourself to own and work this lead.
+                  </p>
+                )}
               </section>
             )}
 
