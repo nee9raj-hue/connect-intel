@@ -5,9 +5,9 @@ export const PIPELINE_TABLE_COLUMNS = [
   { id: 'name', label: 'Name', default: true, locked: true },
   { id: 'status', label: 'Status', default: true },
   { id: 'company', label: 'Company', default: true },
-  { id: 'city', label: 'City', default: true },
-  { id: 'state', label: 'State', default: true },
-  { id: 'tags', label: 'Tags', default: true },
+  { id: 'city', label: 'City', default: false },
+  { id: 'state', label: 'State', default: false },
+  { id: 'tags', label: 'Tags', default: false },
   { id: 'phone', label: 'Phone', default: true },
   { id: 'owner', label: 'Lead owner', default: true },
   { id: 'activity', label: 'Last activity', default: true },
@@ -16,7 +16,32 @@ export const PIPELINE_TABLE_COLUMNS = [
   { id: 'created', label: 'Create date', default: false },
 ]
 
-const DEFAULT_VISIBLE = PIPELINE_TABLE_COLUMNS.filter((c) => c.default).map((c) => c.id)
+export const DEFAULT_PIPELINE_VISIBLE_COLUMNS = PIPELINE_TABLE_COLUMNS.filter((c) => c.default).map(
+  (c) => c.id,
+)
+
+/** Previous default before city/state/tags became optional. */
+const LEGACY_DEFAULT_VISIBLE = [
+  'name',
+  'status',
+  'company',
+  'city',
+  'state',
+  'tags',
+  'phone',
+  'owner',
+  'activity',
+]
+
+const DEFAULT_VISIBLE = DEFAULT_PIPELINE_VISIBLE_COLUMNS
+
+function isLegacyDefaultPrefs(columnIds) {
+  const normalized = normalizePipelineColumnOrder(columnIds)
+  return (
+    normalized.length === LEGACY_DEFAULT_VISIBLE.length &&
+    LEGACY_DEFAULT_VISIBLE.every((id, index) => normalized[index] === id)
+  )
+}
 
 const VALID_COLUMN_IDS = new Set(PIPELINE_TABLE_COLUMNS.map((c) => c.id))
 
@@ -51,17 +76,7 @@ function mergeNewDefaultColumns(columnIds) {
   if (!additions.length) return cols
 
   for (const col of additions) {
-    const anchor = col.id === 'city' || col.id === 'state' || col.id === 'tags' ? 'company' : null
-    const anchorIdx = anchor ? cols.indexOf(anchor) : -1
-    if (anchorIdx >= 0) {
-      let insertAt = anchorIdx + 1
-      while (insertAt < cols.length && ['city', 'state', 'tags'].includes(cols[insertAt])) {
-        insertAt += 1
-      }
-      cols.splice(insertAt, 0, col.id)
-    } else {
-      cols.push(col.id)
-    }
+    cols.push(col.id)
     seen.add(col.id)
   }
   return normalizePipelineColumnOrder(cols)
@@ -73,6 +88,11 @@ export function loadPipelineColumnPrefs() {
     if (!raw) return [...DEFAULT_VISIBLE]
     const parsed = JSON.parse(raw)
     if (!Array.isArray(parsed) || !parsed.length) return [...DEFAULT_VISIBLE]
+    if (isLegacyDefaultPrefs(parsed)) {
+      const next = [...DEFAULT_VISIBLE]
+      savePipelineColumnPrefs(next)
+      return next
+    }
     return mergeNewDefaultColumns(parsed)
   } catch {
     return [...DEFAULT_VISIBLE]

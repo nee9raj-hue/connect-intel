@@ -7,7 +7,10 @@ import { getLeadEmail, leadHasSendableEmail } from '../../lib/emailUtils'
 import LeadPhoneCall from './LeadPhoneCall'
 import LeadTag from '../ui/LeadTag'
 import { leadHasCallablePhone } from '../../lib/phoneUtils'
-import { normalizePipelineColumnOrder } from '../../lib/pipelineColumnPrefs'
+import {
+  DEFAULT_PIPELINE_VISIBLE_COLUMNS,
+  normalizePipelineColumnOrder,
+} from '../../lib/pipelineColumnPrefs'
 import PipelineRowActionsMenu from './PipelineRowActionsMenu'
 
 function displayName(lead) {
@@ -553,7 +556,7 @@ export default function PipelineLeadsTable({
   onSelect,
   onToggleSelect,
   onSelectAllVisible,
-  visibleColumns = ['name', 'status', 'company', 'city', 'state', 'tags', 'phone', 'owner', 'activity'],
+  visibleColumns = DEFAULT_PIPELINE_VISIBLE_COLUMNS,
   statusOptions = [],
   tagById,
   teamMembers = [],
