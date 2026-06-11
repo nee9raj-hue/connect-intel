@@ -2424,8 +2424,7 @@ textarea {
 .pipeline-list-workspace .crm-content-scroll {
   padding: 0;
   min-width: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: auto;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -9931,10 +9930,9 @@ html[data-pipeline-mobile="1"] .ci-app-header-chip--secondary {
   }
 
   .pipeline-list-workspace .crm-content-scroll.pipeline-scroll-area {
-    overflow-x: hidden;
-    overflow-y: auto;
+    overflow: auto;
     -webkit-overflow-scrolling: touch;
-    overscroll-behavior-y: contain;
+    overscroll-behavior: contain;
   }
 
   .pipeline-bulk-hs-bar {

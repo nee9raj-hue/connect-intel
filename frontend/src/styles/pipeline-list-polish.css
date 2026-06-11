@@ -134,20 +134,7 @@
   line-height: 1;
 }
 
-.pipeline-hs-table-wrap--v2 {
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  flex: 0 0 auto;
-  overflow-x: auto;
-  overflow-y: visible;
-  -webkit-overflow-scrolling: touch;
-}
-
 .pipeline-hs-table-wrap--v2 .pipeline-hs-table {
-  table-layout: fixed;
-  width: 100%;
-  min-width: 1080px;
   border-collapse: collapse;
   border-spacing: 0;
 }
@@ -1070,8 +1057,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 0;
-  padding: 2px 8px;
+  padding: 0 8px;
+  min-height: 1.125rem;
+  line-height: 1.125rem;
   border-top: 1px solid #eaf0f6;
   background: #fff;
 }
@@ -1080,9 +1068,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  min-height: 1.5rem;
-  line-height: 1.2;
+  gap: 5px;
+  min-height: 1.125rem;
+  line-height: 1.125rem;
 }
 
 .pipeline-load-more-bar__meta {
@@ -1104,7 +1092,6 @@
 
 .pipeline-load-more-bar__btn:hover:not(:disabled) {
   color: #e5652f;
-  text-decoration: underline;
 }
 
 .pipeline-load-more-bar__btn:disabled {
@@ -1114,23 +1101,6 @@
 
 /* Mobile list — sticky checkbox + name, tight columns, single horizontal scroll */
 @media (max-width: 767px) {
-  .pipeline-hs-table-wrap--v2 {
-    display: block;
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
-    overflow-x: auto;
-    overflow-y: visible;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-x: contain;
-  }
-
-  .pipeline-hs-table-wrap--v2 .pipeline-hs-table {
-    table-layout: auto;
-    width: max-content;
-    min-width: 100%;
-  }
-
   .pipeline-hs-table-wrap--v2 .pipeline-hs-th-check,
   .pipeline-hs-table-wrap--v2 .pipeline-hs-td-check {
     position: sticky;
@@ -1227,10 +1197,18 @@
   transition: color 0.12s ease, background-color 0.12s ease;
 }
 
+/* One scroll region for pipeline list (vertical + horizontal). */
+.pipeline-list-workspace .crm-page-body {
+  padding: 0;
+  overflow: hidden;
+}
+
 .pipeline-list-workspace .crm-content-card--pipeline-table {
   display: flex;
   flex-direction: column;
+  flex: 1 1 0;
   min-height: 0;
+  overflow: hidden;
 }
 
 .pipeline-list-workspace .crm-content-scroll.pipeline-scroll-area {
@@ -1238,8 +1216,26 @@
   min-height: 0;
   min-width: 0;
   display: block;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: auto;
+  padding: 0;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
+}
+
+.pipeline-list-workspace .pipeline-hs-table-wrap.pipeline-hs-table-wrap--v2 {
+  overflow: visible;
+  width: max-content;
+  min-width: 100%;
+  max-width: none;
+  flex: none;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
+.pipeline-list-workspace .pipeline-hs-table-wrap--v2 .pipeline-hs-table {
+  table-layout: auto;
+  width: max-content;
+  min-width: 100%;
 }
