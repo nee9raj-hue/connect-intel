@@ -710,12 +710,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   }, [serverSidePipeline, view, stageListMode, serverFilters, boardColumnLimits])
 
   const filtered = useMemo(() => {
-    const base =
-      serverSidePipeline && effectiveAssigneeFilter
-        ? scopedLeads
-        : serverSidePipeline
-          ? pipelineScopedLeads
-          : scopedLeads
+    const base = serverSidePipeline ? pipelineScopedLeads : scopedLeads
     const closingThisMonth = panelOptions?.closing === 'this-month'
     return applyPipelineFilters(base, {
       status: serverSidePipeline ? 'all' : pipelineStatusFilter,
@@ -1374,7 +1369,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                 serverSidePipeline &&
                 (appliedSearch ||
                   getFilterCities(appliedAdvanced).length ||
-                  getFilterStates(appliedAdvanced).length)
+                  getFilterStates(appliedAdvanced).length ||
+                  effectiveAssigneeFilter)
                   ? pipelineLoad.total || filtered.length
                   : scopedLeads.length
               }
