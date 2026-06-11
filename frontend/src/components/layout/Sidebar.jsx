@@ -8,6 +8,7 @@ import {
   countUpcomingFromLeads,
   isNavTargetActive,
   navTargetToOptions,
+  pipelineSidebarNavOptions,
 } from '../../lib/navConfig'
 import { BRAND_LOGO_ICON_TRANSPARENT, BRAND_LOGO_ICON_CLASS } from '../../lib/brandAssets'
 import { isChithiPanel } from '../../lib/chithiNav'
@@ -182,7 +183,9 @@ export default function Sidebar({
   }
 
   const go = (target) => {
-    onNavigate(target.panel, navTargetToOptions(target))
+    const options =
+      target.panel === 'pipeline' ? pipelineSidebarNavOptions(target) : navTargetToOptions(target)
+    onNavigate(target.panel, options)
     onMobileClose?.()
   }
 

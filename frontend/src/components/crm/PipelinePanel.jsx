@@ -363,6 +363,14 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       setAppliedAdvanced(adv)
       setView('list')
       setListStatusFilter('all')
+    } else if (po.status && !po.returnTo && !hasMarketingFilter) {
+      const empty = { ...DEFAULT_PIPELINE_FILTERS }
+      setAdvancedFilters(empty)
+      setAppliedAdvanced(empty)
+      setAppliedSearch('')
+      setSearch('')
+      setSmartViewFilters({})
+      setSmartViewId(null)
     }
 
     if (po.tasksDueToday || (po.view === 'tasks' && po.due === 'today')) {
@@ -399,6 +407,11 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     panelOptions?.activityFilter,
     panelOptions?.teamId,
     panelOptions?.leadIds,
+    panelOptions?.returnTo,
+    panelOptions?.campaignId,
+    panelOptions?.openedCampaignId,
+    panelOptions?.clickedCampaignId,
+    panelOptions?.campaignRecipientFilter,
   ])
 
   const dealsStageLabel = useMemo(() => {

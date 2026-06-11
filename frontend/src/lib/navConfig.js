@@ -52,6 +52,18 @@ export function countUpcomingFromLeads(leads = []) {
   return n
 }
 
+/** Sidebar pipeline stages — status/view only; no dashboard drill-down params. */
+export function pipelineSidebarNavOptions(target = {}) {
+  const view = target.view || 'leads'
+  const options = { view }
+  if (view === 'deals') {
+    if (target.dealStage) options.dealStage = target.dealStage
+    return options
+  }
+  if (target.status) options.status = target.status
+  return options
+}
+
 export function navTargetToOptions(target = {}) {
   const options = {}
   if (target.tab) options.tab = target.tab

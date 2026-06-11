@@ -132,18 +132,7 @@ export default function AppShell() {
     return () => clearTimeout(t)
   }, [liveToast])
 
-  const resolvePanelOptions = useCallback(
-    (panel, options = {}) => {
-      const assigneeId = options.assigneeUserId || options.userId
-      if (assigneeId) return options
-      const scopedPanels = new Set(['pipeline', 'crm-log', 'crm-calendar'])
-      if (scopedPanels.has(panel) && pipelineAssigneeFilter) {
-        return { ...options, userId: pipelineAssigneeFilter }
-      }
-      return options
-    },
-    [pipelineAssigneeFilter]
-  )
+  const resolvePanelOptions = useCallback((panel, options = {}) => options, [])
 
   const applyLocation = useCallback(
     (location) => {

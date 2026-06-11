@@ -90,7 +90,9 @@ export function getFilterStates(filters) {
 export function leadMatchesAssignee(lead, assigneeUserId) {
   if (!assigneeUserId) return true
   if (assigneeUserId === '__unassigned__') return !lead?.assignedToUserId
-  return String(lead?.assignedToUserId || '') === String(assigneeUserId)
+  const id = String(assigneeUserId)
+  const owners = [lead?.assignedToUserId, lead?.savedByUserId, lead?.userId].filter(Boolean)
+  return owners.some((v) => String(v) === id)
 }
 
 function matchesAnyLocationField(value, filterList) {
