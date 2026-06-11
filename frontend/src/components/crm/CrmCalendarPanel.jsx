@@ -866,29 +866,22 @@ function MonthView({ anchor, eventsByDay, onSelect, onSelectDay, onGoToDay, mobi
 
 function MonthEventChip({ event, onSelect, mobile = false }) {
   const colors = kindColor(event.kind)
-  if (mobile) {
-    const filled = event.kind === 'meeting' || event.kind === 'google'
-    return (
-      <button
-        type="button"
-        className={`gcal-mobile-month-pill${filled ? ' gcal-mobile-month-pill--fill' : ''}`}
-        style={{
-          borderColor: colors.border,
-          color: filled ? '#fff' : colors.border,
-          background: filled ? colors.dot : '#fff',
-        }}
-        onClick={() => onSelect(event)}
-      >
-        {event.title}
-      </button>
-    )
-  }
+  const filled = event.kind === 'meeting' || event.kind === 'google'
+  const label = mobile ? event.title : `${formatEventTime(event.scheduledAt)} ${event.title}`
+
   return (
-    <button type="button" className="gcal-month__event" onClick={() => onSelect(event)}>
-      <span className="gcal-month__event-dot" style={{ background: colors.dot }} />
-      <span className="gcal-month__event-text">
-        {formatEventTime(event.scheduledAt)} {event.title}
-      </span>
+    <button
+      type="button"
+      className={`gcal-month__pill${filled ? ' gcal-month__pill--fill' : ''}`}
+      style={{
+        borderColor: colors.border,
+        color: filled ? '#fff' : colors.border,
+        background: filled ? colors.dot : '#fff',
+      }}
+      onClick={() => onSelect(event)}
+      title={event.title}
+    >
+      {label}
     </button>
   )
 }

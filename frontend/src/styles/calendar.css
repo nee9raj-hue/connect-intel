@@ -446,61 +446,80 @@
   background: var(--gcal-bg);
 }
 
-/* Month grid */
+/* Month grid — equal columns & rows, clipped event boxes */
 .gcal-month {
   display: flex;
   flex-direction: column;
-  min-height: 100%;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  --gcal-month-cols: repeat(7, minmax(0, 1fr));
 }
 .gcal-month__head {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: var(--gcal-month-cols);
   border-bottom: 1px solid var(--gcal-border);
+  border-left: 1px solid var(--gcal-border);
   position: sticky;
   top: 0;
   background: var(--gcal-bg);
   z-index: 2;
+  flex-shrink: 0;
 }
 .gcal-month__head-cell {
+  min-width: 0;
   text-align: center;
   font-size: 11px;
   font-weight: 500;
   color: var(--gcal-muted);
   padding: 8px 0;
   text-transform: uppercase;
+  border-right: 1px solid var(--gcal-border);
 }
 .gcal-month__grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: var(--gcal-month-cols);
+  grid-template-rows: repeat(6, minmax(0, 1fr));
   flex: 1;
+  min-height: 0;
+  border-left: 1px solid var(--gcal-border);
 }
 .gcal-month__cell {
-  min-height: 106px;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
   border-right: 1px solid var(--gcal-border);
   border-bottom: 1px solid var(--gcal-border);
-  padding: 2px 4px 4px;
-  vertical-align: top;
-}
-.gcal-month__cell:nth-child(7n) {
-  border-right: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+  background: var(--gcal-bg);
 }
 .gcal-month__cell--off {
   background: #fafafa;
 }
 .gcal-month__date {
+  flex-shrink: 0;
   display: flex;
   justify-content: flex-end;
-  padding: 4px 6px 2px;
+  align-items: center;
+  padding: 3px 4px 0;
+  min-height: 26px;
 }
 .gcal-month__date-btn {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   border: none;
   background: transparent;
   border-radius: 50%;
   font-size: 12px;
+  line-height: 1;
   color: var(--gcal-text);
   cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
 }
 .gcal-month__cell--off .gcal-month__date-btn {
   color: var(--gcal-muted);
@@ -510,66 +529,119 @@
   color: #fff;
 }
 .gcal-month__events {
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   gap: 1px;
+  padding: 0 2px 2px;
+  overflow: hidden;
 }
 .gcal-month__event {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   width: 100%;
+  min-width: 0;
+  height: 18px;
+  min-height: 18px;
+  max-height: 18px;
   text-align: left;
   border: none;
   background: transparent;
-  padding: 1px 4px;
+  padding: 0 4px;
   border-radius: 4px;
   font-size: 11px;
-  line-height: 1.3;
+  line-height: 18px;
   color: var(--gcal-text);
   cursor: pointer;
-  min-width: 0;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 .gcal-month__event:hover {
   background: #f1f3f4;
 }
 .gcal-month__event-dot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   flex-shrink: 0;
 }
 .gcal-month__event-text {
+  flex: 1;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.gcal-month__pill {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  height: 16px;
+  min-height: 16px;
+  max-height: 16px;
+  padding: 0 4px;
+  margin: 0;
+  border: 1px solid;
+  border-radius: 3px;
+  font-size: 10px;
+  line-height: 14px;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+.gcal-month__pill--fill {
+  border-color: transparent;
+}
 .gcal-month__more {
+  flex-shrink: 0;
   border: none;
   background: none;
-  font-size: 11px;
+  font-size: 10px;
+  line-height: 14px;
+  height: 14px;
   color: var(--gcal-muted);
-  padding: 2px 4px;
+  padding: 0 4px;
   cursor: pointer;
   text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .gcal-month__more:hover {
   color: var(--gcal-blue);
 }
 .gcal-month__tasks-bar {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-top: 2px;
-  padding: 2px 6px;
-  border-radius: 4px;
+  flex-shrink: 0;
+  display: block;
+  height: 16px;
+  min-height: 16px;
+  max-height: 16px;
+  line-height: 16px;
+  margin: 0;
+  padding: 0 4px;
+  border-radius: 3px;
   background: #e8f0fe;
-  font-size: 11px;
+  font-size: 10px;
   color: var(--gcal-blue);
   border: none;
   width: 100%;
+  min-width: 0;
   text-align: left;
   cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+/* Desktop month: equal row height in main panel */
+.gcal-month:not(.gcal-month--mobile) .gcal-month__grid {
+  min-height: 540px;
 }
 
 /* Time grid (week / day) */
@@ -1338,42 +1410,51 @@
   color: #fff;
 }
 
-/* Mobile month grid */
+/* Mobile month grid — square cells driven by column width */
+.gcal-month--mobile {
+  flex: 1;
+  min-height: 0;
+}
 .gcal-month--mobile .gcal-month__head-cell {
   font-size: 10px;
   padding: 6px 0;
 }
+.gcal-month--mobile .gcal-month__grid {
+  flex: none;
+  grid-template-rows: repeat(6, auto);
+  width: 100%;
+}
 .gcal-month--mobile .gcal-month__cell {
-  min-height: 88px;
-  padding: 2px 1px;
+  aspect-ratio: 1 / 1;
+  height: auto;
+  max-height: none;
 }
 .gcal-month--mobile .gcal-month__date {
   justify-content: center;
-  padding: 2px 0;
+  padding: 2px 0 0;
+  min-height: 22px;
 }
 .gcal-month--mobile .gcal-month__date-btn {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   font-size: 11px;
 }
-.gcal-mobile-month-pill {
-  display: block;
-  width: 100%;
-  padding: 1px 4px;
-  margin-bottom: 1px;
-  border: 1px solid;
-  border-radius: 3px;
+.gcal-month--mobile .gcal-month__pill {
+  height: 14px;
+  min-height: 14px;
+  max-height: 14px;
+  line-height: 12px;
   font-size: 9px;
-  line-height: 1.2;
-  text-align: left;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  cursor: pointer;
+  padding: 0 3px;
+  border-radius: 2px;
 }
-.gcal-month--mobile .gcal-month__event,
-.gcal-month--mobile .gcal-month__event-dot {
-  display: none;
+.gcal-month--mobile .gcal-month__more,
+.gcal-month--mobile .gcal-month__tasks-bar {
+  height: 12px;
+  min-height: 12px;
+  max-height: 12px;
+  line-height: 12px;
+  font-size: 9px;
 }
 
 /* Desktop: hide sync float on very wide if needed — show always */
