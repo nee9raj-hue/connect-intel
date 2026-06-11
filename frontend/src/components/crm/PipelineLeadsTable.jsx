@@ -317,63 +317,63 @@ export default function PipelineLeadsTable({
                           >
                             {nameStr}
                           </button>
-                          <span className="pipeline-row-hover-actions" aria-label="Quick actions">
-                            {leadHasCallablePhone(lead) ? (
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  onQuickCall?.(lead)
-                                }}
-                              >
-                                Call
-                              </button>
-                            ) : null}
-                            {email ? (
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  onQuickEmail?.(lead)
-                                }}
-                              >
-                                Email
-                              </button>
-                            ) : null}
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                onQuickTask?.(lead)
-                              }}
-                            >
-                              Task
-                            </button>
-                            {lead.phone && onQuickWhatsApp ? (
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  onQuickWhatsApp?.(lead)
-                                }}
-                              >
-                                WhatsApp
-                              </button>
-                            ) : null}
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                onSelect(lead.id)
-                              }}
-                            >
-                              Open →
-                            </button>
-                          </span>
                         </div>
                         {loc ? <span className="pipeline-hs-sub">{loc}</span> : null}
                         <LeadTagDots lead={lead} tagById={tagById} className="pipeline-hs-tags" max={4} />
                       </div>
+                      <span className="pipeline-row-hover-actions" aria-label="Quick actions">
+                        {leadHasCallablePhone(lead) ? (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              onQuickCall?.(lead)
+                            }}
+                          >
+                            Call
+                          </button>
+                        ) : null}
+                        {email ? (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              onQuickEmail?.(lead)
+                            }}
+                          >
+                            Email
+                          </button>
+                        ) : null}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            onQuickTask?.(lead)
+                          }}
+                        >
+                          Task
+                        </button>
+                        {lead.phone && onQuickWhatsApp ? (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              onQuickWhatsApp?.(lead)
+                            }}
+                          >
+                            WhatsApp
+                          </button>
+                        ) : null}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            onSelect(lead.id)
+                          }}
+                        >
+                          Open →
+                        </button>
+                      </span>
                     </div>
                   </td>
                 )}

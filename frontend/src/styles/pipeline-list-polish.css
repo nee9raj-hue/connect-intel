@@ -158,6 +158,8 @@
   align-items: flex-start;
   gap: 0.5rem;
   max-width: 100%;
+  position: relative;
+  overflow: visible;
 }
 
 .pipeline-hs-name-stack {
@@ -227,14 +229,15 @@
 
 .pipeline-row-hover-actions {
   position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 2;
+  left: 2rem;
+  top: 0.2rem;
+  z-index: 6;
   display: flex;
   align-items: center;
   gap: 2px;
   flex-wrap: nowrap;
+  width: max-content;
+  max-width: min(28rem, calc(100vw - 6rem));
   visibility: hidden;
   opacity: 0;
   pointer-events: none;
@@ -247,7 +250,17 @@
 }
 
 .pipeline-hs-row--v2:hover {
-  z-index: 2;
+  position: relative;
+  z-index: 4;
+}
+
+.pipeline-hs-row--v2:hover .pipeline-hs-td--name,
+.pipeline-hs-row--v2:hover .pipeline-hs-td--company {
+  overflow: visible;
+}
+
+.pipeline-hs-row--v2:hover .pipeline-hs-name-link {
+  visibility: hidden;
 }
 
 .pipeline-hs-row--v2:hover .pipeline-row-hover-actions {
