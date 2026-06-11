@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 8b67951
+npm run prod:rollback -- 4a041dc
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 8b67951
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `4459d66` |
-| Log updated (IST) | 11/06/2026, 21:20:29 |
+| Commit | `d439ffa` |
+| Log updated (IST) | 11/06/2026, 21:34:11 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 8b67951
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 11/06/2026, 21:20:07 | `4459d66` | fix: restore orange pipeline name initials on list avatars | [preview](https://connect-intel-98h4b6264-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4459d66` | **← LIVE**
+| 11/06/2026, 21:34:02 | `d439ffa` | fix: stabilize pipeline list, restore hover actions and tags | [preview](https://connect-intel-9yv36uu5q-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d439ffa` | **← LIVE**
+| 11/06/2026, 21:21:11 | `4a041dc` | chore: production log after pipeline avatar color fix | [preview](https://connect-intel-ebjr8k2u6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4a041dc` |
+| 11/06/2026, 21:20:07 | `4459d66` | fix: restore orange pipeline name initials on list avatars | [preview](https://connect-intel-98h4b6264-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4459d66` |
 | 11/06/2026, 21:11:35 | `8b67951` | chore: production log after pipeline color revert deploy | [preview](https://connect-intel-jn9eveyfb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8b67951` |
 | 11/06/2026, 21:10:29 | `4add1de` | fix: revert pipeline brand colors and repair list table UI | [preview](https://connect-intel-op6sau9ev-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4add1de` |
 | 11/06/2026, 20:53:26 | `be87909` | chore: production log after pipeline list polish deploy | [preview](https://connect-intel-m9j1mzzfj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- be87909` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 8b67951
 | 10/06/2026, 17:43:03 | `c625be4` | chore: production log after Marketing Hub performance fix deploy | [preview](https://connect-intel-q9s84lmta-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c625be4` |
 | 10/06/2026, 17:41:52 | `e569c84` | fix: Marketing Hub timeouts, reports, overview data, and bulk email manual entry | [preview](https://connect-intel-pbsp0kiuh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e569c84` |
 | 10/06/2026, 17:25:23 | `39e86d9` | chore: production log after Marketing Hub deploy | [preview](https://connect-intel-ag600twcn-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 39e86d9` |
-| 10/06/2026, 17:24:30 | `281694a` | Rebuild Marketing Hub with indigo v3 UI and new APIs. | [preview](https://connect-intel-g8drpaq1a-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 281694a` |
-| 10/06/2026, 16:56:32 | `9ae193f` | chore: production log after useEffect fix deploy | [preview](https://connect-intel-kyqg17mym-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9ae193f` |
 
 ---
 

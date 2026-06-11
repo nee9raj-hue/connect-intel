@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-11T15:50:29.542Z",
-  "updatedAtIst": "11/06/2026, 21:20:29",
+  "updatedAt": "2026-06-11T16:04:11.980Z",
+  "updatedAtIst": "11/06/2026, 21:34:11",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "4459d66",
+  "currentProductionCommit": "d439ffa",
   "entries": [
+    {
+      "logId": "20260611-2134-d439ffa",
+      "commit": "d439ffa",
+      "commitFull": "d439ffa70a34e6746795014b07fa156a4997e8ce",
+      "message": "fix: stabilize pipeline list, restore hover actions and tags",
+      "deployedAt": "2026-06-11T16:04:02.901Z",
+      "deployedAtIst": "11/06/2026, 21:34:02",
+      "committedAtIst": "11/06/2026, 21:33:12",
+      "vercelPreviewUrl": "https://connect-intel-9yv36uu5q-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- d439ffa"
+    },
+    {
+      "logId": "20260611-2121-4a041dc",
+      "commit": "4a041dc",
+      "commitFull": "4a041dca54f79ec3423bce860a97633f23d16490",
+      "message": "chore: production log after pipeline avatar color fix",
+      "deployedAt": "2026-06-11T15:51:11.791Z",
+      "deployedAtIst": "11/06/2026, 21:21:11",
+      "committedAtIst": "11/06/2026, 21:20:34",
+      "vercelPreviewUrl": "https://connect-intel-ebjr8k2u6-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 4a041dc"
+    },
     {
       "logId": "20260611-2120-4459d66",
       "commit": "4459d66",
@@ -15,7 +43,7 @@
       "committedAtIst": "11/06/2026, 21:19:30",
       "vercelPreviewUrl": "https://connect-intel-98h4b6264-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 4459d66"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 39e86d9"
-    },
-    {
-      "logId": "20260610-1724-281694a",
-      "commit": "281694a",
-      "commitFull": "281694a35d9fcc1da318de0d823aceea7f76caee",
-      "message": "Rebuild Marketing Hub with indigo v3 UI and new APIs.",
-      "deployedAt": "2026-06-10T11:54:30.893Z",
-      "deployedAtIst": "10/06/2026, 17:24:30",
-      "committedAtIst": "10/06/2026, 17:23:47",
-      "vercelPreviewUrl": "https://connect-intel-g8drpaq1a-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 281694a"
-    },
-    {
-      "logId": "20260610-1656-9ae193f",
-      "commit": "9ae193f",
-      "commitFull": "9ae193f1e02085a8b600503c8cba6a0269811a8b",
-      "message": "chore: production log after useEffect fix deploy",
-      "deployedAt": "2026-06-10T11:26:32.861Z",
-      "deployedAtIst": "10/06/2026, 16:56:32",
-      "committedAtIst": "10/06/2026, 16:55:53",
-      "vercelPreviewUrl": "https://connect-intel-kyqg17mym-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 9ae193f"
     }
   ]
 }
