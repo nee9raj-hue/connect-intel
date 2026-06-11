@@ -55,6 +55,41 @@ export default function BulkEmailModal({ open, leadIds, leads, onClose, onDone, 
       return undefined
     }
 
+    const pool = fallbackLeadsRef.current || []
+    const allIdsInPool = ids.every((id) => pool.some((l) => String(l.id) === String(id)))
+    if (allIdsInPool && pool.length > 0) {
+      const resolved = []
+      const sendable = []
+      const skip = []
+      for (const leadId of ids) {
+        const lead = pool.find((l) => String(l.id) === String(leadId))
+        if (!lead) {
+          skip.push({ leadId, reason: 'not_loaded' })
+          continue
+        }
+        resolved.push({
+          id: lead.id,
+          firstName: lead.firstName || '',
+          lastName: lead.lastName || '',
+          company: lead.company || '',
+          title: lead.title || '',
+          email: lead.email || '',
+          emailStatus: lead.emailStatus || '',
+          emailBouncedAt: lead.emailBouncedAt || null,
+          crm: lead.crm,
+        })
+        if (leadHasSendableEmail(lead)) sendable.push(leadId)
+        else skip.push({ leadId, reason: 'no_email' })
+      }
+      fetchedKeyRef.current = leadIdsKey
+      setResolvedLeads(resolved)
+      setSendableIds(sendable)
+      setSkipped(skip)
+      setResolveError(null)
+      setResolving(false)
+      return undefined
+    }
+
     let cancelled = false
     setResolving(true)
     setResolveError(null)

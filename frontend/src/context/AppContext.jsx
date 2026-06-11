@@ -807,13 +807,15 @@ export function AppProvider({ children }) {
         failedCount: aggregate.failedCount,
         skippedCount: aggregate.skippedCount,
       }
-      if (/timed out/i.test(error?.message || '') && aggregate.campaignId) {
+      if (/timed out/i.test(error?.message || '')) {
         return {
           ...aggregate,
           background: true,
-          sendStatus: 'queued',
+          sendStatus: aggregate.campaignId ? 'queued' : 'preparing',
           pendingSends: ids.length,
           timedOut: true,
+          workerHint:
+            'The request timed out, but your send may still be processing. Check the Pipeline progress banner or try Send again in a minute.',
         }
       }
       throw error

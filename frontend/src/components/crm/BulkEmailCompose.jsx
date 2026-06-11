@@ -232,6 +232,13 @@ export default function BulkEmailCompose({
       )
       setResult(data)
       setResumeCampaignId(null)
+      if (data.timedOut) {
+        setError(null)
+        setNotice(
+          data.workerHint ||
+            'The request timed out, but your send may still be processing. Check the Pipeline progress banner or try Send again in a minute.'
+        )
+      }
       if (data.campaignId) {
         setBackgroundCampaignId(data.campaignId)
         saveActivePipelineEmailCampaign(data.campaignId)
