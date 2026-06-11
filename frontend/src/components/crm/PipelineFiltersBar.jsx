@@ -459,7 +459,8 @@ export default function PipelineFiltersBar({
         ) : (
           <PipelineFilterToolbarButton
             label="Owner"
-            active={activeFilter?.type === 'owner' || Boolean(ownerFilter)}
+            displayValue={ownerSelectOptions.find((o) => String(o.value) === String(ownerFilter))?.label}
+            active={Boolean(ownerFilter)}
             aria-expanded={activeFilter?.type === 'owner'}
             onClick={() => openFilter('owner')}
           />
@@ -479,7 +480,8 @@ export default function PipelineFiltersBar({
         ) : (
           <PipelineFilterToolbarButton
             label="Status"
-            active={activeFilter?.type === 'status' || statusFilter !== 'all'}
+            displayValue={statusOptions.find((s) => s.id === statusFilter)?.label}
+            active={statusFilter !== 'all'}
             aria-expanded={activeFilter?.type === 'status'}
             onClick={() => openFilter('status')}
           />
@@ -498,7 +500,14 @@ export default function PipelineFiltersBar({
       ) : (
         <PipelineFilterToolbarButton
           label="City"
-          active={activeFilter?.type === 'city' || (filters.cities?.length || 0) > 0}
+          displayValue={
+            (filters.cities?.length || 0) > 0
+              ? filters.cities.length === 1
+                ? filters.cities[0]
+                : `${filters.cities.length} selected`
+              : undefined
+          }
+          active={(filters.cities?.length || 0) > 0}
           aria-expanded={activeFilter?.type === 'city'}
           onClick={() => openFilter('city')}
         />
@@ -517,7 +526,14 @@ export default function PipelineFiltersBar({
       ) : (
         <PipelineFilterToolbarButton
           label="State"
-          active={activeFilter?.type === 'state' || (filters.states?.length || 0) > 0}
+          displayValue={
+            (filters.states?.length || 0) > 0
+              ? filters.states.length === 1
+                ? filters.states[0]
+                : `${filters.states.length} selected`
+              : undefined
+          }
+          active={(filters.states?.length || 0) > 0}
           aria-expanded={activeFilter?.type === 'state'}
           onClick={() => openFilter('state')}
         />
@@ -536,7 +552,8 @@ export default function PipelineFiltersBar({
       ) : (
         <PipelineFilterToolbarButton
           label="Contact"
-          active={activeFilter?.type === 'contact' || (filters.contact && filters.contact !== 'any')}
+          displayValue={CONTACT_FILTER_OPTIONS.find((o) => o.id === filters.contact)?.label}
+          active={Boolean(filters.contact && filters.contact !== 'any')}
           aria-expanded={activeFilter?.type === 'contact'}
           onClick={() => openFilter('contact')}
         />

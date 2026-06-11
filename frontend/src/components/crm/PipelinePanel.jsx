@@ -629,7 +629,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     if (q === appliedSearch) return
     applyFilters({ search: q })
     if (serverSidePipeline) {
-      loadPipelineList(buildServerFilters(advancedFilters, q), { append: false, silent: false }).catch(
+      loadPipelineList(buildServerFilters(advancedFilters, q), { append: false, silent: true }).catch(
         () => {}
       )
     }
@@ -646,7 +646,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
         setAppliedSearch(patch.search)
       }
       if (serverSidePipeline) {
-        loadPipelineList(buildServerFilters(nextAdv, nextSearch), { append: false, silent: false }).catch(
+        loadPipelineList(buildServerFilters(nextAdv, nextSearch), { append: false, silent: true }).catch(
           () => {}
         )
       }
@@ -822,9 +822,12 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       listStatusFilter !== 'all' ||
       Boolean(appliedSearch?.trim()) ||
       Boolean(assigneeName)
+    const paginated =
+      pipelineLoad.hasMore ||
+      (pipelineLoad.total > pipelineLoad.loaded && pipelineLoad.loaded > 0)
     return buildPipelineBreadcrumb({
       total,
-      showing: Math.min(showing, pipelineLoad.loaded || showing),
+      showing: paginated ? 0 : Math.min(showing, pipelineLoad.loaded || showing),
       parts,
       hasActiveFilters: hasFilters,
       filteredTotal: hasFilters ? showing : null,
@@ -840,6 +843,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     pipelineSummary.total,
     filtered.length,
     pipelineLoad.loaded,
+    pipelineLoad.hasMore,
+    pipelineLoad.total,
     activeFilterCount,
   ])
 
@@ -1411,15 +1416,10 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
           )}
 
           <div
-            className={`crm-content-scroll pipeline-scroll-area pipeline-scroll-area--relative ${
+            className={`crm-content-scroll pipeline-scroll-area ${
               view === 'board' && !stageListMode ? 'crm-content-scroll-board' : ''
             }`}
           >
-          {filterApplying ? (
-            <div className="pipeline-filter-apply-overlay" role="status" aria-live="polite">
-              <p className="text-sm font-medium text-[#516f90]">Updating leads…</p>
-            </div>
-          ) : null}
           {isDealsView ? (
             <div className="p-3 md:p-4">
               <PipelineDealsView
@@ -1818,16 +1818,10 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
 function PipelineLoadMoreBar({ loaded, total, loading, onLoadMore }) {
   return (
     <div className="pipeline-load-more-bar">
-      <p className="pipeline-load-more-bar__meta">
-        Showing <strong>{loaded.toLocaleString()}</strong> of <strong>{total.toLocaleString()}</strong>{' '}
-        leads
-      </p>
-      <button
-        type="button"
-        disabled={loading}
-        onClick={onLoadMore}
-        className="pipeline-load-more-bar__btn"
-      >
+      <span className="pipeline-load-more-bar__meta">
+        {loaded.toLocaleString()} of {total.toLocaleString()}
+      </span>
+      <button type="button" disabled={loading} onClick={onLoadMore} className="crm-filter-link-btn">
         {loading ? 'Loading…' : 'View more'}
       </button>
     </div>
