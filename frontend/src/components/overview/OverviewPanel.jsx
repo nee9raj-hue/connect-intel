@@ -1,6 +1,6 @@
 import { useApp } from '../../context/AppContext'
 import { isFreightDealOrg } from '../../lib/freightDeal'
-import MyDayDashboard from './MyDayDashboard'
+import HomeDashboard from './HomeDashboard'
 import FreightDealsDashboard from './FreightDealsDashboard'
 
 export default function OverviewPanel({ onNavigate, isActive = true }) {
@@ -9,9 +9,9 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
   if (!isActive) return null
 
   return (
-    <div className="panel-shell overview-panel-v3 myday-shell">
-      <div className="myday-scroll panel-body-scroll">
-        <MyDayDashboard onNavigate={onNavigate} isActive={isActive} />
+    <div className="panel-shell overview-panel-v3 dash-v4-shell">
+      <div className="panel-body-scroll">
+        <HomeDashboard onNavigate={onNavigate} isActive={isActive} />
         {isFreightDealOrg(user) ? (
           <div className="myday-freight-addon">
             <FreightDealsDashboard user={user} pipelineSummary={pipelineSummary} onNavigate={onNavigate} />

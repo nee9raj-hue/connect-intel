@@ -350,6 +350,7 @@ export const api = {
     request(`/api/crm/activity-timeline?${appendTimeZoneToQuery(query)}`, { timeoutMs: 20_000 }),
   getCrmMyDay: (query = '') =>
     request(`/api/crm/my-day?${appendTimeZoneToQuery(query)}`, { timeoutMs: 15_000 }),
+  getDashboardBootstrap: () => request('/api/dashboard/bootstrap', { timeoutMs: 30_000 }),
   postWorkspacePulse: (body = {}) =>
     request('/api/crm/workspace-pulse', { method: 'POST', body }, { silent: true }),
   ackMeetingReminder: (leadId, meetingId, { silent = false } = {}) =>

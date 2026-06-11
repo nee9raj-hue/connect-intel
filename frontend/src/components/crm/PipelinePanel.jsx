@@ -183,23 +183,50 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   }, [isTeamManager, user?.id, teamMembers])
 
   useEffect(() => {
-    if (panelOptions?.userId === undefined) return
-    const id = panelOptions.userId ? String(panelOptions.userId) : null
+    const po = panelOptions || {}
+    if (po.scopeOwner === 'me' && user?.id) {
+      setPipelineAssigneeFilter?.(String(user.id))
+      return
+    }
+    if (po.hierarchyTeam === 'mine' || po.scope === 'all') {
+      setPipelineAssigneeFilter?.(null)
+      return
+    }
+    if (po.userId === undefined && po.assigneeUserId === undefined) return
+    const id = po.userId || po.assigneeUserId ? String(po.userId || po.assigneeUserId) : null
     setPipelineAssigneeFilter?.(id)
-  }, [panelOptions?.userId, setPipelineAssigneeFilter])
+  }, [
+    panelOptions?.userId,
+    panelOptions?.assigneeUserId,
+    panelOptions?.scopeOwner,
+    panelOptions?.hierarchyTeam,
+    panelOptions?.scope,
+    user?.id,
+    setPipelineAssigneeFilter,
+  ])
 
   const effectiveAssigneeFilter = useMemo(() => {
+    if (panelOptions?.hierarchyTeam === 'mine' || panelOptions?.scope === 'all') {
+      if (pipelineAssigneeFilter && isTeamManager && !managerTeamUserIds.has(String(pipelineAssigneeFilter))) {
+        return null
+      }
+      return pipelineAssigneeFilter || null
+    }
     if (pipelineAssigneeFilter) {
       if (isTeamManager && !managerTeamUserIds.has(String(pipelineAssigneeFilter))) {
         return null
       }
       return pipelineAssigneeFilter
     }
+    if (panelOptions?.scopeOwner === 'me' && user?.id) return String(user.id)
     if (isTeamManager) return null
     if (user?.accountType === 'company' && !isOrgAdmin && user?.id) return String(user.id)
     return null
   }, [
     pipelineAssigneeFilter,
+    panelOptions?.hierarchyTeam,
+    panelOptions?.scope,
+    panelOptions?.scopeOwner,
     user?.accountType,
     user?.id,
     isOrgAdmin,
@@ -221,11 +248,19 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     const adv = { ...DEFAULT_PIPELINE_FILTERS }
     if (po.overdueFollowUp) adv.overdueFollowUp = true
     if (po.followUpDue) adv.followUpDue = true
-    if (po.closingThisWeek) adv.closingThisWeek = true
+    if (po.closingThisWeek || po.closing === 'this-month') adv.closingThisWeek = true
+    if (po.stuck) adv.staleDays = 7
+    if (po.scoreMin != null && po.scoreMin !== '') adv.minLeadScore = Number(po.scoreMin)
     if (po.smartTags?.length) adv.smartTags = po.smartTags
 
     const hasAdv =
-      po.overdueFollowUp || po.followUpDue || po.closingThisWeek || (po.smartTags?.length > 0)
+      po.overdueFollowUp ||
+      po.followUpDue ||
+      po.closingThisWeek ||
+      po.closing === 'this-month' ||
+      po.stuck ||
+      po.scoreMin != null ||
+      (po.smartTags?.length > 0)
 
     if (hasAdv) {
       setSmartViewId(null)
@@ -251,6 +286,9 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     panelOptions?.overdueFollowUp,
     panelOptions?.followUpDue,
     panelOptions?.closingThisWeek,
+    panelOptions?.closing,
+    panelOptions?.stuck,
+    panelOptions?.scoreMin,
     panelOptions?.smartTags,
   ])
 

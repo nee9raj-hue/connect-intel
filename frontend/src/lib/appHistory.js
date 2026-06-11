@@ -69,6 +69,16 @@ export function parseAppLocation(search = '', pathname = '/') {
   if (params.get('followUpDue') === '1') panelOptions.followUpDue = true
   if (params.get('overdueFollowUp') === '1') panelOptions.overdueFollowUp = true
   if (params.get('closingThisWeek') === '1') panelOptions.closingThisWeek = true
+  if (params.get('scope')) panelOptions.scope = params.get('scope')
+  if (params.get('team')) panelOptions.hierarchyTeam = params.get('team')
+  if (params.get('owner') === 'me') panelOptions.scopeOwner = 'me'
+  if (params.get('stuck') === '1' || params.get('stuck') === 'true') panelOptions.stuck = true
+  if (params.get('score_min')) panelOptions.scoreMin = Number(params.get('score_min'))
+  if (params.get('assigned_after')) panelOptions.assignedAfter = params.get('assigned_after')
+  if (params.get('due')) panelOptions.due = params.get('due')
+  if (params.get('closing')) panelOptions.closing = params.get('closing')
+  if (params.get('filter')) panelOptions.activityFilter = params.get('filter')
+  if (params.get('date')) panelOptions.calendarDate = params.get('date')
   const smartTags = params.getAll('smartTag').filter(Boolean)
   if (smartTags.length) panelOptions.smartTags = smartTags
 
@@ -215,6 +225,18 @@ export function serializeAppLocation({ panel = 'overview', panelOptions = {}, le
   if (panelOptions.followUpDue) params.set('followUpDue', '1')
   if (panelOptions.overdueFollowUp) params.set('overdueFollowUp', '1')
   if (panelOptions.closingThisWeek) params.set('closingThisWeek', '1')
+  if (panelOptions.scope === 'all') params.set('scope', 'all')
+  if (panelOptions.hierarchyTeam) params.set('team', String(panelOptions.hierarchyTeam))
+  if (panelOptions.scopeOwner === 'me') params.set('owner', 'me')
+  if (panelOptions.stuck) params.set('stuck', '1')
+  if (panelOptions.scoreMin != null && panelOptions.scoreMin !== '') {
+    params.set('score_min', String(panelOptions.scoreMin))
+  }
+  if (panelOptions.assignedAfter) params.set('assigned_after', String(panelOptions.assignedAfter))
+  if (panelOptions.due) params.set('due', String(panelOptions.due))
+  if (panelOptions.closing) params.set('closing', String(panelOptions.closing))
+  if (panelOptions.activityFilter) params.set('filter', String(panelOptions.activityFilter))
+  if (panelOptions.calendarDate) params.set('date', String(panelOptions.calendarDate))
   for (const tag of panelOptions.smartTags || []) {
     if (tag) params.append('smartTag', String(tag))
   }

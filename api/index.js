@@ -81,6 +81,7 @@ const ROUTES = {
   'crm/team-metrics': () => import('../lib/server/handlers/crm-team-metrics.js'),
   'crm/activity-timeline': () => import('../lib/server/handlers/crm-activity-timeline.js'),
   'crm/my-day': () => import('../lib/server/handlers/crm-my-day.js'),
+  'dashboard/bootstrap': () => import('../lib/server/handlers/dashboard-bootstrap.js'),
   'crm/workspace-pulse': () => import('../lib/server/handlers/crm-workspace-pulse.js'),
   'crm/saved-views': () => import('../lib/server/handlers/crm-saved-views.js'),
   'crm/sequences': () => import('../lib/server/handlers/crm-sequences.js'),
