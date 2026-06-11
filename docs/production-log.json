@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-11T20:33:13.422Z",
-  "updatedAtIst": "12/06/2026, 02:03:13",
+  "updatedAt": "2026-06-11T20:44:02.293Z",
+  "updatedAtIst": "12/06/2026, 02:14:02",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "d8e12ad",
+  "currentProductionCommit": "3a4ec78",
   "entries": [
+    {
+      "logId": "20260612-0213-3a4ec78",
+      "commit": "3a4ec78",
+      "commitFull": "3a4ec78cba3a335f0c27515c0979dcdbe04e7fe4",
+      "message": "fix: mobile calendar drawer clarity and pipeline owner/status filters",
+      "deployedAt": "2026-06-11T20:43:55.692Z",
+      "deployedAtIst": "12/06/2026, 02:13:55",
+      "committedAtIst": "12/06/2026, 02:13:17",
+      "vercelPreviewUrl": "https://connect-intel-9nof9dm34-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 3a4ec78"
+    },
+    {
+      "logId": "20260612-0204-9d53335",
+      "commit": "9d53335",
+      "commitFull": "9d533358284e87ff2af5fd7e874d1eaf3be52d5d",
+      "message": "chore: production log after calendar chrome UX deploy",
+      "deployedAt": "2026-06-11T20:34:00.401Z",
+      "deployedAtIst": "12/06/2026, 02:04:00",
+      "committedAtIst": "12/06/2026, 02:03:23",
+      "vercelPreviewUrl": "https://connect-intel-jez8o0rj0-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 9d53335"
+    },
     {
       "logId": "20260612-0203-d8e12ad",
       "commit": "d8e12ad",
@@ -15,7 +43,7 @@
       "committedAtIst": "12/06/2026, 02:02:26",
       "vercelPreviewUrl": "https://connect-intel-96kx93h4v-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- d8e12ad"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 51bc36f"
-    },
-    {
-      "logId": "20260611-2313-e55951f",
-      "commit": "e55951f",
-      "commitFull": "e55951f6f3e7174b0d45b5df92434898495c27f4",
-      "message": "fix: align home dashboard colors with activity log page",
-      "deployedAt": "2026-06-11T17:43:26.878Z",
-      "deployedAtIst": "11/06/2026, 23:13:26",
-      "committedAtIst": "11/06/2026, 23:12:46",
-      "vercelPreviewUrl": "https://connect-intel-gmfuk7a4p-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- e55951f"
-    },
-    {
-      "logId": "20260611-2305-b95eed2",
-      "commit": "b95eed2",
-      "commitFull": "b95eed25ac30b8b4d4e992ec523517e7f2067d65",
-      "message": "fix: keep pipeline row hover actions on screen",
-      "deployedAt": "2026-06-11T17:35:08.002Z",
-      "deployedAtIst": "11/06/2026, 23:05:08",
-      "committedAtIst": "11/06/2026, 23:04:26",
-      "vercelPreviewUrl": "https://connect-intel-b6dgd7a0l-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- b95eed2"
     }
   ]
 }
