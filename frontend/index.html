@@ -18,6 +18,53 @@
       href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
+    <script>
+      (function () {
+        var KEY = 'ci_deploy_recovery'
+        function isStale(msg) {
+          msg = String(msg || '').toLowerCase()
+          return (
+            msg.indexOf('importing a module script failed') !== -1 ||
+            msg.indexOf('failed to fetch dynamically imported module') !== -1 ||
+            msg.indexOf('error loading dynamically imported module') !== -1
+          )
+        }
+        function recover() {
+          if (sessionStorage.getItem(KEY)) return
+          sessionStorage.setItem(KEY, '1')
+          Promise.resolve()
+            .then(function () {
+              if (!('serviceWorker' in navigator)) return
+              return navigator.serviceWorker.getRegistrations().then(function (regs) {
+                return Promise.all(regs.map(function (reg) { return reg.unregister() }))
+              })
+            })
+            .then(function () {
+              if (!('caches' in window)) return
+              return caches.keys().then(function (keys) {
+                return Promise.all(keys.map(function (key) { return caches.delete(key) }))
+              })
+            })
+            .then(function () { location.reload() })
+            .catch(function () { location.reload() })
+        }
+        window.addEventListener(
+          'error',
+          function (event) {
+            if (isStale(event.message)) recover()
+          },
+          true,
+        )
+        window.addEventListener('unhandledrejection', function (event) {
+          var reason = event.reason
+          var msg = reason && reason.message ? reason.message : String(reason || '')
+          if (isStale(msg)) recover()
+        })
+        window.addEventListener('load', function () {
+          try { sessionStorage.removeItem(KEY) } catch (_) {}
+        })
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>
