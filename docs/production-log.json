@@ -1,10 +1,52 @@
 {
-  "updatedAt": "2026-06-11T16:45:30.352Z",
-  "updatedAtIst": "11/06/2026, 22:15:30",
+  "updatedAt": "2026-06-11T16:55:14.670Z",
+  "updatedAtIst": "11/06/2026, 22:25:14",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "6812480",
+  "currentProductionCommit": "eeec0da",
   "entries": [
+    {
+      "logId": "20260611-2224-eeec0da",
+      "commit": "eeec0da",
+      "commitFull": "eeec0da5b05858802c3631de6f0740c2f88fd70a",
+      "message": "fix: pipeline filter toolbar popups with owner filter and Esc support",
+      "deployedAt": "2026-06-11T16:54:58.476Z",
+      "deployedAtIst": "11/06/2026, 22:24:58",
+      "committedAtIst": "11/06/2026, 22:24:14",
+      "vercelPreviewUrl": "https://connect-intel-1ta6oncjm-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- eeec0da"
+    },
+    {
+      "logId": "20260611-2216-32288b9",
+      "commit": "32288b9",
+      "commitFull": "32288b9ebf10500665450d923a6de558fa6b0460",
+      "message": "chore: production log after marketing pipeline drill-down deploy",
+      "deployedAt": "2026-06-11T16:46:31.419Z",
+      "deployedAtIst": "11/06/2026, 22:16:31",
+      "committedAtIst": "11/06/2026, 22:15:35",
+      "vercelPreviewUrl": "https://connect-intel-dnde73g2o-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 32288b9"
+    },
+    {
+      "logId": "20260611-2215-1ea89a3",
+      "commit": "1ea89a3",
+      "commitFull": "1ea89a35d424755f12760dec082a023ce9c21e83",
+      "message": "fix: restore intentional dark left sidebar chrome",
+      "deployedAt": "2026-06-11T16:45:58.852Z",
+      "deployedAtIst": "11/06/2026, 22:15:58",
+      "committedAtIst": "11/06/2026, 22:01:18",
+      "vercelPreviewUrl": "https://connect-intel-pijs795kz-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 1ea89a3"
+    },
     {
       "logId": "20260611-2215-6812480",
       "commit": "6812480",
@@ -15,7 +57,7 @@
       "committedAtIst": "11/06/2026, 22:14:41",
       "vercelPreviewUrl": "https://connect-intel-mwszfe8nl-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 6812480"
     },
@@ -242,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- c78111f"
-    },
-    {
-      "logId": "20260611-1233-4474efe",
-      "commit": "4474efe",
-      "commitFull": "4474efe91a0c4e95dfd01a0434e446bfe01e7548",
-      "message": "chore: production log after home dashboard rebuild deploy",
-      "deployedAt": "2026-06-11T07:03:29.671Z",
-      "deployedAtIst": "11/06/2026, 12:33:29",
-      "committedAtIst": "11/06/2026, 12:32:52",
-      "vercelPreviewUrl": "https://connect-intel-el5ox16u4-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 4474efe"
-    },
-    {
-      "logId": "20260611-1232-6951eb2",
-      "commit": "6951eb2",
-      "commitFull": "6951eb2a0a2baa391d140acdd1450263ec75bb46",
-      "message": "feat: rebuild home dashboard with role-aware bootstrap API and indigo v4 UI",
-      "deployedAt": "2026-06-11T07:02:29.016Z",
-      "deployedAtIst": "11/06/2026, 12:32:29",
-      "committedAtIst": "11/06/2026, 12:31:50",
-      "vercelPreviewUrl": "https://connect-intel-97vtz0e7v-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 6951eb2"
     }
   ]
 }
