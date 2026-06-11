@@ -32,7 +32,7 @@ export default function MarketingHubShell({
           <button type="button" className="mhub-v3-btn" onClick={onImportContacts}>
             Import
           </button>
-          <button type="button" className="mhub-v3-btn mhub-v3-btn--primary" onClick={onCreateCampaign}>
+          <button type="button" className="mhub-v3-btn mhub-v3-btn--accent" onClick={onCreateCampaign}>
             Create campaign
           </button>
         </div>

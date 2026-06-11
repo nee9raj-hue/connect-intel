@@ -3,7 +3,9 @@
 import { Sparkline } from './TeamIntelligenceCharts'
 import { formatDealValue } from '../../lib/crmTimeline'
 
-const ORANGE = '#FF773D'
+import { brand } from '../../lib/brandTokens'
+
+const ORANGE = brand.primary
 const SLATE = '#64748b'
 const GREEN = '#16a34a'
 const AMBER = '#d97706'

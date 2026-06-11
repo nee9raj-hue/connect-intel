@@ -61,6 +61,11 @@ export default function PipelineFiltersBar({
   onOpenViewSettings,
   canSaveAsAudience = false,
   onSaveAsAudience,
+  canShowOwnerFilter = false,
+  ownerFilter = null,
+  ownerOptions = [],
+  onOwnerFilterChange,
+  statusCounts = {},
 }) {
   const [savedViews, setSavedViews] = useState([])
   const [advancedOpen, setAdvancedOpen] = useState(false)
@@ -135,7 +140,14 @@ export default function PipelineFiltersBar({
 
   const cityOptions = cities.map((c) => ({ label: c, value: c }))
   const stateOptions = states.map((s) => ({ label: s, value: s }))
-  const stageOptions = statusOptions.map((s) => ({ label: s.label, value: s.id }))
+  const stageOptions = statusOptions.map((s) => ({
+    label: statusCounts[s.id] != null ? `${s.label} (${statusCounts[s.id]})` : s.label,
+    value: s.id,
+  }))
+  const ownerSelectOptions = ownerOptions.map((m) => ({
+    label: m.name || m.email || 'Team member',
+    value: m.userId,
+  }))
   const contactOptions = CONTACT_FILTER_OPTIONS.filter((o) => o.id !== 'any').map((o) => ({
     label: o.label,
     value: o.id,
@@ -422,6 +434,104 @@ export default function PipelineFiltersBar({
       )}
 
       <div className="hs-advanced-filter-section">
+        <p className="hs-advanced-filter-label">Date added</p>
+        <div className="hs-advanced-filter-field">
+          <label>
+            From
+            <input
+              type="date"
+              value={filters.addedFrom || ''}
+              onChange={(e) => set({ addedFrom: e.target.value })}
+            />
+          </label>
+          <label>
+            To
+            <input
+              type="date"
+              value={filters.addedTo || ''}
+              onChange={(e) => set({ addedTo: e.target.value })}
+            />
+          </label>
+        </div>
+      </div>
+
+      <div className="hs-advanced-filter-section">
+        <p className="hs-advanced-filter-label">Last activity</p>
+        <div className="hs-advanced-filter-field">
+          <label>
+            From
+            <input
+              type="date"
+              value={filters.lastActivityFrom || ''}
+              onChange={(e) => set({ lastActivityFrom: e.target.value })}
+            />
+          </label>
+          <label>
+            To
+            <input
+              type="date"
+              value={filters.lastActivityTo || ''}
+              onChange={(e) => set({ lastActivityTo: e.target.value })}
+            />
+          </label>
+        </div>
+      </div>
+
+      <div className="hs-advanced-filter-section">
+        <p className="hs-advanced-filter-label">Lead score</p>
+        <div className="flex gap-2">
+          <input
+            type="number"
+            min={0}
+            max={100}
+            placeholder="Min"
+            value={filters.minLeadScore ?? ''}
+            onChange={(e) =>
+              set({ minLeadScore: e.target.value === '' ? null : Number(e.target.value) })
+            }
+            className="hs-advanced-filter-field-input w-full border rounded px-2 py-1 text-xs"
+          />
+          <input
+            type="number"
+            min={0}
+            max={100}
+            placeholder="Max"
+            value={filters.maxLeadScore ?? ''}
+            onChange={(e) =>
+              set({ maxLeadScore: e.target.value === '' ? null : Number(e.target.value) })
+            }
+            className="hs-advanced-filter-field-input w-full border rounded px-2 py-1 text-xs"
+          />
+        </div>
+      </div>
+
+      <div className="hs-advanced-filter-section">
+        <p className="hs-advanced-filter-label">Source</p>
+        <select
+          value={filters.sourceFilter || ''}
+          onChange={(e) => set({ sourceFilter: e.target.value })}
+          className="w-full border rounded px-2 py-1.5 text-xs"
+        >
+          <option value="">All sources</option>
+          <option value="manual">Manual entry</option>
+          <option value="import">Import</option>
+          <option value="referral">Referral</option>
+          <option value="website">Website</option>
+        </select>
+      </div>
+
+      <div className="hs-advanced-filter-section">
+        <label className="flex items-center gap-2 text-xs font-medium text-gray-700">
+          <input
+            type="checkbox"
+            checked={Boolean(filters.stuckLeads)}
+            onChange={(e) => set({ stuckLeads: e.target.checked })}
+          />
+          Stuck leads (no activity 7+ days)
+        </label>
+      </div>
+
+      <div className="hs-advanced-filter-section">
         <p className="hs-advanced-filter-label">Smart</p>
         <FilterDropdown
           compact
@@ -519,9 +629,24 @@ export default function PipelineFiltersBar({
 
   const desktopFilterIcons = (
     <>
+      {canShowOwnerFilter && (
+        <FilterDropdown
+          label="Owner"
+          value={ownerFilter || ''}
+          displayValue={ownerSelectOptions.find((o) => String(o.value) === String(ownerFilter))?.label}
+          options={ownerSelectOptions}
+          searchable
+          placeholder="Search owners…"
+          onChange={(v) => {
+            onOwnerFilterChange?.(v || null)
+            onApplyFilters?.()
+          }}
+          emptyLabel="All owners"
+        />
+      )}
+
       {!stageListMode && (
         <FilterDropdown
-          iconOnly
           icon={ListIcon}
           showLabel
           label="Status"
@@ -537,7 +662,6 @@ export default function PipelineFiltersBar({
       )}
 
       <FilterDropdown
-        iconOnly
         icon={MapPinIcon}
         showLabel
         label="City"
@@ -551,7 +675,6 @@ export default function PipelineFiltersBar({
       />
 
       <FilterDropdown
-        iconOnly
         icon={MapIcon}
         showLabel
         label="State"
@@ -565,7 +688,6 @@ export default function PipelineFiltersBar({
       />
 
       <FilterDropdown
-        iconOnly
         icon={PeopleIcon}
         showLabel
         label="Contact"
@@ -579,7 +701,7 @@ export default function PipelineFiltersBar({
       <div className="hs-advanced-filter-wrap hs-filter-icon-wrap" ref={advancedRef}>
         <FilterToolbarIcon
           icon={SlidersIcon}
-          label="More"
+          label="More filters"
           showLabel
           active={advancedOpen || advancedActiveCount > 0}
           badge={advancedActiveCount > 0}
@@ -598,7 +720,7 @@ export default function PipelineFiltersBar({
   )
 
   return (
-    <div className="crm-toolbar crm-toolbar--hubspot">
+    <div className="crm-toolbar crm-toolbar--hubspot pipeline-filter-labeled">
       <div className="hs-filter-bar-top">
         <div className="crm-search-wrap crm-search-wrap--hubspot hs-filter-search hs-filter-search--compact">
           <svg className="crm-search-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
@@ -619,9 +741,9 @@ export default function PipelineFiltersBar({
                 handleApply()
               }
             }}
-            placeholder="Search"
+            placeholder="Search by name, email, phone, company…"
             className="crm-search-input crm-search-input--hubspot"
-            aria-label="Search pipeline"
+            aria-label="Search pipeline leads"
           />
         </div>
 

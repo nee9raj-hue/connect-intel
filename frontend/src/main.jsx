@@ -1,8 +1,10 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { registerSW } from 'virtual:pwa-register'
+import { applyBrandCssVars } from './lib/brandTokens'
 import './index.css'
 import './styles/hubspot-premium.css'
+import './styles/pipeline-list-polish.css'
 import './styles/platform-design-system.css'
 import './styles/panel-preferences.css'
 import './styles/marketing-hub-v3.css'
@@ -18,6 +20,7 @@ registerSW({
   },
 })
 void initNativeAppShell()
+applyBrandCssVars()
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

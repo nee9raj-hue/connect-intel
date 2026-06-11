@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { SettingsGearIcon } from '../ui/icons'
 import { createPortal } from 'react-dom'
+import { PIPELINE_TABLE_COLUMNS } from '../../lib/pipelineColumnPrefs'
 
 export default function PipelineViewSettings({
   open,
@@ -8,6 +9,8 @@ export default function PipelineViewSettings({
   view = 'list',
   onViewChange,
   stageListMode = false,
+  visibleColumns = [],
+  onColumnsChange,
   onExport,
   onResetFilters,
 }) {
@@ -23,6 +26,16 @@ export default function PipelineViewSettings({
       window.removeEventListener('keydown', onKey)
     }
   }, [open, onClose])
+
+  const toggleColumn = (id, checked) => {
+    const col = PIPELINE_TABLE_COLUMNS.find((c) => c.id === id)
+    if (col?.locked) return
+    let next = checked
+      ? [...visibleColumns, id]
+      : visibleColumns.filter((c) => c !== id)
+    if (!next.includes('name')) next = ['name', ...next]
+    onColumnsChange?.(next)
+  }
 
   if (!open) return null
 
@@ -75,11 +88,18 @@ export default function PipelineViewSettings({
           )}
 
           <section className="hs-view-settings__section">
-            <p className="hs-view-settings__section-label">Table settings</p>
-            <button type="button" className="hs-view-settings__row" disabled>
-              <span>Column visibility</span>
-              <span className="hs-view-settings__hint">Coming soon</span>
-            </button>
+            <p className="hs-view-settings__section-label">Columns</p>
+            {PIPELINE_TABLE_COLUMNS.map((col) => (
+              <label key={col.id} className="hs-view-settings__row hs-view-settings__row--check">
+                <span>{col.label}</span>
+                <input
+                  type="checkbox"
+                  checked={visibleColumns.includes(col.id)}
+                  disabled={col.locked}
+                  onChange={(e) => toggleColumn(col.id, e.target.checked)}
+                />
+              </label>
+            ))}
           </section>
 
           <section className="hs-view-settings__section">

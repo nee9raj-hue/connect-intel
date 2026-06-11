@@ -69,6 +69,10 @@ import useIsMobile from '../../hooks/useIsMobile'
 import usePipelineFilterMobile, { usePipelineNarrowViewport } from '../../hooks/usePipelineFilterMobile'
 import MyDayReturnBar from '../overview/MyDayReturnBar'
 import { describeDashboardFilter } from '../../lib/dashboardNavigation'
+import { buildPipelineBreadcrumb, pipelineFilterParts } from '../../lib/pipelineListBreadcrumb'
+import { loadPipelineColumnPrefs, savePipelineColumnPrefs } from '../../lib/pipelineColumnPrefs'
+import PipelineInfiniteSentinel from './PipelineInfiniteSentinel'
+import { useDebouncedPipelineSearch } from '../../hooks/useDebouncedPipelineSearch'
 
 export default function PipelinePanel({ onNavigate, panelOptions }) {
   const {
@@ -90,9 +94,12 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     teamMembers,
     refreshTeam,
     bulkUpdatePipeline,
+    patchLead,
     orgLeadTags,
     notifications,
   } = useApp()
+
+  const [tableColumns, setTableColumns] = useState(() => loadPipelineColumnPrefs())
 
   const [crmSettings, setCrmSettings] = useState(null)
   const [activePipelineId, setActivePipelineId] = useState('default')
@@ -137,6 +144,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const [selectedIds, setSelectedIds] = useState(new Set())
   const [importOpen, setImportOpen] = useState(false)
   const [addOpen, setAddOpen] = useState(false)
+  const [addLeadStatus, setAddLeadStatus] = useState('new')
+  const [addLeadToast, setAddLeadToast] = useState(null)
   const [bulkOpen, setBulkOpen] = useState(false)
   const [bulkAssignOpen, setBulkAssignOpen] = useState(false)
   const [bulkEditOpen, setBulkEditOpen] = useState(false)
@@ -423,6 +432,16 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     return 'Team member'
   }, [effectiveAssigneeFilter, teamMembers, user?.id, user?.name, user?.email])
 
+  const canFilterByOwner = isOrgAdmin || isTeamManager
+
+  const handleOwnerFilter = useCallback(
+    (userId) => {
+      if (!canFilterByOwner) return
+      setPipelineAssigneeFilter?.(String(userId))
+    },
+    [canFilterByOwner, setPipelineAssigneeFilter]
+  )
+
   const scopedLeads = useMemo(() => {
     if (!effectiveAssigneeFilter) return pipelineScopedLeads
     return pipelineScopedLeads.filter((l) => leadMatchesAssignee(l, effectiveAssigneeFilter))
@@ -528,7 +547,15 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     getFilterStates(advancedFilters).join('|') !== getFilterStates(appliedAdvanced).join('|') ||
     advancedFilters.contact !== appliedAdvanced.contact ||
     (advancedFilters.tagIds || []).join(',') !== (appliedAdvanced.tagIds || []).join(',') ||
-    (advancedFilters.smartTags || []).join(',') !== (appliedAdvanced.smartTags || []).join(',')
+    (advancedFilters.smartTags || []).join(',') !== (appliedAdvanced.smartTags || []).join(',') ||
+    advancedFilters.minLeadScore !== appliedAdvanced.minLeadScore ||
+    advancedFilters.maxLeadScore !== appliedAdvanced.maxLeadScore ||
+    advancedFilters.addedFrom !== appliedAdvanced.addedFrom ||
+    advancedFilters.addedTo !== appliedAdvanced.addedTo ||
+    advancedFilters.lastActivityFrom !== appliedAdvanced.lastActivityFrom ||
+    advancedFilters.lastActivityTo !== appliedAdvanced.lastActivityTo ||
+    advancedFilters.sourceFilter !== appliedAdvanced.sourceFilter ||
+    advancedFilters.stuckLeads !== appliedAdvanced.stuckLeads
 
   const buildServerFilters = useCallback(
     (adv, q) => ({
@@ -591,6 +618,16 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     setAppliedSearch(nextSearch)
     setAppliedAdvanced(nextAdv)
   }, [search, advancedFilters])
+
+  useDebouncedPipelineSearch(search, (q) => {
+    if (q === appliedSearch) return
+    applyFilters({ search: q })
+    if (serverSidePipeline) {
+      loadPipelineList(buildServerFilters(advancedFilters, q), { append: false, silent: false }).catch(
+        () => {}
+      )
+    }
+  })
 
   const removeAppliedFilter = useCallback(
     (patch) => {
@@ -682,6 +719,13 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       closingThisWeek: appliedAdvanced.closingThisWeek && !closingThisMonth,
       closingThisMonth,
       minLeadScore: appliedAdvanced.minLeadScore ?? smartViewFilters.minLeadScore,
+      maxLeadScore: appliedAdvanced.maxLeadScore,
+      addedFrom: appliedAdvanced.addedFrom,
+      addedTo: appliedAdvanced.addedTo,
+      lastActivityFrom: appliedAdvanced.lastActivityFrom,
+      lastActivityTo: appliedAdvanced.lastActivityTo,
+      sourceFilter: appliedAdvanced.sourceFilter,
+      stuckLeads: appliedAdvanced.stuckLeads,
       staleDays: appliedAdvanced.staleDays ?? smartViewFilters.staleDays,
       assignedAfter: panelOptions?.assignedAfter || null,
       lastActivity: panelOptions?.lastActivity || null,
@@ -745,6 +789,66 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const activeFilterCount = useMemo(
     () => countActiveFilters(appliedAdvanced, appliedSearch),
     [appliedAdvanced, appliedSearch]
+  )
+
+  const listBreadcrumb = useMemo(() => {
+    const statusLabel =
+      listStatusFilter !== 'all'
+        ? columns.find((c) => c.id === listStatusFilter)?.label
+        : stageListMode
+          ? getStatusMeta(filter).label
+          : null
+    const parts = pipelineFilterParts({
+      statusLabel: statusLabel && statusLabel !== 'All' ? statusLabel : null,
+      assigneeName,
+      cityLabels: getFilterCities(appliedAdvanced),
+      stateLabels: getFilterStates(appliedAdvanced),
+      search: appliedSearch,
+    })
+    if (!statusLabel && !stageListMode && listStatusFilter === 'all') {
+      parts.push('All statuses')
+    }
+    const total = pipelineSummary.total || 0
+    const showing = filtered.length
+    const hasFilters =
+      activeFilterCount > 0 ||
+      filter !== 'all' ||
+      listStatusFilter !== 'all' ||
+      Boolean(appliedSearch?.trim()) ||
+      Boolean(assigneeName)
+    return buildPipelineBreadcrumb({
+      total,
+      showing: Math.min(showing, pipelineLoad.loaded || showing),
+      parts,
+      hasActiveFilters: hasFilters,
+      filteredTotal: hasFilters ? showing : null,
+    })
+  }, [
+    listStatusFilter,
+    columns,
+    stageListMode,
+    filter,
+    assigneeName,
+    appliedAdvanced,
+    appliedSearch,
+    pipelineSummary.total,
+    filtered.length,
+    pipelineLoad.loaded,
+    activeFilterCount,
+  ])
+
+  const handleLeadStatusChange = useCallback(
+    async (leadId, nextStatus) => {
+      const lead = findLeadInLists(leadId)
+      if (!lead) return
+      try {
+        await patchLead(leadId, { crm: { ...(lead.crm || {}), status: nextStatus } })
+        await refreshPipelineLead?.(leadId)
+      } catch {
+        setBulkNotice('Could not update status')
+      }
+    },
+    [findLeadInLists, patchLead, refreshPipelineLead]
   )
 
   const pipelineHasLeads = pipelineSummary.total > 0
@@ -1140,73 +1244,37 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
             </span>
           </div>
         ) : null}
-        <header className="crm-page-header pipeline-page-header">
-          <div
-            className={`crm-page-header-top pipeline-page-header-top ${
-              usePipelineNarrow ? 'pipeline-page-header-top--compact' : ''
-            }`}
-          >
-            {!usePipelineNarrow ? (
-            <div className="pipeline-page-heading min-w-0">
-              <PipelineIcon className="pipeline-page-icon w-6 h-6 shrink-0 text-[#516f90]" aria-hidden />
-              <p className="pipeline-page-stats">
-                {assigneeName ? (
-                  <>
-                    <span className="sr-only">Pipeline — </span>
-                    Viewing <strong>{assigneeName}</strong>
-                    {pipelineLoad.total > 0 && (
-                      <>
-                        {' · '}
-                        {(pipelineLoad.total || filtered.length).toLocaleString()} leads
-                        {hasMoreLeads && ` · ${pipelineLoad.loaded.toLocaleString()} loaded`}
-                      </>
-                    )}
-                    {' · '}
-                    <button
-                      type="button"
-                      className="text-[#0091ae] hover:underline"
-                      onClick={() => setPipelineAssigneeFilter?.(null)}
-                    >
-                      Clear assignee
-                    </button>
-                  </>
-                ) : pipelineSummary.total === 0 ? (
-                  <>
-                    <span className="sr-only">Pipeline — </span>
-                    Add or import leads to get started
-                  </>
-                ) : showNoFilterMatches ? (
-                  <>
-                    <span className="sr-only">Pipeline — </span>
-                    <strong>0 matches</strong>
-                    {' · '}
-                    {pipelineSummary.total.toLocaleString()} leads in pipeline
-                  </>
-                ) : isDealsView ? (
-                  <>
-                    <span className="sr-only">Freight deals — </span>
-                    <strong>{dealsStageLabel}</strong>
-                    {' · shipment RFQs'}
-                  </>
-                ) : (
-                  <>
-                    <span className="sr-only">Pipeline — </span>
-                    {stageListMode && (
-                      <>
-                        <strong>{getStatusMeta(filter).label}</strong>
-                        {' · '}
-                      </>
-                    )}
-                    {pipelineSummary.total.toLocaleString()} leads
-                    {hasMoreLeads && ` · ${pipelineLoad.loaded.toLocaleString()} loaded`}
-                  </>
-                )}
-              </p>
-            </div>
+        <header className="crm-page-header pipeline-page-header pipeline-v2-header">
+          <div className="pipeline-v2-header__row">
+            {!usePipelineNarrow && !isDealsView ? (
+              <div className="min-w-0">
+                <h1 className="pipeline-v2-header__title">Pipeline</h1>
+                <p className="pipeline-v2-header__breadcrumb">
+                  {isDealsView ? (
+                    <>
+                      {dealsStageLabel} · shipment RFQs
+                    </>
+                  ) : (
+                    listBreadcrumb
+                  )}
+                  {assigneeName ? (
+                    <>
+                      {' · '}
+                      <button
+                        type="button"
+                        className="crm-filter-link-btn"
+                        onClick={() => setPipelineAssigneeFilter?.(null)}
+                      >
+                        Clear owner
+                      </button>
+                    </>
+                  ) : null}
+                </p>
+              </div>
             ) : null}
             <div className="crm-page-actions pipeline-page-actions">
               {!stageListMode && !usePipelineNarrow && !isDealsView ? (
-                <div className="crm-view-tabs">
+                <div className="pipeline-v2-view-toggle" role="tablist" aria-label="Pipeline view">
                   {[
                     { id: 'board', label: 'Board' },
                     { id: 'list', label: 'List' },
@@ -1214,8 +1282,10 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                     <button
                       key={v.id}
                       type="button"
+                      role="tab"
+                      aria-selected={view === v.id}
                       onClick={() => setView(v.id)}
-                      className={`crm-view-tab ${view === v.id ? 'is-active' : ''}`}
+                      className={`pipeline-v2-view-toggle__btn ${view === v.id ? 'is-active' : ''}`}
                     >
                       {v.label}
                     </button>
@@ -1225,20 +1295,23 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               <button
                 type="button"
                 onClick={() => setImportOpen(true)}
-                className="crm-btn crm-btn-secondary pipeline-action-btn"
+                className="pipeline-v2-btn-import"
                 aria-label="Import leads"
               >
-                <UploadIcon className="pipeline-action-btn__icon" aria-hidden />
-                <span className="pipeline-action-btn__text">Import</span>
+                <UploadIcon className="pipeline-action-btn__icon w-4 h-4" aria-hidden />
+                <span>Import</span>
               </button>
               <button
                 type="button"
-                onClick={() => setAddOpen(true)}
-                className="crm-btn crm-btn-primary pipeline-action-btn"
+                onClick={() => {
+                  setAddLeadStatus('new')
+                  setAddOpen(true)
+                }}
+                className="pipeline-v2-btn-add"
                 aria-label="Add lead"
               >
-                <PlusIcon className="pipeline-action-btn__icon" aria-hidden />
-                <span className="pipeline-action-btn__text">Add lead</span>
+                <PlusIcon className="pipeline-action-btn__icon w-4 h-4" aria-hidden />
+                <span>Add lead</span>
               </button>
             </div>
           </div>
@@ -1253,7 +1326,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                   onClick={() => setActivePipelineId(pipe.id)}
                   className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${
                     activePipelineId === pipe.id
-                      ? 'bg-[#fff4ee] border-[#ffd4b8] text-[#FF773D]'
+                      ? 'bg-[#fff7ed] border-[#fed7aa] text-[var(--brand-primary,#f97316)]'
                       : 'border-gray-200 text-gray-600'
                   }`}
                 >
@@ -1300,6 +1373,14 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               onOpenViewSettings={() => setViewSettingsOpen(true)}
               canSaveAsAudience={canSaveAsAudience}
               onSaveAsAudience={() => setSaveFilterAudienceOpen(true)}
+              canShowOwnerFilter={canFilterByOwner}
+              ownerFilter={effectiveAssigneeFilter}
+              ownerOptions={teamMembers}
+              onOwnerFilterChange={(id) => setPipelineAssigneeFilter?.(id)}
+              statusCounts={pipelineSummary?.byStatus?.reduce?.((acc, row) => {
+                if (row?.status) acc[row.status] = row.count
+                return acc
+              }, {}) || {}}
             />
           )}
         </header>
@@ -1314,24 +1395,6 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                   : ''
             }`}
           >
-            {selectedIds.size > 0 && (
-              <PipelineBulkActionsBar
-                count={selectedIds.size}
-                canAssign={canAssign}
-                busy={bulkBusy}
-                onAssign={openBulkAssign}
-                onEdit={() => setBulkEditOpen(true)}
-                onTags={orgLeadTags?.length ? () => setBulkTagsOpen(true) : undefined}
-                onMarkReplied={() => runBulk({ markReplied: true })}
-                onEmail={openBulkEmail}
-                onCreateBatchLists={openBatchListsFlow}
-                onWhatsApp={() => setWaOpen(true)}
-                emailCount={selectedEmailCount}
-                phoneCount={selectedPhoneCount}
-                onClear={() => setSelectedIds(new Set())}
-              />
-            )}
-
           {bulkNotice && (
             <div
               className="shrink-0 mx-2 md:mx-4 mb-1 text-xs md:text-sm font-medium text-green-900 bg-green-50 border border-green-200 rounded-lg px-2.5 py-1.5 md:px-3 md:py-2"
@@ -1360,13 +1423,16 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
             </div>
           ) : showPipelineOnboarding ? (
             <EmptyPipeline
-              onNavigate={onNavigate}
               onImport={() => setImportOpen(true)}
               onAdd={() => setAddOpen(true)}
               compact={isMobile}
             />
           ) : showNoFilterMatches ? (
-            <PipelineNoMatches onClearFilters={resetAllPipelineFilters} onNavigate={onNavigate} />
+            <PipelineNoMatches
+              onClearFilters={resetAllPipelineFilters}
+              onAdd={() => setAddOpen(true)}
+              filterSummary={listBreadcrumb}
+            />
           ) : view === 'board' && !stageListMode ? (
             <div className="crm-kanban-board min-w-0">
               {columns.map((col) => {
@@ -1388,8 +1454,14 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                     onSelect={openPipelineLead}
                     onToggleSelect={toggleSelect}
                     onSelectAllInColumn={(checked) => selectAllInColumn(col.id, checked)}
+                    onStatusChange={handleLeadStatusChange}
+                    onAddLead={() => {
+                      setAddLeadStatus(col.id)
+                      setAddOpen(true)
+                    }}
                     compact={isMobile}
                     tagById={tagById}
+                    teamMembers={teamMembers}
                   />
                 )
               })}
@@ -1402,22 +1474,44 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               onSelect={openPipelineLead}
               onToggleSelect={toggleSelect}
               onSelectAllVisible={selectAllVisible}
-              showStatus={!stageListMode}
+              visibleColumns={tableColumns}
+              statusOptions={columns}
               tagById={tagById}
               teamMembers={teamMembers}
+              onStatusChange={handleLeadStatusChange}
+              onOwnerFilter={handleOwnerFilter}
+              canFilterByOwner={canFilterByOwner}
+              onQuickCall={(lead) => openPipelineLead(lead.id, 'calls')}
+              onQuickEmail={(lead) => openPipelineLead(lead.id, 'emails')}
+              onQuickTask={(lead) => openPipelineLead(lead.id, 'tasks')}
+              canAssign={canAssign}
+              onDeleteLead={async (lead) => {
+                if (!window.confirm(`Remove ${lead.firstName || lead.company || 'this lead'} from pipeline?`)) {
+                  return
+                }
+                await toggleSaveLead(lead)
+                await refreshSavedLeads()
+              }}
+              onChangeOwner={(lead) => {
+                setBulkAssignOpen(true)
+                setSelectedIds(new Set([lead.id]))
+              }}
+              onChangeStatus={(lead) => {
+                setBulkEditOpen(true)
+                setSelectedIds(new Set([lead.id]))
+              }}
+            />
+          )}
+          {(view === 'list' || stageListMode) && filtered.length > 0 && (
+            <PipelineInfiniteSentinel
+              enabled
+              hasMore={hasMoreLeads}
+              loading={pipelineLoad.loadingMore}
+              onLoadMore={handleLoadMore}
+              total={pipelineLoad.total || pipelineSummary.total}
             />
           )}
           </div>
-          {(view === 'list' || stageListMode) && hasMoreLeads && filtered.length > 0 && (
-            <div className="crm-load-more-bar">
-              <PipelineLoadMoreBar
-                loaded={pipelineLoad.loaded}
-                total={pipelineLoad.total || pipelineSummary.total}
-                loading={pipelineLoad.loadingMore}
-                onLoadMore={handleLoadMore}
-              />
-            </div>
-          )}
           </div>
         </div>
       </div>
@@ -1440,9 +1534,45 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
 
       <AddLeadModal
         open={addOpen}
-        onClose={() => setAddOpen(false)}
-        onAdded={() => refreshSavedLeads()}
+        initialStatus={addLeadStatus}
+        onClose={() => {
+          setAddOpen(false)
+          setAddLeadStatus('new')
+        }}
+        onAdded={(lead) => {
+          refreshSavedLeads()
+          if (lead?.id) {
+            const label =
+              [lead.firstName, lead.lastName].filter(Boolean).join(' ').trim() ||
+              lead.company ||
+              'Lead'
+            setAddLeadToast({ id: lead.id, label })
+          }
+        }}
       />
+      {addLeadToast ? (
+        <div className="pipeline-add-toast" role="status">
+          <span>Lead added</span>
+          <button
+            type="button"
+            className="pipeline-add-toast__link"
+            onClick={() => {
+              openPipelineLead(addLeadToast.id)
+              setAddLeadToast(null)
+            }}
+          >
+            Open lead →
+          </button>
+          <button
+            type="button"
+            className="pipeline-add-toast__dismiss"
+            onClick={() => setAddLeadToast(null)}
+            aria-label="Dismiss"
+          >
+            ×
+          </button>
+        </div>
+      ) : null}
       <PipelineImportModal
         open={importOpen}
         onClose={() => setImportOpen(false)}
@@ -1609,6 +1739,11 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
         view={view}
         onViewChange={setView}
         stageListMode={stageListMode}
+        visibleColumns={tableColumns}
+        onColumnsChange={(cols) => {
+          setTableColumns(cols)
+          savePipelineColumnPrefs(cols)
+        }}
         onExport={exportVisibleLeads}
         onResetFilters={() => {
           clearAllFilters()
@@ -1618,6 +1753,48 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
           setSmartViewFilters({})
         }}
       />
+
+      {selectedIds.size > 0 &&
+        createPortal(
+          <PipelineBulkActionsBar
+            floating
+            count={selectedIds.size}
+            canAssign={canAssign}
+            busy={bulkBusy}
+            onAssign={openBulkAssign}
+            onEdit={() => setBulkEditOpen(true)}
+            onTags={orgLeadTags?.length ? () => setBulkTagsOpen(true) : undefined}
+            onMarkReplied={() => runBulk({ markReplied: true })}
+            onEmail={openBulkEmail}
+            onCreateBatchLists={openBatchListsFlow}
+            onWhatsApp={() => setWaOpen(true)}
+            emailCount={selectedEmailCount}
+            phoneCount={selectedPhoneCount}
+            onClear={() => setSelectedIds(new Set())}
+            onExport={() => downloadLeadsCsv(selectedLeads)}
+            onDelete={async () => {
+              if (
+                !window.confirm(
+                  `Remove ${selectedIds.size} lead${selectedIds.size === 1 ? '' : 's'} from pipeline?`
+                )
+              ) {
+                return
+              }
+              setBulkBusy(true)
+              try {
+                for (const id of selectedIds) {
+                  const lead = findLeadInLists(id)
+                  if (lead) await toggleSaveLead(lead)
+                }
+                setSelectedIds(new Set())
+                await refreshSavedLeads()
+              } finally {
+                setBulkBusy(false)
+              }
+            }}
+          />,
+          document.body
+        )}
     </div>
     </>
   )
@@ -1653,16 +1830,39 @@ function KanbanColumn({
   onSelect,
   onToggleSelect,
   onSelectAllInColumn,
+  onStatusChange,
+  onAddLead,
   tagById,
+  teamMembers = [],
   compact = false,
 }) {
+  const [dropTarget, setDropTarget] = useState(false)
+  const [draggingId, setDraggingId] = useState(null)
   const allSelected = leads.length > 0 && leads.every((l) => selectedIds.has(l.id))
+
+  const ownerName = (lead) => {
+    const id = lead.assignedToUserId
+    if (!id) return null
+    const m = (teamMembers || []).find((t) => t.userId === id)
+    return m?.name || 'Owner'
+  }
 
   return (
     <div className={`crm-kanban-column ${compact ? 'w-[200px]' : ''}`}>
       <div className="crm-kanban-column-header flex items-center justify-between gap-1">
         <span className="truncate">{column.label}</span>
         <div className="flex items-center gap-1 shrink-0">
+          {onAddLead ? (
+            <button
+              type="button"
+              className="pipeline-kanban-col-add"
+              onClick={onAddLead}
+              aria-label={`Add lead to ${column.label}`}
+              title="Add lead"
+            >
+              +
+            </button>
+          ) : null}
           <input
             type="checkbox"
             checked={allSelected}
@@ -1671,13 +1871,28 @@ function KanbanColumn({
             aria-label={`Select all in ${column.label}`}
             className="w-3.5 h-3.5"
           />
-          <span className="text-sm font-semibold text-[#516f90] bg-white border border-[#cbd6e2] px-1.5 py-0.5 rounded-sm tabular-nums">
-            {leads.length}
-            {totalInColumn > leads.length ? ` / ${totalInColumn}` : ''}
+          <span
+            className="text-xs font-medium tabular-nums px-2 py-0.5 rounded-full"
+            style={{ background: 'var(--brand-accent, #3730a3)', color: '#fff' }}
+          >
+            {totalInColumn > leads.length ? totalInColumn : leads.length}
           </span>
         </div>
       </div>
-      <div className="crm-kanban-column-body">
+      <div
+        className={`crm-kanban-column-body ${dropTarget ? 'pipeline-kanban-column--drop-target' : ''}`}
+        onDragOver={(e) => {
+          e.preventDefault()
+          setDropTarget(true)
+        }}
+        onDragLeave={() => setDropTarget(false)}
+        onDrop={(e) => {
+          e.preventDefault()
+          setDropTarget(false)
+          const leadId = e.dataTransfer.getData('text/lead-id')
+          if (leadId && onStatusChange) onStatusChange(leadId, column.id)
+        }}
+      >
         {leads.length === 0 ? (
           <p className="text-xs text-[#7c98b6] text-center py-6">No leads</p>
         ) : (
@@ -1689,9 +1904,16 @@ function KanbanColumn({
             return (
             <div
               key={lead.id}
+              draggable
+              onDragStart={(e) => {
+                e.dataTransfer.setData('text/lead-id', lead.id)
+                e.dataTransfer.effectAllowed = 'move'
+                setDraggingId(lead.id)
+              }}
+              onDragEnd={() => setDraggingId(null)}
               className={`crm-kanban-card ${selectedId === lead.id ? 'is-active' : ''} ${
                 selectedIds.has(lead.id) ? 'is-checked' : ''
-              }`}
+              } ${draggingId === lead.id ? 'pipeline-kanban-card--dragging' : ''}`}
             >
               <div className="flex items-start gap-1 p-1.5">
                 <input
@@ -1732,6 +1954,9 @@ function KanbanColumn({
                     </div>
                   ) : null}
                   <LeadTagDots lead={lead} tagById={tagById} />
+                  {ownerName(lead) ? (
+                    <p className="text-xs text-[#7c98b6] mt-1 truncate">{ownerName(lead)}</p>
+                  ) : null}
                   {lead.crm?.lastEmailSentAt && (
                     <div className="text-sm text-gray-400 mt-1">
                       Emailed {formatCrmDate(lead.crm.lastEmailSentAt)}
@@ -1776,78 +2001,44 @@ function KanbanColumn({
   )
 }
 
-function PipelineNoMatches({ onClearFilters, onNavigate }) {
+function PipelineNoMatches({ onClearFilters, onAdd, filterSummary = '' }) {
   return (
-    <div className="flex flex-col items-center justify-center py-16 text-center max-w-md mx-auto px-4">
-      <div className="w-16 h-16 rounded-full bg-[#eaf0f6] flex items-center justify-center mb-4 text-2xl text-[#7c98b6]">
+    <div className="pipeline-empty-v2">
+      <div className="pipeline-empty-v2__icon" aria-hidden>
         ⌕
       </div>
-      <p className="text-sm font-semibold text-[#33475b]">No leads match your filters</p>
-      <p className="text-sm text-[#516f90] mt-2 leading-relaxed">
-        No data available for this selection. Clear filters to see your full pipeline, or try AI search to
-        find new prospects.
-      </p>
-      <div className="flex flex-col sm:flex-row gap-2 mt-6 w-full sm:w-auto">
+      <h3 className="pipeline-empty-v2__title">No leads match your filters</h3>
+      {filterSummary ? <p className="pipeline-empty-v2__filters">{filterSummary}</p> : null}
+      <p className="pipeline-empty-v2__sub">Try clearing filters or add a lead manually.</p>
+      <div className="flex flex-col sm:flex-row gap-2">
         <button type="button" onClick={onClearFilters} className="crm-btn crm-btn-secondary">
-          Clear all filters
+          Clear filters
         </button>
-        <button
-          type="button"
-          onClick={() => onNavigate?.('search')}
-          className="crm-btn crm-btn-primary"
-        >
-          Search with AI
+        <button type="button" onClick={onAdd} className="pipeline-v2-btn-add">
+          Add lead manually
         </button>
       </div>
     </div>
   )
 }
 
-function EmptyPipeline({ onNavigate, onImport, onAdd, compact = false }) {
+function EmptyPipeline({ onImport, onAdd, compact = false }) {
   return (
-    <div
-      className={`flex flex-col items-center justify-center text-center max-w-lg mx-auto px-2 ${
-        compact ? 'py-8' : 'py-16'
-      }`}
-    >
-      <div
-        className={`w-full rounded-2xl border border-gray-200 bg-white shadow-sm ${
-          compact ? 'p-5' : 'p-8'
-        }`}
-      >
-        <p className="text-xs font-semibold uppercase tracking-wider text-[#8a6600] mb-2">Step 1 — CRM</p>
-        <h3 className="text-sm font-semibold text-gray-900 mb-2">Build your pipeline first</h3>
-        <p className="text-sm text-gray-500 leading-relaxed">
-          Connect Intel is your team CRM. Add or import the leads you are already working, assign owners, and
-          track follow-ups. When your pipeline is ready, use AI prospect search to find new opportunities.
-        </p>
-        <div className="flex flex-col gap-2 mt-6">
-          <button
-            type="button"
-            onClick={() => onAdd?.()}
-            className="px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg"
-          >
-            Add lead manually
-          </button>
-          <button
-            type="button"
-            onClick={onImport}
-            className="px-5 py-2.5 border-2 border-[#FF773D] text-[#242424] text-sm font-semibold rounded-lg"
-          >
-            Import CSV / Excel
-          </button>
-        </div>
-        <div className="mt-8 pt-6 border-t border-gray-100">
-          <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Step 2 — AI</p>
-          <button
-            type="button"
-            onClick={() => onNavigate?.('search')}
-            className="w-full px-5 py-2.5 border border-gray-200 text-gray-800 text-sm font-medium rounded-lg hover:bg-gray-50"
-          >
-            Search prospects with AI
-          </button>
-          <p className="text-sm text-gray-400 mt-2">50+ matches · 10 full previews · unlock with credits</p>
-        </div>
+    <div className={`pipeline-empty-v2 ${compact ? 'py-8' : ''}`}>
+      <div className="pipeline-empty-v2__icon" aria-hidden>
+        ◫
+      </div>
+      <h3 className="pipeline-empty-v2__title">Your pipeline is empty</h3>
+      <p className="pipeline-empty-v2__sub">
+        Start adding leads or import from CSV to get going.
+      </p>
+      <div className="flex flex-col sm:flex-row gap-2">
+        <button type="button" onClick={() => onAdd?.()} className="pipeline-v2-btn-add">
+          Add first lead
+        </button>
+        <button type="button" onClick={onImport} className="pipeline-v2-btn-import">
+          Import from CSV
+        </button>
       </div>
     </div>
   )

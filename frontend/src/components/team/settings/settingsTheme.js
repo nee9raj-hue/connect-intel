@@ -1,13 +1,15 @@
+import { brand } from '../../../lib/brandTokens'
+
 /** Shared tokens for Org Admin / Settings hub (HubSpot-style). */
 
 export const C = {
-  pageBg: '#f5f5f3',
-  cardBg: '#ffffff',
-  border: 'rgba(0, 0, 0, 0.08)',
-  accent: '#3730a3',
-  text: '#111111',
-  textSecondary: '#666666',
-  textMuted: '#999999',
+  pageBg: brand.pageBg,
+  cardBg: brand.cardBg,
+  border: brand.border,
+  accent: brand.accent,
+  text: brand.textPrimary,
+  textSecondary: brand.textSecondary,
+  textMuted: brand.textMuted,
 }
 
 export const ROLE_BADGE = {

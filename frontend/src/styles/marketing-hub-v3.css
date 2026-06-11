@@ -114,7 +114,7 @@
   border-color: rgba(0, 0, 0, 0.15);
 }
 
-.mhub-v3 .mhub-v3-btn--primary {
+.mhub-v3 .mhub-v3-btn--primary:not(.mhub-v3-btn--keep-orange) {
   background: var(--mh-accent);
   border-color: var(--mh-accent);
   color: #fff;

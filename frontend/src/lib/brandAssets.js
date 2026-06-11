@@ -1,6 +1,8 @@
-/** Connect Intel brand colors (from logo). */
-export const BRAND_ORANGE = '#FF773D'
-export const BRAND_ORANGE_HOVER = '#e5652f'
+import { brand } from './brandTokens'
+
+/** Connect Intel brand colors — re-exported from brandTokens.js */
+export const BRAND_ORANGE = brand.primary
+export const BRAND_ORANGE_HOVER = brand.primaryHover
 export const BRAND_ORANGE_SOFT = '#fff4ee'
 export const BRAND_ORANGE_BORDER = '#ffd4b8'
 export const BRAND_SLATE = '#64748B'

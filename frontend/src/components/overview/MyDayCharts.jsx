@@ -2,7 +2,9 @@ import { DashboardNavIcon } from '../dashboard/dashboardUi'
 import { formatDealValue } from '../../lib/crmTimeline'
 import { formatDateTime } from '../../lib/crmUiConstants'
 
-const ORANGE = '#FF773D'
+import { brand } from '../../lib/brandTokens'
+
+const LINK_COLOR = brand.accent
 
 const KIND_ICONS = {
   task: 'task',

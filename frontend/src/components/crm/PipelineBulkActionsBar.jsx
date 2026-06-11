@@ -23,6 +23,7 @@ export default function PipelineBulkActionsBar({
   count,
   canAssign = false,
   busy = false,
+  floating = false,
   onAssign,
   onEdit,
   onTags,
@@ -41,6 +42,8 @@ export default function PipelineBulkActionsBar({
   showEmail = true,
   showWhatsApp = true,
   showMore = true,
+  onExport,
+  onDelete,
 }) {
   const [moreOpen, setMoreOpen] = useState(false)
   const [emailOpen, setEmailOpen] = useState(false)
@@ -67,141 +70,136 @@ export default function PipelineBulkActionsBar({
   if (count < 1) return null
 
   const noun = count === 1 ? recordLabel : `${recordLabel}s`
+  const rootClass = floating ? 'pipeline-bulk-floating' : 'pipeline-bulk-hs-bar'
 
   return (
-    <div className="pipeline-bulk-hs-bar" role="toolbar" aria-label="Bulk actions">
-      <span className="pipeline-bulk-hs-bar__count">
+    <div className={rootClass} role="toolbar" aria-label="Bulk actions">
+      <span className={floating ? 'pipeline-bulk-floating__count' : 'pipeline-bulk-hs-bar__count'}>
+        {floating ? <span className="pipeline-bulk-floating__dot" aria-hidden /> : null}
         {count} {noun} selected
       </span>
 
-      <div className="pipeline-bulk-hs-bar__actions">
+      <div className={floating ? 'pipeline-bulk-floating__actions' : 'pipeline-bulk-hs-bar__actions'}>
         {showAssign && canAssign && (
-          <button type="button" className="pipeline-bulk-hs-bar__btn" disabled={busy} onClick={onAssign}>
+          <button
+            type="button"
+            className={floating ? 'pipeline-bulk-floating__btn' : 'pipeline-bulk-hs-bar__btn'}
+            disabled={busy}
+            onClick={onAssign}
+          >
             <AssignIcon className="pipeline-bulk-hs-bar__icon" />
-            Assign
+            Assign owner
           </button>
         )}
-
         {showEdit && (
-          <button type="button" className="pipeline-bulk-hs-bar__btn" disabled={busy} onClick={onEdit}>
+          <button
+            type="button"
+            className={floating ? 'pipeline-bulk-floating__btn' : 'pipeline-bulk-hs-bar__btn'}
+            disabled={busy}
+            onClick={onEdit}
+          >
             <PencilIcon className="pipeline-bulk-hs-bar__icon" />
-            Edit
+            Change status
           </button>
         )}
-
         {onTags && (
-          <button type="button" className="pipeline-bulk-hs-bar__btn" disabled={busy} onClick={onTags}>
+          <button
+            type="button"
+            className={floating ? 'pipeline-bulk-floating__btn' : 'pipeline-bulk-hs-bar__btn'}
+            disabled={busy}
+            onClick={onTags}
+          >
             <TagIcon className="pipeline-bulk-hs-bar__icon" />
-            Tags
+            Add tag
           </button>
         )}
-
-        {showEmail && (
-          <div className="pipeline-bulk-hs-bar__more" ref={emailRef}>
+        {showEmail && onEmail && (
+          <div className="relative" ref={emailRef}>
             <button
               type="button"
-              className="pipeline-bulk-hs-bar__btn"
-              disabled={busy || emailDisabled || (emailCount !== null && emailCount < 1)}
-              aria-expanded={emailOpen}
-              aria-haspopup="menu"
+              className={floating ? 'pipeline-bulk-floating__btn' : 'pipeline-bulk-hs-bar__btn'}
+              disabled={busy || emailDisabled}
+              title={emailDisabledTitle || undefined}
               onClick={() => setEmailOpen((v) => !v)}
-              title={
-                emailDisabledTitle ||
-                (emailCount === 0 ? 'No selected leads have a sendable email' : undefined)
-              }
             >
               <MailIcon className="pipeline-bulk-hs-bar__icon" />
-              Email{emailCount != null && emailCount > 0 ? ` (${emailCount})` : ''}
+              Email
+              {emailCount != null ? ` (${emailCount})` : ''}
             </button>
             {emailOpen && (
-              <div className="pipeline-bulk-hs-menu" role="menu">
-                <button
-                  type="button"
-                  role="menuitem"
-                  className="pipeline-bulk-hs-menu__item"
-                  disabled={busy || emailDisabled || (emailCount !== null && emailCount < 1)}
-                  onClick={() => {
-                    setEmailOpen(false)
-                    onEmail?.()
-                  }}
-                >
+              <div className="pipeline-bulk-hs-menu">
+                <button type="button" className="pipeline-bulk-hs-menu__item" onClick={() => { setEmailOpen(false); onEmail() }}>
                   Send email
                 </button>
                 {onCreateBatchLists ? (
-                  <button
-                    type="button"
-                    role="menuitem"
-                    className="pipeline-bulk-hs-menu__item"
-                    disabled={busy || (emailCount !== null && emailCount < 1)}
-                    onClick={() => {
-                      setEmailOpen(false)
-                      onCreateBatchLists()
-                    }}
-                  >
-                    Create static lists (200 each)
+                  <button type="button" className="pipeline-bulk-hs-menu__item" onClick={() => { setEmailOpen(false); onCreateBatchLists() }}>
+                    Create batch lists
                   </button>
                 ) : null}
               </div>
             )}
           </div>
         )}
-
-        {showWhatsApp && (
-        <button
-          type="button"
-          className="pipeline-bulk-hs-bar__btn"
-          disabled={busy || (phoneCount !== null && phoneCount < 1)}
-          onClick={onWhatsApp}
-          title={phoneCount === 0 ? 'No selected leads have phone' : undefined}
-        >
-          <WhatsAppIcon className="pipeline-bulk-hs-bar__icon" />
-          WhatsApp{phoneCount != null && phoneCount > 0 ? ` (${phoneCount})` : ''}
-        </button>
-        )}
-
-        {showMore && (
-        <div className="pipeline-bulk-hs-bar__more" ref={moreRef}>
+        {showWhatsApp && onWhatsApp && (
           <button
             type="button"
-            className="pipeline-bulk-hs-bar__btn"
+            className={floating ? 'pipeline-bulk-floating__btn' : 'pipeline-bulk-hs-bar__btn'}
             disabled={busy}
-            aria-expanded={moreOpen}
-            aria-haspopup="menu"
-            onClick={() => setMoreOpen((v) => !v)}
+            onClick={onWhatsApp}
           >
-            <MoreHorizontalIcon className="pipeline-bulk-hs-bar__icon" />
-            More
+            <WhatsAppIcon className="pipeline-bulk-hs-bar__icon" />
+            WhatsApp
+            {phoneCount != null ? ` (${phoneCount})` : ''}
           </button>
-          {moreOpen && (
-            <div className="pipeline-bulk-hs-menu" role="menu">
-              <button
-                type="button"
-                role="menuitem"
-                className="pipeline-bulk-hs-menu__item"
-                disabled={busy}
-                onClick={() => {
-                  setMoreOpen(false)
-                  onMarkReplied?.()
-                }}
-              >
-                Mark as replied
-              </button>
-            </div>
-          )}
-        </div>
+        )}
+        {floating && onExport && (
+          <button
+            type="button"
+            className="pipeline-bulk-floating__btn"
+            disabled={busy}
+            onClick={onExport}
+          >
+            Export CSV
+          </button>
+        )}
+        {floating && onDelete && (
+          <button
+            type="button"
+            className="pipeline-bulk-floating__btn pipeline-bulk-floating__btn--danger"
+            disabled={busy}
+            onClick={onDelete}
+          >
+            Delete
+          </button>
+        )}
+        {showMore && onMarkReplied && (
+          <div className="relative" ref={moreRef}>
+            <button
+              type="button"
+              className={floating ? 'pipeline-bulk-floating__btn' : 'pipeline-bulk-hs-bar__btn'}
+              disabled={busy}
+              onClick={() => setMoreOpen((v) => !v)}
+            >
+              <MoreHorizontalIcon className="pipeline-bulk-hs-bar__icon" />
+              More
+            </button>
+            {moreOpen && (
+              <div className="pipeline-bulk-hs-menu">
+                <button type="button" className="pipeline-bulk-hs-menu__item" onClick={() => { setMoreOpen(false); onMarkReplied() }}>
+                  Mark as replied
+                </button>
+              </div>
+            )}
+          </div>
         )}
       </div>
 
-      <span className="pipeline-bulk-hs-bar__spacer" aria-hidden />
-
       <button
         type="button"
-        className="pipeline-bulk-hs-bar__clear"
-        disabled={busy}
+        className={floating ? 'pipeline-bulk-floating__clear' : 'pipeline-bulk-hs-bar__clear'}
         onClick={onClear}
-        aria-label="Clear selection"
       >
-        ×
+        {floating ? '× Clear selection' : 'Clear'}
       </button>
     </div>
   )

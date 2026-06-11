@@ -28,10 +28,16 @@ export function pipelineServerFilterExtras(adv = {}, smartView = {}) {
     minLeadScore != null && minLeadScore !== '' && !Number.isNaN(Number(minLeadScore))
       ? Number(minLeadScore)
       : undefined
+  const max =
+    adv.maxLeadScore != null && adv.maxLeadScore !== '' && !Number.isNaN(Number(adv.maxLeadScore))
+      ? Number(adv.maxLeadScore)
+      : undefined
   return {
     minLeadScore: min,
+    maxLeadScore: max,
     followUpDue: adv.followUpDue ? '1' : undefined,
     overdueFollowUp: adv.overdueFollowUp ? '1' : undefined,
+    stuck: adv.stuckLeads ? '1' : undefined,
   }
 }
 
@@ -45,6 +51,14 @@ export const DEFAULT_PIPELINE_FILTERS = {
   overdueFollowUp: false,
   followUpDue: false,
   closingThisWeek: false,
+  minLeadScore: null,
+  maxLeadScore: null,
+  addedFrom: '',
+  addedTo: '',
+  lastActivityFrom: '',
+  lastActivityTo: '',
+  sourceFilter: '',
+  stuckLeads: false,
 }
 
 /** @deprecated use cities[] — kept for saved views migration */
@@ -168,10 +182,34 @@ function matchesAssignedAfter(lead, assignedAfter) {
   return Number.isFinite(afterMs) ? savedMs >= afterMs : true
 }
 
+function leadLastActivityMs(lead) {
+  const at =
+    lead.crm?.lastCommunicationAt ||
+    lead.crm?.lastEmailSentAt ||
+    lead.crm?.lastCallAt ||
+    null
+  return at ? new Date(at).getTime() : null
+}
+
 function matchesLastActivity(lead, lastActivity) {
   if (!lastActivity) return true
   if (lastActivity === 'never') {
-    return !lead.crm?.lastCommunicationAt && !lead.crm?.lastEmailSentAt
+    return leadLastActivityMs(lead) == null
+  }
+  return true
+}
+
+function matchesDateRange(iso, from, to) {
+  if (!iso) return false
+  const t = new Date(iso).getTime()
+  if (!Number.isFinite(t)) return false
+  if (from) {
+    const f = new Date(`${from}T00:00:00`).getTime()
+    if (Number.isFinite(f) && t < f) return false
+  }
+  if (to) {
+    const end = new Date(`${to}T23:59:59`).getTime()
+    if (Number.isFinite(end) && t > end) return false
   }
   return true
 }
@@ -208,8 +246,15 @@ export function applyPipelineFilters(
     contact = 'any',
     search = '',
     minLeadScore = null,
+    maxLeadScore = null,
     minDealValue = null,
     staleDays = null,
+    addedFrom = '',
+    addedTo = '',
+    lastActivityFrom = '',
+    lastActivityTo = '',
+    sourceFilter = '',
+    stuckLeads = false,
     overdueFollowUp = false,
     followUpDue = false,
     closingThisWeek = false,
@@ -259,6 +304,41 @@ export function applyPipelineFilters(
     if (!Number.isNaN(min)) {
       list = list.filter((l) => (l.crm?.leadScore ?? 0) >= min)
     }
+  }
+
+  if (maxLeadScore != null && maxLeadScore !== '') {
+    const max = Number(maxLeadScore)
+    if (!Number.isNaN(max)) {
+      list = list.filter((l) => (l.crm?.leadScore ?? 0) <= max)
+    }
+  }
+
+  if (stuckLeads) {
+    const cutoff = Date.now() - 7 * MS_DAY
+    list = list.filter((l) => {
+      const last = leadLastActivityMs(l) ?? (l.savedAt ? new Date(l.savedAt).getTime() : null)
+      if (!last) return true
+      const st = l.crm?.status || 'new'
+      if (st === 'won' || st === 'lost') return false
+      return last < cutoff
+    })
+  }
+
+  if (addedFrom || addedTo) {
+    list = list.filter((l) => matchesDateRange(l.savedAt || l.createdAt, addedFrom, addedTo))
+  }
+
+  if (lastActivityFrom || lastActivityTo) {
+    list = list.filter((l) => {
+      const at =
+        l.crm?.lastCommunicationAt || l.crm?.lastEmailSentAt || l.crm?.lastCallAt || null
+      return matchesDateRange(at, lastActivityFrom, lastActivityTo)
+    })
+  }
+
+  if (sourceFilter) {
+    const src = String(sourceFilter).toLowerCase()
+    list = list.filter((l) => String(l.crm?.source || l.source || '').toLowerCase() === src)
   }
 
   if (minDealValue != null && minDealValue !== '') {
@@ -408,6 +488,12 @@ export function countActiveFilters(filters, search) {
   if (filters.overdueFollowUp) n += 1
   if (filters.followUpDue) n += 1
   if (filters.closingThisWeek) n += 1
+  if (filters.minLeadScore != null && filters.minLeadScore !== '') n += 1
+  if (filters.maxLeadScore != null && filters.maxLeadScore !== '') n += 1
+  if (filters.addedFrom || filters.addedTo) n += 1
+  if (filters.lastActivityFrom || filters.lastActivityTo) n += 1
+  if (filters.sourceFilter) n += 1
+  if (filters.stuckLeads) n += 1
   if (search?.trim()) n += 1
   return n
 }
