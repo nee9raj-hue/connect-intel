@@ -201,7 +201,7 @@ export function AppProvider({ children }) {
     const data = await api.fetchPipelineLeads({
       offset,
       cursor,
-      limit: 50,
+      limit: 100,
       silent,
       ...filters,
     })
@@ -237,7 +237,7 @@ export function AppProvider({ children }) {
   const refreshSavedLeads = useCallback(
     async () => {
       try {
-        const bootstrap = await api.getPipelineBootstrap({ offset: 0, limit: 50, silent: false })
+        const bootstrap = await api.getPipelineBootstrap({ offset: 0, limit: 100, silent: false })
         const leads = bootstrap.leads || []
         const summary = bootstrap.summary || {}
         setPipelineSummary(normalizePipelineSummary(summary))
@@ -446,7 +446,7 @@ export function AppProvider({ children }) {
       const run = (async () => {
         try {
           const [bootstrap, historyResult] = await Promise.all([
-            api.getPipelineBootstrap({ offset: 0, limit: 50, silent: true }),
+            api.getPipelineBootstrap({ offset: 0, limit: 100, silent: true }),
             api.getSearchHistory({ silent: true }),
           ])
 

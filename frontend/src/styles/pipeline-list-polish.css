@@ -181,10 +181,12 @@
   width: 44px;
 }
 
-.pipeline-hs-table-wrap--v2 .pipeline-hs-td--name {
+.pipeline-hs-table-wrap--v2 .pipeline-hs-td--name,
+.pipeline-hs-row--v2 .pipeline-hs-td--name {
   width: 16%;
   min-width: 150px;
   max-width: 220px;
+  overflow: visible;
 }
 
 .pipeline-hs-table-wrap--v2 .pipeline-hs-th--company,
@@ -208,27 +210,26 @@
 }
 
 .pipeline-hs-name-row {
-  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
   min-width: 0;
   width: 100%;
   min-height: 1.25rem;
 }
 
 .pipeline-hs-name-row .pipeline-hs-name-link {
-  display: inline-block;
-  max-width: 100%;
+  flex: 1;
+  min-width: 0;
+  display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   text-align: left;
-  vertical-align: top;
 }
 
 .pipeline-row-hover-actions {
-  position: absolute;
-  left: 0;
-  top: calc(100% + 1px);
-  z-index: 5;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 2px;
@@ -900,4 +901,189 @@
   gap: 8px;
   font-size: 12px;
   color: #33475b;
+}
+
+/* Desktop filter popup (toolbar) */
+.pipeline-filter-popup-root {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  pointer-events: none;
+}
+
+.pipeline-filter-popup-backdrop {
+  position: absolute;
+  inset: 0;
+  border: none;
+  background: rgba(15, 23, 42, 0.35);
+  pointer-events: auto;
+  cursor: default;
+}
+
+.pipeline-filter-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+  width: min(440px, calc(100vw - 32px));
+  max-height: min(78vh, 640px);
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.18);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.pipeline-filter-popup--wide {
+  width: min(560px, calc(100vw - 32px));
+}
+
+.pipeline-filter-popup__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid #eaf0f6;
+}
+
+.pipeline-filter-popup__title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #33475b;
+}
+
+.pipeline-filter-popup__close {
+  border: none;
+  background: transparent;
+  font-size: 22px;
+  line-height: 1;
+  color: #7c98b6;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.pipeline-filter-popup__body {
+  padding: 14px 16px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.pipeline-filter-popup__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-top: 1px solid #eaf0f6;
+}
+
+.hs-filter-popup-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid #cbd6e2;
+  border-radius: 6px;
+  background: #fff;
+  color: #33475b;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.hs-filter-popup-btn:hover {
+  background: #f5f8fa;
+  border-color: #99acc2;
+}
+
+.hs-filter-popup-btn.is-active {
+  border-color: #ff7a59;
+  background: #fff4ee;
+  color: #d45d3e;
+}
+
+.hs-filter-popup-btn__chevron {
+  width: 12px;
+  height: 12px;
+  color: #7c98b6;
+  flex-shrink: 0;
+}
+
+.hs-filter-more-btn {
+  gap: 6px;
+}
+
+.hs-filter-more-btn__icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+/* Manual pagination — stops auto infinite scroll jitter */
+.pipeline-scroll-area--relative {
+  position: relative;
+}
+
+.pipeline-filter-apply-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 48px;
+  background: rgba(255, 255, 255, 0.72);
+  pointer-events: none;
+}
+
+.pipeline-load-more-wrap {
+  padding: 12px 16px 20px;
+  border-top: 1px solid #eaf0f6;
+  background: #fff;
+}
+
+.pipeline-load-more-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.pipeline-load-more-bar__meta {
+  margin: 0;
+  font-size: 13px;
+  color: #516f90;
+}
+
+.pipeline-load-more-bar__meta strong {
+  color: #33475b;
+  font-weight: 600;
+}
+
+.pipeline-load-more-bar__btn {
+  border: 1px solid #ff7a59;
+  background: #fff;
+  color: #ff7a59;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.pipeline-load-more-bar__btn:hover:not(:disabled) {
+  background: #fff4ee;
+}
+
+.pipeline-load-more-bar__btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

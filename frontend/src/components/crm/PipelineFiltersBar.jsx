@@ -1,12 +1,13 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import useIsMobile from '../../hooks/useIsMobile'
+import { useCallback, useEffect, useState } from 'react'
 import usePipelineFilterMobile from '../../hooks/usePipelineFilterMobile'
 import { PIPELINE_SEARCH_ID } from '../../hooks/useAppKeyboardShortcuts'
 import { api } from '../../lib/api'
 import { CONTACT_FILTER_OPTIONS, DEFAULT_PIPELINE_FILTERS, getFilterCities, getFilterStates } from '../../lib/pipelineFilters'
-import FilterDropdown, { FilterChipButton } from './FilterDropdown'
+import { FilterChipButton } from './FilterDropdown'
 import LeadTag from '../ui/LeadTag'
 import FilterToolbarIcon from '../ui/FilterToolbarIcon'
+import PipelineFilterPopup from './PipelineFilterPopup'
+import PipelineFilterToolbarButton from './PipelineFilterToolbarButton'
 import PipelineMobileFilterSheet, { SearchableMultiList, SingleSelectList } from './PipelineMobileFilterSheet'
 import {
   ListIcon,
@@ -69,15 +70,8 @@ export default function PipelineFiltersBar({
   statusCounts = {},
 }) {
   const [savedViews, setSavedViews] = useState([])
-  const [advancedOpen, setAdvancedOpen] = useState(false)
-  const [mobileSheet, setMobileSheet] = useState(null)
-  const advancedRef = useRef(null)
-  const advancedPanelRef = useRef(null)
-  const advancedOpenedAtRef = useRef(0)
-  const isMobile = useIsMobile()
+  const [activeFilter, setActiveFilter] = useState(null)
   const useMobileFilterSheet = usePipelineFilterMobile()
-  const set = (patch) => onFiltersChange({ ...filters, ...patch })
-  const closeAdvanced = useCallback(() => setAdvancedOpen(false), [])
 
   const loadViews = useCallback(async () => {
     try {
@@ -92,40 +86,6 @@ export default function PipelineFiltersBar({
     loadViews()
   }, [loadViews])
 
-  useEffect(() => {
-    if (!advancedOpen) return undefined
-    const onKey = (e) => {
-      if (e.key === 'Escape') closeAdvanced()
-    }
-    const onDoc = (e) => {
-      if (Date.now() - advancedOpenedAtRef.current < 320) return
-      const t = e.target
-      if (advancedRef.current?.contains(t)) return
-      if (advancedPanelRef.current?.contains(t)) return
-      closeAdvanced()
-    }
-    window.addEventListener('keydown', onKey)
-    const timer = window.setTimeout(() => {
-      document.addEventListener('mousedown', onDoc, true)
-      document.addEventListener('touchstart', onDoc, { capture: true, passive: true })
-    }, 280)
-    return () => {
-      window.clearTimeout(timer)
-      window.removeEventListener('keydown', onKey)
-      document.removeEventListener('mousedown', onDoc, true)
-      document.removeEventListener('touchstart', onDoc, true)
-    }
-  }, [advancedOpen, closeAdvanced])
-
-  useEffect(() => {
-    if (!advancedOpen || !isMobile || useMobileFilterSheet) return undefined
-    const prev = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.body.style.overflow = prev
-    }
-  }, [advancedOpen, isMobile, useMobileFilterSheet])
-
   const handleApply = () => onApplyFilters?.()
 
   const commitFilters = useCallback(
@@ -134,13 +94,6 @@ export default function PipelineFiltersBar({
       onApplyFilters?.({ advanced: nextFilters })
     },
     [onFiltersChange, onApplyFilters]
-  )
-
-  const applyFilterPatch = useCallback(
-    (patch) => {
-      commitFilters({ ...filters, ...patch })
-    },
-    [commitFilters, filters]
   )
 
   const cityOptions = cities.map((c) => ({ label: c, value: c }))
@@ -169,8 +122,8 @@ export default function PipelineFiltersBar({
     (appliedFilters.smartTags?.length || 0) +
     (activeSmartViewId ? 1 : 0)
 
-  const openMobileFilter = (type) => {
-    setMobileSheet({
+  const openFilter = (type) => {
+    setActiveFilter({
       type,
       draft: {
         filters: { ...filters },
@@ -181,12 +134,12 @@ export default function PipelineFiltersBar({
     })
   }
 
-  const closeMobileFilter = () => {
-    setMobileSheet(null)
+  const closeFilter = () => {
+    setActiveFilter(null)
   }
 
-  const updateMobileDraftFilters = (patch) => {
-    setMobileSheet((prev) =>
+  const updateFilterDraft = (patch) => {
+    setActiveFilter((prev) =>
       prev
         ? {
             ...prev,
@@ -199,8 +152,8 @@ export default function PipelineFiltersBar({
     )
   }
 
-  const updateMobileDraftStatus = (statusId) => {
-    setMobileSheet((prev) =>
+  const updateFilterDraftStatus = (statusId) => {
+    setActiveFilter((prev) =>
       prev
         ? {
             ...prev,
@@ -213,8 +166,8 @@ export default function PipelineFiltersBar({
     )
   }
 
-  const updateMobileDraftOwner = (ownerId) => {
-    setMobileSheet((prev) =>
+  const updateFilterDraftOwner = (ownerId) => {
+    setActiveFilter((prev) =>
       prev
         ? {
             ...prev,
@@ -227,8 +180,8 @@ export default function PipelineFiltersBar({
     )
   }
 
-  const updateMobileDraftSmartView = (viewId) => {
-    setMobileSheet((prev) =>
+  const updateFilterDraftSmartView = (viewId) => {
+    setActiveFilter((prev) =>
       prev
         ? {
             ...prev,
@@ -241,9 +194,9 @@ export default function PipelineFiltersBar({
     )
   }
 
-  const applyMobileFilter = () => {
-    if (!mobileSheet?.draft) return
-    const { type, draft } = mobileSheet
+  const applyActiveFilter = () => {
+    if (!activeFilter?.draft) return
+    const { type, draft } = activeFilter
 
     switch (type) {
       case 'owner':
@@ -273,22 +226,22 @@ export default function PipelineFiltersBar({
         break
     }
 
-    closeMobileFilter()
+    closeFilter()
   }
 
-  const mobileDraft = mobileSheet?.draft
+  const filterDraft = activeFilter?.draft
 
-  const renderMobileFilterContent = () => {
-    if (!mobileSheet || !mobileDraft) return null
+  const renderFilterContent = () => {
+    if (!activeFilter || !filterDraft) return null
 
-    switch (mobileSheet.type) {
+    switch (activeFilter.type) {
       case 'owner':
         return (
           <SingleSelectList
             options={ownerSelectOptions}
-            value={mobileDraft.ownerFilter || ''}
+            value={filterDraft.ownerFilter || ''}
             emptyLabel="All owners"
-            onChange={updateMobileDraftOwner}
+            onChange={updateFilterDraftOwner}
           />
         )
       case 'status':
@@ -296,17 +249,17 @@ export default function PipelineFiltersBar({
           <SingleSelectList
             statusStyle
             options={stageOptions}
-            value={mobileDraft.statusFilter !== 'all' ? mobileDraft.statusFilter : ''}
+            value={filterDraft.statusFilter !== 'all' ? filterDraft.statusFilter : ''}
             emptyLabel="All statuses"
-            onChange={updateMobileDraftStatus}
+            onChange={updateFilterDraftStatus}
           />
         )
       case 'city':
         return (
           <SearchableMultiList
             options={cityOptions}
-            values={mobileDraft.filters.cities || []}
-            onChange={(v) => updateMobileDraftFilters({ cities: v })}
+            values={filterDraft.filters.cities || []}
+            onChange={(v) => updateFilterDraft({ cities: v })}
             placeholder="Search cities…"
             emptyLabel="All cities"
           />
@@ -315,8 +268,8 @@ export default function PipelineFiltersBar({
         return (
           <SearchableMultiList
             options={stateOptions}
-            values={mobileDraft.filters.states || []}
-            onChange={(v) => updateMobileDraftFilters({ states: v })}
+            values={filterDraft.filters.states || []}
+            onChange={(v) => updateFilterDraft({ states: v })}
             placeholder="Search states…"
             emptyLabel="All states"
           />
@@ -325,9 +278,9 @@ export default function PipelineFiltersBar({
         return (
           <SingleSelectList
             options={contactOptions}
-            value={mobileDraft.filters.contact !== 'any' ? mobileDraft.filters.contact : ''}
+            value={filterDraft.filters.contact !== 'any' ? filterDraft.filters.contact : ''}
             emptyLabel="All contacts"
-            onChange={(v) => updateMobileDraftFilters({ contact: v || 'any' })}
+            onChange={(v) => updateFilterDraft({ contact: v || 'any' })}
           />
         )
       case 'advanced':
@@ -338,9 +291,9 @@ export default function PipelineFiltersBar({
                 <p className="hs-advanced-filter-label">Saved views</p>
                 <SingleSelectList
                   options={savedViewOptions}
-                  value={mobileDraft.smartViewId || ''}
+                  value={filterDraft.smartViewId || ''}
                   emptyLabel="None"
-                  onChange={updateMobileDraftSmartView}
+                  onChange={updateFilterDraftSmartView}
                 />
               </section>
             ) : null}
@@ -349,8 +302,8 @@ export default function PipelineFiltersBar({
                 <div className="flex items-center justify-between gap-2 mb-2">
                   <p className="hs-advanced-filter-label mb-0">Tags</p>
                   <select
-                    value={mobileDraft.filters.tagMode || 'any'}
-                    onChange={(e) => updateMobileDraftFilters({ tagMode: e.target.value })}
+                    value={filterDraft.filters.tagMode || 'any'}
+                    onChange={(e) => updateFilterDraft({ tagMode: e.target.value })}
                     className="crm-select-sm crm-select-sm--hubspot"
                   >
                     <option value="any">Any</option>
@@ -359,8 +312,8 @@ export default function PipelineFiltersBar({
                 </div>
                 <SearchableMultiList
                   options={tagOptions}
-                  values={mobileDraft.filters.tagIds || []}
-                  onChange={(v) => updateMobileDraftFilters({ tagIds: v })}
+                  values={filterDraft.filters.tagIds || []}
+                  onChange={(v) => updateFilterDraft({ tagIds: v })}
                   placeholder="Search tags…"
                   emptyLabel="Any tag"
                 />
@@ -373,16 +326,16 @@ export default function PipelineFiltersBar({
                   From
                   <input
                     type="date"
-                    value={mobileDraft.filters.addedFrom || ''}
-                    onChange={(e) => updateMobileDraftFilters({ addedFrom: e.target.value })}
+                    value={filterDraft.filters.addedFrom || ''}
+                    onChange={(e) => updateFilterDraft({ addedFrom: e.target.value })}
                   />
                 </label>
                 <label>
                   To
                   <input
                     type="date"
-                    value={mobileDraft.filters.addedTo || ''}
-                    onChange={(e) => updateMobileDraftFilters({ addedTo: e.target.value })}
+                    value={filterDraft.filters.addedTo || ''}
+                    onChange={(e) => updateFilterDraft({ addedTo: e.target.value })}
                   />
                 </label>
               </div>
@@ -394,16 +347,16 @@ export default function PipelineFiltersBar({
                   From
                   <input
                     type="date"
-                    value={mobileDraft.filters.lastActivityFrom || ''}
-                    onChange={(e) => updateMobileDraftFilters({ lastActivityFrom: e.target.value })}
+                    value={filterDraft.filters.lastActivityFrom || ''}
+                    onChange={(e) => updateFilterDraft({ lastActivityFrom: e.target.value })}
                   />
                 </label>
                 <label>
                   To
                   <input
                     type="date"
-                    value={mobileDraft.filters.lastActivityTo || ''}
-                    onChange={(e) => updateMobileDraftFilters({ lastActivityTo: e.target.value })}
+                    value={filterDraft.filters.lastActivityTo || ''}
+                    onChange={(e) => updateFilterDraft({ lastActivityTo: e.target.value })}
                   />
                 </label>
               </div>
@@ -416,9 +369,9 @@ export default function PipelineFiltersBar({
                   min={0}
                   max={100}
                   placeholder="Min"
-                  value={mobileDraft.filters.minLeadScore ?? ''}
+                  value={filterDraft.filters.minLeadScore ?? ''}
                   onChange={(e) =>
-                    updateMobileDraftFilters({
+                    updateFilterDraft({
                       minLeadScore: e.target.value === '' ? null : Number(e.target.value),
                     })
                   }
@@ -428,9 +381,9 @@ export default function PipelineFiltersBar({
                   min={0}
                   max={100}
                   placeholder="Max"
-                  value={mobileDraft.filters.maxLeadScore ?? ''}
+                  value={filterDraft.filters.maxLeadScore ?? ''}
                   onChange={(e) =>
-                    updateMobileDraftFilters({
+                    updateFilterDraft({
                       maxLeadScore: e.target.value === '' ? null : Number(e.target.value),
                     })
                   }
@@ -440,8 +393,8 @@ export default function PipelineFiltersBar({
             <section className="pipeline-filter-popout-section">
               <p className="hs-advanced-filter-label">Source</p>
               <select
-                value={mobileDraft.filters.sourceFilter || ''}
-                onChange={(e) => updateMobileDraftFilters({ sourceFilter: e.target.value })}
+                value={filterDraft.filters.sourceFilter || ''}
+                onChange={(e) => updateFilterDraft({ sourceFilter: e.target.value })}
                 className="pipeline-filter-popout-select"
               >
                 <option value="">All sources</option>
@@ -455,8 +408,8 @@ export default function PipelineFiltersBar({
               <label className="pipeline-filter-popout-check">
                 <input
                   type="checkbox"
-                  checked={Boolean(mobileDraft.filters.stuckLeads)}
-                  onChange={(e) => updateMobileDraftFilters({ stuckLeads: e.target.checked })}
+                  checked={Boolean(filterDraft.filters.stuckLeads)}
+                  onChange={(e) => updateFilterDraft({ stuckLeads: e.target.checked })}
                 />
                 Stuck leads (no activity 7+ days)
               </label>
@@ -465,8 +418,8 @@ export default function PipelineFiltersBar({
               <p className="hs-advanced-filter-label">Smart</p>
               <SearchableMultiList
                 options={smartOptions}
-                values={mobileDraft.filters.smartTags || []}
-                onChange={(v) => updateMobileDraftFilters({ smartTags: v })}
+                values={filterDraft.filters.smartTags || []}
+                onChange={(v) => updateFilterDraft({ smartTags: v })}
                 placeholder="Search…"
                 emptyLabel="Any"
               />
@@ -481,210 +434,6 @@ export default function PipelineFiltersBar({
   const activeStageLabel = statusOptions.find((s) => s.id === statusFilter)?.label
   const activeContactLabel = CONTACT_FILTER_OPTIONS.find((o) => o.id === appliedFilters.contact)?.label
 
-  const advancedPanel = advancedOpen ? (
-    <div
-      ref={advancedPanelRef}
-      className={`hs-advanced-filter-panel ${isMobile ? 'hs-advanced-filter-panel--mobile-sheet' : ''}`}
-      role="dialog"
-      aria-label="Advanced filters"
-      style={
-        isMobile
-          ? {
-              position: 'fixed',
-              left: 0,
-              right: 0,
-              bottom: 0,
-              top: 'auto',
-              zIndex: 1200,
-              width: '100%',
-              maxWidth: '100%',
-            }
-          : undefined
-      }
-    >
-      {isMobile && (
-        <div className="crm-filter-menu-header crm-filter-menu-header--sheet">
-          <span className="crm-filter-menu-header-title">Advanced filters</span>
-          <button type="button" className="crm-filter-menu-sheet-close" onClick={closeAdvanced} aria-label="Close">
-            ×
-          </button>
-        </div>
-      )}
-      {savedViews.length > 0 && (
-        <div className="hs-advanced-filter-section">
-          <p className="hs-advanced-filter-label">Saved views</p>
-          <FilterDropdown
-            compact
-            label="Saved view"
-            value={activeSmartViewId || ''}
-            displayValue={savedViews.find((v) => v.id === activeSmartViewId)?.name}
-            options={savedViewOptions}
-            onChange={(viewId) => {
-              const view = savedViews.find((v) => v.id === viewId)
-              if (view) onApplySmartView?.(view)
-            }}
-            emptyLabel="None"
-          />
-        </div>
-      )}
-
-      {orgLeadTags.length > 0 && (
-        <div className="hs-advanced-filter-section">
-          <div className="flex items-center justify-between gap-2 mb-1.5">
-            <p className="hs-advanced-filter-label mb-0">Tags</p>
-            <select
-              value={filters.tagMode || 'any'}
-              onChange={(e) => set({ tagMode: e.target.value })}
-              className="crm-select-sm crm-select-sm--hubspot"
-            >
-              <option value="any">Any</option>
-              <option value="all">All</option>
-            </select>
-          </div>
-          <FilterDropdown
-            compact
-            label="Tags"
-            multiSelect
-            wide
-            values={filters.tagIds || []}
-            onMultiChange={(v) => set({ tagIds: v })}
-            options={tagOptions}
-            searchable
-            placeholder="Search tags…"
-            emptyLabel="Any tag"
-          />
-        </div>
-      )}
-
-      <div className="hs-advanced-filter-section">
-        <p className="hs-advanced-filter-label">Date added</p>
-        <div className="hs-advanced-filter-field">
-          <label>
-            From
-            <input
-              type="date"
-              value={filters.addedFrom || ''}
-              onChange={(e) => set({ addedFrom: e.target.value })}
-            />
-          </label>
-          <label>
-            To
-            <input
-              type="date"
-              value={filters.addedTo || ''}
-              onChange={(e) => set({ addedTo: e.target.value })}
-            />
-          </label>
-        </div>
-      </div>
-
-      <div className="hs-advanced-filter-section">
-        <p className="hs-advanced-filter-label">Last activity</p>
-        <div className="hs-advanced-filter-field">
-          <label>
-            From
-            <input
-              type="date"
-              value={filters.lastActivityFrom || ''}
-              onChange={(e) => set({ lastActivityFrom: e.target.value })}
-            />
-          </label>
-          <label>
-            To
-            <input
-              type="date"
-              value={filters.lastActivityTo || ''}
-              onChange={(e) => set({ lastActivityTo: e.target.value })}
-            />
-          </label>
-        </div>
-      </div>
-
-      <div className="hs-advanced-filter-section">
-        <p className="hs-advanced-filter-label">Lead score</p>
-        <div className="flex gap-2">
-          <input
-            type="number"
-            min={0}
-            max={100}
-            placeholder="Min"
-            value={filters.minLeadScore ?? ''}
-            onChange={(e) =>
-              set({ minLeadScore: e.target.value === '' ? null : Number(e.target.value) })
-            }
-            className="hs-advanced-filter-field-input w-full border rounded px-2 py-1 text-xs"
-          />
-          <input
-            type="number"
-            min={0}
-            max={100}
-            placeholder="Max"
-            value={filters.maxLeadScore ?? ''}
-            onChange={(e) =>
-              set({ maxLeadScore: e.target.value === '' ? null : Number(e.target.value) })
-            }
-            className="hs-advanced-filter-field-input w-full border rounded px-2 py-1 text-xs"
-          />
-        </div>
-      </div>
-
-      <div className="hs-advanced-filter-section">
-        <p className="hs-advanced-filter-label">Source</p>
-        <select
-          value={filters.sourceFilter || ''}
-          onChange={(e) => set({ sourceFilter: e.target.value })}
-          className="w-full border rounded px-2 py-1.5 text-xs"
-        >
-          <option value="">All sources</option>
-          <option value="manual">Manual entry</option>
-          <option value="import">Import</option>
-          <option value="referral">Referral</option>
-          <option value="website">Website</option>
-        </select>
-      </div>
-
-      <div className="hs-advanced-filter-section">
-        <label className="flex items-center gap-2 text-xs font-medium text-gray-700">
-          <input
-            type="checkbox"
-            checked={Boolean(filters.stuckLeads)}
-            onChange={(e) => set({ stuckLeads: e.target.checked })}
-          />
-          Stuck leads (no activity 7+ days)
-        </label>
-      </div>
-
-      <div className="hs-advanced-filter-section">
-        <p className="hs-advanced-filter-label">Smart</p>
-        <FilterDropdown
-          compact
-          label="Smart"
-          multiSelect
-          values={filters.smartTags || []}
-          onMultiChange={(v) => set({ smartTags: v })}
-          options={smartOptions}
-          emptyLabel="Any"
-        />
-      </div>
-
-      <div className="hs-advanced-filter-footer">
-        <button type="button" className="crm-filter-link-btn" onClick={onClearFilters}>
-          Clear all
-        </button>
-        <button
-          type="button"
-          className="crm-filter-menu-footer-apply"
-          onClick={() => {
-            commitFilters(filters)
-            closeAdvanced()
-          }}
-        >
-          Apply
-        </button>
-      </div>
-    </div>
-  ) : null
-
   const showActiveChips =
     appliedSearch ||
     appliedCities.length ||
@@ -694,163 +443,124 @@ export default function PipelineFiltersBar({
     (!stageListMode && statusFilter !== 'all') ||
     (appliedFilters.contact && appliedFilters.contact !== 'any')
 
-  const mobileFilterIcons = (
+  const filterToolbar = (
     <>
-      {canShowOwnerFilter && (
+      {canShowOwnerFilter &&
+        (useMobileFilterSheet ? (
+          <FilterToolbarIcon
+            icon={PeopleIcon}
+            label="Owner"
+            showLabel
+            active={activeFilter?.type === 'owner' || Boolean(ownerFilter)}
+            badge={Boolean(ownerFilter)}
+            aria-expanded={activeFilter?.type === 'owner'}
+            onClick={() => openFilter('owner')}
+          />
+        ) : (
+          <PipelineFilterToolbarButton
+            label="Owner"
+            active={activeFilter?.type === 'owner' || Boolean(ownerFilter)}
+            aria-expanded={activeFilter?.type === 'owner'}
+            onClick={() => openFilter('owner')}
+          />
+        ))}
+
+      {!stageListMode &&
+        (useMobileFilterSheet ? (
+          <FilterToolbarIcon
+            icon={ListIcon}
+            label="Status"
+            showLabel
+            active={activeFilter?.type === 'status' || statusFilter !== 'all'}
+            badge={statusFilter !== 'all'}
+            aria-expanded={activeFilter?.type === 'status'}
+            onClick={() => openFilter('status')}
+          />
+        ) : (
+          <PipelineFilterToolbarButton
+            label="Status"
+            active={activeFilter?.type === 'status' || statusFilter !== 'all'}
+            aria-expanded={activeFilter?.type === 'status'}
+            onClick={() => openFilter('status')}
+          />
+        ))}
+
+      {useMobileFilterSheet ? (
+        <FilterToolbarIcon
+          icon={MapPinIcon}
+          label="City"
+          showLabel
+          active={activeFilter?.type === 'city' || (filters.cities?.length || 0) > 0}
+          badge={(filters.cities?.length || 0) > 0}
+          aria-expanded={activeFilter?.type === 'city'}
+          onClick={() => openFilter('city')}
+        />
+      ) : (
+        <PipelineFilterToolbarButton
+          label="City"
+          active={activeFilter?.type === 'city' || (filters.cities?.length || 0) > 0}
+          aria-expanded={activeFilter?.type === 'city'}
+          onClick={() => openFilter('city')}
+        />
+      )}
+
+      {useMobileFilterSheet ? (
+        <FilterToolbarIcon
+          icon={MapIcon}
+          label="State"
+          showLabel
+          active={activeFilter?.type === 'state' || (filters.states?.length || 0) > 0}
+          badge={(filters.states?.length || 0) > 0}
+          aria-expanded={activeFilter?.type === 'state'}
+          onClick={() => openFilter('state')}
+        />
+      ) : (
+        <PipelineFilterToolbarButton
+          label="State"
+          active={activeFilter?.type === 'state' || (filters.states?.length || 0) > 0}
+          aria-expanded={activeFilter?.type === 'state'}
+          onClick={() => openFilter('state')}
+        />
+      )}
+
+      {useMobileFilterSheet ? (
         <FilterToolbarIcon
           icon={PeopleIcon}
-          label="Owner"
+          label="Contact"
           showLabel
-          active={mobileSheet?.type === 'owner' || Boolean(ownerFilter)}
-          badge={Boolean(ownerFilter)}
-          aria-expanded={mobileSheet?.type === 'owner'}
-          onClick={() => openMobileFilter('owner')}
+          active={activeFilter?.type === 'contact' || (filters.contact && filters.contact !== 'any')}
+          badge={Boolean(filters.contact && filters.contact !== 'any')}
+          aria-expanded={activeFilter?.type === 'contact'}
+          onClick={() => openFilter('contact')}
+        />
+      ) : (
+        <PipelineFilterToolbarButton
+          label="Contact"
+          active={activeFilter?.type === 'contact' || (filters.contact && filters.contact !== 'any')}
+          aria-expanded={activeFilter?.type === 'contact'}
+          onClick={() => openFilter('contact')}
         />
       )}
 
-      {!stageListMode && (
-        <FilterToolbarIcon
-          icon={ListIcon}
-          label="Status"
-          showLabel
-          active={mobileSheet?.type === 'status' || statusFilter !== 'all'}
-          badge={statusFilter !== 'all'}
-          aria-expanded={mobileSheet?.type === 'status'}
-          onClick={() => openMobileFilter('status')}
-        />
-      )}
-
-      <FilterToolbarIcon
-        icon={MapPinIcon}
-        label="City"
-        showLabel
-        active={mobileSheet?.type === 'city' || (filters.cities?.length || 0) > 0}
-        badge={(filters.cities?.length || 0) > 0}
-        aria-expanded={mobileSheet?.type === 'city'}
-        onClick={() => openMobileFilter('city')}
-      />
-
-      <FilterToolbarIcon
-        icon={MapIcon}
-        label="State"
-        showLabel
-        active={mobileSheet?.type === 'state' || (filters.states?.length || 0) > 0}
-        badge={(filters.states?.length || 0) > 0}
-        aria-expanded={mobileSheet?.type === 'state'}
-        onClick={() => openMobileFilter('state')}
-      />
-
-      <FilterToolbarIcon
-        icon={PeopleIcon}
-        label="Contact"
-        showLabel
-        active={mobileSheet?.type === 'contact' || (filters.contact && filters.contact !== 'any')}
-        badge={Boolean(filters.contact && filters.contact !== 'any')}
-        aria-expanded={mobileSheet?.type === 'contact'}
-        onClick={() => openMobileFilter('contact')}
-      />
-
-      <FilterToolbarIcon
-        icon={SlidersIcon}
-        label="More filters"
-        showLabel
-        active={mobileSheet?.type === 'advanced' || advancedActiveCount > 0}
-        badge={advancedActiveCount > 0}
-        aria-expanded={mobileSheet?.type === 'advanced'}
-        onClick={() => openMobileFilter('advanced')}
-      />
-    </>
-  )
-
-  const desktopFilterIcons = (
-    <>
-      {canShowOwnerFilter && (
-        <FilterDropdown
-          label="Owner"
-          value={ownerFilter || ''}
-          displayValue={ownerSelectOptions.find((o) => String(o.value) === String(ownerFilter))?.label}
-          options={ownerSelectOptions}
-          searchable
-          placeholder="Search owners…"
-          onChange={(v) => {
-            onOwnerFilterChange?.(v || null)
-            onApplyFilters?.()
-          }}
-          emptyLabel="All owners"
-        />
-      )}
-
-      {!stageListMode && (
-        <FilterDropdown
-          icon={ListIcon}
-          showLabel
-          label="Status"
-          value={statusFilter !== 'all' ? statusFilter : ''}
-          displayValue={statusOptions.find((s) => s.id === statusFilter)?.label}
-          options={stageOptions}
-          onChange={(v) => {
-            onStatusFilterChange?.(v || 'all')
-            onApplyFilters?.()
-          }}
-          emptyLabel="All statuses"
-        />
-      )}
-
-      <FilterDropdown
-        icon={MapPinIcon}
-        showLabel
-        label="City"
-        multiSelect
-        values={filters.cities || []}
-        onMultiChange={(v) => applyFilterPatch({ cities: v })}
-        options={cityOptions}
-        searchable
-        placeholder="Search cities…"
-        emptyLabel="All cities"
-      />
-
-      <FilterDropdown
-        icon={MapIcon}
-        showLabel
-        label="State"
-        multiSelect
-        values={filters.states || []}
-        onMultiChange={(v) => applyFilterPatch({ states: v })}
-        options={stateOptions}
-        searchable
-        placeholder="Search states…"
-        emptyLabel="All states"
-      />
-
-      <FilterDropdown
-        icon={PeopleIcon}
-        showLabel
-        label="Contact"
-        value={filters.contact !== 'any' ? filters.contact : ''}
-        displayValue={CONTACT_FILTER_OPTIONS.find((o) => o.id === filters.contact)?.label}
-        options={contactOptions}
-        onChange={(v) => applyFilterPatch({ contact: v || 'any' })}
-        emptyLabel="All contacts"
-      />
-
-      <div className="hs-advanced-filter-wrap hs-filter-icon-wrap" ref={advancedRef}>
+      {useMobileFilterSheet ? (
         <FilterToolbarIcon
           icon={SlidersIcon}
           label="More filters"
           showLabel
-          active={advancedOpen || advancedActiveCount > 0}
+          active={activeFilter?.type === 'advanced' || advancedActiveCount > 0}
           badge={advancedActiveCount > 0}
-          aria-expanded={advancedOpen}
-          onClick={() => {
-            setAdvancedOpen((v) => {
-              if (!v) advancedOpenedAtRef.current = Date.now()
-              return !v
-            })
-          }}
+          aria-expanded={activeFilter?.type === 'advanced'}
+          onClick={() => openFilter('advanced')}
         />
-
-        {advancedOpen && advancedPanel}
-      </div>
+      ) : (
+        <PipelineFilterToolbarButton
+          variant="more"
+          label="More filters"
+          active={activeFilter?.type === 'advanced' || advancedActiveCount > 0}
+          aria-expanded={activeFilter?.type === 'advanced'}
+          onClick={() => openFilter('advanced')}
+        />
+      )}
     </>
   )
 
@@ -887,18 +597,30 @@ export default function PipelineFiltersBar({
           role="toolbar"
           aria-label="Lead filters"
         >
-          {useMobileFilterSheet ? mobileFilterIcons : desktopFilterIcons}
+          {filterToolbar}
         </div>
 
+        {!useMobileFilterSheet && (
+          <PipelineFilterPopup
+            open={Boolean(activeFilter)}
+            title={activeFilter ? MOBILE_FILTER_TITLES[activeFilter.type] || 'Filter' : 'Filter'}
+            wide={activeFilter?.type === 'advanced'}
+            onClose={closeFilter}
+            onApply={applyActiveFilter}
+          >
+            {renderFilterContent()}
+          </PipelineFilterPopup>
+        )}
+
         <PipelineMobileFilterSheet
-          open={Boolean(useMobileFilterSheet && mobileSheet)}
-          title={mobileSheet ? MOBILE_FILTER_TITLES[mobileSheet.type] || 'Filter' : 'Filter'}
-          subtitle={mobileSheet ? MOBILE_FILTER_SUBTITLES[mobileSheet.type] : undefined}
-          onClose={closeMobileFilter}
-          onSave={applyMobileFilter}
+          open={Boolean(useMobileFilterSheet && activeFilter)}
+          title={activeFilter ? MOBILE_FILTER_TITLES[activeFilter.type] || 'Filter' : 'Filter'}
+          subtitle={activeFilter ? MOBILE_FILTER_SUBTITLES[activeFilter.type] : undefined}
+          onClose={closeFilter}
+          onSave={applyActiveFilter}
           saveLabel="Apply"
         >
-          {renderMobileFilterContent()}
+          {renderFilterContent()}
         </PipelineMobileFilterSheet>
 
         <span className="hs-filter-bar-spacer hidden sm:block" aria-hidden />

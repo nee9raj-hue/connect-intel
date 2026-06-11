@@ -71,7 +71,6 @@ import MyDayReturnBar from '../overview/MyDayReturnBar'
 import { describeDashboardFilter } from '../../lib/dashboardNavigation'
 import { buildPipelineBreadcrumb, pipelineFilterParts } from '../../lib/pipelineListBreadcrumb'
 import { loadPipelineColumnPrefs, savePipelineColumnPrefs } from '../../lib/pipelineColumnPrefs'
-import PipelineInfiniteSentinel from './PipelineInfiniteSentinel'
 import { useDebouncedPipelineSearch } from '../../hooks/useDebouncedPipelineSearch'
 
 export default function PipelinePanel({ onNavigate, panelOptions }) {
@@ -674,7 +673,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     lastServerFiltersRef.current = key
     setBoardColumnLimits({})
     setFilterApplying(true)
-    loadPipelineList(serverFilters, { append: false, silent: false })
+    loadPipelineList(serverFilters, { append: false, silent: true })
       .catch(() => {})
       .finally(() => setFilterApplying(false))
   }, [serverSidePipeline, serverFilters, loadPipelineList, hasActiveServerFilters])
@@ -1412,15 +1411,16 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
           )}
 
           <div
-            className={`crm-content-scroll pipeline-scroll-area ${
+            className={`crm-content-scroll pipeline-scroll-area pipeline-scroll-area--relative ${
               view === 'board' && !stageListMode ? 'crm-content-scroll-board' : ''
             }`}
           >
           {filterApplying ? (
-            <div className="flex flex-col items-center justify-center py-16 text-center px-4">
+            <div className="pipeline-filter-apply-overlay" role="status" aria-live="polite">
               <p className="text-sm font-medium text-[#516f90]">Updating leads…</p>
             </div>
-          ) : isDealsView ? (
+          ) : null}
+          {isDealsView ? (
             <div className="p-3 md:p-4">
               <PipelineDealsView
                 dealStage={dealsStage}
@@ -1513,15 +1513,19 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               }}
             />
           )}
-          {(view === 'list' || stageListMode) && filtered.length > 0 && (
-            <PipelineInfiniteSentinel
-              enabled
-              hasMore={hasMoreLeads}
-              loading={pipelineLoad.loadingMore}
-              onLoadMore={handleLoadMore}
-              total={pipelineLoad.total || pipelineSummary.total}
-            />
-          )}
+          {(view === 'list' || stageListMode) &&
+            filtered.length > 0 &&
+            hasMoreLeads &&
+            serverSidePipeline && (
+              <div className="pipeline-load-more-wrap">
+                <PipelineLoadMoreBar
+                  loaded={pipelineLoad.loaded}
+                  total={pipelineLoad.total || pipelineSummary.total}
+                  loading={pipelineLoad.loadingMore}
+                  onLoadMore={handleLoadMore}
+                />
+              </div>
+            )}
           </div>
           </div>
         </div>
@@ -1813,20 +1817,20 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
 
 function PipelineLoadMoreBar({ loaded, total, loading, onLoadMore }) {
   return (
-    <>
-      <p className="text-sm text-[#516f90]">
-        Showing <strong className="text-[#33475b]">{loaded.toLocaleString()}</strong> of{' '}
-        <strong className="text-[#33475b]">{total.toLocaleString()}</strong> leads
+    <div className="pipeline-load-more-bar">
+      <p className="pipeline-load-more-bar__meta">
+        Showing <strong>{loaded.toLocaleString()}</strong> of <strong>{total.toLocaleString()}</strong>{' '}
+        leads
       </p>
       <button
         type="button"
         disabled={loading}
         onClick={onLoadMore}
-        className="crm-btn crm-btn-primary"
+        className="pipeline-load-more-bar__btn"
       >
-        {loading ? 'Loading…' : 'Load more'}
+        {loading ? 'Loading…' : 'View more'}
       </button>
-    </>
+    </div>
   )
 }
 
