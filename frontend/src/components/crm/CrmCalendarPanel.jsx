@@ -1,21 +1,39 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { formatDateTime } from '../../lib/crmUiConstants'
 import LoadingExperience from '../ui/LoadingExperience'
 import { LOADING_MESSAGES } from '../../lib/loadingQuotes'
+import useIsMobile from '../../hooks/useIsMobile'
 import {
-  KIND_STYLES,
+  CALENDAR_FILTER_OPTIONS,
+  GCAL_HOUR_HEIGHT,
+  GCAL_HOURS,
+  KIND_COLORS,
   addDays,
   calendarRangeForView,
   eventsForDay,
+  formatEventTime,
+  getMiniMonthGrid,
   getMonthGrid,
   getWeekDays,
   groupEventsByDay,
+  layoutTimedEvents,
   sameDay,
+  sortEventsByTime,
   startOfDay,
 } from '../../lib/calendarUtils'
 import MyDayReturnBar from '../overview/MyDayReturnBar'
+
+const VIEW_OPTIONS = [
+  { id: 'schedule', label: 'Schedule' },
+  { id: 'day', label: 'Day' },
+  { id: 'week', label: 'Week' },
+  { id: 'month', label: 'Month' },
+]
+
+const WEEKDAY_LABELS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
+const MINI_WEEKDAYS = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 
 function parseFocusDate(iso) {
   if (!iso) return null
@@ -23,16 +41,16 @@ function parseFocusDate(iso) {
   return Number.isNaN(d.getTime()) ? null : startOfDay(d)
 }
 
-const VIEWS = [
-  { id: 'list', label: 'List' },
-  { id: 'week', label: 'Week' },
-  { id: 'month', label: 'Month' },
-]
+function kindColor(kind) {
+  return KIND_COLORS[kind] || KIND_COLORS.task
+}
 
 export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
   const { openPipelineLead, calendarFocus, clearCalendarFocus } = useApp()
+  const isMobile = useIsMobile()
   const upcomingOnly = Boolean(panelOptions?.upcomingOnly)
-  const [view, setView] = useState('list')
+
+  const [view, setView] = useState(() => (upcomingOnly || isMobile ? 'schedule' : 'month'))
   const [anchor, setAnchor] = useState(() => startOfDay(new Date()))
   const [events, setEvents] = useState([])
   const [members, setMembers] = useState([])
@@ -43,10 +61,19 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
   const [googleCal, setGoogleCal] = useState(null)
   const [googleBusy, setGoogleBusy] = useState(false)
   const [googleNotice, setGoogleNotice] = useState(null)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [createOpen, setCreateOpen] = useState(false)
+  const [viewMenuOpen, setViewMenuOpen] = useState(false)
+  const [kindFilters, setKindFilters] = useState(() =>
+    Object.fromEntries(CALENDAR_FILTER_OPTIONS.map((o) => [o.id, true]))
+  )
+
+  const createRef = useRef(null)
+  const viewMenuRef = useRef(null)
 
   useEffect(() => {
     if (panelOptions?.upcomingOnly || panelOptions?.focusToday) {
-      setView('list')
+      setView('schedule')
       setAnchor(startOfDay(new Date()))
     }
   }, [panelOptions?.upcomingOnly, panelOptions?.focusToday])
@@ -54,12 +81,14 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
   useEffect(() => {
     if (!calendarFocus?.scheduledAt) return
     const day = parseFocusDate(calendarFocus.scheduledAt)
-    if (day) setAnchor(day)
-  }, [calendarFocus?.scheduledAt, calendarFocus?.eventId])
+    if (day) {
+      setAnchor(day)
+      if (!upcomingOnly) setView(isMobile ? 'schedule' : 'day')
+    }
+  }, [calendarFocus?.scheduledAt, calendarFocus?.eventId, isMobile, upcomingOnly])
 
   useEffect(() => {
     if (!calendarFocus || loading) return
-
     let match = null
     if (calendarFocus.eventId) {
       match = events.find((e) => e.id === calendarFocus.eventId)
@@ -73,9 +102,7 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
             : e.meetingId === calendarFocus.meetingId || e.taskId === calendarFocus.taskId)
       )
     }
-
     if (match) {
-      setView('list')
       setSelectedDay(null)
       setSelectedDayEvents([])
       setSelected(match)
@@ -83,45 +110,62 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
     }
   }, [calendarFocus, events, loading, clearCalendarFocus])
 
+  useEffect(() => {
+    const onDocClick = (e) => {
+      if (createRef.current && !createRef.current.contains(e.target)) setCreateOpen(false)
+      if (viewMenuRef.current && !viewMenuRef.current.contains(e.target)) setViewMenuOpen(false)
+    }
+    document.addEventListener('mousedown', onDocClick)
+    return () => document.removeEventListener('mousedown', onDocClick)
+  }, [])
+
   const memberName = useMemo(() => {
     const map = Object.fromEntries(members.map((m) => [m.userId, m.name]))
     return (id) => map[id] || 'Team member'
   }, [members])
 
-  const load = useCallback(async ({ silent = false } = {}) => {
-    if (!silent) setLoading(true)
-    try {
-      let q
-      if (upcomingOnly) {
-        const from = startOfDay(new Date())
-        const to = addDays(from, 90)
-        q = new URLSearchParams({ from: from.toISOString(), to: to.toISOString() }).toString()
-      } else {
-        const range = calendarRangeForView(view, anchor)
-        q = new URLSearchParams({ from: range.from, to: range.to }).toString()
-      }
-      const data = await api.getCrmCalendar(q, { silent: true })
-      setEvents(data.events || [])
-      setMembers(data.members || [])
-      setGoogleCal(data.googleCalendar || null)
-    } catch {
-      if (!silent) setEvents([])
-    } finally {
-      if (!silent) setLoading(false)
-    }
-  }, [view, anchor, upcomingOnly])
+  const effectiveView = upcomingOnly ? 'schedule' : view
 
-  const visibleEvents = useMemo(() => {
-    if (!upcomingOnly) return events
-    const now = Date.now()
-    return events.filter((e) => new Date(e.scheduledAt).getTime() >= now)
-  }, [events, upcomingOnly])
+  const load = useCallback(
+    async ({ silent = false } = {}) => {
+      if (!silent) setLoading(true)
+      try {
+        let q
+        if (upcomingOnly) {
+          const from = startOfDay(new Date())
+          const to = addDays(from, 90)
+          q = new URLSearchParams({ from: from.toISOString(), to: to.toISOString() }).toString()
+        } else {
+          const range = calendarRangeForView(effectiveView, anchor)
+          q = new URLSearchParams({ from: range.from, to: range.to }).toString()
+        }
+        const data = await api.getCrmCalendar(q, { silent: true })
+        setEvents(data.events || [])
+        setMembers(data.members || [])
+        setGoogleCal(data.googleCalendar || null)
+      } catch {
+        if (!silent) setEvents([])
+      } finally {
+        if (!silent) setLoading(false)
+      }
+    },
+    [effectiveView, anchor, upcomingOnly]
+  )
 
   useEffect(() => {
     load()
     const timer = setInterval(() => load({ silent: true }), 45_000)
     return () => clearInterval(timer)
   }, [load])
+
+  const filteredEvents = useMemo(() => {
+    let list = events.filter((e) => kindFilters[e.kind] !== false)
+    if (upcomingOnly) {
+      const now = Date.now()
+      list = list.filter((e) => new Date(e.scheduledAt).getTime() >= now)
+    }
+    return list
+  }, [events, kindFilters, upcomingOnly])
 
   const openDay = useCallback((day, dayEvents) => {
     if (!dayEvents?.length) return
@@ -136,6 +180,14 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
     setSelected(ev)
   }, [])
 
+  const goToDay = useCallback(
+    (day) => {
+      setAnchor(startOfDay(day))
+      if (!upcomingOnly) setView(isMobile ? 'schedule' : 'day')
+      setSidebarOpen(false)
+    },
+    [isMobile, upcomingOnly]
+  )
 
   const connectGoogleCalendar = async () => {
     setGoogleBusy(true)
@@ -176,158 +228,245 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
   }, [])
 
   const shiftAnchor = (delta) => {
-    if (view === 'month') {
+    if (effectiveView === 'month' || effectiveView === 'schedule') {
       setAnchor(new Date(anchor.getFullYear(), anchor.getMonth() + delta, 1))
-    } else if (view === 'week') {
+    } else if (effectiveView === 'week') {
       setAnchor(addDays(anchor, delta * 7))
     } else {
       setAnchor(addDays(anchor, delta))
     }
   }
 
+  const goToday = () => {
+    setAnchor(startOfDay(new Date()))
+    load()
+  }
+
   const headerLabel = useMemo(() => {
-    if (view === 'month') {
+    if (effectiveView === 'month') {
       return anchor.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })
     }
-    if (view === 'week') {
+    if (effectiveView === 'week') {
       const days = getWeekDays(anchor)
       const a = days[0]
       const b = days[6]
+      if (a.getMonth() === b.getMonth()) {
+        return `${a.toLocaleDateString(undefined, { month: 'long' })} ${a.getDate()} – ${b.getDate()}, ${b.getFullYear()}`
+      }
       return `${a.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} – ${b.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}`
     }
-    if (upcomingOnly) return 'Upcoming only'
-    return 'All tasks & meetings'
-  }, [view, anchor, upcomingOnly])
+    if (effectiveView === 'day') {
+      return anchor.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+    }
+    if (upcomingOnly) return 'Upcoming'
+    return anchor.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })
+  }, [effectiveView, anchor, upcomingOnly])
+
+  const viewLabel = VIEW_OPTIONS.find((v) => v.id === effectiveView)?.label || 'Schedule'
+
+  const toggleKind = (id) => {
+    setKindFilters((prev) => ({ ...prev, [id]: !prev[id] }))
+  }
+
+  const handleCreatePipeline = () => {
+    setCreateOpen(false)
+    onNavigate?.('pipeline')
+  }
 
   return (
-    <div className="panel-shell relative">
+    <div className="panel-shell crm-calendar-panel gcal-root relative">
       <MyDayReturnBar panelOptions={panelOptions} onNavigate={onNavigate} />
-      <header className="shrink-0 bg-white border-b border-gray-200 px-4 md:px-5 py-4 space-y-3">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h1 className="text-lg font-semibold text-gray-900">
-              {upcomingOnly ? 'Upcoming meetings' : 'Calendar'}
-            </h1>
-            <p className="text-xs text-gray-500 mt-0.5">
-              {upcomingOnly
-                ? 'Tasks and meetings from now — next 90 days'
-                : 'Tasks, meetings, and follow-ups · past items kept for history'}
-            </p>
-          </div>
+
+      <header className="gcal-toolbar">
+        <div className="gcal-toolbar__brand">
           <button
             type="button"
-            onClick={() => {
-              setAnchor(startOfDay(new Date()))
-              load()
-            }}
-            className="text-xs font-semibold px-3 py-1.5 border border-gray-200 rounded-lg hover:bg-gray-50"
+            className="gcal-toolbar__menu-btn"
+            aria-label="Open menu"
+            onClick={() => setSidebarOpen(true)}
           >
-            Today
+            ☰
+          </button>
+          <div className="gcal-logo">
+            <span className="gcal-logo__icon" aria-hidden>
+              {anchor.getDate()}
+            </span>
+            <span className="gcal-logo__text">Calendar</span>
+          </div>
+        </div>
+
+        <button type="button" className="gcal-btn-today" onClick={goToday}>
+          Today
+        </button>
+
+        <div className="gcal-nav">
+          <button type="button" className="gcal-nav__btn" aria-label="Previous" onClick={() => shiftAnchor(-1)}>
+            ‹
+          </button>
+          <button type="button" className="gcal-nav__btn" aria-label="Next" onClick={() => shiftAnchor(1)}>
+            ›
           </button>
         </div>
 
+        <h1 className="gcal-toolbar__title">{headerLabel}</h1>
+
+        <div className="gcal-toolbar__spacer" />
+
         {!upcomingOnly && (
-          <div className="rounded-xl border border-emerald-200 bg-emerald-50/80 px-3 py-2.5 text-xs text-emerald-950 space-y-2">
-            <p className="font-semibold">Google Calendar sync</p>
-            <p className="text-emerald-900/90 leading-relaxed">
-              {googleCal?.calendarScope
-                ? 'Google events sync automatically while you use Connect Intel. CRM meetings can also be pushed to Google (green events).'
-                : 'Connect the same work Google account to show Gmail Calendar events and push new CRM meetings.'}
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {!googleCal?.calendarScope && (
-                <button
-                  type="button"
-                  disabled={googleBusy}
-                  onClick={connectGoogleCalendar}
-                  className="font-semibold px-3 py-1.5 rounded-lg bg-emerald-700 text-white disabled:opacity-50"
-                >
-                  {googleBusy ? 'Connecting…' : 'Connect Google Calendar'}
-                </button>
-              )}
-              {googleCal?.calendarScope && (
-                <>
-                  <button
-                    type="button"
-                    disabled={googleBusy}
-                    onClick={syncGoogleCalendar}
-                    className="font-semibold px-3 py-1.5 rounded-lg bg-white border border-emerald-300 text-emerald-900 disabled:opacity-50"
-                  >
-                    {googleBusy ? 'Syncing…' : 'Sync from Google'}
-                  </button>
-                  {googleCal.lastSyncAt && (
-                    <span className="self-center text-xs text-emerald-800">
-                      Last sync {formatDateTime(googleCal.lastSyncAt)}
-                    </span>
-                  )}
-                </>
-              )}
-            </div>
-            {googleNotice && <p className="text-xs font-medium">{googleNotice}</p>}
-          </div>
-        )}
-
-        <div className="flex flex-wrap items-center gap-2">
-          {!upcomingOnly && (
-            <div className="flex rounded-lg border border-gray-200 overflow-hidden text-xs font-semibold">
-              {VIEWS.map((v) => (
-                <button
-                  key={v.id}
-                  type="button"
-                  onClick={() => setView(v.id)}
-                  className={`px-3 py-1.5 ${view === v.id ? 'bg-gray-900 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
-                >
-                  {v.label}
-                </button>
-              ))}
-            </div>
-          )}
-          {!upcomingOnly && view !== 'list' && (
-            <div className="flex items-center gap-1 ml-auto">
-              <button type="button" onClick={() => shiftAnchor(-1)} className="px-2 py-1 text-sm border rounded-lg">
-                ‹
-              </button>
-              <span className="text-sm font-medium text-gray-800 min-w-[140px] text-center">{headerLabel}</span>
-              <button type="button" onClick={() => shiftAnchor(1)} className="px-2 py-1 text-sm border rounded-lg">
-                ›
-              </button>
-            </div>
-          )}
-        </div>
-      </header>
-
-      <div className="panel-body-scroll p-4 md:p-5">
-        {loading ? (
-          <LoadingExperience message={LOADING_MESSAGES.calendar} fill={false} className="rounded-xl border border-gray-200 min-h-[200px]" />
-        ) : null}
-        {!loading && visibleEvents.length === 0 && (
-          <div className="bg-white border border-gray-200 rounded-xl p-8 text-center max-w-md mx-auto">
-            <p className="text-sm text-gray-600">No tasks or meetings in this range.</p>
-            <p className="text-xs text-gray-400 mt-2">
-              Create them from Pipeline → open a lead → Tasks & meetings.
-            </p>
+          <div className="gcal-view-select" ref={viewMenuRef}>
             <button
               type="button"
-              onClick={() => onNavigate?.('pipeline')}
-              className="mt-4 text-xs font-semibold underline text-gray-800"
+              className="gcal-view-select__btn"
+              onClick={() => setViewMenuOpen((o) => !o)}
+              aria-expanded={viewMenuOpen}
             >
-              Open pipeline
+              {viewLabel} ▾
             </button>
+            {viewMenuOpen && (
+              <div className="gcal-view-select__menu" role="menu">
+                {VIEW_OPTIONS.map((v) => (
+                  <button
+                    key={v.id}
+                    type="button"
+                    role="menuitem"
+                    className={`gcal-view-select__item${effectiveView === v.id ? ' gcal-view-select__item--active' : ''}`}
+                    onClick={() => {
+                      setView(v.id)
+                      setViewMenuOpen(false)
+                    }}
+                  >
+                    {v.label}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         )}
+      </header>
 
-        {!loading && view === 'list' && visibleEvents.length > 0 && (
-          <ListView events={visibleEvents} onSelect={openEvent} />
-        )}
+      <div className="gcal-layout">
+        <button
+          type="button"
+          className={`gcal-sidebar-backdrop${sidebarOpen ? ' gcal-sidebar-backdrop--visible' : ''}`}
+          aria-label="Close menu"
+          onClick={() => setSidebarOpen(false)}
+        />
 
-        {!loading && view === 'week' && (
-          <WeekView days={getWeekDays(anchor)} events={events} onSelect={openEvent} />
-        )}
+        <aside className={`gcal-sidebar${sidebarOpen ? ' gcal-sidebar--open' : ''}`}>
+          <div className="gcal-create-wrap" ref={createRef}>
+            <button type="button" className="gcal-create-btn" onClick={() => setCreateOpen((o) => !o)}>
+              <span className="gcal-create-btn__plus">+</span>
+              Create
+            </button>
+            {createOpen && (
+              <div className="gcal-create-menu">
+                <button type="button" className="gcal-create-menu__item" onClick={handleCreatePipeline}>
+                  Task or meeting in pipeline
+                </button>
+                {!googleCal?.calendarScope && (
+                  <button type="button" className="gcal-create-menu__item" onClick={connectGoogleCalendar}>
+                    Connect Google Calendar
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
 
-        {!loading && view === 'month' && (
-          <MonthView anchor={anchor} events={events} onSelect={openEvent} onSelectDay={openDay} />
-        )}
+          <MiniCalendar anchor={anchor} onPickDay={goToDay} onMonthChange={setAnchor} />
+
+          <div className="gcal-sidebar__section">
+            <p className="gcal-sidebar__heading">My calendars</p>
+            {CALENDAR_FILTER_OPTIONS.map((opt) => {
+              const colors = kindColor(opt.id)
+              return (
+                <label key={opt.id} className="gcal-cal-toggle">
+                  <input
+                    type="checkbox"
+                    checked={kindFilters[opt.id] !== false}
+                    onChange={() => toggleKind(opt.id)}
+                  />
+                  <span className="gcal-cal-toggle__dot" style={{ background: colors.dot }} />
+                  {opt.label}
+                </label>
+              )
+            })}
+          </div>
+
+          {!upcomingOnly && (
+            <div className="gcal-google-sync">
+              {googleCal?.calendarScope ? (
+                <>
+                  <p>Google Calendar connected. CRM meetings sync to Google.</p>
+                  <button type="button" disabled={googleBusy} onClick={syncGoogleCalendar}>
+                    {googleBusy ? 'Syncing…' : 'Sync now'}
+                  </button>
+                  {googleCal.lastSyncAt && (
+                    <p style={{ marginTop: 8, marginBottom: 0, fontSize: 11 }}>
+                      Last sync {formatDateTime(googleCal.lastSyncAt)}
+                    </p>
+                  )}
+                </>
+              ) : (
+                <>
+                  <p>Import Gmail Calendar events and push CRM meetings to Google.</p>
+                  <button type="button" disabled={googleBusy} onClick={connectGoogleCalendar}>
+                    {googleBusy ? 'Connecting…' : 'Connect Google'}
+                  </button>
+                </>
+              )}
+              {googleNotice && <p style={{ marginTop: 8, marginBottom: 0 }}>{googleNotice}</p>}
+            </div>
+          )}
+        </aside>
+
+        <main className="gcal-main">
+          {loading ? (
+            <LoadingExperience
+              message={LOADING_MESSAGES.calendar}
+              fill={false}
+              className="gcal-loading rounded-none border-0 min-h-[240px]"
+            />
+          ) : filteredEvents.length === 0 ? (
+            <div className="gcal-empty">
+              <p>No tasks or meetings in this range.</p>
+              <p style={{ fontSize: 12 }}>Create them from Pipeline → open a lead → Tasks &amp; meetings.</p>
+              <button type="button" className="link" onClick={() => onNavigate?.('pipeline')}>
+                Open pipeline
+              </button>
+            </div>
+          ) : (
+            <>
+              {effectiveView === 'schedule' && (
+                <ScheduleView events={filteredEvents} onSelect={openEvent} upcomingOnly={upcomingOnly} />
+              )}
+              {effectiveView === 'month' && (
+                <MonthView
+                  anchor={anchor}
+                  events={filteredEvents}
+                  onSelect={openEvent}
+                  onSelectDay={openDay}
+                  onGoToDay={goToDay}
+                />
+              )}
+              {effectiveView === 'week' && (
+                <TimeGridView mode="week" anchor={anchor} events={filteredEvents} onSelect={openEvent} onGoToDay={goToDay} />
+              )}
+              {effectiveView === 'day' && (
+                <TimeGridView mode="day" anchor={anchor} events={filteredEvents} onSelect={openEvent} onGoToDay={goToDay} />
+              )}
+            </>
+          )}
+        </main>
       </div>
+
+      <button
+        type="button"
+        className="gcal-fab"
+        aria-label="Create"
+        onClick={() => (isMobile ? setSidebarOpen(true) : setCreateOpen(true))}
+      >
+        +
+      </button>
 
       {selectedDay && selectedDayEvents.length > 0 && (
         <DayEventsDrawer
@@ -347,7 +486,7 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
           memberName={memberName}
           onClose={() => setSelected(null)}
           onOpenLead={() => {
-            openPipelineLead(selected.leadId)
+            openPipelineLead(selected.leadId, 'schedule')
             onNavigate?.('pipeline')
           }}
         />
@@ -356,125 +495,121 @@ export default function CrmCalendarPanel({ onNavigate, panelOptions }) {
   )
 }
 
-function ListView({ events, onSelect }) {
-  const grouped = groupEventsByDay(events)
-  const keys = [...grouped.keys()].sort()
-
-  return (
-    <div className="max-w-3xl mx-auto space-y-4">
-      {keys.map((key) => (
-        <section key={key}>
-          <h2 className="text-xs font-bold uppercase text-gray-400 mb-2 sticky top-0 bg-[var(--color-hs-canvas)] py-1">
-            {new Date(key).toLocaleDateString(undefined, {
-              weekday: 'long',
-              month: 'short',
-              day: 'numeric',
-              year: 'numeric',
-            })}
-          </h2>
-          <ul className="space-y-2">
-            {grouped.get(key).map((ev) => (
-              <EventChip key={ev.id} event={ev} onClick={() => onSelect(ev)} />
-            ))}
-          </ul>
-        </section>
-      ))}
-    </div>
-  )
-}
-
-function WeekView({ days, events, onSelect }) {
-  return (
-    <div className="grid grid-cols-7 gap-1 min-h-[320px]">
-      {days.map((day) => {
-        const dayEvents = eventsForDay(events, day)
-        const isToday = sameDay(day, new Date())
-        return (
-          <div
-            key={day.toISOString()}
-            className={`bg-white border rounded-lg min-h-[120px] flex flex-col ${
-              isToday ? 'border-[#FF773D] ring-1 ring-[#FF773D]/40' : 'border-gray-200'
-            }`}
-          >
-            <p className={`text-xs font-bold px-2 py-1.5 border-b ${isToday ? 'bg-[#fff4ee]' : 'bg-gray-50'}`}>
-              {day.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric' })}
-            </p>
-            <div className="flex-1 overflow-y-auto p-1 space-y-1">
-              {dayEvents.map((ev) => (
-                <button
-                  key={ev.id}
-                  type="button"
-                  onClick={() => onSelect(ev)}
-                  className={`w-full text-left text-xs px-1.5 py-1 rounded border truncate ${KIND_STYLES[ev.kind]?.bg} ${KIND_STYLES[ev.kind]?.border}`}
-                >
-                  {new Date(ev.scheduledAt).toLocaleTimeString(undefined, {
-                    hour: 'numeric',
-                    minute: '2-digit',
-                  })}{' '}
-                  {ev.title}
-                </button>
-              ))}
-            </div>
-          </div>
-        )
-      })}
-    </div>
-  )
-}
-
-function MonthView({ anchor, events, onSelect, onSelectDay }) {
-  const grid = getMonthGrid(anchor)
+function MiniCalendar({ anchor, onPickDay, onMonthChange }) {
+  const grid = getMiniMonthGrid(anchor)
   const month = anchor.getMonth()
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-      <div className="grid grid-cols-7 border-b border-gray-100 bg-gray-50 text-xs font-bold text-gray-500 uppercase">
-        {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((d) => (
-          <div key={d} className="px-2 py-2 text-center">
+    <div className="gcal-mini-cal">
+      <div className="gcal-mini-cal__head">
+        <span className="gcal-mini-cal__title">
+          {anchor.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}
+        </span>
+        <div className="gcal-mini-cal__nav">
+          <button
+            type="button"
+            aria-label="Previous month"
+            onClick={() => onMonthChange(new Date(anchor.getFullYear(), anchor.getMonth() - 1, 1))}
+          >
+            ‹
+          </button>
+          <button
+            type="button"
+            aria-label="Next month"
+            onClick={() => onMonthChange(new Date(anchor.getFullYear(), anchor.getMonth() + 1, 1))}
+          >
+            ›
+          </button>
+        </div>
+      </div>
+      <div className="gcal-mini-cal__weekdays">
+        {MINI_WEEKDAYS.map((d, i) => (
+          <span key={`${d}-${i}`}>{d}</span>
+        ))}
+      </div>
+      <div className="gcal-mini-cal__grid">
+        {grid.map((day) => {
+          const isToday = sameDay(day, new Date())
+          const isSelected = sameDay(day, anchor)
+          const off = day.getMonth() !== month
+          return (
+            <button
+              key={day.toISOString()}
+              type="button"
+              className={[
+                'gcal-mini-cal__day',
+                off ? 'gcal-mini-cal__day--off' : '',
+                isToday ? 'gcal-mini-cal__day--today' : '',
+                isSelected && !isToday ? 'gcal-mini-cal__day--selected' : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
+              onClick={() => onPickDay(day)}
+            >
+              {day.getDate()}
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+function MonthView({ anchor, events, onSelect, onSelectDay, onGoToDay }) {
+  const grid = getMonthGrid(anchor)
+  const month = anchor.getMonth()
+  const maxVisible = 3
+
+  return (
+    <div className="gcal-month">
+      <div className="gcal-month__head">
+        {WEEKDAY_LABELS.map((d) => (
+          <div key={d} className="gcal-month__head-cell">
             {d}
           </div>
         ))}
       </div>
-      <div className="grid grid-cols-7">
+      <div className="gcal-month__grid">
         {grid.map((day) => {
-          const dayEvents = eventsForDay(events, day)
+          const dayEvents = sortEventsByTime(eventsForDay(events, day))
           const inMonth = day.getMonth() === month
           const isToday = sameDay(day, new Date())
+          const pendingTasks = dayEvents.filter((e) => e.kind === 'task' && e.timeStatus !== 'completed')
+
           return (
             <div
               key={day.toISOString()}
-              className={`min-h-[72px] border-t border-r border-gray-100 p-1 text-left ${
-                !inMonth ? 'bg-gray-50/80 text-gray-400' : ''
-              } ${isToday ? 'bg-[#fff4ee]/60' : ''}`}
+              className={`gcal-month__cell${!inMonth ? ' gcal-month__cell--off' : ''}`}
             >
-              <button
-                type="button"
-                onClick={() => onSelectDay(day, dayEvents)}
-                className={`text-xs font-semibold px-1 rounded hover:bg-gray-100 ${
-                  isToday ? 'text-[#8a6600]' : ''
-                } ${dayEvents.length ? 'underline decoration-dotted' : ''}`}
-                title={dayEvents.length ? `View all ${dayEvents.length} events` : undefined}
-              >
-                {day.getDate()}
-              </button>
-              <div className="mt-0.5 space-y-0.5">
-                {dayEvents.slice(0, 3).map((ev) => (
-                  <button
-                    key={ev.id}
-                    type="button"
-                    onClick={() => onSelect(ev)}
-                    className={`block w-full text-left text-xs truncate px-1 rounded hover:ring-1 hover:ring-gray-300 ${KIND_STYLES[ev.kind]?.bg}`}
-                  >
-                    {ev.title}
-                  </button>
+              <div className="gcal-month__date">
+                <button
+                  type="button"
+                  className={`gcal-month__date-btn${isToday ? ' gcal-month__date-btn--today' : ''}`}
+                  onClick={() => onGoToDay(day)}
+                >
+                  {day.getDate()}
+                </button>
+              </div>
+              <div className="gcal-month__events">
+                {dayEvents.slice(0, maxVisible).map((ev) => (
+                  <MonthEventChip key={ev.id} event={ev} onSelect={onSelect} />
                 ))}
-                {dayEvents.length > 3 && (
+                {dayEvents.length > maxVisible && (
                   <button
                     type="button"
+                    className="gcal-month__more"
                     onClick={() => onSelectDay(day, dayEvents)}
-                    className="text-xs font-semibold text-[#FF773D] hover:underline px-1"
                   >
-                    +{dayEvents.length - 3} more
+                    {dayEvents.length - maxVisible} more
+                  </button>
+                )}
+                {pendingTasks.length > 0 && dayEvents.length <= maxVisible && (
+                  <button
+                    type="button"
+                    className="gcal-month__tasks-bar"
+                    onClick={() => onSelectDay(day, dayEvents)}
+                  >
+                    ✓ {pendingTasks.length} pending task{pendingTasks.length === 1 ? '' : 's'}
                   </button>
                 )}
               </div>
@@ -486,46 +621,177 @@ function MonthView({ anchor, events, onSelect, onSelectDay }) {
   )
 }
 
-function EventChip({ event, onClick }) {
-  const style = KIND_STYLES[event.kind] || KIND_STYLES.task
+function MonthEventChip({ event, onSelect }) {
+  const colors = kindColor(event.kind)
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`w-full text-left rounded-xl border p-3 hover:shadow-sm transition-shadow ${style.bg} ${style.border}`}
-    >
-      <div className="flex items-center gap-2">
-        <span className={`text-xs font-bold uppercase ${style.text}`}>{style.label}</span>
-        <StatusPill status={event.timeStatus} />
-      </div>
-      <p className="text-sm font-semibold text-gray-900 mt-1">{event.title}</p>
-      <p className="text-xs text-gray-600">
-        {event.kind === 'google'
-          ? 'From Google Calendar'
-          : `${event.leadName || ''}${event.company ? ` · ${event.company}` : ''}`}
-      </p>
-      <p className="text-xs text-gray-500 mt-1">{formatDateTime(event.scheduledAt)}</p>
+    <button type="button" className="gcal-month__event" onClick={() => onSelect(event)}>
+      <span className="gcal-month__event-dot" style={{ background: colors.dot }} />
+      <span className="gcal-month__event-text">
+        {formatEventTime(event.scheduledAt)} {event.title}
+      </span>
     </button>
   )
 }
 
-function StatusPill({ status }) {
-  const map = {
-    upcoming: 'bg-emerald-100 text-emerald-800',
-    past: 'bg-gray-200 text-gray-600',
-    completed: 'bg-[#f1f5f9] text-[#64748B]',
-  }
+function TimeGridView({ mode, anchor, events, onSelect, onGoToDay }) {
+  const scrollRef = useRef(null)
+  const days = mode === 'day' ? [startOfDay(anchor)] : getWeekDays(anchor)
+  const today = new Date()
+
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    const now = new Date()
+    const scrollTop = Math.max(0, now.getHours() * GCAL_HOUR_HEIGHT - 120)
+    el.scrollTop = scrollTop
+  }, [mode, anchor])
+
+  const nowMinutes = today.getHours() * 60 + today.getMinutes()
+  const nowTop = (nowMinutes / 60) * GCAL_HOUR_HEIGHT
+  const showNow = days.some((d) => sameDay(d, today))
+
   return (
-    <span className={`text-xs font-bold uppercase px-1.5 py-0.5 rounded-full ${map[status] || map.past}`}>
-      {status || 'past'}
-    </span>
+    <div className="gcal-timegrid-wrap" ref={scrollRef}>
+      <div className="gcal-timegrid__header">
+        <div className="gcal-timegrid__gutter" />
+        <div className="gcal-timegrid__cols" style={{ gridTemplateColumns: `repeat(${days.length}, 1fr)` }}>
+          {days.map((day) => {
+            const isToday = sameDay(day, today)
+            return (
+              <div key={day.toISOString()} className="gcal-timegrid__day-head">
+                <div className="gcal-timegrid__day-name">
+                  {day.toLocaleDateString(undefined, { weekday: 'short' })}
+                </div>
+                <button
+                  type="button"
+                  className={`gcal-timegrid__day-num${isToday ? ' gcal-timegrid__day-num--today' : ''}`}
+                  onClick={() => onGoToDay(day)}
+                >
+                  {day.getDate()}
+                </button>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      <div className="gcal-timegrid__body">
+        <div className="gcal-timegrid__hours">
+          {GCAL_HOURS.map((h) => (
+            <div key={h} className="gcal-timegrid__hour-label">
+              {h === 0
+                ? ''
+                : new Date(2000, 0, 1, h).toLocaleTimeString(undefined, { hour: 'numeric' })}
+            </div>
+          ))}
+        </div>
+        <div className="gcal-timegrid__cols" style={{ gridTemplateColumns: `repeat(${days.length}, 1fr)` }}>
+          {days.map((day) => {
+            const layouts = layoutTimedEvents(events, day)
+            const isToday = sameDay(day, today)
+            return (
+              <div key={day.toISOString()} className="gcal-timegrid__col">
+                {GCAL_HOURS.map((h) => (
+                  <div
+                    key={h}
+                    className="gcal-timegrid__hour-line"
+                    style={{ top: h * GCAL_HOUR_HEIGHT }}
+                  />
+                ))}
+                {isToday && showNow && (
+                  <div className="gcal-timegrid__now-line" style={{ top: nowTop }} />
+                )}
+                {layouts.map(({ event, top, height }) => {
+                  const colors = kindColor(event.kind)
+                  return (
+                    <button
+                      key={event.id}
+                      type="button"
+                      className="gcal-timegrid__event"
+                      style={{
+                        top,
+                        height,
+                        background: colors.bg,
+                        borderLeftColor: colors.border,
+                        color: '#3c4043',
+                      }}
+                      onClick={() => onSelect(event)}
+                    >
+                      <div className="gcal-timegrid__event-title">{event.title}</div>
+                      <div className="gcal-timegrid__event-time">{formatEventTime(event.scheduledAt)}</div>
+                    </button>
+                  )
+                })}
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ScheduleView({ events, onSelect, upcomingOnly }) {
+  const grouped = groupEventsByDay(events)
+  const keys = [...grouped.keys()].sort()
+  const todayKey = new Intl.DateTimeFormat('en-CA').format(new Date())
+
+  if (!keys.length) return null
+
+  return (
+    <div className="gcal-schedule">
+      {keys.map((key) => {
+        const day = new Date(`${key}T12:00:00`)
+        const isToday = key === todayKey
+        const dayEvents = sortEventsByTime(grouped.get(key))
+
+        return (
+          <section key={key} className="gcal-schedule__day">
+            <div className="gcal-schedule__day-label">
+              <span className="gcal-schedule__weekday">
+                {day.toLocaleDateString(undefined, { weekday: 'short' })}
+              </span>
+              <span className={`gcal-schedule__dom${isToday ? ' gcal-schedule__dom--today' : ''}`}>
+                {day.getDate()}
+              </span>
+            </div>
+            <div className="gcal-schedule__events">
+              {dayEvents.map((ev) => {
+                const colors = kindColor(ev.kind)
+                return (
+                  <button
+                    key={ev.id}
+                    type="button"
+                    className="gcal-schedule__event"
+                    onClick={() => onSelect(ev)}
+                  >
+                    <span className="gcal-schedule__event-bar" style={{ background: colors.dot }} />
+                    <span className="gcal-schedule__event-time">
+                      {upcomingOnly && isToday && new Date(ev.scheduledAt).getTime() < Date.now()
+                        ? 'Now'
+                        : formatEventTime(ev.scheduledAt)}
+                    </span>
+                    <span className="gcal-schedule__event-body">
+                      <span className="gcal-schedule__event-title">{ev.title}</span>
+                      <span className="gcal-schedule__event-meta">
+                        {ev.kind === 'google'
+                          ? 'Google Calendar'
+                          : [ev.leadName, ev.company].filter(Boolean).join(' · ') || kindColor(ev.kind).label}
+                      </span>
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+          </section>
+        )
+      })}
+    </div>
   )
 }
 
 function DayEventsDrawer({ day, events, onClose, onSelectEvent }) {
-  const sorted = [...events].sort(
-    (a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime()
-  )
+  const sorted = sortEventsByTime(events)
   const label = day.toLocaleDateString(undefined, {
     weekday: 'long',
     month: 'long',
@@ -535,23 +801,23 @@ function DayEventsDrawer({ day, events, onClose, onSelectEvent }) {
 
   return (
     <>
-      <button type="button" aria-label="Close" className="fixed inset-0 z-40 bg-black/30" onClick={onClose} />
-      <aside className="fixed right-0 top-0 bottom-0 z-50 w-full max-w-md bg-white shadow-xl border-l border-gray-200 flex flex-col">
-        <div className="px-5 py-4 border-b border-gray-100 flex items-start justify-between gap-3">
-          <div>
-            <p className="text-xs font-bold uppercase text-gray-400">Day schedule</p>
-            <h2 className="text-lg font-semibold text-gray-900 mt-1">{label}</h2>
-            <p className="text-xs text-gray-500 mt-1">
+      <button type="button" aria-label="Close" className="gcal-drawer-backdrop" onClick={onClose} />
+      <aside className="gcal-drawer">
+        <div className="gcal-drawer__head">
+          <div style={{ flex: 1 }}>
+            <p className="gcal-drawer__row-label">Day schedule</p>
+            <h2 className="gcal-drawer__title">{label}</h2>
+            <p style={{ fontSize: 12, color: '#70757a', margin: '4px 0 0' }}>
               {sorted.length} event{sorted.length === 1 ? '' : 's'}
             </p>
           </div>
-          <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-700 text-xl leading-none">
+          <button type="button" className="gcal-drawer__close" onClick={onClose} aria-label="Close">
             ×
           </button>
         </div>
-        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-2">
+        <div className="gcal-drawer__body">
           {sorted.map((ev) => (
-            <EventChip key={ev.id} event={ev} onClick={() => onSelectEvent(ev)} />
+            <ScheduleEventRow key={ev.id} event={ev} onClick={() => onSelectEvent(ev)} />
           ))}
         </div>
       </aside>
@@ -559,79 +825,112 @@ function DayEventsDrawer({ day, events, onClose, onSelectEvent }) {
   )
 }
 
+function ScheduleEventRow({ event, onClick }) {
+  const colors = kindColor(event.kind)
+  return (
+    <button type="button" className="gcal-schedule__event" onClick={onClick} style={{ width: '100%' }}>
+      <span className="gcal-schedule__event-bar" style={{ background: colors.dot }} />
+      <span className="gcal-schedule__event-time">{formatEventTime(event.scheduledAt)}</span>
+      <span className="gcal-schedule__event-body">
+        <span className="gcal-schedule__event-title">{event.title}</span>
+        <span className="gcal-schedule__event-meta">
+          {event.kind === 'google' ? 'Google Calendar' : event.leadName || colors.label}
+        </span>
+      </span>
+    </button>
+  )
+}
+
 function EventDetailDrawer({ event, memberName, onClose, onOpenLead }) {
-  const style = KIND_STYLES[event.kind] || KIND_STYLES.task
+  const colors = kindColor(event.kind)
   const participants = (event.participantUserIds || []).filter((id) => id !== event.assignedToUserId)
 
   return (
     <>
-      <button type="button" aria-label="Close" className="fixed inset-0 z-40 bg-black/30" onClick={onClose} />
-      <aside className="fixed right-0 top-0 bottom-0 z-50 w-full max-w-md bg-white shadow-xl border-l border-gray-200 flex flex-col">
-        <div className="px-5 py-4 border-b border-gray-100 flex items-start justify-between gap-3">
-          <div>
-            <span className={`text-xs font-bold uppercase ${style.text}`}>{style.label}</span>
-            <h2 className="text-lg font-semibold text-gray-900 mt-1">{event.title}</h2>
+      <button type="button" aria-label="Close" className="gcal-drawer-backdrop" onClick={onClose} />
+      <aside className="gcal-drawer">
+        <div className="gcal-drawer__head">
+          <span className="gcal-drawer__color" style={{ background: colors.dot }} />
+          <div style={{ flex: 1 }}>
+            <h2 className="gcal-drawer__title">{event.title}</h2>
             <StatusPill status={event.timeStatus} />
           </div>
-          <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-700 text-xl leading-none">
+          <button type="button" className="gcal-drawer__close" onClick={onClose} aria-label="Close">
             ×
           </button>
         </div>
-        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4 text-sm">
-          <DetailRow label="When" value={formatDateTime(event.scheduledAt)} />
-          {event.endAt && <DetailRow label="Ends" value={formatDateTime(event.endAt)} />}
+        <div className="gcal-drawer__body">
+          <DrawerRow icon="🕐" label="When" value={formatDateTime(event.scheduledAt)} />
+          {event.endAt && <DrawerRow icon="🕐" label="Ends" value={formatDateTime(event.endAt)} />}
           {event.kind !== 'google' && (
-            <DetailRow label="Lead" value={`${event.leadName}${event.company ? ` (${event.company})` : ''}`} />
+            <DrawerRow
+              icon="👤"
+              label="Lead"
+              value={`${event.leadName || '—'}${event.company ? ` · ${event.company}` : ''}`}
+            />
           )}
-          {event.kind === 'google' && (
-            <DetailRow label="Source" value="Google Calendar (imported)" />
+          {event.kind === 'google' && <DrawerRow icon="📅" label="Source" value="Google Calendar" />}
+          {event.type && (
+            <DrawerRow icon="📋" label="Type" value={String(event.type).replace(/_/g, ' ')} />
           )}
-          {event.type && <DetailRow label="Type" value={String(event.type).replace('_', ' ')} />}
-          {event.location && <DetailRow label="Location" value={event.location} />}
-          {event.notes && <DetailRow label="Notes" value={event.notes} />}
+          {event.location && <DrawerRow icon="📍" label="Location" value={event.location} />}
+          {event.notes && <DrawerRow icon="📝" label="Notes" value={event.notes} />}
           {event.assignedToUserId && (
-            <DetailRow label="Owner" value={memberName(event.assignedToUserId)} />
+            <DrawerRow icon="👤" label="Owner" value={memberName(event.assignedToUserId)} />
           )}
           {participants.length > 0 && (
-            <DetailRow label="With" value={participants.map((id) => memberName(id)).join(', ')} />
+            <DrawerRow icon="👥" label="With" value={participants.map((id) => memberName(id)).join(', ')} />
           )}
-          {event.createdByName && <DetailRow label="Created by" value={event.createdByName} />}
-          {event.completedAt && <DetailRow label="Completed" value={formatDateTime(event.completedAt)} />}
+          {event.createdByName && <DrawerRow icon="✏️" label="Created by" value={event.createdByName} />}
+          {event.completedAt && <DrawerRow icon="✓" label="Completed" value={formatDateTime(event.completedAt)} />}
           {event.visitRecordedAt && (
-            <DetailRow label="Visit logged" value={formatDateTime(event.visitRecordedAt)} />
+            <DrawerRow icon="📍" label="Visit logged" value={formatDateTime(event.visitRecordedAt)} />
           )}
         </div>
-        <div className="shrink-0 p-4 border-t border-gray-100 space-y-2">
+        <div className="gcal-drawer__foot">
           {event.kind === 'google' && event.htmlLink && (
             <a
               href={event.htmlLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="block w-full py-2.5 text-center bg-emerald-700 text-white text-sm font-semibold rounded-lg"
+              className="gcal-drawer__btn gcal-drawer__btn--primary"
             >
               Open in Google Calendar
             </a>
           )}
           {event.leadId && (
-            <button
-              type="button"
-              onClick={onOpenLead}
-              className="w-full py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg"
-            >
+            <button type="button" onClick={onOpenLead} className="gcal-drawer__btn gcal-drawer__btn--primary">
               Open lead in pipeline
             </button>
           )}
+          <button type="button" onClick={onClose} className="gcal-drawer__btn gcal-drawer__btn--secondary">
+            Close
+          </button>
         </div>
       </aside>
     </>
   )
 }
 
-function DetailRow({ label, value }) {
+function DrawerRow({ icon, label, value }) {
   return (
-    <div>
-      <p className="text-xs font-bold uppercase text-gray-400">{label}</p>
-      <p className="text-gray-800 mt-0.5 whitespace-pre-wrap">{value}</p>
+    <div className="gcal-drawer__row">
+      <span className="gcal-drawer__row-icon" aria-hidden>
+        {icon}
+      </span>
+      <div>
+        <div className="gcal-drawer__row-label">{label}</div>
+        <div style={{ marginTop: 4, whiteSpace: 'pre-wrap' }}>{value}</div>
+      </div>
     </div>
   )
+}
+
+function StatusPill({ status }) {
+  const map = {
+    upcoming: 'gcal-status gcal-status--upcoming',
+    past: 'gcal-status gcal-status--past',
+    completed: 'gcal-status gcal-status--completed',
+  }
+  return <span className={map[status] || map.past}>{status || 'past'}</span>
 }
