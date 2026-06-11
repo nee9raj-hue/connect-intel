@@ -70,7 +70,12 @@ import usePipelineFilterMobile, { usePipelineNarrowViewport } from '../../hooks/
 import MyDayReturnBar from '../overview/MyDayReturnBar'
 import { describeDashboardFilter } from '../../lib/dashboardNavigation'
 import { buildPipelineBreadcrumb, pipelineFilterParts } from '../../lib/pipelineListBreadcrumb'
-import { loadPipelineColumnPrefs, savePipelineColumnPrefs } from '../../lib/pipelineColumnPrefs'
+import {
+  loadPipelineColumnPrefs,
+  loadPipelineHoverActionsPref,
+  savePipelineColumnPrefs,
+  savePipelineHoverActionsPref,
+} from '../../lib/pipelineColumnPrefs'
 import { useDebouncedPipelineSearch } from '../../hooks/useDebouncedPipelineSearch'
 
 export default function PipelinePanel({ onNavigate, panelOptions }) {
@@ -99,6 +104,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   } = useApp()
 
   const [tableColumns, setTableColumns] = useState(() => loadPipelineColumnPrefs())
+  const [hoverActionsEnabled, setHoverActionsEnabled] = useState(() => loadPipelineHoverActionsPref())
 
   const [crmSettings, setCrmSettings] = useState(null)
   const [activePipelineId, setActivePipelineId] = useState('default')
@@ -1515,6 +1521,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
           ) : (
             <PipelineLeadsTable
               leads={filtered}
+              showHoverActions={hoverActionsEnabled}
               selectedId={pipelineLeadId}
               selectedIds={selectedIds}
               onSelect={(leadId) => {
@@ -1797,6 +1804,11 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
         onColumnsChange={(cols) => {
           setTableColumns(cols)
           savePipelineColumnPrefs(cols)
+        }}
+        hoverActionsEnabled={hoverActionsEnabled}
+        onHoverActionsChange={(enabled) => {
+          setHoverActionsEnabled(enabled)
+          savePipelineHoverActionsPref(enabled)
         }}
         onExport={exportVisibleLeads}
         onResetFilters={() => {

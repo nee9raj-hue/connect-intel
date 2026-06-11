@@ -1,4 +1,5 @@
 const STORAGE_KEY = 'ci:pipeline-table-columns'
+const HOVER_ACTIONS_KEY = 'ci:pipeline-hover-actions'
 
 export const PIPELINE_TABLE_COLUMNS = [
   { id: 'name', label: 'Name', default: true, locked: true },
@@ -33,6 +34,25 @@ export function loadPipelineColumnPrefs() {
 export function savePipelineColumnPrefs(visibleIds) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(visibleIds))
+  } catch {
+    /* ignore */
+  }
+}
+
+/** Row hover quick actions (Call, Email, Task, etc.) — default on. */
+export function loadPipelineHoverActionsPref() {
+  try {
+    const raw = localStorage.getItem(HOVER_ACTIONS_KEY)
+    if (raw === '0' || raw === 'false') return false
+    return true
+  } catch {
+    return true
+  }
+}
+
+export function savePipelineHoverActionsPref(enabled) {
+  try {
+    localStorage.setItem(HOVER_ACTIONS_KEY, enabled ? '1' : '0')
   } catch {
     /* ignore */
   }

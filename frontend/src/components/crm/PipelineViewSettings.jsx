@@ -11,6 +11,8 @@ export default function PipelineViewSettings({
   stageListMode = false,
   visibleColumns = [],
   onColumnsChange,
+  hoverActionsEnabled = true,
+  onHoverActionsChange,
   onExport,
   onResetFilters,
 }) {
@@ -84,6 +86,23 @@ export default function PipelineViewSettings({
                   Board
                 </button>
               </div>
+            </section>
+          )}
+
+          {view === 'list' && (
+            <section className="hs-view-settings__section">
+              <p className="hs-view-settings__section-label">List</p>
+              <label className="hs-view-settings__row hs-view-settings__row--check">
+                <span>Hover quick actions</span>
+                <input
+                  type="checkbox"
+                  checked={hoverActionsEnabled}
+                  onChange={(e) => onHoverActionsChange?.(e.target.checked)}
+                />
+              </label>
+              <p className="hs-view-settings__hint px-0 pt-1">
+                Show Call, Email, Task, and other buttons when you hover a lead row.
+              </p>
             </section>
           )}
 

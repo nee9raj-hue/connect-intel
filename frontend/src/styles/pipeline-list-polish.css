@@ -269,6 +269,10 @@
   pointer-events: auto;
 }
 
+.pipeline-hs-table-wrap--no-hover-actions .pipeline-hs-row--v2:hover .pipeline-hs-name-link {
+  visibility: visible;
+}
+
 .pipeline-row-hover-actions button {
   border: none;
   background: #eaf0f6;
