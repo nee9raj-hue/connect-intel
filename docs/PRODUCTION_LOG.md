@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- e89345d
+npm run prod:rollback -- cf5c8fa
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- e89345d
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `79b554b` |
-| Log updated (IST) | 11/06/2026, 12:16:36 |
+| Commit | `6951eb2` |
+| Log updated (IST) | 11/06/2026, 12:32:40 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- e89345d
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 11/06/2026, 12:16:18 | `79b554b` | fix: scope Manager pipeline visibility to their team only | [preview](https://connect-intel-4bxsry3tt-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 79b554b` | **← LIVE**
+| 11/06/2026, 12:32:29 | `6951eb2` | feat: rebuild home dashboard with role-aware bootstrap API and indigo v4 UI | [preview](https://connect-intel-97vtz0e7v-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6951eb2` | **← LIVE**
+| 11/06/2026, 12:17:17 | `cf5c8fa` | chore: production log after Manager team scope fix deploy | [preview](https://connect-intel-6o9cmfc2r-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- cf5c8fa` |
+| 11/06/2026, 12:16:18 | `79b554b` | fix: scope Manager pipeline visibility to their team only | [preview](https://connect-intel-4bxsry3tt-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 79b554b` |
 | 10/06/2026, 17:46:15 | `e89345d` | chore: production log after Team members tab fix deploy | [preview](https://connect-intel-od495iml7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e89345d` |
 | 10/06/2026, 17:45:14 | `39bbe33` | fix: import useEffect in TeamMembersTab to stop Team members crash | [preview](https://connect-intel-h6svnc1tt-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 39bbe33` |
 | 10/06/2026, 17:43:03 | `c625be4` | chore: production log after Marketing Hub performance fix deploy | [preview](https://connect-intel-q9s84lmta-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c625be4` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- e89345d
 | 10/06/2026, 16:13:28 | `ea59b80` | Polish Org Admin: member roles, moves, deactivate, and import stats. | [preview](https://connect-intel-fduehr25f-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ea59b80` |
 | 10/06/2026, 16:09:01 | `0349be6` | Add Org Admin hub with departments, teams, and permissions matrix. | [preview](https://connect-intel-bdrik1uy9-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0349be6` |
 | 10/06/2026, 16:01:47 | `e7961d6` | Add pipeline keyset pagination and Sprint 1 performance reliability. | [preview](https://connect-intel-aozpg6zbp-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e7961d6` |
-| 10/06/2026, 15:20:51 | `409bd68` | Add DB-level team hierarchy RBAC for pipeline scoping and sidebar counts. | [preview](https://connect-intel-4gr87irfw-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 409bd68` |
-| 10/06/2026, 14:22:06 | `c80f60a` | Add SQL-backed marketing email queue and analytics snapshots. | [preview](https://connect-intel-m0i6u6x23-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c80f60a` |
 
 ---
 
