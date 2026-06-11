@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-11T07:23:03.087Z",
-  "updatedAtIst": "11/06/2026, 12:53:03",
+  "updatedAt": "2026-06-11T07:43:52.608Z",
+  "updatedAtIst": "11/06/2026, 13:13:52",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "c78111f",
+  "currentProductionCommit": "4e94f86",
   "entries": [
+    {
+      "logId": "20260611-1313-4e94f86",
+      "commit": "4e94f86",
+      "commitFull": "4e94f869426c935d9b39d9dede64ea96f340bc0a",
+      "message": "feat: marketing campaign metrics drill down to filtered pipeline",
+      "deployedAt": "2026-06-11T07:43:00.384Z",
+      "deployedAtIst": "11/06/2026, 13:13:00",
+      "committedAtIst": "11/06/2026, 13:12:18",
+      "vercelPreviewUrl": "https://connect-intel-o5w3wsj8v-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 4e94f86"
+    },
+    {
+      "logId": "20260611-1253-b92be6e",
+      "commit": "b92be6e",
+      "commitFull": "b92be6e9d76437e4e3260ec1a50506c8272a1110",
+      "message": "chore: production log after dashboard filter drill-down deploy",
+      "deployedAt": "2026-06-11T07:23:50.857Z",
+      "deployedAtIst": "11/06/2026, 12:53:50",
+      "committedAtIst": "11/06/2026, 12:53:15",
+      "vercelPreviewUrl": "https://connect-intel-cvpgxqe4j-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- b92be6e"
+    },
     {
       "logId": "20260611-1252-c78111f",
       "commit": "c78111f",
@@ -15,7 +43,7 @@
       "committedAtIst": "11/06/2026, 12:52:14",
       "vercelPreviewUrl": "https://connect-intel-fxbpsqecl-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- c78111f"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- bf41817"
-    },
-    {
-      "logId": "20260610-1618-7059942",
-      "commit": "7059942",
-      "commitFull": "7059942e1c68d8b3a91bad43b05fb7b18c4e66aa",
-      "message": "Surface Departments & teams in sidebar with URL deep links.",
-      "deployedAt": "2026-06-10T10:48:34.207Z",
-      "deployedAtIst": "10/06/2026, 16:18:34",
-      "committedAtIst": "10/06/2026, 16:17:56",
-      "vercelPreviewUrl": "https://connect-intel-1sokgx894-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 7059942"
-    },
-    {
-      "logId": "20260610-1613-ea59b80",
-      "commit": "ea59b80",
-      "commitFull": "ea59b80f167fe2d313a9d33bdba4b268c3561fef",
-      "message": "Polish Org Admin: member roles, moves, deactivate, and import stats.",
-      "deployedAt": "2026-06-10T10:43:28.341Z",
-      "deployedAtIst": "10/06/2026, 16:13:28",
-      "committedAtIst": "10/06/2026, 16:12:51",
-      "vercelPreviewUrl": "https://connect-intel-fduehr25f-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- ea59b80"
     }
   ]
 }
