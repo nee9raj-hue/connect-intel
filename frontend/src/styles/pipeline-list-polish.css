@@ -136,7 +136,8 @@
 
 .pipeline-hs-table-wrap--v2 {
   overflow-x: auto;
-  overflow-y: visible;
+  overflow-y: hidden;
+  scrollbar-gutter: stable;
 }
 
 .pipeline-hs-table-wrap--v2 .pipeline-hs-table {
@@ -154,23 +155,23 @@
 }
 
 .pipeline-hs-name-cell--v2 {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 0.5rem;
   width: 100%;
   max-width: 100%;
   min-height: 1.5rem;
-  position: relative;
   overflow: hidden;
 }
 
 .pipeline-hs-name-stack {
   min-width: 0;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  position: relative;
+  flex: 1 1 0;
+  overflow: hidden;
+}
+
+.pipeline-hs-row--v2 {
+  contain: layout style;
 }
 
 .pipeline-hs-row--v2 .pipeline-hs-td {
@@ -187,9 +188,9 @@
 
 .pipeline-hs-table-wrap--v2 .pipeline-hs-td--name,
 .pipeline-hs-row--v2 .pipeline-hs-td--name {
-  width: 16%;
-  min-width: 150px;
-  max-width: 220px;
+  width: 18%;
+  min-width: 200px;
+  max-width: 280px;
   overflow: hidden;
 }
 
@@ -229,33 +230,35 @@
   text-align: left;
 }
 
+/* Fixed-width slot — always in layout so hover never shifts columns or scrollbars */
 .pipeline-row-hover-actions {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 2;
+  position: static;
+  flex: 0 0 10.5rem;
+  width: 10.5rem;
+  min-width: 10.5rem;
+  max-width: 10.5rem;
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 2px;
   flex-wrap: nowrap;
-  width: max-content;
-  max-width: min(20rem, 100%);
-  visibility: hidden;
+  overflow: hidden;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.12s ease, visibility 0.12s ease;
-  background: linear-gradient(90deg, transparent 0, #f5f8fa 0.65rem, #f5f8fa 100%);
+  background: transparent;
   border: none;
-  border-radius: 0;
-  padding: 0 0 0 0.65rem;
+  padding: 0;
+  margin: 0;
   box-shadow: none;
 }
 
 .pipeline-hs-row--v2:hover .pipeline-row-hover-actions {
-  visibility: visible;
   opacity: 1;
   pointer-events: auto;
+}
+
+.pipeline-hs-table-wrap--no-hover-actions .pipeline-row-hover-actions {
+  display: none;
 }
 
 .pipeline-row-hover-actions button {
@@ -1086,7 +1089,8 @@
     width: 100%;
     max-width: 100%;
     overflow-x: auto;
-    overflow-y: visible;
+    overflow-y: hidden;
+    scrollbar-gutter: stable;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-x: contain;
   }
@@ -1191,4 +1195,9 @@
 
 .pipeline-hs-table-wrap--v2 .pipeline-row-hover-actions button {
   transition: color 0.12s ease, background-color 0.12s ease;
+}
+
+.pipeline-list-workspace .crm-content-scroll.pipeline-scroll-area {
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
 }
