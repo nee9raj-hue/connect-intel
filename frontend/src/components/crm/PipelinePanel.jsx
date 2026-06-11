@@ -1484,6 +1484,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               onQuickCall={(lead) => openPipelineLead(lead.id, 'calls')}
               onQuickEmail={(lead) => openPipelineLead(lead.id, 'emails')}
               onQuickTask={(lead) => openPipelineLead(lead.id, 'tasks')}
+              onQuickWhatsApp={(lead) => openPipelineLead(lead.id, 'whatsapp')}
               canAssign={canAssign}
               onDeleteLead={async (lead) => {
                 if (!window.confirm(`Remove ${lead.firstName || lead.company || 'this lead'} from pipeline?`)) {
@@ -1932,12 +1933,15 @@ function KanbanColumn({
                   }}
                   className="flex-1 min-w-0 text-left"
                 >
-                  <div className="flex items-center gap-1.5 min-w-0">
+                  <div className="flex items-center gap-1.5 min-w-0 flex-wrap">
                     <span className="pipeline-hs-avatar pipeline-hs-avatar--sm shrink-0" aria-hidden>
                       {(lead.firstName?.[0] || lead.company?.[0] || '?').toUpperCase()}
                     </span>
                     <span className="text-sm font-medium text-[#33475b] truncate leading-tight ci-selectable-text">
                       {primaryLabel}
+                    </span>
+                    <span className={`pipeline-hs-status ${getStatusMeta(lead.crm?.status).color} shrink-0`}>
+                      {getStatusMeta(lead.crm?.status).label}
                     </span>
                   </div>
                   {showCompanyRow ? (

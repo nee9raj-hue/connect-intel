@@ -5,6 +5,9 @@ import { getLeadCity, getLeadState } from '../../lib/pipelineFilters'
 import { hasActiveTextSelection } from '../../lib/keyboardShortcuts'
 import { getLeadEmail, leadHasSendableEmail } from '../../lib/emailUtils'
 import LeadPhoneCall from './LeadPhoneCall'
+import LeadTagDots from './LeadTagDots'
+import LeadTag from '../ui/LeadTag'
+import { leadHasCallablePhone } from '../../lib/phoneUtils'
 import PipelineRowActionsMenu from './PipelineRowActionsMenu'
 
 function displayName(lead) {
@@ -16,6 +19,13 @@ function initialsFor(name) {
   const parts = String(name || '?').trim().split(/\s+/)
   if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase()
   return (parts[0]?.[0] || '?').toUpperCase()
+}
+
+function resolveLeadTags(lead, tagById) {
+  const ids = lead.crm?.tagIds || []
+  return ids
+    .map((id) => (typeof tagById?.get === 'function' ? tagById.get(id) : tagById?.[id]))
+    .filter(Boolean)
 }
 
 function resolveOwnerName(lead, teamMembers) {
@@ -169,6 +179,7 @@ export default function PipelineLeadsTable({
   onQuickCall,
   onQuickEmail,
   onQuickTask,
+  onQuickWhatsApp,
   canAssign = false,
   onDeleteLead,
   onChangeOwner,
@@ -268,8 +279,7 @@ export default function PipelineLeadsTable({
             const rel = relativeLabel(activityAt)
             const stale =
               activityAt && Date.now() - new Date(activityAt).getTime() > 7 * 86400000
-            const tagIds = lead.crm?.tagIds || []
-            const tags = tagIds.map((id) => tagById?.[id]).filter(Boolean)
+            const tags = resolveLeadTags(lead, tagById)
             const nameStr = displayName(lead)
 
             return (
@@ -290,23 +300,49 @@ export default function PipelineLeadsTable({
                   />
                 </td>
                 {col('name') && (
-                  <td className="pipeline-hs-td">
+                  <td className="pipeline-hs-td pipeline-hs-td--name">
                     <div className="pipeline-hs-name-cell pipeline-hs-name-cell--v2">
                       <span className="pipeline-hs-avatar" aria-hidden>
                         {(lead.firstName?.[0] || lead.company?.[0] || '?').toUpperCase()}
                       </span>
                       <div className="pipeline-hs-name-stack">
-                        <button
-                          type="button"
-                          className="pipeline-hs-name-link pipeline-hs-primary-text ci-selectable-text"
-                          onClick={() => {
-                            if (hasActiveTextSelection()) return
-                            onSelect(lead.id)
-                          }}
-                        >
-                          {nameStr}
-                        </button>
+                        <div className="pipeline-hs-name-row">
+                          <button
+                            type="button"
+                            className="pipeline-hs-name-link pipeline-hs-primary-text ci-selectable-text"
+                            onClick={() => {
+                              if (hasActiveTextSelection()) return
+                              onSelect(lead.id)
+                            }}
+                          >
+                            {nameStr}
+                          </button>
+                          <span className="pipeline-row-hover-actions" aria-label="Quick actions">
+                            {leadHasCallablePhone(lead) ? (
+                              <button type="button" onClick={() => onQuickCall?.(lead)}>
+                                Call
+                              </button>
+                            ) : null}
+                            {email ? (
+                              <button type="button" onClick={() => onQuickEmail?.(lead)}>
+                                Email
+                              </button>
+                            ) : null}
+                            <button type="button" onClick={() => onQuickTask?.(lead)}>
+                              Task
+                            </button>
+                            {lead.phone && onQuickWhatsApp ? (
+                              <button type="button" onClick={() => onQuickWhatsApp?.(lead)}>
+                                WhatsApp
+                              </button>
+                            ) : null}
+                            <button type="button" onClick={() => onSelect(lead.id)}>
+                              Open →
+                            </button>
+                          </span>
+                        </div>
                         {loc ? <span className="pipeline-hs-sub">{loc}</span> : null}
+                        <LeadTagDots lead={lead} tagById={tagById} className="pipeline-hs-tags" max={4} />
                       </div>
                     </div>
                   </td>
@@ -395,14 +431,12 @@ export default function PipelineLeadsTable({
                   <td className="pipeline-hs-td">
                     {tags.length ? (
                       <>
-                        {tags.slice(0, 2).map((t) => (
-                          <span key={t.id} className="pipeline-tag-pill" title={t.name}>
-                            {t.name}
-                          </span>
+                        {tags.slice(0, 3).map((t) => (
+                          <LeadTag key={t.id} name={t.name} title={t.name} />
                         ))}
-                        {tags.length > 2 ? (
+                        {tags.length > 3 ? (
                           <span className="pipeline-tag-overflow" title={tags.map((t) => t.name).join(', ')}>
-                            +{tags.length - 2}
+                            +{tags.length - 3}
                           </span>
                         ) : null}
                       </>
