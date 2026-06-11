@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-11T15:40:52.707Z",
-  "updatedAtIst": "11/06/2026, 21:10:52",
+  "updatedAt": "2026-06-11T15:50:29.542Z",
+  "updatedAtIst": "11/06/2026, 21:20:29",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "4add1de",
+  "currentProductionCommit": "4459d66",
   "entries": [
+    {
+      "logId": "20260611-2120-4459d66",
+      "commit": "4459d66",
+      "commitFull": "4459d66067771a6f528a1b97631d00a85eb84be5",
+      "message": "fix: restore orange pipeline name initials on list avatars",
+      "deployedAt": "2026-06-11T15:50:07.243Z",
+      "deployedAtIst": "11/06/2026, 21:20:07",
+      "committedAtIst": "11/06/2026, 21:19:30",
+      "vercelPreviewUrl": "https://connect-intel-98h4b6264-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 4459d66"
+    },
+    {
+      "logId": "20260611-2111-8b67951",
+      "commit": "8b67951",
+      "commitFull": "8b6795130443c52c5d5a852df60bdc54151f428d",
+      "message": "chore: production log after pipeline color revert deploy",
+      "deployedAt": "2026-06-11T15:41:35.829Z",
+      "deployedAtIst": "11/06/2026, 21:11:35",
+      "committedAtIst": "11/06/2026, 21:10:57",
+      "vercelPreviewUrl": "https://connect-intel-jn9eveyfb-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 8b67951"
+    },
     {
       "logId": "20260611-2110-4add1de",
       "commit": "4add1de",
@@ -15,7 +43,7 @@
       "committedAtIst": "11/06/2026, 21:09:54",
       "vercelPreviewUrl": "https://connect-intel-op6sau9ev-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 4add1de"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 9ae193f"
-    },
-    {
-      "logId": "20260610-1655-1be5e79",
-      "commit": "1be5e79",
-      "commitFull": "1be5e792549f3160e3cd2daeec743b8527caa8ec",
-      "message": "fix: import useEffect in TeamMembersTab to stop runtime crash",
-      "deployedAt": "2026-06-10T11:25:15.831Z",
-      "deployedAtIst": "10/06/2026, 16:55:15",
-      "committedAtIst": "10/06/2026, 16:54:26",
-      "vercelPreviewUrl": "https://connect-intel-cnecxk3z8-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 1be5e79"
-    },
-    {
-      "logId": "20260610-1648-0fad84b",
-      "commit": "0fad84b",
-      "commitFull": "0fad84b35a4843322b1f4fb6835cf0c276f36fa1",
-      "message": "Update production log after team hierarchy fix deploy.",
-      "deployedAt": "2026-06-10T11:18:46.035Z",
-      "deployedAtIst": "10/06/2026, 16:48:46",
-      "committedAtIst": "10/06/2026, 16:48:09",
-      "vercelPreviewUrl": "https://connect-intel-4iz84gtqb-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 0fad84b"
     }
   ]
 }
