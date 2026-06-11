@@ -159,13 +159,28 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   })
   const [exportGuard, setExportGuard] = useState({ open: false, mode: 'instant', preparing: false })
 
-  const canAssign = Boolean(
+  const isOrgAdmin = Boolean(
     (user?.isOrgAdmin || user?.orgRole === 'org_admin') && user?.accountType === 'company'
   )
+  const isTeamManager = Boolean(
+    user?.accountType === 'company' && !isOrgAdmin && user?.pipelineRole === 'manager'
+  )
+  const canAssign = isOrgAdmin
 
   useEffect(() => {
-    if (canAssign) refreshTeam?.()
-  }, [canAssign, refreshTeam])
+    if (isOrgAdmin || isTeamManager) refreshTeam?.()
+  }, [isOrgAdmin, isTeamManager, refreshTeam])
+
+  const managerTeamUserIds = useMemo(() => {
+    if (!isTeamManager || !user?.id) return new Set()
+    const myTeamId = teamMembers.find((m) => String(m.userId) === String(user.id))?.teamId
+    if (!myTeamId) return new Set([String(user.id)])
+    const ids = new Set([String(user.id)])
+    for (const m of teamMembers) {
+      if (m.teamId && String(m.teamId) === String(myTeamId)) ids.add(String(m.userId))
+    }
+    return ids
+  }, [isTeamManager, user?.id, teamMembers])
 
   useEffect(() => {
     if (panelOptions?.userId === undefined) return
@@ -174,10 +189,23 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   }, [panelOptions?.userId, setPipelineAssigneeFilter])
 
   const effectiveAssigneeFilter = useMemo(() => {
-    if (pipelineAssigneeFilter) return pipelineAssigneeFilter
-    if (user?.accountType === 'company' && !canAssign && user?.id) return String(user.id)
+    if (pipelineAssigneeFilter) {
+      if (isTeamManager && !managerTeamUserIds.has(String(pipelineAssigneeFilter))) {
+        return null
+      }
+      return pipelineAssigneeFilter
+    }
+    if (isTeamManager) return null
+    if (user?.accountType === 'company' && !isOrgAdmin && user?.id) return String(user.id)
     return null
-  }, [pipelineAssigneeFilter, user?.accountType, user?.id, canAssign])
+  }, [
+    pipelineAssigneeFilter,
+    user?.accountType,
+    user?.id,
+    isOrgAdmin,
+    isTeamManager,
+    managerTeamUserIds,
+  ])
 
   const freightOrg = isFreightDealOrg(user)
   const isDealsView = freightOrg && panelOptions?.view === 'deals'
