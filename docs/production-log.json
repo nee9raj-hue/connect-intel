@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-11T07:43:52.608Z",
-  "updatedAtIst": "11/06/2026, 13:13:52",
+  "updatedAt": "2026-06-11T15:22:40.721Z",
+  "updatedAtIst": "11/06/2026, 20:52:40",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "4e94f86",
+  "currentProductionCommit": "339ec1e",
   "entries": [
+    {
+      "logId": "20260611-2051-339ec1e",
+      "commit": "339ec1e",
+      "commitFull": "339ec1e70fb546217303ceaf1f76c8889b0ac981",
+      "message": "feat: pipeline list polish with brand tokens and board UX",
+      "deployedAt": "2026-06-11T15:21:48.194Z",
+      "deployedAtIst": "11/06/2026, 20:51:48",
+      "committedAtIst": "11/06/2026, 20:50:53",
+      "vercelPreviewUrl": "https://connect-intel-6lxd7t1x9-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 339ec1e"
+    },
+    {
+      "logId": "20260611-1314-5a8c263",
+      "commit": "5a8c263",
+      "commitFull": "5a8c263e7f760709e7852528ce4ed91c57695458",
+      "message": "chore: production log after marketing pipeline drill-down deploy",
+      "deployedAt": "2026-06-11T07:44:45.798Z",
+      "deployedAtIst": "11/06/2026, 13:14:45",
+      "committedAtIst": "11/06/2026, 13:14:05",
+      "vercelPreviewUrl": "https://connect-intel-ezysxu8ci-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 5a8c263"
+    },
     {
       "logId": "20260611-1313-4e94f86",
       "commit": "4e94f86",
@@ -15,7 +43,7 @@
       "committedAtIst": "11/06/2026, 13:12:18",
       "vercelPreviewUrl": "https://connect-intel-o5w3wsj8v-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 4e94f86"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 38357bc"
-    },
-    {
-      "logId": "20260610-1633-517219f",
-      "commit": "517219f",
-      "commitFull": "517219f9b5724fb7518da4ed7d606f4f4efc4a8b",
-      "message": "Rebuild Team settings as HubSpot-style tabbed admin hub.",
-      "deployedAt": "2026-06-10T11:03:49.428Z",
-      "deployedAtIst": "10/06/2026, 16:33:49",
-      "committedAtIst": "10/06/2026, 16:33:08",
-      "vercelPreviewUrl": "https://connect-intel-d8kf35eny-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 517219f"
-    },
-    {
-      "logId": "20260610-1619-bf41817",
-      "commit": "bf41817",
-      "commitFull": "bf418177d372faed3fa6446e2c4f800d508c34ba",
-      "message": "Update production log after departments nav deploy.",
-      "deployedAt": "2026-06-10T10:49:29.185Z",
-      "deployedAtIst": "10/06/2026, 16:19:29",
-      "committedAtIst": "10/06/2026, 16:18:52",
-      "vercelPreviewUrl": "https://connect-intel-5qualwjb6-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- bf41817"
     }
   ]
 }

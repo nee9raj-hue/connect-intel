@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- b92be6e
+npm run prod:rollback -- 5a8c263
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- b92be6e
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `4e94f86` |
-| Log updated (IST) | 11/06/2026, 13:13:52 |
+| Commit | `339ec1e` |
+| Log updated (IST) | 11/06/2026, 20:52:40 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- b92be6e
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 11/06/2026, 13:13:00 | `4e94f86` | feat: marketing campaign metrics drill down to filtered pipeline | [preview](https://connect-intel-o5w3wsj8v-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4e94f86` | **← LIVE**
+| 11/06/2026, 20:51:48 | `339ec1e` | feat: pipeline list polish with brand tokens and board UX | [preview](https://connect-intel-6lxd7t1x9-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 339ec1e` | **← LIVE**
+| 11/06/2026, 13:14:45 | `5a8c263` | chore: production log after marketing pipeline drill-down deploy | [preview](https://connect-intel-ezysxu8ci-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5a8c263` |
+| 11/06/2026, 13:13:00 | `4e94f86` | feat: marketing campaign metrics drill down to filtered pipeline | [preview](https://connect-intel-o5w3wsj8v-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4e94f86` |
 | 11/06/2026, 12:53:50 | `b92be6e` | chore: production log after dashboard filter drill-down deploy | [preview](https://connect-intel-cvpgxqe4j-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b92be6e` |
 | 11/06/2026, 12:52:51 | `c78111f` | fix: wire dashboard drill-downs to filtered pipeline views and speed up bootstrap | [preview](https://connect-intel-fxbpsqecl-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c78111f` |
 | 11/06/2026, 12:33:29 | `4474efe` | chore: production log after home dashboard rebuild deploy | [preview](https://connect-intel-el5ox16u4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4474efe` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- b92be6e
 | 10/06/2026, 16:48:46 | `0fad84b` | Update production log after team hierarchy fix deploy. | [preview](https://connect-intel-4iz84gtqb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0fad84b` |
 | 10/06/2026, 16:48:00 | `db3b924` | Fix team hierarchy assignment and speed up settings loads. | [preview](https://connect-intel-6th7nwwei-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- db3b924` |
 | 10/06/2026, 16:34:35 | `38357bc` | Update production log after settings hub deploy. | [preview](https://connect-intel-224pgdf4j-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 38357bc` |
-| 10/06/2026, 16:33:49 | `517219f` | Rebuild Team settings as HubSpot-style tabbed admin hub. | [preview](https://connect-intel-d8kf35eny-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 517219f` |
-| 10/06/2026, 16:19:29 | `bf41817` | Update production log after departments nav deploy. | [preview](https://connect-intel-5qualwjb6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- bf41817` |
 
 ---
 
