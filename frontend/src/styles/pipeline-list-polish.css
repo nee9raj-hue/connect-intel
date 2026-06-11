@@ -290,8 +290,26 @@
   color: #ff773d;
 }
 
-.pipeline-hs-tags {
-  margin-top: 2px;
+.pipeline-hs-td--city,
+.pipeline-hs-td--state {
+  max-width: 9rem;
+}
+
+.pipeline-hs-td--tags {
+  min-width: 6rem;
+  max-width: 14rem;
+}
+
+.pipeline-hs-tags-cell {
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+
+.pipeline-hs-tags-cell .ci-lead-tag {
+  flex-shrink: 0;
+  max-width: 5.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .pipeline-hs-name-link:hover {

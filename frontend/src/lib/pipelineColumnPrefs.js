@@ -5,10 +5,12 @@ export const PIPELINE_TABLE_COLUMNS = [
   { id: 'name', label: 'Name', default: true, locked: true },
   { id: 'status', label: 'Status', default: true },
   { id: 'company', label: 'Company', default: true },
+  { id: 'city', label: 'City', default: true },
+  { id: 'state', label: 'State', default: true },
+  { id: 'tags', label: 'Tags', default: true },
   { id: 'phone', label: 'Phone', default: true },
   { id: 'owner', label: 'Lead owner', default: true },
   { id: 'activity', label: 'Last activity', default: true },
-  { id: 'tags', label: 'Tags', default: true },
   { id: 'email', label: 'Email', default: false },
   { id: 'notes', label: 'Notes', default: false },
   { id: 'created', label: 'Create date', default: false },
@@ -42,13 +44,36 @@ export function normalizePipelineColumnOrder(columnIds) {
   return ordered.length > 1 || ordered[0] === 'name' ? ordered : [...DEFAULT_VISIBLE]
 }
 
+function mergeNewDefaultColumns(columnIds) {
+  const cols = normalizePipelineColumnOrder(columnIds)
+  const seen = new Set(cols)
+  const additions = PIPELINE_TABLE_COLUMNS.filter((c) => c.default && !c.locked && !seen.has(c.id))
+  if (!additions.length) return cols
+
+  for (const col of additions) {
+    const anchor = col.id === 'city' || col.id === 'state' || col.id === 'tags' ? 'company' : null
+    const anchorIdx = anchor ? cols.indexOf(anchor) : -1
+    if (anchorIdx >= 0) {
+      let insertAt = anchorIdx + 1
+      while (insertAt < cols.length && ['city', 'state', 'tags'].includes(cols[insertAt])) {
+        insertAt += 1
+      }
+      cols.splice(insertAt, 0, col.id)
+    } else {
+      cols.push(col.id)
+    }
+    seen.add(col.id)
+  }
+  return normalizePipelineColumnOrder(cols)
+}
+
 export function loadPipelineColumnPrefs() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return [...DEFAULT_VISIBLE]
     const parsed = JSON.parse(raw)
     if (!Array.isArray(parsed) || !parsed.length) return [...DEFAULT_VISIBLE]
-    return normalizePipelineColumnOrder(parsed)
+    return mergeNewDefaultColumns(parsed)
   } catch {
     return [...DEFAULT_VISIBLE]
   }

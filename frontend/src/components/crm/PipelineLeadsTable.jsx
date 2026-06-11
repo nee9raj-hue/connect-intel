@@ -5,7 +5,6 @@ import { getLeadCity, getLeadState } from '../../lib/pipelineFilters'
 import { hasActiveTextSelection } from '../../lib/keyboardShortcuts'
 import { getLeadEmail, leadHasSendableEmail } from '../../lib/emailUtils'
 import LeadPhoneCall from './LeadPhoneCall'
-import LeadTagDots from './LeadTagDots'
 import LeadTag from '../ui/LeadTag'
 import { leadHasCallablePhone } from '../../lib/phoneUtils'
 import { normalizePipelineColumnOrder } from '../../lib/pipelineColumnPrefs'
@@ -159,6 +158,18 @@ function renderPipelineHeader(colId, { sortKey, sortDir, onSort }) {
           className="pipeline-hs-th pipeline-hs-th--company"
         />
       )
+    case 'city':
+      return (
+        <th key={colId} scope="col" className="pipeline-hs-th pipeline-hs-th--city">
+          City
+        </th>
+      )
+    case 'state':
+      return (
+        <th key={colId} scope="col" className="pipeline-hs-th pipeline-hs-th--state">
+          State
+        </th>
+      )
     case 'phone':
       return (
         <th key={colId} scope="col" className="pipeline-hs-th pipeline-hs-th--phone">
@@ -222,7 +233,8 @@ function renderPipelineCell(colId, lead, ctx) {
   const {
     meta,
     email,
-    loc,
+    city,
+    state,
     ownerName,
     activityAt,
     activityType,
@@ -240,7 +252,6 @@ function renderPipelineCell(colId, lead, ctx) {
     onOwnerFilter,
     canFilterByOwner,
     statusOptions,
-    tagById,
     canAssign,
     onDeleteLead,
     onChangeOwner,
@@ -256,20 +267,16 @@ function renderPipelineCell(colId, lead, ctx) {
               {(lead.firstName?.[0] || lead.company?.[0] || '?').toUpperCase()}
             </span>
             <div className="pipeline-hs-name-stack">
-              <div className="pipeline-hs-name-row">
-                <button
-                  type="button"
-                  className="pipeline-hs-name-link pipeline-hs-primary-text ci-selectable-text"
-                  onClick={() => {
-                    if (hasActiveTextSelection()) return
-                    onSelect(lead.id)
-                  }}
-                >
-                  {nameStr}
-                </button>
-              </div>
-              {loc ? <span className="pipeline-hs-sub">{loc}</span> : null}
-              <LeadTagDots lead={lead} tagById={tagById} className="pipeline-hs-tags" max={4} />
+              <button
+                type="button"
+                className="pipeline-hs-name-link pipeline-hs-primary-text ci-selectable-text"
+                onClick={() => {
+                  if (hasActiveTextSelection()) return
+                  onSelect(lead.id)
+                }}
+              >
+                {nameStr}
+              </button>
             </div>
             {showHoverActions ? (
               <span className="pipeline-row-hover-actions" aria-label="Quick actions">
@@ -353,6 +360,30 @@ function renderPipelineCell(colId, lead, ctx) {
           )}
         </td>
       )
+    case 'city':
+      return (
+        <td key={colId} className="pipeline-hs-td pipeline-hs-td--city">
+          {city ? (
+            <span className="pipeline-hs-cell-text" title={city}>
+              {city}
+            </span>
+          ) : (
+            <span className="pipeline-hs-muted">—</span>
+          )}
+        </td>
+      )
+    case 'state':
+      return (
+        <td key={colId} className="pipeline-hs-td pipeline-hs-td--state">
+          {state ? (
+            <span className="pipeline-hs-cell-text" title={state}>
+              {state}
+            </span>
+          ) : (
+            <span className="pipeline-hs-muted">—</span>
+          )}
+        </td>
+      )
     case 'phone':
       return (
         <td key={colId} className="pipeline-hs-td pipeline-hs-td--phone">
@@ -416,18 +447,18 @@ function renderPipelineCell(colId, lead, ctx) {
       )
     case 'tags':
       return (
-        <td key={colId} className="pipeline-hs-td">
+        <td key={colId} className="pipeline-hs-td pipeline-hs-td--tags">
           {tags.length ? (
-            <>
-              {tags.slice(0, 3).map((t) => (
+            <div className="ci-lead-tags pipeline-hs-tags-cell">
+              {tags.slice(0, 4).map((t) => (
                 <LeadTag key={t.id} name={t.name} title={t.name} />
               ))}
-              {tags.length > 3 ? (
-                <span className="pipeline-tag-overflow" title={tags.map((t) => t.name).join(', ')}>
-                  +{tags.length - 3}
+              {tags.length > 4 ? (
+                <span className="ci-lead-tags-more" title={tags.map((t) => t.name).join(', ')}>
+                  +{tags.length - 4}
                 </span>
               ) : null}
-            </>
+            </div>
           ) : (
             <span className="pipeline-hs-muted">—</span>
           )}
@@ -522,7 +553,7 @@ export default function PipelineLeadsTable({
   onSelect,
   onToggleSelect,
   onSelectAllVisible,
-  visibleColumns = ['name', 'status', 'company', 'phone', 'owner', 'activity', 'tags'],
+  visibleColumns = ['name', 'status', 'company', 'city', 'state', 'tags', 'phone', 'owner', 'activity'],
   statusOptions = [],
   tagById,
   teamMembers = [],
@@ -590,7 +621,8 @@ export default function PipelineLeadsTable({
             const isActive = selectedId === lead.id
             const isChecked = selectedIds.has(lead.id)
             const email = getLeadEmail(lead)
-            const loc = [getLeadCity(lead), getLeadState(lead)].filter(Boolean).join(', ')
+            const city = getLeadCity(lead)
+            const state = getLeadState(lead)
             const ownerName = resolveOwnerName(lead, teamMembers)
             const { at: activityAt, type: activityType } = lastActivityMeta(lead)
             const rel = relativeLabel(activityAt)
@@ -620,7 +652,8 @@ export default function PipelineLeadsTable({
                   renderPipelineCell(colId, lead, {
                     meta,
                     email,
-                    loc,
+                    city,
+                    state,
                     ownerName,
                     activityAt,
                     activityType,
@@ -638,7 +671,6 @@ export default function PipelineLeadsTable({
                     onOwnerFilter,
                     canFilterByOwner,
                     statusOptions,
-                    tagById,
                     canAssign,
                     onDeleteLead,
                     onChangeOwner,
