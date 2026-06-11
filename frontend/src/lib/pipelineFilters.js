@@ -84,15 +84,12 @@ export function getFilterStates(filters) {
 }
 
 /**
- * Match a lead to a team member for assignee-scoped views (Team Intelligence drill-down, etc.).
- * Uses assigned owner when set; unassigned rows fall back to who saved the lead.
+ * Match a lead to the pipeline Owner filter (assigned rep shown in the table).
  */
 export function leadMatchesAssignee(lead, assigneeUserId) {
   if (!assigneeUserId) return true
   if (assigneeUserId === '__unassigned__') return !lead?.assignedToUserId
-  const id = String(assigneeUserId)
-  const owners = [lead?.assignedToUserId, lead?.savedByUserId, lead?.userId].filter(Boolean)
-  return owners.some((v) => String(v) === id)
+  return String(lead?.assignedToUserId || '') === String(assigneeUserId)
 }
 
 function matchesAnyLocationField(value, filterList) {

@@ -191,11 +191,15 @@ export function AppProvider({ children }) {
   const loadedCountRef = useRef(0)
   const pipelineCursorRef = useRef(null)
   const pipelineLoadRef = useRef(pipelineLoad)
+  const pipelineListFetchGenRef = useRef(0)
   useEffect(() => {
     pipelineLoadRef.current = pipelineLoad
   }, [pipelineLoad])
 
   const loadPipelineList = useCallback(async (filters = {}, { append = false, silent = false } = {}) => {
+    let fetchGen = pipelineListFetchGenRef.current
+    if (!append) fetchGen = ++pipelineListFetchGenRef.current
+
     const offset = append ? loadedCountRef.current : 0
     const cursor = append ? pipelineCursorRef.current : null
     const data = await api.fetchPipelineLeads({
@@ -206,6 +210,8 @@ export function AppProvider({ children }) {
       ...filters,
     })
     const leads = data.leads || []
+    if (!append && fetchGen !== pipelineListFetchGenRef.current) return leads
+
     const newLoaded = append ? loadedCountRef.current + leads.length : leads.length
     loadedCountRef.current = newLoaded
     pipelineCursorRef.current = data.nextCursor || null
@@ -445,8 +451,10 @@ export function AppProvider({ children }) {
 
       const run = (async () => {
         try {
+          const bootstrapGen = pipelineListFetchGenRef.current
+          const assigneeUserId = loadPipelineAssigneeFilter() || undefined
           const [bootstrap, historyResult] = await Promise.all([
-            api.getPipelineBootstrap({ offset: 0, limit: 100, silent: true }),
+            api.getPipelineBootstrap({ offset: 0, limit: 100, silent: true, assigneeUserId }),
             api.getSearchHistory({ silent: true }),
           ])
 
@@ -455,17 +463,21 @@ export function AppProvider({ children }) {
           const leads = bootstrap.leads || []
           const summary = bootstrap.summary || {}
           setPipelineSummary(normalizePipelineSummary(summary))
-          setSavedLeads(leads)
           setSearchHistory(historyResult.history || [])
-          setPipelineLoad({
-            total: summary.total ?? bootstrap.pipelineTotal ?? leads.length,
-            loaded: leads.length,
-            hasMore: Boolean(bootstrap.hasMore),
-            loadingMore: false,
-          })
-          loadedCountRef.current = leads.length
-          pipelineCursorRef.current = bootstrap.nextCursor || null
-          workspaceLoadedAtRef.current = Date.now()
+
+          const listSuperseded = bootstrapGen !== pipelineListFetchGenRef.current
+          if (!listSuperseded) {
+            setSavedLeads(leads)
+            setPipelineLoad({
+              total: bootstrap.total ?? summary.total ?? bootstrap.pipelineTotal ?? leads.length,
+              loaded: leads.length,
+              hasMore: Boolean(bootstrap.hasMore),
+              loadingMore: false,
+            })
+            loadedCountRef.current = leads.length
+            pipelineCursorRef.current = bootstrap.nextCursor || null
+            workspaceLoadedAtRef.current = Date.now()
+          }
           setSessionError(null)
 
           void api.getCrmNotifications(undefined, { silent: true }).catch(() => {})
