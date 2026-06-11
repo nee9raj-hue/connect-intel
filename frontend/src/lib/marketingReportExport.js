@@ -2,15 +2,19 @@ import * as XLSX from 'xlsx'
 
 function recipientExportRow(r) {
   return {
-    Name: r.name,
-    Email: r.email,
-    Phone: r.phone || '',
-    Company: r.company,
-    Status: r.deliveryStatus,
-    Opens: r.opens,
-    Clicks: r.clicks,
-    Sent: r.sentCount,
+    Name: r.name || '',
+    Email: r.email || '',
+    Mobile: r.phone || r.mobile || '',
+    Phone: r.phone || r.mobile || '',
+    Title: r.title || '',
+    Company: r.company || '',
+    Status: r.deliveryStatus || '',
+    Engagement: r.opens > 0 ? (r.clicks > 0 ? 'Clicked' : 'Opened') : r.sentCount > 0 ? 'Sent' : 'Pending',
+    Opens: r.opens ?? 0,
+    Clicks: r.clicks ?? 0,
+    Sent: r.sentCount ?? 0,
     Error: r.lastError || '',
+    LastSent: r.lastSentAt || '',
     LastOpen: r.lastOpenAt || '',
     LastClick: r.lastClickAt || '',
   }
@@ -18,7 +22,8 @@ function recipientExportRow(r) {
 
 export function exportCampaignReportCsv(report, filename = 'campaign-report.csv') {
   const rows = report?.recipients || []
-  const headers = 'name,email,phone,company,delivery,opens,clicks,sent_count,last_error,last_open,last_click'
+  const headers =
+    'name,email,mobile,phone,title,company,delivery,opens,clicks,sent_count,last_error,last_sent,last_open,last_click'
   const lines = [
     headers,
     ...rows.map((r) =>
@@ -26,12 +31,15 @@ export function exportCampaignReportCsv(report, filename = 'campaign-report.csv'
         r.name,
         r.email,
         r.phone,
+        r.phone,
+        r.title,
         r.company,
         r.deliveryStatus,
         r.opens,
         r.clicks,
         r.sentCount,
         r.lastError,
+        r.lastSentAt,
         r.lastOpenAt,
         r.lastClickAt,
       ]
@@ -72,12 +80,11 @@ export function exportCampaignReportPdf(report) {
     <h1>${report?.campaign?.name || 'Campaign report'}</h1>
     <p>Sent: ${stats.sent || 0} · Opens: ${stats.uniqueOpens || 0} (${stats.openRate || 0}%) · Clicks: ${stats.uniqueClicks || 0}</p>
     <p>Attributed revenue: ${rev.attributedRevenue || 0} ${rev.currency || ''} (${rev.attributedDeals || 0} deals)</p>
-    <table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Company</th><th>Status</th><th>Opens</th><th>Clicks</th></tr></thead><tbody>
+    <table><thead><tr><th>Name</th><th>Email</th><th>Mobile</th><th>Title</th><th>Company</th><th>Status</th><th>Opens</th><th>Clicks</th></tr></thead><tbody>
     ${rows
-      .slice(0, 200)
       .map(
         (r) =>
-          `<tr><td>${r.name || ''}</td><td>${r.email || ''}</td><td>${r.phone || ''}</td><td>${r.company || ''}</td><td>${r.deliveryStatus}</td><td>${r.opens}</td><td>${r.clicks}</td></tr>`
+          `<tr><td>${r.name || ''}</td><td>${r.email || ''}</td><td>${r.phone || ''}</td><td>${r.title || ''}</td><td>${r.company || ''}</td><td>${r.deliveryStatus}</td><td>${r.opens}</td><td>${r.clicks}</td></tr>`
       )
       .join('')}
     </tbody></table></body></html>`)

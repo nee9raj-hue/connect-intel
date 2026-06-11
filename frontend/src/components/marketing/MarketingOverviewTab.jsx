@@ -7,7 +7,7 @@ import {
   campaignInitials,
   formatPct,
 } from './marketingTheme'
-import { marketingPipelineOptions } from '../../lib/marketingNavigation'
+import { navigateToMarketingPipeline } from '../../lib/marketingNavigation'
 
 function StatusBadge({ status }) {
   const key = String(status || 'draft').toLowerCase()
@@ -100,15 +100,12 @@ export default function MarketingOverviewTab({
 
   const goToCampaignPipeline = (campaign, filter) => {
     if (!campaign?.id) return
-    onNavigate?.(
-      'pipeline',
-      marketingPipelineOptions({
-        campaignId: campaign.id,
-        filter,
-        campaignName: campaign.name,
-        returnTo: 'marketing',
-      })
-    )
+    void navigateToMarketingPipeline(onNavigate, {
+      campaignId: campaign.id,
+      filter,
+      campaignName: campaign.name,
+      returnTo: 'marketing',
+    })
   }
 
   if (dataLoading && !reportCampaigns.length && !summary) {

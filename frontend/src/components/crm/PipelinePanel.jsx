@@ -273,9 +273,6 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     const filter =
       po.campaignRecipientFilter ||
       (po.openedCampaignId ? 'opened' : po.clickedCampaignId ? 'clicked' : 'all')
-    if (filter === 'all' && !po.campaignRecipientFilter && !po.openedCampaignId && !po.clickedCampaignId) {
-      return null
-    }
     return { campaignId, filter }
   }, [panelOptions])
 

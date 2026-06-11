@@ -5,7 +5,7 @@ import { formatDateTime } from '../../lib/crmUiConstants'
 import { HubSkeleton } from './MarketingHubCharts'
 import { BarChart, LineChart, ReputationBar } from './MarketingSimpleCharts'
 import CampaignReportsView from './CampaignReportsView'
-import { marketingPipelineOptions } from '../../lib/marketingNavigation'
+import { navigateToMarketingPipeline } from '../../lib/marketingNavigation'
 
 const PERIODS = [
   { id: '7d', label: '7d' },
@@ -87,15 +87,12 @@ export default function MarketingAnalyticsHub({
 
   const goToCampaignPipeline = (campaign, filter) => {
     if (!campaign?.id) return
-    onNavigate?.(
-      'pipeline',
-      marketingPipelineOptions({
-        campaignId: campaign.id,
-        filter,
-        campaignName: campaign.name,
-        returnTo: 'marketing',
-      })
-    )
+    void navigateToMarketingPipeline(onNavigate, {
+      campaignId: campaign.id,
+      filter,
+      campaignName: campaign.name,
+      returnTo: 'marketing',
+    })
   }
 
   if (campaignId) {

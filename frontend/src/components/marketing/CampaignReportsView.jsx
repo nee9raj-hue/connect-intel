@@ -15,7 +15,10 @@ import {
   filterCampaignRecipients,
   campaignRecipientFilterLabel,
 } from '../../../../lib/marketingCampaignRecipientFilter.js'
-import { marketingPipelineOptions } from '../../lib/marketingNavigation'
+import {
+  marketingPipelineOptions,
+  navigateToMarketingPipeline,
+} from '../../lib/marketingNavigation'
 
 const PAGE_SIZE = 100
 
@@ -282,6 +285,7 @@ function RecipientRow({ row, expanded, onToggle, onOpenLead }) {
         </td>
         <td className="px-4 py-3 text-gray-600">{row.company || '—'}</td>
         <td className="px-4 py-3 text-gray-600 text-xs">{row.email}</td>
+        <td className="px-4 py-3 text-gray-600 text-xs whitespace-nowrap">{row.phone || '—'}</td>
         <td className="px-4 py-3">
           <span className={`text-xs font-semibold uppercase px-2 py-0.5 rounded border ${statusClass}`}>
             {recipientEngagementLabel(row)}
@@ -331,7 +335,7 @@ function RecipientRow({ row, expanded, onToggle, onOpenLead }) {
       </tr>
       {expanded && (row.clickUrls?.length > 0 || row.lastError) && (
         <tr className="bg-gray-50/80 border-b border-gray-100">
-          <td colSpan={7} className="px-4 py-3 text-xs text-gray-600 space-y-1">
+          <td colSpan={8} className="px-4 py-3 text-xs text-gray-600 space-y-1">
             {row.lastError && row.deliveryStatus !== 'delivered' && (
               <p>
                 <span className="font-semibold text-gray-700">Error: </span>
@@ -348,81 +352,6 @@ function RecipientRow({ row, expanded, onToggle, onOpenLead }) {
         </tr>
       )}
     </>
-  )
-}
-
-function KpiRecipientsPopup({
-  title,
-  filter,
-  recipients,
-  isWhatsApp,
-  onClose,
-  onShowInTable,
-  onViewInPipeline,
-  onOpenLead,
-}) {
-  const [visible, setVisible] = useState(PAGE_SIZE)
-  const filtered = useMemo(() => filterCampaignRecipients(recipients, filter), [recipients, filter])
-  const shown = filtered.slice(0, visible)
-  const hasMore = visible < filtered.length
-
-  return (
-    <ReportOverlay title={title} onClose={onClose}>
-      <p className="text-xs text-gray-500 mb-3">
-        {filtered.length} contact{filtered.length === 1 ? '' : 's'}
-      </p>
-      <ul className="divide-y divide-gray-100 border border-gray-200 rounded-lg overflow-hidden max-h-[min(420px,50vh)] overflow-y-auto">
-        {!shown.length ? (
-          <li className="px-4 py-8 text-center text-sm text-gray-500">No contacts in this group.</li>
-        ) : (
-          shown.map((row) => (
-            <li key={row.enrollmentId} className="px-3 py-2.5 flex items-start justify-between gap-2">
-              <button
-                type="button"
-                onClick={() => onOpenLead(row.leadId)}
-                className="text-left min-w-0 flex-1"
-              >
-                <span className="text-sm font-medium text-gray-900 hover:underline">
-                  {row.name || '—'}
-                </span>
-                <span className="block text-xs text-gray-500 truncate">
-                  {isWhatsApp ? row.phone : row.email}
-                  {row.company ? ` · ${row.company}` : ''}
-                </span>
-              </button>
-              <span className="text-xs font-semibold uppercase text-gray-500 shrink-0">
-                {row.deliveryStatus}
-              </span>
-            </li>
-          ))
-        )}
-      </ul>
-      {hasMore && (
-        <button
-          type="button"
-          onClick={() => setVisible((n) => n + PAGE_SIZE)}
-          className="mt-3 w-full text-xs font-semibold py-2 border border-gray-200 rounded-lg hover:bg-gray-50"
-        >
-          Load more ({filtered.length - visible} remaining)
-        </button>
-      )}
-      <div className="mt-3 flex flex-col gap-2">
-        <button
-          type="button"
-          onClick={() => onViewInPipeline(filter, filtered.map((r) => r.leadId).filter(Boolean))}
-          className="w-full text-xs font-semibold py-2 bg-[#FF773D] text-white rounded-lg hover:bg-[#e5652f]"
-        >
-          View in pipeline ({filtered.length})
-        </button>
-        <button
-          type="button"
-          onClick={() => onShowInTable(filter)}
-          className="w-full text-xs font-semibold py-2 border border-gray-200 rounded-lg hover:bg-gray-50"
-        >
-          Show in recipient table
-        </button>
-      </div>
-    </ReportOverlay>
   )
 }
 
@@ -443,7 +372,6 @@ function CampaignDetailReport({
   const [search, setSearch] = useState('')
   const [waBusy, setWaBusy] = useState(false)
   const [listVisible, setListVisible] = useState(PAGE_SIZE)
-  const [kpiPopup, setKpiPopup] = useState(null)
   const recipientsRef = useRef(null)
   const isWhatsApp = report?.campaign?.channel === 'whatsapp'
 
@@ -481,7 +409,6 @@ function CampaignDetailReport({
       : filterCampaignRecipients(report?.recipients || [], recipientFilter)
           .map((r) => r.leadId)
           .filter(Boolean)
-    if (!rows.length && recipientFilter !== 'all') return
     onClose?.()
     onNavigate?.(
       'pipeline',
@@ -536,31 +463,13 @@ function CampaignDetailReport({
 
   const showInTable = (nextFilter) => {
     setFilter(nextFilter)
-    setKpiPopup(null)
     requestAnimationFrame(() => {
       recipientsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     })
   }
 
-  const kpiCountForFilter = (nextFilter) => {
-    if (nextFilter === 'all') return stats.enrolled ?? allRecipients.length
-    if (nextFilter === 'sent') return sentKpi
-    if (nextFilter === 'opened') return stats.uniqueOpens ?? 0
-    if (nextFilter === 'clicked') return stats.uniqueClicks ?? 0
-    if (nextFilter === 'bounced') return stats.bounced ?? 0
-    if (nextFilter === 'failed') return stats.failed ?? 0
-    if (nextFilter === 'unsubscribed') return stats.unsubscribed ?? 0
-    if (nextFilter === 'pending') return stats.pending ?? 0
-    return filterCampaignRecipients(allRecipients, nextFilter).length
-  }
-
-  const openKpi = (nextFilter, label) => {
-    const count = kpiCountForFilter(nextFilter)
-    if (count > 0 && nextFilter !== 'all') {
-      goToPipeline(nextFilter)
-      return
-    }
-    setKpiPopup({ filter: nextFilter, label })
+  const openKpi = (nextFilter) => {
+    goToPipeline(nextFilter)
   }
 
   if (loading) {
@@ -585,19 +494,6 @@ function CampaignDetailReport({
 
   return (
     <div className="space-y-4">
-      {kpiPopup && (
-        <KpiRecipientsPopup
-          title={kpiPopup.label}
-          filter={kpiPopup.filter}
-          recipients={allRecipients}
-          isWhatsApp={isWhatsApp}
-          onClose={() => setKpiPopup(null)}
-          onShowInTable={showInTable}
-          onViewInPipeline={goToPipeline}
-          onOpenLead={goToLead}
-        />
-      )}
-
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
@@ -714,15 +610,15 @@ function CampaignDetailReport({
         <KpiTile
           label="Enrolled"
           value={stats.enrolled ?? 0}
-          active={filter === 'all' && !kpiPopup}
-          onClick={() => openKpi('all', 'Enrolled')}
+          active={filter === 'all'}
+          onClick={() => openKpi('all')}
         />
         <KpiTile
           label="Sent"
           value={sentKpi}
           accent="text-[#FF773D]"
           active={filter === 'sent'}
-          onClick={() => openKpi('sent', 'Sent')}
+          onClick={() => openKpi('sent')}
         />
         {!isWhatsApp && (
           <>
@@ -731,35 +627,35 @@ function CampaignDetailReport({
               value={stats.bounced ?? 0}
               accent="text-red-700"
               active={filter === 'bounced'}
-              onClick={() => openKpi('bounced', 'Bounced')}
+              onClick={() => openKpi('bounced')}
             />
             <KpiTile
               label={`Opened${stats.openRate ? ` (${stats.openRate}%)` : ''}`}
               value={stats.uniqueOpens ?? 0}
               accent="text-[#FF773D]"
               active={filter === 'opened'}
-              onClick={() => openKpi('opened', 'Opened')}
+              onClick={() => openKpi('opened')}
             />
             <KpiTile
               label={`Clicked${stats.clickRate ? ` (${stats.clickRate}%)` : ''}`}
               value={stats.uniqueClicks ?? 0}
               accent="text-[#FF773D]"
               active={filter === 'clicked'}
-              onClick={() => openKpi('clicked', 'Clicked')}
+              onClick={() => openKpi('clicked')}
             />
             <KpiTile
               label="Unsubscribed"
               value={stats.unsubscribed ?? 0}
               accent="text-amber-800"
               active={filter === 'unsubscribed'}
-              onClick={() => openKpi('unsubscribed', 'Unsubscribed')}
+              onClick={() => openKpi('unsubscribed')}
             />
             <KpiTile
               label="Failed"
               value={stats.failed ?? 0}
               accent="text-orange-700"
               active={filter === 'failed'}
-              onClick={() => openKpi('failed', 'Failed')}
+              onClick={() => openKpi('failed')}
             />
           </>
         )}
@@ -769,17 +665,42 @@ function CampaignDetailReport({
               label="Pending"
               value={stats.pending ?? 0}
               active={filter === 'pending'}
-              onClick={() => openKpi('pending', 'Pending')}
+              onClick={() => openKpi('pending')}
             />
             <KpiTile
               label="Failed"
               value={stats.failed ?? 0}
               accent="text-orange-700"
               active={filter === 'failed'}
-              onClick={() => openKpi('failed', 'Failed')}
+              onClick={() => openKpi('failed')}
             />
           </>
         )}
+      </div>
+
+      <div className="flex flex-wrap gap-1.5">
+        {FILTERS.map((f) => (
+          <button
+            key={f.id}
+            type="button"
+            onClick={() => openKpi(f.id)}
+            className={`text-xs font-semibold px-2.5 py-1 rounded-full border transition-colors ${
+              filter === f.id
+                ? 'bg-[#FF773D] text-white border-[#FF773D]'
+                : 'bg-white text-gray-700 border-gray-200 hover:border-[#FF773D] hover:text-[#FF773D]'
+            }`}
+            title="Open filtered leads in pipeline"
+          >
+            {f.label}
+          </button>
+        ))}
+        <button
+          type="button"
+          onClick={() => showInTable(filter)}
+          className="text-xs font-semibold px-2.5 py-1 rounded-full border border-gray-200 text-gray-600 hover:bg-gray-50"
+        >
+          Show in table
+        </button>
       </div>
 
       <div
@@ -812,6 +733,7 @@ function CampaignDetailReport({
                   <th className="px-4 py-2 font-semibold">Contact</th>
                   <th className="px-4 py-2 font-semibold">Company</th>
                   <th className="px-4 py-2 font-semibold">Email</th>
+                  <th className="px-4 py-2 font-semibold">Mobile</th>
                   <th className="px-4 py-2 font-semibold">Status</th>
                   <th className="px-4 py-2 font-semibold text-center">Opens</th>
                   <th className="px-4 py-2 font-semibold text-center">Clicks</th>
@@ -822,7 +744,7 @@ function CampaignDetailReport({
             <tbody>
               {!shownRecipients.length ? (
                 <tr>
-                  <td colSpan={isWhatsApp ? 5 : 7} className="px-4 py-10 text-center text-gray-500 text-sm">
+                  <td colSpan={isWhatsApp ? 5 : 8} className="px-4 py-10 text-center text-gray-500 text-sm">
                     No recipients match.
                   </td>
                 </tr>
@@ -1040,17 +962,15 @@ export default function CampaignReportsView({
   const controlBusy = busy || actionBusy
 
   const goToCampaignPipeline = useCallback(
-    (campaign, filter) => {
+    (campaign, filter, e) => {
+      e?.stopPropagation?.()
       if (!campaign?.id || !onNavigate) return
-      onNavigate(
-        'pipeline',
-        marketingPipelineOptions({
-          campaignId: campaign.id,
-          filter,
-          campaignName: campaign.name,
-          returnTo: 'marketing',
-        })
-      )
+      void navigateToMarketingPipeline(onNavigate, {
+        campaignId: campaign.id,
+        filter,
+        campaignName: campaign.name,
+        returnTo: 'marketing',
+      })
     },
     [onNavigate]
   )
@@ -1437,10 +1357,7 @@ export default function CampaignReportsView({
                           value={enrolled || sentCount}
                           onClick={
                             sentCount > 0 || enrolled > 0
-                              ? (e) => {
-                                  e.stopPropagation()
-                                  goToCampaignPipeline(c, 'sent')
-                                }
+                              ? (e) => goToCampaignPipeline(c, 'sent', e)
                               : null
                           }
                         />
@@ -1448,27 +1365,13 @@ export default function CampaignReportsView({
                           className="text-gray-900"
                           value={<span className="font-medium">{stats.openRate || 0}%</span>}
                           sub={opens > 0 ? `${opens} opened` : null}
-                          onClick={
-                            opens > 0
-                              ? (e) => {
-                                  e.stopPropagation()
-                                  goToCampaignPipeline(c, 'opened')
-                                }
-                              : null
-                          }
+                          onClick={opens > 0 ? (e) => goToCampaignPipeline(c, 'opened', e) : null}
                         />
                         <CampaignMetricButton
                           className="text-gray-900"
                           value={<span className="font-medium">{stats.clickRate || 0}%</span>}
                           sub={clicks > 0 ? `${clicks} clicked` : null}
-                          onClick={
-                            clicks > 0
-                              ? (e) => {
-                                  e.stopPropagation()
-                                  goToCampaignPipeline(c, 'clicked')
-                                }
-                              : null
-                          }
+                          onClick={clicks > 0 ? (e) => goToCampaignPipeline(c, 'clicked', e) : null}
                         />
                         <CampaignMetricButton
                           className="text-amber-900"
@@ -1478,25 +1381,13 @@ export default function CampaignReportsView({
                               ? `${stats.unsubscribeRate}%`
                               : null
                           }
-                          onClick={
-                            unsubs > 0
-                              ? (e) => {
-                                  e.stopPropagation()
-                                  goToCampaignPipeline(c, 'unsubscribed')
-                                }
-                              : null
-                          }
+                          onClick={unsubs > 0 ? (e) => goToCampaignPipeline(c, 'unsubscribed', e) : null}
                         />
                         <CampaignMetricButton
                           className="text-red-700"
                           value={stats.bounced || 0}
                           onClick={
-                            (stats.bounced || 0) > 0
-                              ? (e) => {
-                                  e.stopPropagation()
-                                  goToCampaignPipeline(c, 'bounced')
-                                }
-                              : null
+                            (stats.bounced || 0) > 0 ? (e) => goToCampaignPipeline(c, 'bounced', e) : null
                           }
                         />
                         <td className="px-4 py-3 text-right">
