@@ -13,13 +13,13 @@ export const C = {
 }
 
 export const ROLE_BADGE = {
-  admin: { bg: '#eeedfe', color: '#3c3489', label: 'Admin' },
-  org_admin: { bg: '#eeedfe', color: '#3c3489', label: 'Admin' },
-  manager: { bg: '#e6f1fb', color: '#0c447c', label: 'Manager' },
-  marketing_manager: { bg: '#e6f1fb', color: '#0c447c', label: 'Marketing manager' },
-  rep: { bg: '#e1f5ee', color: '#085041', label: 'Rep' },
-  member: { bg: '#e1f5ee', color: '#085041', label: 'Rep' },
-  marketing_executive: { bg: '#e1f5ee', color: '#085041', label: 'Marketing executive' },
+  admin: { bg: '#fff4ee', color: '#FF773D', label: 'Admin' },
+  org_admin: { bg: '#fff4ee', color: '#FF773D', label: 'Admin' },
+  manager: { bg: '#f1f5f9', color: '#64748B', label: 'Manager' },
+  marketing_manager: { bg: '#f1f5f9', color: '#64748B', label: 'Marketing manager' },
+  rep: { bg: '#f1f5f9', color: '#64748B', label: 'Rep' },
+  member: { bg: '#f1f5f9', color: '#64748B', label: 'Rep' },
+  marketing_executive: { bg: '#f1f5f9', color: '#64748B', label: 'Marketing executive' },
 }
 
 export const STATUS_BADGE = {

@@ -31,14 +31,8 @@ export default function PipelineInfiniteSentinel({
 
   return (
     <div ref={ref} className="pipeline-infinite-sentinel" aria-hidden>
-      {loading ? (
-        <div className="pipeline-skeleton-rows">
-          {[0, 1, 2].map((i) => (
-            <div key={i} className="pipeline-skeleton-row" />
-          ))}
-        </div>
-      ) : hasMore ? (
-        <p className="pipeline-infinite-hint">Loading more leads…</p>
+      {loading || hasMore ? (
+        <p className="pipeline-infinite-hint">{loading ? 'Loading more leads…' : 'Scroll for more leads…'}</p>
       ) : (
         <p className="pipeline-infinite-done">
           {total != null ? `All ${total.toLocaleString()} leads loaded` : 'All leads loaded'}

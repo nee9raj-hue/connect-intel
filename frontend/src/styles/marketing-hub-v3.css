@@ -4,8 +4,8 @@
  */
 
 .mhub-v3 {
-  --mh-accent: #3730a3;
-  --mh-accent-tint: #eeedfe;
+  --mh-accent: #ff773d;
+  --mh-accent-tint: #fff4ee;
   --mh-page-bg: #f5f5f3;
   --mh-card-bg: #ffffff;
   --mh-border: rgba(0, 0, 0, 0.09);
@@ -121,8 +121,8 @@
 }
 
 .mhub-v3 .mhub-v3-btn--primary:hover {
-  background: #312e81;
-  border-color: #312e81;
+  background: #e5652f;
+  border-color: #e5652f;
 }
 
 /* —— Tab bar —— */

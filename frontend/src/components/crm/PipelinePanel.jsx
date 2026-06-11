@@ -1326,7 +1326,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                   onClick={() => setActivePipelineId(pipe.id)}
                   className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${
                     activePipelineId === pipe.id
-                      ? 'bg-[#fff7ed] border-[#fed7aa] text-[var(--brand-primary,#f97316)]'
+                      ? 'bg-[#fff4ee] border-[#ffd4b8] text-[#FF773D]'
                       : 'border-gray-200 text-gray-600'
                   }`}
                 >
@@ -1873,7 +1873,7 @@ function KanbanColumn({
           />
           <span
             className="text-xs font-medium tabular-nums px-2 py-0.5 rounded-full"
-            style={{ background: 'var(--brand-accent, #3730a3)', color: '#fff' }}
+            style={{ background: '#64748B', color: '#fff' }}
           >
             {totalInColumn > leads.length ? totalInColumn : leads.length}
           </span>

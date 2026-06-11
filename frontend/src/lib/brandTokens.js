@@ -1,28 +1,28 @@
-// Connect Intel — single source of truth for brand colors (June 2026)
+// Connect Intel — brand colors (#FF773D orange, #64748B slate)
 
 export const brand = {
-  primary: '#f97316',
-  primaryHover: '#ea6c0a',
-  primaryText: '#ffffff',
+  primary: '#FF773D',
+  primaryHover: '#e5652f',
+  primaryText: '#242424',
 
-  navBg: '#1a1a2e',
-  navText: '#e8e8f0',
-  navTextMuted: '#9999bb',
+  navBg: '#64748B',
+  navText: '#f8fafc',
+  navTextMuted: '#cbd5e1',
   navActive: '#ffffff',
-  navActiveBg: 'rgba(255,255,255,0.12)',
+  navActiveBg: 'rgba(255,255,255,0.14)',
 
-  accent: '#3730a3',
-  accentLight: '#eeedfe',
-  accentText: '#3c3489',
+  accent: '#64748B',
+  accentLight: '#f1f5f9',
+  accentText: '#475569',
 
-  pageBg: '#f5f5f3',
+  pageBg: '#f5f8fa',
   cardBg: '#ffffff',
   border: 'rgba(0,0,0,0.09)',
   borderMedium: 'rgba(0,0,0,0.15)',
 
-  textPrimary: '#111111',
-  textSecondary: '#666666',
-  textMuted: '#999999',
+  textPrimary: '#33475b',
+  textSecondary: '#516f90',
+  textMuted: '#7c98b6',
 
   success: '#27500a',
   successBg: '#eaf3de',
@@ -32,51 +32,23 @@ export const brand = {
   dangerBg: '#fcebeb',
   info: '#0c447c',
   infoBg: '#e6f1fb',
-
-  statusNew: { bg: '#e6f1fb', text: '#0c447c' },
-  statusContacted: { bg: '#eeedfe', text: '#3c3489' },
-  statusFollowup: { bg: '#faeeda', text: '#633806' },
-  statusReplied: { bg: '#e1f5ee', text: '#085041' },
-  statusQualified: { bg: '#e1f5ee', text: '#085041' },
-  statusWon: { bg: '#eaf3de', text: '#27500a' },
-  statusLost: { bg: '#fcebeb', text: '#791f1f' },
-
-  activityCall: { bg: '#e6f1fb', text: '#0c447c' },
-  activityEmail: { bg: '#eeedfe', text: '#3c3489' },
-  activityTask: { bg: '#f1efe8', text: '#5f5e5a' },
-  activityNote: { bg: '#faeeda', text: '#633806' },
-  activityMeeting: { bg: '#e1f5ee', text: '#085041' },
-  activityStatus: { bg: '#eeedfe', text: '#3c3489' },
 }
 
-const STATUS_TOKEN_MAP = {
-  new: 'statusNew',
-  contacted: 'statusContacted',
-  follow_up: 'statusFollowup',
-  replied: 'statusReplied',
-  qualified: 'statusQualified',
-  won: 'statusWon',
-  lost: 'statusLost',
-  active_trading: 'statusQualified',
-}
-
-export function leadStatusBrand(statusId) {
-  const key = STATUS_TOKEN_MAP[statusId] || 'statusNew'
-  return brand[key]
-}
-
-const ACTIVITY_TOKEN_MAP = {
-  call: 'activityCall',
-  email: 'activityEmail',
-  task: 'activityTask',
-  note: 'activityNote',
-  meeting: 'activityMeeting',
-  status: 'activityStatus',
+/** @deprecated Pipeline status uses CRM_STATUSES tailwind classes via getStatusMeta(). */
+export function leadStatusBrand() {
+  return { bg: '#f1f5f9', text: '#64748b' }
 }
 
 export function activityBrand(type) {
-  const key = ACTIVITY_TOKEN_MAP[type] || 'activityTask'
-  return brand[key]
+  const map = {
+    call: { bg: '#e6f1fb', text: '#0c447c' },
+    email: { bg: '#f1f5f9', text: '#64748b' },
+    task: { bg: '#f1f5f9', text: '#64748b' },
+    note: { bg: '#faeeda', text: '#633806' },
+    meeting: { bg: '#e1f5ee', text: '#085041' },
+    status: { bg: '#f1f5f9', text: '#64748b' },
+  }
+  return map[type] || map.task
 }
 
 /** Apply CSS custom properties on :root for use in stylesheets. */
@@ -114,5 +86,7 @@ export function applyBrandCssVars(doc = document) {
   root.style.setProperty('--hs-brand-soft', '#fff4ee')
   root.style.setProperty('--hs-brand-border', '#ffd4b8')
   root.style.setProperty('--color-ci-brand', b.primary)
+  root.style.setProperty('--color-ci-brand-hover', b.primaryHover)
+  root.style.setProperty('--color-ci-brand-muted', b.accent)
   root.style.setProperty('--color-hs-canvas', b.pageBg)
 }

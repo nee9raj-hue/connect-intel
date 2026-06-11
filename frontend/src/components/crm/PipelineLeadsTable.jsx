@@ -5,8 +5,6 @@ import { getLeadCity, getLeadState } from '../../lib/pipelineFilters'
 import { hasActiveTextSelection } from '../../lib/keyboardShortcuts'
 import { getLeadEmail, leadHasSendableEmail } from '../../lib/emailUtils'
 import LeadPhoneCall from './LeadPhoneCall'
-import { leadStatusBrand } from '../../lib/brandTokens'
-import useIsMobile from '../../hooks/useIsMobile'
 import PipelineRowActionsMenu from './PipelineRowActionsMenu'
 
 function displayName(lead) {
@@ -114,7 +112,7 @@ function SortHeader({ label, sortKey, activeKey, sortDir, onSort, className = ''
         <span>{label}</span>
         <span
           className="pipeline-hs-sort-icon"
-          style={active ? { color: 'var(--brand-accent, #3730a3)' } : undefined}
+          style={active ? { color: 'var(--brand-primary, #FF773D)' } : undefined}
           aria-hidden
         >
           {active ? (sortDir === 'asc' ? '↑' : '↓') : '↕'}
@@ -124,15 +122,13 @@ function SortHeader({ label, sortKey, activeKey, sortDir, onSort, className = ''
   )
 }
 
-function StatusBadge({ status, label, onChange, statusOptions = [] }) {
+function StatusBadge({ status, label, colorClass, onChange, statusOptions = [] }) {
   const [open, setOpen] = useState(false)
-  const style = leadStatusBrand(status)
   return (
     <div className="relative inline-block">
       <button
         type="button"
-        className="pipeline-status-pill"
-        style={{ background: style.bg, color: style.text }}
+        className={`pipeline-hs-status ${colorClass}`}
         onClick={(e) => {
           e.stopPropagation()
           setOpen((v) => !v)
@@ -186,7 +182,6 @@ export default function PipelineLeadsTable({
 }) {
   const [sortKey, setSortKey] = useState('created')
   const [sortDir, setSortDir] = useState('desc')
-  const isMobile = useIsMobile()
 
   const col = useCallback((id) => visibleColumns.includes(id), [visibleColumns])
 
@@ -303,7 +298,7 @@ export default function PipelineLeadsTable({
                 </td>
                 {col('name') && (
                   <td className="pipeline-hs-td">
-                    <div className="pipeline-hs-name-cell" style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                    <div className="pipeline-hs-name-cell pipeline-hs-name-cell--v2">
                       <span
                         className="pipeline-hs-avatar"
                         style={{ background: `hsl(${hue} 45% 90%)`, color: `hsl(${hue} 40% 35%)` }}
@@ -311,45 +306,18 @@ export default function PipelineLeadsTable({
                       >
                         {(lead.firstName?.[0] || lead.company?.[0] || '?').toUpperCase()}
                       </span>
-                      <div className="min-w-0 flex-1">
-                        <span
-                          role="button"
-                          tabIndex={0}
-                          className="pipeline-hs-primary-text ci-selectable-text pipeline-hs-name-link"
+                      <div className="pipeline-hs-name-stack">
+                        <button
+                          type="button"
+                          className="pipeline-hs-name-link pipeline-hs-primary-text ci-selectable-text"
                           onClick={() => {
                             if (hasActiveTextSelection()) return
                             onSelect(lead.id)
                           }}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.preventDefault()
-                              onSelect(lead.id)
-                            }
-                          }}
                         >
                           {nameStr}
-                        </span>
+                        </button>
                         {loc ? <span className="pipeline-hs-sub">{loc}</span> : null}
-                        {!isMobile && (
-                          <span className="pipeline-row-hover-actions">
-                            {lead.phone ? (
-                              <button type="button" onClick={() => onQuickCall?.(lead)}>
-                                Call
-                              </button>
-                            ) : null}
-                            {email ? (
-                              <button type="button" onClick={() => onQuickEmail?.(lead)}>
-                                Email
-                              </button>
-                            ) : null}
-                            <button type="button" onClick={() => onQuickTask?.(lead)}>
-                              Task
-                            </button>
-                            <button type="button" onClick={() => onSelect(lead.id)}>
-                              Open →
-                            </button>
-                          </span>
-                        )}
                       </div>
                     </div>
                   </td>
@@ -359,6 +327,7 @@ export default function PipelineLeadsTable({
                     <StatusBadge
                       status={lead.crm?.status}
                       label={meta.label}
+                      colorClass={meta.color}
                       statusOptions={statusOptions}
                       onChange={(next) => onStatusChange?.(lead.id, next)}
                     />

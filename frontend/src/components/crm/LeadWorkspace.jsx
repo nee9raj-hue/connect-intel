@@ -920,7 +920,7 @@ export default function LeadWorkspace({
                 <button
                   type="button"
                   onClick={() => setTab('deals')}
-                  className="text-xs font-semibold text-[var(--brand-primary, #f97316)] underline shrink-0"
+                  className="text-xs font-semibold text-[#FF773D] underline shrink-0"
                 >
                   Manage deals
                 </button>
@@ -963,7 +963,7 @@ export default function LeadWorkspace({
                         setError(err.message)
                       }
                     }}
-                    className="text-xs font-semibold px-3 py-2 rounded-lg bg-[var(--brand-primary, #f97316)] text-[#242424] disabled:opacity-40"
+                    className="text-xs font-semibold px-3 py-2 rounded-lg bg-[#FF773D] text-[#242424] disabled:opacity-40"
                   >
                     Enroll
                   </button>
@@ -1083,7 +1083,7 @@ export default function LeadWorkspace({
                     onClick={() => setTimelineFilter(f.id)}
                     className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${
                       timelineFilter === f.id
-                        ? 'bg-[#fff4ee] border-[#ffd4b8] text-[var(--brand-primary, #f97316)]'
+                        ? 'bg-[#fff4ee] border-[#ffd4b8] text-[#FF773D]'
                         : 'border-gray-200 text-gray-600 hover:bg-gray-50'
                     }`}
                   >
@@ -1152,7 +1152,7 @@ export default function LeadWorkspace({
                     onChange={setTaskParticipants}
                   />
                 )}
-                <button type="submit" disabled={busy || savingTask} className="w-full py-2 text-xs font-semibold bg-[var(--brand-primary, #f97316)] rounded-lg disabled:opacity-50">
+                <button type="submit" disabled={busy || savingTask} className="w-full py-2 text-xs font-semibold bg-[#FF773D] rounded-lg disabled:opacity-50">
                   {savingTask ? 'Saving task…' : 'Add task'}
                 </button>
                 {scheduleFeedback?.form === 'task' && (
@@ -1176,7 +1176,7 @@ export default function LeadWorkspace({
                       </p>
                     )}
                     {!t.completedAt && (
-                      <button type="button" onClick={() => completeTask(t.id)} className="mt-1 text-[var(--brand-primary, #f97316)] font-semibold underline">
+                      <button type="button" onClick={() => completeTask(t.id)} className="mt-1 text-[#FF773D] font-semibold underline">
                         Mark done
                       </button>
                     )}
@@ -1293,7 +1293,7 @@ export default function LeadWorkspace({
                   <button
                     type="submit"
                     disabled={busy || savingVisit}
-                    className="w-full py-2 text-xs font-semibold border-2 border-[var(--brand-primary, #f97316)] rounded-lg disabled:opacity-50"
+                    className="w-full py-2 text-xs font-semibold border-2 border-[#FF773D] rounded-lg disabled:opacity-50"
                   >
                     {savingVisit ? 'Saving visit…' : 'Save field visit report'}
                   </button>
@@ -1373,7 +1373,7 @@ export default function LeadWorkspace({
                   type="button"
                   onClick={connectWorkGmail}
                   disabled={busy || !gmailStatus.gmailConnectAvailable}
-                  className="w-full py-2 text-xs font-semibold bg-[var(--brand-primary, #f97316)] text-[#242424] rounded-lg disabled:opacity-50"
+                  className="w-full py-2 text-xs font-semibold bg-[#FF773D] text-[#242424] rounded-lg disabled:opacity-50"
                 >
                   {connectingGmail ? 'Connecting…' : 'Connect work email'}
                 </button>
