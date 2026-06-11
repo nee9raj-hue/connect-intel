@@ -172,7 +172,7 @@ export default function PipelineBulkActionsBar({
             Delete
           </button>
         )}
-        {showMore && onMarkReplied && (
+        {showMore && (onMarkReplied || onExport || onDelete) && (
           <div className="relative" ref={moreRef}>
             <button
               type="button"
@@ -185,21 +185,57 @@ export default function PipelineBulkActionsBar({
             </button>
             {moreOpen && (
               <div className="pipeline-bulk-hs-menu">
-                <button type="button" className="pipeline-bulk-hs-menu__item" onClick={() => { setMoreOpen(false); onMarkReplied() }}>
-                  Mark as replied
-                </button>
+                {onMarkReplied ? (
+                  <button
+                    type="button"
+                    className="pipeline-bulk-hs-menu__item"
+                    onClick={() => {
+                      setMoreOpen(false)
+                      onMarkReplied()
+                    }}
+                  >
+                    Mark as replied
+                  </button>
+                ) : null}
+                {!floating && onExport ? (
+                  <button
+                    type="button"
+                    className="pipeline-bulk-hs-menu__item"
+                    onClick={() => {
+                      setMoreOpen(false)
+                      onExport()
+                    }}
+                  >
+                    Export CSV
+                  </button>
+                ) : null}
+                {!floating && onDelete ? (
+                  <button
+                    type="button"
+                    className="pipeline-bulk-hs-menu__item"
+                    onClick={() => {
+                      setMoreOpen(false)
+                      onDelete()
+                    }}
+                  >
+                    Remove from pipeline
+                  </button>
+                ) : null}
               </div>
             )}
           </div>
         )}
       </div>
 
+      {!floating ? <span className="pipeline-bulk-hs-bar__spacer" aria-hidden /> : null}
+
       <button
         type="button"
         className={floating ? 'pipeline-bulk-floating__clear' : 'pipeline-bulk-hs-bar__clear'}
         onClick={onClear}
+        aria-label="Clear selection"
       >
-        {floating ? '× Clear selection' : 'Clear'}
+        {floating ? '× Clear selection' : '×'}
       </button>
     </div>
   )

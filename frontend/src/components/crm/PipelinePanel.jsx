@@ -1406,6 +1406,45 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                   : ''
             }`}
           >
+          {selectedIds.size > 0 && (
+            <PipelineBulkActionsBar
+              count={selectedIds.size}
+              canAssign={canAssign}
+              busy={bulkBusy}
+              onAssign={openBulkAssign}
+              onEdit={() => setBulkEditOpen(true)}
+              onTags={orgLeadTags?.length ? () => setBulkTagsOpen(true) : undefined}
+              onMarkReplied={() => runBulk({ markReplied: true })}
+              onEmail={openBulkEmail}
+              onCreateBatchLists={openBatchListsFlow}
+              onWhatsApp={() => setWaOpen(true)}
+              emailCount={selectedEmailCount}
+              phoneCount={selectedPhoneCount}
+              onClear={() => setSelectedIds(new Set())}
+              onExport={() => downloadLeadsCsv(selectedLeads)}
+              onDelete={async () => {
+                if (
+                  !window.confirm(
+                    `Remove ${selectedIds.size} lead${selectedIds.size === 1 ? '' : 's'} from pipeline?`
+                  )
+                ) {
+                  return
+                }
+                setBulkBusy(true)
+                try {
+                  for (const id of selectedIds) {
+                    const lead = findLeadInLists(id)
+                    if (lead) await toggleSaveLead(lead)
+                  }
+                  setSelectedIds(new Set())
+                  await refreshSavedLeads()
+                } finally {
+                  setBulkBusy(false)
+                }
+              }}
+            />
+          )}
+
           {bulkNotice && (
             <div
               className="shrink-0 mx-2 md:mx-4 mb-1 text-xs md:text-sm font-medium text-green-900 bg-green-50 border border-green-200 rounded-lg px-2.5 py-1.5 md:px-3 md:py-2"
@@ -1769,47 +1808,6 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
         }}
       />
 
-      {selectedIds.size > 0 &&
-        createPortal(
-          <PipelineBulkActionsBar
-            floating
-            count={selectedIds.size}
-            canAssign={canAssign}
-            busy={bulkBusy}
-            onAssign={openBulkAssign}
-            onEdit={() => setBulkEditOpen(true)}
-            onTags={orgLeadTags?.length ? () => setBulkTagsOpen(true) : undefined}
-            onMarkReplied={() => runBulk({ markReplied: true })}
-            onEmail={openBulkEmail}
-            onCreateBatchLists={openBatchListsFlow}
-            onWhatsApp={() => setWaOpen(true)}
-            emailCount={selectedEmailCount}
-            phoneCount={selectedPhoneCount}
-            onClear={() => setSelectedIds(new Set())}
-            onExport={() => downloadLeadsCsv(selectedLeads)}
-            onDelete={async () => {
-              if (
-                !window.confirm(
-                  `Remove ${selectedIds.size} lead${selectedIds.size === 1 ? '' : 's'} from pipeline?`
-                )
-              ) {
-                return
-              }
-              setBulkBusy(true)
-              try {
-                for (const id of selectedIds) {
-                  const lead = findLeadInLists(id)
-                  if (lead) await toggleSaveLead(lead)
-                }
-                setSelectedIds(new Set())
-                await refreshSavedLeads()
-              } finally {
-                setBulkBusy(false)
-              }
-            }}
-          />,
-          document.body
-        )}
     </div>
     </>
   )

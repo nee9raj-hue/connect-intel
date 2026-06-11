@@ -219,7 +219,14 @@ export default function PipelineLeadsTable({
               />
             </th>
             {col('name') && (
-              <SortHeader label="Name" sortKey="name" activeKey={sortKey} sortDir={sortDir} onSort={onSort} />
+              <SortHeader
+                label="Name"
+                sortKey="name"
+                activeKey={sortKey}
+                sortDir={sortDir}
+                onSort={onSort}
+                className="pipeline-hs-th pipeline-hs-th--name"
+              />
             )}
             {col('status') && <th scope="col" className="pipeline-hs-th">Status</th>}
             {col('company') && (

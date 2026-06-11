@@ -1011,3 +1011,89 @@
   font-size: 12px;
   color: #7c98b6;
 }
+
+/* Mobile list — sticky checkbox + name, tight columns, single horizontal scroll */
+@media (max-width: 767px) {
+  .pipeline-hs-table-wrap--v2 {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+  }
+
+  .pipeline-hs-table-wrap--v2 .pipeline-hs-table {
+    table-layout: auto;
+    width: max-content;
+    min-width: 100%;
+  }
+
+  .pipeline-hs-table-wrap--v2 .pipeline-hs-th-check,
+  .pipeline-hs-table-wrap--v2 .pipeline-hs-td-check {
+    position: sticky;
+    left: 0;
+    z-index: 4;
+    width: 40px;
+    min-width: 40px;
+    max-width: 40px;
+    background: #fff;
+    box-shadow: 1px 0 0 #eaf0f6;
+  }
+
+  .pipeline-hs-table-wrap--v2 thead .pipeline-hs-th-check {
+    z-index: 5;
+    background: #f5f8fa;
+  }
+
+  .pipeline-hs-table-wrap--v2 .pipeline-hs-th--name,
+  .pipeline-hs-table-wrap--v2 .pipeline-hs-td--name {
+    position: sticky;
+    left: 40px;
+    z-index: 3;
+    width: auto;
+    min-width: 7rem;
+    max-width: 9rem;
+    background: #fff;
+    box-shadow: 1px 0 0 #eaf0f6;
+    overflow: hidden;
+  }
+
+  .pipeline-hs-table-wrap--v2 thead .pipeline-hs-th--name {
+    z-index: 4;
+    background: #f5f8fa;
+  }
+
+  .pipeline-hs-table-wrap--v2 .pipeline-hs-row--v2.is-checked .pipeline-hs-td-check,
+  .pipeline-hs-table-wrap--v2 .pipeline-hs-row--v2.is-checked .pipeline-hs-td--name {
+    background: #f0f9fc;
+  }
+
+  .pipeline-hs-table-wrap--v2 .pipeline-hs-th--company,
+  .pipeline-hs-table-wrap--v2 .pipeline-hs-td--company,
+  .pipeline-hs-table-wrap--v2 .pipeline-hs-th--phone,
+  .pipeline-hs-table-wrap--v2 .pipeline-hs-td--phone,
+  .pipeline-hs-table-wrap--v2 .pipeline-hs-th--owner,
+  .pipeline-hs-table-wrap--v2 .pipeline-hs-td--owner,
+  .pipeline-hs-table-wrap--v2 .pipeline-hs-th--activity,
+  .pipeline-hs-table-wrap--v2 .pipeline-hs-td--activity {
+    width: auto;
+    min-width: 5.5rem;
+    max-width: none;
+    white-space: nowrap;
+  }
+
+  .pipeline-hs-name-cell--v2 {
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .pipeline-hs-row--v2 .pipeline-row-hover-actions {
+    display: none;
+  }
+
+  .pipeline-hs-row--v2:hover .pipeline-hs-name-link {
+    visibility: visible;
+  }
+}
