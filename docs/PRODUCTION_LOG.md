@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 9d53335
+npm run prod:rollback -- 3a4ec78
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 9d53335
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `3a4ec78` |
-| Log updated (IST) | 12/06/2026, 02:14:02 |
+| Commit | `f2c8bd1` |
+| Log updated (IST) | 12/06/2026, 02:20:43 |
 
 ---
 
@@ -44,7 +44,8 @@ npm run prod:rollback -- 9d53335
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 12/06/2026, 02:13:55 | `3a4ec78` | fix: mobile calendar drawer clarity and pipeline owner/status filters | [preview](https://connect-intel-9nof9dm34-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3a4ec78` | **← LIVE**
+| 12/06/2026, 02:20:41 | `f2c8bd1` | fix: pipeline owner filter for saved-by leads and sidebar stage nav | [preview](https://connect-intel-didx9h8lc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f2c8bd1` | **← LIVE**
+| 12/06/2026, 02:13:55 | `3a4ec78` | fix: mobile calendar drawer clarity and pipeline owner/status filters | [preview](https://connect-intel-9nof9dm34-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3a4ec78` |
 | 12/06/2026, 02:04:00 | `9d53335` | chore: production log after calendar chrome UX deploy | [preview](https://connect-intel-jez8o0rj0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9d53335` |
 | 12/06/2026, 02:03:12 | `d8e12ad` | fix: calendar sync toolbar, mobile drawer portal, and immersive chrome | [preview](https://connect-intel-96kx93h4v-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d8e12ad` |
 | 12/06/2026, 01:56:40 | `4a8d8a8` | feat: team-wide unassigned leads pool with self-claim | [preview](https://connect-intel-pquf1y5mb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4a8d8a8` |
@@ -63,7 +64,6 @@ npm run prod:rollback -- 9d53335
 | 11/06/2026, 23:58:01 | `27f7bd2` | feat: toggle pipeline row hover quick actions in view settings | [preview](https://connect-intel-ptzj3a2wq-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 27f7bd2` |
 | 11/06/2026, 23:51:19 | `11d3945` | fix: populate city/state filter options from full pipeline index | [preview](https://connect-intel-2ovxfwklo-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 11d3945` |
 | 11/06/2026, 23:44:19 | `d919172` | fix: exact city/state pipeline filters with location parsing | [preview](https://connect-intel-3d5477zio-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d919172` |
-| 11/06/2026, 23:26:34 | `51bc36f` | fix: pipeline top bulk bar and mobile list scroll | [preview](https://connect-intel-1rjb9udyr-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 51bc36f` |
 
 ---
 

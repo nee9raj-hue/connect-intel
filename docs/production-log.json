@@ -1,10 +1,24 @@
 {
-  "updatedAt": "2026-06-11T20:44:02.293Z",
-  "updatedAtIst": "12/06/2026, 02:14:02",
+  "updatedAt": "2026-06-11T20:50:43.396Z",
+  "updatedAtIst": "12/06/2026, 02:20:43",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "3a4ec78",
+  "currentProductionCommit": "f2c8bd1",
   "entries": [
+    {
+      "logId": "20260612-0220-f2c8bd1",
+      "commit": "f2c8bd1",
+      "commitFull": "f2c8bd13c9296465e453c2eb1b66a8d57a855ec2",
+      "message": "fix: pipeline owner filter for saved-by leads and sidebar stage nav",
+      "deployedAt": "2026-06-11T20:50:41.458Z",
+      "deployedAtIst": "12/06/2026, 02:20:41",
+      "committedAtIst": "12/06/2026, 02:19:26",
+      "vercelPreviewUrl": "https://connect-intel-didx9h8lc-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- f2c8bd1"
+    },
     {
       "logId": "20260612-0213-3a4ec78",
       "commit": "3a4ec78",
@@ -15,7 +29,7 @@
       "committedAtIst": "12/06/2026, 02:13:17",
       "vercelPreviewUrl": "https://connect-intel-9nof9dm34-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 3a4ec78"
     },
@@ -270,20 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- d919172"
-    },
-    {
-      "logId": "20260611-2326-51bc36f",
-      "commit": "51bc36f",
-      "commitFull": "51bc36f0a1d202fbab741835ecae03036b37c825",
-      "message": "fix: pipeline top bulk bar and mobile list scroll",
-      "deployedAt": "2026-06-11T17:56:34.472Z",
-      "deployedAtIst": "11/06/2026, 23:26:34",
-      "committedAtIst": "11/06/2026, 23:25:55",
-      "vercelPreviewUrl": "https://connect-intel-1rjb9udyr-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 51bc36f"
     }
   ]
 }
