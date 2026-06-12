@@ -1314,6 +1314,14 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
               campaignId={panelOptions?.campaignId}
               reportCampaigns={reportCampaigns}
               summary={summary}
+              onReload={load}
+              onDuplicate={duplicateCampaignForResend}
+              onPause={pauseCampaign}
+              onResume={continueCampaignSending}
+              onStop={stopCampaign}
+              onContinue={continueCampaignSending}
+              busy={busy}
+              showCreator={Boolean(user?.isOrgAdmin && user?.accountType === 'company')}
             />
           ) : tab === 'forms' ? (
             <MarketingFormsHub teamMembers={teamMembers} onReload={load} />

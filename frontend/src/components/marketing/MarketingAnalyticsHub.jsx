@@ -56,6 +56,14 @@ export default function MarketingAnalyticsHub({
   campaignId,
   reportCampaigns = [],
   summary = null,
+  onReload,
+  onDuplicate,
+  onPause,
+  onResume,
+  onStop,
+  onContinue,
+  busy = false,
+  showCreator = false,
 }) {
   const [period, setPeriod] = useState(externalPeriod || '30d')
   const [analytics, setAnalytics] = useState(null)
@@ -392,6 +400,21 @@ export default function MarketingAnalyticsHub({
             Spam complaints: <strong>{deliverability.spamRate ?? '0.0%'}</strong>
           </div>
         </div>
+      </section>
+
+      <section className="mhub-v3-section">
+        <CampaignReportsView
+          campaigns={reportCampaigns}
+          onNavigate={onNavigate}
+          onReload={onReload}
+          onDuplicate={onDuplicate}
+          onPause={onPause}
+          onResume={onResume}
+          onStop={onStop}
+          onContinue={onContinue}
+          busy={busy}
+          showCreator={showCreator}
+        />
       </section>
     </div>
   )

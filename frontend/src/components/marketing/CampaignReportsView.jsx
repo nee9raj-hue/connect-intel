@@ -15,10 +15,7 @@ import {
   filterCampaignRecipients,
   campaignRecipientFilterLabel,
 } from '../../../../lib/marketingCampaignRecipientFilter.js'
-import {
-  marketingPipelineOptions,
-  navigateToMarketingPipeline,
-} from '../../lib/marketingNavigation'
+import { navigateToMarketingPipeline } from '../../lib/marketingNavigation'
 
 const PAGE_SIZE = 100
 
@@ -410,16 +407,13 @@ function CampaignDetailReport({
           .map((r) => r.leadId)
           .filter(Boolean)
     onClose?.()
-    onNavigate?.(
-      'pipeline',
-      marketingPipelineOptions({
-        campaignId,
-        filter: recipientFilter,
-        campaignName: report?.campaign?.name || campaignName,
-        leadIds: rows.length ? rows : undefined,
-        returnTo: 'marketing',
-      })
-    )
+    void navigateToMarketingPipeline(onNavigate, {
+      campaignId,
+      filter: recipientFilter,
+      campaignName: report?.campaign?.name || campaignName,
+      leadIds: rows.length ? rows : undefined,
+      returnTo: 'marketing',
+    })
   }
 
   const markWhatsAppSent = async (enrollmentId) => {
@@ -470,6 +464,10 @@ function CampaignDetailReport({
 
   const openKpi = (nextFilter) => {
     goToPipeline(nextFilter)
+  }
+
+  const viewAllInPipeline = () => {
+    goToPipeline(filter)
   }
 
   if (loading) {
@@ -776,13 +774,20 @@ function CampaignDetailReport({
           </table>
         </div>
         {hasMoreRecipients && (
-          <div className="px-4 py-2 border-t border-gray-100">
+          <div className="px-4 py-2 border-t border-gray-100 flex flex-wrap items-center justify-center gap-3">
+            <button
+              type="button"
+              onClick={viewAllInPipeline}
+              className="text-xs font-semibold py-2 px-3 rounded-lg bg-[#FF773D] text-[#242424] hover:opacity-90"
+            >
+              View all {recipients.length} in Pipeline ({filterLabel})
+            </button>
             <button
               type="button"
               onClick={() => setListVisible((n) => n + PAGE_SIZE)}
-              className="w-full text-xs font-semibold py-2 text-[#FF773D] hover:underline"
+              className="text-xs font-semibold py-2 text-[#FF773D] hover:underline"
             >
-              Load more ({recipients.length - listVisible} remaining)
+              Show more in table ({recipients.length - listVisible} remaining)
             </button>
           </div>
         )}
@@ -954,7 +959,9 @@ export default function CampaignReportsView({
 
   const visibleRows = rows.slice(0, listVisible)
   const hasMoreList = listVisible < rows.length
-  const reportCampaign = allCampaigns.find((c) => c.id === reportCampaignId)
+  const reportCampaign =
+    allCampaigns.find((c) => c.id === reportCampaignId) ||
+    (reportCampaignId ? { id: reportCampaignId, name: 'Campaign report', status: 'completed' } : null)
 
   const allSelected = visibleRows.length > 0 && visibleRows.every((c) => selectedIds.has(c.id))
   const someSelected = selectedIds.size > 0
@@ -1143,15 +1150,15 @@ export default function CampaignReportsView({
         />
       )}
 
-      {reportCampaignId && reportCampaign && (
+      {reportCampaignId && (
         <ReportOverlay
           wide
-          title={reportCampaign.name}
+          title={reportCampaign?.name || 'Campaign report'}
           onClose={() => setReportCampaignId(null)}
         >
           <CampaignDetailReport
             campaignId={reportCampaignId}
-            campaignName={reportCampaign.name}
+            campaignName={reportCampaign?.name}
             onClose={() => setReportCampaignId(null)}
             onNavigate={onNavigate}
             onDuplicate={onDuplicate}

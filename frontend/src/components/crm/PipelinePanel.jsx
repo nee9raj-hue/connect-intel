@@ -279,6 +279,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   }, [panelOptions])
 
   const [marketingLeadIds, setMarketingLeadIds] = useState(null)
+  const [marketingSliceLeads, setMarketingSliceLeads] = useState(null)
+  const [marketingSliceLoading, setMarketingSliceLoading] = useState(false)
 
   useEffect(() => {
     if (!marketingCampaignFilter || panelOptions?.leadIds?.length) {
@@ -310,6 +312,42 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     if (marketingLeadIds?.length) return marketingLeadIds
     return unreadLeadIds
   }, [panelOptions?.leadIds, marketingLeadIds, unreadLeadIds])
+
+  const activeMarketingLeadIds = useMemo(() => {
+    if (!marketingCampaignFilter) return null
+    const ids = (dashboardLeadIds || []).filter((id) => id && id !== '__none__')
+    return ids.length ? ids : null
+  }, [marketingCampaignFilter, dashboardLeadIds])
+
+  useEffect(() => {
+    if (!activeMarketingLeadIds?.length) {
+      setMarketingSliceLeads(null)
+      setMarketingSliceLoading(false)
+      return undefined
+    }
+    let cancelled = false
+    setMarketingSliceLoading(true)
+    api
+      .fetchPipelineLeads({
+        leadIds: activeMarketingLeadIds,
+        limit: Math.min(activeMarketingLeadIds.length, 500),
+        silent: true,
+      })
+      .then((data) => {
+        if (cancelled) return
+        setMarketingSliceLeads(data.leads || [])
+        setMarketingSliceLoading(false)
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setMarketingSliceLeads([])
+          setMarketingSliceLoading(false)
+        }
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [activeMarketingLeadIds])
 
   useEffect(() => {
     const po = panelOptions || {}
@@ -473,9 +511,10 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   )
 
   const scopedLeads = useMemo(() => {
-    if (!effectiveAssigneeFilter) return pipelineScopedLeads
-    return pipelineScopedLeads.filter((l) => leadMatchesAssignee(l, effectiveAssigneeFilter))
-  }, [pipelineScopedLeads, effectiveAssigneeFilter])
+    const base = marketingSliceLeads ?? pipelineScopedLeads
+    if (!effectiveAssigneeFilter) return base
+    return base.filter((l) => leadMatchesAssignee(l, effectiveAssigneeFilter))
+  }, [marketingSliceLeads, pipelineScopedLeads, effectiveAssigneeFilter])
 
   const locationOptions = useMemo(() => {
     const fromLoaded = collectLocationOptions(scopedLeads)
@@ -895,7 +934,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     Boolean(smartViewId)
   const showPipelineOnboarding = !pipelineHasLeads && !filterApplying
   const showNoFilterMatches =
-    pipelineHasLeads && filtered.length === 0 && !filterApplying
+    pipelineHasLeads && filtered.length === 0 && !filterApplying && !marketingSliceLoading
   const showPipelineFilters = pipelineHasLeads || hasPipelineFiltersActive
 
   const selectedLeads = useMemo(() => {
@@ -928,8 +967,9 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   )
 
   const hasMoreLeads =
-    pipelineLoad.hasMore ||
-    (pipelineLoad.total > pipelineLoad.loaded && pipelineLoad.loaded > 0)
+    !activeMarketingLeadIds &&
+    (pipelineLoad.hasMore ||
+      (pipelineLoad.total > pipelineLoad.loaded && pipelineLoad.loaded > 0))
 
   const mobileHeaderStats = useMemo(() => {
     if (assigneeName) return `Viewing ${assigneeName}`

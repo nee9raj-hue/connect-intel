@@ -256,6 +256,7 @@ export const api = {
     followUpDue,
     overdueFollowUp,
     teamId,
+    leadIds,
     silent = false,
   } = {}) => {
     const qs = new URLSearchParams({
@@ -263,6 +264,12 @@ export const api = {
       offset: cursor ? '0' : String(offset),
       light: '1',
     })
+    const idList = [...new Set((leadIds || []).filter(Boolean))]
+    if (idList.length) {
+      qs.set('idsOnly', '1')
+      for (const id of idList) qs.append('leadId', id)
+      qs.set('limit', String(Math.min(limit, idList.length)))
+    }
     if (cursor) qs.set('cursor', cursor)
     if (status && status !== 'all') qs.set('status', status)
     if (q) qs.set('q', q)
