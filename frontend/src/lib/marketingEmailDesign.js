@@ -43,10 +43,39 @@ export const BLOCK_TYPES = [
 
 export const DEFAULT_THEME = {
   primaryColor: '#111827',
-  backgroundColor: '#f3f4f6',
+  backgroundColor: '#f4f4f4',
   contentBackground: '#ffffff',
   contentWidth: 600,
-  fontFamily: 'Arial, Helvetica, sans-serif',
+  fontFamily: 'Helvetica, Arial, sans-serif',
+  textColor: '#000000',
+  linkColor: '#000000',
+  buttonColor: '#000000',
+  buttonTextColor: '#ffffff',
+  buttonShape: 'square',
+  buttonSize: 'medium',
+  buttonAlign: 'center',
+  dividerColor: '#000000',
+  dividerThickness: 2,
+  imageBorderRadius: 0,
+  imageAlign: 'center',
+  logoAlign: 'center',
+  mobilePaddingLeft: 16,
+  mobilePaddingRight: 16,
+  unifiedDeviceStyles: true,
+  baseFontSize: 16,
+  lineHeight: 1.5,
+}
+
+function buttonBorderRadius(shape) {
+  if (shape === 'pill') return '999px'
+  if (shape === 'round') return '8px'
+  return '4px'
+}
+
+function buttonPadding(size) {
+  if (size === 'small') return '8px 16px'
+  if (size === 'large') return '14px 32px'
+  return '12px 24px'
 }
 
 export const MERGE_FIELDS = [
@@ -583,7 +612,12 @@ function renderBlockHtml(block, theme, renderOpts = {}) {
       const src = sanitizeUrl(block.url)
       if (!src) return ''
       const width = clampSize(block.width, 20, 100, 100)
-      const radius = block.rounded ? '8px' : '0'
+      const radius =
+        theme.imageBorderRadius != null
+          ? `${clampSize(theme.imageBorderRadius, 0, 48, 0)}px`
+          : block.rounded
+            ? '8px'
+            : '0'
       const img = `<img src="${escapeHtml(src)}" alt="${escapeHtml(block.alt || '')}" width="${width}%" style="max-width:${width}%;width:${width}%;height:auto;border:0;display:inline-block;border-radius:${radius};" />`
       const inner = block.link
         ? `<a href="${escapeHtml(sanitizeUrl(block.link))}" style="text-decoration:none;">${img}</a>`
@@ -618,14 +652,20 @@ function renderBlockHtml(block, theme, renderOpts = {}) {
     case 'button': {
       const url = sanitizeUrl(block.url)
       if (!url || !block.label) return ''
-      const bgColor = block.buttonColor || primary
+      const bgColor = block.buttonColor || theme.buttonColor || primary
+      const btnAlign = block.align || theme.buttonAlign || align
+      const btnShape = block.buttonShape || theme.buttonShape || 'round'
+      const btnSize = block.buttonSize || theme.buttonSize || 'medium'
+      const borderColor = theme.buttonBorderColor || bgColor
+      const borderStyle = theme.buttonBorderStyle === 'none' ? 'none' : `solid`
+      const borderWidth = theme.buttonBorderStyle === 'none' ? 0 : theme.buttonBorderWidth ?? 2
       const labelStyle = textStyle(block, theme, {
-        fontSize: clampSize(block.fontSize, 12, 24, 15),
-        color: block.buttonTextColor || '#ffffff',
+        fontSize: clampSize(block.fontSize, 12, 24, theme.baseFontSize || 15),
+        color: block.buttonTextColor || theme.buttonTextColor || '#ffffff',
         fontWeight: '600',
       })
-      return `<tr><td style="padding:16px 32px;background:${bg};text-align:${align};">
-        <a href="${escapeHtml(url)}" style="display:inline-block;padding:12px 24px;background:${bgColor};text-decoration:none;border-radius:8px;${labelStyle}">${escapeHtml(block.label)}</a>
+      return `<tr><td style="padding:16px 32px;background:${bg};text-align:${btnAlign};">
+        <a href="${escapeHtml(url)}" style="display:inline-block;padding:${buttonPadding(btnSize)};background:${bgColor};text-decoration:none;border-radius:${buttonBorderRadius(btnShape)};border:${borderWidth}px ${borderStyle} ${borderColor};${labelStyle}">${escapeHtml(block.label)}</a>
       </td></tr>`
     }
     case 'form': {
@@ -666,8 +706,11 @@ function renderBlockHtml(block, theme, renderOpts = {}) {
         </td></tr></table>
       </td></tr>`
     }
-    case 'divider':
-      return `<tr><td style="padding:8px 32px;background:${bg};"><hr style="border:none;border-top:1px solid ${block.color || '#e5e7eb'};margin:0;" /></td></tr>`
+    case 'divider': {
+      const thickness = theme.dividerThickness ?? 1
+      const color = block.color || theme.dividerColor || '#e5e7eb'
+      return `<tr><td style="padding:8px 32px;background:${bg};"><hr style="border:none;border-top:${thickness}px solid ${color};margin:0;" /></td></tr>`
+    }
     case 'spacer':
       return `<tr><td style="height:${clampSize(block.height, 8, 80, 16)}px;background:${bg};"></td></tr>`
     case 'footer': {

@@ -22,7 +22,15 @@ import { BLOCK_PALETTE_STYLES } from '../../lib/marketingUiConstants'
 import MarketingBlockEditor from './MarketingBlockEditor'
 import { BRAND_LOGO_MARK_LIGHT, BRAND_LOGO_MARK_CLASS } from '../../lib/brandAssets'
 import {
+  MailchimpBlocksPanel,
+  MailchimpOptimizePanel,
+  MailchimpSectionsPanel,
+  MailchimpStylesPanel,
+  mailchimpPanelMeta,
+} from './MarketingMailchimpEditorPanels'
+import {
   BlocksIcon,
+  ChartIcon,
   DesktopIcon,
   EyeIcon,
   PencilIcon,
@@ -63,6 +71,7 @@ const MAILCHIMP_RAIL = [
   { id: 'blocks', label: 'Blocks', icon: BlocksIcon },
   { id: 'presets', label: 'Sections', icon: LayoutTemplateIcon },
   { id: 'styles', label: 'Styles', icon: SwatchIcon },
+  { id: 'optimize', label: 'Optimize', icon: ChartIcon },
 ]
 
 const IMMERSIVE_RAIL_WIDTH = 216
@@ -1463,8 +1472,36 @@ export default function MarketingTemplateBuilder({
     closeImmersive?.()
   }
 
-  const mailchimpPanelTitle =
-    sideTab === 'blocks' ? 'Content blocks' : MAILCHIMP_RAIL.find((t) => t.id === sideTab)?.label || ''
+  const mailchimpPanel = mailchimpPanelMeta(sideTab)
+
+  const patchMailchimpDesign = (patch) => {
+    applyChange({
+      ...value,
+      design: { ...DEFAULT_THEME, ...value.design, ...patch },
+    })
+  }
+
+  const mailchimpPanelContent = (
+    <>
+      {sideTab === 'blocks' && <MailchimpBlocksPanel onAddBlock={addBlockAtEnd} />}
+      {sideTab === 'presets' && (
+        <MailchimpSectionsPanel
+          blocks={value.blocks}
+          onSelectBlock={(index) => openBlockEditor(index)}
+          onAddSection={() => addBlockAtEnd('spacer')}
+          starters={starters}
+          starterPreview={starterPreview}
+          onLoadStarter={(id) => loadStarter(id)}
+        />
+      )}
+      {sideTab === 'styles' && (
+        <MailchimpStylesPanel design={value.design} patchDesign={patchMailchimpDesign} />
+      )}
+      {sideTab === 'optimize' && (
+        <MailchimpOptimizePanel blocks={value.blocks} subject={value.subject} />
+      )}
+    </>
+  )
 
   const mailchimpStudioPopup =
     studioPanel &&
@@ -1562,11 +1599,16 @@ export default function MarketingTemplateBuilder({
               ))}
             </nav>
             <div className="mc-mc-editor__panel">
-              <h2 className="mc-mc-editor__panel-title">{mailchimpPanelTitle}</h2>
-              {sideTab === 'blocks' ? (
-                <p className="mc-mc-editor__panel-hint">Drag to add content to your email.</p>
+              {mailchimpPanel.title ? (
+                <h2 className="mc-mc-editor__panel-title">{mailchimpPanel.title}</h2>
               ) : null}
-              <div className="mc-mc-editor__panel-scroll">{panelContent}</div>
+              {mailchimpPanel.hint ? (
+                <p className="mc-mc-editor__panel-hint">{mailchimpPanel.hint}</p>
+              ) : null}
+              <div className="mc-mc-editor__panel-scroll">{mailchimpPanelContent}</div>
+              <button type="button" className="mc-mc-editor__upgrade" disabled>
+                Upgrade
+              </button>
             </div>
           </aside>
 
@@ -1620,12 +1662,6 @@ export default function MarketingTemplateBuilder({
             </div>
 
             <div className="mc-mc-editor__canvas-scroll" ref={immersiveCanvasRef}>
-              <div className="mc-mc-practice-banner" role="note">
-                <span className="mc-mc-practice-banner__tag">Note</span>
-                <span>
-                  This is a practice email. Follow the tips below to learn how the builder works.
-                </span>
-              </div>
               <div
                 className="mc-mc-editor__canvas-area"
                 onClick={handleCanvasAreaClick}
