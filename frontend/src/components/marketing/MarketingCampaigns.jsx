@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { formatDateTime } from '../../lib/crmUiConstants'
 import { campaignStatusColor } from './marketingTheme'
+import { campaignAnalyticsSummary, campaignListStatus } from '../../lib/marketingCampaignStatus'
 import { MailIcon, ChevronRightIcon } from '../ui/icons'
 
 function formatEdited(iso) {
@@ -14,16 +15,6 @@ function formatEdited(iso) {
   } catch {
     return { date: '—', time: '' }
   }
-}
-
-function analyticsSummary(campaign) {
-  const stats = campaign.stats || {}
-  const sent = stats.recipientsSent ?? stats.sent ?? 0
-  if (!sent && campaign.status === 'draft') return '—'
-  const openRate = stats.openRate ?? campaign.openRate ?? 0
-  const clickRate = stats.clickRate ?? campaign.clickRate ?? stats.ctr ?? 0
-  if (!openRate && !clickRate) return '—'
-  return `${openRate}% opens · ${clickRate}% clicks`
 }
 
 export default function MarketingCampaigns({
@@ -54,7 +45,7 @@ export default function MarketingCampaigns({
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
     return campaigns.filter((c) => {
-      if (statusFilter && c.status !== statusFilter) return false
+      if (statusFilter && campaignListStatus(c).key !== statusFilter) return false
       if (typeFilter && (c.channel || 'email') !== typeFilter) return false
       if (!q) return true
       return c.name?.toLowerCase().includes(q) || c.status?.includes(q)
@@ -79,7 +70,8 @@ export default function MarketingCampaigns({
   }
 
   const openCampaign = (c) => {
-    if (c.status === 'draft' || c.status === 'scheduled') onEdit?.(c)
+    const display = campaignListStatus(c)
+    if (display.key === 'draft' || display.key === 'scheduled') onEdit?.(c)
     else onOpenReport?.(c)
   }
 
@@ -197,7 +189,8 @@ export default function MarketingCampaigns({
                 const edited = formatEdited(c.updatedAt || c.createdAt)
                 const audience =
                   audienceById[c.listId] || audienceById[c.segmentId] || c.listName || c.segmentName || '—'
-                const canEdit = c.status === 'draft' || c.status === 'scheduled'
+                const displayStatus = campaignListStatus(c)
+                const canEdit = displayStatus.key === 'draft' || displayStatus.key === 'scheduled'
                 return (
                   <tr key={c.id}>
                     <td className="mc-table__check">
@@ -219,12 +212,15 @@ export default function MarketingCampaigns({
                       {edited.time ? <span className="mc-table__date-time">{edited.time}</span> : null}
                     </td>
                     <td>
-                      <span className="mc-status-text" style={{ color: campaignStatusColor(c.status) }}>
-                        {statusLabel(c.status)}
+                      <span className="mc-status-text" style={{ color: campaignStatusColor(displayStatus.key) }}>
+                        {displayStatus.label}
                       </span>
+                      {displayStatus.hint ? (
+                        <span className="mc-status-hint">{displayStatus.hint}</span>
+                      ) : null}
                     </td>
                     <td>{audience}</td>
-                    <td>{analyticsSummary(c)}</td>
+                    <td>{campaignAnalyticsSummary(c)}</td>
                     <td className="mc-table__actions">
                       {canEdit ? (
                         <button type="button" className="mc-btn mc-btn--outline mc-btn--sm" onClick={() => onEdit?.(c)}>
@@ -258,9 +254,3 @@ export default function MarketingCampaigns({
   )
 }
 
-function statusLabel(status) {
-  const s = String(status || 'draft').toLowerCase()
-  if (s === 'completed' || s === 'sent') return 'Sent'
-  if (s === 'active') return 'Sending'
-  return s.charAt(0).toUpperCase() + s.slice(1)
-}

@@ -845,6 +845,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
     try {
       const res = await api.testSendMarketingCampaign(id, [user?.email].filter(Boolean))
       setNotice(`Test sent to ${res.sent || 0} address(es)`)
+      await load()
     } catch (e) {
       setError(e.message)
     } finally {
