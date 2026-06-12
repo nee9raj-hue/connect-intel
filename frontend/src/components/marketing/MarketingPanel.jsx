@@ -19,7 +19,7 @@ import MarketingHubShell from './MarketingHubShell'
 import MarketingOverviewTab from './MarketingOverviewTab'
 import MarketingBulkEmailTab from './MarketingBulkEmailTab'
 import MarketingCampaignStudio from './MarketingCampaignStudio'
-import MarketingCampaignWizardStudio from './MarketingCampaignWizardStudio'
+import MarketingCampaignChecklistBuilder from './MarketingCampaignChecklistBuilder'
 import MarketingTemplateMarketplace from './MarketingTemplateMarketplace'
 import MarketingBrandKit, { mergeBrandKit } from './MarketingBrandKit'
 import MarketingAnalyticsHub from './MarketingAnalyticsHub'
@@ -87,6 +87,8 @@ const EMPTY_CAMPAIGN = {
   recurrence: '',
   abTest: null,
   emailProvider: 'auto',
+  fromName: '',
+  fromEmail: '',
 }
 
 export default function MarketingPanel({ onNavigate, panelOptions, activePanel, isActive = true }) {
@@ -132,7 +134,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
   const hideMarketingHeader =
     !isMobile &&
     ((tab === 'templates' && templatePhase === 'editor') ||
-      (tab === 'campaigns' && campaignDesktopPhase === 'editor'))
+      (tab === 'campaigns' && (campaignDesktopPhase === 'editor' || campaignDesktopPhase === 'wizard')))
   const visibleTabs = isMobile ? MOBILE_TABS : TABS
   const [summary, setSummary] = useState(null)
   const [gmailStatus, setGmailStatus] = useState(null)
@@ -1074,26 +1076,31 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
     if (campaignDesktopPhase === 'wizard') {
       return (
         <>
-          <MarketingCampaignWizardStudio
+          <MarketingCampaignChecklistBuilder
             campaignForm={campaignForm}
             setCampaignForm={setCampaignForm}
             lists={lists}
             segments={segments}
             templates={templates}
-            summary={summary}
-            step={campaignWizardStep}
-            setStep={setCampaignWizardStep}
+            user={user}
+            gmailStatus={gmailStatus}
+            orgName={user?.organizationName}
             onBackToList={() => setCampaignDesktopPhase('list')}
             onEnterEditor={() => setCampaignDesktopPhase('editor')}
             onSaveDraft={async () => {
               setError(null)
-              await createCampaign()
+              if (campaignForm.name.trim() && hasAudience) {
+                await createCampaign()
+              }
+              setCampaignDesktopPhase('list')
             }}
             onLaunch={createAndStart}
+            onTestSend={handleTestSend}
             busy={busy}
             error={error}
             notice={notice}
-            onOpenBrandKit={() => setBrandKitOpen(true)}
+            onNavigate={onNavigate}
+            needsWorkEmail={needsWorkEmail}
           />
           <MarketingBrandKit
             open={brandKitOpen}
@@ -1303,6 +1310,13 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
               segments={segments}
               dataLoading={loading}
               onOpenCampaign={(c) => onNavigate?.('marketing', { tab: 'analytics', campaignId: c.id })}
+              onCreateCampaign={() => {
+                setTab('campaigns')
+                resetCampaignForm()
+                setCampaignForm((p) => ({ ...p, design: mergeBrandKit(p.design) }))
+                setCampaignWizardStep(0)
+                setCampaignDesktopPhase('wizard')
+              }}
             />
           ) : tab === 'bulk-email' ? (
             <MarketingBulkEmailTab lists={lists} onNavigate={onNavigate} />

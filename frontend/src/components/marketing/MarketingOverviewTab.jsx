@@ -8,6 +8,7 @@ import {
   formatPct,
 } from './marketingTheme'
 import { navigateToMarketingPipeline } from '../../lib/marketingNavigation'
+import MarketingGettingStarted from './MarketingGettingStarted'
 
 function StatusBadge({ status }) {
   const key = String(status || 'draft').toLowerCase()
@@ -28,6 +29,7 @@ export default function MarketingOverviewTab({
   segments = [],
   dataLoading = false,
   onOpenCampaign,
+  onCreateCampaign,
 }) {
   const kpis = useMemo(() => {
     const sent = summary?.sent ?? 0
@@ -122,6 +124,12 @@ export default function MarketingOverviewTab({
 
   return (
     <div className="mhub-v3-page">
+      <MarketingGettingStarted
+        lists={lists}
+        reportCampaigns={reportCampaigns}
+        onNavigate={onNavigate}
+        onCreateCampaign={onCreateCampaign}
+      />
       <div className="mhub-v3-stat-row">
         <div className="mhub-v3-stat">
           <span className="mhub-v3-stat__label">Emails sent</span>

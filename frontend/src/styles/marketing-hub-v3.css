@@ -1061,3 +1061,589 @@
   color: var(--mh-text-muted);
   cursor: pointer;
 }
+
+/* —— Mailchimp-style sidebar layout (desktop) —— */
+@media (min-width: 900px) {
+  .mhub-v3.mhub-v3--sidebar {
+    flex-direction: row;
+    background: var(--mh-card-bg);
+  }
+
+  .mhub-v3--sidebar .mhub-v3-sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    border-right: 0.5px solid var(--mh-border);
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    background: #fafaf9;
+  }
+
+  .mhub-v3--sidebar .mhub-v3-sidebar__brand {
+    padding: 14px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border-bottom: 0.5px solid var(--mh-border);
+  }
+
+  .mhub-v3--sidebar .mhub-v3-sidebar__create {
+    margin: 12px;
+    width: calc(100% - 24px);
+  }
+
+  .mhub-v3--sidebar .mhub-v3-sidebar__nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .mhub-v3--sidebar .mhub-v3-sidebar__link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    text-align: left;
+    padding: 8px 10px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    font-size: 13px;
+    color: var(--mh-text);
+    cursor: pointer;
+  }
+
+  .mhub-v3--sidebar .mhub-v3-sidebar__link:hover {
+    background: rgba(0, 0, 0, 0.04);
+  }
+
+  .mhub-v3--sidebar .mhub-v3-sidebar__link.is-active {
+    background: var(--mh-accent-tint);
+    color: var(--mh-text);
+    font-weight: 500;
+  }
+
+  .mhub-v3--sidebar .mhub-v3-main {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--mh-page-bg);
+  }
+
+  .mhub-v3--sidebar .mhub-v3-topbar {
+    border-bottom: 0.5px solid var(--mh-border);
+  }
+
+  .mhub-v3--sidebar .mhub-v3-tabs {
+    display: none;
+  }
+}
+
+/* —— Getting started (Mailchimp home) —— */
+.mhub-getting-started {
+  background: var(--mh-card-bg);
+  border: 0.5px solid var(--mh-border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.mhub-getting-started__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.mhub-getting-started__head h2 {
+  margin: 0 0 4px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.mhub-getting-started__head p {
+  margin: 0;
+  color: var(--mh-text-secondary);
+  font-size: 13px;
+}
+
+.mhub-getting-started__progress-ring {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 3px solid var(--mh-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.mhub-getting-started__head-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
+
+.mhub-getting-started__list {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 8px;
+  border-left: 2px solid var(--mh-border);
+}
+
+.mhub-getting-started__item {
+  position: relative;
+  padding: 0 0 16px 20px;
+}
+
+.mhub-getting-started__marker {
+  position: absolute;
+  left: -11px;
+  top: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--mh-border);
+  background: var(--mh-card-bg);
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+.mhub-getting-started__item.is-done .mhub-getting-started__marker {
+  background: #16a34a;
+  border-color: #16a34a;
+}
+
+.mhub-getting-started__card {
+  background: var(--mh-page-bg);
+  border: 0.5px solid var(--mh-border);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.mhub-getting-started__card h3 {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+
+.mhub-getting-started__card p {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: var(--mh-text-secondary);
+}
+
+.mhub-getting-started__row {
+  border: none;
+  background: none;
+  padding: 4px 0;
+  font-size: 13px;
+  color: var(--mh-text-secondary);
+  cursor: pointer;
+  text-align: left;
+}
+
+.mhub-getting-started__item.is-active .mhub-getting-started__row {
+  display: none;
+}
+
+/* —— Campaign checklist builder (Mailchimp compose) —— */
+.mc-checklist {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: #f6f6f4;
+}
+
+.mc-checklist__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  background: #fff;
+  border-bottom: 0.5px solid var(--mh-border);
+  flex-shrink: 0;
+}
+
+.mc-checklist__header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+
+.mc-checklist__header-right {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.mc-checklist-back {
+  border: none;
+  background: none;
+  font-size: 12px;
+  color: var(--mh-text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.mc-checklist-title-input {
+  border: none;
+  background: transparent;
+  font-size: 15px;
+  font-weight: 600;
+  min-width: 0;
+  flex: 1;
+  max-width: 320px;
+}
+
+.mc-checklist-draft {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: #f1f5f9;
+  color: var(--mh-text-secondary);
+}
+
+.mc-checklist__progress {
+  padding: 12px 16px;
+  background: #fff;
+  border-bottom: 0.5px solid var(--mh-border);
+  flex-shrink: 0;
+}
+
+.mc-checklist__progress-label {
+  font-size: 12px;
+  color: var(--mh-text-secondary);
+  margin-bottom: 8px;
+}
+
+.mc-checklist__progress-bar {
+  display: flex;
+  gap: 4px;
+}
+
+.mc-checklist__progress-seg {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: #e2e8f0;
+}
+
+.mc-checklist__progress-seg.is-done {
+  background: #16a34a;
+}
+
+.mc-checklist__body {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(280px, 420px) 1fr;
+  gap: 0;
+}
+
+.mc-checklist__steps {
+  overflow-y: auto;
+  background: #fff;
+  border-right: 0.5px solid var(--mh-border);
+  padding: 8px 0;
+}
+
+.mc-checklist-step {
+  border-bottom: 0.5px solid var(--mh-border);
+}
+
+.mc-checklist-step__head {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  padding: 14px 16px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.mc-checklist-step.is-expanded .mc-checklist-step__head {
+  background: #fafaf9;
+}
+
+.mc-checklist-step__icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid #cbd5e1;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #fff;
+}
+
+.mc-checklist-step__icon.is-done {
+  background: #16a34a;
+  border-color: #16a34a;
+}
+
+.mc-checklist-step__label {
+  display: block;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.mc-checklist-step__question,
+.mc-checklist-step__summary {
+  display: block;
+  font-size: 12px;
+  color: var(--mh-text-secondary);
+  margin-top: 2px;
+}
+
+.mc-checklist-step__body {
+  padding: 0 16px 16px 50px;
+}
+
+.mc-checklist-panel__lead {
+  font-size: 13px;
+  color: var(--mh-text-secondary);
+  margin: 0 0 12px;
+}
+
+.mc-checklist-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: var(--mh-text-secondary);
+}
+
+.mc-checklist-input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 0.5px solid var(--mh-border);
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.mc-checklist-segmented {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.mc-checklist-segmented__btn {
+  flex: 1;
+  padding: 8px;
+  border: 0.5px solid var(--mh-border);
+  border-radius: 8px;
+  background: #fff;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.mc-checklist-segmented__btn.is-active {
+  border-color: var(--mh-accent);
+  background: var(--mh-accent-tint);
+}
+
+.mc-checklist-send-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.mc-checklist-send-card {
+  text-align: left;
+  padding: 12px;
+  border: 2px solid var(--mh-border);
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.mc-checklist-send-card.is-active {
+  border-color: #0d9488;
+  background: #f0fdfa;
+}
+
+.mc-checklist-send-card strong {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.mc-checklist-send-card span {
+  font-size: 11px;
+  color: var(--mh-text-secondary);
+}
+
+.mc-checklist-panel__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.mc-checklist-btn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 0.5px solid var(--mh-border);
+  background: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.mc-checklist-btn--primary {
+  background: #0d9488;
+  border-color: #0d9488;
+  color: #fff;
+}
+
+.mc-checklist-btn--send {
+  background: var(--mh-accent);
+  border-color: var(--mh-accent);
+  color: #242424;
+}
+
+.mc-checklist-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.mc-checklist-link {
+  border: none;
+  background: none;
+  color: #0d9488;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.mc-checklist-hint {
+  font-size: 12px;
+  color: var(--mh-text-secondary);
+  margin: 8px 0;
+}
+
+.mc-checklist-warn {
+  margin-bottom: 12px;
+}
+
+.mc-checklist__preview {
+  overflow-y: auto;
+  padding: 16px 20px;
+  background: #ececea;
+}
+
+.mc-checklist-preview__toolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.mc-checklist-preview__frame {
+  max-width: 520px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.mc-checklist-preview__inbox {
+  padding: 12px 16px;
+  border-bottom: 0.5px solid var(--mh-border);
+  font-size: 12px;
+}
+
+.mc-checklist-preview__inbox-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.mc-checklist-preview__inbox-label {
+  width: 52px;
+  color: var(--mh-text-muted);
+  flex-shrink: 0;
+}
+
+.mc-checklist-preview__html {
+  max-height: 480px;
+  overflow: auto;
+}
+
+.mc-checklist-preview__empty {
+  padding: 40px 24px;
+  text-align: center;
+}
+
+.mc-checklist-preview__empty p:first-child {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+.mc-checklist-alerts {
+  padding: 8px 16px;
+  background: #fff;
+}
+
+.mc-checklist-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mc-checklist-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.mc-checklist-modal__card {
+  position: relative;
+  background: #fff;
+  border-radius: 12px;
+  max-width: 640px;
+  width: 92%;
+  max-height: 85vh;
+  overflow: auto;
+  padding: 16px;
+}
+
+.mc-checklist-modal__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 899px) {
+  .mc-checklist__body {
+    grid-template-columns: 1fr;
+  }
+
+  .mc-checklist__preview {
+    display: none;
+  }
+}
