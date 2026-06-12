@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-12T11:44:05.055Z",
-  "updatedAtIst": "12/06/2026, 17:14:05",
+  "updatedAt": "2026-06-12T12:58:26.031Z",
+  "updatedAtIst": "12/06/2026, 18:28:26",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "25bd4f7",
+  "currentProductionCommit": "a9424cd",
   "entries": [
+    {
+      "logId": "20260612-1828-a9424cd",
+      "commit": "a9424cd",
+      "commitFull": "a9424cd421e12e762f7682bf298ee1fe62f397c1",
+      "message": "feat: redesign campaigns page and enrich list metrics from enrollments",
+      "deployedAt": "2026-06-12T12:58:15.174Z",
+      "deployedAtIst": "12/06/2026, 18:28:15",
+      "committedAtIst": "12/06/2026, 18:27:41",
+      "vercelPreviewUrl": "https://connect-intel-i0l1mi08u-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- a9424cd"
+    },
+    {
+      "logId": "20260612-1714-03f553e",
+      "commit": "03f553e",
+      "commitFull": "03f553e1afe2d789b23b40379a758b6df92455e9",
+      "message": "chore: sync production log after campaign status fix deploy",
+      "deployedAt": "2026-06-12T11:44:40.910Z",
+      "deployedAtIst": "12/06/2026, 17:14:40",
+      "committedAtIst": "12/06/2026, 17:14:09",
+      "vercelPreviewUrl": "https://connect-intel-llwkadlw2-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 03f553e"
+    },
     {
       "logId": "20260612-1713-25bd4f7",
       "commit": "25bd4f7",
@@ -15,7 +43,7 @@
       "committedAtIst": "12/06/2026, 17:13:19",
       "vercelPreviewUrl": "https://connect-intel-3k8rvob2p-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 25bd4f7"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- e71bbd9"
-    },
-    {
-      "logId": "20260612-0225-89c7245",
-      "commit": "89c7245",
-      "commitFull": "89c72456420bb6a66757d76c7190f10e51119acc",
-      "message": "chore: production log after calendar drawer and pipeline filter deploy",
-      "deployedAt": "2026-06-11T20:55:06.188Z",
-      "deployedAtIst": "12/06/2026, 02:25:06",
-      "committedAtIst": "12/06/2026, 02:14:07",
-      "vercelPreviewUrl": "https://connect-intel-ncij3a53c-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 89c7245"
-    },
-    {
-      "logId": "20260612-0224-af832af",
-      "commit": "af832af",
-      "commitFull": "af832af18f802e1c9494da11e05367948669ceb3",
-      "message": "style: tone down dashboard orange for a cleaner home overview",
-      "deployedAt": "2026-06-11T20:54:35.888Z",
-      "deployedAtIst": "12/06/2026, 02:24:35",
-      "committedAtIst": "12/06/2026, 02:23:47",
-      "vercelPreviewUrl": "https://connect-intel-hbm2jeqns-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- af832af"
     }
   ]
 }
