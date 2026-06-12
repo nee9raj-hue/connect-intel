@@ -50,7 +50,7 @@ function CampaignGalleryCard({ campaign, audience, busy, user, permissions, onOp
           <div><strong>{stats.revenue ? `$${stats.revenue}` : '—'}</strong><span>Revenue</span></div>
         </div>
         <footer className="mhub-v3-campaign-card__foot" onClick={(e) => e.stopPropagation()}>
-          <button type="button" className="mhub-v3-btn" onClick={() => onEdit?.(campaign)}>Edit</button>
+          <button type="button" className="mhub-v3-btn" onClick={() => onEdit?.(campaign)} disabled={campaign.status !== 'draft' && campaign.status !== 'scheduled'}>Edit</button>
           {canStart && (
             <button type="button" className="mhub-v3-btn mhub-v3-btn--primary" disabled={busy} onClick={() => onStart?.(campaign.id)}>Launch</button>
           )}
@@ -94,7 +94,7 @@ export default function MarketingCampaignStudio({
 }) {
   const [query, setQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
-  const [view, setView] = useState('grid')
+  const [view, setView] = useState('list')
   const [detail, setDetail] = useState(null)
 
   const audienceById = useMemo(() => {
@@ -133,39 +133,31 @@ export default function MarketingCampaignStudio({
 
   return (
     <div className="mhub-v3-page mhub-v3-campaigns">
-      <header className="mhub-v3-campaigns__head">
-        <div>
-          <p className="mhub-v3-eyebrow">Campaign studio</p>
-          <h2 style={{ fontSize: 16, fontWeight: 500, margin: '0 0 4px' }}>Build campaigns that perform</h2>
-          <p style={{ fontSize: 12, color: '#666', margin: 0 }}>Visual gallery — outcomes first, no spreadsheet mindset.</p>
+      <header className="mhub-v3-campaigns__head mhub-v3-campaigns__head--mailchimp">
+        <h2 className="mhub-v3-campaigns__title">Campaigns</h2>
+        <div className="mhub-v3-campaigns__head-actions">
+          <div className="mhub-v3-periods mhub-v3-campaigns__view-toggle">
+            <button type="button" className={`mhub-v3-period${view === 'list' ? ' is-active' : ''}`} onClick={() => setView('list')}>List</button>
+            <button type="button" className={`mhub-v3-period${view === 'grid' ? ' is-active' : ''}`} onClick={() => setView('grid')}>Grid</button>
+          </div>
+          <button type="button" className="mhub-v3-btn mhub-v3-btn--primary" onClick={onCreate}>
+            Create
+          </button>
         </div>
-        <button type="button" className="mhub-v3-btn mhub-v3-btn--primary" onClick={onCreate}>
-          Create campaign
-        </button>
       </header>
 
-      <div className="mhub-v3-inline-stats" style={{ marginBottom: 12 }}>
-        <span>Active: <strong>{studioKpis.active}</strong></span>
-        <span>Scheduled: <strong>{studioKpis.scheduled}</strong></span>
-        <span>Drafts: <strong>{studioKpis.draft}</strong></span>
-        <span>Completed: <strong>{studioKpis.completed}</strong></span>
-        <span>Open rate: <strong>{studioKpis.openRate}%</strong></span>
-        <span>Click rate: <strong>{studioKpis.clickRate}%</strong></span>
-      </div>
-
-      <div className="mhub-v3-campaigns__toolbar">
+      <div className="mhub-v3-campaigns__toolbar mhub-v3-campaigns__toolbar--mailchimp">
         <input type="search" className="mhub-v3-input" placeholder="Search campaigns…" value={query} onChange={(e) => setQuery(e.target.value)} />
-        <select className="mhub-v3-input" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-          <option value="">All statuses</option>
+        <select className="mhub-v3-input mhub-v3-input--filter" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+          <option value="">Status: All</option>
           <option value="active">Active</option>
           <option value="scheduled">Scheduled</option>
           <option value="draft">Draft</option>
           <option value="completed">Completed</option>
         </select>
-        <div className="mhub-v3-periods">
-          <button type="button" className={`mhub-v3-period${view === 'grid' ? ' is-active' : ''}`} onClick={() => setView('grid')}>Grid</button>
-          <button type="button" className={`mhub-v3-period${view === 'list' ? ' is-active' : ''}`} onClick={() => setView('list')}>List</button>
-        </div>
+        {(statusFilter || query) ? (
+          <button type="button" className="mhub-v3-link" onClick={() => { setStatusFilter(''); setQuery('') }}>Clear all</button>
+        ) : null}
       </div>
 
       {view === 'grid' ? (

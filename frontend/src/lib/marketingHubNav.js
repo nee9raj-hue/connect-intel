@@ -1,32 +1,38 @@
-/** Marketing Hub V3 — navigation IA */
+/** Marketing Hub — Mailchimp-style navigation IA */
 
 export const MARKETING_HUB_TABS = [
-  { id: 'overview', label: 'Overview', short: 'Home' },
+  { id: 'overview', label: 'Home', short: 'Home' },
   { id: 'campaigns', label: 'Campaigns', short: 'Camp' },
-  { id: 'bulk-email', label: 'Bulk email', short: 'Bulk' },
   { id: 'automations', label: 'Automations', short: 'Auto' },
-  { id: 'audiences', label: 'Audiences', short: 'Aud' },
   { id: 'forms', label: 'Forms', short: 'Form' },
-  { id: 'landing', label: 'Landing pages', short: 'Land' },
-  { id: 'templates', label: 'Templates', short: 'Tpl' },
+  { id: 'audiences', label: 'Audience', short: 'Aud' },
   { id: 'analytics', label: 'Analytics', short: 'Stats' },
   { id: 'domains', label: 'Domains', short: 'Dom' },
+  { id: 'templates', label: 'Content', short: 'Tpl' },
+]
+
+export const CAMPAIGN_SUB_NAV = [
+  { id: 'templates', label: 'Email templates', badge: 'New' },
 ]
 
 export const MOBILE_HUB_TABS = MARKETING_HUB_TABS.filter(
-  (t) => !['templates', 'landing', 'domains'].includes(t.id)
+  (t) => !['templates', 'domains'].includes(t.id)
 )
 
 const TAB_ALIASES = {
   dashboard: 'overview',
+  home: 'overview',
   lists: 'audiences',
   segments: 'audiences',
   reports: 'analytics',
-  feeds: 'assets',
+  feeds: 'templates',
   assets: 'templates',
+  content: 'templates',
   suppressions: 'domains',
   inbox: 'campaigns',
   'bulk email': 'bulk-email',
+  'bulk-email': 'bulk-email',
+  landing: 'templates',
 }
 
 export function normalizeMarketingTab(tab) {

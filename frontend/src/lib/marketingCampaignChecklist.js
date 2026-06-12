@@ -1,4 +1,49 @@
+import { DEFAULT_THEME } from './marketingEmailDesign'
+
 /** Mailchimp-style campaign setup checklist (To → From → Subject → Send time → Content). */
+
+function toDatetimeLocal(iso) {
+  if (!iso) return ''
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return ''
+  const pad = (n) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+
+/** Hydrate checklist form when editing an existing draft campaign. */
+export function campaignToEditForm(campaign) {
+  const steps = campaign?.steps || []
+  const s0 = steps[0] || {}
+  const s1 = steps[1]
+  return {
+    id: campaign?.id || '',
+    name: String(campaign?.name || '').trim() || 'Untitled',
+    channel: campaign?.channel || 'email',
+    listId: campaign?.listId || '',
+    segmentId: campaign?.segmentId || '',
+    audienceMode: campaign?.segmentId ? 'segment' : 'list',
+    templateId: campaign?.templateId || '',
+    subject: s0.subject || campaign?.subject || '',
+    body: s0.body || campaign?.body || '',
+    blocks: s0.blocks || campaign?.blocks || [],
+    design: s0.design || campaign?.design || { ...DEFAULT_THEME },
+    previewText: s0.previewText || campaign?.previewText || '',
+    fromName: campaign?.fromName || '',
+    fromEmail: campaign?.fromEmail || '',
+    sendMode: campaign?.sendMode || (campaign?.scheduledAt ? 'scheduled' : 'immediate'),
+    scheduledAt: toDatetimeLocal(campaign?.scheduledAt),
+    useSequence: steps.length > 1,
+    step2Subject: s1?.subject || '',
+    step2Body: s1?.body || '',
+    step2Blocks: s1?.blocks || [],
+    step2Design: s1?.design || { ...DEFAULT_THEME },
+    step2PreviewText: s1?.previewText || '',
+    step2Delay: s1?.delayDays ?? 3,
+    emailProvider: campaign?.emailProvider || 'auto',
+    recurrence: campaign?.recurrence || '',
+    abTest: campaign?.abTest || null,
+  }
+}
 
 export const CAMPAIGN_CHECKLIST_STEPS = [
   { id: 'to', label: 'To', question: 'Who are you sending this email to?' },
@@ -19,23 +64,27 @@ export function visibleChecklistSteps(channel = 'email') {
 }
 
 export function audienceLabel(campaignForm, lists = [], segments = []) {
+  if (campaignForm.audienceMode === 'all') return 'Entire audience'
   if (campaignForm.audienceMode === 'segment' && campaignForm.segmentId) {
     const seg = segments.find((s) => s.id === campaignForm.segmentId)
     return seg?.name || 'Segment selected'
   }
-  if (campaignForm.listId) {
+  if (campaignForm.listId || campaignForm.audienceMode === 'list') {
     const list = lists.find((l) => l.id === campaignForm.listId)
     return list?.name || 'List selected'
   }
   return null
 }
 
-export function audienceCount(campaignForm, lists = [], segments = []) {
+export function audienceCount(campaignForm, lists = [], segments = [], totalContacts = 0) {
+  if (campaignForm.audienceMode === 'all') {
+    return totalContacts || 0
+  }
   if (campaignForm.audienceMode === 'segment' && campaignForm.segmentId) {
     const seg = segments.find((s) => s.id === campaignForm.segmentId)
     return seg?.memberCount ?? seg?.snapshot?.contactCount ?? 0
   }
-  if (campaignForm.listId) {
+  if (campaignForm.listId || campaignForm.audienceMode === 'list') {
     const list = lists.find((l) => l.id === campaignForm.listId)
     return list?.memberCount ?? list?.leadIds?.length ?? list?.snapshot?.contactCount ?? 0
   }
@@ -45,6 +94,7 @@ export function audienceCount(campaignForm, lists = [], segments = []) {
 export function isChecklistStepComplete(stepId, campaignForm, { gmailConnected = false } = {}) {
   switch (stepId) {
     case 'to':
+      if (campaignForm.audienceMode === 'all') return true
       return Boolean(campaignForm.listId || campaignForm.segmentId)
     case 'from':
       if (campaignForm.channel === 'whatsapp') return true
@@ -85,11 +135,11 @@ export function defaultFromFields(user, gmailStatus, orgName) {
   return { fromName, fromEmail }
 }
 
-export function stepSummary(stepId, campaignForm, lists, segments, { gmailStatus } = {}) {
+export function stepSummary(stepId, campaignForm, lists, segments, { gmailStatus, totalContacts = 0 } = {}) {
   switch (stepId) {
     case 'to': {
       const label = audienceLabel(campaignForm, lists, segments)
-      const count = audienceCount(campaignForm, lists, segments)
+      const count = audienceCount(campaignForm, lists, segments, totalContacts)
       if (!label) return null
       return count ? `${label} · ${count.toLocaleString()} contacts` : label
     }

@@ -18,7 +18,8 @@ import MarketingCampaignWizardModal from './MarketingCampaignWizardModal'
 import MarketingHubShell from './MarketingHubShell'
 import MarketingOverviewTab from './MarketingOverviewTab'
 import MarketingBulkEmailTab from './MarketingBulkEmailTab'
-import MarketingCampaignStudio from './MarketingCampaignStudio'
+import MarketingCampaigns from './MarketingCampaigns'
+import MarketingCreateChooser from './MarketingCreateChooser'
 import MarketingCampaignChecklistBuilder from './MarketingCampaignChecklistBuilder'
 import MarketingTemplateMarketplace from './MarketingTemplateMarketplace'
 import MarketingBrandKit, { mergeBrandKit } from './MarketingBrandKit'
@@ -35,6 +36,7 @@ import {
   normalizeMarketingTab,
   audienceTabFromPanelOptions,
 } from '../../lib/marketingHubNav'
+import { campaignToEditForm } from '../../lib/marketingCampaignChecklist'
 import MarketingDomainsPanel from './MarketingDomainsPanel'
 import MarketingFeedsPanel from './MarketingFeedsPanel'
 import PanelGuideModal from '../guides/PanelGuideModal'
@@ -124,17 +126,29 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
   const [brandKitOpen, setBrandKitOpen] = useState(false)
   const handleMarketingTabChange = (newTab) => {
     if (newTab === 'templates') setTemplatePhase('marketplace')
+    if (newTab === 'campaigns' && campaignDesktopPhase === 'report') {
+      setCampaignDesktopPhase('list')
+    }
     setTab(newTab)
+  }
+
+  const openCreateFlow = () => {
+    setTab('campaigns')
+    setCampaignDesktopPhase('create')
   }
   const isMobile = useIsMobile()
 
   const isBuilderTab = tab === 'campaigns' || tab === 'templates'
   const hideMarketingKpis =
     isBuilderTab || tab === 'analytics' || tab === 'audiences' || tab === 'overview' || tab === 'assets'
+  const campaignReportId = panelOptions?.report || null
+
   const hideMarketingHeader =
     !isMobile &&
     ((tab === 'templates' && templatePhase === 'editor') ||
-      (tab === 'campaigns' && (campaignDesktopPhase === 'editor' || campaignDesktopPhase === 'wizard')))
+      (tab === 'campaigns' &&
+        ['create', 'editor', 'wizard', 'report'].includes(campaignDesktopPhase)) ||
+      (tab === 'analytics' && Boolean(panelOptions?.campaignId)))
   const visibleTabs = isMobile ? MOBILE_TABS : TABS
   const [summary, setSummary] = useState(null)
   const [gmailStatus, setGmailStatus] = useState(null)
@@ -154,7 +168,17 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
     design: { ...DEFAULT_THEME },
     step2Design: { ...DEFAULT_THEME },
   })
+  const totalContacts = useMemo(() => {
+    const fromSummary = summary?.enrolled
+    if (fromSummary != null) return fromSummary
+    return (lists || []).reduce(
+      (n, l) => n + (l.memberCount || l.leadIds?.length || 0),
+      0
+    )
+  }, [summary, lists])
+
   const hasAudience =
+    campaignForm.audienceMode === 'all' ||
     Boolean(campaignForm.listId) ||
     Boolean(campaignForm.segmentId) ||
     (campaignForm.audienceMode === 'segment' && Boolean(campaignForm.segmentId))
@@ -220,6 +244,10 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
     if (panelOptions?.audienceTab) setAudienceSubTab(panelOptions.audienceTab)
     else if (panelOptions?.tab === 'lists') setAudienceSubTab('lists')
     else if (panelOptions?.tab === 'segments') setAudienceSubTab('segments')
+    if (panelOptions?.report) {
+      setTab('campaigns')
+      setCampaignDesktopPhase('report')
+    }
     if (panelOptions?.launchListId) {
       setTab('campaigns')
       setCampaignDesktopPhase('wizard')
@@ -232,7 +260,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
         name: panelOptions.audienceName || p.name,
       }))
     }
-  }, [activePanel, panelOptions?.tab, panelOptions?.audienceTab, panelOptions?.launchListId, panelOptions?.audienceName])
+  }, [activePanel, panelOptions?.tab, panelOptions?.audienceTab, panelOptions?.launchListId, panelOptions?.audienceName, panelOptions?.report])
 
   useEffect(() => {
     if (user?.accountType !== 'company') return
@@ -477,20 +505,13 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
     }
   }
 
-  const createCampaign = async () => {
-    if (!campaignForm.name.trim()) return setError('Campaign name is required')
-    if (!hasAudience) return setError('Choose a list or segment')
+  const buildCampaignPayload = (options = {}) => {
+    const { partial = false } = options
+    const name = campaignForm.name.trim() || 'Untitled'
     const isWa = campaignForm.channel === 'whatsapp'
-    if (!campaignForm.body.trim() && !campaignForm.blocks?.length) {
-      return setError('Message content is required')
-    }
-    if (!isWa && !campaignForm.subject.trim()) {
-      return setError('Email subject is required')
-    }
-
     const steps = [
       {
-        subject: campaignForm.subject.trim() || campaignForm.name.trim(),
+        subject: campaignForm.subject.trim() || name,
         body: campaignForm.body.trim(),
         blocks: campaignForm.blocks?.length ? campaignForm.blocks : undefined,
         design: campaignForm.design,
@@ -508,42 +529,114 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
         delayDays: Number(campaignForm.step2Delay) || 3,
       })
     }
+    let listId = campaignForm.listId || undefined
+    let segmentId = campaignForm.segmentId || undefined
+    if (campaignForm.audienceMode === 'segment') {
+      listId = undefined
+    } else if (campaignForm.audienceMode === 'all') {
+      segmentId = undefined
+      const biggest = [...lists].sort(
+        (a, b) =>
+          (b.memberCount || b.leadIds?.length || 0) - (a.memberCount || a.leadIds?.length || 0)
+      )[0]
+      listId = biggest?.id
+    } else {
+      segmentId = undefined
+    }
+    return {
+      name,
+      channel: campaignForm.channel,
+      listId,
+      segmentId: campaignForm.audienceMode === 'segment' ? segmentId : undefined,
+      sendMode: campaignForm.sendMode,
+      scheduledAt:
+        campaignForm.sendMode === 'scheduled' && campaignForm.scheduledAt
+          ? new Date(campaignForm.scheduledAt).toISOString()
+          : undefined,
+      recurrence: campaignForm.recurrence || undefined,
+      abTest: campaignForm.abTest || undefined,
+      emailProvider: campaignForm.emailProvider !== 'auto' ? campaignForm.emailProvider : undefined,
+      templateId: campaignForm.templateId || undefined,
+      fromName: campaignForm.fromName || undefined,
+      fromEmail: campaignForm.fromEmail || undefined,
+      type: steps.length > 1 ? 'sequence' : 'one_shot',
+      subject: campaignForm.subject.trim() || (partial ? undefined : name),
+      body: campaignForm.body.trim() || (partial ? '' : undefined),
+      blocks: campaignForm.blocks?.length ? campaignForm.blocks : undefined,
+      design: campaignForm.design,
+      previewText: campaignForm.previewText || undefined,
+      steps,
+      partial: partial || undefined,
+      skipContentValidation: partial || undefined,
+      isWa,
+    }
+  }
+
+  const createCampaign = async (options = {}) => {
+    const { partial = false, keepEditing = false } = options
+    if (!campaignForm.name.trim() && !partial) return setError('Campaign name is required')
+    if (!hasAudience) return setError('Choose a list or segment')
+
+    const payload = buildCampaignPayload({ partial })
+    const isWa = payload.isWa
+    delete payload.isWa
+    delete payload.partial
+    delete payload.skipContentValidation
+
+    if (!partial) {
+      if (!payload.body && !campaignForm.blocks?.length) {
+        return setError('Message content is required')
+      }
+      if (!isWa && !campaignForm.subject.trim()) {
+        return setError('Email subject is required')
+      }
+    } else if (!campaignForm.id && !payload.body && !campaignForm.blocks?.length) {
+      payload.subject = campaignForm.subject.trim() || '(draft)'
+      payload.body = ' '
+      payload.steps = [
+        {
+          ...payload.steps[0],
+          subject: payload.subject,
+          body: ' ',
+          blocks: undefined,
+        },
+      ]
+    }
 
     setBusy(true)
     setError(null)
     try {
-      const data = await api.createMarketingCampaign({
-        name: campaignForm.name.trim(),
-        channel: campaignForm.channel,
-        listId: campaignForm.audienceMode === 'segment' ? undefined : campaignForm.listId,
-        segmentId: campaignForm.audienceMode === 'segment' ? campaignForm.segmentId : undefined,
-        sendMode: campaignForm.sendMode,
-        scheduledAt:
-          campaignForm.sendMode === 'scheduled' && campaignForm.scheduledAt
-            ? new Date(campaignForm.scheduledAt).toISOString()
-            : undefined,
-        recurrence: campaignForm.recurrence || undefined,
-        abTest: campaignForm.abTest || undefined,
-        emailProvider: campaignForm.emailProvider !== 'auto' ? campaignForm.emailProvider : undefined,
-        templateId: campaignForm.templateId || undefined,
-        type: steps.length > 1 ? 'sequence' : 'one_shot',
-        subject: campaignForm.subject.trim(),
-        body: campaignForm.body.trim(),
-        blocks: campaignForm.blocks?.length ? campaignForm.blocks : undefined,
-        design: campaignForm.design,
-        previewText: campaignForm.previewText || undefined,
-        steps,
-      })
-      setNotice('Campaign created as draft')
-      resetCampaignForm()
+      let campaignId = campaignForm.id
+      if (campaignForm.id) {
+        await api.updateMarketingCampaign({ id: campaignForm.id, ...payload })
+        setNotice('Campaign saved')
+      } else {
+        const data = await api.createMarketingCampaign(payload)
+        campaignId = data.campaign?.id
+        if (campaignId) {
+          setCampaignForm((p) => ({ ...p, id: campaignId }))
+        }
+        setNotice(partial ? 'Draft saved' : 'Campaign created as draft')
+      }
+      if (!keepEditing) resetCampaignForm()
       await load()
-      return data.campaign?.id
+      return campaignId
     } catch (e) {
       setError(e.message)
       return null
     } finally {
       setBusy(false)
     }
+  }
+
+  const openCampaignEditor = (campaign) => {
+    if (!campaign) return
+    skipNextCampaignResetRef.current = true
+    setCampaignForm(campaignToEditForm(campaign))
+    setCampaignEmailStep(1)
+    setCampaignWizardStep(0)
+    setCampaignDesktopPhase('wizard')
+    setTab('campaigns')
   }
 
   const duplicateCampaignForResend = async (campaignId) => {
@@ -1041,34 +1134,49 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
       )
     }
 
-    if (campaignDesktopPhase === 'list') {
+    if (campaignDesktopPhase === 'create') {
       return (
-        <MarketingCampaignStudio
-          campaigns={campaigns}
-          lists={lists}
-          segments={segments}
-          summary={summary}
-          busy={busy}
-          user={user}
-          permissions={permissions}
-          onNavigate={onNavigate}
-          onStart={startCampaign}
-          onPause={pauseCampaign}
-          onResume={continueCampaignSending}
-          onStop={stopCampaign}
-          onContinue={continueCampaignSending}
-          onApprove={approveCampaign}
-          onReject={rejectCampaign}
-          onCreate={() => {
+        <MarketingCreateChooser
+          onBack={() => setCampaignDesktopPhase('list')}
+          onStartCampaign={() => {
             resetCampaignForm()
-            setCampaignForm((p) => ({ ...p, design: mergeBrandKit(p.design) }))
+            setCampaignForm((p) => ({ ...p, design: mergeBrandKit(p.design), audienceMode: 'all' }))
             setCampaignWizardStep(0)
             setCampaignDesktopPhase('wizard')
           }}
-          onEdit={() => {
-            setCampaignWizardStep(1)
-            setCampaignDesktopPhase('wizard')
+          onNavigate={onNavigate}
+        />
+      )
+    }
+
+    if (campaignDesktopPhase === 'report') {
+      const reportId = campaignReportId || panelOptions?.campaignId
+      return (
+        <div className="mc-page mc-report-page">
+          <CampaignReportsView
+            campaigns={reportCampaigns}
+            initialCampaignId={reportId}
+            onNavigate={onNavigate}
+          />
+        </div>
+      )
+    }
+
+    if (campaignDesktopPhase === 'list') {
+      return (
+        <MarketingCampaigns
+          campaigns={campaigns}
+          lists={lists}
+          segments={segments}
+          busy={busy}
+          onNavigate={onNavigate}
+          onCreate={() => setCampaignDesktopPhase('create')}
+          onEdit={openCampaignEditor}
+          onOpenReport={(c) => {
+            onNavigate?.('marketing', { tab: 'campaigns', report: c.id })
+            setCampaignDesktopPhase('report')
           }}
+          onDuplicate={duplicateCampaignForResend}
         />
       )
     }
@@ -1085,14 +1193,16 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
             user={user}
             gmailStatus={gmailStatus}
             orgName={user?.organizationName}
-            onBackToList={() => setCampaignDesktopPhase('list')}
+            totalContacts={totalContacts}
+            onBackToList={async () => {
+              await createCampaign({ partial: true, keepEditing: false }).catch(() => {})
+              setCampaignDesktopPhase('list')
+            }}
             onEnterEditor={() => setCampaignDesktopPhase('editor')}
             onSaveDraft={async () => {
               setError(null)
-              if (campaignForm.name.trim() && hasAudience) {
-                await createCampaign()
-              }
-              setCampaignDesktopPhase('list')
+              const id = await createCampaign({ partial: true, keepEditing: false })
+              if (id) setCampaignDesktopPhase('list')
             }}
             onLaunch={createAndStart}
             onTestSend={handleTestSend}
@@ -1238,6 +1348,25 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
             renderCampaignsTab()
           ) : tab === 'templates' ? (
             renderTemplatesTab()
+          ) : tab === 'bulk-email' ? (
+            <MarketingBulkEmailTab lists={lists} onNavigate={onNavigate} />
+          ) : tab === 'analytics' ? (
+            <MarketingAnalyticsHub
+              onNavigate={onNavigate}
+              period={hubPeriod}
+              onPeriodChange={setHubPeriod}
+              campaignId={panelOptions?.campaignId}
+              reportCampaigns={reportCampaigns}
+              summary={summary}
+              onReload={load}
+              onDuplicate={duplicateCampaignForResend}
+              onPause={pauseCampaign}
+              onResume={continueCampaignSending}
+              onStop={stopCampaign}
+              onContinue={continueCampaignSending}
+              busy={busy}
+              showCreator={Boolean(user?.isOrgAdmin && user?.accountType === 'company')}
+            />
           ) : null}
         </div>
       ) : (
@@ -1246,20 +1375,8 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
           onTabChange={handleMarketingTabChange}
           onNavigate={onNavigate}
           orgName={user?.organizationName}
-          onCreateCampaign={() => {
-            setTab('campaigns')
-            resetCampaignForm()
-            setCampaignForm((p) => ({ ...p, design: mergeBrandKit(p.design) }))
-            setCampaignWizardStep(0)
-            setCampaignDesktopPhase('wizard')
-          }}
-          onCreateAutomation={() => setTab('automations')}
-          onImportContacts={() => {
-            setTab('audiences')
-            setAudienceSubTab('lists')
-          }}
-          onCreateForm={() => setTab('forms')}
-          onCreateLanding={() => setTab('landing')}
+          user={user}
+          onCreateCampaign={openCreateFlow}
           alerts={
             <>
               {(error || notice) && (
@@ -1303,20 +1420,9 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
           {tab === 'overview' ? (
             <MarketingOverviewTab
               onNavigate={onNavigate}
-              summary={summary}
               reportCampaigns={reportCampaigns}
-              forms={forms}
               lists={lists}
-              segments={segments}
-              dataLoading={loading}
-              onOpenCampaign={(c) => onNavigate?.('marketing', { tab: 'analytics', campaignId: c.id })}
-              onCreateCampaign={() => {
-                setTab('campaigns')
-                resetCampaignForm()
-                setCampaignForm((p) => ({ ...p, design: mergeBrandKit(p.design) }))
-                setCampaignWizardStep(0)
-                setCampaignDesktopPhase('wizard')
-              }}
+              onCreateCampaign={openCreateFlow}
             />
           ) : tab === 'bulk-email' ? (
             <MarketingBulkEmailTab lists={lists} onNavigate={onNavigate} />

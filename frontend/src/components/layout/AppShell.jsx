@@ -299,11 +299,17 @@ export default function AppShell() {
     return () => setPanelNavigate(null)
   }, [navigate, setPanelNavigate])
 
+  const crmSidebarClass = marketingFocus
+    ? 'ci-marketing-focus__crm-sidebar'
+    : chithiFocus
+      ? 'ci-chithi-focus__crm-sidebar'
+      : ''
+
   return (
     <div
       className={`flex h-[100dvh] w-full overflow-hidden bg-[var(--color-hs-canvas)] ${
         chithiFocus ? 'ci-chithi-focus' : ''
-      }`}
+      }${marketingFocus ? ' ci-marketing-focus' : ''}`}
     >
       <Sidebar
         active={activePanel}
@@ -314,7 +320,7 @@ export default function AppShell() {
         sidebarMode={sidebarMode}
         onToggleSidebarCollapsed={toggleSidebarCollapsed}
         chithiOpen={chithiFocus}
-        className={chithiFocus ? 'ci-chithi-focus__crm-sidebar' : ''}
+        className={crmSidebarClass}
       />
       <main
         className={`ci-app-main flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden${

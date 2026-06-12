@@ -1,17 +1,52 @@
-import { MARKETING_HUB_TABS, MOBILE_HUB_TABS } from '../../lib/marketingHubNav'
+import { useEffect, useState } from 'react'
+import {
+  MARKETING_HUB_TABS,
+  MOBILE_HUB_TABS,
+  CAMPAIGN_SUB_NAV,
+} from '../../lib/marketingHubNav'
 import useIsMobile from '../../hooks/useIsMobile'
+import { BRAND_LOGO_MARK_LIGHT, BRAND_LOGO_MARK_CLASS } from '../../lib/brandAssets'
+import {
+  HomeIcon,
+  MailIcon,
+  BoltIcon,
+  PeopleIcon,
+  NoteIcon,
+  ChartIcon,
+  LayoutTemplateIcon,
+  RouteIcon,
+  ChevronLeftIcon,
+  SignOutIcon,
+} from '../ui/icons'
 
-const SIDEBAR_ICONS = {
-  overview: '⌂',
-  campaigns: '✉',
-  'bulk-email': '◎',
-  automations: '⚡',
-  audiences: '👥',
-  forms: '📋',
-  landing: '🌐',
-  templates: '▦',
-  analytics: '📊',
-  domains: '🔗',
+const SIDEBAR_KEY = 'ci_mhub_sidebar_collapsed'
+
+const TAB_ICONS = {
+  overview: HomeIcon,
+  campaigns: MailIcon,
+  automations: BoltIcon,
+  audiences: PeopleIcon,
+  forms: NoteIcon,
+  analytics: ChartIcon,
+  domains: RouteIcon,
+  templates: LayoutTemplateIcon,
+}
+
+function loadCollapsed() {
+  try {
+    return localStorage.getItem(SIDEBAR_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
+function userInitials(user) {
+  const n = [user?.firstName, user?.lastName].filter(Boolean).join(' ')
+  if (n) {
+    const p = n.split(/\s+/)
+    return `${p[0]?.[0] || ''}${p[1]?.[0] || ''}`.toUpperCase() || 'U'
+  }
+  return (user?.email?.[0] || 'U').toUpperCase()
 }
 
 export default function MarketingHubShell({
@@ -19,84 +54,122 @@ export default function MarketingHubShell({
   onTabChange,
   onNavigate,
   onCreateCampaign,
-  onImportContacts,
+  user,
   orgName,
   children,
   alerts,
 }) {
   const isMobile = useIsMobile()
   const visibleTabs = isMobile ? MOBILE_HUB_TABS : MARKETING_HUB_TABS
-  const useSidebar = !isMobile
+  const [collapsed, setCollapsed] = useState(loadCollapsed)
 
-  const backToCrm = () => {
-    onNavigate?.('pipeline')
-  }
+  useEffect(() => {
+    try {
+      localStorage.setItem(SIDEBAR_KEY, collapsed ? '1' : '0')
+    } catch {
+      /* ignore */
+    }
+  }, [collapsed])
 
-  const sidebar = useSidebar ? (
-    <aside className="mhub-v3-sidebar" aria-label="Marketing navigation">
-      <div className="mhub-v3-sidebar__brand">Marketing</div>
-      <button type="button" className="mhub-v3-btn mhub-v3-btn--primary mhub-v3-sidebar__create" onClick={onCreateCampaign}>
-        Create
+  const backToCrm = () => onNavigate?.('pipeline')
+
+  const sidebar = !isMobile ? (
+    <aside className={`mc-nav${collapsed ? ' is-collapsed' : ''}`} aria-label="Marketing">
+      <div className="mc-nav__head">
+        <img src={BRAND_LOGO_MARK_LIGHT} alt="" className={`mc-nav__logo ${BRAND_LOGO_MARK_CLASS}`} />
+        {!collapsed ? <span className="mc-nav__brand">Connect Intel</span> : null}
+        <button
+          type="button"
+          className="mc-nav__collapse"
+          onClick={backToCrm}
+          title="Back to CRM"
+          aria-label="Back to CRM"
+        >
+          <ChevronLeftIcon className="w-4 h-4" />
+        </button>
+      </div>
+
+      <button type="button" className="mc-nav__create" onClick={onCreateCampaign}>
+        {!collapsed ? '+ Create' : '+'}
       </button>
-      <nav className="mhub-v3-sidebar__nav">
-        {visibleTabs.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            className={`mhub-v3-sidebar__link${tab === t.id ? ' is-active' : ''}`}
-            onClick={() => onTabChange(t.id)}
-          >
-            <span aria-hidden>{SIDEBAR_ICONS[t.id] || '•'}</span>
-            {t.label}
-          </button>
-        ))}
+
+      <nav className="mc-nav__links">
+        {visibleTabs.map((t) => {
+          const Icon = TAB_ICONS[t.id] || MailIcon
+          const active = tab === t.id
+          return (
+            <div key={t.id}>
+              <button
+                type="button"
+                className={`mc-nav__link${active ? ' is-active' : ''}`}
+                onClick={() => onTabChange(t.id)}
+                title={t.label}
+              >
+                <Icon className="mc-nav__icon" />
+                {!collapsed ? <span>{t.label}</span> : null}
+              </button>
+              {!collapsed && t.id === 'campaigns' && tab === 'campaigns'
+                ? CAMPAIGN_SUB_NAV.map((sub) => (
+                    <button
+                      key={sub.id}
+                      type="button"
+                      className="mc-nav__sublink"
+                      onClick={() => onTabChange(sub.id)}
+                    >
+                      {sub.label}
+                      {sub.badge ? <span className="mc-nav__badge">{sub.badge}</span> : null}
+                    </button>
+                  ))
+                : null}
+            </div>
+          )
+        })}
       </nav>
+
+      <div className="mc-nav__foot">
+        {!collapsed && user ? (
+          <div className="mc-nav__user">
+            <span className="mc-nav__avatar" aria-hidden>
+              {userInitials(user)}
+            </span>
+            <div className="mc-nav__user-meta">
+              <strong>
+                {[user.firstName, user.lastName].filter(Boolean).join(' ') || user.email}
+              </strong>
+              <span>{user.email}</span>
+            </div>
+          </div>
+        ) : null}
+        <button type="button" className="mc-nav__exit" onClick={backToCrm}>
+          <SignOutIcon className="mc-nav__icon" />
+          {!collapsed ? <span>Back to CRM</span> : null}
+        </button>
+      </div>
     </aside>
   ) : null
 
-  const topbar = (
-    <header className="mhub-v3-topbar">
-      <div className="mhub-v3-topbar__left">
-        <button type="button" className="mhub-v3-back" onClick={backToCrm}>
-          ← CRM
-        </button>
-        <h1 className="mhub-v3-topbar__title">Marketing Hub</h1>
-        {orgName ? <span className="mhub-v3-org">{orgName}</span> : null}
-      </div>
-      <div className="mhub-v3-topbar__actions">
-        <button type="button" className="mhub-v3-btn" onClick={onImportContacts}>
-          Import
-        </button>
-        <button type="button" className="mhub-v3-btn mhub-v3-btn--primary" onClick={onCreateCampaign}>
-          Create campaign
-        </button>
-      </div>
-    </header>
-  )
-
-  const tabs = !useSidebar ? (
-    <nav className="mhub-v3-tabs" aria-label="Marketing sections">
+  const mobileTabs = isMobile ? (
+    <nav className="mc-mobile-tabs" aria-label="Marketing sections">
       {visibleTabs.map((t) => (
         <button
           key={t.id}
           type="button"
-          className={`mhub-v3-tab${tab === t.id ? ' is-active' : ''}`}
+          className={`mc-mobile-tabs__btn${tab === t.id ? ' is-active' : ''}`}
           onClick={() => onTabChange(t.id)}
         >
-          {isMobile ? t.short || t.label : t.label}
+          {t.short || t.label}
         </button>
       ))}
     </nav>
   ) : null
 
   return (
-    <div className={`mhub-v3 mhub-shell panel-shell flex-1 min-h-0 w-full${useSidebar ? ' mhub-v3--sidebar' : ''}`}>
+    <div className="mc-shell">
       {sidebar}
-      <div className="mhub-v3-main">
-        {topbar}
-        {tabs}
-        {alerts ? <div className="mhub-v3-alerts">{alerts}</div> : null}
-        <div className="mhub-v3-body panel-body-scroll">{children}</div>
+      <div className="mc-shell__main">
+        {mobileTabs}
+        {alerts ? <div className="mc-shell__alerts">{alerts}</div> : null}
+        <div className="mc-shell__body">{children}</div>
       </div>
     </div>
   )

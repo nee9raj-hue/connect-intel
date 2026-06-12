@@ -4,9 +4,9 @@
  */
 
 .mhub-v3 {
-  --mh-accent: #ff773d;
-  --mh-accent-tint: #fff4ee;
-  --mh-page-bg: #f5f5f3;
+  --mh-accent: #007c89;
+  --mh-accent-tint: #e8f4f5;
+  --mh-page-bg: #f6f6f4;
   --mh-card-bg: #ffffff;
   --mh-border: rgba(0, 0, 0, 0.09);
   --mh-text: #111111;
@@ -121,8 +121,8 @@
 }
 
 .mhub-v3 .mhub-v3-btn--primary:hover {
-  background: #e5652f;
-  border-color: #e5652f;
+  background: #006570;
+  border-color: #006570;
 }
 
 /* —— Tab bar —— */
@@ -656,7 +656,17 @@
   color: var(--mh-accent);
 }
 
-/* App shell: hide CRM chrome when marketing is full-screen */
+/* App shell: marketing hub owns the full viewport (hide CRM sidebar + top chrome) */
+@media (min-width: 768px) {
+  .ci-marketing-focus .ci-marketing-focus__crm-sidebar {
+    display: none;
+  }
+}
+
+.ci-marketing-focus .ci-app-main {
+  background: var(--mh-page-bg, #f6f6f4);
+}
+
 .ci-app-main.marketing-focus .ci-mobile-top-bar,
 .ci-app-main.marketing-focus > :not(.ci-app-main__panels):not(script) {
   /* handled per-element below */
@@ -1066,29 +1076,67 @@
 @media (min-width: 900px) {
   .mhub-v3.mhub-v3--sidebar {
     flex-direction: row;
-    background: var(--mh-card-bg);
+    background: var(--mh-page-bg);
+    height: 100%;
   }
 
   .mhub-v3--sidebar .mhub-v3-sidebar {
-    width: 220px;
+    width: 232px;
     flex-shrink: 0;
     border-right: 0.5px solid var(--mh-border);
     display: flex;
     flex-direction: column;
     min-height: 0;
-    background: #fafaf9;
+    background: #fff;
+    transition: width 0.15s ease;
+  }
+
+  .mhub-v3--sidebar .mhub-v3-sidebar.is-collapsed {
+    width: 64px;
+  }
+
+  .mhub-v3--sidebar .mhub-v3-sidebar__top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 12px;
+    border-bottom: 0.5px solid var(--mh-border);
+    min-height: 52px;
+  }
+
+  .mhub-v3--sidebar .mhub-v3-sidebar__logo {
+    height: 22px;
+    width: auto;
+    flex-shrink: 0;
   }
 
   .mhub-v3--sidebar .mhub-v3-sidebar__brand {
-    padding: 14px 16px;
     font-size: 13px;
     font-weight: 600;
-    border-bottom: 0.5px solid var(--mh-border);
+    color: var(--mh-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mhub-v3--sidebar .mhub-v3-sidebar__icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    color: #241c15;
   }
 
   .mhub-v3--sidebar .mhub-v3-sidebar__create {
     margin: 12px;
     width: calc(100% - 24px);
+    justify-content: center;
+    gap: 8px;
+    font-weight: 500;
+  }
+
+  .mhub-v3--sidebar.is-collapsed .mhub-v3-sidebar__create {
+    padding-left: 0;
+    padding-right: 0;
   }
 
   .mhub-v3--sidebar .mhub-v3-sidebar__nav {
@@ -1103,26 +1151,58 @@
   .mhub-v3--sidebar .mhub-v3-sidebar__link {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     width: 100%;
     text-align: left;
-    padding: 8px 10px;
+    padding: 9px 10px;
     border: none;
     border-radius: 8px;
     background: transparent;
     font-size: 13px;
-    color: var(--mh-text);
+    color: #241c15;
     cursor: pointer;
   }
 
+  .mhub-v3--sidebar.is-collapsed .mhub-v3-sidebar__link {
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
   .mhub-v3--sidebar .mhub-v3-sidebar__link:hover {
-    background: rgba(0, 0, 0, 0.04);
+    background: #f0f0f0;
   }
 
   .mhub-v3--sidebar .mhub-v3-sidebar__link.is-active {
-    background: var(--mh-accent-tint);
-    color: var(--mh-text);
+    background: #efeeea;
     font-weight: 500;
+  }
+
+  .mhub-v3--sidebar .mhub-v3-sidebar__link--muted {
+    color: #6b6b6b;
+    font-size: 12px;
+  }
+
+  .mhub-v3--sidebar .mhub-v3-sidebar__link--exit {
+    color: #6b6b6b;
+    font-size: 12px;
+  }
+
+  .mhub-v3--sidebar .mhub-v3-sidebar__foot {
+    border-top: 0.5px solid var(--mh-border);
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .mhub-v3--sidebar .mhub-v3-sidebar__org {
+    margin: 6px 10px 4px;
+    font-size: 11px;
+    color: var(--mh-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .mhub-v3--sidebar .mhub-v3-main {
@@ -1134,8 +1214,9 @@
     background: var(--mh-page-bg);
   }
 
-  .mhub-v3--sidebar .mhub-v3-topbar {
-    border-bottom: 0.5px solid var(--mh-border);
+  .mhub-v3--sidebar .mhub-v3-body {
+    height: auto;
+    flex: 1;
   }
 
   .mhub-v3--sidebar .mhub-v3-tabs {
@@ -1220,8 +1301,8 @@
 }
 
 .mhub-getting-started__item.is-done .mhub-getting-started__marker {
-  background: #16a34a;
-  border-color: #16a34a;
+  background: var(--mh-accent);
+  border-color: var(--mh-accent);
 }
 
 .mhub-getting-started__card {
@@ -1342,10 +1423,6 @@
   background: #e2e8f0;
 }
 
-.mc-checklist__progress-seg.is-done {
-  background: #16a34a;
-}
-
 .mc-checklist__body {
   flex: 1;
   min-height: 0;
@@ -1394,8 +1471,8 @@
 }
 
 .mc-checklist-step__icon.is-done {
-  background: #16a34a;
-  border-color: #16a34a;
+  background: var(--mh-accent);
+  border-color: var(--mh-accent);
 }
 
 .mc-checklist-step__label {
@@ -1477,8 +1554,8 @@
 }
 
 .mc-checklist-send-card.is-active {
-  border-color: #0d9488;
-  background: #f0fdfa;
+  border-color: var(--mh-accent);
+  background: var(--mh-accent-tint);
 }
 
 .mc-checklist-send-card strong {
@@ -1509,15 +1586,156 @@
 }
 
 .mc-checklist-btn--primary {
-  background: #0d9488;
-  border-color: #0d9488;
+  background: var(--mh-accent);
+  border-color: var(--mh-accent);
   color: #fff;
 }
 
 .mc-checklist-btn--send {
   background: var(--mh-accent);
   border-color: var(--mh-accent);
-  color: #242424;
+  color: #fff;
+}
+
+.mc-checklist-btn--send:hover:not(:disabled) {
+  background: #006570;
+  border-color: #006570;
+}
+
+.mc-checklist__progress-seg.is-done {
+  background: var(--mh-accent);
+}
+
+.mc-checklist-segmented__btn.is-active {
+  border-color: var(--mh-accent);
+  background: var(--mh-accent-tint);
+}
+
+.mc-checklist-send-card.is-active {
+  border-color: var(--mh-accent);
+  background: var(--mh-accent-tint);
+}
+
+.mc-checklist-link {
+  color: var(--mh-accent);
+}
+
+/* Create home (Mailchimp-style) */
+.mhub-create-home {
+  margin-bottom: 28px;
+}
+
+.mhub-create-home__head h1 {
+  margin: 0 0 10px;
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.mhub-create-home__badge {
+  display: inline-block;
+  margin: 0 0 20px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #fff4d6;
+  font-size: 12px;
+  color: #241c15;
+}
+
+.mhub-create-home__head h2 {
+  margin: 0 0 16px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.mhub-create-home__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.mhub-create-home__card {
+  background: #fff;
+  border: 0.5px solid var(--mh-border);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.mhub-create-home__illus {
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mhub-create-home__illus-icon {
+  width: 72px;
+  height: 56px;
+  border: 2px solid rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.mhub-create-home__card h3 {
+  margin: 16px 16px 8px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.mhub-create-home__card p {
+  margin: 0 16px 16px;
+  font-size: 13px;
+  color: var(--mh-text-secondary);
+  flex: 1;
+}
+
+.mhub-create-home__cta {
+  margin: 0 16px 16px;
+  padding: 10px 14px;
+  border: 1px solid #241c15;
+  border-radius: 999px;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  align-self: flex-start;
+}
+
+.mhub-create-home__cta:hover {
+  background: #f6f6f4;
+}
+
+.mhub-v3-campaigns__head--mailchimp {
+  align-items: center;
+}
+
+.mhub-v3-campaigns__title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.mhub-v3-campaigns__head-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mhub-v3-campaigns__toolbar--mailchimp {
+  align-items: center;
+}
+
+.mhub-v3-input--filter {
+  max-width: 160px;
+  flex: 0 0 auto;
+}
+
+@media (max-width: 1100px) {
+  .mhub-create-home__grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .mc-checklist-btn:disabled {

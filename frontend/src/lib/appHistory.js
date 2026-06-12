@@ -59,6 +59,7 @@ export function parseAppLocation(search = '', pathname = '/') {
   if (params.get('channel')) panelOptions.channel = params.get('channel')
   if (params.get('upcoming') === '1') panelOptions.upcomingOnly = true
   if (params.get('campaign')) panelOptions.campaignId = params.get('campaign')
+  if (params.get('report')) panelOptions.report = params.get('report')
   if (params.get('activityType')) panelOptions.activityType = params.get('activityType')
   if (params.get('period')) panelOptions.period = params.get('period')
   if (params.get('userId')) panelOptions.userId = params.get('userId')
@@ -87,6 +88,7 @@ export function parseAppLocation(search = '', pathname = '/') {
   const leadIds = params.getAll('leadId').filter(Boolean)
   if (leadIds.length) panelOptions.leadIds = leadIds
   if (params.get('campaign')) panelOptions.campaignId = params.get('campaign')
+  if (params.get('report')) panelOptions.report = params.get('report')
   if (params.get('campaign_filter')) panelOptions.campaignRecipientFilter = params.get('campaign_filter')
   if (params.get('campaign_name')) panelOptions.campaignName = params.get('campaign_name')
   if (params.get('opened_campaign')) panelOptions.openedCampaignId = params.get('opened_campaign')
@@ -228,6 +230,7 @@ export function serializeAppLocation({ panel = 'overview', panelOptions = {}, le
   if (panelOptions.channel) params.set('channel', panelOptions.channel)
   if (panelOptions.upcomingOnly) params.set('upcoming', '1')
   if (panelOptions.campaignId) params.set('campaign', String(panelOptions.campaignId))
+  if (panelOptions.report) params.set('report', String(panelOptions.report))
   if (panelOptions.activityType) params.set('activityType', panelOptions.activityType)
   if (panelOptions.period && panelOptions.period !== 'week') params.set('period', panelOptions.period)
   if (panelOptions.userId) params.set('userId', String(panelOptions.userId))
@@ -259,6 +262,7 @@ export function serializeAppLocation({ panel = 'overview', panelOptions = {}, le
     if (id) params.append('leadId', String(id))
   }
   if (panelOptions.campaignId) params.set('campaign', String(panelOptions.campaignId))
+  if (panelOptions.report) params.set('report', String(panelOptions.report))
   if (panelOptions.campaignRecipientFilter) {
     params.set('campaign_filter', String(panelOptions.campaignRecipientFilter))
   }

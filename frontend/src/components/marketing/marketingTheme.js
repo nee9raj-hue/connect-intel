@@ -1,17 +1,40 @@
-/** Marketing Hub V3 — design tokens (orange + slate brand). */
+/** Marketing Hub — Mailchimp-aligned design tokens. */
+import { mc } from '../../lib/marketingColors'
 
 export const MH = {
-  pageBg: '#f5f8fa',
-  cardBg: '#ffffff',
-  border: 'rgba(0, 0, 0, 0.09)',
-  accent: '#FF773D',
-  accentTint: '#fff4ee',
-  text: '#33475b',
-  textSecondary: '#64748b',
-  textMuted: '#94a3b8',
-  danger: '#dc2626',
+  pageBg: mc.pageBg,
+  cardBg: mc.cardBg,
+  border: mc.border,
+  accent: mc.primary,
+  accentTint: mc.primaryLight,
+  text: mc.text,
+  textSecondary: mc.textMuted,
+  textMuted: mc.textLight,
+  danger: mc.danger,
   topBarH: 52,
   tabBarH: 40,
+}
+
+/** Plain text status styles for campaigns table (no pill badges). */
+export const CAMPAIGN_STATUS_TEXT = {
+  draft: mc.textMuted,
+  scheduled: mc.primary,
+  active: mc.primary,
+  completed: mc.success,
+  sent: mc.success,
+  paused: mc.warning,
+  stopped: mc.danger,
+}
+
+export function campaignStatusTextClass(status) {
+  const key = String(status || 'draft').toLowerCase()
+  const color = CAMPAIGN_STATUS_TEXT[key] || CAMPAIGN_STATUS_TEXT.draft
+  return 'mc-status-text'
+}
+
+export function campaignStatusColor(status) {
+  const key = String(status || 'draft').toLowerCase()
+  return CAMPAIGN_STATUS_TEXT[key] || CAMPAIGN_STATUS_TEXT.draft
 }
 
 export const CAMPAIGN_STATUS = {

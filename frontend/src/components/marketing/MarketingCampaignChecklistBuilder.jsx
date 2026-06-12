@@ -12,7 +12,37 @@ import {
 } from '../../lib/marketingCampaignChecklist'
 import { marketingOptionLabel } from './MarketingCreatorBadge'
 import MarketingTemplateMarketplace from './MarketingTemplateMarketplace'
+import MarketingSendConfirmModal from './MarketingSendConfirmModal'
 import WorkEmailOptions from '../team/WorkEmailOptions'
+import { SettingsGearIcon } from '../ui/icons'
+
+const STEP_QUESTIONS = {
+  to: 'Who are you sending this email to?',
+  from: 'Who is sending this email?',
+  subject: "What's the subject line for this email?",
+  sendtime: 'When should we send this email?',
+  content: 'Design your email content',
+}
+
+function ProgressBar({ completed, total, stepIds, campaignForm, gmailConnected }) {
+  return (
+    <div>
+      <span className="mc-progress__label">
+        {completed}/{total} items complete
+      </span>
+      <div className="mc-progress__bar" aria-hidden>
+        {stepIds.map((id) => (
+          <span
+            key={id}
+            className={`mc-progress__seg${
+              isChecklistStepComplete(id, campaignForm, { gmailConnected }) ? ' is-done' : ''
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
 
 export default function MarketingCampaignChecklistBuilder({
   campaignForm,
@@ -23,6 +53,7 @@ export default function MarketingCampaignChecklistBuilder({
   user,
   gmailStatus,
   orgName,
+  totalContacts = 0,
   onBackToList,
   onEnterEditor,
   onSaveDraft,
@@ -36,6 +67,9 @@ export default function MarketingCampaignChecklistBuilder({
 }) {
   const [activeStep, setActiveStep] = useState('to')
   const [previewOpen, setPreviewOpen] = useState(false)
+  const [sendConfirmOpen, setSendConfirmOpen] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const [mobilePreview, setMobilePreview] = useState(false)
 
   const gmailConnected = Boolean(gmailStatus?.connected)
   const progress = useMemo(
@@ -69,7 +103,7 @@ export default function MarketingCampaignChecklistBuilder({
 
   const channelLists = lists.filter((l) => (l.channel || 'email') === campaignForm.channel)
   const channelSegments = segments.filter((s) => (s.channel || 'email') === campaignForm.channel)
-  const audienceMode = campaignForm.audienceMode || (campaignForm.segmentId ? 'segment' : 'list')
+  const audienceMode = campaignForm.audienceMode || (campaignForm.segmentId ? 'segment' : campaignForm.listId ? 'list' : 'all')
 
   const applyStarter = (tpl) => {
     if (!tpl) return
@@ -90,290 +124,332 @@ export default function MarketingCampaignChecklistBuilder({
     const nextIncomplete = progress.stepIds.slice(idx + 1).find(
       (id) => !isChecklistStepComplete(id, campaignForm, { gmailConnected })
     )
-    if (nextIncomplete) setActiveStep(nextIncomplete)
-    else {
-      const next = progress.stepIds[idx + 1]
-      if (next) setActiveStep(next)
-    }
+    setActiveStep(nextIncomplete || progress.stepIds[idx + 1] || activeStep)
   }
 
-  const renderStepPanel = () => {
-    switch (activeStep) {
-      case 'to':
-        return (
-          <div className="mc-checklist-panel">
-            <p className="mc-checklist-panel__lead">
-              Pick a saved audience list or dynamic segment. Contacts must have valid{' '}
-              {campaignForm.channel === 'whatsapp' ? 'phone numbers' : 'email addresses'}.
-            </p>
-            <div className="mc-checklist-segmented">
-              {[
-                { id: 'list', label: 'Static list' },
-                { id: 'segment', label: 'Dynamic segment' },
-              ].map((m) => (
-                <button
-                  key={m.id}
-                  type="button"
-                  className={`mc-checklist-segmented__btn${audienceMode === m.id ? ' is-active' : ''}`}
-                  onClick={() =>
-                    setCampaignForm((p) => ({
-                      ...p,
-                      audienceMode: m.id,
-                      listId: m.id === 'list' ? p.listId : '',
-                      segmentId: m.id === 'segment' ? p.segmentId : '',
-                    }))
-                  }
-                >
-                  {m.label}
-                </button>
-              ))}
-            </div>
-            {audienceMode === 'segment' ? (
-              <select
-                className="mc-checklist-input"
-                value={campaignForm.segmentId || ''}
-                onChange={(e) =>
-                  setCampaignForm((p) => ({ ...p, segmentId: e.target.value, listId: '' }))
-                }
-              >
-                <option value="">Choose segment…</option>
-                {channelSegments.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {marketingOptionLabel(s)} ({s.memberCount ?? 0})
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <select
-                className="mc-checklist-input"
-                value={campaignForm.listId || ''}
-                onChange={(e) =>
-                  setCampaignForm((p) => ({ ...p, listId: e.target.value, segmentId: '' }))
-                }
-              >
-                <option value="">Choose audience list…</option>
-                {channelLists.map((l) => (
-                  <option key={l.id} value={l.id}>
-                    {marketingOptionLabel(l)} ({l.leadIds?.length || l.memberCount || 0})
-                  </option>
-                ))}
-              </select>
-            )}
-            {!channelLists.length && audienceMode === 'list' && (
-              <p className="mc-checklist-hint">
-                No lists yet.{' '}
-                <button type="button" className="mc-checklist-link" onClick={() => onNavigate?.('marketing', { tab: 'audiences', audienceTab: 'lists' })}>
-                  Create an audience
-                </button>
-              </p>
-            )}
-            <div className="mc-checklist-panel__actions">
-              <button type="button" className="mc-checklist-btn mc-checklist-btn--primary" onClick={saveStep} disabled={!isChecklistStepComplete('to', campaignForm)}>
-                Save
-              </button>
-              <button type="button" className="mc-checklist-btn" onClick={() => setActiveStep('to')}>
-                Cancel
-              </button>
-            </div>
-          </div>
-        )
-      case 'from':
-        return (
-          <div className="mc-checklist-panel">
-            {needsWorkEmail && (
-              <div className="mc-checklist-warn">
-                <WorkEmailOptions onNavigate={onNavigate} compact />
-              </div>
-            )}
-            <label className="mc-checklist-field">
-              <span>Name</span>
-              <input
-                className="mc-checklist-input"
-                value={campaignForm.fromName || ''}
-                onChange={(e) => setCampaignForm((p) => ({ ...p, fromName: e.target.value }))}
-                placeholder="Your company or team name"
-              />
-            </label>
-            <label className="mc-checklist-field">
-              <span>Email address</span>
-              <input
-                className="mc-checklist-input"
-                type="email"
-                value={campaignForm.fromEmail || ''}
-                onChange={(e) => setCampaignForm((p) => ({ ...p, fromEmail: e.target.value }))}
-                placeholder="you@company.com"
-              />
-            </label>
-            {gmailConnected && (
-              <p className="mc-checklist-hint">Sending via your connected Gmail ({gmailStatus?.email}).</p>
-            )}
-            <div className="mc-checklist-panel__actions">
-              <button type="button" className="mc-checklist-btn mc-checklist-btn--primary" onClick={saveStep}>
-                Save
-              </button>
-              <button type="button" className="mc-checklist-btn" onClick={() => setActiveStep('from')}>
-                Cancel
-              </button>
-            </div>
-          </div>
-        )
-      case 'subject':
-        return (
-          <div className="mc-checklist-panel">
-            <label className="mc-checklist-field">
-              <span>Subject line</span>
-              <input
-                className="mc-checklist-input"
-                value={campaignForm.subject || ''}
-                onChange={(e) => setCampaignForm((p) => ({ ...p, subject: e.target.value }))}
-                placeholder="Subject line for recipients"
-              />
-            </label>
-            <label className="mc-checklist-field">
-              <span>Preview text</span>
-              <input
-                className="mc-checklist-input"
-                value={campaignForm.previewText || ''}
-                onChange={(e) => setCampaignForm((p) => ({ ...p, previewText: e.target.value }))}
-                placeholder="Inbox snippet (optional)"
-              />
-            </label>
-            <input
-              className="mc-checklist-input"
-              value={campaignForm.name || ''}
-              onChange={(e) => setCampaignForm((p) => ({ ...p, name: e.target.value }))}
-              placeholder="Internal campaign name"
-            />
-            <div className="mc-checklist-panel__actions">
-              <button
-                type="button"
-                className="mc-checklist-btn mc-checklist-btn--primary"
-                onClick={saveStep}
-                disabled={!campaignForm.subject?.trim()}
-              >
-                Save
-              </button>
-              <button type="button" className="mc-checklist-btn" onClick={() => setActiveStep('subject')}>
-                Cancel
-              </button>
-            </div>
-          </div>
-        )
-      case 'sendtime':
-        return (
-          <div className="mc-checklist-panel">
-            <div className="mc-checklist-send-cards">
-              <button
-                type="button"
-                className={`mc-checklist-send-card${campaignForm.sendMode !== 'scheduled' ? ' is-active' : ''}`}
-                onClick={() => setCampaignForm((p) => ({ ...p, sendMode: 'immediate', scheduledAt: '' }))}
-              >
-                <strong>Send now</strong>
-                <span>Deliver as soon as you click Send</span>
-              </button>
-              <button
-                type="button"
-                className={`mc-checklist-send-card${campaignForm.sendMode === 'scheduled' ? ' is-active' : ''}`}
-                onClick={() => setCampaignForm((p) => ({ ...p, sendMode: 'scheduled' }))}
-              >
-                <strong>Schedule</strong>
-                <span>Pick a date and time</span>
-              </button>
-            </div>
-            {campaignForm.sendMode === 'scheduled' && (
-              <label className="mc-checklist-field">
-                <span>Send date & time</span>
-                <input
-                  type="datetime-local"
-                  className="mc-checklist-input"
-                  value={campaignForm.scheduledAt || ''}
-                  onChange={(e) => setCampaignForm((p) => ({ ...p, scheduledAt: e.target.value }))}
-                />
-              </label>
-            )}
-            <div className="mc-checklist-panel__actions">
-              <button type="button" className="mc-checklist-btn mc-checklist-btn--primary" onClick={saveStep}>
-                Save
-              </button>
-              <button type="button" className="mc-checklist-btn" onClick={() => setActiveStep('sendtime')}>
-                Cancel
-              </button>
-            </div>
-          </div>
-        )
-      case 'content':
-        return (
-          <div className="mc-checklist-panel">
-            {campaignForm.blocks?.length ? (
-              <>
-                <p className="mc-checklist-hint">Your email design is ready. Open the studio to refine blocks, images, and brand styling.</p>
-                <button type="button" className="mc-checklist-btn mc-checklist-btn--primary" onClick={onEnterEditor}>
-                  Edit design
-                </button>
-              </>
-            ) : (
-              <>
-                <p className="mc-checklist-panel__lead">Start from a template or open the drag-and-drop email studio.</p>
-                <MarketingTemplateMarketplace
-                  templates={templates}
-                  title="Choose a template"
-                  subtitle="Pick a layout, then customize in the email studio."
-                  onSelect={(tpl) => {
-                    applyStarter(tpl)
-                    onEnterEditor?.()
-                  }}
-                  onCreateBlank={() => {
-                    const blank = STARTER_TEMPLATES.find((t) => t.id === 'blank') || STARTER_TEMPLATES[0]
-                    applyStarter(blank)
-                    onEnterEditor?.()
-                  }}
-                />
-              </>
-            )}
-            <div className="mc-checklist-panel__actions">
-              <button
-                type="button"
-                className="mc-checklist-btn mc-checklist-btn--primary"
-                onClick={saveStep}
-                disabled={!isChecklistStepComplete('content', campaignForm)}
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        )
-      default:
-        return null
-    }
+  const toggleStep = (id) => {
+    setActiveStep((prev) => (prev === id ? prev : id))
   }
 
-  const count = audienceCount(campaignForm, lists, segments)
+  const renderToPanel = () => (
+    <>
+      <p className="mc-field-hint">Send to:</p>
+      {[
+        {
+          id: 'all',
+          title: 'Entire audience',
+          desc: `All ${totalContacts.toLocaleString()} contacts in your CRM`,
+        },
+        {
+          id: 'segment',
+          title: 'Audience segment or tag',
+          desc: 'Dynamic segment from pipeline rules',
+        },
+        {
+          id: 'list',
+          title: 'Static list',
+          desc: 'Saved marketing audience list',
+        },
+      ].map((opt) => (
+        <button
+          key={opt.id}
+          type="button"
+          className={`mc-radio-block${audienceMode === opt.id ? ' is-active' : ''}`}
+          onClick={() =>
+            setCampaignForm((p) => ({
+              ...p,
+              audienceMode: opt.id,
+              listId: opt.id === 'list' ? p.listId : '',
+              segmentId: opt.id === 'segment' ? p.segmentId : '',
+            }))
+          }
+        >
+          <span aria-hidden>{audienceMode === opt.id ? '●' : '○'}</span>
+          <span>
+            <strong>{opt.title}</strong>
+            <span>{opt.desc}</span>
+          </span>
+        </button>
+      ))}
+      {audienceMode === 'segment' && (
+        <div className="mc-field">
+          <select
+            value={campaignForm.segmentId || ''}
+            onChange={(e) =>
+              setCampaignForm((p) => ({ ...p, segmentId: e.target.value, listId: '' }))
+            }
+          >
+            <option value="">Select a segment or tag…</option>
+            {channelSegments.map((s) => (
+              <option key={s.id} value={s.id}>
+                {marketingOptionLabel(s)} ({s.memberCount ?? 0})
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+      {audienceMode === 'list' && (
+        <div className="mc-field">
+          <select
+            value={campaignForm.listId || ''}
+            onChange={(e) =>
+              setCampaignForm((p) => ({ ...p, listId: e.target.value, segmentId: '' }))
+            }
+          >
+            <option value="">Choose audience list…</option>
+            {channelLists.map((l) => (
+              <option key={l.id} value={l.id}>
+                {marketingOptionLabel(l)} ({l.leadIds?.length || l.memberCount || 0})
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+      {!channelLists.length && audienceMode === 'list' && (
+        <p className="mc-field-hint">
+          No lists yet.{' '}
+          <button type="button" className="mc-link" onClick={() => onNavigate?.('marketing', { tab: 'audiences', audienceTab: 'lists' })}>
+            Create an audience
+          </button>
+        </p>
+      )}
+      <div className="mc-accordion__actions">
+        <button
+          type="button"
+          className="mc-btn mc-btn--primary"
+          onClick={saveStep}
+          disabled={!isChecklistStepComplete('to', campaignForm, { gmailConnected })}
+        >
+          Save
+        </button>
+        <button type="button" className="mc-btn mc-btn--ghost" onClick={() => setActiveStep('to')}>
+          Cancel
+        </button>
+        <button type="button" className="mc-link">About audience organization →</button>
+      </div>
+    </>
+  )
+
+  const renderFromPanel = () => (
+    <>
+      {needsWorkEmail && (
+        <div className="mc-field">
+          <WorkEmailOptions onNavigate={onNavigate} compact />
+        </div>
+      )}
+      <div className="mc-field">
+        <label>Name *</label>
+        <input
+          value={campaignForm.fromName || ''}
+          onChange={(e) => setCampaignForm((p) => ({ ...p, fromName: e.target.value }))}
+          placeholder="Your company or team name"
+        />
+        <p className="mc-field-hint">Use something recognizable, like company name.</p>
+      </div>
+      <div className="mc-field">
+        <label>Email address *</label>
+        <input
+          type="email"
+          value={campaignForm.fromEmail || ''}
+          onChange={(e) => setCampaignForm((p) => ({ ...p, fromEmail: e.target.value }))}
+          placeholder="you@company.com"
+        />
+        {gmailConnected && (
+          <p className="mc-field-hint">Sending via connected Gmail ({gmailStatus?.email}).</p>
+        )}
+      </div>
+      <div className="mc-accordion__actions">
+        <button type="button" className="mc-btn mc-btn--primary" onClick={saveStep}>
+          Save
+        </button>
+        <button type="button" className="mc-btn mc-btn--ghost" onClick={() => setActiveStep('from')}>
+          Cancel
+        </button>
+        <button type="button" className="mc-link">How to set default &quot;from&quot; fields →</button>
+      </div>
+    </>
+  )
+
+  const renderSubjectPanel = () => (
+    <>
+      <div className="mc-field">
+        <label>Subject line *</label>
+        <input
+          value={campaignForm.subject || ''}
+          onChange={(e) => setCampaignForm((p) => ({ ...p, subject: e.target.value }))}
+          placeholder="Subject line for recipients"
+        />
+      </div>
+      <div className="mc-field">
+        <label>Preview text</label>
+        <input
+          value={campaignForm.previewText || ''}
+          onChange={(e) => setCampaignForm((p) => ({ ...p, previewText: e.target.value }))}
+          placeholder="Inbox snippet (optional)"
+        />
+        <p className="mc-field-hint">Preview text appears in the inbox after the subject line.</p>
+      </div>
+      <div className="mc-field">
+        <label>Internal campaign name</label>
+        <input
+          value={campaignForm.name || ''}
+          onChange={(e) => setCampaignForm((p) => ({ ...p, name: e.target.value }))}
+          placeholder="Untitled"
+        />
+      </div>
+      <div className="mc-accordion__actions">
+        <button
+          type="button"
+          className="mc-btn mc-btn--primary"
+          onClick={saveStep}
+          disabled={!campaignForm.subject?.trim()}
+        >
+          Save
+        </button>
+        <button type="button" className="mc-btn mc-btn--ghost" onClick={() => setActiveStep('subject')}>
+          Cancel
+        </button>
+      </div>
+    </>
+  )
+
+  const renderSendtimePanel = () => (
+    <>
+      {[
+        { id: 'scheduled', title: 'Schedule', desc: 'Pick a date and time' },
+        { id: 'immediate', title: 'Send now', desc: 'Deliver as soon as you click Send' },
+      ].map((opt) => {
+        const active =
+          opt.id === 'immediate'
+            ? campaignForm.sendMode !== 'scheduled'
+            : campaignForm.sendMode === 'scheduled'
+        return (
+          <button
+            key={opt.id}
+            type="button"
+            className={`mc-radio-block${active ? ' is-active' : ''}`}
+            onClick={() =>
+              setCampaignForm((p) => ({
+                ...p,
+                sendMode: opt.id === 'scheduled' ? 'scheduled' : 'immediate',
+                scheduledAt: opt.id === 'scheduled' ? p.scheduledAt : '',
+              }))
+            }
+          >
+            <span aria-hidden>{active ? '●' : '○'}</span>
+            <span>
+              <strong>{opt.title}</strong>
+              <span>{opt.desc}</span>
+            </span>
+          </button>
+        )
+      })}
+      {campaignForm.sendMode === 'scheduled' && (
+        <div className="mc-field">
+          <label>Send on</label>
+          <input
+            type="datetime-local"
+            value={campaignForm.scheduledAt || ''}
+            onChange={(e) => setCampaignForm((p) => ({ ...p, scheduledAt: e.target.value }))}
+          />
+        </div>
+      )}
+      <div className="mc-accordion__actions">
+        <button type="button" className="mc-btn mc-btn--primary" onClick={saveStep}>
+          Save
+        </button>
+        <button type="button" className="mc-btn mc-btn--ghost" onClick={() => setActiveStep('sendtime')}>
+          Cancel
+        </button>
+        <button type="button" className="mc-link">How to schedule or pause emails →</button>
+      </div>
+    </>
+  )
+
+  const renderContentPanel = () => (
+    <>
+      {campaignForm.blocks?.length ? (
+        <>
+          <p className="mc-field-hint">✓ A plain-text version of this email will be included.</p>
+          <button type="button" className="mc-btn mc-btn--primary" onClick={onEnterEditor}>
+            Edit design →
+          </button>
+        </>
+      ) : (
+        <>
+          <p className="mc-field-hint">Start from a template or open the drag-and-drop email studio.</p>
+          <MarketingTemplateMarketplace
+            templates={templates}
+            title="Choose a template"
+            subtitle="Pick a layout, then customize in the email studio."
+            onSelect={(tpl) => {
+              applyStarter(tpl)
+              onEnterEditor?.()
+            }}
+            onCreateBlank={() => {
+              const blank = STARTER_TEMPLATES.find((t) => t.id === 'blank') || STARTER_TEMPLATES[0]
+              applyStarter(blank)
+              onEnterEditor?.()
+            }}
+          />
+        </>
+      )}
+      <div className="mc-accordion__actions">
+        <button
+          type="button"
+          className="mc-btn mc-btn--primary"
+          onClick={saveStep}
+          disabled={!isChecklistStepComplete('content', campaignForm)}
+        >
+          Save
+        </button>
+      </div>
+    </>
+  )
+
+  const panels = {
+    to: renderToPanel,
+    from: renderFromPanel,
+    subject: renderSubjectPanel,
+    sendtime: renderSendtimePanel,
+    content: renderContentPanel,
+  }
+
+  const count = audienceCount(campaignForm, lists, segments, totalContacts)
 
   return (
-    <div className="mc-checklist">
-      <header className="mc-checklist__header">
-        <div className="mc-checklist__header-left">
-          <button type="button" className="mc-checklist-back" onClick={onBackToList}>
+    <div className="mc-editor">
+      <header className="mc-editor__topbar">
+        <div className="mc-editor__topbar-left">
+          <button type="button" className="mc-editor__back" onClick={onBackToList}>
             ← Campaigns
           </button>
           <input
-            className="mc-checklist-title-input"
+            className="mc-editor__title"
             value={campaignForm.name || ''}
             onChange={(e) => setCampaignForm((p) => ({ ...p, name: e.target.value }))}
             placeholder="Untitled"
             aria-label="Campaign name"
           />
-          <span className="mc-checklist-draft">Draft</span>
+          <span className="mc-editor__draft">Draft</span>
         </div>
-        <div className="mc-checklist__header-right">
-          <button type="button" className="mc-checklist-btn" onClick={onSaveDraft} disabled={busy}>
+        <div className="mc-editor__topbar-right">
+          <button
+            type="button"
+            className="mc-btn mc-btn--icon"
+            onClick={() => setSettingsOpen((v) => !v)}
+            title="Settings"
+          >
+            <SettingsGearIcon className="w-4 h-4" />
+          </button>
+          <button type="button" className="mc-btn mc-btn--ghost" onClick={onSaveDraft} disabled={busy}>
             Finish later
           </button>
           <button
             type="button"
-            className="mc-checklist-btn mc-checklist-btn--send"
+            className="mc-btn mc-btn--primary"
             disabled={busy || !readyToSend}
-            onClick={onLaunch}
+            onClick={() => setSendConfirmOpen(true)}
           >
             Send
           </button>
@@ -381,126 +457,162 @@ export default function MarketingCampaignChecklistBuilder({
       </header>
 
       {(error || notice) && (
-        <div className="mc-checklist-alerts">
+        <div className="mc-shell__alerts">
           {error && <p className="crm-alert crm-alert-error">{error}</p>}
           {notice && <p className="crm-alert crm-alert-success">{notice}</p>}
         </div>
       )}
 
-      <div className="mc-checklist__progress">
-        <div className="mc-checklist__progress-label">
-          {progress.complete}/{progress.total} items complete
+      {settingsOpen && (
+        <div className="mc-shell__alerts">
+          <p className="mc-field-hint">Campaign settings — tracking and folder options coming soon.</p>
         </div>
-        <div className="mc-checklist__progress-bar" aria-hidden>
-          {progress.stepIds.map((id) => (
-            <span
-              key={id}
-              className={`mc-checklist__progress-seg${
-                isChecklistStepComplete(id, campaignForm, { gmailConnected }) ? ' is-done' : ''
-              }`}
+      )}
+
+      <div className="mc-editor__body">
+        <div className="mc-editor__layout">
+          <div className="mc-editor__main">
+            <ProgressBar
+              completed={progress.complete}
+              total={progress.total}
+              stepIds={progress.stepIds}
+              campaignForm={campaignForm}
+              gmailConnected={gmailConnected}
             />
-          ))}
-        </div>
-      </div>
 
-      <div className="mc-checklist__body">
-        <aside className="mc-checklist__steps">
-          {steps.map((step) => {
-            const done = isChecklistStepComplete(step.id, campaignForm, { gmailConnected })
-            const summary = stepSummary(step.id, campaignForm, lists, segments, { gmailStatus })
-            const expanded = activeStep === step.id
-            return (
-              <div
-                key={step.id}
-                className={`mc-checklist-step${expanded ? ' is-expanded' : ''}${done ? ' is-done' : ''}`}
-              >
-                <button
-                  type="button"
-                  className="mc-checklist-step__head"
-                  onClick={() => setActiveStep(step.id)}
+            {steps.map((step) => {
+              const done = isChecklistStepComplete(step.id, campaignForm, { gmailConnected })
+              const summary = stepSummary(step.id, campaignForm, lists, segments, {
+                gmailStatus,
+                totalContacts,
+              })
+              const expanded = activeStep === step.id
+              return (
+                <section
+                  key={step.id}
+                  className={`mc-accordion${expanded ? ' is-expanded' : ''}`}
                 >
-                  <span className={`mc-checklist-step__icon${done ? ' is-done' : ''}`} aria-hidden>
-                    {done ? '✓' : ''}
-                  </span>
-                  <span className="mc-checklist-step__meta">
-                    <span className="mc-checklist-step__label">{step.label}</span>
-                    {!expanded && summary ? (
-                      <span className="mc-checklist-step__summary">{summary}</span>
-                    ) : (
-                      <span className="mc-checklist-step__question">{step.question}</span>
-                    )}
-                  </span>
-                </button>
-                {expanded && <div className="mc-checklist-step__body">{renderStepPanel()}</div>}
-              </div>
-            )
-          })}
-        </aside>
+                  <button
+                    type="button"
+                    className="mc-accordion__head"
+                    onClick={() => toggleStep(step.id)}
+                  >
+                    <span className={`mc-accordion__icon${done ? ' is-done' : ''}`}>
+                      {done ? '✓' : ''}
+                    </span>
+                    <span className="mc-accordion__meta">
+                      <span className="mc-accordion__label">{step.label}</span>
+                      <span className="mc-accordion__sub">
+                        {!expanded && summary ? summary : STEP_QUESTIONS[step.id]}
+                      </span>
+                    </span>
+                    <span className="mc-accordion__chev">{expanded ? '▲' : '▾'}</span>
+                  </button>
+                  {expanded && (
+                    <div className="mc-accordion__body">{panels[step.id]?.()}</div>
+                  )}
+                </section>
+              )
+            })}
+          </div>
 
-        <aside className="mc-checklist__preview">
-          <div className="mc-checklist-preview__toolbar">
-            <button type="button" className="mc-checklist-link" onClick={() => setPreviewOpen(true)}>
-              ⊙ Preview
-            </button>
-            {campaignForm.channel === 'email' && (
-              <button type="button" className="mc-checklist-link" onClick={onTestSend} disabled={busy}>
-                ✈ Send a test email
-              </button>
-            )}
-          </div>
-          <div className="mc-checklist-preview__frame">
-            <div className="mc-checklist-preview__inbox">
-              <div className="mc-checklist-preview__inbox-row">
-                <span className="mc-checklist-preview__inbox-label">To</span>
-                <span>
-                  {audienceLabel(campaignForm, lists, segments) || 'Audience'}
-                  {count > 0 ? ` (${count.toLocaleString()})` : ''}
-                </span>
-              </div>
-              <div className="mc-checklist-preview__inbox-row">
-                <span className="mc-checklist-preview__inbox-label">From</span>
-                <span>
-                  {stepSummary('from', campaignForm, lists, segments, { gmailStatus }) || '—'}
-                </span>
-              </div>
-              <div className="mc-checklist-preview__inbox-row">
-                <span className="mc-checklist-preview__inbox-label">Subject</span>
-                <span>{campaignForm.subject || '—'}</span>
-              </div>
-            </div>
-            {previewHtml ? (
-              <div className="mc-checklist-preview__html" dangerouslySetInnerHTML={{ __html: previewHtml }} />
-            ) : (
-              <div className="mc-checklist-preview__empty">
-                <p>Drag, drop, and build</p>
-                <p className="mc-checklist-hint">Complete Content to see your email here, or open the design studio.</p>
-                <button type="button" className="mc-checklist-btn mc-checklist-btn--primary" onClick={onEnterEditor}>
-                  Edit design
+          <aside className="mc-editor__preview-col">
+            <div className="mc-preview-panel">
+              <div className="mc-preview-panel__toolbar">
+                <button type="button" className="mc-link" onClick={() => setPreviewOpen(true)}>
+                  Preview
                 </button>
+                {campaignForm.channel === 'email' && (
+                  <button type="button" className="mc-link" onClick={onTestSend} disabled={busy}>
+                    Send a test email
+                  </button>
+                )}
               </div>
-            )}
-          </div>
-        </aside>
+              <div
+                className="mc-preview-frame"
+                style={mobilePreview ? { maxWidth: 375, margin: '0 auto' } : undefined}
+              >
+                <div className="mc-preview-inbox">
+                  <div className="mc-preview-inbox-row">
+                    <span className="mc-preview-inbox-label">To</span>
+                    <span>
+                      {audienceLabel(campaignForm, lists, segments) || 'Audience'}
+                      {count > 0 ? ` (${count.toLocaleString()})` : ''}
+                    </span>
+                  </div>
+                  <div className="mc-preview-inbox-row">
+                    <span className="mc-preview-inbox-label">From</span>
+                    <span>
+                      {stepSummary('from', campaignForm, lists, segments, { gmailStatus }) || '—'}
+                    </span>
+                  </div>
+                  <div className="mc-preview-inbox-row">
+                    <span className="mc-preview-inbox-label">Subject</span>
+                    <span>{campaignForm.subject || '—'}</span>
+                  </div>
+                </div>
+                {previewHtml ? (
+                  <div
+                    className="mc-preview-html"
+                    dangerouslySetInnerHTML={{ __html: previewHtml }}
+                  />
+                ) : (
+                  <div className="mc-preview-empty">
+                    <h3>Drag, drop, and build</h3>
+                    <p className="mc-field-hint">
+                      Complete Content to see your email here, or open the design studio.
+                    </p>
+                    <button type="button" className="mc-btn mc-btn--primary" onClick={onEnterEditor}>
+                      Edit design
+                    </button>
+                  </div>
+                )}
+              </div>
+              <button
+                type="button"
+                className="mc-link"
+                style={{ marginTop: 12, display: 'block' }}
+                onClick={() => setMobilePreview((v) => !v)}
+              >
+                {mobilePreview ? 'Desktop preview' : 'Mobile preview'}
+              </button>
+            </div>
+          </aside>
+        </div>
       </div>
 
       {previewOpen && (
-        <div className="mc-checklist-modal" role="dialog" aria-modal="true">
-          <div className="mc-checklist-modal__backdrop" onClick={() => setPreviewOpen(false)} />
-          <div className="mc-checklist-modal__card">
-            <header className="mc-checklist-modal__head">
-              <h3>Email preview</h3>
-              <button type="button" onClick={() => setPreviewOpen(false)}>
+        <div className="mc-modal" role="dialog" aria-modal="true">
+          <div className="mc-modal__backdrop" onClick={() => setPreviewOpen(false)} />
+          <div className="mc-modal__card" style={{ maxWidth: 640 }}>
+            <header style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
+              <h3 style={{ margin: 0 }}>Email preview</h3>
+              <button type="button" className="mc-btn mc-btn--ghost" onClick={() => setPreviewOpen(false)}>
                 Close
               </button>
             </header>
             {previewHtml ? (
-              <div className="mc-checklist-preview__html" dangerouslySetInnerHTML={{ __html: previewHtml }} />
+              <div className="mc-preview-html" dangerouslySetInnerHTML={{ __html: previewHtml }} />
             ) : (
-              <p className="mc-checklist-hint">Add content to preview your email.</p>
+              <p className="mc-field-hint">Add content to preview your email.</p>
             )}
           </div>
         </div>
       )}
+
+      <MarketingSendConfirmModal
+        open={sendConfirmOpen}
+        onClose={() => setSendConfirmOpen(false)}
+        onConfirm={() => {
+          setSendConfirmOpen(false)
+          onLaunch?.()
+        }}
+        campaignForm={campaignForm}
+        lists={lists}
+        segments={segments}
+        gmailStatus={gmailStatus}
+        busy={busy}
+      />
     </div>
   )
 }
