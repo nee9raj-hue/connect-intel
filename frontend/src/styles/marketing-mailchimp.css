@@ -1077,6 +1077,46 @@
   box-shadow: inset 0 -2px 0 var(--mc-primary);
 }
 
+/* —— Immersive email editor top bar —— */
+.marketing-immersive-topbar {
+  height: 52px;
+  min-height: 52px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 16px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e5e5;
+  z-index: 40;
+}
+
+.marketing-immersive-topbar__close {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: none;
+  padding: 6px 10px;
+  margin-left: -6px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+}
+
+.marketing-immersive-topbar__close:hover {
+  color: #1f2328;
+  background: #f7f7f7;
+}
+
+.marketing-immersive-topbar__title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1f2328;
+}
+
 @media (max-width: 1100px) {
   .mc-create-chooser__cards {
     grid-template-columns: 1fr;

@@ -1022,6 +1022,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
             setTemplateForm({ ...EMPTY_TEMPLATE, design: mergeBrandKit({ ...DEFAULT_THEME }) })
             setTemplatePhase('marketplace')
           }}
+          backLabel="Close editor"
           busy={busy}
           templates={templates}
           onEdit={editTemplate}
@@ -1265,13 +1266,11 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
                 body: next.body ?? p.body,
               }))
             }
-            onBack={() => {
-              setCampaignDesktopPhase('wizard')
-              setCampaignWizardStep(4)
-            }}
+            onBack={() => setCampaignDesktopPhase('wizard')}
+            backLabel="Back to campaign"
             onSaveDraft={async () => {
               setError(null)
-              await createCampaign()
+              await createCampaign({ partial: true, keepEditing: true })
             }}
             onSaveAsTemplate={saveCampaignAsTemplate}
             onSend={createAndStart}
@@ -1307,13 +1306,11 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
                 step2Body: next.body ?? p.step2Body,
               }))
             }
-            onBack={() => {
-              setCampaignDesktopPhase('wizard')
-              setCampaignWizardStep(4)
-            }}
+            onBack={() => setCampaignDesktopPhase('wizard')}
+            backLabel="Back to campaign"
             onSaveDraft={async () => {
               setError(null)
-              await createCampaign()
+              await createCampaign({ partial: true, keepEditing: true })
             }}
             onSaveAsTemplate={saveCampaignAsTemplate}
             onSend={createAndStart}

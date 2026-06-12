@@ -198,6 +198,7 @@ export default function MarketingTemplateBuilder({
   immersive = false,
   historyResetKey = '',
   onBack,
+  backLabel,
   onSaveDraft,
   onSaveAsTemplate,
   onSend,
@@ -1423,9 +1424,22 @@ export default function MarketingTemplateBuilder({
     </aside>
   )
 
+  const closeImmersive = onBack || onCancel
+  const closeImmersiveLabel =
+    backLabel || (onBack ? 'Back to campaign' : onCancel ? 'Close editor' : '')
+
   if (isImmersive) {
     return (
       <div className="marketing-immersive-studio flex flex-col flex-1 min-h-0 w-full bg-white">
+        {closeImmersive ? (
+          <header className="marketing-immersive-topbar">
+            <button type="button" className="marketing-immersive-topbar__close" onClick={closeImmersive}>
+              <ChevronLeftIcon className="h-4 w-4 shrink-0" aria-hidden />
+              <span>{closeImmersiveLabel}</span>
+            </button>
+            <span className="marketing-immersive-topbar__title">Email editor</span>
+          </header>
+        ) : null}
         <div className="marketing-immersive-canvas" ref={immersiveCanvasRef}>
           <div
             className="marketing-immersive-canvas-main"
