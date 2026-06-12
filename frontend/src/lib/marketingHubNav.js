@@ -3,17 +3,15 @@
 export const MARKETING_HUB_TABS = [
   { id: 'overview', label: 'Home', short: 'Home' },
   { id: 'campaigns', label: 'Campaigns', short: 'Camp' },
+  { id: 'templates', label: 'Email templates', short: 'Tpl', badge: 'New' },
   { id: 'automations', label: 'Automations', short: 'Auto' },
   { id: 'forms', label: 'Forms', short: 'Form' },
   { id: 'audiences', label: 'Audience', short: 'Aud' },
   { id: 'analytics', label: 'Analytics', short: 'Stats' },
   { id: 'domains', label: 'Domains', short: 'Dom' },
-  { id: 'templates', label: 'Email templates', short: 'Tpl', badge: 'New' },
 ]
 
-export const CAMPAIGN_SUB_NAV = [
-  { id: 'templates', label: 'Email templates', badge: 'New' },
-]
+export const CAMPAIGN_SUB_NAV = []
 
 export const AUDIENCE_SUB_NAV = [
   { id: 'contacts', label: 'Contacts' },

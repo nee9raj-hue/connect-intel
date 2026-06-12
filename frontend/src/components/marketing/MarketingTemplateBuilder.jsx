@@ -1779,7 +1779,7 @@ export default function MarketingTemplateBuilder({
             <div>
               <h3 className="text-sm font-semibold text-slate-900">Your saved templates</h3>
               <p className="text-xs text-slate-500 mt-0.5">
-                Reuse layouts quickly the same way teams browse templates in Mailchimp.
+                Reuse layouts quickly — pick a saved design and start a new campaign.
               </p>
             </div>
             <span className="crm-toolbar-count">{templates.length} saved</span>

@@ -10,10 +10,57 @@ import { ChevronRightIcon, ListIcon, MailIcon, SearchIcon } from '../ui/icons'
 const PAGE_SIZE = 10
 
 const TABS = [
-  { id: 'starter', label: 'Mailchimp templates' },
+  { id: 'starter', label: 'Template gallery' },
   { id: 'saved', label: 'Saved' },
   { id: 'recent', label: 'Recently sent' },
 ]
+
+const GALLERY_CATEGORY_META = {
+  welcome: { label: 'WELCOME', color: '#0074bd' },
+  newsletter: { label: 'MONTHLY UPDATE', color: '#0074bd' },
+  announcement: { label: 'ANNOUNCEMENT', color: '#01866f' },
+  promo: { label: 'PRODUCT UPDATE', color: '#844b9c' },
+  event: { label: 'INVITATION', color: '#c84d3a' },
+  popular: { label: 'FEATURED', color: '#6366f1' },
+  saved: { label: 'YOUR TEMPLATE', color: '#6b7280' },
+}
+
+const NAME_CATEGORY_LABELS = [
+  { match: 'product launch', label: 'PRODUCT UPDATE', color: '#844b9c' },
+  { match: 'event invite', label: 'INVITATION', color: '#c84d3a' },
+  { match: 're-engagement', label: 'RE-ENGAGEMENT', color: '#844b9c' },
+  { match: 'case study', label: 'CASE STUDY', color: '#0074bd' },
+  { match: 'webinar', label: 'WEBINAR', color: '#c84d3a' },
+  { match: 'thank you', label: 'THANK YOU', color: '#01866f' },
+  { match: 'pricing', label: 'SPECIAL OFFER', color: '#844b9c' },
+  { match: 'testimonial', label: 'TESTIMONIAL', color: '#0074bd' },
+  { match: 'seasonal', label: 'SEASONAL', color: '#c84d3a' },
+  { match: 'follow-up', label: 'FOLLOW-UP', color: '#6b7280' },
+]
+
+function inferGalleryCategory(t) {
+  if (t.category) return t.category
+  const id = (t.id || '').toLowerCase()
+  const name = (t.name || '').toLowerCase()
+  if (id.includes('welcome') || name.includes('welcome')) return 'welcome'
+  if (id.includes('news') || name.includes('newsletter')) return 'newsletter'
+  if (id.includes('promo') || name.includes('launch') || name.includes('offer') || name.includes('pricing')) {
+    return 'promo'
+  }
+  if (id.includes('event') || name.includes('invite') || name.includes('webinar')) return 'event'
+  if (id.includes('announce') || name.includes('announce') || name.includes('thank') || name.includes('testimonial')) {
+    return 'announcement'
+  }
+  return 'popular'
+}
+
+function galleryCategoryLabel(tpl) {
+  const name = (tpl.name || '').toLowerCase()
+  const named = NAME_CATEGORY_LABELS.find((row) => name.includes(row.match))
+  if (named) return { label: named.label, color: named.color }
+  const cat = tpl.source === 'saved' ? 'saved' : inferGalleryCategory(tpl)
+  return GALLERY_CATEGORY_META[cat] || GALLERY_CATEGORY_META.popular
+}
 
 function GridViewIcon({ className }) {
   return (
@@ -68,6 +115,39 @@ function TemplateThumb({ blocks, design, className }) {
   )
 }
 
+function TemplateGalleryCard({ tpl, showCategory = true, onOpen }) {
+  const srcDoc = useMemo(
+    () =>
+      renderEmailHtml(tpl.blocks || [], tpl.design || DEFAULT_THEME, {
+        previewText: '',
+        lead: PREVIEW_LEAD,
+      }),
+    [tpl.blocks, tpl.design]
+  )
+  const category = showCategory ? galleryCategoryLabel(tpl) : null
+
+  return (
+    <button
+      type="button"
+      className="mc-tpl-gallery-card"
+      onClick={() => onOpen(tpl)}
+    >
+      <div className="mc-tpl-gallery-card__preview">
+        {category ? (
+          <span className="mc-tpl-gallery-card__cat" style={{ color: category.color }}>
+            {category.label}
+          </span>
+        ) : null}
+        <iframe title={`Preview ${tpl.name}`} srcDoc={srcDoc} tabIndex={-1} />
+      </div>
+      <div className="mc-tpl-gallery-card__body">
+        <span className="mc-tpl-gallery-card__name">{tpl.name}</span>
+        {tpl.subject ? <span className="mc-tpl-gallery-card__sub">{tpl.subject}</span> : null}
+      </div>
+    </button>
+  )
+}
+
 export default function MarketingEmailTemplates({
   templates = [],
   user,
@@ -76,7 +156,7 @@ export default function MarketingEmailTemplates({
   onCreateEmail,
   onSelectStarter,
 }) {
-  const [activeTab, setActiveTab] = useState('saved')
+  const [activeTab, setActiveTab] = useState('starter')
   const [query, setQuery] = useState('')
   const [sortBy, setSortBy] = useState('newest')
   const [view, setView] = useState('list')
@@ -90,6 +170,7 @@ export default function MarketingEmailTemplates({
         ...t,
         source: 'starter',
         status: 'Starter',
+        category: inferGalleryCategory(t),
       })),
     []
   )
@@ -283,18 +364,12 @@ export default function MarketingEmailTemplates({
       {activeTab === 'starter' || view === 'grid' ? (
         <div className="mc-templates-grid">
           {(activeTab === 'starter' ? starterItems : listForTab).map((tpl) => (
-            <button
+            <TemplateGalleryCard
               key={`${tpl.source}-${tpl.id}`}
-              type="button"
-              className="mc-templates-grid-card"
-              onClick={() => openTemplate(tpl)}
-            >
-              <TemplateThumb blocks={tpl.blocks} design={tpl.design} />
-              <span className="mc-templates-grid-card__name">{tpl.name}</span>
-              {tpl.subject ? (
-                <span className="mc-templates-grid-card__sub">{tpl.subject}</span>
-              ) : null}
-            </button>
+              tpl={tpl}
+              showCategory={activeTab === 'starter'}
+              onOpen={openTemplate}
+            />
           ))}
           {!listForTab.length && activeTab !== 'starter' ? (
             <div className="mc-templates-empty-inline">

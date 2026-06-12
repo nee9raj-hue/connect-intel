@@ -116,7 +116,7 @@ export default function MarketingHubShell({
                   </>
                 ) : null}
               </button>
-              {!collapsed && t.id === 'campaigns' && (tab === 'campaigns' || tab === 'templates')
+              {!collapsed && CAMPAIGN_SUB_NAV.length > 0 && t.id === 'campaigns' && tab === 'campaigns'
                 ? CAMPAIGN_SUB_NAV.map((sub) => (
                     <button
                       key={sub.id}
