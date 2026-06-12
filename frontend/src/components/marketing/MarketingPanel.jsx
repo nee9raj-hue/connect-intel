@@ -1266,6 +1266,8 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
                 body: next.body ?? p.body,
               }))
             }
+            title={campaignForm.name || 'Untitled'}
+            onTestSend={handleTestSend}
             onBack={() => setCampaignDesktopPhase('wizard')}
             backLabel="Back to campaign"
             onSaveDraft={async () => {
@@ -1306,6 +1308,8 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
                 step2Body: next.body ?? p.step2Body,
               }))
             }
+            title={campaignForm.name ? `${campaignForm.name} — Step 2` : 'Untitled'}
+            onTestSend={handleTestSend}
             onBack={() => setCampaignDesktopPhase('wizard')}
             backLabel="Back to campaign"
             onSaveDraft={async () => {

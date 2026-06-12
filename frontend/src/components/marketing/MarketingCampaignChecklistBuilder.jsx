@@ -14,7 +14,8 @@ import { marketingOptionLabel } from './MarketingCreatorBadge'
 import MarketingTemplateMarketplace from './MarketingTemplateMarketplace'
 import MarketingSendConfirmModal from './MarketingSendConfirmModal'
 import WorkEmailOptions from '../team/WorkEmailOptions'
-import { SettingsGearIcon } from '../ui/icons'
+import { BRAND_LOGO_MARK_LIGHT, BRAND_LOGO_MARK_CLASS } from '../../lib/brandAssets'
+import { ChevronLeftIcon, EyeIcon, MailIcon, SearchIcon, SettingsGearIcon } from '../ui/icons'
 
 const STEP_QUESTIONS = {
   to: 'Who are you sending this email to?',
@@ -421,9 +422,14 @@ export default function MarketingCampaignChecklistBuilder({
     <div className="mc-editor">
       <header className="mc-editor__topbar">
         <div className="mc-editor__topbar-left">
-          <button type="button" className="mc-editor__back" onClick={onBackToList}>
-            ← Campaigns
+          <button type="button" className="mc-editor__back" onClick={onBackToList} aria-label="Back to campaigns">
+            <ChevronLeftIcon className="mc-editor__back-icon" />
           </button>
+          <img
+            src={BRAND_LOGO_MARK_LIGHT}
+            alt=""
+            className={`mc-editor__logo ${BRAND_LOGO_MARK_CLASS}`}
+          />
           <input
             className="mc-editor__title"
             value={campaignForm.name || ''}
@@ -480,6 +486,7 @@ export default function MarketingCampaignChecklistBuilder({
               gmailConnected={gmailConnected}
             />
 
+            <div className="mc-accordion-list">
             {steps.map((step) => {
               const done = isChecklistStepComplete(step.id, campaignForm, { gmailConnected })
               const summary = stepSummary(step.id, campaignForm, lists, segments, {
@@ -487,44 +494,78 @@ export default function MarketingCampaignChecklistBuilder({
                 totalContacts,
               })
               const expanded = activeStep === step.id
+              const contentDone = step.id === 'content' && done
               return (
                 <section
                   key={step.id}
                   className={`mc-accordion${expanded ? ' is-expanded' : ''}`}
                 >
-                  <button
-                    type="button"
-                    className="mc-accordion__head"
-                    onClick={() => toggleStep(step.id)}
-                  >
-                    <span className={`mc-accordion__icon${done ? ' is-done' : ''}`}>
-                      {done ? '✓' : ''}
-                    </span>
-                    <span className="mc-accordion__meta">
-                      <span className="mc-accordion__label">{step.label}</span>
-                      <span className="mc-accordion__sub">
-                        {!expanded && summary ? summary : STEP_QUESTIONS[step.id]}
+                  <div className="mc-accordion__head-row">
+                    <button
+                      type="button"
+                      className="mc-accordion__head"
+                      onClick={() => toggleStep(step.id)}
+                    >
+                      <span className={`mc-accordion__icon${done ? ' is-done' : ''}`}>
+                        {done ? '✓' : ''}
                       </span>
-                    </span>
-                    <span className="mc-accordion__chev">{expanded ? '▲' : '▾'}</span>
-                  </button>
+                      <span className="mc-accordion__meta">
+                        <span className="mc-accordion__label">{step.label}</span>
+                        <span className="mc-accordion__sub">
+                          {!expanded && summary ? summary : STEP_QUESTIONS[step.id]}
+                        </span>
+                        {contentDone && !expanded && (
+                          <span className="mc-content-badge-warn">
+                            <span className="mc-content-badge-warn__icon" aria-hidden>!</span>
+                            We automatically add a required Connect Intel badge to your email footer.
+                          </span>
+                        )}
+                      </span>
+                      <span className="mc-accordion__chev" aria-hidden />
+                    </button>
+                    {contentDone && !expanded && (
+                      <button
+                        type="button"
+                        className="mc-btn mc-btn--outline mc-accordion__edit-design"
+                        onClick={onEnterEditor}
+                      >
+                        Edit design
+                      </button>
+                    )}
+                  </div>
                   {expanded && (
-                    <div className="mc-accordion__body">{panels[step.id]?.()}</div>
+                    <div className="mc-accordion__body">
+                      {panels[step.id]?.()}
+                      {contentDone && (
+                        <p className="mc-content-badge-warn mc-content-badge-warn--inline">
+                          <span className="mc-content-badge-warn__icon" aria-hidden>!</span>
+                          We automatically add a required Connect Intel badge to your email footer.
+                        </p>
+                      )}
+                    </div>
                   )}
                 </section>
               )
             })}
+            </div>
           </div>
 
           <aside className="mc-editor__preview-col">
             <div className="mc-preview-panel">
               <div className="mc-preview-panel__toolbar">
-                <button type="button" className="mc-link" onClick={() => setPreviewOpen(true)}>
+                <button type="button" className="mc-preview-tool" onClick={() => setPreviewOpen(true)}>
+                  <SearchIcon className="mc-preview-tool__icon" />
                   Preview
                 </button>
                 {campaignForm.channel === 'email' && (
-                  <button type="button" className="mc-link" onClick={onTestSend} disabled={busy}>
-                    Send a test email
+                  <button
+                    type="button"
+                    className="mc-preview-tool"
+                    onClick={onTestSend}
+                    disabled={busy}
+                  >
+                    <MailIcon className="mc-preview-tool__icon" />
+                    Send a Test Email
                   </button>
                 )}
               </div>
@@ -532,24 +573,11 @@ export default function MarketingCampaignChecklistBuilder({
                 className="mc-preview-frame"
                 style={mobilePreview ? { maxWidth: 375, margin: '0 auto' } : undefined}
               >
-                <div className="mc-preview-inbox">
-                  <div className="mc-preview-inbox-row">
-                    <span className="mc-preview-inbox-label">To</span>
-                    <span>
-                      {audienceLabel(campaignForm, lists, segments) || 'Audience'}
-                      {count > 0 ? ` (${count.toLocaleString()})` : ''}
-                    </span>
-                  </div>
-                  <div className="mc-preview-inbox-row">
-                    <span className="mc-preview-inbox-label">From</span>
-                    <span>
-                      {stepSummary('from', campaignForm, lists, segments, { gmailStatus }) || '—'}
-                    </span>
-                  </div>
-                  <div className="mc-preview-inbox-row">
-                    <span className="mc-preview-inbox-label">Subject</span>
-                    <span>{campaignForm.subject || '—'}</span>
-                  </div>
+                <div className="mc-mc-practice-banner mc-mc-practice-banner--preview" role="note">
+                  <span className="mc-mc-practice-banner__tag">Note</span>
+                  <span>
+                    This is a practice email. Follow the tips below to learn how the builder works.
+                  </span>
                 </div>
                 {previewHtml ? (
                   <div
@@ -558,22 +586,23 @@ export default function MarketingCampaignChecklistBuilder({
                   />
                 ) : (
                   <div className="mc-preview-empty">
+                    <p className="mc-preview-empty__logo">LOGO</p>
                     <h3>Drag, drop, and build</h3>
                     <p className="mc-field-hint">
                       Complete Content to see your email here, or open the design studio.
                     </p>
-                    <button type="button" className="mc-btn mc-btn--primary" onClick={onEnterEditor}>
-                      Edit design
+                    <button type="button" className="mc-btn mc-btn--outline" onClick={onEnterEditor}>
+                      Click me to edit
                     </button>
                   </div>
                 )}
               </div>
               <button
                 type="button"
-                className="mc-link"
-                style={{ marginTop: 12, display: 'block' }}
+                className="mc-preview-tool mc-preview-tool--toggle"
                 onClick={() => setMobilePreview((v) => !v)}
               >
+                <EyeIcon className="mc-preview-tool__icon" />
                 {mobilePreview ? 'Desktop preview' : 'Mobile preview'}
               </button>
             </div>
@@ -613,6 +642,10 @@ export default function MarketingCampaignChecklistBuilder({
         gmailStatus={gmailStatus}
         busy={busy}
       />
+
+      <button type="button" className="mc-feedback-tab" tabIndex={-1} aria-hidden>
+        Feedback
+      </button>
     </div>
   )
 }

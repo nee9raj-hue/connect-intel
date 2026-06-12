@@ -20,6 +20,7 @@ import {
 } from '../../lib/marketingEmailDesign'
 import { BLOCK_PALETTE_STYLES } from '../../lib/marketingUiConstants'
 import MarketingBlockEditor from './MarketingBlockEditor'
+import { BRAND_LOGO_MARK_LIGHT, BRAND_LOGO_MARK_CLASS } from '../../lib/brandAssets'
 import {
   BlocksIcon,
   DesktopIcon,
@@ -30,6 +31,7 @@ import {
   PanelLeftIcon,
   PanelRightIcon,
   ChevronLeftIcon,
+  ChevronRightIcon,
   GripIcon,
   MailIcon,
   RedoIcon,
@@ -55,6 +57,12 @@ const STUDIO_RAIL = [
   { id: 'blocks', label: 'Blocks', icon: BlocksIcon },
   { id: 'styles', label: 'Styles', icon: SwatchIcon },
   { id: 'presets', label: 'Layouts', icon: LayoutTemplateIcon },
+]
+
+const MAILCHIMP_RAIL = [
+  { id: 'blocks', label: 'Blocks', icon: BlocksIcon },
+  { id: 'presets', label: 'Sections', icon: LayoutTemplateIcon },
+  { id: 'styles', label: 'Styles', icon: SwatchIcon },
 ]
 
 const IMMERSIVE_RAIL_WIDTH = 216
@@ -202,6 +210,7 @@ export default function MarketingTemplateBuilder({
   onSaveDraft,
   onSaveAsTemplate,
   onSend,
+  onTestSend,
   draftDisabled = false,
   sendDisabled = false,
   showNameField = true,
@@ -215,6 +224,7 @@ export default function MarketingTemplateBuilder({
   const isCompact = compactMode || (embedded && !fillHeight && isMobile && !studioMode)
   const isStudio = studioMode && !isCompact
   const isImmersive = isStudio && immersive
+  const isMailchimpEditor = isImmersive && Boolean(onBack)
   const isStudioLayout = isCompact || isStudio
   const [previewMode, setPreviewMode] = useState('mobile')
   const [sideTab, setSideTab] = useState('blocks')
@@ -605,14 +615,16 @@ export default function MarketingTemplateBuilder({
               className="ci-input w-full mb-2"
             />
           )}
-          <div className="marketing-panel-caption">
-            {isImmersive
-              ? 'Adds to the bottom of your email — click any section on the canvas to edit it'
-              : isStudioLayout
-                ? 'Click a block — it is added to the bottom of your email'
-                : 'Drag or click to add'}
-          </div>
-          <div className="grid grid-cols-2 gap-2">
+          {!isMailchimpEditor && (
+            <div className="marketing-panel-caption">
+              {isImmersive
+                ? 'Adds to the bottom of your email — click any section on the canvas to edit it'
+                : isStudioLayout
+                  ? 'Click a block — it is added to the bottom of your email'
+                  : 'Drag or click to add'}
+            </div>
+          )}
+          <div className={isMailchimpEditor ? 'mc-mc-block-grid' : 'grid grid-cols-2 gap-2'}>
             {PALETTE.map((item) => {
               const style = BLOCK_PALETTE_STYLES[item.type] || BLOCK_PALETTE_STYLES.text
               return (
@@ -623,15 +635,26 @@ export default function MarketingTemplateBuilder({
                   onDragStart={isStudioLayout ? undefined : (e) => handlePaletteDragStart(e, item.type)}
                   onDragEnd={isStudioLayout ? undefined : () => setPaletteDragType(null)}
                   onClick={() => (isStudioLayout ? addBlockAtEnd(item.type) : addBlock(item.type))}
-                  className={`marketing-palette-tile ${style.border} ${style.bg} ${style.text}`}
+                  className={
+                    isMailchimpEditor
+                      ? 'mc-mc-block-tile'
+                      : `marketing-palette-tile ${style.border} ${style.bg} ${style.text}`
+                  }
                 >
-                  <span className="marketing-palette-glyph">{style.icon}</span>
-                  <span className="marketing-palette-label">{item.label}</span>
-                  <span className="marketing-palette-hint">{item.hint}</span>
+                  <span className={isMailchimpEditor ? 'mc-mc-block-tile__icon' : 'marketing-palette-glyph'}>
+                    {style.icon}
+                  </span>
+                  <span className={isMailchimpEditor ? 'mc-mc-block-tile__label' : 'marketing-palette-label'}>
+                    {item.label}
+                  </span>
+                  {!isMailchimpEditor && (
+                    <span className="marketing-palette-hint">{item.hint}</span>
+                  )}
                 </button>
               )
             })}
           </div>
+          {!isMailchimpEditor && (
           <div className="mt-4 border-t border-slate-100 pt-3">
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500 mb-2">
               Personalization
@@ -644,6 +667,7 @@ export default function MarketingTemplateBuilder({
               ))}
             </div>
           </div>
+          )}
         </>
       )}
               {sideTab === 'styles' && (
@@ -1428,6 +1452,202 @@ export default function MarketingTemplateBuilder({
   const closeImmersiveLabel =
     backLabel || (onBack ? 'Back to campaign' : onCancel ? 'Close editor' : '')
 
+  const handleSaveAndExit = async () => {
+    if (onSaveDraft && !draftDisabled) {
+      try {
+        await onSaveDraft()
+      } catch {
+        // still exit — draft may have saved locally
+      }
+    }
+    closeImmersive?.()
+  }
+
+  const mailchimpPanelTitle =
+    sideTab === 'blocks' ? 'Content blocks' : MAILCHIMP_RAIL.find((t) => t.id === sideTab)?.label || ''
+
+  const mailchimpStudioPopup =
+    studioPanel &&
+    createPortal(
+      <div
+        className="marketing-studio-popup-overlay"
+        role="presentation"
+        onClick={closeStudioPanel}
+      >
+        <div
+          className="marketing-studio-popup"
+          role="dialog"
+          aria-label={studioPanelTitle}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <header className="marketing-studio-popup-head">
+            <div>
+              <h3>{studioPanelTitle}</h3>
+              {studioPanelSubtitle ? (
+                <p className="marketing-studio-popup-sub">{studioPanelSubtitle}</p>
+              ) : null}
+            </div>
+            <button
+              type="button"
+              className="crm-modal-close"
+              aria-label="Close (Esc)"
+              onClick={closeStudioPanel}
+            >
+              ×
+            </button>
+          </header>
+          <div
+            className={`marketing-studio-popup-body ${
+              studioPanel === 'edit' ? 'marketing-studio-popup-body--edit' : ''
+            }`}
+          >
+            {studioPanelBody}
+          </div>
+          {studioPanelFooter}
+        </div>
+      </div>,
+      document.body
+    )
+
+  if (isMailchimpEditor) {
+    return (
+      <div className="mc-mc-editor">
+        <header className="mc-mc-editor__header">
+          <div className="mc-mc-editor__brand">
+            <img
+              src={BRAND_LOGO_MARK_LIGHT}
+              alt=""
+              className={`mc-mc-editor__logo ${BRAND_LOGO_MARK_CLASS}`}
+            />
+            <span className="mc-mc-editor__title">{title || value.name || 'Untitled'}</span>
+          </div>
+          <div className="mc-mc-editor__actions">
+            <span className="mc-mc-editor__saved">Changes saved</span>
+            {onTestSend ? (
+              <button
+                type="button"
+                className="mc-mc-editor__btn-outline"
+                disabled={busy}
+                onClick={() => void onTestSend()}
+              >
+                Send test
+              </button>
+            ) : null}
+            <button
+              type="button"
+              className="mc-mc-editor__save-exit"
+              disabled={busy}
+              onClick={() => void handleSaveAndExit()}
+            >
+              <span>Save and exit</span>
+              <ChevronRightIcon className="mc-mc-editor__save-caret" aria-hidden />
+            </button>
+          </div>
+        </header>
+
+        <div className="mc-mc-editor__workspace">
+          <aside className="mc-mc-editor__sidebar">
+            <nav className="mc-mc-editor__tabs" aria-label="Editor tools">
+              {MAILCHIMP_RAIL.map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  title={tab.label}
+                  className={`mc-mc-editor__tab${sideTab === tab.id ? ' is-active' : ''}`}
+                  onClick={() => setSideTab(tab.id)}
+                >
+                  <tab.icon className="mc-mc-editor__tab-icon" />
+                  <span>{tab.label}</span>
+                </button>
+              ))}
+            </nav>
+            <div className="mc-mc-editor__panel">
+              <h2 className="mc-mc-editor__panel-title">{mailchimpPanelTitle}</h2>
+              {sideTab === 'blocks' ? (
+                <p className="mc-mc-editor__panel-hint">Drag to add content to your email.</p>
+              ) : null}
+              <div className="mc-mc-editor__panel-scroll">{panelContent}</div>
+            </div>
+          </aside>
+
+          <div className="mc-mc-editor__main">
+            <div className="mc-mc-editor__canvas-bar">
+              <div className="mc-mc-editor__view-toggle" role="group" aria-label="Desktop or mobile">
+                <button
+                  type="button"
+                  className={`mc-mc-editor__view-btn${previewMode === 'desktop' ? ' is-active' : ''}`}
+                  onClick={() => setPreviewMode('desktop')}
+                  title="Desktop"
+                >
+                  <DesktopIcon className="h-4 w-4" />
+                </button>
+                <button
+                  type="button"
+                  className={`mc-mc-editor__view-btn${previewMode === 'mobile' ? ' is-active' : ''}`}
+                  onClick={() => setPreviewMode('mobile')}
+                  title="Mobile"
+                >
+                  <MobileDeviceIcon className="h-4 w-4" />
+                </button>
+              </div>
+              <div className="mc-mc-editor__canvas-tools">
+                <button
+                  type="button"
+                  className="mc-mc-editor__tool-btn"
+                  onClick={undo}
+                  disabled={!canUndo}
+                  title="Undo"
+                >
+                  <UndoIcon className="h-4 w-4" />
+                </button>
+                <button
+                  type="button"
+                  className="mc-mc-editor__tool-btn"
+                  onClick={redo}
+                  disabled={!canRedo}
+                  title="Redo"
+                >
+                  <RedoIcon className="h-4 w-4" />
+                </button>
+                <button
+                  type="button"
+                  className="mc-mc-editor__preview-btn"
+                  onClick={() => setPreviewOpen(true)}
+                >
+                  Preview
+                </button>
+              </div>
+            </div>
+
+            <div className="mc-mc-editor__canvas-scroll" ref={immersiveCanvasRef}>
+              <div className="mc-mc-practice-banner" role="note">
+                <span className="mc-mc-practice-banner__tag">Note</span>
+                <span>
+                  This is a practice email. Follow the tips below to learn how the builder works.
+                </span>
+              </div>
+              <div
+                className="mc-mc-editor__canvas-area"
+                onClick={handleCanvasAreaClick}
+                onMouseMove={handleCanvasAreaMove}
+                onMouseLeave={handleCanvasAreaLeave}
+                onWheel={handleImmersiveCanvasWheel}
+              >
+                <div className="mc-mc-editor__canvas-inner">{canvas}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {mailchimpStudioPopup}
+        {previewModal}
+        <button type="button" className="mc-feedback-tab" tabIndex={-1} aria-hidden>
+          Feedback
+        </button>
+      </div>
+    )
+  }
+
   if (isImmersive) {
     return (
       <div className="marketing-immersive-studio flex flex-col flex-1 min-h-0 w-full bg-white">
@@ -1456,48 +1676,7 @@ export default function MarketingTemplateBuilder({
           {immersiveRightRail}
         </div>
 
-        {studioPanel &&
-          createPortal(
-            <div
-              className="marketing-studio-popup-overlay"
-              role="presentation"
-              onClick={closeStudioPanel}
-            >
-              <div
-                className="marketing-studio-popup"
-                role="dialog"
-                aria-label={studioPanelTitle}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <header className="marketing-studio-popup-head">
-                  <div>
-                    <h3>{studioPanelTitle}</h3>
-                    {studioPanelSubtitle ? (
-                      <p className="marketing-studio-popup-sub">{studioPanelSubtitle}</p>
-                    ) : null}
-                  </div>
-                  <button
-                    type="button"
-                    className="crm-modal-close"
-                    aria-label="Close (Esc)"
-                    onClick={closeStudioPanel}
-                  >
-                    ×
-                  </button>
-                </header>
-                <div
-                  className={`marketing-studio-popup-body ${
-                    studioPanel === 'edit' ? 'marketing-studio-popup-body--edit' : ''
-                  }`}
-                >
-                  {studioPanelBody}
-                </div>
-                {studioPanelFooter}
-              </div>
-            </div>,
-            document.body
-          )}
-
+        {mailchimpStudioPopup}
         {previewModal}
       </div>
     )
