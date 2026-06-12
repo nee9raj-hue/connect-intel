@@ -1,59 +1,82 @@
 /** Campaign list status + analytics labels (merged stats + test sends). */
 
 export function campaignListStatus(campaign) {
-  const stats = campaign?.stats || {}
+  const stats = campaign?.stats || campaign?.analytics || {}
   const sent = Math.max(stats.sent || 0, stats.recipientsSent || 0)
   const enrolled = stats.enrolled || 0
   const testSent = stats.testSent || campaign?.testSendCount || 0
   const base = String(campaign?.status || 'draft').toLowerCase()
 
   if (base === 'draft' && sent === 0 && enrolled === 0 && testSent > 0) {
-    return { key: 'draft', label: 'Draft', hint: 'Test sent' }
+    return { key: 'draft', label: 'Draft', hint: 'Test sent', tone: 'draft' }
   }
-  if (base === 'draft' && sent > 0 && enrolled > 0) {
-    if (sent + (stats.failed || 0) >= enrolled) {
-      return { key: 'completed', label: 'Sent' }
-    }
-    return { key: 'active', label: 'Sending' }
+  if (sent > 0 && enrolled > 0 && sent + (stats.failed || 0) < enrolled) {
+    return { key: 'active', label: 'Sending', tone: 'active' }
   }
-
-  if (base === 'completed' || base === 'sent') return { key: 'completed', label: 'Sent' }
-  if (base === 'active') return { key: 'active', label: 'Sending' }
-  if (base === 'scheduled') return { key: 'scheduled', label: 'Scheduled' }
-  if (base === 'paused') return { key: 'paused', label: 'Paused' }
-  if (base === 'stopped') return { key: 'stopped', label: 'Stopped' }
-  return { key: base, label: base.charAt(0).toUpperCase() + base.slice(1) }
+  if (sent > 0 || base === 'completed' || base === 'sent') {
+    return { key: 'completed', label: 'Sent', tone: 'completed' }
+  }
+  if (base === 'active') return { key: 'active', label: 'Sending', tone: 'active' }
+  if (base === 'scheduled') return { key: 'scheduled', label: 'Scheduled', tone: 'scheduled' }
+  if (base === 'paused') return { key: 'paused', label: 'Paused', tone: 'paused' }
+  if (base === 'stopped') return { key: 'stopped', label: 'Stopped', tone: 'stopped' }
+  return { key: 'draft', label: 'Draft', tone: 'draft' }
 }
 
-export function campaignAnalyticsSummary(campaign) {
-  const stats = campaign?.stats || {}
+export function campaignMetrics(campaign) {
+  const stats = campaign?.stats || campaign?.analytics || {}
   const sent = Math.max(stats.sent || 0, stats.recipientsSent || 0)
   const testSent = stats.testSent || campaign?.testSendCount || 0
   const enrolled = stats.enrolled || 0
+  return {
+    sent,
+    enrolled,
+    testSent,
+    openRate: stats.openRate ?? campaign?.openRate ?? 0,
+    clickRate: stats.clickRate ?? campaign?.clickRate ?? stats.ctr ?? 0,
+    opens: stats.uniqueOpens ?? stats.opens ?? 0,
+    clicks: stats.uniqueClicks ?? stats.clicks ?? 0,
+  }
+}
 
-  if (sent > 0) {
-    const openRate = stats.openRate ?? campaign?.openRate ?? 0
-    const clickRate = stats.clickRate ?? campaign?.clickRate ?? stats.ctr ?? 0
-    if (openRate || clickRate) {
-      return `${openRate}% opens · ${clickRate}% clicks`
+export function campaignAnalyticsSummary(campaign) {
+  const m = campaignMetrics(campaign)
+
+  if (m.sent > 0) {
+    if (m.openRate || m.clickRate) {
+      return `${m.openRate}% opens · ${m.clickRate}% clicks`
     }
-    if (enrolled > 0) {
-      return `${sent.toLocaleString()} of ${enrolled.toLocaleString()} sent`
+    if (m.enrolled > 0) {
+      return `${m.sent.toLocaleString()} of ${m.enrolled.toLocaleString()} sent`
     }
-    return `${sent.toLocaleString()} sent`
+    return `${m.sent.toLocaleString()} delivered`
   }
 
-  if (testSent > 0) {
-    const when = campaign?.lastTestSentAt || stats.lastTestSentAt
+  if (m.testSent > 0) {
+    const when = campaign?.lastTestSentAt || campaign?.stats?.lastTestSentAt
     if (when) {
       try {
-        return `${testSent} test delivered · ${new Date(when).toLocaleDateString()}`
+        return `${m.testSent} test · ${new Date(when).toLocaleDateString()}`
       } catch {
-        return `${testSent} test delivered`
+        return `${m.testSent} test delivered`
       }
     }
-    return `${testSent} test delivered`
+    return `${m.testSent} test delivered`
   }
 
   return '—'
+}
+
+export function campaignSummaryCounts(campaigns = []) {
+  const counts = { draft: 0, scheduled: 0, active: 0, sent: 0, test: 0 }
+  for (const c of campaigns) {
+    const display = campaignListStatus(c)
+    const m = campaignMetrics(c)
+    if (display.key === 'draft') counts.draft += 1
+    else if (display.key === 'scheduled') counts.scheduled += 1
+    else if (display.key === 'active') counts.active += 1
+    else if (display.key === 'completed') counts.sent += 1
+    if (m.testSent > 0) counts.test += 1
+  }
+  return counts
 }
