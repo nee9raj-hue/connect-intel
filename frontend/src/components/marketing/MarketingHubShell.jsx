@@ -106,14 +106,19 @@ export default function MarketingHubShell({
                 title={t.label}
               >
                 <Icon className="mc-nav__icon" />
-                {!collapsed ? <span>{t.label}</span> : null}
+                {!collapsed ? (
+                  <>
+                    <span>{t.label}</span>
+                    {t.badge ? <span className="mc-nav__badge mc-nav__badge--inline">{t.badge}</span> : null}
+                  </>
+                ) : null}
               </button>
-              {!collapsed && t.id === 'campaigns' && tab === 'campaigns'
+              {!collapsed && t.id === 'campaigns' && (tab === 'campaigns' || tab === 'templates')
                 ? CAMPAIGN_SUB_NAV.map((sub) => (
                     <button
                       key={sub.id}
                       type="button"
-                      className="mc-nav__sublink"
+                      className={`mc-nav__sublink${tab === sub.id ? ' is-active' : ''}`}
                       onClick={() => onTabChange(sub.id)}
                     >
                       {sub.label}

@@ -22,6 +22,7 @@ import MarketingCampaigns from './MarketingCampaigns'
 import MarketingCreateChooser from './MarketingCreateChooser'
 import MarketingCampaignChecklistBuilder from './MarketingCampaignChecklistBuilder'
 import MarketingTemplateMarketplace from './MarketingTemplateMarketplace'
+import MarketingEmailTemplates from './MarketingEmailTemplates'
 import MarketingBrandKit, { mergeBrandKit } from './MarketingBrandKit'
 import MarketingAnalyticsHub from './MarketingAnalyticsHub'
 import MarketingAudiencesHub from './MarketingAudiencesHub'
@@ -985,22 +986,38 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
     }
   }
 
+  const createEmailFromTemplate = (tpl) => {
+    if (!tpl) return
+    resetCampaignForm()
+    setCampaignForm((prev) => ({
+      ...prev,
+      name: tpl.name || 'Untitled',
+      templateId: tpl.id,
+      subject: tpl.subject || '',
+      body: tpl.body || '',
+      blocks: tpl.blocks ? [...tpl.blocks] : [],
+      design: mergeBrandKit(tpl.design || { ...DEFAULT_THEME }),
+      previewText: tpl.previewText || '',
+    }))
+    setTab('campaigns')
+    setCampaignDesktopPhase('wizard')
+  }
+
   const renderTemplatesTab = () => {
     if (templatePhase === 'marketplace') {
       return (
         <>
-          <div className="mhub-v3-page">
-          <MarketingTemplateMarketplace
+          <MarketingEmailTemplates
             templates={templates}
-            savedTemplates={templates}
-            onSelect={openTemplateFromMarketplace}
+            user={user}
+            onEdit={editTemplate}
+            onSelectStarter={openTemplateFromMarketplace}
             onCreateBlank={() => {
               setTemplateForm({ ...EMPTY_TEMPLATE, design: mergeBrandKit({ ...DEFAULT_THEME }) })
               setTemplatePhase('editor')
             }}
-            onOpenBrandKit={() => setBrandKitOpen(true)}
+            onCreateEmail={createEmailFromTemplate}
           />
-          </div>
           <MarketingBrandKit
             open={brandKitOpen}
             onClose={() => setBrandKitOpen(false)}

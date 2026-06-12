@@ -8,7 +8,7 @@ export const MARKETING_HUB_TABS = [
   { id: 'audiences', label: 'Audience', short: 'Aud' },
   { id: 'analytics', label: 'Analytics', short: 'Stats' },
   { id: 'domains', label: 'Domains', short: 'Dom' },
-  { id: 'templates', label: 'Content', short: 'Tpl' },
+  { id: 'templates', label: 'Email templates', short: 'Tpl', badge: 'New' },
 ]
 
 export const CAMPAIGN_SUB_NAV = [
