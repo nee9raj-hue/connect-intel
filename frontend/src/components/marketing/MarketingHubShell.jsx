@@ -3,6 +3,7 @@ import {
   MARKETING_HUB_TABS,
   MOBILE_HUB_TABS,
   CAMPAIGN_SUB_NAV,
+  AUDIENCE_SUB_NAV,
 } from '../../lib/marketingHubNav'
 import useIsMobile from '../../hooks/useIsMobile'
 import { BRAND_LOGO_MARK_LIGHT, BRAND_LOGO_MARK_CLASS } from '../../lib/brandAssets'
@@ -52,6 +53,8 @@ function userInitials(user) {
 export default function MarketingHubShell({
   tab,
   onTabChange,
+  audienceSubTab = 'contacts',
+  onAudienceSubTabChange,
   onNavigate,
   onCreateCampaign,
   user,
@@ -123,6 +126,18 @@ export default function MarketingHubShell({
                     >
                       {sub.label}
                       {sub.badge ? <span className="mc-nav__badge">{sub.badge}</span> : null}
+                    </button>
+                  ))
+                : null}
+              {!collapsed && t.id === 'audiences' && tab === 'audiences'
+                ? AUDIENCE_SUB_NAV.map((sub) => (
+                    <button
+                      key={sub.id}
+                      type="button"
+                      className={`mc-nav__sublink${audienceSubTab === sub.id ? ' is-active' : ''}`}
+                      onClick={() => onAudienceSubTabChange?.(sub.id)}
+                    >
+                      {sub.label}
                     </button>
                   ))
                 : null}

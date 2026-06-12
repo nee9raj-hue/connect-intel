@@ -15,8 +15,9 @@ export default function MarketingSegmentsPanel({
   setError,
   setNotice,
   orgLeadTags = [],
+  startCreating = false,
 }) {
-  const [creating, setCreating] = useState(false)
+  const [creating, setCreating] = useState(startCreating)
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this segment?')) return

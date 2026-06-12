@@ -95,7 +95,8 @@ const EMPTY_CAMPAIGN = {
 }
 
 export default function MarketingPanel({ onNavigate, panelOptions, activePanel, isActive = true }) {
-  const { savedLeads, refreshSavedLeads, user, teamMembers, refreshTeam, orgLeadTags } = useApp()
+  const { savedLeads, refreshSavedLeads, user, teamMembers, refreshTeam, orgLeadTags, refreshOrgLeadTags } =
+    useApp()
   const [tab, setTab] = useState(() =>
     activePanel === 'bulk-email' ? 'bulk-email' : normalizeMarketingTab(panelOptions?.tab || 'overview')
   )
@@ -1391,6 +1392,8 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
         <MarketingHubShell
           tab={tab}
           onTabChange={handleMarketingTabChange}
+          audienceSubTab={audienceSubTab}
+          onAudienceSubTabChange={setAudienceSubTab}
           onNavigate={onNavigate}
           orgName={user?.organizationName}
           user={user}
@@ -1475,7 +1478,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
             <MarketingAudiencesHub
               initialTab={audienceSubTab}
               audienceStats={{
-                totalContacts: summary?.enrolled,
+                totalContacts: summary?.enrolled ?? savedLeads?.length,
                 activeContacts: lists.reduce((n, l) => n + (l.memberCount || l.leadIds?.length || 0), 0),
                 listCount: lists.length,
                 segmentCount: segments.length,
@@ -1485,6 +1488,8 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
               refreshTeam={refreshTeam}
               savedLeads={savedLeads}
               orgLeadTags={orgLeadTags}
+              refreshOrgLeadTags={refreshOrgLeadTags}
+              onNavigate={onNavigate}
               lists={lists}
               setLists={setLists}
               segments={segments}

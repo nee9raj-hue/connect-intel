@@ -15,6 +15,21 @@ export const CAMPAIGN_SUB_NAV = [
   { id: 'templates', label: 'Email templates', badge: 'New' },
 ]
 
+export const AUDIENCE_SUB_NAV = [
+  { id: 'contacts', label: 'Contacts' },
+  { id: 'tags', label: 'Tags' },
+  { id: 'segments', label: 'Segments' },
+  { id: 'surveys', label: 'Surveys' },
+  { id: 'preferences', label: 'Subscriber preferences' },
+  { id: 'inbox', label: 'Inbox' },
+]
+
+const AUDIENCE_TAB_ALIASES = {
+  overview: 'contacts',
+  lists: 'contacts',
+  studio: 'contacts',
+}
+
 export const MOBILE_HUB_TABS = MARKETING_HUB_TABS.filter(
   (t) => !['templates', 'domains'].includes(t.id)
 )
@@ -41,8 +56,9 @@ export function normalizeMarketingTab(tab) {
 }
 
 export function audienceTabFromPanelOptions(panelOptions) {
-  if (panelOptions?.audienceTab) return panelOptions.audienceTab
-  if (panelOptions?.tab === 'lists') return 'lists'
-  if (panelOptions?.tab === 'segments') return 'segments'
-  return 'overview'
+  const raw =
+    panelOptions?.audienceTab ||
+    (panelOptions?.tab === 'lists' ? 'contacts' : panelOptions?.tab === 'segments' ? 'segments' : null)
+  if (!raw) return 'contacts'
+  return AUDIENCE_TAB_ALIASES[raw] || raw
 }
