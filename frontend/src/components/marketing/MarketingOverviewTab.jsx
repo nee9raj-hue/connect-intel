@@ -8,7 +8,7 @@ export default function MarketingOverviewTab({
   onCreateCampaign,
 }) {
   return (
-    <div className="mc-page">
+    <div className="mc-page mc-home">
       <MarketingCreateHome onNavigate={onNavigate} onCreateCampaign={onCreateCampaign} />
       <MarketingGettingStarted
         lists={lists}
