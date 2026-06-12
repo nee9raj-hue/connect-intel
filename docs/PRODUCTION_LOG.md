@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 3a4ec78
+npm run prod:rollback -- ee50f70
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 3a4ec78
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `f2c8bd1` |
-| Log updated (IST) | 12/06/2026, 02:20:43 |
+| Commit | `f49bb6d` |
+| Log updated (IST) | 12/06/2026, 16:41:06 |
 
 ---
 
@@ -44,26 +44,26 @@ npm run prod:rollback -- 3a4ec78
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 12/06/2026, 02:20:41 | `f2c8bd1` | fix: pipeline owner filter for saved-by leads and sidebar stage nav | [preview](https://connect-intel-didx9h8lc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f2c8bd1` | **← LIVE**
+| 12/06/2026, 16:40:55 | `f49bb6d` | feat: redesign email template gallery with branded cards and nav fix | [preview](https://connect-intel-m6lh65ow2-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f49bb6d` | **← LIVE**
+| 12/06/2026, 16:19:35 | `ee50f70` | feat: Mailchimp campaign editor Styles, Sections, and Optimize panels | [preview](https://connect-intel-h1pwtudvc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ee50f70` |
+| 12/06/2026, 16:02:15 | `635ec40` | feat: Mailchimp-style Audience hub with Contacts, Tags, Segments, and more | [preview](https://connect-intel-perdjx6ot-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 635ec40` |
+| 12/06/2026, 15:52:08 | `c6f71e0` | feat: Mailchimp-style Email Templates page with saved list and actions | [preview](https://connect-intel-5xnqobakk-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c6f71e0` |
+| 12/06/2026, 15:41:28 | `d5fec16` | feat: Mailchimp-parity campaign checklist and email editor layout | [preview](https://connect-intel-p9cp5hc1b-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d5fec16` |
+| 12/06/2026, 15:26:02 | `b7d6912` | fix: add back-to-campaign close bar on email editor | [preview](https://connect-intel-hfd51i3he-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b7d6912` |
+| 12/06/2026, 15:08:16 | `9200201` | feat: full Mailchimp-style marketing hub shell, campaigns list, and editor | [preview](https://connect-intel-fr90xnn8j-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9200201` |
+| 12/06/2026, 14:15:58 | `4c0f0b3` | feat: Mailchimp-style marketing hub with checklist campaign builder | [preview](https://connect-intel-oywz4b6pu-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4c0f0b3` |
+| 12/06/2026, 12:53:05 | `98c0262` | fix: marketing reports drill down to filtered pipeline by lead IDs | [preview](https://connect-intel-cnzw8o7sb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 98c0262` |
+| 12/06/2026, 12:31:09 | `45b80b3` | perf: speed up marketing hub by skipping heavy enrollment reads | [preview](https://connect-intel-hnbinisb1-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 45b80b3` |
+| 12/06/2026, 02:47:32 | `e5b3750` | fix: pipeline owner filter uses assignee-or-saver ownership model | [preview](https://connect-intel-qga9yeyu6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e5b3750` |
+| 12/06/2026, 02:42:59 | `a10d75e` | feat: hide city, state, and tags from default pipeline columns | [preview](https://connect-intel-93v4u2kuj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a10d75e` |
+| 12/06/2026, 02:37:11 | `76d27e4` | fix: pipeline owner filter matches assigned rep shown in table | [preview](https://connect-intel-7jfcp5cy6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 76d27e4` |
+| 12/06/2026, 02:31:19 | `e71bbd9` | fix: recover from stale PWA cache after production deploys | [preview](https://connect-intel-h73lkwiwf-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e71bbd9` |
+| 12/06/2026, 02:25:06 | `89c7245` | chore: production log after calendar drawer and pipeline filter deploy | [preview](https://connect-intel-ncij3a53c-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 89c7245` |
+| 12/06/2026, 02:24:35 | `af832af` | style: tone down dashboard orange for a cleaner home overview | [preview](https://connect-intel-hbm2jeqns-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- af832af` |
+| 12/06/2026, 02:22:01 | `733dbd6` | chore: production log after pipeline assignee filter deploy | [preview](https://connect-intel-iyp8l4oyw-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 733dbd6` |
+| 12/06/2026, 02:20:41 | `f2c8bd1` | fix: pipeline owner filter for saved-by leads and sidebar stage nav | [preview](https://connect-intel-didx9h8lc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f2c8bd1` |
 | 12/06/2026, 02:13:55 | `3a4ec78` | fix: mobile calendar drawer clarity and pipeline owner/status filters | [preview](https://connect-intel-9nof9dm34-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3a4ec78` |
 | 12/06/2026, 02:04:00 | `9d53335` | chore: production log after calendar chrome UX deploy | [preview](https://connect-intel-jez8o0rj0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9d53335` |
-| 12/06/2026, 02:03:12 | `d8e12ad` | fix: calendar sync toolbar, mobile drawer portal, and immersive chrome | [preview](https://connect-intel-96kx93h4v-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d8e12ad` |
-| 12/06/2026, 01:56:40 | `4a8d8a8` | feat: team-wide unassigned leads pool with self-claim | [preview](https://connect-intel-pquf1y5mb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4a8d8a8` |
-| 12/06/2026, 01:52:47 | `da088f2` | feat: Google Calendar-style mobile layout and minimal sync floater | [preview](https://connect-intel-2frwzb4rz-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- da088f2` |
-| 12/06/2026, 01:48:52 | `0e2a9da` | fix: align month calendar cells and clip event pills | [preview](https://connect-intel-k210zfyrf-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0e2a9da` |
-| 12/06/2026, 01:32:05 | `30baa07` | perf: speed up CRM calendar load for large pipelines | [preview](https://connect-intel-5v8u3uepj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 30baa07` |
-| 12/06/2026, 01:29:24 | `2afbb2f` | fix: restore pipeline scroll and pin compact load-more bar to bottom | [preview](https://connect-intel-aut68tkh8-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2afbb2f` |
-| 12/06/2026, 01:24:28 | `b664332` | feat: redesign CRM calendar with Google Calendar-style UI | [preview](https://connect-intel-einidhnn1-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b664332` |
-| 12/06/2026, 01:12:56 | `1a9fc07` | fix: pipeline list uses single overflow scroll for vertical and horizontal | [preview](https://connect-intel-jftpu1kjl-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1a9fc07` |
-| 12/06/2026, 00:57:15 | `06b754d` | fix: stop pipeline table jitter with fixed hover action slots | [preview](https://connect-intel-291rje1t8-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 06b754d` |
-| 12/06/2026, 00:53:41 | `6e4c119` | fix: pipeline row hover uses color-only changes without layout jitter | [preview](https://connect-intel-96ea8cu1n-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6e4c119` |
-| 12/06/2026, 00:43:58 | `cb2557d` | feat: pipeline city, state, and tags as separate table columns | [preview](https://connect-intel-5jqyz3sr8-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- cb2557d` |
-| 12/06/2026, 00:36:19 | `a92da9a` | fix: pipeline owner filter matches assignee and saved-by owner fields | [preview](https://connect-intel-doe6exghb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a92da9a` |
-| 12/06/2026, 00:21:29 | `57c5c0d` | fix: stop bulk email timeouts by avoiding marketingCampaigns blob loads | [preview](https://connect-intel-br1wuw42a-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 57c5c0d` |
-| 12/06/2026, 00:14:21 | `b6d25d8` | fix: bulk email queue timeouts and pipeline column reorder | [preview](https://connect-intel-8kya5wuxm-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b6d25d8` |
-| 11/06/2026, 23:58:01 | `27f7bd2` | feat: toggle pipeline row hover quick actions in view settings | [preview](https://connect-intel-ptzj3a2wq-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 27f7bd2` |
-| 11/06/2026, 23:51:19 | `11d3945` | fix: populate city/state filter options from full pipeline index | [preview](https://connect-intel-2ovxfwklo-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 11d3945` |
-| 11/06/2026, 23:44:19 | `d919172` | fix: exact city/state pipeline filters with location parsing | [preview](https://connect-intel-3d5477zio-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d919172` |
 
 ---
 
