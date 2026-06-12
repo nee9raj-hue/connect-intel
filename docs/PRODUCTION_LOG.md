@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 75a25bc
+npm run prod:rollback -- d6a188f
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 75a25bc
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `a76ab25` |
-| Log updated (IST) | 12/06/2026, 17:06:08 |
+| Commit | `25bd4f7` |
+| Log updated (IST) | 12/06/2026, 17:14:05 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 75a25bc
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 12/06/2026, 17:05:56 | `a76ab25` | feat: polish marketing home with illustrated create cards and getting-started guide | [preview](https://connect-intel-bslyma59g-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a76ab25` | **← LIVE**
+| 12/06/2026, 17:13:56 | `25bd4f7` | fix: sync campaign status after test sends and background email delivery | [preview](https://connect-intel-3k8rvob2p-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 25bd4f7` | **← LIVE**
+| 12/06/2026, 17:06:45 | `d6a188f` | chore: sync production log after marketing home deploy | [preview](https://connect-intel-5vuzb6kmd-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d6a188f` |
+| 12/06/2026, 17:05:56 | `a76ab25` | feat: polish marketing home with illustrated create cards and getting-started guide | [preview](https://connect-intel-bslyma59g-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a76ab25` |
 | 12/06/2026, 16:41:46 | `75a25bc` | chore: sync production log after template gallery deploy | [preview](https://connect-intel-lzahmwdzn-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 75a25bc` |
 | 12/06/2026, 16:40:55 | `f49bb6d` | feat: redesign email template gallery with branded cards and nav fix | [preview](https://connect-intel-m6lh65ow2-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f49bb6d` |
 | 12/06/2026, 16:19:35 | `ee50f70` | feat: Mailchimp campaign editor Styles, Sections, and Optimize panels | [preview](https://connect-intel-h1pwtudvc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ee50f70` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 75a25bc
 | 12/06/2026, 02:31:19 | `e71bbd9` | fix: recover from stale PWA cache after production deploys | [preview](https://connect-intel-h73lkwiwf-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e71bbd9` |
 | 12/06/2026, 02:25:06 | `89c7245` | chore: production log after calendar drawer and pipeline filter deploy | [preview](https://connect-intel-ncij3a53c-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 89c7245` |
 | 12/06/2026, 02:24:35 | `af832af` | style: tone down dashboard orange for a cleaner home overview | [preview](https://connect-intel-hbm2jeqns-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- af832af` |
-| 12/06/2026, 02:22:01 | `733dbd6` | chore: production log after pipeline assignee filter deploy | [preview](https://connect-intel-iyp8l4oyw-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 733dbd6` |
-| 12/06/2026, 02:20:41 | `f2c8bd1` | fix: pipeline owner filter for saved-by leads and sidebar stage nav | [preview](https://connect-intel-didx9h8lc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f2c8bd1` |
 
 ---
 
