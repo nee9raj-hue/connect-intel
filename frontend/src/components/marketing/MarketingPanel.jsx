@@ -195,8 +195,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
     setLoading(true)
     setError(null)
     try {
-      const light = tab !== 'analytics'
-      const data = await api.getMarketingOverview({ light, timeoutMs: 60_000 })
+      const data = await api.getMarketingOverview({ light: true, timeoutMs: 45_000 })
       setLists(data.lists || [])
       setTemplates(data.templates || [])
       const all = data.campaigns || []
@@ -211,7 +210,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
     } finally {
       setLoading(false)
     }
-  }, [tab])
+  }, [])
 
   useEffect(() => {
     if (activePanel === 'bulk-email') setTab('bulk-email')
@@ -246,8 +245,9 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
   }, [user?.accountType, user?.id])
 
   useEffect(() => {
+    if (!isActive) return
     load()
-  }, [load])
+  }, [load, isActive])
 
   useEffect(() => {
     if (!user?.id || !isActive) return
