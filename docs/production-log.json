@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-12T11:11:06.711Z",
-  "updatedAtIst": "12/06/2026, 16:41:06",
+  "updatedAt": "2026-06-12T11:36:08.714Z",
+  "updatedAtIst": "12/06/2026, 17:06:08",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "f49bb6d",
+  "currentProductionCommit": "a76ab25",
   "entries": [
+    {
+      "logId": "20260612-1705-a76ab25",
+      "commit": "a76ab25",
+      "commitFull": "a76ab255fc94982281b41d88c8cb60439085e216",
+      "message": "feat: polish marketing home with illustrated create cards and getting-started guide",
+      "deployedAt": "2026-06-12T11:35:56.779Z",
+      "deployedAtIst": "12/06/2026, 17:05:56",
+      "committedAtIst": "12/06/2026, 17:05:24",
+      "vercelPreviewUrl": "https://connect-intel-bslyma59g-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- a76ab25"
+    },
+    {
+      "logId": "20260612-1641-75a25bc",
+      "commit": "75a25bc",
+      "commitFull": "75a25bc781c76834628dd6c09c9c3919529de93c",
+      "message": "chore: sync production log after template gallery deploy",
+      "deployedAt": "2026-06-12T11:11:46.496Z",
+      "deployedAtIst": "12/06/2026, 16:41:46",
+      "committedAtIst": "12/06/2026, 16:41:15",
+      "vercelPreviewUrl": "https://connect-intel-lzahmwdzn-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 75a25bc"
+    },
     {
       "logId": "20260612-1640-f49bb6d",
       "commit": "f49bb6d",
@@ -15,7 +43,7 @@
       "committedAtIst": "12/06/2026, 16:40:19",
       "vercelPreviewUrl": "https://connect-intel-m6lh65ow2-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- f49bb6d"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- f2c8bd1"
-    },
-    {
-      "logId": "20260612-0213-3a4ec78",
-      "commit": "3a4ec78",
-      "commitFull": "3a4ec78cba3a335f0c27515c0979dcdbe04e7fe4",
-      "message": "fix: mobile calendar drawer clarity and pipeline owner/status filters",
-      "deployedAt": "2026-06-11T20:43:55.692Z",
-      "deployedAtIst": "12/06/2026, 02:13:55",
-      "committedAtIst": "12/06/2026, 02:13:17",
-      "vercelPreviewUrl": "https://connect-intel-9nof9dm34-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 3a4ec78"
-    },
-    {
-      "logId": "20260612-0204-9d53335",
-      "commit": "9d53335",
-      "commitFull": "9d533358284e87ff2af5fd7e874d1eaf3be52d5d",
-      "message": "chore: production log after calendar chrome UX deploy",
-      "deployedAt": "2026-06-11T20:34:00.401Z",
-      "deployedAtIst": "12/06/2026, 02:04:00",
-      "committedAtIst": "12/06/2026, 02:03:23",
-      "vercelPreviewUrl": "https://connect-intel-jez8o0rj0-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 9d53335"
     }
   ]
 }

@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- ee50f70
+npm run prod:rollback -- 75a25bc
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- ee50f70
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `f49bb6d` |
-| Log updated (IST) | 12/06/2026, 16:41:06 |
+| Commit | `a76ab25` |
+| Log updated (IST) | 12/06/2026, 17:06:08 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- ee50f70
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 12/06/2026, 16:40:55 | `f49bb6d` | feat: redesign email template gallery with branded cards and nav fix | [preview](https://connect-intel-m6lh65ow2-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f49bb6d` | **← LIVE**
+| 12/06/2026, 17:05:56 | `a76ab25` | feat: polish marketing home with illustrated create cards and getting-started guide | [preview](https://connect-intel-bslyma59g-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a76ab25` | **← LIVE**
+| 12/06/2026, 16:41:46 | `75a25bc` | chore: sync production log after template gallery deploy | [preview](https://connect-intel-lzahmwdzn-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 75a25bc` |
+| 12/06/2026, 16:40:55 | `f49bb6d` | feat: redesign email template gallery with branded cards and nav fix | [preview](https://connect-intel-m6lh65ow2-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f49bb6d` |
 | 12/06/2026, 16:19:35 | `ee50f70` | feat: Mailchimp campaign editor Styles, Sections, and Optimize panels | [preview](https://connect-intel-h1pwtudvc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ee50f70` |
 | 12/06/2026, 16:02:15 | `635ec40` | feat: Mailchimp-style Audience hub with Contacts, Tags, Segments, and more | [preview](https://connect-intel-perdjx6ot-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 635ec40` |
 | 12/06/2026, 15:52:08 | `c6f71e0` | feat: Mailchimp-style Email Templates page with saved list and actions | [preview](https://connect-intel-5xnqobakk-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c6f71e0` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- ee50f70
 | 12/06/2026, 02:24:35 | `af832af` | style: tone down dashboard orange for a cleaner home overview | [preview](https://connect-intel-hbm2jeqns-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- af832af` |
 | 12/06/2026, 02:22:01 | `733dbd6` | chore: production log after pipeline assignee filter deploy | [preview](https://connect-intel-iyp8l4oyw-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 733dbd6` |
 | 12/06/2026, 02:20:41 | `f2c8bd1` | fix: pipeline owner filter for saved-by leads and sidebar stage nav | [preview](https://connect-intel-didx9h8lc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f2c8bd1` |
-| 12/06/2026, 02:13:55 | `3a4ec78` | fix: mobile calendar drawer clarity and pipeline owner/status filters | [preview](https://connect-intel-9nof9dm34-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3a4ec78` |
-| 12/06/2026, 02:04:00 | `9d53335` | chore: production log after calendar chrome UX deploy | [preview](https://connect-intel-jez8o0rj0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9d53335` |
 
 ---
 
