@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- ab64547
+npm run prod:rollback -- 1c30efe
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- ab64547
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `0cecc46` |
-| Log updated (IST) | 13/06/2026, 19:53:42 |
+| Commit | `90c4f6a` |
+| Log updated (IST) | 13/06/2026, 20:00:46 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- ab64547
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 13/06/2026, 19:53:30 | `0cecc46` | fix: analytics team filter matches campaign owner user ids | [preview](https://connect-intel-kkbjcp97p-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0cecc46` | **← LIVE**
+| 13/06/2026, 20:00:32 | `90c4f6a` | feat: full-page campaign reports in new tabs with engagement charts | [preview](https://connect-intel-h17vlw4m6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 90c4f6a` | **← LIVE**
+| 13/06/2026, 19:54:16 | `1c30efe` | chore: sync production log after analytics team filter fix | [preview](https://connect-intel-rkaegt9dn-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1c30efe` |
+| 13/06/2026, 19:53:30 | `0cecc46` | fix: analytics team filter matches campaign owner user ids | [preview](https://connect-intel-kkbjcp97p-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0cecc46` |
 | 13/06/2026, 19:34:03 | `ab64547` | chore: sync production log after analytics redesign deploy | [preview](https://connect-intel-kgnvicdq7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ab64547` |
 | 13/06/2026, 19:33:11 | `4e15e3b` | feat: redesign marketing analytics with filters and campaign drill-down | [preview](https://connect-intel-1acbctknb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4e15e3b` |
 | 13/06/2026, 19:20:02 | `d198ab9` | chore: sync production log after campaigns loading fix | [preview](https://connect-intel-lberin2co-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d198ab9` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- ab64547
 | 12/06/2026, 15:52:08 | `c6f71e0` | feat: Mailchimp-style Email Templates page with saved list and actions | [preview](https://connect-intel-5xnqobakk-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c6f71e0` |
 | 12/06/2026, 15:41:28 | `d5fec16` | feat: Mailchimp-parity campaign checklist and email editor layout | [preview](https://connect-intel-p9cp5hc1b-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d5fec16` |
 | 12/06/2026, 15:26:02 | `b7d6912` | fix: add back-to-campaign close bar on email editor | [preview](https://connect-intel-hfd51i3he-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b7d6912` |
-| 12/06/2026, 15:08:16 | `9200201` | feat: full Mailchimp-style marketing hub shell, campaigns list, and editor | [preview](https://connect-intel-fr90xnn8j-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9200201` |
-| 12/06/2026, 14:15:58 | `4c0f0b3` | feat: Mailchimp-style marketing hub with checklist campaign builder | [preview](https://connect-intel-oywz4b6pu-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4c0f0b3` |
 
 ---
 

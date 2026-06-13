@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-13T14:23:42.808Z",
-  "updatedAtIst": "13/06/2026, 19:53:42",
+  "updatedAt": "2026-06-13T14:30:46.284Z",
+  "updatedAtIst": "13/06/2026, 20:00:46",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "0cecc46",
+  "currentProductionCommit": "90c4f6a",
   "entries": [
+    {
+      "logId": "20260613-2000-90c4f6a",
+      "commit": "90c4f6a",
+      "commitFull": "90c4f6afac2c3a30efab3f411336972c4cca1224",
+      "message": "feat: full-page campaign reports in new tabs with engagement charts",
+      "deployedAt": "2026-06-13T14:30:32.323Z",
+      "deployedAtIst": "13/06/2026, 20:00:32",
+      "committedAtIst": "13/06/2026, 20:00:02",
+      "vercelPreviewUrl": "https://connect-intel-h17vlw4m6-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 90c4f6a"
+    },
+    {
+      "logId": "20260613-1954-1c30efe",
+      "commit": "1c30efe",
+      "commitFull": "1c30efe8b09459c74a3081d2f65a9b0b6e569a8e",
+      "message": "chore: sync production log after analytics team filter fix",
+      "deployedAt": "2026-06-13T14:24:16.826Z",
+      "deployedAtIst": "13/06/2026, 19:54:16",
+      "committedAtIst": "13/06/2026, 19:53:46",
+      "vercelPreviewUrl": "https://connect-intel-rkaegt9dn-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 1c30efe"
+    },
     {
       "logId": "20260613-1953-0cecc46",
       "commit": "0cecc46",
@@ -15,7 +43,7 @@
       "committedAtIst": "13/06/2026, 19:52:59",
       "vercelPreviewUrl": "https://connect-intel-kkbjcp97p-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 0cecc46"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- b7d6912"
-    },
-    {
-      "logId": "20260612-1508-9200201",
-      "commit": "9200201",
-      "commitFull": "92002012a8dee5d3236271633edbb3e2440d409f",
-      "message": "feat: full Mailchimp-style marketing hub shell, campaigns list, and editor",
-      "deployedAt": "2026-06-12T09:38:16.810Z",
-      "deployedAtIst": "12/06/2026, 15:08:16",
-      "committedAtIst": "12/06/2026, 15:07:31",
-      "vercelPreviewUrl": "https://connect-intel-fr90xnn8j-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 9200201"
-    },
-    {
-      "logId": "20260612-1415-4c0f0b3",
-      "commit": "4c0f0b3",
-      "commitFull": "4c0f0b3ec4915bcd44e99c4e97b1f5c83cdac037",
-      "message": "feat: Mailchimp-style marketing hub with checklist campaign builder",
-      "deployedAt": "2026-06-12T08:45:58.070Z",
-      "deployedAtIst": "12/06/2026, 14:15:58",
-      "committedAtIst": "12/06/2026, 14:15:20",
-      "vercelPreviewUrl": "https://connect-intel-oywz4b6pu-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 4c0f0b3"
     }
   ]
 }
