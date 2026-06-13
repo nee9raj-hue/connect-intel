@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-13T13:49:32.377Z",
-  "updatedAtIst": "13/06/2026, 19:19:32",
+  "updatedAt": "2026-06-13T14:03:24.366Z",
+  "updatedAtIst": "13/06/2026, 19:33:24",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "3ce72c6",
+  "currentProductionCommit": "4e15e3b",
   "entries": [
+    {
+      "logId": "20260613-1933-4e15e3b",
+      "commit": "4e15e3b",
+      "commitFull": "4e15e3b6bb60ccc4753aae853cdce7a4b7c230f8",
+      "message": "feat: redesign marketing analytics with filters and campaign drill-down",
+      "deployedAt": "2026-06-13T14:03:11.242Z",
+      "deployedAtIst": "13/06/2026, 19:33:11",
+      "committedAtIst": "13/06/2026, 19:32:36",
+      "vercelPreviewUrl": "https://connect-intel-1acbctknb-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 4e15e3b"
+    },
+    {
+      "logId": "20260613-1920-d198ab9",
+      "commit": "d198ab9",
+      "commitFull": "d198ab9c9dbbfb87b7e023b5084e9921376c902a",
+      "message": "chore: sync production log after campaigns loading fix",
+      "deployedAt": "2026-06-13T13:50:02.918Z",
+      "deployedAtIst": "13/06/2026, 19:20:02",
+      "committedAtIst": "13/06/2026, 19:19:32",
+      "vercelPreviewUrl": "https://connect-intel-lberin2co-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- d198ab9"
+    },
     {
       "logId": "20260613-1919-3ce72c6",
       "commit": "3ce72c6",
@@ -15,7 +43,7 @@
       "committedAtIst": "13/06/2026, 19:18:45",
       "vercelPreviewUrl": "https://connect-intel-dlbq5x27r-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 3ce72c6"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 45b80b3"
-    },
-    {
-      "logId": "20260612-0247-e5b3750",
-      "commit": "e5b3750",
-      "commitFull": "e5b37502cd112a3651a225035bdfd35628e2b750",
-      "message": "fix: pipeline owner filter uses assignee-or-saver ownership model",
-      "deployedAt": "2026-06-11T21:17:32.538Z",
-      "deployedAtIst": "12/06/2026, 02:47:32",
-      "committedAtIst": "12/06/2026, 02:46:55",
-      "vercelPreviewUrl": "https://connect-intel-qga9yeyu6-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- e5b3750"
-    },
-    {
-      "logId": "20260612-0242-a10d75e",
-      "commit": "a10d75e",
-      "commitFull": "a10d75ec85ff1c9704f62c62d77a8ba5aed27e43",
-      "message": "feat: hide city, state, and tags from default pipeline columns",
-      "deployedAt": "2026-06-11T21:12:59.035Z",
-      "deployedAtIst": "12/06/2026, 02:42:59",
-      "committedAtIst": "12/06/2026, 02:42:21",
-      "vercelPreviewUrl": "https://connect-intel-93v4u2kuj-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- a10d75e"
     }
   ]
 }

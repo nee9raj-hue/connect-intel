@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 18d764e
+npm run prod:rollback -- d198ab9
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 18d764e
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `3ce72c6` |
-| Log updated (IST) | 13/06/2026, 19:19:32 |
+| Commit | `4e15e3b` |
+| Log updated (IST) | 13/06/2026, 19:33:24 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 18d764e
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 13/06/2026, 19:19:18 | `3ce72c6` | fix: stop infinite loading loop on marketing campaigns tab | [preview](https://connect-intel-dlbq5x27r-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3ce72c6` | **← LIVE**
+| 13/06/2026, 19:33:11 | `4e15e3b` | feat: redesign marketing analytics with filters and campaign drill-down | [preview](https://connect-intel-1acbctknb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4e15e3b` | **← LIVE**
+| 13/06/2026, 19:20:02 | `d198ab9` | chore: sync production log after campaigns loading fix | [preview](https://connect-intel-lberin2co-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d198ab9` |
+| 13/06/2026, 19:19:18 | `3ce72c6` | fix: stop infinite loading loop on marketing campaigns tab | [preview](https://connect-intel-dlbq5x27r-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3ce72c6` |
 | 12/06/2026, 18:29:03 | `18d764e` | chore: sync production log after campaigns page deploy | [preview](https://connect-intel-yn3axt41a-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 18d764e` |
 | 12/06/2026, 18:28:15 | `a9424cd` | feat: redesign campaigns page and enrich list metrics from enrollments | [preview](https://connect-intel-i0l1mi08u-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a9424cd` |
 | 12/06/2026, 17:14:40 | `03f553e` | chore: sync production log after campaign status fix deploy | [preview](https://connect-intel-llwkadlw2-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 03f553e` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 18d764e
 | 12/06/2026, 14:15:58 | `4c0f0b3` | feat: Mailchimp-style marketing hub with checklist campaign builder | [preview](https://connect-intel-oywz4b6pu-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4c0f0b3` |
 | 12/06/2026, 12:53:05 | `98c0262` | fix: marketing reports drill down to filtered pipeline by lead IDs | [preview](https://connect-intel-cnzw8o7sb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 98c0262` |
 | 12/06/2026, 12:31:09 | `45b80b3` | perf: speed up marketing hub by skipping heavy enrollment reads | [preview](https://connect-intel-hnbinisb1-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 45b80b3` |
-| 12/06/2026, 02:47:32 | `e5b3750` | fix: pipeline owner filter uses assignee-or-saver ownership model | [preview](https://connect-intel-qga9yeyu6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e5b3750` |
-| 12/06/2026, 02:42:59 | `a10d75e` | feat: hide city, state, and tags from default pipeline columns | [preview](https://connect-intel-93v4u2kuj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a10d75e` |
 
 ---
 
