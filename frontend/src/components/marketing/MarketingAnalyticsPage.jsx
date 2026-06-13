@@ -47,10 +47,12 @@ function campaignOwnerUserId(campaign) {
 
 function buildSentChart(trend = [], campaigns = []) {
   if (trend?.length) {
-    return trend.slice(-12).map((t) => ({
+    return trend.slice(-14).map((t) => ({
       date: t.date,
       sent: t.sent || 0,
-      openRate: t.opens && t.sent ? Math.round((t.opens / t.sent) * 100) : null,
+      opens: t.opens || 0,
+      clicks: t.clicks || 0,
+      openRate: t.sent && t.opens ? Math.round((t.opens / t.sent) * 100) : null,
     }))
   }
   const byDate = new Map()
@@ -61,23 +63,36 @@ function buildSentChart(trend = [], campaigns = []) {
   }
   return [...byDate.entries()]
     .sort((a, b) => a[0].localeCompare(b[0]))
-    .slice(-12)
+    .slice(-14)
     .map(([date, sent]) => ({ date, sent }))
 }
 
 function buildGrowthChart(audienceTrend, totalContacts) {
   if (audienceTrend?.length) {
-    return audienceTrend.slice(-12).map((r) => ({
+    return audienceTrend.slice(-14).map((r) => ({
       date: r.date,
-      total: r.events || r.opens || r.value || r.total || 0,
+      total: r.total ?? r.value ?? r.events ?? r.opens ?? 0,
     }))
   }
+  const total = totalContacts || 0
   const now = new Date()
-  return Array.from({ length: 12 }, (_, i) => {
+  return Array.from({ length: 14 }, (_, i) => {
     const d = new Date(now)
-    d.setDate(d.getDate() - (11 - i) * 7)
-    return { date: d.toISOString().slice(0, 10), total: i === 11 ? totalContacts : 0 }
+    d.setDate(d.getDate() - (13 - i))
+    return { date: d.toISOString().slice(0, 10), total }
   })
+}
+
+function chartSummary(data, valueKey) {
+  if (!data?.length) return { total: 0, peak: null, avg: 0 }
+  let total = 0
+  let peak = data[0]
+  for (const row of data) {
+    const v = Number(row[valueKey]) || 0
+    total += v
+    if (v > (Number(peak[valueKey]) || 0)) peak = row
+  }
+  return { total, peak, avg: Math.round(total / data.length) }
 }
 
 function StatusBadge({ campaign }) {
@@ -122,6 +137,8 @@ export default function MarketingAnalyticsPage({
   const insights = analytics?.insights || []
   const sentChart = buildSentChart(analytics?.campaign_stats?.trend, reportCampaigns)
   const growthChart = buildGrowthChart(analytics?.growth_chart, audience.totalContacts)
+  const sentSummary = useMemo(() => chartSummary(sentChart, 'sent'), [sentChart])
+  const growthSummary = useMemo(() => chartSummary(growthChart, 'total'), [growthChart])
 
   const filteredCampaigns = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -275,16 +292,49 @@ export default function MarketingAnalyticsPage({
       </div>
 
       <div className="mc-analytics-grid">
-        <section className="mc-analytics-panel">
-          <h2 className="mc-analytics-panel__title">Emails sent over time</h2>
-          <BarChart data={sentChart} valueKey="sent" labelKey="date" height={180} />
+        <section className="mc-analytics-panel mc-analytics-panel--chart">
+          <div className="mc-analytics-panel__chart-head">
+            <div>
+              <h2 className="mc-analytics-panel__title">Emails sent over time</h2>
+              <p className="mc-analytics-panel__meta mc-analytics-panel__meta--flush">
+                Daily send volume for the selected period.
+              </p>
+            </div>
+            <div className="mc-analytics-chart-legend">
+              <span className="mc-analytics-chart-legend__item">
+                <i className="mc-analytics-chart-legend__swatch mc-analytics-chart-legend__swatch--sent" />
+                Sent
+              </span>
+              <span className="mc-analytics-chart-legend__stat">{sentSummary.total.toLocaleString()} total</span>
+              {sentSummary.peak && Number(sentSummary.peak.sent) > 0 ? (
+                <span className="mc-analytics-chart-legend__stat">
+                  Peak {Number(sentSummary.peak.sent).toLocaleString()}
+                </span>
+              ) : null}
+            </div>
+          </div>
+          <BarChart data={sentChart} valueKey="sent" labelKey="date" />
         </section>
-        <section className="mc-analytics-panel">
-          <h2 className="mc-analytics-panel__title">Audience growth</h2>
-          <LineChart data={growthChart} valueKey="total" labelKey="date" height={180} />
-          <p className="mc-analytics-panel__meta">
-            Active {(audience.activeContacts ?? 0).toLocaleString()} · Growth {audience.growthPct ?? 0}%
-          </p>
+        <section className="mc-analytics-panel mc-analytics-panel--chart">
+          <div className="mc-analytics-panel__chart-head">
+            <div>
+              <h2 className="mc-analytics-panel__title">Audience growth</h2>
+              <p className="mc-analytics-panel__meta mc-analytics-panel__meta--flush">
+                Active {(audience.activeContacts ?? 0).toLocaleString()} contacts ·{' '}
+                {audience.growthPct ?? 0}% growth
+              </p>
+            </div>
+            <div className="mc-analytics-chart-legend">
+              <span className="mc-analytics-chart-legend__item">
+                <i className="mc-analytics-chart-legend__swatch mc-analytics-chart-legend__swatch--audience" />
+                Contacts
+              </span>
+              <span className="mc-analytics-chart-legend__stat">
+                {(growthSummary.peak?.total ?? audience.totalContacts ?? 0).toLocaleString()} current
+              </span>
+            </div>
+          </div>
+          <LineChart data={growthChart} valueKey="total" labelKey="date" />
         </section>
       </div>
 
