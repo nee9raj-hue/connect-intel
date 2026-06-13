@@ -1369,15 +1369,8 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
     }
     return (
       <MarketingReportsListPage
-        campaigns={reportCampaigns}
         onNavigate={onNavigate}
-        onDuplicate={duplicateCampaignForResend}
-        onReload={load}
-        onPause={pauseCampaign}
-        onResume={continueCampaignSending}
-        onStop={stopCampaign}
-        onContinue={continueCampaignSending}
-        busy={busy}
+        teamMembers={teamMembers}
         showCreator={Boolean(user?.isOrgAdmin && user?.accountType === 'company')}
       />
     )

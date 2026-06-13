@@ -28,14 +28,22 @@ export function campaignMetrics(campaign) {
   const sent = Math.max(stats.sent || 0, stats.recipientsSent || 0)
   const testSent = stats.testSent || campaign?.testSendCount || 0
   const enrolled = stats.enrolled || 0
+  const opens = stats.uniqueOpens ?? stats.opens ?? 0
+  const clicks = stats.uniqueClicks ?? stats.clicks ?? 0
+  let openRate = stats.openRate ?? campaign?.openRate ?? 0
+  let clickRate = stats.clickRate ?? campaign?.clickRate ?? stats.ctr ?? 0
+  if (sent > 0) {
+    if (opens > 0 && !openRate) openRate = Math.round((opens / sent) * 100)
+    if (clicks > 0 && !clickRate) clickRate = Math.round((clicks / sent) * 100)
+  }
   return {
     sent,
     enrolled,
     testSent,
-    openRate: stats.openRate ?? campaign?.openRate ?? 0,
-    clickRate: stats.clickRate ?? campaign?.clickRate ?? stats.ctr ?? 0,
-    opens: stats.uniqueOpens ?? stats.opens ?? 0,
-    clicks: stats.uniqueClicks ?? stats.clicks ?? 0,
+    openRate,
+    clickRate,
+    opens,
+    clicks,
   }
 }
 

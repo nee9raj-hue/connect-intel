@@ -1548,6 +1548,40 @@
   margin-top: 4px;
 }
 
+.mc-reports-list-filters {
+  align-items: flex-end;
+}
+
+.mc-reports-list-filters__search {
+  flex: 1;
+  min-width: 200px;
+  max-width: 280px;
+}
+
+.mc-reports-list-filters__search .mc-camp-toolbar__search {
+  width: 100%;
+}
+
+.mc-reports-list-kpis {
+  margin-bottom: 20px;
+}
+
+.mc-reports-list-table-panel {
+  margin-bottom: 24px;
+}
+
+.mc-reports-list-table .mc-reports-list-metric-sub {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--mc-text-muted);
+  margin-top: 2px;
+}
+
+.mc-reports-list-table .mc-link {
+  text-align: left;
+}
+
 @media (max-width: 900px) {
   .mc-report-detail__charts-grid,
   .mc-report-rates {

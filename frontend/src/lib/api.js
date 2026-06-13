@@ -518,10 +518,14 @@ export const api = {
       timeoutMs: opts.timeoutMs ?? 120_000,
       silent: opts.silent,
     }),
-  getMarketingOverview: (opts = {}) =>
-    request(`/api/marketing/campaigns?overview=1${opts.light ? '&light=1' : ''}`, {
+  getMarketingOverview: (opts = {}) => {
+    const q = new URLSearchParams({ overview: '1' })
+    if (opts.light) q.set('light', '1')
+    if (opts.withEngagement) q.set('withEngagement', '1')
+    return request(`/api/marketing/campaigns?${q}`, {
       timeoutMs: opts.timeoutMs ?? 60_000,
-    }),
+    })
+  },
   getMarketingCampaignReport: (campaignId) =>
     request(`/api/marketing/campaigns?campaignId=${encodeURIComponent(campaignId)}`, {
       timeoutMs: 90_000,
