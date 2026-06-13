@@ -1183,8 +1183,14 @@ textarea {
 }
 
 .marketing-report-kpi-tile--active {
-  border-color: #17191c;
-  box-shadow: 0 0 0 2px rgba(23, 25, 28, 0.12);
+  background: var(--mc-primary, #007c89);
+  border-color: var(--mc-primary, #007c89);
+  box-shadow: 0 4px 12px rgba(0, 124, 137, 0.28);
+}
+
+.marketing-report-kpi-tile--active .marketing-report-kpi-tile__label,
+.marketing-report-kpi-tile--active .marketing-report-kpi-tile__value {
+  color: #fff;
 }
 
 .marketing-report-kpi-tile__label {

@@ -108,7 +108,7 @@ function CampaignMetricButton({ value, sub, onClick, className = '' }) {
         title="View in pipeline"
       >
         {value}
-        {sub != null ? <span className="block text-xs text-[#FF773D]">{sub} · pipeline</span> : null}
+        {sub != null ? <span className="block text-xs text-[#007c89]">{sub} · pipeline</span> : null}
       </button>
     </td>
   )
@@ -197,15 +197,15 @@ function ReportOverlay({ title, onClose, children, wide }) {
   )
 }
 
-function KpiTile({ label, value, active, onClick, accent }) {
+function KpiTile({ label, value, active, onClick }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`marketing-report-kpi-tile ${active ? 'marketing-report-kpi-tile--active' : ''}`}
+      className={`marketing-report-kpi-tile${active ? ' marketing-report-kpi-tile--active' : ''}`}
     >
       <span className="marketing-report-kpi-tile__label">{label}</span>
-      <span className={`marketing-report-kpi-tile__value ${accent || ''}`}>{value}</span>
+      <span className="marketing-report-kpi-tile__value">{value}</span>
     </button>
   )
 }
@@ -550,7 +550,7 @@ function CampaignDetailReport({
             type="button"
             disabled={busy}
             onClick={() => onDuplicate?.(campaignId)}
-            className="text-xs font-semibold px-3 py-2 bg-[#FF773D] text-[#242424] rounded-lg disabled:opacity-50"
+            className="text-xs font-semibold px-3 py-2 bg-[#FF773D] text-white rounded-lg disabled:opacity-50"
           >
             Duplicate
           </button>
@@ -647,7 +647,6 @@ function CampaignDetailReport({
         <KpiTile
           label="Sent"
           value={sentKpi}
-          accent="text-[#FF773D]"
           active={filter === 'sent'}
           onClick={() => openKpi('sent')}
         />
@@ -656,35 +655,30 @@ function CampaignDetailReport({
             <KpiTile
               label="Bounced"
               value={stats.bounced ?? 0}
-              accent="text-red-700"
               active={filter === 'bounced'}
               onClick={() => openKpi('bounced')}
             />
             <KpiTile
               label={`Opened${stats.openRate ? ` (${stats.openRate}%)` : ''}`}
               value={stats.uniqueOpens ?? 0}
-              accent="text-[#FF773D]"
               active={filter === 'opened'}
               onClick={() => openKpi('opened')}
             />
             <KpiTile
               label={`Clicked${stats.clickRate ? ` (${stats.clickRate}%)` : ''}`}
               value={stats.uniqueClicks ?? 0}
-              accent="text-[#FF773D]"
               active={filter === 'clicked'}
               onClick={() => openKpi('clicked')}
             />
             <KpiTile
               label="Unsubscribed"
               value={stats.unsubscribed ?? 0}
-              accent="text-amber-800"
               active={filter === 'unsubscribed'}
               onClick={() => openKpi('unsubscribed')}
             />
             <KpiTile
               label="Failed"
               value={stats.failed ?? 0}
-              accent="text-orange-700"
               active={filter === 'failed'}
               onClick={() => openKpi('failed')}
             />
@@ -701,7 +695,6 @@ function CampaignDetailReport({
             <KpiTile
               label="Failed"
               value={stats.failed ?? 0}
-              accent="text-orange-700"
               active={filter === 'failed'}
               onClick={() => openKpi('failed')}
             />
