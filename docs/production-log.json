@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-13T14:30:46.284Z",
-  "updatedAtIst": "13/06/2026, 20:00:46",
+  "updatedAt": "2026-06-13T14:41:51.397Z",
+  "updatedAtIst": "13/06/2026, 20:11:51",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "90c4f6a",
+  "currentProductionCommit": "edfc08e",
   "entries": [
+    {
+      "logId": "20260613-2011-edfc08e",
+      "commit": "edfc08e",
+      "commitFull": "edfc08ec8e07084a29e76a701c1c6d8405b1a203",
+      "message": "fix: accurate open and click rates on campaign reports list",
+      "deployedAt": "2026-06-13T14:41:36.116Z",
+      "deployedAtIst": "13/06/2026, 20:11:36",
+      "committedAtIst": "13/06/2026, 20:11:06",
+      "vercelPreviewUrl": "https://connect-intel-oartaggt9-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- edfc08e"
+    },
+    {
+      "logId": "20260613-2001-a574ac7",
+      "commit": "a574ac7",
+      "commitFull": "a574ac76a275c0ae13e62cce764d8979022b62cf",
+      "message": "chore: sync production log after full-page reports deploy",
+      "deployedAt": "2026-06-13T14:31:23.333Z",
+      "deployedAtIst": "13/06/2026, 20:01:23",
+      "committedAtIst": "13/06/2026, 20:00:50",
+      "vercelPreviewUrl": "https://connect-intel-dqcucscmg-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- a574ac7"
+    },
     {
       "logId": "20260613-2000-90c4f6a",
       "commit": "90c4f6a",
@@ -15,7 +43,7 @@
       "committedAtIst": "13/06/2026, 20:00:02",
       "vercelPreviewUrl": "https://connect-intel-h17vlw4m6-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 90c4f6a"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- c6f71e0"
-    },
-    {
-      "logId": "20260612-1541-d5fec16",
-      "commit": "d5fec16",
-      "commitFull": "d5fec16d675e7ab8fd78f926313dea3d3f76dc53",
-      "message": "feat: Mailchimp-parity campaign checklist and email editor layout",
-      "deployedAt": "2026-06-12T10:11:28.201Z",
-      "deployedAtIst": "12/06/2026, 15:41:28",
-      "committedAtIst": "12/06/2026, 15:40:51",
-      "vercelPreviewUrl": "https://connect-intel-p9cp5hc1b-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- d5fec16"
-    },
-    {
-      "logId": "20260612-1526-b7d6912",
-      "commit": "b7d6912",
-      "commitFull": "b7d6912910155ac0bb0c4ac8a9be5cf7577d05a0",
-      "message": "fix: add back-to-campaign close bar on email editor",
-      "deployedAt": "2026-06-12T09:56:02.045Z",
-      "deployedAtIst": "12/06/2026, 15:26:02",
-      "committedAtIst": "12/06/2026, 15:25:33",
-      "vercelPreviewUrl": "https://connect-intel-hfd51i3he-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- b7d6912"
     }
   ]
 }
