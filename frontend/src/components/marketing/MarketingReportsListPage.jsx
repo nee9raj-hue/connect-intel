@@ -13,10 +13,8 @@ import MarketingReportFocusShell from './MarketingReportFocusShell'
 import { CAMPAIGN_STATUS } from './marketingTheme'
 import {
   ChartIcon,
-  EyeIcon,
-  MailIcon,
   SearchIcon,
-  PeopleIcon,
+  SlidersIcon,
 } from '../ui/icons'
 
 const PERIODS = [
@@ -28,7 +26,7 @@ const PERIODS = [
 ]
 
 const STATUS_FILTERS = [
-  { id: '', label: 'All campaigns' },
+  { id: '', label: 'All statuses' },
   { id: 'completed', label: 'Sent' },
   { id: 'active', label: 'Sending' },
   { id: 'draft', label: 'Draft' },
@@ -181,6 +179,27 @@ export default function MarketingReportsListPage({
 
   const totals = useMemo(() => aggregateMetrics(filtered), [filtered])
 
+  const activeFilterCount = useMemo(() => {
+    let n = 0
+    if (period !== 'all') n += 1
+    if (teamFilter !== 'all') n += 1
+    if (statusFilter) n += 1
+    if (query.trim()) n += 1
+    return n
+  }, [period, teamFilter, statusFilter, query])
+
+  const clearFilters = () => {
+    setPeriod('all')
+    setTeamFilter('all')
+    setStatusFilter('')
+    setQuery('')
+  }
+
+  const activeCampaignCount = useMemo(
+    () => campaigns.filter((c) => c.status !== 'archived').length,
+    [campaigns]
+  )
+
   const goToPipeline = (campaign, filter, e) => {
     e?.stopPropagation?.()
     if (!campaign?.id) return
@@ -209,168 +228,176 @@ export default function MarketingReportsListPage({
   return (
     <MarketingReportFocusShell
       title="Campaign reports"
-      subtitle="Accurate opens, clicks, and delivery — synced from enrollments and engagement events."
+      subtitle="Opens, clicks, and delivery for every send — filter, search, and drill into CRM."
       onNavigate={onNavigate}
       showBackToList={false}
     >
       <div className="mc-page mc-reports-list-page">
-        <div className="mc-analytics-filters mc-reports-list-filters">
-          <div className="mc-analytics-filters__group">
-            <span className="mc-analytics-filters__label">Folder</span>
-            <div className="mc-pill-toggle">
-              <button
-                type="button"
-                className={`mc-pill-toggle__btn${folder === 'reports' ? ' is-active' : ''}`}
-                onClick={() => setFolder('reports')}
-              >
-                All campaigns
-              </button>
-              <button
-                type="button"
-                className={`mc-pill-toggle__btn${folder === 'archive' ? ' is-active' : ''}`}
-                onClick={() => setFolder('archive')}
-              >
-                Archive{archiveCount > 0 ? ` (${archiveCount})` : ''}
-              </button>
-            </div>
-          </div>
-          <div className="mc-analytics-filters__group">
-            <span className="mc-analytics-filters__label">Date range</span>
-            <div className="mc-pill-toggle mc-analytics-periods">
-              {PERIODS.map((p) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  className={`mc-pill-toggle__btn${period === p.id ? ' is-active' : ''}`}
-                  onClick={() => setPeriod(p.id)}
-                >
-                  {p.label}
-                </button>
-              ))}
-            </div>
-          </div>
-          {showTeamFilter ? (
-            <div className="mc-analytics-filters__group">
-              <label className="mc-analytics-filters__label" htmlFor="reports-team">
-                Team member
-              </label>
-              <select
-                id="reports-team"
-                className="mc-input mc-input--filter"
-                value={teamFilter}
-                onChange={(e) => setTeamFilter(e.target.value)}
-              >
-                <option value="all">All team</option>
-                {teamOptions.map((m) => (
-                  <option key={teamMemberUserId(m)} value={teamMemberUserId(m)}>
-                    {teamMemberLabel(m)}
-                  </option>
-                ))}
-              </select>
-            </div>
-          ) : null}
-          <div className="mc-analytics-filters__group">
-            <label className="mc-analytics-filters__label" htmlFor="reports-status">
-              Status
-            </label>
-            <select
-              id="reports-status"
-              className="mc-input mc-input--filter"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-            >
-              {STATUS_FILTERS.map((f) => (
-                <option key={f.id || 'all'} value={f.id}>
-                  {f.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="mc-analytics-filters__group mc-reports-list-filters__search">
-            <label className="mc-analytics-filters__label" htmlFor="reports-search">
-              Search
-            </label>
-            <div className="mc-camp-toolbar__search">
-              <SearchIcon className="mc-camp-toolbar__search-icon" aria-hidden />
-              <input
-                id="reports-search"
-                type="search"
-                className="mc-input"
-                placeholder="Search campaigns"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-              />
-            </div>
-          </div>
-          <button type="button" className="mc-btn mc-btn--ghost mc-btn--sm" onClick={load} disabled={loading}>
-            Refresh
-          </button>
-        </div>
-
         {error ? <p className="mc-analytics-error">{error}</p> : null}
         {loading ? <LoadingExperience message="Loading campaign reports…" fill={false} className="py-12" /> : null}
 
         {!loading ? (
           <>
-            <div className="mc-camp-summary mc-reports-list-kpis">
-              <div className="mc-camp-summary__card">
-                <ChartIcon className="mc-camp-summary__icon" aria-hidden />
-                <div>
-                  <span className="mc-camp-summary__value">{totals.count}</span>
-                  <span className="mc-camp-summary__label">Campaigns</span>
-                </div>
+            <div className="mc-reports-kpis">
+              <div className="mc-reports-kpi">
+                <span className="mc-reports-kpi__value">{totals.count}</span>
+                <span className="mc-reports-kpi__label">Campaigns</span>
               </div>
-              <div className="mc-camp-summary__card">
-                <PeopleIcon className="mc-camp-summary__icon" aria-hidden />
-                <div>
-                  <span className="mc-camp-summary__value">{totals.enrolled.toLocaleString()}</span>
-                  <span className="mc-camp-summary__label">Recipients</span>
-                </div>
+              <div className="mc-reports-kpi">
+                <span className="mc-reports-kpi__value">{totals.enrolled.toLocaleString()}</span>
+                <span className="mc-reports-kpi__label">Recipients</span>
               </div>
-              <div className="mc-camp-summary__card mc-camp-summary__card--accent">
-                <MailIcon className="mc-camp-summary__icon" aria-hidden />
-                <div>
-                  <span className="mc-camp-summary__value">{totals.sent.toLocaleString()}</span>
-                  <span className="mc-camp-summary__label">Emails sent</span>
-                </div>
+              <div className="mc-reports-kpi mc-reports-kpi--accent">
+                <span className="mc-reports-kpi__value">{totals.sent.toLocaleString()}</span>
+                <span className="mc-reports-kpi__label">Emails sent</span>
               </div>
-              <div className="mc-camp-summary__card">
-                <EyeIcon className="mc-camp-summary__icon" aria-hidden />
-                <div>
-                  <span className="mc-camp-summary__value">{totals.openRate}%</span>
-                  <span className="mc-camp-summary__label">{totals.opens} opens</span>
-                </div>
+              <div className="mc-reports-kpi">
+                <span className="mc-reports-kpi__value">{totals.openRate}%</span>
+                <span className="mc-reports-kpi__label">{totals.opens.toLocaleString()} opens</span>
               </div>
-              <div className="mc-camp-summary__card">
-                <ChartIcon className="mc-camp-summary__icon" aria-hidden />
-                <div>
-                  <span className="mc-camp-summary__value">{totals.clickRate}%</span>
-                  <span className="mc-camp-summary__label">{totals.clicks} clicks</span>
-                </div>
+              <div className="mc-reports-kpi">
+                <span className="mc-reports-kpi__value">{totals.clickRate}%</span>
+                <span className="mc-reports-kpi__label">{totals.clicks.toLocaleString()} clicks</span>
               </div>
             </div>
 
-            <section className="mc-analytics-panel mc-analytics-panel--wide mc-reports-list-table-panel">
-              <div className="mc-analytics-panel__head">
-                <div>
-                  <h2 className="mc-analytics-panel__title">Campaign performance</h2>
-                  <p className="mc-analytics-panel__meta">
-                    Click a metric to open those leads in CRM Pipeline, or View report for the full engagement story.
-                  </p>
-                </div>
+            <div className="mc-reports-shell">
+              <nav className="mc-reports-tabs" aria-label="Report folders">
                 <button
                   type="button"
-                  className="mc-btn mc-btn--outline mc-btn--sm"
-                  onClick={() => onNavigate?.('marketing', { tab: 'campaigns' })}
+                  className={`mc-reports-tab${folder === 'reports' ? ' is-active' : ''}`}
+                  onClick={() => setFolder('reports')}
                 >
-                  Manage campaigns
+                  Campaigns
+                  <span className="mc-reports-tab__count">{activeCampaignCount}</span>
                 </button>
+                <button
+                  type="button"
+                  className={`mc-reports-tab${folder === 'archive' ? ' is-active' : ''}`}
+                  onClick={() => setFolder('archive')}
+                >
+                  Archive
+                  {archiveCount > 0 ? (
+                    <span className="mc-reports-tab__count">{archiveCount}</span>
+                  ) : null}
+                </button>
+              </nav>
+
+              <div className="mc-reports-toolbar">
+                <div className="mc-reports-toolbar__search">
+                  <SearchIcon className="mc-reports-toolbar__search-icon" aria-hidden />
+                  <input
+                    id="reports-search"
+                    type="search"
+                    className="mc-reports-toolbar__search-input"
+                    placeholder="Search by campaign name…"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                  />
+                </div>
+
+                <div className="mc-reports-toolbar__filters" aria-label="Filter campaigns">
+                  <SlidersIcon className="mc-reports-toolbar__filters-icon" aria-hidden />
+                  <select
+                    id="reports-period"
+                    className="mc-reports-select"
+                    value={period}
+                    onChange={(e) => setPeriod(e.target.value)}
+                    aria-label="Date range"
+                  >
+                    {PERIODS.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.label}
+                      </option>
+                    ))}
+                  </select>
+                  {showTeamFilter ? (
+                    <select
+                      id="reports-team"
+                      className="mc-reports-select"
+                      value={teamFilter}
+                      onChange={(e) => setTeamFilter(e.target.value)}
+                      aria-label="Team member"
+                    >
+                      <option value="all">All team</option>
+                      {teamOptions.map((m) => (
+                        <option key={teamMemberUserId(m)} value={teamMemberUserId(m)}>
+                          {teamMemberLabel(m)}
+                        </option>
+                      ))}
+                    </select>
+                  ) : null}
+                  <select
+                    id="reports-status"
+                    className="mc-reports-select"
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    aria-label="Campaign status"
+                  >
+                    {STATUS_FILTERS.map((f) => (
+                      <option key={f.id || 'all'} value={f.id}>
+                        {f.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="mc-reports-toolbar__actions">
+                  {activeFilterCount > 0 ? (
+                    <button type="button" className="mc-reports-clear" onClick={clearFilters}>
+                      Clear filters
+                    </button>
+                  ) : null}
+                  <button
+                    type="button"
+                    className="mc-btn mc-btn--ghost mc-btn--sm"
+                    onClick={load}
+                    disabled={loading}
+                  >
+                    Refresh
+                  </button>
+                  <button
+                    type="button"
+                    className="mc-btn mc-btn--outline mc-btn--sm"
+                    onClick={() => onNavigate?.('marketing', { tab: 'campaigns' })}
+                  >
+                    Manage campaigns
+                  </button>
+                </div>
+              </div>
+
+              <div className="mc-reports-results-bar">
+                <p className="mc-reports-results-bar__text">
+                  <strong>{filtered.length}</strong>
+                  {filtered.length === 1 ? ' campaign' : ' campaigns'}
+                  {activeFilterCount > 0 ? (
+                    <span className="mc-reports-results-bar__hint">
+                      {' '}
+                      · {activeFilterCount} filter{activeFilterCount === 1 ? '' : 's'} applied
+                    </span>
+                  ) : null}
+                </p>
               </div>
 
               {!filtered.length ? (
-                <p className="mc-analytics-empty">No campaigns match your filters.</p>
+                <div className="mc-reports-empty">
+                  <ChartIcon className="mc-reports-empty__icon" aria-hidden />
+                  <h3 className="mc-reports-empty__title">No campaigns match</h3>
+                  <p className="mc-reports-empty__text">
+                    {activeFilterCount > 0
+                      ? 'Try clearing filters or widening the date range.'
+                      : folder === 'archive'
+                        ? 'Archived campaigns will appear here.'
+                        : 'Send a campaign to see performance reports.'}
+                  </p>
+                  {activeFilterCount > 0 ? (
+                    <button type="button" className="mc-btn mc-btn--outline mc-btn--sm" onClick={clearFilters}>
+                      Clear filters
+                    </button>
+                  ) : null}
+                </div>
               ) : (
-                <div className="mc-table-wrap">
+                <div className="mc-table-wrap mc-reports-table-wrap">
                   <table className="mc-table mc-reports-list-table">
                     <thead>
                       <tr>
@@ -382,7 +409,7 @@ export default function MarketingReportsListPage({
                         <th>Click rate</th>
                         <th>Unsubs</th>
                         <th>Bounced</th>
-                        <th>Actions</th>
+                        <th aria-label="Actions" />
                       </tr>
                     </thead>
                     <tbody>
@@ -492,10 +519,10 @@ export default function MarketingReportsListPage({
                               )}
                             </td>
                             <td>
-                              <div className="mc-analytics-actions">
+                              <div className="mc-reports-row-actions">
                                 <button
                                   type="button"
-                                  className="mc-btn mc-btn--outline mc-btn--sm"
+                                  className="mc-btn mc-btn--primary mc-btn--sm"
                                   onClick={() => openMarketingCampaignReport(c.id)}
                                 >
                                   View report
@@ -519,7 +546,13 @@ export default function MarketingReportsListPage({
                   </table>
                 </div>
               )}
-            </section>
+
+              {filtered.length > 0 ? (
+                <p className="mc-reports-table-foot">
+                  Click open or click rates to jump to those contacts in CRM Pipeline.
+                </p>
+              ) : null}
+            </div>
           </>
         ) : null}
       </div>
