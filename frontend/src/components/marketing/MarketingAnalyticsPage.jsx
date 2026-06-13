@@ -33,6 +33,18 @@ const STATUS_FILTERS = [
   { id: 'scheduled', label: 'Scheduled' },
 ]
 
+function teamMemberUserId(member) {
+  return member?.userId ? String(member.userId) : ''
+}
+
+function teamMemberLabel(member) {
+  return member?.name || [member?.firstName, member?.lastName].filter(Boolean).join(' ') || member?.email || 'Team member'
+}
+
+function campaignOwnerUserId(campaign) {
+  return campaign?.createdByUserId ? String(campaign.createdByUserId) : ''
+}
+
 function buildSentChart(trend = [], campaigns = []) {
   if (trend?.length) {
     return trend.slice(-12).map((t) => ({
@@ -115,7 +127,7 @@ export default function MarketingAnalyticsPage({
     return [...reportCampaigns]
       .filter((c) => {
         if (c.status === 'archived') return false
-        if (teamFilter !== 'all' && c.createdByUserId !== teamFilter) return false
+        if (teamFilter !== 'all' && campaignOwnerUserId(c) !== teamFilter) return false
         if (statusFilter && campaignListStatus(c).key !== statusFilter) return false
         if (q && !c.name?.toLowerCase().includes(q)) return false
         return true
@@ -135,7 +147,12 @@ export default function MarketingAnalyticsPage({
     [filteredCampaigns]
   )
 
-  const showTeamFilter = teamMembers.length > 1
+  const teamOptions = useMemo(
+    () => (teamMembers || []).filter((m) => m.status !== 'inactive' && teamMemberUserId(m)),
+    [teamMembers]
+  )
+
+  const showTeamFilter = teamOptions.length > 1
 
   return (
     <div className="mc-page mc-analytics-page">
@@ -143,7 +160,7 @@ export default function MarketingAnalyticsPage({
         <div>
           <h1 className="mc-camp-page-head__title">Analytics</h1>
           <p className="mc-camp-page-head__sub">
-            What&apos;s working, what isn&apos;t, and where to dig deeper — campaign by campaign.
+            What&apos;s working, what isn&apos;t, and where to focus next — campaign by campaign.
           </p>
         </div>
         <button
@@ -184,9 +201,9 @@ export default function MarketingAnalyticsPage({
               onChange={(e) => setTeamFilter(e.target.value)}
             >
               <option value="all">All team</option>
-              {teamMembers.map((m) => (
-                <option key={m.id || m.userId} value={m.id || m.userId}>
-                  {[m.firstName, m.lastName].filter(Boolean).join(' ') || m.email || 'Member'}
+              {teamOptions.map((m) => (
+                <option key={teamMemberUserId(m)} value={teamMemberUserId(m)}>
+                  {teamMemberLabel(m)}
                 </option>
               ))}
             </select>
@@ -286,7 +303,11 @@ export default function MarketingAnalyticsPage({
         </div>
 
         {!filteredCampaigns.length ? (
-          <p className="mc-analytics-empty">No campaigns match your filters yet.</p>
+          <p className="mc-analytics-empty">
+            {teamFilter !== 'all'
+              ? 'No campaigns match this team member for the selected filters.'
+              : 'No campaigns match your filters yet.'}
+          </p>
         ) : (
           <div className="mc-table-wrap">
             <table className="mc-table mc-analytics-table">
@@ -360,7 +381,7 @@ export default function MarketingAnalyticsPage({
                             className="mc-btn mc-btn--outline mc-btn--sm"
                             onClick={() => onDrillCampaign?.(c.id)}
                           >
-                            Dig deeper
+                            View report
                           </button>
                           {isActive && onPause ? (
                             <button type="button" className="mc-btn mc-btn--ghost mc-btn--sm" disabled={busy} onClick={() => onPause(c.id)}>
