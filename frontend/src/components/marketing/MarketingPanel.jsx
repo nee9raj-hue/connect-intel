@@ -1190,7 +1190,6 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
           segments={segments}
           busy={busy}
           onNavigate={onNavigate}
-          onRefresh={load}
           onCreate={() => setCampaignDesktopPhase('create')}
           onEdit={openCampaignEditor}
           onOpenReport={(c) => {

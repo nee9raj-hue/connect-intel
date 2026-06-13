@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { campaignThumbnailStyle } from '../../lib/marketingExperience'
 import { renderEmailCanvasHtml } from '../../lib/marketingEmailDesign'
 import {
@@ -158,16 +158,11 @@ export default function MarketingCampaigns({
   onOpenReport,
   onDuplicate,
   onNavigate,
-  onRefresh,
 }) {
   const [query, setQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [typeFilter, setTypeFilter] = useState('')
   const [view, setView] = useState('grid')
-
-  useEffect(() => {
-    onRefresh?.()
-  }, [onRefresh])
 
   const audienceById = useMemo(() => {
     const map = {}
