@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-13T14:03:24.366Z",
-  "updatedAtIst": "13/06/2026, 19:33:24",
+  "updatedAt": "2026-06-13T14:23:42.808Z",
+  "updatedAtIst": "13/06/2026, 19:53:42",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "4e15e3b",
+  "currentProductionCommit": "0cecc46",
   "entries": [
+    {
+      "logId": "20260613-1953-0cecc46",
+      "commit": "0cecc46",
+      "commitFull": "0cecc46f6bb1977996a30f72cf72dc95519fd941",
+      "message": "fix: analytics team filter matches campaign owner user ids",
+      "deployedAt": "2026-06-13T14:23:30.943Z",
+      "deployedAtIst": "13/06/2026, 19:53:30",
+      "committedAtIst": "13/06/2026, 19:52:59",
+      "vercelPreviewUrl": "https://connect-intel-kkbjcp97p-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 0cecc46"
+    },
+    {
+      "logId": "20260613-1934-ab64547",
+      "commit": "ab64547",
+      "commitFull": "ab64547ca9bbc52b1e38aa795a4fcae8f8e94f03",
+      "message": "chore: sync production log after analytics redesign deploy",
+      "deployedAt": "2026-06-13T14:04:03.701Z",
+      "deployedAtIst": "13/06/2026, 19:34:03",
+      "committedAtIst": "13/06/2026, 19:33:33",
+      "vercelPreviewUrl": "https://connect-intel-kgnvicdq7-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- ab64547"
+    },
     {
       "logId": "20260613-1933-4e15e3b",
       "commit": "4e15e3b",
@@ -15,7 +43,7 @@
       "committedAtIst": "13/06/2026, 19:32:36",
       "vercelPreviewUrl": "https://connect-intel-1acbctknb-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 4e15e3b"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 4c0f0b3"
-    },
-    {
-      "logId": "20260612-1253-98c0262",
-      "commit": "98c0262",
-      "commitFull": "98c02624db3f9b6361df929430473a98ce06a2bc",
-      "message": "fix: marketing reports drill down to filtered pipeline by lead IDs",
-      "deployedAt": "2026-06-12T07:23:05.166Z",
-      "deployedAtIst": "12/06/2026, 12:53:05",
-      "committedAtIst": "12/06/2026, 12:52:26",
-      "vercelPreviewUrl": "https://connect-intel-cnzw8o7sb-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 98c0262"
-    },
-    {
-      "logId": "20260612-1231-45b80b3",
-      "commit": "45b80b3",
-      "commitFull": "45b80b3903fb46e4c034276ae2ad42d1d435f7b8",
-      "message": "perf: speed up marketing hub by skipping heavy enrollment reads",
-      "deployedAt": "2026-06-12T07:01:09.996Z",
-      "deployedAtIst": "12/06/2026, 12:31:09",
-      "committedAtIst": "12/06/2026, 12:30:33",
-      "vercelPreviewUrl": "https://connect-intel-hnbinisb1-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 45b80b3"
     }
   ]
 }
