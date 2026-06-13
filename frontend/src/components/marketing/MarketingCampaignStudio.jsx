@@ -5,6 +5,7 @@ import { renderEmailCanvasHtml } from '../../lib/marketingEmailDesign'
 import MarketingCreatorBadge from './MarketingCreatorBadge'
 import MarketingCampaignDetailPanel from './MarketingCampaignDetailPanel'
 import { CAMPAIGN_STATUS, campaignInitials, campaignIconTint } from './marketingTheme'
+import { openMarketingCampaignReport } from '../../lib/marketingReportUrls'
 
 function StatusBadge({ status }) {
   const key = String(status || 'draft').toLowerCase()
@@ -61,7 +62,7 @@ function CampaignGalleryCard({ campaign, audience, busy, user, permissions, onOp
             <button type="button" className="mhub-v3-btn mhub-v3-btn--primary" disabled={busy} onClick={() => onResume?.(campaign.id)}>Resume</button>
           )}
           {(stats.sent > 0 || campaign.status === 'completed' || campaign.status === 'active') && (
-            <button type="button" className="mhub-v3-btn" onClick={() => onNavigate?.('marketing', { tab: 'analytics', campaignId: campaign.id })}>Report</button>
+            <button type="button" className="mhub-v3-btn" onClick={() => openMarketingCampaignReport(campaign.id)}>Report</button>
           )}
           {campaign.status === 'pending_approval' && permissions?.canApprove && (
             <>

@@ -16,6 +16,12 @@ import {
   campaignRecipientFilterLabel,
 } from '../../../../lib/marketingCampaignRecipientFilter.js'
 import { navigateToMarketingPipeline } from '../../lib/marketingNavigation'
+import { openMarketingCampaignReport } from '../../lib/marketingReportUrls'
+import {
+  ReportActivityChart,
+  ReportEngagementFunnel,
+  ReportEngagementRates,
+} from './ReportEngagementCharts'
 
 const PAGE_SIZE = 100
 
@@ -365,7 +371,13 @@ function CampaignDetailReport({
   onClose,
   onNavigate,
   onDuplicate,
+  onReload,
+  onPause,
+  onResume,
+  onStop,
+  onContinue,
   busy,
+  fullPage = false,
 }) {
   const { openPipelineLead, user } = useApp()
   const [report, setReport] = useState(null)
@@ -402,8 +414,8 @@ function CampaignDetailReport({
 
   const goToLead = (leadId) => {
     if (!leadId) return
-    onClose?.()
-    onNavigate?.('pipeline', { returnTo: 'marketing', marketingTab: 'analytics' })
+    if (!fullPage) onClose?.()
+    onNavigate?.('pipeline', { returnTo: 'marketing', marketingTab: 'reports' })
     openPipelineLead(leadId, 'overview')
   }
 
@@ -413,7 +425,7 @@ function CampaignDetailReport({
       : filterCampaignRecipients(report?.recipients || [], recipientFilter)
           .map((r) => r.leadId)
           .filter(Boolean)
-    onClose?.()
+    if (!fullPage) onClose?.()
     void navigateToMarketingPipeline(onNavigate, {
       campaignId,
       filter: recipientFilter,
@@ -498,40 +510,42 @@ function CampaignDetailReport({
       : FILTERS.find((f) => f.id === filter)?.label || 'All recipients'
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-start justify-between gap-3">
+    <div className={fullPage ? 'mc-report-detail' : 'space-y-4'}>
+      <header className="mc-report-detail__head">
         <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-base font-semibold text-gray-900 truncate">
-              {campaignName || report?.campaign?.name}
-            </h2>
-            {report?.campaign?.createdByName && (
+          <div className="mc-report-detail__title-row">
+            <h2 className="mc-report-detail__title">{campaignName || report?.campaign?.name}</h2>
+            {report?.campaign?.createdByName ? (
               <MarketingCreatorBadge
                 name={report.campaign.createdByName}
                 isOwn={report.campaign.createdByUserId === user?.id}
               />
-            )}
+            ) : null}
           </div>
-          <p className="text-xs text-gray-500 mt-0.5 capitalize">
+          {report?.campaign?.createdByName ? (
+            <p className="mc-report-detail__creator">
+              Created by <strong>{report.campaign.createdByName}</strong>
+            </p>
+          ) : null}
+          <p className="mc-report-detail__meta capitalize">
             {report?.campaign?.status} · {isWhatsApp ? 'WhatsApp' : 'Email'} ·{' '}
             {report?.campaign?.type === 'sequence' ? 'Sequence' : 'One-shot'}
             {report?.campaign?.startedAt && ` · ${formatDateTime(report.campaign.startedAt)}`}
           </p>
           {!isWhatsApp && (
-            <p className="text-xs text-[#516f90] mt-1 leading-relaxed max-w-2xl">
+            <p className="mc-report-detail__hint">
               {report?.reportScope === 'org_member'
-                ? 'Team view: all enrolled recipients and engagement for org campaigns you can open. Click a KPI to drill down; expand a row for link activity.'
-                : 'Click a KPI to open those leads in Pipeline (filtered). Expand a row for link activity.'}
+                ? 'Team view — click a metric to open those leads in Pipeline, or expand a contact for link activity.'
+                : 'Click a metric to open matching leads in CRM Pipeline. Expand a contact row to see clicked links.'}
               {sentKpi > 0 && stats.uniqueOpens === 0 && stats.uniqueClicks === 0 && (
-                <span className="block mt-1 text-amber-800">
-                  Opens/clicks appear after recipients load images or click tracked links (some mail clients block
-                  tracking).
+                <span className="mc-report-detail__hint-warn">
+                  Opens and clicks appear after recipients load images or click tracked links.
                 </span>
               )}
             </p>
           )}
         </div>
-        <div className="flex flex-wrap gap-2 shrink-0">
+        <div className="mc-report-detail__actions">
           <button
             type="button"
             disabled={busy}
@@ -573,14 +587,24 @@ function CampaignDetailReport({
             PDF
           </button>
         </div>
-      </div>
+      </header>
 
       {report?.revenue?.attributedRevenue > 0 && (
-        <p className="text-sm text-[#33475b] bg-emerald-50 border border-emerald-100 rounded-lg px-3 py-2">
+        <p className="mc-report-revenue">
           Attributed revenue: <strong>{report.revenue.attributedRevenue}</strong> {report.revenue.currency} across{' '}
           <strong>{report.revenue.attributedDeals}</strong> won deal(s) after campaign clicks.
         </p>
       )}
+
+      {fullPage ? (
+        <div className="mc-report-detail__charts">
+          <ReportEngagementRates stats={stats} />
+          <div className="mc-report-detail__charts-grid">
+            <ReportEngagementFunnel stats={stats} isWhatsApp={isWhatsApp} />
+            <ReportActivityChart recipients={allRecipients} />
+          </div>
+        </div>
+      ) : null}
 
       {report?.abVariants?.length > 1 && (
         <div className="overflow-x-auto">
@@ -609,6 +633,8 @@ function CampaignDetailReport({
         </div>
       )}
 
+      <section className="mc-report-behavior">
+        <h3 className="mc-report-behavior__title">Recipient engagement</h3>
       <div
         className={`grid gap-2 ${isWhatsApp ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-2 sm:grid-cols-4 lg:grid-cols-7'}`}
       >
@@ -683,7 +709,7 @@ function CampaignDetailReport({
         )}
       </div>
 
-      <div className="flex flex-wrap gap-1.5">
+      <div className="mc-report-filter-pills flex flex-wrap gap-1.5">
         {FILTERS.map((f) => (
           <button
             key={f.id}
@@ -710,7 +736,7 @@ function CampaignDetailReport({
 
       <div
         ref={recipientsRef}
-        className="bg-white border border-gray-200 rounded-xl overflow-hidden"
+        className="mc-report-recipients bg-white border border-gray-200 rounded-xl overflow-hidden"
       >
         <div className="px-4 py-2.5 border-b border-gray-100 flex flex-wrap items-center justify-between gap-2">
           <span className="text-xs font-semibold text-gray-700">{filterLabel}</span>
@@ -799,9 +825,12 @@ function CampaignDetailReport({
           </div>
         )}
       </div>
+      </section>
     </div>
   )
 }
+
+export { CampaignDetailReport }
 
 function RemoveCampaignModal({ count, names, archiveOnly, busy, onArchive, onPermanentDelete, onCancel }) {
   return (
@@ -914,8 +943,11 @@ export default function CampaignReportsView({
   busy,
   initialCampaignId,
   showCreator = false,
+  standalone = false,
 }) {
-  const [reportCampaignId, setReportCampaignId] = useState(initialCampaignId || null)
+  const [reportCampaignId, setReportCampaignId] = useState(
+    standalone ? null : initialCampaignId || null
+  )
   const [selectedIds, setSelectedIds] = useState(() => new Set())
   const [listVisible, setListVisible] = useState(PAGE_SIZE)
   const [actionBusy, setActionBusy] = useState(false)
@@ -928,8 +960,9 @@ export default function CampaignReportsView({
   const [removeModal, setRemoveModal] = useState(null)
 
   useEffect(() => {
+    if (standalone) return
     if (initialCampaignId) setReportCampaignId(initialCampaignId)
-  }, [initialCampaignId])
+  }, [initialCampaignId, standalone])
 
   useEffect(() => {
     setListVisible(PAGE_SIZE)
@@ -1132,7 +1165,8 @@ export default function CampaignReportsView({
 
   const openReport = (id, e) => {
     e?.stopPropagation?.()
-    setReportCampaignId(id)
+    openMarketingCampaignReport(id)
+    if (!standalone) setReportCampaignId(id)
   }
 
   return (
@@ -1157,7 +1191,7 @@ export default function CampaignReportsView({
         />
       )}
 
-      {reportCampaignId && (
+      {!standalone && reportCampaignId && (
         <ReportOverlay
           wide
           title={reportCampaign?.name || 'Campaign report'}
@@ -1169,6 +1203,11 @@ export default function CampaignReportsView({
             onClose={() => setReportCampaignId(null)}
             onNavigate={onNavigate}
             onDuplicate={onDuplicate}
+            onReload={onReload}
+            onPause={onPause}
+            onResume={onResume}
+            onStop={onStop}
+            onContinue={onContinue}
             busy={busy}
           />
         </ReportOverlay>
@@ -1411,7 +1450,7 @@ export default function CampaignReportsView({
                               onClick={(e) => openReport(c.id, e)}
                               className="mc-reports-action mc-reports-action--primary"
                             >
-                              Report
+                              View report
                             </button>
                             {!archiveOnly &&
                               (c.status === 'active' || c.status === 'paused') && (

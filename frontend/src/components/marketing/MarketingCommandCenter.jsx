@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '../../lib/api'
 import { navTargetToOptions } from '../../lib/navConfig'
+import { openMarketingCampaignReport } from '../../lib/marketingReportUrls'
 import { formatDealValue } from '../../lib/crmTimeline'
 import { formatDateTime } from '../../lib/crmUiConstants'
 
@@ -61,6 +62,10 @@ export default function MarketingCommandCenter({ onNavigate, period: externalPer
   const runAction = useCallback(
     (action) => {
       if (!action) return
+      if (action.campaignId) {
+        openMarketingCampaignReport(action.campaignId)
+        return
+      }
       const tab = action.tab || 'overview'
       onNavigate?.('marketing', { tab, ...navTargetToOptions(action) })
     },

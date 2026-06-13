@@ -100,6 +100,7 @@ export default function MarketingAnalyticsPage({
   reportCampaigns = [],
   summary,
   onDrillCampaign,
+  onOpenAllReports,
   onNavigate,
   onPause,
   onStop,
@@ -166,10 +167,10 @@ export default function MarketingAnalyticsPage({
         <button
           type="button"
           className="mc-btn mc-btn--outline"
-          onClick={() => onNavigate?.('marketing', { tab: 'campaigns' })}
+          onClick={() => onOpenAllReports?.() || onNavigate?.('marketing', { tab: 'reports' })}
         >
-          <MailIcon className="w-4 h-4" />
-          All campaigns
+          <ChartIcon className="w-4 h-4" />
+          All reports
         </button>
       </header>
 

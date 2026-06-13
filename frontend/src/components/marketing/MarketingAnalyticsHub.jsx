@@ -1,40 +1,29 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '../../lib/api'
 import { navigateToMarketingPipeline } from '../../lib/marketingNavigation'
-import CampaignReportsView from './CampaignReportsView'
+import { openMarketingCampaignReport, openMarketingReportsList } from '../../lib/marketingReportUrls'
 import MarketingAnalyticsPage from './MarketingAnalyticsPage'
-import { ChevronLeftIcon } from '../ui/icons'
 
 export default function MarketingAnalyticsHub({
   onNavigate,
   period: externalPeriod,
   onPeriodChange,
-  campaignId,
   reportCampaigns = [],
   summary = null,
   teamMembers = [],
-  onReload,
-  onDuplicate,
   onPause,
-  onResume,
   onStop,
-  onContinue,
+  onResume,
   busy = false,
-  showCreator = false,
 }) {
   const [period, setPeriod] = useState(externalPeriod || '30d')
   const [analytics, setAnalytics] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [drillId, setDrillId] = useState(campaignId || null)
 
   useEffect(() => {
     if (externalPeriod && externalPeriod !== period) setPeriod(externalPeriod)
   }, [externalPeriod, period])
-
-  useEffect(() => {
-    if (campaignId) setDrillId(campaignId)
-  }, [campaignId])
 
   const load = useCallback(async () => {
     setError(null)
@@ -68,38 +57,8 @@ export default function MarketingAnalyticsHub({
     })
   }
 
-  const openDrill = (id) => {
-    setDrillId(id)
-    onNavigate?.('marketing', { tab: 'analytics', campaignId: id })
-  }
-
-  const closeDrill = () => {
-    setDrillId(null)
-    onNavigate?.('marketing', { tab: 'analytics' })
-  }
-
-  if (drillId) {
-    return (
-      <div className="mc-page mc-analytics-page mc-analytics-page--drill">
-        <button type="button" className="mc-analytics-back" onClick={closeDrill}>
-          <ChevronLeftIcon className="w-4 h-4" />
-          Back to Analytics
-        </button>
-        <CampaignReportsView
-          campaigns={reportCampaigns}
-          initialCampaignId={drillId}
-          onNavigate={onNavigate}
-          onReload={onReload}
-          onDuplicate={onDuplicate}
-          onPause={onPause}
-          onResume={onResume}
-          onStop={onStop}
-          onContinue={onContinue}
-          busy={busy}
-          showCreator={showCreator}
-        />
-      </div>
-    )
+  const openCampaignReport = (id) => {
+    openMarketingCampaignReport(id)
   }
 
   return (
@@ -112,7 +71,8 @@ export default function MarketingAnalyticsHub({
       error={error}
       reportCampaigns={reportCampaigns}
       summary={summary}
-      onDrillCampaign={openDrill}
+      onDrillCampaign={openCampaignReport}
+      onOpenAllReports={() => openMarketingReportsList()}
       onNavigate={onNavigate}
       onPause={onPause}
       onResume={onResume}

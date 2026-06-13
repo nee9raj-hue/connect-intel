@@ -6,6 +6,9 @@ import MarketingTemplateBuilder, { FOLLOW_UP_STARTER } from './MarketingTemplate
 import { DEFAULT_FORM_FIELDS, DEFAULT_FORM_THEME } from '../../../../lib/marketingFormSchema.js'
 import LoadingExperience from '../ui/LoadingExperience'
 import CampaignReportsView, { campaignToForm } from './CampaignReportsView'
+import MarketingReportsListPage from './MarketingReportsListPage'
+import MarketingCampaignReportPage from './MarketingCampaignReportPage'
+import { openMarketingCampaignReport } from '../../lib/marketingReportUrls'
 import MarketingListsPanel from './MarketingListsPanel'
 import WhatsAppInboxPanel from './WhatsAppInboxPanel'
 import MarketingCreatorBadge, { marketingOptionLabel } from './MarketingCreatorBadge'
@@ -149,8 +152,8 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
     !isMobile &&
     ((tab === 'templates' && templatePhase === 'editor') ||
       (tab === 'campaigns' &&
-        ['create', 'editor', 'wizard', 'report'].includes(campaignDesktopPhase)) ||
-      (tab === 'analytics' && Boolean(panelOptions?.campaignId)))
+        ['create', 'editor', 'wizard'].includes(campaignDesktopPhase)) ||
+      tab === 'reports')
   const visibleTabs = isMobile ? MOBILE_TABS : TABS
   const [summary, setSummary] = useState(null)
   const [gmailStatus, setGmailStatus] = useState(null)
@@ -247,8 +250,9 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
     else if (panelOptions?.tab === 'lists') setAudienceSubTab('lists')
     else if (panelOptions?.tab === 'segments') setAudienceSubTab('segments')
     if (panelOptions?.report) {
-      setTab('campaigns')
-      setCampaignDesktopPhase('report')
+      setTab('reports')
+    } else if (panelOptions?.campaignId && panelOptions?.tab === 'analytics') {
+      setTab('reports')
     }
     if (panelOptions?.launchListId) {
       setTab('campaigns')
@@ -1170,13 +1174,13 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
     }
 
     if (campaignDesktopPhase === 'report') {
-      const reportId = campaignReportId || panelOptions?.campaignId
       return (
         <div className="mc-page mc-report-page">
           <CampaignReportsView
             campaigns={reportCampaigns}
-            initialCampaignId={reportId}
+            initialCampaignId={campaignReportId || panelOptions?.campaignId}
             onNavigate={onNavigate}
+            standalone
           />
         </div>
       )
@@ -1192,10 +1196,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
           onNavigate={onNavigate}
           onCreate={() => setCampaignDesktopPhase('create')}
           onEdit={openCampaignEditor}
-          onOpenReport={(c) => {
-            onNavigate?.('marketing', { tab: 'campaigns', report: c.id })
-            setCampaignDesktopPhase('report')
-          }}
+          onOpenReport={(c) => openMarketingCampaignReport(c.id)}
           onDuplicate={duplicateCampaignForResend}
         />
       )
@@ -1347,6 +1348,41 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
     )
   }
 
+  const renderReportsTab = () => {
+    const reportId = campaignReportId || panelOptions?.report || panelOptions?.campaignId
+    if (reportId) {
+      const campaign = reportCampaigns.find((c) => c.id === reportId)
+      return (
+        <MarketingCampaignReportPage
+          campaignId={reportId}
+          campaignName={campaign?.name}
+          onNavigate={onNavigate}
+          onDuplicate={duplicateCampaignForResend}
+          onReload={load}
+          onPause={pauseCampaign}
+          onResume={continueCampaignSending}
+          onStop={stopCampaign}
+          onContinue={continueCampaignSending}
+          busy={busy}
+        />
+      )
+    }
+    return (
+      <MarketingReportsListPage
+        campaigns={reportCampaigns}
+        onNavigate={onNavigate}
+        onDuplicate={duplicateCampaignForResend}
+        onReload={load}
+        onPause={pauseCampaign}
+        onResume={continueCampaignSending}
+        onStop={stopCampaign}
+        onContinue={continueCampaignSending}
+        busy={busy}
+        showCreator={Boolean(user?.isOrgAdmin && user?.accountType === 'company')}
+      />
+    )
+  }
+
   return (
     <div
       className={`crm-workspace flex flex-col h-full min-h-0 w-full overflow-hidden ${
@@ -1370,22 +1406,19 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
             renderTemplatesTab()
           ) : tab === 'bulk-email' ? (
             <MarketingBulkEmailTab lists={lists} onNavigate={onNavigate} />
+          ) : tab === 'reports' ? (
+            renderReportsTab()
           ) : tab === 'analytics' ? (
             <MarketingAnalyticsHub
               onNavigate={onNavigate}
               period={hubPeriod}
               onPeriodChange={setHubPeriod}
-              campaignId={panelOptions?.campaignId}
               reportCampaigns={reportCampaigns}
               summary={summary}
-              onReload={load}
-              onDuplicate={duplicateCampaignForResend}
               onPause={pauseCampaign}
               onResume={continueCampaignSending}
               onStop={stopCampaign}
-              onContinue={continueCampaignSending}
               busy={busy}
-              showCreator={Boolean(user?.isOrgAdmin && user?.accountType === 'company')}
               teamMembers={teamMembers}
             />
           ) : null}
@@ -1454,19 +1487,16 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
               onNavigate={onNavigate}
               period={hubPeriod}
               onPeriodChange={setHubPeriod}
-              campaignId={panelOptions?.campaignId}
               reportCampaigns={reportCampaigns}
               summary={summary}
-              onReload={load}
-              onDuplicate={duplicateCampaignForResend}
               onPause={pauseCampaign}
               onResume={continueCampaignSending}
               onStop={stopCampaign}
-              onContinue={continueCampaignSending}
               busy={busy}
-              showCreator={Boolean(user?.isOrgAdmin && user?.accountType === 'company')}
               teamMembers={teamMembers}
             />
+          ) : tab === 'reports' ? (
+            renderReportsTab()
           ) : tab === 'forms' ? (
             <MarketingFormsHub teamMembers={teamMembers} onReload={load} />
           ) : tab === 'domains' ? (
@@ -1630,7 +1660,7 @@ function CampaignCard({
           campaign.status === 'stopped') && (
           <button
             type="button"
-            onClick={() => onNavigate?.('marketing', { tab: 'analytics', campaignId: campaign.id })}
+            onClick={() => openMarketingCampaignReport(campaign.id)}
             className="crm-link-btn p-0"
           >
             View report

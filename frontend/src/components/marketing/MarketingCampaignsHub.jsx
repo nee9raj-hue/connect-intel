@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { formatDateTime } from '../../lib/crmUiConstants'
 import MarketingCreatorBadge from './MarketingCreatorBadge'
+import { openMarketingCampaignReport } from '../../lib/marketingReportUrls'
 
 const VIEWS = [
   { id: 'grid', label: 'Grid' },
@@ -215,7 +216,7 @@ function CampaignPerformanceCard({
         <button
           type="button"
           className="mhub-link"
-          onClick={() => onNavigate?.('marketing', { tab: 'analytics', campaignId: c.id })}
+          onClick={() => openMarketingCampaignReport(c.id)}
         >
           Analytics →
         </button>

@@ -2,6 +2,7 @@ import { formatDateTime } from '../../lib/crmUiConstants'
 import { formatDealValue } from '../../lib/crmTimeline'
 import { renderEmailCanvasHtml } from '../../lib/marketingEmailDesign'
 import { CAMPAIGN_STATUS } from './marketingTheme'
+import { openMarketingCampaignReport } from '../../lib/marketingReportUrls'
 
 export default function MarketingCampaignDetailPanel({ campaign, onClose, onEdit, onNavigate }) {
   if (!campaign) return null
@@ -68,7 +69,7 @@ export default function MarketingCampaignDetailPanel({ campaign, onClose, onEdit
             type="button"
             className="mhub-v3-link"
             style={{ marginTop: 12 }}
-            onClick={() => onNavigate?.('marketing', { tab: 'analytics', campaignId: campaign.id })}
+            onClick={() => openMarketingCampaignReport(campaign.id)}
           >
             View full report →
           </button>

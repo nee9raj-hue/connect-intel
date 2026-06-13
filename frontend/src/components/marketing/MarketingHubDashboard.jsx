@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '../../lib/api'
 import { navTargetToOptions } from '../../lib/navConfig'
+import { openMarketingCampaignReport } from '../../lib/marketingReportUrls'
 import { formatDealValue } from '../../lib/crmTimeline'
 import {
   HubCommandBar,
@@ -51,6 +52,10 @@ export default function MarketingHubDashboard({ onNavigate, period: externalPeri
   const runAction = useCallback(
     (action) => {
       if (!action) return
+      if (action.campaignId && action.tab !== 'campaigns') {
+        openMarketingCampaignReport(action.campaignId)
+        return
+      }
       const tab = action.tab || 'overview'
       onNavigate?.('marketing', { tab, ...navTargetToOptions(action) })
     },

@@ -37,7 +37,6 @@ const TAB_ALIASES = {
   home: 'overview',
   lists: 'audiences',
   segments: 'audiences',
-  reports: 'analytics',
   feeds: 'templates',
   assets: 'templates',
   content: 'templates',

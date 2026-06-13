@@ -3,6 +3,7 @@ import { api } from '../../lib/api'
 import { useUsagePolicies } from '../../hooks/useUsagePolicies.js'
 import { buildCustomerNavSections } from '../../lib/navConfig'
 import { flattenNavSections, filterNavItems, QUICK_ACTIONS } from '../../lib/platformNav'
+import { openMarketingCampaignReport } from '../../lib/marketingReportUrls'
 
 const TYPE_LABELS = {
   lead: 'Lead',
@@ -113,7 +114,7 @@ export default function CommandPalette({
 
       if (item.kind === 'record') {
         if (item.type === 'campaign') {
-          onNavigate?.('marketing', { tab: 'analytics', campaignId: item.id })
+          openMarketingCampaignReport(item.id)
           return
         }
         if (item.leadId) {
