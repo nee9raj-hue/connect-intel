@@ -280,7 +280,14 @@ function RecipientRow({ row, expanded, onToggle, onOpenLead }) {
           </button>
           {row.title && <p className="text-xs text-gray-500">{row.title}</p>}
         </td>
-        <td className="px-4 py-3 text-gray-600">{row.company || '—'}</td>
+        <td className="px-4 py-3 text-gray-600">
+          {row.company || '—'}
+          {(row.city || row.state) && (
+            <p className="text-[10px] text-gray-400 mt-0.5">
+              {[row.city, row.state].filter(Boolean).join(', ')}
+            </p>
+          )}
+        </td>
         <td className="px-4 py-3 text-gray-600 text-xs">{row.email}</td>
         <td className="px-4 py-3 text-gray-600 text-xs whitespace-nowrap">{row.phone || '—'}</td>
         <td className="px-4 py-3">

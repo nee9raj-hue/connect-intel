@@ -1386,6 +1386,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
               onContinue={continueCampaignSending}
               busy={busy}
               showCreator={Boolean(user?.isOrgAdmin && user?.accountType === 'company')}
+              teamMembers={teamMembers}
             />
           ) : null}
         </div>
@@ -1464,6 +1465,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
               onContinue={continueCampaignSending}
               busy={busy}
               showCreator={Boolean(user?.isOrgAdmin && user?.accountType === 'company')}
+              teamMembers={teamMembers}
             />
           ) : tab === 'forms' ? (
             <MarketingFormsHub teamMembers={teamMembers} onReload={load} />

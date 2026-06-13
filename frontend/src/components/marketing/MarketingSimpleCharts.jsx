@@ -6,24 +6,36 @@ function niceMax(n) {
   return Math.ceil(n / mag) * mag
 }
 
+function formatChartDate(value) {
+  if (!value) return ''
+  const d = new Date(value)
+  if (!Number.isNaN(d.getTime())) {
+    return `${d.getMonth() + 1}/${d.getDate()}`
+  }
+  return String(value).slice(5, 10)
+}
+
 export function BarChart({ data = [], valueKey = 'sent', labelKey = 'date', height = 160 }) {
   const values = data.map((d) => Number(d[valueKey]) || 0)
   const max = niceMax(Math.max(...values, 0))
-  const w = Math.max(data.length * 28, 280)
-  const barW = Math.min(20, Math.max(8, (w - 40) / Math.max(data.length, 1) - 6))
+  const barCount = data.length
+  const barW = barCount > 8 ? 14 : Math.min(20, Math.max(8, (280 - 40) / Math.max(barCount, 1) - 6))
+  const w = Math.max(barCount * (barW + 10) + 48, 280)
+  const labelStep = Math.max(1, Math.ceil(barCount / 6))
 
   if (!data.length) {
-    return <p className="mhub-v3-empty">No data for this period yet.</p>
+    return <p className="mc-analytics-empty">No data for this period yet.</p>
   }
 
   return (
-    <div className="mhub-v3-chart-wrap" role="img" aria-label="Bar chart">
+    <div className="mc-analytics-chart" role="img" aria-label="Bar chart">
       <svg width="100%" height={height} viewBox={`0 0 ${w} ${height}`} preserveAspectRatio="xMidYMid meet">
         {data.map((d, i) => {
           const v = Number(d[valueKey]) || 0
           const barH = max ? (v / max) * (height - 36) : 0
-          const x = 24 + i * (barW + 8)
+          const x = 24 + i * (barW + 10)
           const y = height - 24 - barH
+          const showLabel = i % labelStep === 0 || i === barCount - 1
           return (
             <g key={d[labelKey] || i}>
               <title>
@@ -31,9 +43,11 @@ export function BarChart({ data = [], valueKey = 'sent', labelKey = 'date', heig
                 {d.openRate != null ? ` · ${d.openRate}% open` : ''}
               </title>
               <rect x={x} y={y} width={barW} height={barH} rx={3} fill={MH.accent} opacity={0.9} />
-              <text x={x + barW / 2} y={height - 8} textAnchor="middle" fontSize="9" fill={MH.textMuted}>
-                {String(d[labelKey] || '').slice(5)}
-              </text>
+              {showLabel ? (
+                <text x={x + barW / 2} y={height - 8} textAnchor="middle" fontSize="10" fill={MH.textMuted}>
+                  {formatChartDate(d[labelKey])}
+                </text>
+              ) : null}
             </g>
           )
         })}
@@ -50,7 +64,7 @@ export function LineChart({ data = [], valueKey = 'total', labelKey = 'date', he
   const innerH = height - pad * 2
 
   if (!data.length) {
-    return <p className="mhub-v3-empty">Start importing contacts to see growth here.</p>
+    return <p className="mc-analytics-empty">Start importing contacts to see growth here.</p>
   }
 
   const points = data.map((d, i) => {
@@ -64,7 +78,7 @@ export function LineChart({ data = [], valueKey = 'total', labelKey = 'date', he
   const areaPath = `${linePath} L ${points[points.length - 1].x} ${height - pad} L ${points[0].x} ${height - pad} Z`
 
   return (
-    <div className="mhub-v3-chart-wrap" role="img" aria-label="Line chart">
+    <div className="mc-analytics-chart" role="img" aria-label="Line chart">
       <svg width="100%" height={height} viewBox={`0 0 ${w} ${height}`} preserveAspectRatio="xMidYMid meet">
         <path d={areaPath} fill={MH.accentTint} fillOpacity={0.3} />
         <path d={linePath} fill="none" stroke={MH.accent} strokeWidth="2" strokeLinecap="round" />
