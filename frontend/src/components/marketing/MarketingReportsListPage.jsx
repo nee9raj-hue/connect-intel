@@ -134,8 +134,7 @@ export default function MarketingReportsListPage({
     try {
       const data = await api.getMarketingOverview({
         light: true,
-        withEngagement: true,
-        timeoutMs: 90_000,
+        timeoutMs: 45_000,
       })
       setCampaigns(data.campaigns || [])
     } catch (e) {
