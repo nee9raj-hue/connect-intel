@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-12T12:58:26.031Z",
-  "updatedAtIst": "12/06/2026, 18:28:26",
+  "updatedAt": "2026-06-13T13:49:32.377Z",
+  "updatedAtIst": "13/06/2026, 19:19:32",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "a9424cd",
+  "currentProductionCommit": "3ce72c6",
   "entries": [
+    {
+      "logId": "20260613-1919-3ce72c6",
+      "commit": "3ce72c6",
+      "commitFull": "3ce72c6ea32905b6566ed8dc5784b5915cfeb847",
+      "message": "fix: stop infinite loading loop on marketing campaigns tab",
+      "deployedAt": "2026-06-13T13:49:18.017Z",
+      "deployedAtIst": "13/06/2026, 19:19:18",
+      "committedAtIst": "13/06/2026, 19:18:45",
+      "vercelPreviewUrl": "https://connect-intel-dlbq5x27r-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 3ce72c6"
+    },
+    {
+      "logId": "20260612-1829-18d764e",
+      "commit": "18d764e",
+      "commitFull": "18d764e0cc9cfba6855fc760b792856b94057c16",
+      "message": "chore: sync production log after campaigns page deploy",
+      "deployedAt": "2026-06-12T12:59:03.032Z",
+      "deployedAtIst": "12/06/2026, 18:29:03",
+      "committedAtIst": "12/06/2026, 18:28:31",
+      "vercelPreviewUrl": "https://connect-intel-yn3axt41a-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 18d764e"
+    },
     {
       "logId": "20260612-1828-a9424cd",
       "commit": "a9424cd",
@@ -15,7 +43,7 @@
       "committedAtIst": "12/06/2026, 18:27:41",
       "vercelPreviewUrl": "https://connect-intel-i0l1mi08u-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- a9424cd"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- a10d75e"
-    },
-    {
-      "logId": "20260612-0237-76d27e4",
-      "commit": "76d27e4",
-      "commitFull": "76d27e49960d5cc24f2d018aa2fd2b873d7f4b83",
-      "message": "fix: pipeline owner filter matches assigned rep shown in table",
-      "deployedAt": "2026-06-11T21:07:11.486Z",
-      "deployedAtIst": "12/06/2026, 02:37:11",
-      "committedAtIst": "12/06/2026, 02:36:33",
-      "vercelPreviewUrl": "https://connect-intel-7jfcp5cy6-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 76d27e4"
-    },
-    {
-      "logId": "20260612-0231-e71bbd9",
-      "commit": "e71bbd9",
-      "commitFull": "e71bbd9f00e2668071440a43fe1b0c197b7a657b",
-      "message": "fix: recover from stale PWA cache after production deploys",
-      "deployedAt": "2026-06-11T21:01:19.831Z",
-      "deployedAtIst": "12/06/2026, 02:31:19",
-      "committedAtIst": "12/06/2026, 02:30:43",
-      "vercelPreviewUrl": "https://connect-intel-h73lkwiwf-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- e71bbd9"
     }
   ]
 }
