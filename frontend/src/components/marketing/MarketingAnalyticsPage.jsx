@@ -143,7 +143,7 @@ export default function MarketingAnalyticsPage({
   const topByOpens = useMemo(
     () =>
       [...filteredCampaigns]
-        .sort((a, b) => (b.stats?.openRate || 0) - (a.stats?.openRate || 0))
+        .sort((a, b) => campaignMetrics(b).openRate - campaignMetrics(a).openRate)
         .slice(0, 5),
     [filteredCampaigns]
   )
@@ -417,7 +417,7 @@ export default function MarketingAnalyticsPage({
                 <li key={c.id}>
                   <button type="button" className="mc-analytics-top__item" onClick={() => onDrillCampaign?.(c.id)}>
                     <span>{c.name}</span>
-                    <strong>{c.stats?.openRate ?? campaignMetrics(c).openRate ?? 0}% opens</strong>
+                    <strong>{campaignMetrics(c).openRate}% opens</strong>
                     <ChevronRightIcon className="w-3.5 h-3.5" aria-hidden />
                   </button>
                 </li>
