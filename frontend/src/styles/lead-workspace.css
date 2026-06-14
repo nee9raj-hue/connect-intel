@@ -718,32 +718,57 @@
 
 /* Timeline */
 .lw-timeline {
+  --lw-timeline-rail: 20px;
   list-style: none;
   margin: 0;
-  padding: 0 0 0 14px;
-  border-left: 2px solid var(--lw-border);
+  padding: 4px 0;
   display: flex;
   flex-direction: column;
   gap: 12px;
   max-height: 50vh;
   overflow-y: auto;
+  position: relative;
+}
+
+.lw-timeline::before {
+  content: '';
+  position: absolute;
+  left: calc(var(--lw-timeline-rail) / 2 - 1px);
+  top: 14px;
+  bottom: 14px;
+  width: 2px;
+  background: var(--lw-border);
+  border-radius: 1px;
+  pointer-events: none;
 }
 
 .lw-timeline__item {
-  position: relative;
-  padding-left: 12px;
+  display: grid;
+  grid-template-columns: var(--lw-timeline-rail) minmax(0, 1fr);
+  column-gap: 10px;
+  align-items: start;
 }
 
 .lw-timeline__item::before {
   content: '';
-  position: absolute;
-  left: -19px;
-  top: 8px;
-  width: 8px;
-  height: 8px;
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: center;
+  align-self: start;
+  width: 10px;
+  height: 10px;
+  margin-top: 10px;
   border-radius: 50%;
   background: var(--lw-surface);
   border: 2px solid var(--lw-accent);
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+}
+
+.lw-timeline__item > * {
+  grid-column: 2;
+  min-width: 0;
 }
 
 .lw-timeline-card {
