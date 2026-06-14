@@ -8,6 +8,7 @@ import {
   groupActivityByDay,
   PipelineHealthChart,
 } from './DashboardHomeCharts'
+import TeamReviewBlock from './TeamReviewBlock'
 import '../../styles/dashboard-home.css'
 
 const PERIODS = [
@@ -83,58 +84,6 @@ function PrioritiesCard({ priorities, onAction, onLead, title, subtitle }) {
       ))}
       {!priorities?.length ? <p className="dash-home__empty">No urgent items — you&apos;re clear.</p> : null}
     </section>
-  )
-}
-
-function TeamPerformanceTable({ rows, onAction, columns = 'rep' }) {
-  if (!rows?.length) return <p className="dash-home__empty">No team activity in this period yet.</p>
-  return (
-    <div className="dash-home__table-wrap">
-      <table className="dash-home__table">
-        <thead>
-          <tr>
-            <th>{columns === 'team' ? 'Team' : 'Rep'}</th>
-            <th>Open</th>
-            <th>Follow-up</th>
-            <th>Activities</th>
-            <th>Won</th>
-            {columns === 'rep' ? <th>Last active</th> : null}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((r) => (
-            <tr key={r.userId || r.teamId}>
-              <td>
-                <button type="button" className="dash-home__table-btn" onClick={() => onAction(r.action || r.cellActions?.open)}>
-                  {columns === 'team' ? r.teamName : r.name}
-                </button>
-              </td>
-              <td>
-                <button type="button" className="dash-home__table-btn" onClick={() => onAction(r.cellActions?.open || r.action)}>
-                  {r.open ?? r.openLeads}
-                </button>
-              </td>
-              <td>
-                <button type="button" className="dash-home__table-btn" onClick={() => onAction(r.cellActions?.followups || r.action)}>
-                  {r.followups}
-                </button>
-              </td>
-              <td>
-                <button type="button" className="dash-home__table-btn" onClick={() => onAction(r.cellActions?.activities || { panel: 'crm-log', userId: r.userId, period: 'week', returnTo: 'overview' })}>
-                  {r.activities7d}
-                </button>
-              </td>
-              <td>
-                <button type="button" className="dash-home__table-btn" onClick={() => onAction(r.cellActions?.won || r.cellActions?.wonMonth || r.action)}>
-                  {r.wonMonth}
-                </button>
-              </td>
-              {columns === 'rep' ? <td>{relTime(r.lastActiveAt)}</td> : null}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
   )
 }
 
@@ -430,6 +379,17 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
           </section>
         </div>
 
+        {role === 'manager' || role === 'org_admin' ? (
+          <TeamReviewBlock
+            role={role}
+            period={period}
+            viewData={viewData}
+            user={user}
+            onNavigate={onNavigate}
+            onLead={onLead}
+          />
+        ) : null}
+
         <div className="dash-home__main">
           <div className="dash-home__main-col">
             {role === 'rep' ? (
@@ -440,33 +400,6 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
                 onAction={runAction}
                 onLead={onLead}
               />
-            ) : null}
-
-            {role === 'manager' ? (
-              <section className="dash-home__card">
-                <div className="dash-home__card-head">
-                  <div>
-                    <h3 className="dash-home__card-title">Rep performance</h3>
-                    <p className="dash-home__card-sub">{viewData.teamLabel || 'Your team'} · {viewData.scopeLabel}</p>
-                  </div>
-                  <button type="button" className="dash-home__link" onClick={() => runAction({ panel: 'crm-dashboard', returnTo: 'overview' })}>
-                    Team report →
-                  </button>
-                </div>
-                <TeamPerformanceTable rows={viewData.repPerformance} onAction={runAction} columns="rep" />
-              </section>
-            ) : null}
-
-            {role === 'org_admin' ? (
-              <section className="dash-home__card">
-                <div className="dash-home__card-head">
-                  <div>
-                    <h3 className="dash-home__card-title">Team leaderboard</h3>
-                    <p className="dash-home__card-sub">Compare teams across the organization</p>
-                  </div>
-                </div>
-                <TeamPerformanceTable rows={viewData.teamLeaderboard} onAction={runAction} columns="team" />
-              </section>
             ) : null}
 
             {role === 'marketing_manager' ? (
