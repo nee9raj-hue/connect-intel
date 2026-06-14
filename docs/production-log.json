@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-14T11:05:26.247Z",
-  "updatedAtIst": "14/06/2026, 16:35:26",
+  "updatedAt": "2026-06-14T11:17:46.441Z",
+  "updatedAtIst": "14/06/2026, 16:47:46",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "c7a99e2",
+  "currentProductionCommit": "ba87104",
   "entries": [
+    {
+      "logId": "20260614-1647-ba87104",
+      "commit": "ba87104",
+      "commitFull": "ba87104cabda4e13fe5481147d83d33639a65ef9",
+      "message": "Fix pipeline owner filter clearing after background refresh.",
+      "deployedAt": "2026-06-14T11:17:31.608Z",
+      "deployedAtIst": "14/06/2026, 16:47:31",
+      "committedAtIst": "14/06/2026, 16:46:58",
+      "vercelPreviewUrl": "https://connect-intel-24nh970t6-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- ba87104"
+    },
+    {
+      "logId": "20260614-1636-dd4329e",
+      "commit": "dd4329e",
+      "commitFull": "dd4329e8e78d2afa141ed30873b71f40ec5f5a8e",
+      "message": "chore: sync production log after SQL filter columns deploy",
+      "deployedAt": "2026-06-14T11:06:14.926Z",
+      "deployedAtIst": "14/06/2026, 16:36:14",
+      "committedAtIst": "14/06/2026, 16:35:40",
+      "vercelPreviewUrl": "https://connect-intel-8kx10vau0-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- dd4329e"
+    },
     {
       "logId": "20260614-1629-c7a99e2",
       "commit": "c7a99e2",
@@ -15,7 +43,7 @@
       "committedAtIst": "14/06/2026, 16:22:36",
       "vercelPreviewUrl": "https://connect-intel-k1gfn51ok-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- c7a99e2"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 419f7e1"
-    },
-    {
-      "logId": "20260614-1209-07367b6",
-      "commit": "07367b6",
-      "commitFull": "07367b60ce557a1d451b252ee8b7f19812f3f38f",
-      "message": "Redesign freight deals dashboard with professional table and KPIs.",
-      "deployedAt": "2026-06-14T06:39:46.127Z",
-      "deployedAtIst": "14/06/2026, 12:09:46",
-      "committedAtIst": "14/06/2026, 12:09:05",
-      "vercelPreviewUrl": "https://connect-intel-nkf65fvr8-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 07367b6"
-    },
-    {
-      "logId": "20260614-1205-058ce95",
-      "commit": "058ce95",
-      "commitFull": "058ce95e8b20fac28bc3a9103a0fb6054f484ebd",
-      "message": "Upgrade pipeline health chart with distribution bar and column chart.",
-      "deployedAt": "2026-06-14T06:35:36.460Z",
-      "deployedAtIst": "14/06/2026, 12:05:36",
-      "committedAtIst": "14/06/2026, 12:05:04",
-      "vercelPreviewUrl": "https://connect-intel-qpdyu8is3-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 058ce95"
     }
   ]
 }
