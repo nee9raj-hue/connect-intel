@@ -9,7 +9,7 @@ export default function OverviewPanel({ onNavigate, isActive = true }) {
   if (!isActive) return null
 
   return (
-    <div className="panel-shell overview-panel-v3 dash-v4-shell">
+    <div className="panel-shell overview-panel-v3 dash-home-shell">
       <div className="panel-body-scroll">
         <HomeDashboard onNavigate={onNavigate} isActive={isActive} />
         {isFreightDealOrg(user) ? (
