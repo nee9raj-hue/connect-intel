@@ -328,6 +328,15 @@ export function PlusIcon({ className }) {
   )
 }
 
+export function CloseIcon({ className }) {
+  return (
+    <LineIcon className={className}>
+      <path d="m7 7 10 10" />
+      <path d="m17 7-10 10" />
+    </LineIcon>
+  )
+}
+
 export function UploadIcon({ className }) {
   return (
     <LineIcon className={className}>

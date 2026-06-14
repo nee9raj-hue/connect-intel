@@ -35,6 +35,46 @@ import FieldVisitRecordForm from './FieldVisitRecordForm'
 import LeadDealsSection from './LeadDealsSection'
 import TeamIntelReturnBanner from './TeamIntelReturnBanner'
 import { DEFAULT_FIELD_VISIT_EXPENSE_SETTINGS } from '../../lib/fieldVisitExpenses'
+import {
+  LwSection,
+  LwDivider,
+  LwField,
+  LwInput,
+  LwSelect,
+  LwTextarea,
+  LwBtn,
+  LwSubmitBtn,
+  LwChip,
+  LwNotice,
+  LwAlert,
+  LwStatCard,
+  LwContactGrid,
+  LwInfoGrid,
+  LwListItem,
+  LwTimeline,
+  LwTimelineCard,
+  LwFormStack,
+  LwLinkBtn,
+  LwEmpty,
+} from './leadWorkspaceUi'
+import {
+  CalendarIcon,
+  ChevronRightIcon,
+  CloseIcon,
+  HomeIcon,
+  LogIcon,
+  MailIcon,
+  MapPinIcon,
+  NoteIcon,
+  PencilIcon,
+  PeopleIcon,
+  PlusIcon,
+  PipelineIcon,
+  SparkIcon,
+  TaskIcon,
+  TeamIcon,
+  WhatsAppIcon,
+} from '../ui/icons'
 
 const MAX_EMAIL_ATTACHMENTS = 5
 const MAX_ATTACHMENT_BYTES = 5 * 1024 * 1024
@@ -58,13 +98,21 @@ function formatAttachmentSize(bytes) {
 }
 
 const TABS = [
-  { id: 'overview', label: 'Overview' },
-  { id: 'deals', label: 'Deals' },
-  { id: 'notes', label: 'Timeline' },
-  { id: 'schedule', label: 'Tasks & meetings' },
-  { id: 'email', label: 'Email' },
-  { id: 'whatsapp', label: 'WhatsApp' },
+  { id: 'overview', label: 'Overview', shortLabel: 'Overview', Icon: HomeIcon },
+  { id: 'deals', label: 'Deals', shortLabel: 'Deals', Icon: PipelineIcon },
+  { id: 'notes', label: 'Timeline', shortLabel: 'Timeline', Icon: LogIcon },
+  { id: 'schedule', label: 'Tasks & meetings', shortLabel: 'Tasks', Icon: CalendarIcon },
+  { id: 'email', label: 'Email', shortLabel: 'Email', Icon: MailIcon },
+  { id: 'whatsapp', label: 'WhatsApp', shortLabel: 'WA', Icon: WhatsAppIcon },
 ]
+
+function leadInitials(lead) {
+  const first = lead.firstName?.[0] || ''
+  const last = lead.lastName?.[0] || ''
+  const initials = `${first}${last}`.toUpperCase()
+  if (initials) return initials
+  return lead.company?.[0]?.toUpperCase() || '?'
+}
 
 export default function LeadWorkspace({
   lead,
@@ -726,121 +774,78 @@ export default function LeadWorkspace({
     <aside
       className={
         recordPanel
-          ? 'crm-record-panel fixed inset-0 z-[75] md:static md:inset-auto shrink-0'
-          : 'crm-drawer fixed inset-0 z-[75] md:static md:inset-auto md:w-full md:max-w-[420px] shrink-0'
+          ? 'crm-record-panel lw-root fixed inset-0 z-[75] md:static md:inset-auto shrink-0'
+          : 'crm-drawer lw-root fixed inset-0 z-[75] md:static md:inset-auto md:w-full md:max-w-[420px] shrink-0'
       }
     >
       <TeamIntelReturnBanner onNavigate={onNavigate} onCloseLead={onClose} />
-      <div className={recordPanel ? 'crm-record-panel__header' : 'crm-drawer-header'}>
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0 flex-1">
-            <h2
-              className={
-                recordPanel
-                  ? 'crm-record-panel__title truncate'
-                  : 'text-sm font-semibold tracking-[-0.02em] text-gray-900 truncate'
-              }
-            >
+      <header className="lw-header">
+        <div className="lw-header__top">
+          <div className="lw-header__avatar" aria-hidden>
+            {leadInitials(lead)}
+          </div>
+          <div className="lw-header__info">
+            <h2 className="lw-header__name">
               {[lead.firstName, lead.lastName].filter(Boolean).join(' ')}
             </h2>
-            <p
-              className={
-                recordPanel
-                  ? 'crm-record-panel__subtitle truncate'
-                  : 'text-xs text-gray-500 truncate'
-              }
-            >
-              {lead.title} · {lead.company}
+            <p className="lw-header__meta">
+              {[lead.title, lead.company].filter(Boolean).join(' · ')}
             </p>
-            <span
-              className={`inline-block mt-1 text-xs font-semibold px-2 py-0.5 rounded border ${
-                recordPanel ? 'crm-record-panel__status' : statusMeta.color
-              }`}
-            >
-              {statusMeta.label}
-            </span>
+            <span className={`lw-header__status ${statusMeta.color || ''}`}>{statusMeta.label}</span>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className={
-              recordPanel
-                ? 'crm-record-panel__close'
-                : 'text-gray-400 hover:text-gray-800 text-2xl leading-none px-1'
-            }
-            aria-label="Close"
-          >
-            ×
+          <button type="button" onClick={onClose} className="lw-header__close" aria-label="Close">
+            <CloseIcon />
           </button>
         </div>
-        <div
-          className={
-            recordPanel
-              ? 'crm-record-panel__tabs'
-              : 'flex gap-0.5 mt-2 md:mt-3 overflow-x-auto no-scrollbar pb-0.5'
-          }
-        >
+        <nav className="lw-tabs" role="tablist" aria-label="Lead sections">
           {TABS.map((t) => (
             <button
               key={t.id}
               type="button"
+              role="tab"
+              aria-selected={tab === t.id}
               onClick={() => setTab(t.id)}
-              className={
-                recordPanel
-                  ? `crm-record-panel__tab ${tab === t.id ? 'is-active' : ''}`
-                  : `shrink-0 text-xs font-semibold px-2 py-0.5 md:px-2.5 md:py-1 rounded-md ${
-                      tab === t.id ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600'
-                    }`
-              }
+              className={`lw-tab ${tab === t.id ? 'is-active' : ''}`}
             >
-              {t.label}
+              <t.Icon className="lw-tab__icon" />
+              <span className="lw-tab__label--long">{t.label}</span>
+              <span className="lw-tab__label--short">{t.shortLabel}</span>
             </button>
           ))}
-        </div>
+        </nav>
         {(notice || savingScope === 'general') && (
-          <div
-            className={`mt-2 text-xs font-medium rounded-lg px-2.5 py-1.5 border ${
-              savingScope === 'general'
-                ? 'bg-amber-50 text-amber-900 border-amber-200'
-                : 'bg-green-50 text-green-900 border-green-200'
-            }`}
-            role="status"
-          >
-            {savingScope === 'general' ? 'Saving…' : notice}
+          <div className="pb-2 pt-1">
+            <LwNotice type={savingScope === 'general' ? 'warn' : 'success'}>
+              {savingScope === 'general' ? 'Saving…' : notice}
+            </LwNotice>
           </div>
         )}
-      </div>
+      </header>
 
-      <div
-        className={
-          recordPanel
-            ? 'crm-record-panel__body space-y-3 md:space-y-4'
-            : 'crm-drawer-body space-y-3 md:space-y-4'
-        }
-      >
+      <div className="lw-body">
         {tab === 'overview' && (
           <>
             <LeadCallLogCard lead={lead} saving={saving} onLog={logCallActivity} onSuccess={setNotice} />
 
-            <section>
-              <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Pipeline status</h3>
-              <select value={status} onChange={(e) => changeStatus(e.target.value)} className="w-full text-xs border rounded-lg px-2.5 py-1.5">
-                {statusOptions.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.label}
-                  </option>
-                ))}
-              </select>
+            <LwSection icon={PipelineIcon} title="Pipeline status">
+              <LwField label="Status">
+                <LwSelect value={status} onChange={(e) => changeStatus(e.target.value)}>
+                  {statusOptions.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.label}
+                    </option>
+                  ))}
+                </LwSelect>
+              </LwField>
               {crm.leadScore != null && (
-                <p className="text-xs text-gray-500 mt-2">
-                  Lead score: <strong className="text-gray-900">{crm.leadScore}</strong>/100
-                </p>
+                <div className="lw-score">
+                  Score <strong>{crm.leadScore}</strong>/100
+                </div>
               )}
-            </section>
+            </LwSection>
 
             {user?.accountType === 'company' && (
-              <section>
-                <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Tags</h3>
+              <LwSection icon={TaskIcon} title="Tags">
                 <LeadTagsEditor
                   lead={lead}
                   orgLeadTags={orgLeadTags}
@@ -849,95 +854,60 @@ export default function LeadWorkspace({
                     setNotice('Tags updated')
                   }}
                 />
-              </section>
+              </LwSection>
             )}
 
             {lead.tradingProfile?.firstShipmentAt || lead.tradingProfile?.active ? (
-              <section className="rounded-xl border border-[#ffd4b8] bg-[#fff4ee]/80 p-3 space-y-2">
-                <h3 className="text-xs font-semibold uppercase text-[#c05621]">Active trading</h3>
-                <div className="grid grid-cols-2 gap-2 text-xs text-gray-700">
-                  <div>
-                    <span className="text-gray-500 block">First shipment</span>
-                    <strong>
-                      {lead.tradingProfile.firstShipmentAt
+              <div className="lw-trading-card">
+                <h3 className="lw-trading-card__title">Active trading</h3>
+                <LwInfoGrid
+                  items={[
+                    {
+                      label: 'First shipment',
+                      value: lead.tradingProfile.firstShipmentAt
                         ? new Date(lead.tradingProfile.firstShipmentAt).toLocaleDateString()
-                        : '—'}
-                    </strong>
-                  </div>
-                  <div>
-                    <span className="text-gray-500 block">Last shipment</span>
-                    <strong>
-                      {lead.tradingProfile.lastShipmentAt
+                        : '—',
+                    },
+                    {
+                      label: 'Last shipment',
+                      value: lead.tradingProfile.lastShipmentAt
                         ? new Date(lead.tradingProfile.lastShipmentAt).toLocaleDateString()
-                        : '—'}
-                    </strong>
-                  </div>
-                  <div>
-                    <span className="text-gray-500 block">Shipments</span>
-                    <strong>{lead.tradingProfile.shipmentCount ?? 0}</strong>
-                  </div>
-                  {lead.tradingProfile.customerCode && (
-                    <div>
-                      <span className="text-gray-500 block">Customer code</span>
-                      <strong className="font-mono text-xs">{lead.tradingProfile.customerCode}</strong>
-                    </div>
-                  )}
-                </div>
-                {(lead.tradingProfile.shipments?.length ?? 0) > 0 && (
-                  <p className="text-xs text-gray-600">
-                    Dates:{' '}
-                    {lead.tradingProfile.shipments
-                      .map((s) =>
-                        s.date ? new Date(s.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: '2-digit' }) : ''
-                      )
-                      .filter(Boolean)
-                      .join(' · ')}
-                  </p>
-                )}
-                {lead.tradingProfile.notes && (
-                  <p className="text-xs text-gray-600 whitespace-pre-wrap">{lead.tradingProfile.notes}</p>
-                )}
+                        : '—',
+                    },
+                    { label: 'Shipments', value: String(lead.tradingProfile.shipmentCount ?? 0) },
+                    ...(lead.tradingProfile.customerCode
+                      ? [{ label: 'Customer code', value: lead.tradingProfile.customerCode }]
+                      : []),
+                  ]}
+                />
                 {onNavigate && hasWorkspaceFeature(user, 'panelActiveCustomers') && (
-                  <button
-                    type="button"
+                  <LwBtn
+                    variant="ghost"
+                    className="mt-2"
                     onClick={() => onNavigate('active-customers')}
-                    className="text-xs font-semibold text-[#FF773D] underline"
                   >
-                    Active customers dashboard
-                  </button>
+                    Active customers
+                    <ChevronRightIcon className="lw-btn__icon" />
+                  </LwBtn>
                 )}
-              </section>
+              </div>
             ) : null}
 
-            <section className="border rounded-lg p-2.5 bg-gray-50">
-              <div className="flex items-center justify-between gap-2">
-                <div>
-                  <p className="text-[10px] font-semibold uppercase text-gray-400">Deals</p>
-                  <p className="text-sm font-bold text-gray-900">
-                    {formatDealValue(crm.dealValue)}
-                    <span className="text-xs font-normal text-gray-500 ml-1">
-                      open · {(crm.deals || []).length} total
-                    </span>
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setTab('deals')}
-                  className="text-xs font-semibold text-[#FF773D] underline shrink-0"
-                >
-                  Manage deals
-                </button>
-              </div>
-            </section>
+            <div className="lw-section lw-section--padded">
+              <LwStatCard
+                label="Open deals"
+                value={formatDealValue(crm.dealValue)}
+                sub={`${(crm.deals || []).length} total`}
+                action={<LwLinkBtn onClick={() => setTab('deals')}>Manage</LwLinkBtn>}
+              />
+            </div>
 
             {user?.accountType === 'company' && (
-              <section>
-                <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Sales sequence</h3>
-                <div className="flex gap-2">
-                  <select
+              <LwSection icon={SparkIcon} title="Sales sequence">
+                <div className="lw-btn-row">
+                  <LwSelect
                     value={enrollSequenceId}
                     onChange={(e) => setEnrollSequenceId(e.target.value)}
-                    className="flex-1 text-xs border rounded-lg px-2 py-1.5"
                     onFocus={async () => {
                       try {
                         const data = await api.listCrmSequences()
@@ -953,9 +923,9 @@ export default function LeadWorkspace({
                         {s.name}
                       </option>
                     ))}
-                  </select>
-                  <button
-                    type="button"
+                  </LwSelect>
+                  <LwBtn
+                    variant="brand"
                     disabled={!enrollSequenceId}
                     onClick={async () => {
                       try {
@@ -966,51 +936,44 @@ export default function LeadWorkspace({
                         setError(err.message)
                       }
                     }}
-                    className="text-xs font-semibold px-3 py-2 rounded-lg bg-[#FF773D] text-[#242424] disabled:opacity-40"
                   >
                     Enroll
-                  </button>
+                  </LwBtn>
                 </div>
-              </section>
+              </LwSection>
             )}
 
             {canAssignThisLead && user?.accountType === 'company' && teamMembers.length > 0 && (
-              <section>
-                <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">
-                  {isUnassignedLead ? 'Claim lead' : 'Transfer / assign lead'}
-                </h3>
+              <LwSection icon={TeamIcon} title={isUnassignedLead ? 'Claim lead' : 'Assign lead'}>
                 {isUnassignedLead && !isManager && (
-                  <button
-                    type="button"
+                  <LwBtn
+                    variant="accent"
+                    className="lw-btn--block mb-2"
                     onClick={async () => {
                       setError(null)
                       try {
                         await assignLead(lead.id, user.id)
-                        setNotice('Lead assigned to you — you can now work it in pipeline.')
+                        setNotice('Lead assigned to you')
                       } catch (err) {
                         setError(err.message)
                       }
                     }}
-                    className="mb-2 w-full py-2 text-xs font-semibold rounded-lg bg-[#1a73e8] text-white"
                   >
                     Assign to me
-                  </button>
+                  </LwBtn>
                 )}
-                {isManager || !isUnassignedLead ? (
-                  <select
+                {(isManager || !isUnassignedLead) && (
+                  <LwSelect
                     value={String(lead.assignedToUserId || '')}
                     onChange={async (e) => {
                       setError(null)
                       try {
                         await assignLead(lead.id, e.target.value || null)
-                        setNotice(
-                          e.target.value ? 'Contact assigned successfully.' : 'Contact unassigned.'
-                        )
+                        setNotice(e.target.value ? 'Contact assigned' : 'Contact unassigned')
                       } catch (err) {
                         setError(err.message)
                       }
                     }}
-                    className="w-full text-xs border rounded-lg px-2.5 py-1.5"
                   >
                     <option value="">Unassigned</option>
                     {teamMembers.map((m) => (
@@ -1018,159 +981,156 @@ export default function LeadWorkspace({
                         {m.name}
                       </option>
                     ))}
-                  </select>
-                ) : (
-                  <p className="text-xs text-gray-500 leading-relaxed">
-                    Unassigned leads are visible to the whole team. Assign to yourself to own and work this lead.
-                  </p>
+                  </LwSelect>
                 )}
-              </section>
+              </LwSection>
             )}
 
-            <section>
-              <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Contact record</h3>
-              <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 space-y-1.5 text-xs text-gray-700">
-                <p>
-                  <span className="text-gray-500">Name · </span>
-                  {[lead.firstName, lead.lastName].filter(Boolean).join(' ') || '—'}
-                </p>
-                <p>
-                  <span className="text-gray-500">Company · </span>
-                  {lead.company || '—'}
-                </p>
-                <p className="flex flex-wrap items-center gap-1">
-                  <span className="text-gray-500">Email · </span>
-                  <EmailValidationIcon lead={lead} />
-                  <span>{lead.email || '—'}</span>
-                </p>
-                <p className="flex flex-wrap items-center gap-1">
-                  <span className="text-gray-500">Phone · </span>
-                  <LeadPhoneCall phone={lead.phone} leadId={lead.id} pipelineCallIcon showNumber />
-                </p>
-                <p>
-                  <span className="text-gray-500">Location · </span>
-                  {lead.location || [lead.city, lead.state].filter(Boolean).join(', ') || '—'}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => openContact(contactId)}
-                className="mt-2 w-full py-2 text-xs font-semibold border border-gray-300 rounded-lg text-gray-800 hover:bg-white"
-              >
-                Edit contact details →
-              </button>
-              <p className="text-xs text-gray-400 mt-1.5 leading-relaxed">
-                Pipeline tracks deal activity. Contact info is edited on the Contacts page.
-              </p>
-            </section>
+            <LwSection
+              icon={PeopleIcon}
+              title="Contact"
+              action={
+                <LwBtn variant="ghost" icon={PencilIcon} onClick={() => openContact(contactId)}>
+                  Edit
+                </LwBtn>
+              }
+            >
+              <LwContactGrid
+                rows={[
+                  {
+                    label: 'Name',
+                    value: [lead.firstName, lead.lastName].filter(Boolean).join(' ') || '—',
+                  },
+                  { label: 'Company', value: lead.company || '—' },
+                  {
+                    label: 'Email',
+                    value: (
+                      <span className="inline-flex items-center gap-1 flex-wrap">
+                        <EmailValidationIcon lead={lead} />
+                        {lead.email || '—'}
+                      </span>
+                    ),
+                  },
+                  {
+                    label: 'Phone',
+                    value: (
+                      <LeadPhoneCall phone={lead.phone} leadId={lead.id} pipelineCallIcon showNumber />
+                    ),
+                  },
+                  {
+                    icon: MapPinIcon,
+                    label: 'Location',
+                    value: lead.location || [lead.city, lead.state].filter(Boolean).join(', ') || '—',
+                  },
+                ]}
+              />
+            </LwSection>
 
-            <section className="grid grid-cols-1 gap-2 text-xs">
-              <Info label="Last communication" value={formatDateTime(crm.lastCommunicationAt)} />
-              <Info label="Type" value={ACTIVITY_LABELS[crm.lastCommunicationType] || '—'} />
-              <Info label="Summary" value={crm.lastCommunicationSummary || '—'} />
-              <Info label="Next follow-up" value={formatDateTime(crm.nextFollowUpAt)} />
-              <Info label="Last email" value={formatCrmDate(crm.lastEmailSentAt)} />
-            </section>
+            <LwSection icon={LogIcon} title="Activity">
+              <LwInfoGrid
+                items={[
+                  { label: 'Last communication', value: formatDateTime(crm.lastCommunicationAt) },
+                  { label: 'Type', value: ACTIVITY_LABELS[crm.lastCommunicationType] || '—' },
+                  { label: 'Next follow-up', value: formatDateTime(crm.nextFollowUpAt) },
+                  { label: 'Last email', value: formatCrmDate(crm.lastEmailSentAt) },
+                ]}
+              />
+              {crm.lastCommunicationSummary ? (
+                <div className="lw-info-grid__item lw-info-grid__item--wide mt-2">
+                  <span className="lw-info-grid__label">Summary</span>
+                  <span className="lw-info-grid__value">{crm.lastCommunicationSummary}</span>
+                </div>
+              ) : null}
+            </LwSection>
           </>
         )}
 
         {tab === 'deals' && (
-          <LeadDealsSection
-            lead={lead}
-            user={user}
-            patchLead={patchLead}
-            busy={savingScope !== null && savingScope !== 'deal'}
-            onNotice={setNotice}
-            onError={setError}
-          />
+          <div className="lw-deals">
+            <LeadDealsSection
+              lead={lead}
+              user={user}
+              patchLead={patchLead}
+              busy={savingScope !== null && savingScope !== 'deal'}
+              onNotice={setNotice}
+              onError={setError}
+            />
+          </div>
         )}
 
         {tab === 'notes' && (
           <>
-            <section>
-              <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Customer notes</h3>
-              <textarea
+            <LwSection icon={NoteIcon} title="Customer notes">
+              <LwTextarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 onBlur={() => {
                   if (notesSaveTimerRef.current) clearTimeout(notesSaveTimerRef.current)
                   saveNotes({ persistNoteActivity: true, showNotice: true })
                 }}
-                rows={5}
+                rows={4}
                 placeholder="Requirements, pricing, decision makers…"
-                className="w-full text-xs border rounded-lg px-2.5 py-1.5"
               />
-            </section>
-            <section>
-              <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Unified timeline</h3>
-              <div className="flex flex-wrap gap-1.5 mb-3">
+            </LwSection>
+
+            <LwSection icon={LogIcon} title="Timeline">
+              <div className="lw-chip-row mb-3">
                 {TIMELINE_FILTERS.map((f) => (
-                  <button
-                    key={f.id}
-                    type="button"
-                    onClick={() => setTimelineFilter(f.id)}
-                    className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${
-                      timelineFilter === f.id
-                        ? 'bg-[#fff4ee] border-[#ffd4b8] text-[#FF773D]'
-                        : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-                    }`}
-                  >
+                  <LwChip key={f.id} active={timelineFilter === f.id} onClick={() => setTimelineFilter(f.id)}>
                     {f.label}
-                  </button>
+                  </LwChip>
                 ))}
               </div>
-              <ul className="space-y-2 max-h-[50vh] overflow-y-auto">
-                {timeline.map((item) => (
-                  <li key={item.id} className="text-xs border rounded-lg p-2.5 bg-gray-50">
-                    <span className="font-bold text-[#8a6600]">{timelineTypeLabel(item.type)}</span>
-                    <p className="text-gray-800 mt-1">{item.title}</p>
-                    {item.subtitle && <p className="text-gray-500">{item.subtitle}</p>}
-                    {item.meta?.answers?.length > 0 && (
-                      <ul className="mt-2 space-y-1 text-gray-700 border-t border-gray-200 pt-2">
-                        {item.meta.answers.map((row) => (
-                          <li key={row.fieldId || row.label}>
-                            <span className="font-medium text-gray-600">{row.label}: </span>
-                            {row.value}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                    <p className="text-gray-400 mt-1">{formatDateTime(item.at)}</p>
-                  </li>
-                ))}
-                {!timeline.length && <p className="text-xs text-gray-400">No activity yet</p>}
-              </ul>
-            </section>
+              {timeline.length ? (
+                <LwTimeline
+                  items={timeline}
+                  renderItem={(item) => (
+                    <LwTimelineCard
+                      badge={timelineTypeLabel(item.type)}
+                      title={item.title}
+                      subtitle={item.subtitle}
+                      at={formatDateTime(item.at)}
+                    >
+                      {item.meta?.answers?.length > 0 && (
+                        <ul className="mt-2 pt-2 border-t border-[var(--lw-border)] space-y-1 text-xs text-[var(--lw-text-secondary)]">
+                          {item.meta.answers.map((row) => (
+                            <li key={row.fieldId || row.label}>
+                              <span className="font-medium">{row.label}: </span>
+                              {row.value}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </LwTimelineCard>
+                  )}
+                />
+              ) : (
+                <LwEmpty>No activity yet</LwEmpty>
+              )}
+            </LwSection>
           </>
         )}
 
         {tab === 'schedule' && (
           <>
-            <section>
-              <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Tasks</h3>
-              <form onSubmit={addTask} className="space-y-2 mb-3">
-                <input
-                  value={taskTitle}
-                  onChange={(e) => setTaskTitle(e.target.value)}
-                  placeholder="Task title"
-                  className="w-full text-xs border rounded-lg px-2.5 py-1.5"
-                />
-                <input
-                  type="datetime-local"
-                  value={taskDue}
-                  onChange={(e) => setTaskDue(e.target.value)}
-                  required
-                  className="w-full text-xs border rounded-lg px-2.5 py-1.5"
-                />
-                <p className="text-xs text-gray-400">Due date appears on team calendar</p>
+            <LwSection icon={TaskIcon} title="Tasks">
+              <LwFormStack onSubmit={addTask}>
+                <LwField label="Title">
+                  <LwInput value={taskTitle} onChange={(e) => setTaskTitle(e.target.value)} placeholder="Follow up on quote" />
+                </LwField>
+                <LwField label="Due">
+                  <LwInput type="datetime-local" value={taskDue} onChange={(e) => setTaskDue(e.target.value)} required />
+                </LwField>
                 {canScheduleForTeam && teamMembers.length > 0 && (
-                  <select value={taskAssignee} onChange={(e) => setTaskAssignee(e.target.value)} className="w-full text-xs border rounded-lg px-2.5 py-1.5">
-                    {teamMembers.map((m) => (
-                      <option key={m.userId} value={m.userId}>
-                        {m.name}
-                      </option>
-                    ))}
-                  </select>
+                  <LwField label="Assign to">
+                    <LwSelect value={taskAssignee} onChange={(e) => setTaskAssignee(e.target.value)}>
+                      {teamMembers.map((m) => (
+                        <option key={m.userId} value={m.userId}>
+                          {m.name}
+                        </option>
+                      ))}
+                    </LwSelect>
+                  </LwField>
                 )}
                 {teamMembers.length > 0 && (
                   <TeamParticipantPicker
@@ -1180,61 +1140,65 @@ export default function LeadWorkspace({
                     onChange={setTaskParticipants}
                   />
                 )}
-                <button type="submit" disabled={busy || savingTask} className="w-full py-2 text-xs font-semibold bg-[#FF773D] rounded-lg disabled:opacity-50">
-                  {savingTask ? 'Saving task…' : 'Add task'}
-                </button>
-                {scheduleFeedback?.form === 'task' && (
-                  <p className="text-xs font-semibold text-green-800 bg-green-50 border border-green-200 rounded-lg px-2.5 py-2" role="status">
-                    ✓ {scheduleFeedback.message}
-                  </p>
-                )}
-              </form>
-              <ul className="space-y-2">
-                {(crm.tasks || []).map((t) => (
-                  <li key={t.id} className={`text-xs border rounded-lg p-2 ${t.completedAt ? 'opacity-60' : ''}`}>
-                    <p className="font-medium">{t.title}</p>
-                    <p className="text-gray-500">Due {formatDateTime(t.dueAt)}</p>
-                    {(t.participantUserIds?.length > 1 || (t.participantUserIds?.length === 1 && t.participantUserIds[0] !== t.assignedToUserId)) && (
-                      <p className="text-gray-400 mt-0.5">
-                        With{' '}
-                        {t.participantUserIds
-                          .filter((id) => id !== t.assignedToUserId)
-                          .map((id) => teamMembers.find((m) => m.userId === id)?.name || 'teammate')
-                          .join(', ') || 'team'}
-                      </p>
-                    )}
-                    {!t.completedAt && (
-                      <button type="button" onClick={() => completeTask(t.id)} className="mt-1 text-[#FF773D] font-semibold underline">
-                        Mark done
-                      </button>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </section>
-
-            <section>
-              <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Schedule meeting</h3>
-              <form onSubmit={addMeeting} className="space-y-2">
-                <input value={meetingTitle} onChange={(e) => setMeetingTitle(e.target.value)} placeholder="Title" className="w-full text-xs border rounded-lg px-2.5 py-1.5" />
-                <select value={meetingType} onChange={(e) => setMeetingType(e.target.value)} className="w-full text-xs border rounded-lg px-2.5 py-1.5">
-                  {MEETING_TYPES.map((m) => (
-                    <option key={m.id} value={m.id}>
-                      {m.label}
-                    </option>
+                <LwSubmitBtn variant="brand" icon={PlusIcon} disabled={busy || savingTask}>
+                  {savingTask ? 'Saving…' : 'Add task'}
+                </LwSubmitBtn>
+                {scheduleFeedback?.form === 'task' && <LwNotice>{scheduleFeedback.message}</LwNotice>}
+              </LwFormStack>
+              {(crm.tasks || []).length > 0 && (
+                <ul className="lw-list mt-3">
+                  {(crm.tasks || []).map((t) => (
+                    <LwListItem
+                      key={t.id}
+                      title={t.title}
+                      meta={`Due ${formatDateTime(t.dueAt)}`}
+                      muted={Boolean(t.completedAt)}
+                      action={
+                        !t.completedAt ? (
+                          <LwLinkBtn onClick={() => completeTask(t.id)}>Done</LwLinkBtn>
+                        ) : null
+                      }
+                    />
                   ))}
-                </select>
-                <input type="datetime-local" value={meetingWhen} onChange={(e) => setMeetingWhen(e.target.value)} className="w-full text-xs border rounded-lg px-2.5 py-1.5" />
-                <input value={meetingLocation} onChange={(e) => setMeetingLocation(e.target.value)} placeholder="Location" className="w-full text-xs border rounded-lg px-2.5 py-1.5" />
-                <textarea value={meetingNotes} onChange={(e) => setMeetingNotes(e.target.value)} rows={2} placeholder="Agenda" className="w-full text-xs border rounded-lg px-2.5 py-1.5" />
-                {canScheduleForTeam && teamMembers.length > 0 && (
-                  <select value={meetingAssignee} onChange={(e) => setMeetingAssignee(e.target.value)} className="w-full text-xs border rounded-lg px-2.5 py-1.5">
-                    {teamMembers.map((m) => (
-                      <option key={m.userId} value={m.userId}>
-                        {m.name}
+                </ul>
+              )}
+            </LwSection>
+
+            <LwDivider label="Meetings" />
+
+            <LwSection icon={CalendarIcon} title="Schedule meeting">
+              <LwFormStack onSubmit={addMeeting}>
+                <LwField label="Title">
+                  <LwInput value={meetingTitle} onChange={(e) => setMeetingTitle(e.target.value)} placeholder="Discovery call" />
+                </LwField>
+                <LwField label="Type">
+                  <LwSelect value={meetingType} onChange={(e) => setMeetingType(e.target.value)}>
+                    {MEETING_TYPES.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.label}
                       </option>
                     ))}
-                  </select>
+                  </LwSelect>
+                </LwField>
+                <LwField label="When">
+                  <LwInput type="datetime-local" value={meetingWhen} onChange={(e) => setMeetingWhen(e.target.value)} />
+                </LwField>
+                <LwField label="Location">
+                  <LwInput value={meetingLocation} onChange={(e) => setMeetingLocation(e.target.value)} placeholder="Office, Zoom, or address" />
+                </LwField>
+                <LwField label="Agenda">
+                  <LwTextarea value={meetingNotes} onChange={(e) => setMeetingNotes(e.target.value)} rows={2} placeholder="Topics to cover" />
+                </LwField>
+                {canScheduleForTeam && teamMembers.length > 0 && (
+                  <LwField label="Owner">
+                    <LwSelect value={meetingAssignee} onChange={(e) => setMeetingAssignee(e.target.value)}>
+                      {teamMembers.map((m) => (
+                        <option key={m.userId} value={m.userId}>
+                          {m.name}
+                        </option>
+                      ))}
+                    </LwSelect>
+                  </LwField>
                 )}
                 {teamMembers.length > 0 && (
                   <TeamParticipantPicker
@@ -1242,24 +1206,19 @@ export default function LeadWorkspace({
                     primaryUserId={canScheduleForTeam ? meetingAssignee : user.id}
                     value={meetingParticipants}
                     onChange={setMeetingParticipants}
-                    label="Also attending (team)"
+                    label="Attendees"
                   />
                 )}
-                <button type="submit" disabled={busy || savingMeeting} className="w-full py-2 text-xs font-semibold bg-gray-900 text-white rounded-lg disabled:opacity-50">
+                <LwSubmitBtn variant="primary" icon={CalendarIcon} disabled={busy || savingMeeting}>
                   {savingMeeting ? 'Scheduling…' : 'Schedule meeting'}
-                </button>
-                {scheduleFeedback?.form === 'meeting' && (
-                  <p className="text-xs font-semibold text-green-800 bg-green-50 border border-green-200 rounded-lg px-2.5 py-2" role="status">
-                    ✓ {scheduleFeedback.message}
-                  </p>
-                )}
-              </form>
-            </section>
+                </LwSubmitBtn>
+                {scheduleFeedback?.form === 'meeting' && <LwNotice>{scheduleFeedback.message}</LwNotice>}
+              </LwFormStack>
+            </LwSection>
 
-            <section>
-              <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">
-                {fieldVisitExpensesEnabled ? 'Record field visit & travel' : 'Record field visit'}
-              </h3>
+            <LwDivider label="Field visits" />
+
+            <LwSection icon={MapPinIcon} title={fieldVisitExpensesEnabled ? 'Field visit & travel' : 'Field visit'}>
               {fieldVisitExpensesEnabled && editingVisitMeeting ? (
                 <FieldVisitRecordForm
                   key={`visit-edit-${editingVisitMeetingId}`}
@@ -1281,296 +1240,221 @@ export default function LeadWorkspace({
                   onSubmit={recordVisit}
                 />
               ) : (
-                <form
+                <LwFormStack
                   onSubmit={(e) => {
                     e.preventDefault()
                     recordVisit()
                   }}
-                  className="space-y-2"
                 >
-                  <select
-                    value={visitMeetingId}
-                    onChange={(e) => setVisitMeetingId(e.target.value)}
-                    className="w-full text-xs border rounded-lg px-2.5 py-1.5"
-                  >
-                    <option value="">Select scheduled visit</option>
-                    {(crm.meetings || [])
-                      .filter((m) => m.type === 'field_visit')
-                      .map((m) => (
-                        <option key={m.id} value={m.id}>
-                          {m.title} · {formatDateTime(m.scheduledAt)}
-                        </option>
-                      ))}
-                  </select>
-                  <select
-                    value={visitOutcome}
-                    onChange={(e) => setVisitOutcome(e.target.value)}
-                    className="w-full text-xs border rounded-lg px-2.5 py-1.5"
-                  >
-                    <option value="completed">Completed</option>
-                    <option value="rescheduled">Rescheduled</option>
-                    <option value="no_show">No show</option>
-                  </select>
-                  <textarea
-                    value={visitNotes}
-                    onChange={(e) => setVisitNotes(e.target.value)}
-                    rows={3}
-                    placeholder="Visit notes, outcomes, next steps…"
-                    className="w-full text-xs border rounded-lg px-2.5 py-1.5"
-                  />
-                  <button
-                    type="submit"
-                    disabled={busy || savingVisit}
-                    className="w-full py-2 text-xs font-semibold border-2 border-[#FF773D] rounded-lg disabled:opacity-50"
-                  >
-                    {savingVisit ? 'Saving visit…' : 'Save field visit report'}
-                  </button>
-                </form>
+                  <LwField label="Visit">
+                    <LwSelect value={visitMeetingId} onChange={(e) => setVisitMeetingId(e.target.value)}>
+                      <option value="">Select scheduled visit</option>
+                      {(crm.meetings || [])
+                        .filter((m) => m.type === 'field_visit')
+                        .map((m) => (
+                          <option key={m.id} value={m.id}>
+                            {m.title} · {formatDateTime(m.scheduledAt)}
+                          </option>
+                        ))}
+                    </LwSelect>
+                  </LwField>
+                  <LwField label="Outcome">
+                    <LwSelect value={visitOutcome} onChange={(e) => setVisitOutcome(e.target.value)}>
+                      <option value="completed">Completed</option>
+                      <option value="rescheduled">Rescheduled</option>
+                      <option value="no_show">No show</option>
+                    </LwSelect>
+                  </LwField>
+                  <LwField label="Notes">
+                    <LwTextarea
+                      value={visitNotes}
+                      onChange={(e) => setVisitNotes(e.target.value)}
+                      rows={3}
+                      placeholder="Outcomes and next steps"
+                    />
+                  </LwField>
+                  <LwSubmitBtn variant="brand" disabled={busy || savingVisit}>
+                    {savingVisit ? 'Saving…' : 'Save visit report'}
+                  </LwSubmitBtn>
+                </LwFormStack>
               )}
               {scheduleFeedback?.form === 'visit' && (
-                <p className="mt-2 text-xs font-semibold text-green-800 bg-green-50 border border-green-200 rounded-lg px-2.5 py-2" role="status">
-                  ✓ {scheduleFeedback.message}
-                </p>
+                <div className="mt-2">
+                  <LwNotice>{scheduleFeedback.message}</LwNotice>
+                </div>
               )}
-            </section>
+            </LwSection>
 
             {fieldVisitExpensesEnabled && recordedFieldVisits.length > 0 && !editingVisitMeeting ? (
-              <section>
-                <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Recorded visits</h3>
-                <ul className="space-y-2">
+              <LwSection title="Recorded visits">
+                <ul className="lw-list">
                   {recordedFieldVisits.map((m) => (
-                    <li key={m.id} className="text-xs border rounded-lg p-2 bg-white">
-                      <p className="font-medium">{m.title}</p>
-                      <p className="text-[#516f90]">
-                        {formatDateTime(m.actualVisitAt || m.visitRecordedAt)} · {m.visitOutcome}
-                      </p>
-                      {m.visitTravel ? (
-                        <p className="text-[#516f90] mt-0.5">
-                          {m.visitTravel.startLabel ? `${m.visitTravel.startLabel} → ` : ''}
-                          {m.visitTravel.endLabel || m.location}
-                          {m.visitTravel.claimAmount > 0
-                            ? ` · ₹${m.visitTravel.claimAmount}`
-                            : ''}
+                    <LwListItem
+                      key={m.id}
+                      title={m.title}
+                      meta={`${formatDateTime(m.actualVisitAt || m.visitRecordedAt)} · ${m.visitOutcome}${
+                        m.visitTravel?.claimAmount > 0 ? ` · ₹${m.visitTravel.claimAmount}` : ''
+                      }`}
+                      action={
+                        <LwLinkBtn onClick={() => setEditingVisitMeetingId(m.id)}>Edit</LwLinkBtn>
+                      }
+                    />
+                  ))}
+                </ul>
+              </LwSection>
+            ) : null}
+
+            {(crm.meetings || []).length > 0 && (
+              <LwSection icon={CalendarIcon} title="Upcoming">
+                <ul className="lw-list">
+                  {(crm.meetings || []).map((m) => (
+                    <li key={m.id} className="lw-list-item is-highlight">
+                      <div className="lw-list-item__main">
+                        <p className="lw-list-item__title">{m.title}</p>
+                        <p className="lw-list-item__meta">
+                          {formatDateTime(m.scheduledAt)} · {m.type}
+                          {m.visitRecordedAt ? ' · Visit logged' : ''}
                         </p>
-                      ) : null}
-                      <button
-                        type="button"
-                        onClick={() => setEditingVisitMeetingId(m.id)}
-                        className="mt-1 text-[#FF773D] font-semibold hover:underline"
-                      >
-                        Edit visit & travel
-                      </button>
+                      </div>
                     </li>
                   ))}
                 </ul>
-              </section>
-            ) : null}
-
-            <ul className="space-y-2">
-              <h3 className="text-xs font-semibold uppercase text-gray-400">Upcoming</h3>
-              {(crm.meetings || []).map((m) => (
-                <li key={m.id} className="text-xs border rounded-lg p-2 bg-[#fff4ee]">
-                  <p className="font-medium">{m.title}</p>
-                  <p>{formatDateTime(m.scheduledAt)} · {m.type}</p>
-                  {(m.participantUserIds?.length > 1 ||
-                    (m.participantUserIds?.length === 1 && m.participantUserIds[0] !== m.assignedToUserId)) && (
-                    <p className="text-gray-500 mt-0.5">
-                      With{' '}
-                      {m.participantUserIds
-                        .filter((id) => id !== m.assignedToUserId)
-                        .map((id) => teamMembers.find((tm) => tm.userId === id)?.name || 'teammate')
-                        .join(', ')}
-                    </p>
-                  )}
-                  {m.visitRecordedAt && <p className="text-green-700">Visit logged</p>}
-                </li>
-              ))}
-            </ul>
+              </LwSection>
+            )}
           </>
         )}
 
         {tab === 'email' && (
           <>
             {!canSendEmail && (
-              <section className="rounded-lg border border-amber-200 bg-amber-50 p-3 space-y-2">
-                <h3 className="text-xs font-semibold uppercase text-amber-900">Connect email to send</h3>
-                <p className="text-xs text-amber-900 leading-relaxed">
-                  Sign in once with your work email account. No DNS or domain setup needed.
-                </p>
-                <button
-                  type="button"
+              <LwSection icon={MailIcon} title="Connect email">
+                <LwBtn
+                  variant="brand"
+                  className="lw-btn--block"
+                  icon={MailIcon}
                   onClick={connectWorkGmail}
                   disabled={busy || !gmailStatus.gmailConnectAvailable}
-                  className="w-full py-2 text-xs font-semibold bg-[#FF773D] text-[#242424] rounded-lg disabled:opacity-50"
                 >
                   {connectingGmail ? 'Connecting…' : 'Connect work email'}
-                </button>
+                </LwBtn>
                 {user?.isOrgAdmin && onNavigate && (
-                  <button
-                    type="button"
-                    onClick={() => onNavigate('team')}
-                    className="w-full py-2 text-xs font-medium text-gray-700 border border-gray-300 rounded-lg"
-                  >
-                    Open Team email settings
-                  </button>
+                  <LwBtn variant="secondary" className="lw-btn--block mt-2" onClick={() => onNavigate('team')}>
+                    Team email settings
+                  </LwBtn>
                 )}
-              </section>
+              </LwSection>
             )}
 
             {canSendEmail && gmailStatus.connected && (
-              <p className="text-xs text-emerald-800 bg-emerald-50 border border-emerald-100 rounded-lg px-2 py-1.5">
+              <LwNotice type="info">
                 Sending via <strong>{gmailStatus.mailbox}</strong>
-                {gmailStatus.inboundReplySync
-                  ? ' · lead replies sync to CRM and forward to your inbox automatically'
-                  : ' · use Sync trail below to pull inbound mail (legacy)'}
-              </p>
+              </LwNotice>
             )}
 
-            <section className="rounded-lg border border-gray-200 bg-gray-50 p-3 space-y-2">
-              <div className="flex items-center justify-between gap-2">
-                <h3 className="text-xs font-semibold uppercase text-gray-500">Email signature</h3>
-                <button
-                  type="button"
-                  onClick={() => setShowSignatureEditor((v) => !v)}
-                  className="text-xs font-semibold text-gray-600 underline"
-                >
-                  {showSignatureEditor ? 'Hide' : emailSignature ? 'Edit signature' : 'Add signature'}
-                </button>
-              </div>
+            <LwSection
+              icon={PencilIcon}
+              title="Signature"
+              action={
+                <LwLinkBtn onClick={() => setShowSignatureEditor((v) => !v)}>
+                  {showSignatureEditor ? 'Hide' : emailSignature ? 'Edit' : 'Add'}
+                </LwLinkBtn>
+              }
+            >
               {!showSignatureEditor && emailSignature && (
-                <p className="text-xs text-gray-600 whitespace-pre-wrap border border-gray-200 rounded-lg px-2 py-1.5 bg-white">
-                  {emailSignature}
-                </p>
+                <p className="text-sm whitespace-pre-wrap lw-input">{emailSignature}</p>
               )}
               {showSignatureEditor && (
                 <>
-                  <textarea
+                  <LwTextarea
                     value={emailSignature}
                     onChange={(e) => setEmailSignature(e.target.value)}
                     rows={4}
-                    placeholder={'Best regards,\nYour Name\nCompany · Phone · Website'}
-                    className="w-full text-xs border border-gray-200 rounded-lg px-2 py-1.5 font-mono bg-white"
+                    placeholder={'Best regards,\nYour Name\nCompany'}
                   />
-                  <button
-                    type="button"
-                    onClick={handleSaveSignature}
-                    disabled={savingSignature}
-                    className="text-xs font-semibold px-3 py-1.5 bg-white border border-gray-300 rounded-lg disabled:opacity-50"
-                  >
-                    {savingSignature ? 'Saving…' : 'Save signature for all emails'}
-                  </button>
+                  <LwBtn variant="secondary" className="mt-2" onClick={handleSaveSignature} disabled={savingSignature}>
+                    {savingSignature ? 'Saving…' : 'Save signature'}
+                  </LwBtn>
                 </>
               )}
-              <label className="flex items-center gap-2 text-xs text-gray-700">
-                <input
-                  type="checkbox"
-                  checked={includeSignature}
-                  onChange={(e) => setIncludeSignature(e.target.checked)}
-                />
-                Include signature when sending
+              <label className="lw-check-row mt-2">
+                <input type="checkbox" checked={includeSignature} onChange={(e) => setIncludeSignature(e.target.checked)} />
+                Include when sending
               </label>
-            </section>
+            </LwSection>
 
-            <section className="space-y-2">
-              <h3 className="text-xs font-semibold uppercase text-gray-400">What should this email say?</h3>
-              <input
-                value={senderCompany}
-                onChange={(e) => setSenderCompany(e.target.value)}
-                placeholder="Your company name"
-                className="w-full text-xs border rounded-lg px-2.5 py-1.5"
-              />
-              <textarea
-                value={emailAgenda}
-                onChange={(e) => setEmailAgenda(e.target.value)}
-                rows={3}
-                placeholder="Agenda (required): e.g. Introduce Alvar Fresh organic snacks to US boutique buyers; ask for 15-min call next week"
-                className="w-full text-xs border rounded-lg px-2.5 py-1.5"
-              />
-              <textarea
-                value={emailKeyPoints}
-                onChange={(e) => setEmailKeyPoints(e.target.value)}
-                rows={2}
-                placeholder="Key points (optional): pricing, certifications, trade show, etc."
-                className="w-full text-xs border rounded-lg px-2.5 py-1.5"
-              />
-            </section>
-
-            <div className="flex gap-2">
-              <select value={purpose} onChange={(e) => setPurpose(e.target.value)} className="flex-1 text-xs border rounded-lg px-2 py-1.5">
-                {EMAIL_PURPOSES.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.label}
-                  </option>
-                ))}
-              </select>
-              <button
-                type="button"
-                onClick={handleGenerate}
-                disabled={busy || emailAgenda.trim().length < 8}
-                className="text-xs font-semibold px-3 py-1.5 bg-[#fff4ee] border border-[#ffd4b8] rounded-lg disabled:opacity-50"
-              >
-                {generating ? 'Drafting…' : '✨ AI draft'}
-              </button>
-            </div>
-            <input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Subject" className="w-full text-xs border rounded-lg px-2.5 py-1.5" />
-            <input
-              value={emailCc}
-              onChange={(e) => setEmailCc(e.target.value)}
-              placeholder="Cc (optional): name@company.com, teammate@company.com"
-              className="w-full text-xs border rounded-lg px-2.5 py-1.5"
-            />
-            <textarea value={body} onChange={(e) => setBody(e.target.value)} rows={10} className="w-full text-xs border rounded-lg px-2.5 py-1.5 font-mono text-xs" />
-            {includeSignature && emailSignature.trim() && (
-              <p className="text-xs text-gray-500">
-                Your saved signature will be appended automatically when you send.
-              </p>
-            )}
-            <div className="space-y-2">
-              <div className="flex flex-wrap items-center gap-2">
-                <label className="text-xs font-semibold px-3 py-1.5 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
-                  📎 Attach files
-                  <input
-                    type="file"
-                    multiple
-                    className="hidden"
-                    onChange={handleAttachmentPick}
-                    disabled={busy || emailAttachments.length >= MAX_EMAIL_ATTACHMENTS}
+            <LwSection icon={SparkIcon} title="Compose">
+              <div className="lw-form-stack">
+                <LwField label="Company">
+                  <LwInput value={senderCompany} onChange={(e) => setSenderCompany(e.target.value)} placeholder="Your company" />
+                </LwField>
+                <LwField label="Agenda">
+                  <LwTextarea
+                    value={emailAgenda}
+                    onChange={(e) => setEmailAgenda(e.target.value)}
+                    rows={2}
+                    placeholder="What should this email achieve?"
                   />
-                </label>
-                <span className="text-xs text-gray-500">
-                  Up to {MAX_EMAIL_ATTACHMENTS} files, 5MB each
-                </span>
+                </LwField>
+                <LwField label="Key points">
+                  <LwTextarea
+                    value={emailKeyPoints}
+                    onChange={(e) => setEmailKeyPoints(e.target.value)}
+                    rows={2}
+                    placeholder="Optional details"
+                  />
+                </LwField>
+                <div className="lw-btn-row">
+                  <LwSelect value={purpose} onChange={(e) => setPurpose(e.target.value)}>
+                    {EMAIL_PURPOSES.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.label}
+                      </option>
+                    ))}
+                  </LwSelect>
+                  <LwBtn variant="ai" icon={SparkIcon} onClick={handleGenerate} disabled={busy || emailAgenda.trim().length < 8}>
+                    {generating ? 'Drafting…' : 'AI draft'}
+                  </LwBtn>
+                </div>
+                <LwField label="Subject">
+                  <LwInput value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Subject line" />
+                </LwField>
+                <LwField label="Cc">
+                  <LwInput value={emailCc} onChange={(e) => setEmailCc(e.target.value)} placeholder="Optional" />
+                </LwField>
+                <LwField label="Message">
+                  <LwTextarea value={body} onChange={(e) => setBody(e.target.value)} rows={8} />
+                </LwField>
+                <div>
+                  <label className="lw-btn lw-btn--secondary cursor-pointer">
+                    Attach files
+                    <input
+                      type="file"
+                      multiple
+                      className="hidden"
+                      onChange={handleAttachmentPick}
+                      disabled={busy || emailAttachments.length >= MAX_EMAIL_ATTACHMENTS}
+                    />
+                  </label>
+                  {emailAttachments.length > 0 && (
+                    <ul className="lw-attachments mt-2">
+                      {emailAttachments.map((file, index) => (
+                        <li key={`${file.filename}-${index}`} className="lw-attachment">
+                          <span className="lw-attachment__name">
+                            {file.filename} ({formatAttachmentSize(file.sizeBytes)})
+                          </span>
+                          <LwLinkBtn onClick={() => removeAttachment(index)}>Remove</LwLinkBtn>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                <LwBtn variant="primary" className="lw-btn--block" icon={MailIcon} onClick={handleSend} disabled={busy || !canSendEmail}>
+                  {sending ? 'Sending…' : 'Send & log'}
+                </LwBtn>
               </div>
-              {emailAttachments.length > 0 && (
-                <ul className="space-y-1">
-                  {emailAttachments.map((file, index) => (
-                    <li
-                      key={`${file.filename}-${index}`}
-                      className="flex items-center justify-between gap-2 text-xs bg-gray-50 border border-gray-200 rounded-lg px-2 py-1"
-                    >
-                      <span className="truncate">
-                        📎 {file.filename} ({formatAttachmentSize(file.sizeBytes)})
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => removeAttachment(index)}
-                        className="shrink-0 text-red-600 text-xs font-semibold"
-                      >
-                        Remove
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-            <button
-              type="button"
-              onClick={handleSend}
-              disabled={busy || !canSendEmail}
-              className="w-full py-2 text-xs font-semibold bg-gray-900 text-white rounded-lg disabled:opacity-50"
-            >
-              {sending ? 'Sending…' : 'Send email & log in CRM'}
-            </button>
+            </LwSection>
+
+            <LwDivider label="Thread" />
 
             <CrmEmailThread
               lead={lead}
@@ -1587,133 +1471,116 @@ export default function LeadWorkspace({
 
         {tab === 'whatsapp' && (
           <>
-            <p className="text-xs text-gray-600">
-              Opens <strong>your WhatsApp app</strong> (wa.me) — not the business API. Use a marketing template or AI
-              draft, then send from your phone to <strong>{lead.phone || 'no phone'}</strong>.
-            </p>
-            <label className="block text-xs font-semibold text-gray-700">
-              Load template
-              <select
-                value={waTemplatePick}
-                onChange={(e) => {
-                  const v = e.target.value
-                  setWaTemplatePick(v)
-                  if (!v) return
-                  if (v.startsWith('preset:')) {
-                    const preset = STARTER_TEMPLATES.find((s) => s.id === v.slice(7))
-                    if (preset) {
-                      setWaMessage(blocksToPlainText(preset.blocks, lead))
-                      setNotice(`Preset loaded: ${preset.name}`)
+            {!hasLeadPhone && (
+              <LwAlert type="warn">Add a valid phone number to message this lead.</LwAlert>
+            )}
+
+            <LwSection icon={WhatsAppIcon} title="Message">
+              <LwField label="Template">
+                <LwSelect
+                  value={waTemplatePick}
+                  onChange={(e) => {
+                    const v = e.target.value
+                    setWaTemplatePick(v)
+                    if (!v) return
+                    if (v.startsWith('preset:')) {
+                      const preset = STARTER_TEMPLATES.find((s) => s.id === v.slice(7))
+                      if (preset) {
+                        setWaMessage(blocksToPlainText(preset.blocks, lead))
+                        setNotice(`Preset loaded: ${preset.name}`)
+                      }
+                    } else {
+                      const t = waTemplates.find((x) => x.id === v)
+                      if (t?.blocks?.length) {
+                        setWaMessage(blocksToPlainText(t.blocks, lead))
+                        setNotice(`Template loaded: ${t.name}`)
+                      } else if (t?.body) {
+                        setWaMessage(t.body)
+                        setNotice(`Template loaded: ${t.name}`)
+                      }
                     }
-                  } else {
-                    const t = waTemplates.find((x) => x.id === v)
-                    if (t?.blocks?.length) {
-                      setWaMessage(blocksToPlainText(t.blocks, lead))
-                      setNotice(`Template loaded: ${t.name}`)
-                    } else if (t?.body) {
-                      setWaMessage(t.body)
-                      setNotice(`Template loaded: ${t.name}`)
-                    }
-                  }
-                  setWaTemplatePick('')
-                }}
-                className="mt-1 w-full text-xs border border-gray-200 rounded-lg px-2 py-1.5"
-              >
-                <option value="">Choose preset or saved template…</option>
-                <optgroup label="Built-in presets">
-                  {STARTER_TEMPLATES.map((s) => (
-                    <option key={s.id} value={`preset:${s.id}`}>
-                      {s.name}
-                    </option>
-                  ))}
-                </optgroup>
-                {waTemplates.length > 0 && (
-                  <optgroup label="Your saved templates">
-                    {waTemplates.map((t) => (
-                      <option key={t.id} value={t.id}>
-                        {t.name}
+                    setWaTemplatePick('')
+                  }}
+                >
+                  <option value="">Choose template…</option>
+                  <optgroup label="Presets">
+                    {STARTER_TEMPLATES.map((s) => (
+                      <option key={s.id} value={`preset:${s.id}`}>
+                        {s.name}
                       </option>
                     ))}
                   </optgroup>
+                  {waTemplates.length > 0 && (
+                    <optgroup label="Saved">
+                      {waTemplates.map((t) => (
+                        <option key={t.id} value={t.id}>
+                          {t.name}
+                        </option>
+                      ))}
+                    </optgroup>
+                  )}
+                </LwSelect>
+              </LwField>
+              <div className="lw-form-stack mt-2">
+                <LwField label="Agenda">
+                  <LwTextarea
+                    value={waAgenda}
+                    onChange={(e) => setWaAgenda(e.target.value)}
+                    rows={2}
+                    placeholder="Goal of this message"
+                  />
+                </LwField>
+                <LwField label="Key points">
+                  <LwTextarea
+                    value={waKeyPoints}
+                    onChange={(e) => setWaKeyPoints(e.target.value)}
+                    rows={2}
+                    placeholder="Optional"
+                  />
+                </LwField>
+                <LwBtn variant="ai" icon={SparkIcon} className="lw-btn--block" onClick={handleGenerateWhatsApp} disabled={busy || waAgenda.trim().length < 8}>
+                  {waGenerating ? 'Drafting…' : 'AI draft'}
+                </LwBtn>
+                <LwField label="Message">
+                  <LwTextarea
+                    value={waMessage}
+                    onChange={(e) => setWaMessage(e.target.value)}
+                    rows={6}
+                    placeholder="WhatsApp message"
+                  />
+                </LwField>
+                <LwBtn
+                  variant="whatsapp"
+                  icon={WhatsAppIcon}
+                  className="lw-btn--block"
+                  onClick={openWhatsApp}
+                  disabled={busy || !hasLeadPhone || !waMessage.trim()}
+                >
+                  Open WhatsApp & log
+                </LwBtn>
+                {onNavigate && (
+                  <LwBtn variant="secondary" className="lw-btn--block" onClick={() => onNavigate('marketing', { tab: 'inbox' })}>
+                    Team WA Inbox
+                  </LwBtn>
                 )}
-              </select>
-            </label>
-            {!hasLeadPhone && (
-              <p className="text-xs text-amber-900 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1.5">
-                This lead needs a valid phone number on the record.
-              </p>
-            )}
-            <textarea
-              value={waAgenda}
-              onChange={(e) => setWaAgenda(e.target.value)}
-              rows={2}
-              placeholder="Agenda (required for AI): e.g. follow up on export quote"
-              className="w-full text-xs border rounded-lg px-2.5 py-1.5"
-            />
-            <textarea
-              value={waKeyPoints}
-              onChange={(e) => setWaKeyPoints(e.target.value)}
-              rows={2}
-              placeholder="Key points (optional)"
-              className="w-full text-xs border rounded-lg px-2.5 py-1.5"
-            />
-            <button
-              type="button"
-              onClick={handleGenerateWhatsApp}
-              disabled={busy || waAgenda.trim().length < 8}
-              className="w-full py-2 text-xs font-semibold bg-[#fff4ee] border border-[#ffd4b8] rounded-lg disabled:opacity-50"
-            >
-              {waGenerating ? 'Drafting…' : '✨ AI WhatsApp draft'}
-            </button>
-            <textarea
-              value={waMessage}
-              onChange={(e) => setWaMessage(e.target.value)}
-              rows={8}
-              placeholder="Message to send on WhatsApp"
-              className="w-full text-xs border rounded-lg px-2.5 py-1.5"
-            />
-            <button
-              type="button"
-              onClick={openWhatsApp}
-              disabled={busy || !hasLeadPhone || !waMessage.trim()}
-              className="w-full py-2 text-xs font-semibold bg-[#25D366] text-white rounded-lg disabled:opacity-50"
-            >
-              Open in WhatsApp & log
-            </button>
-            {onNavigate && (
-              <button
-                type="button"
-                onClick={() => onNavigate('marketing', { tab: 'inbox' })}
-                className="w-full py-2 text-xs font-semibold border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50"
-              >
-                Open team WA Inbox (Cloud API)
-              </button>
-            )}
+              </div>
+            </LwSection>
           </>
         )}
 
-        {error && <p className="text-xs text-red-700 bg-red-50 border border-red-100 rounded-lg px-2 py-1.5">{error}</p>}
+        {error && <LwAlert>{error}</LwAlert>}
       </div>
 
-      <div className="shrink-0 px-4 py-2 border-t text-xs text-gray-500 flex flex-wrap items-center gap-x-2 gap-y-1">
-        <span className="inline-flex items-center gap-1">
+      <footer className="lw-footer">
+        <span className="lw-footer__chip">
+          <MailIcon className="lw-footer__chip-icon" aria-hidden />
           <EmailValidationIcon lead={lead} />
-          {lead.email || 'No email'}
+          <span className="truncate">{lead.email || 'No email'}</span>
         </span>
-        <span className="text-gray-300" aria-hidden>
-          ·
+        <span className="lw-footer__chip lw-footer__chip--phone">
+          <LeadPhoneCall phone={lead.phone} leadId={lead.id} numberClassName="text-xs truncate" />
         </span>
-        <LeadPhoneCall phone={lead.phone} leadId={lead.id} numberClassName="text-xs" />
-      </div>
+      </footer>
     </aside>
-  )
-}
-
-function Info({ label, value }) {
-  return (
-    <div className="rounded-lg border border-gray-100 bg-gray-50 px-2.5 py-2">
-      <div className="text-gray-400">{label}</div>
-      <div className="font-medium text-gray-800 mt-0.5 break-words">{value}</div>
-    </div>
   )
 }
