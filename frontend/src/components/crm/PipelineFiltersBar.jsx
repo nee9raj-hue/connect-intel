@@ -5,17 +5,17 @@ import { api } from '../../lib/api'
 import { CONTACT_FILTER_OPTIONS, DEFAULT_PIPELINE_FILTERS, getFilterCities, getFilterStates } from '../../lib/pipelineFilters'
 import { FilterChipButton } from './FilterDropdown'
 import LeadTag from '../ui/LeadTag'
-import FilterToolbarIcon from '../ui/FilterToolbarIcon'
 import PipelineFilterPopup from './PipelineFilterPopup'
 import PipelineFilterToolbarButton from './PipelineFilterToolbarButton'
 import PipelineMobileFilterSheet, { SearchableMultiList, SingleSelectList } from './PipelineMobileFilterSheet'
 import {
   ListIcon,
+  MailIcon,
   MapIcon,
   MapPinIcon,
   PeopleIcon,
+  SearchIcon,
   SettingsGearIcon,
-  SlidersIcon,
 } from '../ui/icons'
 
 const SMART_TAG_OPTIONS = [
@@ -448,153 +448,95 @@ export default function PipelineFiltersBar({
 
   const filterToolbar = (
     <>
-      {canShowOwnerFilter &&
-        (useMobileFilterSheet ? (
-          <FilterToolbarIcon
-            icon={PeopleIcon}
-            label="Owner"
-            showLabel
-            active={activeFilter?.type === 'owner' || Boolean(ownerFilter)}
-            badge={Boolean(ownerFilter)}
-            aria-expanded={activeFilter?.type === 'owner'}
-            onClick={() => openFilter('owner')}
-          />
-        ) : (
-          <PipelineFilterToolbarButton
-            label="Owner"
-            displayValue={ownerSelectOptions.find((o) => String(o.value) === String(ownerFilter))?.label}
-            active={Boolean(ownerFilter)}
-            aria-expanded={activeFilter?.type === 'owner'}
-            onClick={() => openFilter('owner')}
-          />
-        ))}
-
-      {!stageListMode &&
-        (useMobileFilterSheet ? (
-          <FilterToolbarIcon
-            icon={ListIcon}
-            label="Status"
-            showLabel
-            active={activeFilter?.type === 'status' || statusFilter !== 'all'}
-            badge={statusFilter !== 'all'}
-            aria-expanded={activeFilter?.type === 'status'}
-            onClick={() => openFilter('status')}
-          />
-        ) : (
-          <PipelineFilterToolbarButton
-            label="Status"
-            displayValue={statusOptions.find((s) => s.id === statusFilter)?.label}
-            active={statusFilter !== 'all'}
-            aria-expanded={activeFilter?.type === 'status'}
-            onClick={() => openFilter('status')}
-          />
-        ))}
-
-      {useMobileFilterSheet ? (
-        <FilterToolbarIcon
-          icon={MapPinIcon}
-          label="City"
-          showLabel
-          active={activeFilter?.type === 'city' || appliedCities.length > 0}
-          badge={appliedCities.length > 0}
-          aria-expanded={activeFilter?.type === 'city'}
-          onClick={() => openFilter('city')}
-        />
-      ) : (
+      {canShowOwnerFilter ? (
         <PipelineFilterToolbarButton
-          label="City"
-          displayValue={
-            appliedCities.length > 0
-              ? appliedCities.length === 1
-                ? appliedCities[0]
-                : `${appliedCities.length} selected`
-              : undefined
-          }
-          active={appliedCities.length > 0}
-          aria-expanded={activeFilter?.type === 'city'}
-          onClick={() => openFilter('city')}
-        />
-      )}
-
-      {useMobileFilterSheet ? (
-        <FilterToolbarIcon
-          icon={MapIcon}
-          label="State"
-          showLabel
-          active={activeFilter?.type === 'state' || appliedStates.length > 0}
-          badge={appliedStates.length > 0}
-          aria-expanded={activeFilter?.type === 'state'}
-          onClick={() => openFilter('state')}
-        />
-      ) : (
-        <PipelineFilterToolbarButton
-          label="State"
-          displayValue={
-            appliedStates.length > 0
-              ? appliedStates.length === 1
-                ? appliedStates[0]
-                : `${appliedStates.length} selected`
-              : undefined
-          }
-          active={appliedStates.length > 0}
-          aria-expanded={activeFilter?.type === 'state'}
-          onClick={() => openFilter('state')}
-        />
-      )}
-
-      {useMobileFilterSheet ? (
-        <FilterToolbarIcon
           icon={PeopleIcon}
-          label="Contact"
-          showLabel
-          active={activeFilter?.type === 'contact' || (filters.contact && filters.contact !== 'any')}
-          badge={Boolean(filters.contact && filters.contact !== 'any')}
-          aria-expanded={activeFilter?.type === 'contact'}
-          onClick={() => openFilter('contact')}
+          iconTone="owner"
+          label="Owner"
+          compact={useMobileFilterSheet}
+          displayValue={ownerSelectOptions.find((o) => String(o.value) === String(ownerFilter))?.label}
+          active={Boolean(ownerFilter)}
+          aria-expanded={activeFilter?.type === 'owner'}
+          onClick={() => openFilter('owner')}
         />
-      ) : (
-        <PipelineFilterToolbarButton
-          label="Contact"
-          displayValue={CONTACT_FILTER_OPTIONS.find((o) => o.id === filters.contact)?.label}
-          active={Boolean(filters.contact && filters.contact !== 'any')}
-          aria-expanded={activeFilter?.type === 'contact'}
-          onClick={() => openFilter('contact')}
-        />
-      )}
+      ) : null}
 
-      {useMobileFilterSheet ? (
-        <FilterToolbarIcon
-          icon={SlidersIcon}
-          label="More filters"
-          showLabel
-          active={activeFilter?.type === 'advanced' || advancedActiveCount > 0}
-          badge={advancedActiveCount > 0}
-          aria-expanded={activeFilter?.type === 'advanced'}
-          onClick={() => openFilter('advanced')}
-        />
-      ) : (
+      {!stageListMode ? (
         <PipelineFilterToolbarButton
-          variant="more"
-          label="More filters"
-          active={activeFilter?.type === 'advanced' || advancedActiveCount > 0}
-          aria-expanded={activeFilter?.type === 'advanced'}
-          onClick={() => openFilter('advanced')}
+          icon={ListIcon}
+          iconTone="status"
+          label="Status"
+          compact={useMobileFilterSheet}
+          displayValue={statusOptions.find((s) => s.id === statusFilter)?.label}
+          active={statusFilter !== 'all'}
+          aria-expanded={activeFilter?.type === 'status'}
+          onClick={() => openFilter('status')}
         />
-      )}
+      ) : null}
+
+      <PipelineFilterToolbarButton
+        icon={MapPinIcon}
+        iconTone="city"
+        label="City"
+        compact={useMobileFilterSheet}
+        displayValue={
+          appliedCities.length > 0
+            ? appliedCities.length === 1
+              ? appliedCities[0]
+              : `${appliedCities.length} cities`
+            : undefined
+        }
+        active={appliedCities.length > 0}
+        aria-expanded={activeFilter?.type === 'city'}
+        onClick={() => openFilter('city')}
+      />
+
+      <PipelineFilterToolbarButton
+        icon={MapIcon}
+        iconTone="state"
+        label="State"
+        compact={useMobileFilterSheet}
+        displayValue={
+          appliedStates.length > 0
+            ? appliedStates.length === 1
+              ? appliedStates[0]
+              : `${appliedStates.length} states`
+            : undefined
+        }
+        active={appliedStates.length > 0}
+        aria-expanded={activeFilter?.type === 'state'}
+        onClick={() => openFilter('state')}
+      />
+
+      <PipelineFilterToolbarButton
+        icon={MailIcon}
+        iconTone="contact"
+        label="Contact"
+        compact={useMobileFilterSheet}
+        displayValue={CONTACT_FILTER_OPTIONS.find((o) => o.id === filters.contact)?.label}
+        active={Boolean(filters.contact && filters.contact !== 'any')}
+        aria-expanded={activeFilter?.type === 'contact'}
+        onClick={() => openFilter('contact')}
+      />
+
+      <PipelineFilterToolbarButton
+        variant="more"
+        iconTone="more"
+        label="More filters"
+        compact={useMobileFilterSheet}
+        active={activeFilter?.type === 'advanced' || advancedActiveCount > 0}
+        badgeCount={advancedActiveCount}
+        aria-expanded={activeFilter?.type === 'advanced'}
+        onClick={() => openFilter('advanced')}
+      />
     </>
   )
 
   return (
-    <div className="crm-toolbar crm-toolbar--hubspot pipeline-filter-labeled">
-      <div className="hs-filter-bar-top">
-        <div className="crm-search-wrap crm-search-wrap--hubspot hs-filter-search hs-filter-search--compact">
-          <svg className="crm-search-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
-            <path
-              fillRule="evenodd"
-              d="M8.5 3a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 8.5a6.5 6.5 0 1111.436 4.23l3.07 3.07a.75.75 0 11-1.06 1.06l-3.07-3.07A6.5 6.5 0 012 8.5z"
-              clipRule="evenodd"
-            />
-          </svg>
+    <div className="crm-toolbar crm-toolbar--hubspot pipeline-filter-labeled pipeline-filter-command-bar">
+      <div className="pipeline-filter-command-bar__shell">
+        <div className="pipeline-filter-command-bar__search">
+          <SearchIcon className="pipeline-filter-command-bar__search-icon" aria-hidden />
           <input
             id={PIPELINE_SEARCH_ID}
             type="search"
@@ -606,17 +548,23 @@ export default function PipelineFiltersBar({
                 handleApply()
               }
             }}
-            placeholder="Search name, email, phone… (comma = multiple names)"
-            className="crm-search-input crm-search-input--hubspot"
+            placeholder="Search name, email, phone…"
+            className="pipeline-filter-command-bar__search-input"
             aria-label="Search pipeline leads"
           />
+          {search ? (
+            <button
+              type="button"
+              className="pipeline-filter-command-bar__search-clear"
+              onClick={() => onSearchChange('')}
+              aria-label="Clear search"
+            >
+              ×
+            </button>
+          ) : null}
         </div>
 
-        <div
-          className={`hs-filter-icon-strip ${useMobileFilterSheet ? 'hs-filter-icon-strip--mobile-fill' : ''}`}
-          role="toolbar"
-          aria-label="Lead filters"
-        >
+        <div className="pipeline-filter-command-bar__filters" role="toolbar" aria-label="Lead filters">
           {filterToolbar}
         </div>
 
@@ -643,10 +591,30 @@ export default function PipelineFiltersBar({
           {renderFilterContent()}
         </PipelineMobileFilterSheet>
 
-        <span className="hs-filter-bar-spacer hidden sm:block" aria-hidden />
+        <div className="pipeline-filter-command-bar__meta">
+          <span className="pipeline-filter-command-bar__count">
+            {resultCount.toLocaleString()}
+            {totalCount && totalCount !== resultCount ? ` of ${totalCount.toLocaleString()}` : ''} leads
+          </span>
+          {filtersDirty ? (
+            <button type="button" className="pipeline-filter-command-bar__apply" onClick={handleApply} disabled={applying}>
+              {applying ? 'Applying…' : 'Apply filters'}
+            </button>
+          ) : null}
+        </div>
 
-        <button type="button" className="hs-filter-gear-btn shrink-0" onClick={onOpenViewSettings} aria-label="View settings">
-          <SettingsGearIcon className="w-4 h-4" />
+        <button
+          type="button"
+          className="pipeline-filter-pill pipeline-filter-pill--settings"
+          onClick={onOpenViewSettings}
+          aria-label="View settings"
+        >
+          <span className="pipeline-filter-pill__icon pipeline-filter-pill__icon--settings" aria-hidden>
+            <SettingsGearIcon className="pipeline-filter-pill__icon-svg" />
+          </span>
+          <span className="pipeline-filter-pill__body">
+            <span className="pipeline-filter-pill__label">View</span>
+          </span>
         </button>
       </div>
 

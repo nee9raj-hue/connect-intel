@@ -1,5 +1,329 @@
 /* Pipeline list view polish — June 2026 */
 
+/* ── Command bar (search + filter pills) ── */
+.pipeline-filter-command-bar {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 0.5rem;
+  padding-bottom: 0.65rem;
+}
+
+.pipeline-filter-command-bar__shell {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.65rem;
+  padding: 0.65rem 0.85rem;
+  margin: 0 1rem;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
+.pipeline-filter-command-bar__search {
+  position: relative;
+  flex: 1 1 220px;
+  min-width: min(100%, 200px);
+  max-width: 380px;
+}
+
+.pipeline-filter-command-bar__search-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1rem;
+  height: 1rem;
+  color: #007c89;
+  pointer-events: none;
+}
+
+.pipeline-filter-command-bar__search-input {
+  width: 100%;
+  min-height: 2.5rem;
+  padding: 0.5rem 2rem 0.5rem 2.35rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #0f172a;
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.pipeline-filter-command-bar__search-input::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+.pipeline-filter-command-bar__search-input:focus {
+  outline: none;
+  border-color: #007c89;
+  box-shadow: 0 0 0 3px rgba(0, 124, 137, 0.12);
+}
+
+.pipeline-filter-command-bar__search-clear {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1.35rem;
+  height: 1.35rem;
+  border: none;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.pipeline-filter-command-bar__search-clear:hover {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.pipeline-filter-command-bar__filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.pipeline-filter-command-bar__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.pipeline-filter-command-bar__count {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.pipeline-filter-command-bar__apply {
+  padding: 0.35rem 0.75rem;
+  border: none;
+  border-radius: 8px;
+  background: #007c89;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.pipeline-filter-command-bar__apply:hover:not(:disabled) {
+  background: #006570;
+}
+
+.pipeline-filter-command-bar__apply:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+/* Filter pills */
+.pipeline-filter-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.5rem;
+  padding: 0.35rem 0.55rem 0.35rem 0.4rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.12s;
+}
+
+.pipeline-filter-pill:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+}
+
+.pipeline-filter-pill.is-active {
+  border-color: #99d5db;
+  background: #f0fafb;
+  box-shadow: 0 0 0 1px rgba(0, 124, 137, 0.08);
+}
+
+.pipeline-filter-pill.is-compact {
+  min-height: 2.25rem;
+  padding: 0.3rem 0.45rem 0.3rem 0.35rem;
+}
+
+.pipeline-filter-pill--more {
+  border-style: dashed;
+  background: #fafbfc;
+}
+
+.pipeline-filter-pill--more.is-active {
+  border-style: solid;
+}
+
+.pipeline-filter-pill--settings {
+  flex-shrink: 0;
+  padding-right: 0.65rem;
+}
+
+.pipeline-filter-pill__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 8px;
+  flex-shrink: 0;
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.pipeline-filter-pill__icon-svg {
+  width: 0.9375rem;
+  height: 0.9375rem;
+}
+
+.pipeline-filter-pill--tone-owner .pipeline-filter-pill__icon {
+  background: #eef2ff;
+  color: #4338ca;
+}
+
+.pipeline-filter-pill--tone-status .pipeline-filter-pill__icon {
+  background: #f0fafb;
+  color: #007c89;
+}
+
+.pipeline-filter-pill--tone-city .pipeline-filter-pill__icon {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.pipeline-filter-pill--tone-state .pipeline-filter-pill__icon {
+  background: #e0f2fe;
+  color: #0284c7;
+}
+
+.pipeline-filter-pill--tone-contact .pipeline-filter-pill__icon {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.pipeline-filter-pill--tone-more .pipeline-filter-pill__icon {
+  background: #f8fafc;
+  color: #64748b;
+}
+
+.pipeline-filter-pill__icon--settings {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.pipeline-filter-pill__body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.05rem;
+  min-width: 0;
+  max-width: 120px;
+}
+
+.pipeline-filter-pill.is-compact .pipeline-filter-pill__body {
+  max-width: 72px;
+}
+
+.pipeline-filter-pill__label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+  line-height: 1.2;
+}
+
+.pipeline-filter-pill.is-active .pipeline-filter-pill__label {
+  color: #007c89;
+}
+
+.pipeline-filter-pill__value {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #0f172a;
+  line-height: 1.2;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pipeline-filter-pill__chevron {
+  width: 0.75rem;
+  height: 0.75rem;
+  flex-shrink: 0;
+  color: #94a3b8;
+  margin-left: 0.1rem;
+}
+
+.pipeline-filter-pill__badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 1rem;
+  height: 1rem;
+  padding: 0 0.25rem;
+  border-radius: 999px;
+  background: #007c89;
+  color: #fff;
+  font-size: 0.625rem;
+  font-weight: 800;
+  line-height: 1rem;
+  text-align: center;
+}
+
+@media (max-width: 767px) {
+  .pipeline-filter-command-bar__shell {
+    margin: 0 0.65rem;
+    padding: 0.55rem 0.65rem;
+  }
+
+  .pipeline-filter-command-bar__search {
+    flex: 1 1 100%;
+    max-width: none;
+  }
+
+  .pipeline-filter-command-bar__filters {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 2px;
+  }
+
+  .pipeline-filter-command-bar__filters::-webkit-scrollbar {
+    display: none;
+  }
+
+  .pipeline-filter-command-bar__meta {
+    order: 10;
+    width: 100%;
+    margin-left: 0;
+    justify-content: space-between;
+  }
+
+  .pipeline-filter-pill--settings .pipeline-filter-pill__body {
+    display: none;
+  }
+}
+
 .pipeline-v2-header {
   padding: 12px 16px 8px;
   border-bottom: 0.5px solid var(--brand-border, rgba(0, 0, 0, 0.09));
