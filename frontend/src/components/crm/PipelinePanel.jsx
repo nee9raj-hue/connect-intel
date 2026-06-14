@@ -2034,7 +2034,7 @@ function KanbanColumn({
                   {getLeadEmail(lead) ? (
                     <div className="mt-1 flex items-center gap-1 min-w-0">
                       <EmailValidationIcon lead={lead} />
-                      <span className="text-sm text-[#33475b] truncate">{getLeadEmail(lead)}</span>
+                      <span className="text-sm pipeline-hs-email-text truncate">{getLeadEmail(lead)}</span>
                     </div>
                   ) : null}
                   {lead.phone && leadHasCallablePhone(lead.phone) ? (

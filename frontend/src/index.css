@@ -2733,6 +2733,18 @@ textarea {
   white-space: nowrap;
 }
 
+/* Email column — blue text distinguishes addresses from other lead fields */
+.pipeline-hs-td--email .pipeline-hs-cell-text,
+.pipeline-hs-email-text {
+  color: #2563eb;
+  font-weight: 500;
+}
+
+.pipeline-hs-td--email a.pipeline-hs-cell-text:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
 .pipeline-hs-ext {
   font-size: 0.7rem;
   opacity: 0.85;
