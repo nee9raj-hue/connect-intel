@@ -49,8 +49,6 @@ export default function PipelineFiltersBar({
   onStatusFilterChange,
   statusOptions = [],
   resultCount = 0,
-  totalCount = 0,
-  pipelineTotal = 0,
   onSelectAllFiltered,
   hasActiveFilters = false,
   onClearFilters,
@@ -589,17 +587,13 @@ export default function PipelineFiltersBar({
           {renderFilterContent()}
         </PipelineMobileFilterSheet>
 
-        <div className="pipeline-filter-command-bar__meta">
-          <span className="pipeline-filter-command-bar__count">
-            {resultCount.toLocaleString()}
-            {totalCount && totalCount !== resultCount ? ` of ${totalCount.toLocaleString()}` : ''} leads
-          </span>
-          {filtersDirty ? (
+        {filtersDirty ? (
+          <div className="pipeline-filter-command-bar__meta">
             <button type="button" className="pipeline-filter-command-bar__apply" onClick={handleApply} disabled={applying}>
               {applying ? 'Applying…' : 'Apply filters'}
             </button>
-          ) : null}
-        </div>
+          </div>
+        ) : null}
       </div>
 
       <div className="hs-filter-bar-meta flex flex-wrap items-center gap-2 px-0 pt-0.5 pb-0.5 lg:hidden">

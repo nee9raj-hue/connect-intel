@@ -1429,12 +1429,6 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               onStatusFilterChange={setListStatusFilter}
               statusOptions={columns}
               resultCount={filtered.length}
-              totalCount={
-                serverSidePipeline && hasActiveServerFilters
-                  ? pipelineLoad.total || filtered.length
-                  : scopedLeads.length
-              }
-              pipelineTotal={pipelineSummary.total}
               onSelectAllFiltered={selectAllFiltered}
               hasActiveFilters={activeFilterCount > 0 || filter !== 'all' || listStatusFilter !== 'all'}
               onClearFilters={resetAllPipelineFilters}

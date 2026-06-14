@@ -101,14 +101,6 @@
   flex-shrink: 0;
 }
 
-.pipeline-filter-command-bar__count {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #64748b;
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-}
-
 .pipeline-filter-command-bar__apply {
   padding: 0.35rem 0.75rem;
   border: none;
