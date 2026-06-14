@@ -8,7 +8,7 @@ import {
   getVisiblePipelineColumnsForSettings,
   pipelinesFromSettings,
 } from '../../lib/crmPipelines'
-import { PipelineIcon, PlusIcon, UploadIcon } from '../ui/icons'
+import { PipelineIcon, PlusIcon, SettingsGearIcon, UploadIcon } from '../ui/icons'
 import LeadWorkspace from './LeadWorkspace'
 import PipelineImportModal from './PipelineImportModal'
 import BulkEmailModal from './BulkEmailModal'
@@ -1358,6 +1358,15 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               ) : null}
               <button
                 type="button"
+                onClick={() => setViewSettingsOpen(true)}
+                className="pipeline-v2-btn-view"
+                aria-label="View settings"
+              >
+                <SettingsGearIcon className="pipeline-action-btn__icon w-4 h-4" aria-hidden />
+                <span>View</span>
+              </button>
+              <button
+                type="button"
                 onClick={() => setImportOpen(true)}
                 className="pipeline-v2-btn-import"
                 aria-label="Import leads"
@@ -1431,7 +1440,6 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               orgLeadTags={orgLeadTags}
               stageListMode={stageListMode}
               onRemoveAppliedFilter={removeAppliedFilter}
-              onOpenViewSettings={() => setViewSettingsOpen(true)}
               canSaveAsAudience={canSaveAsAudience}
               onSaveAsAudience={() => setSaveFilterAudienceOpen(true)}
               canShowOwnerFilter={canFilterByOwner}

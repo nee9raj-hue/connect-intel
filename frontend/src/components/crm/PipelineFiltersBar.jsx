@@ -15,7 +15,6 @@ import {
   MapPinIcon,
   PeopleIcon,
   SearchIcon,
-  SettingsGearIcon,
 } from '../ui/icons'
 
 const SMART_TAG_OPTIONS = [
@@ -60,7 +59,6 @@ export default function PipelineFiltersBar({
   orgLeadTags = [],
   stageListMode = false,
   onRemoveAppliedFilter,
-  onOpenViewSettings,
   canSaveAsAudience = false,
   onSaveAsAudience,
   canShowOwnerFilter = false,
@@ -602,20 +600,6 @@ export default function PipelineFiltersBar({
             </button>
           ) : null}
         </div>
-
-        <button
-          type="button"
-          className="pipeline-filter-pill pipeline-filter-pill--settings"
-          onClick={onOpenViewSettings}
-          aria-label="View settings"
-        >
-          <span className="pipeline-filter-pill__icon pipeline-filter-pill__icon--settings" aria-hidden>
-            <SettingsGearIcon className="pipeline-filter-pill__icon-svg" />
-          </span>
-          <span className="pipeline-filter-pill__body">
-            <span className="pipeline-filter-pill__label">View</span>
-          </span>
-        </button>
       </div>
 
       <div className="hs-filter-bar-meta flex flex-wrap items-center gap-2 px-0 pt-0.5 pb-0.5 lg:hidden">
