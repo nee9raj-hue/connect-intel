@@ -243,14 +243,28 @@ export function AppProvider({ children }) {
   const refreshSavedLeads = useCallback(
     async () => {
       try {
-        const bootstrap = await api.getPipelineBootstrap({ offset: 0, limit: 100, silent: false })
+        const assigneeUserId =
+          pipelineAssigneeFilter || loadPipelineAssigneeFilter() || undefined
+        const bootstrap = await api.getPipelineBootstrap({
+          offset: 0,
+          limit: 100,
+          silent: false,
+          assigneeUserId,
+        })
         const leads = bootstrap.leads || []
         const summary = bootstrap.summary || {}
-        setPipelineSummary(normalizePipelineSummary(summary))
+        // Keep org-wide sidebar counts when an owner filter is active.
+        if (!assigneeUserId) {
+          setPipelineSummary(normalizePipelineSummary(summary))
+        }
         setSavedLeads(leads)
         setSessionError(null)
         setPipelineLoad({
-          total: summary.total ?? bootstrap.pipelineTotal ?? leads.length,
+          total:
+            bootstrap.total ??
+            bootstrap.pipelineTotal ??
+            (assigneeUserId ? leads.length : summary.total) ??
+            leads.length,
           loaded: leads.length,
           hasMore: Boolean(bootstrap.hasMore),
           loadingMore: false,
@@ -266,7 +280,7 @@ export function AppProvider({ children }) {
         return null
       }
     },
-    []
+    [pipelineAssigneeFilter]
   )
 
   const mergeNotificationItems = useCallback((newItems) => {
@@ -530,11 +544,16 @@ export function AppProvider({ children }) {
 
   useEffect(() => {
     if (!user?.id || !pipelineAssigneeFilter) return
+    if (pipelineAssigneeFilter === '__unassigned__') return
+    const isOrgAdmin = Boolean(
+      (user.isOrgAdmin || user.orgRole === 'org_admin') && user.accountType === 'company'
+    )
+    if (isOrgAdmin) return
     const allowed = new Set([String(user.id), ...teamMembers.map((m) => String(m.userId))])
     if (!allowed.has(String(pipelineAssigneeFilter))) {
       setPipelineAssigneeFilter(null)
     }
-  }, [user?.id, teamMembers, pipelineAssigneeFilter, setPipelineAssigneeFilter])
+  }, [user?.id, user?.isOrgAdmin, user?.orgRole, user?.accountType, teamMembers, pipelineAssigneeFilter, setPipelineAssigneeFilter])
 
   const acceptPendingInvite = useCallback(async () => {
     const token = getStoredInviteToken()

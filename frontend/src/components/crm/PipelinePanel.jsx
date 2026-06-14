@@ -510,11 +510,15 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     [canFilterByOwner, setPipelineAssigneeFilter]
   )
 
+  const serverSidePipeline = pipelineSummary.total > 120
+
   const scopedLeads = useMemo(() => {
     const base = marketingSliceLeads ?? pipelineScopedLeads
     if (!effectiveAssigneeFilter) return base
+    // Large orgs fetch owner-scoped pages from the server; client re-filter drops rows after unfiltered refreshes.
+    if (serverSidePipeline) return base
     return base.filter((l) => leadMatchesAssignee(l, effectiveAssigneeFilter))
-  }, [marketingSliceLeads, pipelineScopedLeads, effectiveAssigneeFilter])
+  }, [marketingSliceLeads, pipelineScopedLeads, effectiveAssigneeFilter, serverSidePipeline])
 
   const locationOptions = useMemo(() => {
     const fromLoaded = collectLocationOptions(scopedLeads)
@@ -536,7 +540,6 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const [smartViewId, setSmartViewId] = useState(null)
   const [smartViewFilters, setSmartViewFilters] = useState({})
 
-  const serverSidePipeline = pipelineSummary.total > 120
   const [boardLeadsByStatus, setBoardLeadsByStatus] = useState(null)
   const [boardColumnTotals, setBoardColumnTotals] = useState({})
   const [boardColumnLimits, setBoardColumnLimits] = useState({})
