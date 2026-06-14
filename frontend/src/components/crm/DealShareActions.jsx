@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { formatDealShareContent } from '../../lib/dealShareFormat'
 import { leadHasCallablePhone, openWhatsAppChat } from '../../lib/phoneUtils'
+import { CopyIcon, MailIcon, WhatsAppIcon } from '../ui/icons'
+import { LwBtn, LwField, LwInput, LwTextarea } from './leadWorkspaceUi'
 
 function leadHasEmail(lead) {
   const email = String(lead?.email || '').trim()
@@ -8,7 +10,7 @@ function leadHasEmail(lead) {
   return email.includes('@')
 }
 
-/** Copy, email (with CC), and WhatsApp share for a CRM deal. */
+/** Copy, email, and WhatsApp share for a deal — icon bar. */
 export default function DealShareActions({
   deal,
   lead,
@@ -40,30 +42,24 @@ export default function DealShareActions({
   const hasEmail = leadHasEmail(lead)
   const hasPhone = leadHasCallablePhone(lead)
 
-  const openEmail = () => {
-    setSubject(share.subject)
-    setBody(share.plainText)
-    setShowEmail((v) => !v)
-  }
-
   const copyDeal = async () => {
     try {
       await navigator.clipboard.writeText(share.plainText)
       setCopied(true)
-      onNotice?.('Deal copied to clipboard')
+      onNotice?.('Copied')
       setTimeout(() => setCopied(false), 2500)
     } catch {
-      onError?.('Could not copy — try selecting the text manually')
+      onError?.('Could not copy')
     }
   }
 
   const sendEmail = async () => {
     if (!hasEmail) {
-      onError?.('This contact has no email address on file')
+      onError?.('No email on contact')
       return
     }
     if (!subject.trim() || !body.trim()) {
-      onError?.('Subject and message are required')
+      onError?.('Subject and message required')
       return
     }
     if (sending || busy) return
@@ -75,10 +71,10 @@ export default function DealShareActions({
         body: body.trim(),
         cc: cc.trim(),
       })
-      onNotice?.('Deal shared by email and logged in CRM')
+      onNotice?.('Email sent')
       setShowEmail(false)
     } catch (e) {
-      onError?.(e.message || 'Could not send email')
+      onError?.(e.message || 'Could not send')
     } finally {
       setSending(false)
     }
@@ -86,14 +82,14 @@ export default function DealShareActions({
 
   const shareWhatsApp = () => {
     if (!hasPhone) {
-      onError?.('This contact has no phone number for WhatsApp')
+      onError?.('No phone on contact')
       return
     }
     if (!openWhatsAppChat(lead.phone, share.plainText)) {
-      onError?.('Invalid phone number for WhatsApp')
+      onError?.('Invalid phone')
       return
     }
-    onNotice?.('WhatsApp opened — send the pre-filled deal summary')
+    onNotice?.('WhatsApp opened')
     void patchLead(lead.id, {
       activity: {
         type: 'whatsapp',
@@ -104,78 +100,61 @@ export default function DealShareActions({
   }
 
   return (
-    <div className="border-t border-gray-100 pt-2 space-y-2">
-      <div className="flex flex-wrap items-center gap-1.5">
-        <span className="text-[10px] font-semibold uppercase text-gray-400 mr-0.5">Share</span>
+    <div className="lw-deal-share">
+      <div className="lw-deal-share__bar">
         <button
           type="button"
           disabled={busy}
           onClick={copyDeal}
-          className="px-2 py-1 rounded-lg text-[10px] font-semibold border border-gray-200 text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+          className={`lw-deal-share__btn ${copied ? 'is-copied' : ''}`}
+          title="Copy deal summary"
+          aria-label="Copy"
         >
-          {copied ? 'Copied ✓' : 'Copy'}
+          <CopyIcon aria-hidden />
         </button>
         <button
           type="button"
           disabled={busy || !hasEmail}
-          onClick={openEmail}
-          title={hasEmail ? 'Send deal summary by email' : 'No email on contact'}
-          className="px-2 py-1 rounded-lg text-[10px] font-semibold border border-indigo-200 text-indigo-800 bg-indigo-50/60 hover:bg-indigo-50 disabled:opacity-40"
+          onClick={() => setShowEmail((v) => !v)}
+          className="lw-deal-share__btn lw-deal-share__btn--email"
+          title={hasEmail ? 'Email deal' : 'No email'}
+          aria-label="Email"
         >
-          Email
+          <MailIcon aria-hidden />
         </button>
         <button
           type="button"
           disabled={busy || !hasPhone}
           onClick={shareWhatsApp}
-          title={hasPhone ? 'Share via WhatsApp' : 'No phone on contact'}
-          className="px-2 py-1 rounded-lg text-[10px] font-semibold border border-green-200 text-green-800 bg-green-50/60 hover:bg-green-50 disabled:opacity-40"
+          className="lw-deal-share__btn lw-deal-share__btn--wa"
+          title={hasPhone ? 'WhatsApp' : 'No phone'}
+          aria-label="WhatsApp"
         >
-          WhatsApp
+          <WhatsAppIcon aria-hidden />
         </button>
       </div>
 
       {showEmail && (
-        <div className="rounded-lg border border-indigo-100 bg-indigo-50/30 p-2.5 space-y-2">
-          <p className="text-[10px] text-gray-600">
-            Sends to <strong>{lead.email}</strong>
-            {cc.trim() ? ' with CC recipients' : ''}. Connect work email under Workspace if send is disabled.
-          </p>
-          <input
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
-            placeholder="Subject"
-            className="w-full text-xs border rounded-lg px-2 py-1.5 bg-white"
-          />
-          <input
-            value={cc}
-            onChange={(e) => setCc(e.target.value)}
-            placeholder="CC — comma-separated emails"
-            className="w-full text-xs border rounded-lg px-2 py-1.5 bg-white"
-          />
-          <textarea
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            rows={10}
-            className="w-full text-xs border rounded-lg px-2 py-1.5 bg-white font-mono leading-relaxed"
-          />
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              disabled={sending || busy}
-              onClick={sendEmail}
-              className="px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-indigo-600 text-white disabled:opacity-50"
-            >
-              {sending ? 'Sending…' : 'Send email'}
-            </button>
-            <button
-              type="button"
-              disabled={sending}
-              onClick={() => setShowEmail(false)}
-              className="px-2.5 py-1.5 rounded-lg text-[11px] font-semibold border border-gray-300 text-gray-600"
-            >
+        <div className="lw-deal-share__panel">
+          <LwField label="To">
+            <LwInput value={lead.email || ''} readOnly disabled />
+          </LwField>
+          <LwField label="Subject">
+            <LwInput value={subject} onChange={(e) => setSubject(e.target.value)} />
+          </LwField>
+          <LwField label="Cc">
+            <LwInput value={cc} onChange={(e) => setCc(e.target.value)} placeholder="Optional" />
+          </LwField>
+          <LwField label="Message">
+            <LwTextarea value={body} onChange={(e) => setBody(e.target.value)} rows={6} />
+          </LwField>
+          <div className="lw-btn-row">
+            <LwBtn variant="primary" onClick={sendEmail} disabled={sending || busy}>
+              {sending ? 'Sending…' : 'Send'}
+            </LwBtn>
+            <LwBtn variant="secondary" onClick={() => setShowEmail(false)} disabled={sending}>
               Cancel
-            </button>
+            </LwBtn>
           </div>
         </div>
       )}

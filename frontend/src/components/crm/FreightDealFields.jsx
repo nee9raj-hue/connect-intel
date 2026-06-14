@@ -12,9 +12,12 @@ import {
   TRANSPORT_MODE_OPTIONS,
 } from '../../lib/freightDeal'
 import CourierContractFields, { formatCourierSummary } from './CourierContractFields'
+import { CheckIcon, RouteIcon, TeamIcon } from '../ui/icons'
+
+const FREIGHT_TYPE_OPTIONS = FREIGHT_CUSTOMER_TYPES.filter((t) => t.id !== 'mixed')
 
 function FieldLabel({ children }) {
-  return <p className="text-[10px] font-semibold uppercase text-gray-500 mb-1">{children}</p>
+  return <span className="lw-field__label">{children}</span>
 }
 
 function LocationBlock({ title, side, freight, onChange, disabled }) {
@@ -97,17 +100,10 @@ function LocationBlock({ title, side, freight, onChange, disabled }) {
 
 function SpotRfqSection({ freight, onChange, disabled, compact, boxes, setBoxes, updateBox, addBox, removeBox }) {
   return (
-    <div className={`space-y-2 ${compact ? '' : 'border rounded-lg p-2.5 bg-indigo-50/30 border-indigo-100'}`}>
-      {!compact && (
-        <div>
-          <p className="text-[10px] font-semibold uppercase text-indigo-700">Spot cargo RFQ</p>
-          <p className="text-[10px] text-indigo-600/80 mt-0.5">Shipment lanes, cargo specs, and declared invoice value.</p>
-        </div>
-      )}
-
+    <div className={`space-y-2 lw-freight-fields ${compact ? '' : 'border rounded-lg p-2.5 bg-indigo-50/20 border-indigo-100'}`}>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         <div>
-          <FieldLabel>Invoice amount (₹)</FieldLabel>
+          <FieldLabel>Invoice (₹)</FieldLabel>
           <input
             type="number"
             min={0}
@@ -120,14 +116,9 @@ function SpotRfqSection({ freight, onChange, disabled, compact, boxes, setBoxes,
                 invoiceAmount: e.target.value === '' ? null : Number(e.target.value),
               })
             }
-            placeholder="Declared value for customs"
-            className="w-full text-xs border rounded-lg px-2 py-1.5 bg-white"
+            placeholder="Declared value"
+            className="lw-input w-full"
           />
-        </div>
-        <div className="flex items-end">
-          <p className="text-[10px] text-gray-500 leading-snug pb-2">
-            Freight charges for this shipment are recorded separately as the deal amount below.
-          </p>
         </div>
       </div>
 
@@ -365,32 +356,31 @@ export default function FreightDealFields({ freight, onChange, disabled = false,
   const setCourier = (courier) => onChange({ ...data, courier })
 
   return (
-    <div className="space-y-3">
-      <div className={compact ? '' : 'border rounded-lg p-2.5 bg-white border-gray-200'}>
-        <FieldLabel>Opportunity type</FieldLabel>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-1">
-          {FREIGHT_CUSTOMER_TYPES.map((type) => {
-            const active = customerType === type.id
-            return (
-              <button
-                key={type.id}
-                type="button"
-                disabled={disabled}
-                onClick={() => setCustomerType(type.id)}
-                className={`text-left rounded-xl border px-2.5 py-2 transition-colors ${
-                  active
-                    ? 'border-[#FF773D] bg-[#fff8f4] ring-1 ring-[#ffd4b8]'
-                    : 'border-gray-200 bg-gray-50 hover:border-gray-300'
-                } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-              >
-                <p className={`text-xs font-semibold ${active ? 'text-[#c44f0f]' : 'text-gray-900'}`}>
-                  {type.label}
-                </p>
-                <p className="text-[10px] text-gray-500 mt-0.5 leading-snug">{type.description}</p>
-              </button>
-            )
-          })}
-        </div>
+    <div className="space-y-3 lw-freight-fields">
+      <FieldLabel>Type</FieldLabel>
+      <div className="lw-freight-type">
+        {FREIGHT_TYPE_OPTIONS.map((type) => {
+          const active = customerType === type.id
+          const Icon = type.id === 'courier' ? TeamIcon : RouteIcon
+          return (
+            <button
+              key={type.id}
+              type="button"
+              disabled={disabled}
+              onClick={() => setCustomerType(type.id)}
+              className={`lw-freight-type__opt ${active ? 'is-active' : ''}`}
+              aria-pressed={active}
+            >
+              <span className="lw-freight-type__icon">
+                <Icon aria-hidden />
+              </span>
+              <span className="lw-freight-type__label">{type.label}</span>
+              <span className="lw-freight-type__check">
+                <CheckIcon aria-hidden />
+              </span>
+            </button>
+          )
+        })}
       </div>
 
       {showsCourierFields(customerType) && (
@@ -453,8 +443,6 @@ function transportModeLabel(mode) {
 }
 
 export function freightDealCreateLabel(customerType) {
-  const meta = getFreightCustomerTypeMeta(customerType)
   if (customerType === 'courier') return 'Create courier deal'
-  if (customerType === 'mixed') return 'Create mixed deal'
   return 'Create RFQ deal'
 }

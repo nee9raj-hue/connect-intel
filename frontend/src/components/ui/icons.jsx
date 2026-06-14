@@ -337,6 +337,35 @@ export function CloseIcon({ className }) {
   )
 }
 
+export function CheckIcon({ className }) {
+  return (
+    <LineIcon className={className}>
+      <path d="m6 12.5 3.5 3.5L18 7" />
+    </LineIcon>
+  )
+}
+
+export function CopyIcon({ className }) {
+  return (
+    <LineIcon className={className}>
+      <rect x="8" y="8" width="11" height="13" rx="1.5" />
+      <path d="M6 16H5a1.5 1.5 0 0 1-1.5-1.5V5A1.5 1.5 0 0 1 5 3.5h9.5A1.5 1.5 0 0 1 16 5v1" />
+    </LineIcon>
+  )
+}
+
+export function TrashIcon({ className }) {
+  return (
+    <LineIcon className={className}>
+      <path d="M5 7h14" />
+      <path d="M10 11v5" />
+      <path d="M14 11v5" />
+      <path d="M7 7l.75-2h8.5L17 7" />
+      <path d="M8 7v11.5h8V7" />
+    </LineIcon>
+  )
+}
+
 export function UploadIcon({ className }) {
   return (
     <LineIcon className={className}>

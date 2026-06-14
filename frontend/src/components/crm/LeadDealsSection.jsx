@@ -11,6 +11,30 @@ import { emptyFreightRfq, isFreightDealOrg } from '../../lib/freightDeal'
 import FreightDealFields, { formatFreightSummary, freightDealCreateLabel } from './FreightDealFields'
 import { getFreightCustomerTypeMeta } from '../../lib/freightDeal'
 import DealShareActions from './DealShareActions'
+import {
+  LwField,
+  LwFormStack,
+  LwInput,
+  LwNotice,
+  LwSelect,
+  LwSubmitBtn,
+} from './leadWorkspaceUi'
+import {
+  CalendarIcon,
+  CheckIcon,
+  ChevronRightIcon,
+  CloseIcon,
+  CopyIcon,
+  PipelineIcon,
+  PlusIcon,
+  RouteIcon,
+  TrashIcon,
+} from '../ui/icons'
+
+function stageBadgeClass(stage, freightOrg) {
+  const meta = getDealStageMeta(stage, { freightOrg })
+  return meta.color || 'bg-gray-50 text-gray-700 border-gray-200'
+}
 
 function DealRow({
   deal,
@@ -34,7 +58,6 @@ function DealRow({
   const [showFreight, setShowFreight] = useState(false)
   const [freightDraft, setFreightDraft] = useState(deal.freight || emptyFreightRfq())
   const [nameDraft, setNameDraft] = useState(deal.name || '')
-  const meta = getDealStageMeta(deal.stage, { freightOrg })
   const closed = isClosedDealStage(deal.stage)
   const stageOptions = getDealStagesForFreight(freightOrg)
   const typeMeta = getFreightCustomerTypeMeta(deal.freight?.customerType)
@@ -55,55 +78,106 @@ function DealRow({
     onUpdate(deal.id, { name: next })
   }
 
-  const deleteLabel = freightOrg && deal.stage === 'rfq' ? 'Delete RFQ' : 'Delete deal'
-
   return (
-    <li className={`text-xs border rounded-lg p-2.5 space-y-2 ${closed ? 'opacity-80 bg-gray-50' : 'bg-white'}`}>
-      <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0 flex-1">
-          <label className="text-[10px] font-semibold uppercase text-gray-400 block mb-0.5">
-            Deal name
-          </label>
+    <li className={`lw-deal-card ${closed ? 'is-closed' : ''}`}>
+      <div className="lw-deal-card__head">
+        <div className="lw-deal-card__main">
           <input
             value={nameDraft}
             disabled={busy}
             onChange={(e) => setNameDraft(e.target.value)}
             onBlur={saveName}
-            className="w-full text-xs font-semibold text-gray-900 border rounded-lg px-2 py-1 bg-white"
+            className="lw-deal-card__name"
+            aria-label="Deal name"
           />
-          <div className="flex flex-wrap items-center gap-1 mt-1">
-            <span className={`inline-block px-1.5 py-0.5 rounded border text-[10px] font-semibold uppercase ${meta.color}`}>
-              {meta.label}
+          <div className="lw-deal-card__meta">
+            <span className={`lw-deal-card__stage ${stageBadgeClass(deal.stage, freightOrg)}`}>
+              {getDealStageMeta(deal.stage, { freightOrg }).label}
             </span>
             {freightOrg && deal.freight?.customerType && deal.freight.customerType !== 'spot_rfq' && (
-              <span className="inline-block px-1.5 py-0.5 rounded border text-[10px] font-semibold uppercase bg-[#fff4ee] text-[#c05621] border-[#ffd4b8]">
-                {typeMeta.shortLabel}
-              </span>
+              <span className="lw-deal-card__type">{typeMeta.shortLabel}</span>
             )}
           </div>
         </div>
-        <div className="shrink-0 text-right space-y-1 max-w-[9.5rem]">
-          {deal.amount != null && deal.amount > 0 && (
-            <p className="font-semibold text-gray-900">{formatDealValue(deal.amount, deal.currency)}</p>
+        <div className="lw-deal-card__amount">
+          {deal.amount != null && deal.amount > 0 ? (
+            <div className="lw-deal-card__amount-value">{formatDealValue(deal.amount, deal.currency)}</div>
+          ) : (
+            <div className="lw-deal-card__amount-sub">No amount</div>
           )}
-          {freightOrg && deal.freight?.invoiceAmount != null && deal.freight.invoiceAmount > 0 && (
-            <p className="text-[10px] text-gray-500">
-              Invoice {formatDealValue(deal.freight.invoiceAmount, deal.currency)}
-            </p>
+          {freightOrg && deal.freight?.invoiceAmount > 0 && (
+            <div className="lw-deal-card__amount-sub">
+              Inv {formatDealValue(deal.freight.invoiceAmount, deal.currency)}
+            </div>
           )}
-          {!confirmDelete ? (
+        </div>
+      </div>
+
+      {freightOrg && freightSummary && (
+        <div className="lw-deal-card__route">
+          <RouteIcon aria-hidden />
+          <span>{freightSummary}</span>
+        </div>
+      )}
+
+      {!closed && (
+        <>
+          <div className="lw-deal-card__controls">
+            <LwSelect
+              value={deal.stage}
+              disabled={busy}
+              onChange={(e) => onUpdate(deal.id, { stage: e.target.value })}
+              aria-label="Stage"
+            >
+              {stageOptions.filter((s) => !isClosedDealStage(s.id)).map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.label}
+                </option>
+              ))}
+            </LwSelect>
+            <LwInput
+              type="number"
+              min={0}
+              defaultValue={deal.amount ?? ''}
+              disabled={busy}
+              placeholder={freightOrg ? 'Freight ₹' : 'Amount ₹'}
+              aria-label="Amount"
+              onBlur={(e) => {
+                const val = e.target.value === '' ? null : Number(e.target.value)
+                if (val !== deal.amount) onUpdate(deal.id, { amount: val })
+              }}
+            />
+          </div>
+
+          <div className="lw-deal-card__actions">
+            <button type="button" disabled={busy} onClick={() => onWon(deal.id)} className="lw-deal-action lw-deal-action--won">
+              <CheckIcon aria-hidden />
+              Won
+            </button>
             <button
               type="button"
               disabled={busy}
-              onClick={() => setConfirmDelete(true)}
-              className="px-2 py-0.5 rounded-md text-[10px] font-semibold border border-red-200 text-red-700 bg-red-50/80 hover:bg-red-50"
+              onClick={() => setShowLost((v) => !v)}
+              className="lw-deal-action lw-deal-action--lost"
             >
-              {deleteLabel}
+              <CloseIcon aria-hidden />
+              Lost
             </button>
-          ) : (
-            <div className="flex flex-col items-end gap-1">
-              <span className="text-[10px] text-red-700 leading-tight">Delete permanently?</span>
-              <div className="flex flex-wrap justify-end gap-1">
+            <button type="button" disabled={busy} onClick={() => onDuplicate(deal.id)} className="lw-deal-action lw-deal-action--icon" title="Duplicate">
+              <CopyIcon aria-hidden />
+            </button>
+            {!confirmDelete ? (
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => setConfirmDelete(true)}
+                className="lw-deal-action lw-deal-action--danger lw-deal-action--icon"
+                title="Delete"
+              >
+                <TrashIcon aria-hidden />
+              </button>
+            ) : (
+              <>
                 <button
                   type="button"
                   disabled={busy}
@@ -111,137 +185,26 @@ function DealRow({
                     onDelete(deal.id)
                     setConfirmDelete(false)
                   }}
-                  className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-red-600 text-white"
+                  className="lw-deal-action lw-deal-action--danger"
                 >
-                  Yes
+                  Confirm delete
                 </button>
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={() => setConfirmDelete(false)}
-                  className="px-2 py-0.5 rounded-md text-[10px] font-semibold border border-gray-300 text-gray-600"
-                >
-                  No
+                <button type="button" disabled={busy} onClick={() => setConfirmDelete(false)} className="lw-deal-action">
+                  Cancel
                 </button>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {freightOrg && freightSummary && (
-        <p className="text-gray-600 bg-indigo-50/60 border border-indigo-100 rounded px-2 py-1">{freightSummary}</p>
-      )}
-      {freightOrg && deal.freight?.rfqDetails && (
-        <p className="text-gray-600 whitespace-pre-wrap">{deal.freight.rfqDetails}</p>
-      )}
-
-      {deal.expectedCloseDate && (
-        <p className="text-gray-500">Close: {new Date(deal.expectedCloseDate).toLocaleDateString()}</p>
-      )}
-      {deal.lostReason && <p className="text-gray-500">Lost reason: {deal.lostReason}</p>}
-      {deal.notes && <p className="text-gray-600 whitespace-pre-wrap">{deal.notes}</p>}
-
-      {freightOrg && (
-        <div>
-          <button
-            type="button"
-            disabled={busy}
-            onClick={() => {
-              setFreightDraft(deal.freight || emptyFreightRfq())
-              setShowFreight((v) => !v)
-            }}
-            className="text-[11px] font-semibold text-indigo-700"
-          >
-            {showFreight ? 'Hide RFQ details' : deal.freight ? 'Edit RFQ details' : 'Add RFQ details'}
-          </button>
-          {showFreight && (
-            <div className="mt-2 space-y-2">
-              <FreightDealFields freight={freightDraft} onChange={setFreightDraft} disabled={busy} compact />
-              {!closed && (
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={saveFreight}
-                  className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-indigo-600 text-white disabled:opacity-50"
-                >
-                  Save RFQ
-                </button>
-              )}
-            </div>
-          )}
-        </div>
-      )}
-
-      {!closed && (
-        <>
-          <div className="grid grid-cols-2 gap-2">
-            <select
-              value={deal.stage}
-              disabled={busy}
-              onChange={(e) => onUpdate(deal.id, { stage: e.target.value })}
-              className="w-full text-xs border rounded-lg px-2 py-1.5"
-            >
-              {stageOptions.filter((s) => !isClosedDealStage(s.id)).map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.label}
-                </option>
-              ))}
-            </select>
-            <input
-              type="number"
-              min={0}
-              defaultValue={deal.amount ?? ''}
-              disabled={busy}
-              placeholder={freightOrg ? 'Freight charges ₹' : 'Amount ₹'}
-              onBlur={(e) => {
-                const val = e.target.value === '' ? null : Number(e.target.value)
-                if (val !== deal.amount) onUpdate(deal.id, { amount: val })
-              }}
-              className="w-full text-xs border rounded-lg px-2 py-1.5"
-            />
+              </>
+            )}
           </div>
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              disabled={busy}
-              onClick={() => onWon(deal.id)}
-              className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-[#fff4ee] text-[#FF773D] border border-[#ffd4b8]"
-            >
-              Mark won
-            </button>
-            <button
-              type="button"
-              disabled={busy}
-              onClick={() => setShowLost((v) => !v)}
-              className="px-2.5 py-1 rounded-lg text-[11px] font-semibold border border-gray-300 text-gray-600"
-            >
-              Mark lost
-            </button>
-            <button
-              type="button"
-              disabled={busy}
-              onClick={() => onDuplicate(deal.id)}
-              className="px-2.5 py-1 rounded-lg text-[11px] font-semibold border border-indigo-200 text-indigo-800 bg-indigo-50/50"
-            >
-              Duplicate
-            </button>
-          </div>
+
           {showLost && (
-            <div className="flex gap-2">
-              <input
+            <div className="lw-deal-lost-form">
+              <LwInput
                 value={lostReason}
                 onChange={(e) => setLostReason(e.target.value)}
-                placeholder="Why lost?"
-                className="flex-1 text-xs border rounded-lg px-2 py-1.5"
+                placeholder="Reason (optional)"
               />
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => onLost(deal.id, lostReason)}
-                className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-gray-900 text-white"
-              >
-                Confirm lost
+              <button type="button" disabled={busy} onClick={() => onLost(deal.id, lostReason)} className="lw-deal-action lw-deal-action--lost">
+                Save
               </button>
             </div>
           )}
@@ -249,16 +212,42 @@ function DealRow({
       )}
 
       {closed && (
-        <div className="flex flex-wrap gap-2 items-center">
+        <div className="lw-deal-card__actions">
+          <button type="button" disabled={busy} onClick={() => onDuplicate(deal.id)} className="lw-deal-action">
+            <CopyIcon aria-hidden />
+            Duplicate
+          </button>
+        </div>
+      )}
+
+      {freightOrg && (
+        <>
           <button
             type="button"
             disabled={busy}
-            onClick={() => onDuplicate(deal.id)}
-            className="px-2.5 py-1 rounded-lg text-[11px] font-semibold border border-indigo-200 text-indigo-800 bg-indigo-50/50"
+            onClick={() => {
+              setFreightDraft(deal.freight || emptyFreightRfq())
+              setShowFreight((v) => !v)
+            }}
+            className="lw-deal-rfq-toggle"
           >
-            Duplicate deal
+            <ChevronRightIcon
+              aria-hidden
+              style={{ transform: showFreight ? 'rotate(90deg)' : undefined, transition: 'transform 0.15s' }}
+            />
+            {showFreight ? 'Hide RFQ' : deal.freight ? 'Edit RFQ' : 'Add RFQ'}
           </button>
-        </div>
+          {showFreight && (
+            <div className="lw-deal-rfq-panel lw-freight-fields">
+              <FreightDealFields freight={freightDraft} onChange={setFreightDraft} disabled={busy} compact />
+              {!closed && (
+                <button type="button" disabled={busy} onClick={saveFreight} className="lw-deal-action lw-deal-action--won mt-2">
+                  Save RFQ
+                </button>
+              )}
+            </div>
+          )}
+        </>
       )}
 
       <DealShareActions
@@ -276,7 +265,7 @@ function DealRow({
   )
 }
 
-/** HubSpot-style deals — multiple opportunities per lead. */
+/** Deals on a lead — compact cards, minimal copy. */
 export default function LeadDealsSection({ lead, patchLead, user, busy = false, onNotice, onError }) {
   const { logCrmEmailSend } = useApp()
   const crm = lead.crm || {}
@@ -292,6 +281,8 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
   const [freight, setFreight] = useState(emptyFreightRfq())
   const [saving, setSaving] = useState(false)
   const [feedback, setFeedback] = useState(null)
+  const [showCreate, setShowCreate] = useState(deals.length === 0)
+  const [listFilter, setListFilter] = useState('open')
 
   const { open, won, lost } = useMemo(() => {
     const o = []
@@ -311,6 +302,12 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
     return { openValue, wonValue }
   }, [open, won])
 
+  const visibleDeals = useMemo(() => {
+    if (listFilter === 'won') return won
+    if (listFilter === 'lost') return lost
+    return open
+  }, [listFilter, open, won, lost])
+
   const suggestedDealName = useMemo(
     () => buildAutoDealName({ company: lead.company, existingDeals: deals }),
     [lead.company, deals]
@@ -319,11 +316,6 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
   useEffect(() => {
     if (!nameTouched) setName(suggestedDealName)
   }, [suggestedDealName, nameTouched])
-
-  const regenerateDealName = () => {
-    setNameTouched(false)
-    setName(buildAutoDealName({ company: lead.company, existingDeals: deals }))
-  }
 
   const runDeal = async (body, okMsg) => {
     if (saving || busy) return false
@@ -334,7 +326,7 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
       if (okMsg) {
         onNotice?.(okMsg)
         setFeedback(okMsg)
-        setTimeout(() => setFeedback(null), 5000)
+        setTimeout(() => setFeedback(null), 4000)
       }
       return true
     } catch (e) {
@@ -358,249 +350,173 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
       expectedCloseDate: expectedCloseDate || null,
     }
     if (freightOrg) payload.freight = freight
-    const ok = await runDeal(payload, freightOrg ? `${freightDealCreateLabel(freight.customerType).replace('Create ', '')} created` : 'Deal created')
+    const ok = await runDeal(
+      payload,
+      freightOrg ? freightDealCreateLabel(freight.customerType).replace('Create ', '') + ' added' : 'Deal added'
+    )
     if (ok) {
       setNameTouched(false)
       setAmount('')
       setStage(freightOrg ? 'rfq' : 'new')
       setExpectedCloseDate('')
       setFreight(emptyFreightRfq())
+      setShowCreate(false)
+      setListFilter('open')
     }
   }
 
-  const updateDeal = (dealId, patch) => runDeal({ action: 'update', dealId, ...patch }, 'Deal updated')
-
+  const updateDeal = (dealId, patch) => runDeal({ action: 'update', dealId, ...patch }, 'Updated')
   const duplicateDeal = (dealId) =>
-    runDeal(
-      {
-        action: 'duplicate',
-        dealId,
-        company: lead.company || '',
-        stage: freightOrg ? 'rfq' : 'new',
-      },
-      'Deal duplicated'
-    )
-
-  const markWon = (dealId) => runDeal({ action: 'won', dealId }, 'Deal marked won')
-
+    runDeal({ action: 'duplicate', dealId, company: lead.company || '', stage: freightOrg ? 'rfq' : 'new' }, 'Duplicated')
+  const markWon = (dealId) => runDeal({ action: 'won', dealId }, 'Marked won')
   const markLost = (dealId, lostReason) =>
-    runDeal({ action: 'lost', dealId, lostReason: lostReason.trim() }, 'Deal marked lost')
-
-  const removeDeal = (dealId) =>
-    runDeal({ action: 'delete', dealId }, freightOrg ? 'Deal / RFQ deleted' : 'Deal deleted')
+    runDeal({ action: 'lost', dealId, lostReason: lostReason.trim() }, 'Marked lost')
+  const removeDeal = (dealId) => runDeal({ action: 'delete', dealId }, 'Deleted')
 
   const dealBusy = saving || busy
 
+  const filterOptions = [
+    { id: 'open', label: 'Open', count: open.length },
+    { id: 'won', label: 'Won', count: won.length },
+    { id: 'lost', label: 'Lost', count: lost.length },
+  ].filter((f) => f.count > 0 || f.id === 'open')
+
   return (
-    <div className="space-y-4">
-      {freightOrg && (
-        <p className="text-xs text-indigo-800 bg-indigo-50 border border-indigo-100 rounded-lg px-2.5 py-2">
-          Choose opportunity type per deal — spot RFQ, courier contract, or mixed. Invoice value lives on the
-          RFQ; freight charges are the deal amount used in pipeline totals.
-        </p>
-      )}
-
-      <section className="grid grid-cols-2 gap-2">
-        <div className="border rounded-lg p-2.5 bg-white">
-          <p className="text-[10px] font-semibold uppercase text-gray-400">Open pipeline</p>
-          <p className="text-sm font-bold text-gray-900">{formatDealValue(totals.openValue || crm.dealValue)}</p>
-          <p className="text-[11px] text-gray-500">
-            {open.length} open deal{open.length === 1 ? '' : 's'}
-            {freightOrg ? ' · freight charges' : ''}
-          </p>
-        </div>
-        <div className="border rounded-lg p-2.5 bg-white">
-          <p className="text-[10px] font-semibold uppercase text-gray-400">Won</p>
-          <p className="text-sm font-bold text-[#FF773D]">{formatDealValue(totals.wonValue)}</p>
-          <p className="text-[11px] text-gray-500">{won.length} won</p>
-        </div>
-      </section>
-
-      <section>
-        <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">
-          {freightOrg ? 'Create freight deal' : 'Create deal'}
-        </h3>
-        <form onSubmit={addDeal} className="space-y-2 border rounded-lg p-2.5 bg-gray-50">
+    <div className="lw-deals">
+      <div className="lw-deals-kpi">
+        <div className="lw-deals-kpi__card">
+          <div className="lw-deals-kpi__icon lw-deals-kpi__icon--open">
+            <PipelineIcon aria-hidden />
+          </div>
           <div>
-            <div className="flex items-center justify-between gap-2 mb-1">
-              <label className="text-[10px] font-semibold uppercase text-gray-500">Deal name</label>
-              <button
-                type="button"
-                disabled={dealBusy}
-                onClick={regenerateDealName}
-                className="text-[10px] font-semibold text-indigo-700"
-              >
-                Regenerate
-              </button>
+            <div className="lw-deals-kpi__label">Open</div>
+            <div className="lw-deals-kpi__value">{formatDealValue(totals.openValue || crm.dealValue)}</div>
+            <div className="lw-deals-kpi__sub">{open.length} deal{open.length === 1 ? '' : 's'}</div>
+          </div>
+        </div>
+        <div className="lw-deals-kpi__card">
+          <div className="lw-deals-kpi__icon lw-deals-kpi__icon--won">
+            <CheckIcon aria-hidden />
+          </div>
+          <div>
+            <div className="lw-deals-kpi__label">Won</div>
+            <div className="lw-deals-kpi__value">{formatDealValue(totals.wonValue)}</div>
+            <div className="lw-deals-kpi__sub">{won.length} deal{won.length === 1 ? '' : 's'}</div>
+          </div>
+        </div>
+      </div>
+
+      {deals.length > 0 && (
+        <div className="lw-deals-filter" role="tablist" aria-label="Deal status">
+          {filterOptions.map((f) => (
+            <button
+              key={f.id}
+              type="button"
+              role="tab"
+              aria-selected={listFilter === f.id}
+              onClick={() => setListFilter(f.id)}
+              className={`lw-deals-filter__btn ${listFilter === f.id ? 'is-active' : ''}`}
+            >
+              {f.label} ({f.count})
+            </button>
+          ))}
+        </div>
+      )}
+
+      {!showCreate ? (
+        <button type="button" className="lw-deals-create-toggle" onClick={() => setShowCreate(true)}>
+          <PlusIcon aria-hidden />
+          {freightOrg ? 'New freight deal' : 'New deal'}
+        </button>
+      ) : (
+        <div className="lw-deals-create-form">
+          <LwFormStack onSubmit={addDeal}>
+            <LwField label="Name">
+              <LwInput
+                value={name}
+                onChange={(e) => {
+                  setNameTouched(true)
+                  setName(e.target.value)
+                }}
+                placeholder={suggestedDealName}
+                required
+              />
+            </LwField>
+
+            {freightOrg && <FreightDealFields freight={freight} onChange={setFreight} disabled={dealBusy} compact />}
+
+            <div className="lw-deal-card__controls">
+              <LwField label="Stage">
+                <LwSelect value={stage} onChange={(e) => setStage(e.target.value)}>
+                  {stageOptions.filter((s) => !isClosedDealStage(s.id)).map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.label}
+                    </option>
+                  ))}
+                </LwSelect>
+              </LwField>
+              <LwField label={freightOrg ? 'Freight ₹' : 'Amount ₹'}>
+                <LwInput
+                  type="number"
+                  min={0}
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="0"
+                />
+              </LwField>
             </div>
-            <input
-              value={name}
-              onChange={(e) => {
-                setNameTouched(true)
-                setName(e.target.value)
-              }}
-              placeholder="DD-MM-YYYY Company 001"
-              required
-              className="w-full text-xs border rounded-lg px-2.5 py-1.5 bg-white"
+
+            <LwField label="Close date" icon={CalendarIcon}>
+              <LwInput type="date" value={expectedCloseDate} onChange={(e) => setExpectedCloseDate(e.target.value)} />
+            </LwField>
+
+            <div className="lw-btn-row">
+              <LwSubmitBtn variant="brand" icon={PlusIcon} disabled={dealBusy}>
+                {saving ? 'Creating…' : freightOrg ? freightDealCreateLabel(freight.customerType) : 'Create deal'}
+              </LwSubmitBtn>
+              {deals.length > 0 && (
+                <button type="button" className="lw-deal-action" onClick={() => setShowCreate(false)}>
+                  Cancel
+                </button>
+              )}
+            </div>
+            {feedback && <LwNotice>{feedback}</LwNotice>}
+          </LwFormStack>
+        </div>
+      )}
+
+      {visibleDeals.length > 0 ? (
+        <ul className="lw-deals-list">
+          {visibleDeals.map((d) => (
+            <DealRow
+              key={d.id}
+              deal={d}
+              lead={lead}
+              user={user}
+              busy={dealBusy}
+              freightOrg={freightOrg}
+              onUpdate={updateDeal}
+              onWon={markWon}
+              onLost={markLost}
+              onDuplicate={duplicateDeal}
+              onDelete={removeDeal}
+              patchLead={patchLead}
+              logCrmEmailSend={logCrmEmailSend}
+              onNotice={onNotice}
+              onError={onError}
             />
-            <p className="text-[10px] text-gray-500 mt-1 leading-snug">
-              Auto-filled as date + company + sequence (001 first today, then Q#### for additional same-day deals).
-            </p>
-          </div>
-          {freightOrg && (
-            <FreightDealFields freight={freight} onChange={setFreight} disabled={dealBusy} />
-          )}
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <label className="text-[10px] font-semibold uppercase text-gray-500 block mb-1">
-                Deal stage
-              </label>
-              <select
-                value={stage}
-                onChange={(e) => setStage(e.target.value)}
-                className="w-full text-xs border rounded-lg px-2.5 py-1.5 bg-white"
-              >
-                {stageOptions.filter((s) => !isClosedDealStage(s.id)).map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.label}
-                  </option>
-                ))}
-              </select>
-              {freightOrg && (
-                <p className="text-[10px] text-gray-500 mt-1 leading-snug">
-                  Shipment pipeline: RFQ → Quoted → Negotiation → Booked → Won.
-                  Separate from this contact&apos;s lead status.
-                </p>
-              )}
-            </div>
-            <div>
-              <label className="text-[10px] font-semibold uppercase text-gray-500 block mb-1">
-                Freight charges (₹)
-              </label>
-              <input
-                type="number"
-                min={0}
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="Quoted / booked freight rate"
-                className="w-full text-xs border rounded-lg px-2.5 py-1.5 bg-white"
-              />
-              {freightOrg && (
-                <p className="text-[10px] text-gray-500 mt-1 leading-snug">
-                  Your freight quote for this shipment — used in pipeline value totals.
-                </p>
-              )}
-            </div>
-          </div>
-          <input
-            type="date"
-            value={expectedCloseDate}
-            onChange={(e) => setExpectedCloseDate(e.target.value)}
-            className="w-full text-xs border rounded-lg px-2.5 py-1.5 bg-white"
-          />
-          <button
-            type="submit"
-            disabled={dealBusy}
-            className="w-full py-2 text-xs font-semibold bg-[#FF773D] text-white rounded-lg disabled:opacity-50"
-          >
-            {saving ? 'Creating…' : freightOrg ? freightDealCreateLabel(freight.customerType) : 'Create deal'}
-          </button>
-          {feedback && (
-            <p className="text-xs font-semibold text-green-800 bg-green-50 border border-green-200 rounded-lg px-2.5 py-2" role="status">
-              ✓ {feedback}
-            </p>
-          )}
-        </form>
-      </section>
-
-      {open.length > 0 && (
-        <section>
-          <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Open deals</h3>
-          <ul className="space-y-2">
-            {open.map((d) => (
-              <DealRow
-                key={d.id}
-                deal={d}
-                lead={lead}
-                user={user}
-                busy={dealBusy}
-                freightOrg={freightOrg}
-                onUpdate={updateDeal}
-                onWon={markWon}
-                onLost={markLost}
-                onDuplicate={duplicateDeal}
-                onDelete={removeDeal}
-                patchLead={patchLead}
-                logCrmEmailSend={logCrmEmailSend}
-                onNotice={onNotice}
-                onError={onError}
-              />
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {won.length > 0 && (
-        <section>
-          <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Won deals</h3>
-          <ul className="space-y-2">
-            {won.map((d) => (
-              <DealRow
-                key={d.id}
-                deal={d}
-                lead={lead}
-                user={user}
-                busy={dealBusy}
-                freightOrg={freightOrg}
-                onUpdate={updateDeal}
-                onWon={markWon}
-                onLost={markLost}
-                onDuplicate={duplicateDeal}
-                onDelete={removeDeal}
-                patchLead={patchLead}
-                logCrmEmailSend={logCrmEmailSend}
-                onNotice={onNotice}
-                onError={onError}
-              />
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {lost.length > 0 && (
-        <section>
-          <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Lost deals</h3>
-          <ul className="space-y-2">
-            {lost.map((d) => (
-              <DealRow
-                key={d.id}
-                deal={d}
-                lead={lead}
-                user={user}
-                busy={dealBusy}
-                freightOrg={freightOrg}
-                onUpdate={updateDeal}
-                onWon={markWon}
-                onLost={markLost}
-                onDuplicate={duplicateDeal}
-                onDelete={removeDeal}
-                patchLead={patchLead}
-                logCrmEmailSend={logCrmEmailSend}
-                onNotice={onNotice}
-                onError={onError}
-              />
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {!deals.length && (
-        <p className="text-xs text-gray-500">
-          {freightOrg
-            ? 'No freight deals yet. Create spot RFQs, courier contracts, or mixed opportunities — one deal per shipment or contract lane.'
-            : 'No deals yet. Create one opportunity per product line, contract, or renewal — like HubSpot deals on a contact.'}
-        </p>
-      )}
+          ))}
+        </ul>
+      ) : deals.length === 0 && !showCreate ? (
+        <div className="lw-deals-empty">
+          <PipelineIcon aria-hidden />
+          <p>No deals yet</p>
+        </div>
+      ) : visibleDeals.length === 0 ? (
+        <div className="lw-deals-empty">
+          <p>No {listFilter} deals</p>
+        </div>
+      ) : null}
     </div>
   )
 }

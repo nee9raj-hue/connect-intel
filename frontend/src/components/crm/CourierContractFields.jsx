@@ -22,18 +22,7 @@ export default function CourierContractFields({ courier, onChange, disabled = fa
   const patch = (next) => onChange({ ...profile, ...next })
 
   return (
-    <div
-      className={`space-y-3 ${compact ? '' : 'border rounded-lg p-2.5 bg-teal-50/40 border-teal-100'}`}
-    >
-      {!compact && (
-        <div>
-          <p className="text-[10px] font-semibold uppercase text-teal-800">Courier contract profile</p>
-          <p className="text-[10px] text-teal-700/80 mt-0.5">
-            Fixed lanes and slab rates for recurring parcel volumes.
-          </p>
-        </div>
-      )}
-
+    <div className={`space-y-3 lw-freight-fields ${compact ? '' : 'border rounded-lg p-2.5 bg-teal-50/30 border-teal-100'}`}>
       <div>
         <FieldLabel>Destination countries</FieldLabel>
         <div className="flex flex-wrap gap-1.5">
