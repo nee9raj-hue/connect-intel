@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- a574ac7
+npm run prod:rollback -- 6759962
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- a574ac7
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `edfc08e` |
-| Log updated (IST) | 13/06/2026, 20:11:51 |
+| Commit | `f2949dc` |
+| Log updated (IST) | 14/06/2026, 15:47:37 |
 
 ---
 
@@ -44,26 +44,26 @@ npm run prod:rollback -- a574ac7
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 13/06/2026, 20:11:36 | `edfc08e` | fix: accurate open and click rates on campaign reports list | [preview](https://connect-intel-oartaggt9-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- edfc08e` | **← LIVE**
-| 13/06/2026, 20:01:23 | `a574ac7` | chore: sync production log after full-page reports deploy | [preview](https://connect-intel-dqcucscmg-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a574ac7` |
-| 13/06/2026, 20:00:32 | `90c4f6a` | feat: full-page campaign reports in new tabs with engagement charts | [preview](https://connect-intel-h17vlw4m6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 90c4f6a` |
-| 13/06/2026, 19:54:16 | `1c30efe` | chore: sync production log after analytics team filter fix | [preview](https://connect-intel-rkaegt9dn-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1c30efe` |
-| 13/06/2026, 19:53:30 | `0cecc46` | fix: analytics team filter matches campaign owner user ids | [preview](https://connect-intel-kkbjcp97p-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0cecc46` |
-| 13/06/2026, 19:34:03 | `ab64547` | chore: sync production log after analytics redesign deploy | [preview](https://connect-intel-kgnvicdq7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ab64547` |
-| 13/06/2026, 19:33:11 | `4e15e3b` | feat: redesign marketing analytics with filters and campaign drill-down | [preview](https://connect-intel-1acbctknb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4e15e3b` |
-| 13/06/2026, 19:20:02 | `d198ab9` | chore: sync production log after campaigns loading fix | [preview](https://connect-intel-lberin2co-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d198ab9` |
-| 13/06/2026, 19:19:18 | `3ce72c6` | fix: stop infinite loading loop on marketing campaigns tab | [preview](https://connect-intel-dlbq5x27r-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3ce72c6` |
-| 12/06/2026, 18:29:03 | `18d764e` | chore: sync production log after campaigns page deploy | [preview](https://connect-intel-yn3axt41a-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 18d764e` |
-| 12/06/2026, 18:28:15 | `a9424cd` | feat: redesign campaigns page and enrich list metrics from enrollments | [preview](https://connect-intel-i0l1mi08u-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a9424cd` |
-| 12/06/2026, 17:14:40 | `03f553e` | chore: sync production log after campaign status fix deploy | [preview](https://connect-intel-llwkadlw2-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 03f553e` |
-| 12/06/2026, 17:13:56 | `25bd4f7` | fix: sync campaign status after test sends and background email delivery | [preview](https://connect-intel-3k8rvob2p-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 25bd4f7` |
-| 12/06/2026, 17:06:45 | `d6a188f` | chore: sync production log after marketing home deploy | [preview](https://connect-intel-5vuzb6kmd-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d6a188f` |
-| 12/06/2026, 17:05:56 | `a76ab25` | feat: polish marketing home with illustrated create cards and getting-started guide | [preview](https://connect-intel-bslyma59g-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a76ab25` |
-| 12/06/2026, 16:41:46 | `75a25bc` | chore: sync production log after template gallery deploy | [preview](https://connect-intel-lzahmwdzn-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 75a25bc` |
-| 12/06/2026, 16:40:55 | `f49bb6d` | feat: redesign email template gallery with branded cards and nav fix | [preview](https://connect-intel-m6lh65ow2-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f49bb6d` |
-| 12/06/2026, 16:19:35 | `ee50f70` | feat: Mailchimp campaign editor Styles, Sections, and Optimize panels | [preview](https://connect-intel-h1pwtudvc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ee50f70` |
-| 12/06/2026, 16:02:15 | `635ec40` | feat: Mailchimp-style Audience hub with Contacts, Tags, Segments, and more | [preview](https://connect-intel-perdjx6ot-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 635ec40` |
-| 12/06/2026, 15:52:08 | `c6f71e0` | feat: Mailchimp-style Email Templates page with saved list and actions | [preview](https://connect-intel-5xnqobakk-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c6f71e0` |
+| 14/06/2026, 15:47:25 | `f2949dc` | Polish pipeline list view with premium icons, motion, and empty states. | [preview](https://connect-intel-4bxe1ngx4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f2949dc` | **← LIVE**
+| 14/06/2026, 15:37:50 | `6759962` | Replace pipeline row ellipsis with labeled Actions trigger. | [preview](https://connect-intel-7lfzqqtvh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6759962` |
+| 14/06/2026, 15:29:30 | `c3d521c` | Fix timeline rail dots clipped on the left in lead panel. | [preview](https://connect-intel-jvbn5675n-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c3d521c` |
+| 14/06/2026, 15:22:33 | `269076b` | Redesign lead Deals tab with compact cards and icon controls. | [preview](https://connect-intel-ghq3uemsi-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 269076b` |
+| 14/06/2026, 15:14:25 | `5f2d3b3` | Redesign lead record panel with icon tabs and premium workspace UI. | [preview](https://connect-intel-llrszyt11-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5f2d3b3` |
+| 14/06/2026, 15:02:49 | `444a32e` | Remove duplicate lead count from pipeline filter bar. | [preview](https://connect-intel-rljvis9m2-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 444a32e` |
+| 14/06/2026, 14:57:43 | `4f75292` | Move pipeline view settings to header actions away from filter bar. | [preview](https://connect-intel-3s8joap34-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4f75292` |
+| 14/06/2026, 14:48:33 | `dfd3e32` | Move pipeline view settings to top-right header actions. | [preview](https://connect-intel-490gpx13g-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- dfd3e32` |
+| 14/06/2026, 14:43:07 | `611c8e0` | Redesign pipeline filter command bar with icon pills and search. | [preview](https://connect-intel-1xn6uafn3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 611c8e0` |
+| 14/06/2026, 14:34:05 | `384e859` | Fix pipeline email column staying orange due to global link styles. | [preview](https://connect-intel-oycy07gfi-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 384e859` |
+| 14/06/2026, 14:28:15 | `374efad` | Style pipeline email addresses in blue for quick visual scan. | [preview](https://connect-intel-l2d77sjpt-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 374efad` |
+| 14/06/2026, 12:17:31 | `419f7e1` | Add Team review block on dashboard for managers and admins. | [preview](https://connect-intel-okxixc3lp-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 419f7e1` |
+| 14/06/2026, 12:09:46 | `07367b6` | Redesign freight deals dashboard with professional table and KPIs. | [preview](https://connect-intel-nkf65fvr8-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 07367b6` |
+| 14/06/2026, 12:05:36 | `058ce95` | Upgrade pipeline health chart with distribution bar and column chart. | [preview](https://connect-intel-qpdyu8is3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 058ce95` |
+| 14/06/2026, 11:59:26 | `61c9984` | Rebuild CRM home dashboard as role-aware command center. | [preview](https://connect-intel-osmf1uswt-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 61c9984` |
+| 13/06/2026, 20:45:10 | `e12df7c` | Upgrade analytics page charts with full-width pro visuals. | [preview](https://connect-intel-leniuo0co-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e12df7c` |
+| 13/06/2026, 20:39:36 | `27eb4a8` | Modernize campaign report funnel and full-width activity chart. | [preview](https://connect-intel-50vfp1c8l-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 27eb4a8` |
+| 13/06/2026, 20:33:12 | `98803b4` | Fix analytics 0% open rates by using campaign-scoped event metrics. | [preview](https://connect-intel-qdnlvofgt-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 98803b4` |
+| 13/06/2026, 20:22:02 | `a16eec8` | Redesign campaign reports list with cleaner tabs, toolbar, and KPI strip. | [preview](https://connect-intel-3bskzyza1-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a16eec8` |
+| 13/06/2026, 20:17:56 | `87a3c25` | Fix 5xx on /api by removing heavy enrollment reads from marketing overview. | [preview](https://connect-intel-hbz8itk3k-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 87a3c25` |
 
 ---
 
