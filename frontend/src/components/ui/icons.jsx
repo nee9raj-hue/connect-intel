@@ -97,6 +97,14 @@ export function ChevronLeftIcon({ className }) {
   )
 }
 
+export function ChevronDownIcon({ className }) {
+  return (
+    <LineIcon className={className}>
+      <path d="m6 9 6 6 6-6" />
+    </LineIcon>
+  )
+}
+
 export function SaveIcon({ className }) {
   return (
     <LineIcon className={className}>
