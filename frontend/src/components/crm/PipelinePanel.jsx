@@ -1356,15 +1356,18 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                   ))}
                 </div>
               ) : null}
-              <button
-                type="button"
-                onClick={() => setViewSettingsOpen(true)}
-                className="pipeline-v2-btn-view"
-                aria-label="View settings"
-              >
-                <SettingsGearIcon className="pipeline-action-btn__icon w-4 h-4" aria-hidden />
-                <span>View</span>
-              </button>
+              {showPipelineFilters && !isDealsView ? (
+                <button
+                  type="button"
+                  className="pipeline-v2-view-settings-btn"
+                  onClick={() => setViewSettingsOpen(true)}
+                  aria-label="View settings"
+                  title="Columns and list view settings"
+                >
+                  <SettingsGearIcon className="pipeline-v2-view-settings-btn__icon" aria-hidden />
+                  <span>View settings</span>
+                </button>
+              ) : null}
               <button
                 type="button"
                 onClick={() => setImportOpen(true)}
