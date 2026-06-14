@@ -6,43 +6,108 @@ import {
   allDealCountsFromSummary,
   dealCountsFromSummary,
   formatDealValue,
+  freightCustomerTypeLabel,
   freightRouteLabel,
   isFreightDealOrg,
   sumDealAmounts,
   transportModeLabel,
 } from '../../lib/freightDeals'
 import { dashboardNavOptions } from '../../lib/dashboardNavigation'
+import '../../styles/dashboard-home.css'
+
+const OPEN_STAGES = [
+  { id: 'rfq', label: 'RFQ' },
+  { id: 'quoted', label: 'Quoted' },
+  { id: 'negotiation', label: 'Negotiation' },
+  { id: 'booked', label: 'Booked' },
+]
+
+const TABS = [
+  { id: 'open', label: 'Open deals', stage: 'all' },
+  { id: 'won', label: 'Won', stage: 'won' },
+  { id: 'lost', label: 'Lost', stage: 'lost' },
+]
 
 function formatWeight(kg) {
   if (kg == null || kg === '') return '—'
   const n = Number(kg)
-  return Number.isFinite(n) ? `${n} kg` : '—'
+  return Number.isFinite(n) ? `${n.toLocaleString()} kg` : '—'
 }
 
-function DealRow({ deal, leadId, leadName, company, onOpenDeal }) {
-  const meta = getDealStageMeta(deal.stage, { freightOrg: true })
-  const freight = deal.freight
-  const metaLine = [
-    leadName,
-    company && company !== leadName ? company : null,
-    transportModeLabel(freight?.transportMode),
-    formatWeight(freight?.grossWeightKg),
-    freightRouteLabel(freight),
-    formatDealValue(deal.amount, deal.currency),
-  ]
-    .filter(Boolean)
-    .join(' · ')
-
+function StageBadge({ stage }) {
+  const meta = getDealStageMeta(stage, { freightOrg: true })
   return (
-    <button type="button" className="dash-v4-freight__deal" onClick={() => onOpenDeal(leadId)}>
-      <div className="dash-v4-freight__deal-title">{deal.name}</div>
-      <div className="dash-v4-freight__deal-meta">{metaLine}</div>
-      <span className="dash-v4__badge dash-v4__badge--follow_up">{meta.label}</span>
-    </button>
+    <span className={`dash-home-freight__stage dash-home-freight__stage--${stage || 'rfq'}`}>
+      {meta.label}
+    </span>
   )
 }
 
-/** Home dashboard block — freight deals by stage with counts and recent lists. */
+function DealsTable({ rows, onOpenDeal, emptyLabel }) {
+  if (!rows.length) {
+    return (
+      <div className="dash-home-freight__empty">
+        <p>{emptyLabel}</p>
+        <span>Create deals from a lead&apos;s Deals tab or open the pipeline.</span>
+      </div>
+    )
+  }
+
+  return (
+    <div className="dash-home-freight__table-wrap">
+      <table className="dash-home-freight__table">
+        <thead>
+          <tr>
+            <th>Deal</th>
+            <th>Customer</th>
+            <th>Route</th>
+            <th>Mode</th>
+            <th className="is-num">Weight</th>
+            <th className="is-num">Value</th>
+            <th>Stage</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map(({ deal, leadId, leadName, company }) => {
+            const freight = deal.freight
+            const route = freightRouteLabel(freight)
+            return (
+              <tr key={deal.id}>
+                <td>
+                  <button type="button" className="dash-home-freight__deal-btn" onClick={() => onOpenDeal(leadId)}>
+                    <span className="dash-home-freight__deal-name">{deal.name}</span>
+                    <span className="dash-home-freight__deal-type">{freightCustomerTypeLabel(freight?.customerType)}</span>
+                  </button>
+                </td>
+                <td>
+                  <span className="dash-home-freight__customer">{leadName || '—'}</span>
+                  {company && company !== leadName ? (
+                    <span className="dash-home-freight__company">{company}</span>
+                  ) : null}
+                </td>
+                <td>
+                  <span className="dash-home-freight__route" title={route}>
+                    {route}
+                  </span>
+                </td>
+                <td>
+                  <span className="dash-home-freight__mode">{transportModeLabel(freight?.transportMode)}</span>
+                </td>
+                <td className="is-num">{formatWeight(freight?.grossWeightKg)}</td>
+                <td className="is-num is-value">{formatDealValue(deal.amount, deal.currency)}</td>
+                <td>
+                  <StageBadge stage={deal.stage} />
+                </td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
+/** Home dashboard — freight deals snapshot with KPIs and drill-down table. */
 export default function FreightDealsDashboard({ user, pipelineSummary, onNavigate }) {
   const { openPipelineLead } = useApp()
   const freightOrg = isFreightDealOrg(user)
@@ -50,6 +115,7 @@ export default function FreightDealsDashboard({ user, pipelineSummary, onNavigat
   const [wonDeals, setWonDeals] = useState([])
   const [lostDeals, setLostDeals] = useState([])
   const [loading, setLoading] = useState(false)
+  const [tab, setTab] = useState('open')
 
   const openCounts = useMemo(() => dealCountsFromSummary(pipelineSummary) || {}, [pipelineSummary])
   const allCounts = useMemo(() => allDealCountsFromSummary(pipelineSummary) || {}, [pipelineSummary])
@@ -97,106 +163,136 @@ export default function FreightDealsDashboard({ user, pipelineSummary, onNavigat
   }
 
   const rfqCount = openCounts.rfq ?? 0
-  const openCount = openCounts.all ?? 0
-  const wonCount = allCounts.won ?? 0
-  const lostCount = allCounts.lost ?? 0
+  const openCount = openCounts.all ?? openDeals.length
+  const wonCount = allCounts.won ?? wonDeals.length
+  const lostCount = allCounts.lost ?? lostDeals.length
   const openValue = sumDealAmounts(openDeals)
   const wonValue = sumDealAmounts(wonDeals)
-  const recentOpen = openDeals.slice(0, 6)
-  const recentWon = wonDeals.slice(0, 5)
-  const recentLost = lostDeals.slice(0, 5)
   const totalWeight = openDeals.reduce(
     (sum, r) => sum + (Number(r.deal?.freight?.grossWeightKg) || 0),
     0
   )
 
+  const tabRows =
+    tab === 'won' ? wonDeals.slice(0, 8) : tab === 'lost' ? lostDeals.slice(0, 8) : openDeals.slice(0, 10)
+
+  const tabEmpty =
+    tab === 'won'
+      ? 'No won deals yet.'
+      : tab === 'lost'
+        ? 'No lost deals yet.'
+        : 'No open freight deals yet.'
+
+  const tabTotal = tab === 'won' ? wonCount : tab === 'lost' ? lostCount : openCount
+
+  const kpis = [
+    { id: 'rfq', label: 'Open RFQs', value: rfqCount, action: () => goDeals('rfq') },
+    { id: 'open', label: 'All open', value: openCount, action: () => goDeals('all'), highlight: openCount > 0 },
+    { id: 'won', label: 'Won deals', value: wonCount, action: () => goDeals('won') },
+    { id: 'lost', label: 'Lost deals', value: lostCount, action: () => goDeals('lost') },
+    {
+      id: 'value',
+      label: 'Open pipeline',
+      value: formatDealValue(openValue || 0),
+      action: () => goDeals('all'),
+      isText: true,
+    },
+    {
+      id: 'won-value',
+      label: 'Won value',
+      value: wonValue > 0 ? formatDealValue(wonValue) : '—',
+      action: wonCount > 0 ? () => goDeals('won') : undefined,
+      isText: true,
+      disabled: wonCount <= 0,
+    },
+  ]
+
   return (
-    <section className="dash-v4-freight">
-      <div className="dash-v4__card">
-        <div className="dash-v4__card-head">
-          <div>
-            <h3 className="dash-v4__card-title">Freight deals</h3>
-            <p className="dash-v4__card-sub">Open RFQs, pipeline value, and closed deals</p>
+    <section className="dash-home-freight" aria-label="Freight deals">
+      <div className="dash-home__inner">
+        <div className="dash-home__panel dash-home-freight__panel">
+          <div className="dash-home-freight__head">
+            <div>
+              <p className="dash-home__eyebrow">Shipment pipeline</p>
+              <h2 className="dash-home-freight__title">Freight deals</h2>
+              <p className="dash-home-freight__sub">
+                RFQs, quotes, and booked lanes — {openCount} open
+                {totalWeight > 0 ? ` · ${Math.round(totalWeight).toLocaleString()} kg in flight` : ''}
+              </p>
+            </div>
+            <button type="button" className="dash-home__btn dash-home__btn--primary" onClick={() => goDeals('all')}>
+              Open deals pipeline
+            </button>
           </div>
-          <button type="button" className="dash-v4__link" onClick={() => goDeals('all')}>
-            All open deals →
-          </button>
-        </div>
 
-        <div className="dash-v4-freight__grid">
-          <button type="button" className="dash-v4-freight__kpi" onClick={() => goDeals('rfq')}>
-            <p className="dash-v4-freight__kpi-label">Open RFQs</p>
-            <p className="dash-v4-freight__kpi-value">{rfqCount}</p>
-          </button>
-          <button type="button" className="dash-v4-freight__kpi" onClick={() => goDeals('all')}>
-            <p className="dash-v4-freight__kpi-label">All open deals</p>
-            <p className="dash-v4-freight__kpi-value">{openCount}</p>
-          </button>
-          <button type="button" className="dash-v4-freight__kpi" onClick={() => goDeals('won')}>
-            <p className="dash-v4-freight__kpi-label">Won deals</p>
-            <p className="dash-v4-freight__kpi-value">{wonCount}</p>
-          </button>
-          <button type="button" className="dash-v4-freight__kpi" onClick={() => goDeals('lost')}>
-            <p className="dash-v4-freight__kpi-label">Lost deals</p>
-            <p className="dash-v4-freight__kpi-value">{lostCount}</p>
-          </button>
-          <button type="button" className="dash-v4-freight__kpi" onClick={() => goDeals('all')}>
-            <p className="dash-v4-freight__kpi-label">Open pipeline value</p>
-            <p className="dash-v4-freight__kpi-value">{formatDealValue(openValue || 0)}</p>
-          </button>
-          <button
-            type="button"
-            className="dash-v4-freight__kpi"
-            onClick={wonCount > 0 ? () => goDeals('won') : undefined}
-            disabled={wonCount <= 0}
-          >
-            <p className="dash-v4-freight__kpi-label">Won value</p>
-            <p className="dash-v4-freight__kpi-value">{wonValue > 0 ? formatDealValue(wonValue) : '—'}</p>
-          </button>
-        </div>
-
-        {totalWeight > 0 ? (
-          <p className="dash-v4__scope" style={{ marginBottom: 12 }}>
-            Open RFQ gross weight (loaded deals): {Math.round(totalWeight)} kg
-          </p>
-        ) : null}
-
-        {loading ? <p className="dash-v4__empty">Loading deals…</p> : null}
-
-        {!loading ? (
-          <div className="dash-v4__grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
-            {[
-              { title: 'Open deals', deals: recentOpen, total: openCount, stage: 'all', empty: 'No open freight deals yet.' },
-              { title: 'Won deals', deals: recentWon, total: wonCount, stage: 'won', empty: 'No won deals yet.' },
-              { title: 'Lost deals', deals: recentLost, total: lostCount, stage: 'lost', empty: 'No lost deals yet.' },
-            ].map((col) => (
-              <div key={col.title}>
-                <div className="dash-v4__card-head" style={{ marginBottom: 8 }}>
-                  <h4 className="dash-v4__card-title" style={{ fontSize: 13 }}>{col.title}</h4>
-                  {col.deals.length < col.total ? (
-                    <button type="button" className="dash-v4__link" onClick={() => goDeals(col.stage)}>
-                      View all {col.total} →
-                    </button>
-                  ) : null}
-                </div>
-                {col.deals.length === 0 ? (
-                  <p className="dash-v4__empty">{col.empty}</p>
-                ) : (
-                  col.deals.map(({ deal, leadId, leadName, company }) => (
-                    <DealRow
-                      key={deal.id}
-                      deal={deal}
-                      leadId={leadId}
-                      leadName={leadName}
-                      company={company}
-                      onOpenDeal={openDeal}
-                    />
-                  ))
-                )}
-              </div>
+          <div className="dash-home-freight__kpi-row">
+            {kpis.map((kpi) => (
+              <button
+                key={kpi.id}
+                type="button"
+                className={`dash-home-freight__kpi${kpi.highlight ? ' is-active' : ''}`}
+                onClick={kpi.action}
+                disabled={kpi.disabled}
+              >
+                <span className="dash-home-freight__kpi-label">{kpi.label}</span>
+                <span className={`dash-home-freight__kpi-value${kpi.isText ? ' is-text' : ''}`}>{kpi.value}</span>
+              </button>
             ))}
           </div>
-        ) : null}
+
+          <div className="dash-home-freight__stages">
+            {OPEN_STAGES.map((stage) => {
+              const count = openCounts[stage.id] ?? 0
+              return (
+                <button
+                  key={stage.id}
+                  type="button"
+                  className={`dash-home-freight__stage-pill dash-home-freight__stage-pill--${stage.id}`}
+                  onClick={() => goDeals(stage.id)}
+                >
+                  <span>{stage.label}</span>
+                  <strong>{count}</strong>
+                </button>
+              )
+            })}
+          </div>
+
+          <div className="dash-home-freight__table-head">
+            <div className="dash-home-freight__tabs" role="tablist">
+              {TABS.map((t) => {
+                const count = t.id === 'open' ? openCount : t.id === 'won' ? wonCount : lostCount
+                return (
+                  <button
+                    key={t.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={tab === t.id}
+                    className={`dash-home-freight__tab${tab === t.id ? ' is-active' : ''}`}
+                    onClick={() => setTab(t.id)}
+                  >
+                    {t.label}
+                    <span className="dash-home-freight__tab-count">{count}</span>
+                  </button>
+                )
+              })}
+            </div>
+            {tabRows.length < tabTotal ? (
+              <button type="button" className="dash-home__link" onClick={() => goDeals(TABS.find((t) => t.id === tab)?.stage)}>
+                View all {tabTotal} →
+              </button>
+            ) : null}
+          </div>
+
+          {loading ? (
+            <div className="dash-home-freight__loading">
+              <span className="dash-home-freight__loading-bar" />
+              <span className="dash-home-freight__loading-bar" />
+              <span className="dash-home-freight__loading-bar" />
+            </div>
+          ) : (
+            <DealsTable rows={tabRows} onOpenDeal={openDeal} emptyLabel={tabEmpty} />
+          )}
+        </div>
       </div>
     </section>
   )
