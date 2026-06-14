@@ -1197,6 +1197,20 @@
   transition: color 0.12s ease, background-color 0.12s ease;
 }
 
+/* Email column — blue text (overrides global CRM link orange) */
+.pipeline-hs-td--email .pipeline-hs-email-text,
+.pipeline-hs-td--email a.pipeline-hs-email-text,
+.pipeline-hs-email-text {
+  color: #2563eb !important;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.pipeline-hs-td--email a.pipeline-hs-email-text:hover {
+  color: #1d4ed8 !important;
+  text-decoration: underline;
+}
+
 /* One scroll region for pipeline list (vertical + horizontal). */
 .pipeline-list-workspace .crm-page-body {
   padding: 0;

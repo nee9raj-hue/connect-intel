@@ -474,13 +474,13 @@ function renderPipelineCell(colId, lead, ctx) {
             leadHasSendableEmail(lead) ? (
               <a
                 href={`mailto:${encodeURIComponent(email)}`}
-                className="pipeline-hs-cell-text"
+                className="pipeline-hs-cell-text pipeline-hs-email-text"
                 onClick={(e) => e.stopPropagation()}
               >
                 {email}
               </a>
             ) : (
-              <span className="pipeline-hs-cell-text">{email}</span>
+              <span className="pipeline-hs-cell-text pipeline-hs-email-text">{email}</span>
             )
           ) : (
             <span className="pipeline-hs-muted">—</span>

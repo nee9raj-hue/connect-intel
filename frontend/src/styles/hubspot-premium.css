@@ -155,12 +155,12 @@ body,
 
 .crm-link-btn,
 a.crm-link,
-.crm-workspace a:not([class*='btn']):not([class*='rounded']) {
+.crm-workspace a:not([class*='btn']):not([class*='rounded']):not(.pipeline-hs-email-text) {
   color: var(--hs-link);
 }
 
 .crm-link-btn:hover,
-.crm-workspace a:not([class*='btn']):hover {
+.crm-workspace a:not([class*='btn']):not([class*='rounded']):not(.pipeline-hs-email-text):hover {
   color: var(--hs-link-hover);
 }
 
