@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-14T10:49:15.514Z",
-  "updatedAtIst": "14/06/2026, 16:19:15",
+  "updatedAt": "2026-06-14T11:05:26.247Z",
+  "updatedAtIst": "14/06/2026, 16:35:26",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "8c688b9",
+  "currentProductionCommit": "c7a99e2",
   "entries": [
+    {
+      "logId": "20260614-1629-c7a99e2",
+      "commit": "c7a99e2",
+      "commitFull": "c7a99e22d748d753f094d41d0eac8bdebc5f53eb",
+      "message": "Add SQL-backed city, state, score filters and paginated deals loading.",
+      "deployedAt": "2026-06-14T10:59:11.840Z",
+      "deployedAtIst": "14/06/2026, 16:29:11",
+      "committedAtIst": "14/06/2026, 16:22:36",
+      "vercelPreviewUrl": "https://connect-intel-k1gfn51ok-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- c7a99e2"
+    },
+    {
+      "logId": "20260614-1619-fcca7f7",
+      "commit": "fcca7f7",
+      "commitFull": "fcca7f7f4c7351694d9fa8dfb24d3f03bdeaa7ac",
+      "message": "chore: sync production log after pipeline performance deploy",
+      "deployedAt": "2026-06-14T10:49:46.055Z",
+      "deployedAtIst": "14/06/2026, 16:19:46",
+      "committedAtIst": "14/06/2026, 16:19:15",
+      "vercelPreviewUrl": "https://connect-intel-o2ir0a51z-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- fcca7f7"
+    },
     {
       "logId": "20260614-1618-8c688b9",
       "commit": "8c688b9",
@@ -15,7 +43,7 @@
       "committedAtIst": "14/06/2026, 16:17:39",
       "vercelPreviewUrl": "https://connect-intel-hwwfc44gh-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 8c688b9"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 058ce95"
-    },
-    {
-      "logId": "20260614-1159-61c9984",
-      "commit": "61c9984",
-      "commitFull": "61c99847a2444840d809956693a7f8da8c16e396",
-      "message": "Rebuild CRM home dashboard as role-aware command center.",
-      "deployedAt": "2026-06-14T06:29:26.916Z",
-      "deployedAtIst": "14/06/2026, 11:59:26",
-      "committedAtIst": "14/06/2026, 11:58:53",
-      "vercelPreviewUrl": "https://connect-intel-osmf1uswt-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 61c9984"
-    },
-    {
-      "logId": "20260613-2045-e12df7c",
-      "commit": "e12df7c",
-      "commitFull": "e12df7c9380cab9399f97ef7383c435cbb08c995",
-      "message": "Upgrade analytics page charts with full-width pro visuals.",
-      "deployedAt": "2026-06-13T15:15:10.657Z",
-      "deployedAtIst": "13/06/2026, 20:45:10",
-      "committedAtIst": "13/06/2026, 20:44:36",
-      "vercelPreviewUrl": "https://connect-intel-leniuo0co-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- e12df7c"
     }
   ]
 }
