@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-14T10:42:54.635Z",
-  "updatedAtIst": "14/06/2026, 16:12:54",
+  "updatedAt": "2026-06-14T10:49:15.514Z",
+  "updatedAtIst": "14/06/2026, 16:19:15",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "fbc6297",
+  "currentProductionCommit": "8c688b9",
   "entries": [
+    {
+      "logId": "20260614-1618-8c688b9",
+      "commit": "8c688b9",
+      "commitFull": "8c688b9a2c4fa640f83adbc6a78f7b02dec4467c",
+      "message": "Speed up pipeline list with SQL follow-up filters and Meili search path.",
+      "deployedAt": "2026-06-14T10:48:59.552Z",
+      "deployedAtIst": "14/06/2026, 16:18:59",
+      "committedAtIst": "14/06/2026, 16:17:39",
+      "vercelPreviewUrl": "https://connect-intel-hwwfc44gh-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 8c688b9"
+    },
+    {
+      "logId": "20260614-1613-2827dd9",
+      "commit": "2827dd9",
+      "commitFull": "2827dd9fbeadd8738f9ba471c43865626bcb0b87",
+      "message": "chore: sync production log after pipeline RBAC hardening deploy",
+      "deployedAt": "2026-06-14T10:43:28.750Z",
+      "deployedAtIst": "14/06/2026, 16:13:28",
+      "committedAtIst": "14/06/2026, 16:12:59",
+      "vercelPreviewUrl": "https://connect-intel-hkzcvjiqo-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 2827dd9"
+    },
     {
       "logId": "20260614-1612-fbc6297",
       "commit": "fbc6297",
@@ -15,7 +43,7 @@
       "committedAtIst": "14/06/2026, 16:12:09",
       "vercelPreviewUrl": "https://connect-intel-do0uw5tyh-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- fbc6297"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- e12df7c"
-    },
-    {
-      "logId": "20260613-2039-27eb4a8",
-      "commit": "27eb4a8",
-      "commitFull": "27eb4a802ddd8c076baefef62f848620c350a079",
-      "message": "Modernize campaign report funnel and full-width activity chart.",
-      "deployedAt": "2026-06-13T15:09:36.625Z",
-      "deployedAtIst": "13/06/2026, 20:39:36",
-      "committedAtIst": "13/06/2026, 20:39:02",
-      "vercelPreviewUrl": "https://connect-intel-50vfp1c8l-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 27eb4a8"
-    },
-    {
-      "logId": "20260613-2033-98803b4",
-      "commit": "98803b4",
-      "commitFull": "98803b452ab029d47e50ba9566e0edbe1ba6a759",
-      "message": "Fix analytics 0% open rates by using campaign-scoped event metrics.",
-      "deployedAt": "2026-06-13T15:03:12.225Z",
-      "deployedAtIst": "13/06/2026, 20:33:12",
-      "committedAtIst": "13/06/2026, 20:32:34",
-      "vercelPreviewUrl": "https://connect-intel-qdnlvofgt-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 98803b4"
     }
   ]
 }

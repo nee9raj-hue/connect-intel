@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- a031e25
+npm run prod:rollback -- 2827dd9
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- a031e25
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `fbc6297` |
-| Log updated (IST) | 14/06/2026, 16:12:54 |
+| Commit | `8c688b9` |
+| Log updated (IST) | 14/06/2026, 16:19:15 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- a031e25
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 14/06/2026, 16:12:46 | `fbc6297` | Harden pipeline RBAC on writes, search, and bulk paths. | [preview](https://connect-intel-do0uw5tyh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- fbc6297` | **← LIVE**
+| 14/06/2026, 16:18:59 | `8c688b9` | Speed up pipeline list with SQL follow-up filters and Meili search path. | [preview](https://connect-intel-hwwfc44gh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8c688b9` | **← LIVE**
+| 14/06/2026, 16:13:28 | `2827dd9` | chore: sync production log after pipeline RBAC hardening deploy | [preview](https://connect-intel-hkzcvjiqo-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2827dd9` |
+| 14/06/2026, 16:12:46 | `fbc6297` | Harden pipeline RBAC on writes, search, and bulk paths. | [preview](https://connect-intel-do0uw5tyh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- fbc6297` |
 | 14/06/2026, 15:48:19 | `a031e25` | chore: sync production log after pipeline premium UI deploy | [preview](https://connect-intel-bsbh7fcdv-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a031e25` |
 | 14/06/2026, 15:47:25 | `f2949dc` | Polish pipeline list view with premium icons, motion, and empty states. | [preview](https://connect-intel-4bxe1ngx4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f2949dc` |
 | 14/06/2026, 15:37:50 | `6759962` | Replace pipeline row ellipsis with labeled Actions trigger. | [preview](https://connect-intel-7lfzqqtvh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6759962` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- a031e25
 | 14/06/2026, 12:05:36 | `058ce95` | Upgrade pipeline health chart with distribution bar and column chart. | [preview](https://connect-intel-qpdyu8is3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 058ce95` |
 | 14/06/2026, 11:59:26 | `61c9984` | Rebuild CRM home dashboard as role-aware command center. | [preview](https://connect-intel-osmf1uswt-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 61c9984` |
 | 13/06/2026, 20:45:10 | `e12df7c` | Upgrade analytics page charts with full-width pro visuals. | [preview](https://connect-intel-leniuo0co-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e12df7c` |
-| 13/06/2026, 20:39:36 | `27eb4a8` | Modernize campaign report funnel and full-width activity chart. | [preview](https://connect-intel-50vfp1c8l-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 27eb4a8` |
-| 13/06/2026, 20:33:12 | `98803b4` | Fix analytics 0% open rates by using campaign-scoped event metrics. | [preview](https://connect-intel-qdnlvofgt-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 98803b4` |
 
 ---
 
