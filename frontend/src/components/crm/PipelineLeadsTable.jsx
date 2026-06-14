@@ -12,6 +12,16 @@ import {
   normalizePipelineColumnOrder,
 } from '../../lib/pipelineColumnPrefs'
 import PipelineRowActionsMenu from './PipelineRowActionsMenu'
+import {
+  PhoneIcon,
+  MailIcon,
+  TaskIcon,
+  NoteIcon,
+  CalendarIcon,
+  LogIcon,
+  WhatsAppIcon,
+  ChevronRightIcon,
+} from '../ui/icons'
 
 function displayName(lead) {
   const n = [lead.firstName, lead.lastName].filter(Boolean).join(' ').trim()
@@ -65,13 +75,32 @@ function relativeLabel(iso) {
   return formatCrmDate(iso)
 }
 
-const ACTIVITY_ICONS = {
-  call: '📞',
-  email: '✉',
-  task: '☐',
-  note: '📝',
-  meeting: '📅',
-  status: '↻',
+const ACTIVITY_ICON_MAP = {
+  call: { Icon: PhoneIcon, wrap: 'pipeline-activity-icon-wrap--call' },
+  email: { Icon: MailIcon, wrap: 'pipeline-activity-icon-wrap--email' },
+  task: { Icon: TaskIcon, wrap: 'pipeline-activity-icon-wrap--task' },
+  note: { Icon: NoteIcon, wrap: 'pipeline-activity-icon-wrap--note' },
+  meeting: { Icon: CalendarIcon, wrap: 'pipeline-activity-icon-wrap--meeting' },
+  status: { Icon: LogIcon, wrap: 'pipeline-activity-icon-wrap--status' },
+}
+
+function ActivityTypeIcon({ type }) {
+  const entry = ACTIVITY_ICON_MAP[type] || ACTIVITY_ICON_MAP.status
+  const { Icon, wrap } = entry
+  return (
+    <span className={`pipeline-activity-icon-wrap ${wrap}`}>
+      <Icon aria-hidden />
+    </span>
+  )
+}
+
+function PipelineQuickAction({ label, Icon, onClick }) {
+  return (
+    <button type="button" className="pipeline-quick-action" onClick={onClick}>
+      <Icon aria-hidden />
+      {label}
+    </button>
+  )
 }
 
 function sortLeads(leads, sortKey, sortDir) {
@@ -189,7 +218,7 @@ function renderPipelineHeader(colId, { sortKey, sortDir, onSort }) {
       return (
         <SortHeader
           key={colId}
-          label="Last activity"
+          label="Last touch"
           sortKey="activity"
           activeKey={sortKey}
           sortDir={sortDir}
@@ -219,7 +248,7 @@ function renderPipelineHeader(colId, { sortKey, sortDir, onSort }) {
       return (
         <SortHeader
           key={colId}
-          label="Create date"
+          label="Created"
           sortKey="created"
           activeKey={sortKey}
           sortDir={sortDir}
@@ -284,56 +313,51 @@ function renderPipelineCell(colId, lead, ctx) {
             {showHoverActions ? (
               <span className="pipeline-row-hover-actions" aria-label="Quick actions">
                 {leadHasCallablePhone(lead) ? (
-                  <button
-                    type="button"
+                  <PipelineQuickAction
+                    label="Call"
+                    Icon={PhoneIcon}
                     onClick={(e) => {
                       e.stopPropagation()
                       onQuickCall?.(lead)
                     }}
-                  >
-                    Call
-                  </button>
+                  />
                 ) : null}
                 {email ? (
-                  <button
-                    type="button"
+                  <PipelineQuickAction
+                    label="Email"
+                    Icon={MailIcon}
                     onClick={(e) => {
                       e.stopPropagation()
                       onQuickEmail?.(lead)
                     }}
-                  >
-                    Email
-                  </button>
+                  />
                 ) : null}
-                <button
-                  type="button"
+                <PipelineQuickAction
+                  label="Task"
+                  Icon={TaskIcon}
                   onClick={(e) => {
                     e.stopPropagation()
                     onQuickTask?.(lead)
                   }}
-                >
-                  Task
-                </button>
+                />
                 {lead.phone && onQuickWhatsApp ? (
-                  <button
-                    type="button"
+                  <PipelineQuickAction
+                    label="WhatsApp"
+                    Icon={WhatsAppIcon}
                     onClick={(e) => {
                       e.stopPropagation()
                       onQuickWhatsApp?.(lead)
                     }}
-                  >
-                    WhatsApp
-                  </button>
+                  />
                 ) : null}
-                <button
-                  type="button"
+                <PipelineQuickAction
+                  label="Open"
+                  Icon={ChevronRightIcon}
                   onClick={(e) => {
                     e.stopPropagation()
                     onSelect(lead.id)
                   }}
-                >
-                  Open →
-                </button>
+                />
               </span>
             ) : null}
           </div>
@@ -440,11 +464,11 @@ function renderPipelineCell(colId, lead, ctx) {
               onClick={() => onSelect(lead.id, 'activity')}
               title={formatDateTime(activityAt)}
             >
-              <span aria-hidden>{ACTIVITY_ICONS[activityType] || '·'}</span>
+              <ActivityTypeIcon type={activityType} />
               {rel}
             </button>
           ) : (
-            <span className="pipeline-activity-cell is-none">No activity</span>
+            <span className="pipeline-activity-cell is-none">No touchpoints yet</span>
           )}
         </td>
       )
@@ -596,7 +620,7 @@ export default function PipelineLeadsTable({
 
   return (
     <div
-      className={`pipeline-hs-table-wrap pipeline-hs-table-wrap--v2${
+      className={`pipeline-hs-table-wrap pipeline-hs-table-wrap--v2 pipeline-hs-table-wrap--premium${
         showHoverActions ? '' : ' pipeline-hs-table-wrap--no-hover-actions'
       }`}
     >

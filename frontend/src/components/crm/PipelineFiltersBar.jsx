@@ -544,7 +544,7 @@ export default function PipelineFiltersBar({
                 handleApply()
               }
             }}
-            placeholder="Search name, email, phone…"
+            placeholder="Search by name, email, or phone…"
             className="pipeline-filter-command-bar__search-input"
             aria-label="Search pipeline leads"
           />

@@ -8,7 +8,7 @@ import {
   getVisiblePipelineColumnsForSettings,
   pipelinesFromSettings,
 } from '../../lib/crmPipelines'
-import { PipelineIcon, PlusIcon, SettingsGearIcon, UploadIcon } from '../ui/icons'
+import { PipelineIcon, PlusIcon, SettingsGearIcon, UploadIcon, ListIcon, SearchIcon } from '../ui/icons'
 import LeadWorkspace from './LeadWorkspace'
 import PipelineImportModal from './PipelineImportModal'
 import BulkEmailModal from './BulkEmailModal'
@@ -1305,43 +1305,41 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       <div
         className={`crm-workspace flex-1 min-w-0 min-h-0 flex flex-col ${
           selectedLead ? 'hidden md:flex' : 'flex'
-        } ${useHubSpotList ? 'pipeline-list-workspace' : ''}`}
+        } ${useHubSpotList ? 'pipeline-list-workspace pipeline-page-premium' : ''}`}
       >
         <MyDayReturnBar panelOptions={panelOptions} onNavigate={onNavigate} />
         <header className="crm-page-header pipeline-page-header pipeline-v2-header">
           <div className="pipeline-v2-header__row">
             {!usePipelineNarrow && !isDealsView ? (
-              <div className="min-w-0">
-                <h1 className="pipeline-v2-header__title">Pipeline</h1>
-                <p className="pipeline-v2-header__breadcrumb">
-                  {isDealsView ? (
-                    <>
-                      {dealsStageLabel} · shipment RFQs
-                    </>
-                  ) : (
-                    listBreadcrumb
-                  )}
-                  {assigneeName ? (
-                    <>
-                      {' · '}
-                      <button
-                        type="button"
-                        className="crm-filter-link-btn"
-                        onClick={() => setPipelineAssigneeFilter?.(null)}
-                      >
-                        Clear owner
-                      </button>
-                    </>
-                  ) : null}
-                </p>
+              <div className="pipeline-v2-header__brand min-w-0">
+                <div className="pipeline-v2-header__icon-wrap" aria-hidden>
+                  <PipelineIcon className="pipeline-v2-header__icon" />
+                </div>
+                <div className="min-w-0">
+                  <h1 className="pipeline-v2-header__title">Pipeline</h1>
+                  <p className="pipeline-v2-header__breadcrumb">
+                    {listBreadcrumb}
+                    {assigneeName ? (
+                      <>
+                        <button
+                          type="button"
+                          className="crm-filter-link-btn"
+                          onClick={() => setPipelineAssigneeFilter?.(null)}
+                        >
+                          Clear owner
+                        </button>
+                      </>
+                    ) : null}
+                  </p>
+                </div>
               </div>
             ) : null}
             <div className="crm-page-actions pipeline-page-actions">
               {!stageListMode && !usePipelineNarrow && !isDealsView ? (
                 <div className="pipeline-v2-view-toggle" role="tablist" aria-label="Pipeline view">
                   {[
-                    { id: 'board', label: 'Board' },
-                    { id: 'list', label: 'List' },
+                    { id: 'board', label: 'Board', Icon: PipelineIcon },
+                    { id: 'list', label: 'List', Icon: ListIcon },
                   ].map((v) => (
                     <button
                       key={v.id}
@@ -1351,6 +1349,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                       onClick={() => setView(v.id)}
                       className={`pipeline-v2-view-toggle__btn ${view === v.id ? 'is-active' : ''}`}
                     >
+                      <v.Icon aria-hidden />
                       {v.label}
                     </button>
                   ))}
@@ -2072,21 +2071,32 @@ function KanbanColumn({
   )
 }
 
+function PipelineEmptyGraphic({ Icon }) {
+  return (
+    <div className="pipeline-empty-v2__graphic" aria-hidden>
+      <span className="pipeline-empty-v2__graphic-ring" />
+      <div className="pipeline-empty-v2__graphic-core">
+        <Icon />
+      </div>
+    </div>
+  )
+}
+
 function PipelineNoMatches({ onClearFilters, onAdd, filterSummary = '' }) {
   return (
-    <div className="pipeline-empty-v2">
-      <div className="pipeline-empty-v2__icon" aria-hidden>
-        ⌕
-      </div>
-      <h3 className="pipeline-empty-v2__title">No leads match your filters</h3>
+    <div className="pipeline-empty-v2 pipeline-empty-v2--premium">
+      <PipelineEmptyGraphic Icon={SearchIcon} />
+      <h3 className="pipeline-empty-v2__title">No leads match this view</h3>
       {filterSummary ? <p className="pipeline-empty-v2__filters">{filterSummary}</p> : null}
-      <p className="pipeline-empty-v2__sub">Try clearing filters or add a lead manually.</p>
+      <p className="pipeline-empty-v2__sub">
+        Broaden your filters or search to surface more results.
+      </p>
       <div className="flex flex-col sm:flex-row gap-2">
         <button type="button" onClick={onClearFilters} className="crm-btn crm-btn-secondary">
-          Clear filters
+          Reset filters
         </button>
         <button type="button" onClick={onAdd} className="pipeline-v2-btn-add">
-          Add lead manually
+          Add lead
         </button>
       </div>
     </div>
@@ -2095,20 +2105,20 @@ function PipelineNoMatches({ onClearFilters, onAdd, filterSummary = '' }) {
 
 function EmptyPipeline({ onImport, onAdd, compact = false }) {
   return (
-    <div className={`pipeline-empty-v2 ${compact ? 'py-8' : ''}`}>
-      <div className="pipeline-empty-v2__icon" aria-hidden>
-        ◫
-      </div>
-      <h3 className="pipeline-empty-v2__title">Your pipeline is empty</h3>
+    <div className={`pipeline-empty-v2 pipeline-empty-v2--premium ${compact ? 'py-8' : ''}`}>
+      <PipelineEmptyGraphic Icon={PipelineIcon} />
+      <h3 className="pipeline-empty-v2__title">Your pipeline is ready</h3>
       <p className="pipeline-empty-v2__sub">
-        Start adding leads or import from CSV to get going.
+        Add your first lead or import a CSV to start moving deals forward.
       </p>
       <div className="flex flex-col sm:flex-row gap-2">
         <button type="button" onClick={() => onAdd?.()} className="pipeline-v2-btn-add">
+          <PlusIcon className="w-4 h-4" aria-hidden />
           Add first lead
         </button>
         <button type="button" onClick={onImport} className="pipeline-v2-btn-import">
-          Import from CSV
+          <UploadIcon className="w-4 h-4" aria-hidden />
+          Import CSV
         </button>
       </div>
     </div>

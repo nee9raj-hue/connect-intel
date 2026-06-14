@@ -241,6 +241,14 @@ export function MailIcon({ className }) {
   )
 }
 
+export function PhoneIcon({ className }) {
+  return (
+    <LineIcon className={className}>
+      <path d="M6.5 4.75c0-.69.56-1.25 1.25-1.25h1.5c.55 0 1.02.36 1.17.88l.72 2.52a1.25 1.25 0 0 1-.38 1.24l-1.1 1.1a12.5 12.5 0 0 0 5.34 5.34l1.1-1.1a1.25 1.25 0 0 1 1.24-.38l2.52.72c.52.15.88.62.88 1.17v1.5c0 .69-.56 1.25-1.25 1.25C10.2 19.37 4.63 13.8 4.63 6.5c0-.69.56-1.25 1.25-1.25h.62Z" />
+    </LineIcon>
+  )
+}
+
 export function ChartIcon({ className }) {
   return (
     <LineIcon className={className}>
