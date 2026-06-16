@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 5997bb7
+npm run prod:rollback -- aef8ae6
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 5997bb7
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `2861496` |
-| Log updated (IST) | 16/06/2026, 12:10:43 |
+| Commit | `510bec5` |
+| Log updated (IST) | 16/06/2026, 12:38:13 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 5997bb7
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 16/06/2026, 12:10:36 | `2861496` | Speed up pipeline lead search with scoped SQL instead of full shard scans. | [preview](https://connect-intel-enqcrzjoe-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2861496` | **← LIVE**
+| 16/06/2026, 12:38:06 | `510bec5` | Harden concurrent multi-user load without changing CRM workflows. | [preview](https://connect-intel-l5nyhqc4v-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 510bec5` | **← LIVE**
+| 16/06/2026, 12:11:28 | `aef8ae6` | chore: sync production log after pipeline search performance deploy | [preview](https://connect-intel-j59djd7w8-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- aef8ae6` |
+| 16/06/2026, 12:10:36 | `2861496` | Speed up pipeline lead search with scoped SQL instead of full shard scans. | [preview](https://connect-intel-enqcrzjoe-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2861496` |
 | 16/06/2026, 12:01:24 | `5997bb7` | chore: sync production log after sidebar pipeline stages deploy | [preview](https://connect-intel-jmz83f0ss-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5997bb7` |
 | 16/06/2026, 12:00:34 | `f354208` | Show all lead pipeline stages in the sidebar for every role. | [preview](https://connect-intel-lrv1ah915-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f354208` |
 | 16/06/2026, 11:58:47 | `9018a97` | chore: sync production log after lead reassignment fix deploy | [preview](https://connect-intel-11g0veckl-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9018a97` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 5997bb7
 | 14/06/2026, 16:36:14 | `dd4329e` | chore: sync production log after SQL filter columns deploy | [preview](https://connect-intel-8kx10vau0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- dd4329e` |
 | 14/06/2026, 16:29:11 | `c7a99e2` | Add SQL-backed city, state, score filters and paginated deals loading. | [preview](https://connect-intel-k1gfn51ok-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c7a99e2` |
 | 14/06/2026, 16:19:46 | `fcca7f7` | chore: sync production log after pipeline performance deploy | [preview](https://connect-intel-o2ir0a51z-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- fcca7f7` |
-| 14/06/2026, 16:18:59 | `8c688b9` | Speed up pipeline list with SQL follow-up filters and Meili search path. | [preview](https://connect-intel-hwwfc44gh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8c688b9` |
-| 14/06/2026, 16:13:28 | `2827dd9` | chore: sync production log after pipeline RBAC hardening deploy | [preview](https://connect-intel-hkzcvjiqo-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2827dd9` |
 
 ---
 
