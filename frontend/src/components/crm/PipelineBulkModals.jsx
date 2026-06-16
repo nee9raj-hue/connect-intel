@@ -73,7 +73,9 @@ export function PipelineBulkAssignModal({
       }
     >
       {!canAssign ? (
-        <p className="text-sm text-[#516f90]">Only managers can assign leads.</p>
+        <p className="text-sm text-[#516f90]">
+          Only admins, managers, or the current lead owner can reassign leads.
+        </p>
       ) : (
         <label className="pipeline-bulk-modal-field">
           <span className="pipeline-bulk-modal-label">Lead owner</span>

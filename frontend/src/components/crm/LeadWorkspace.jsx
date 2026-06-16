@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useUsagePolicies } from '../../hooks/useUsagePolicies.js'
 import { useApp } from '../../context/AppContext'
+import { useUsagePolicies } from '../../hooks/useUsagePolicies.js'
+import { isPipelineAssignManager } from '../../lib/pipelineAssignAccess'
 import { api } from '../../lib/api'
 import { leadHasCallablePhone, openWhatsAppChat } from '../../lib/phoneUtils'
 import LeadCallLogCard from './LeadCallLogCard'
@@ -202,7 +203,7 @@ export default function LeadWorkspace({
   const [timelineFilter, setTimelineFilter] = useState('all')
   const [marketingTimeline, setMarketingTimeline] = useState([])
 
-  const isManager = user?.isOrgAdmin || user?.orgRole === 'org_admin'
+  const isManager = isPipelineAssignManager(user)
   const isUnassignedLead = !lead?.assignedToUserId
   const canAssignThisLead =
     isManager ||

@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { useApp } from '../context/AppContext'
+import { isPipelineAssignManager } from '../lib/pipelineAssignAccess'
 
 /**
  * Role-aware lead visibility (mirrors Supabase leads RLS on the server).
@@ -11,7 +12,7 @@ export function useEnterpriseLeadAccess() {
 
   return useMemo(() => {
     const isCompany = user?.accountType === 'company' && user?.organizationId
-    const isManager = Boolean(user?.isOrgAdmin)
+    const isManager = isPipelineAssignManager(user)
     const isRep = isCompany && !isManager
 
     return {

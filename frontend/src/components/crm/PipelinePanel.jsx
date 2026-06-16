@@ -2,7 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
-import { formatCrmDate, getStatusMeta, getVisiblePipelineColumns } from '../../lib/crmConstants'
+import { CRM_STATUSES, formatCrmDate, getStatusMeta, getVisiblePipelineColumns } from '../../lib/crmConstants'
+import { canAssignPipelineLeads } from '../../lib/pipelineAssignAccess'
 import {
   getDefaultPipelineId,
   getVisiblePipelineColumnsForSettings,
@@ -180,7 +181,6 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const isTeamManager = Boolean(
     user?.accountType === 'company' && !isOrgAdmin && user?.pipelineRole === 'manager'
   )
-  const canAssign = isOrgAdmin
 
   useEffect(() => {
     if (isOrgAdmin || isTeamManager) refreshTeam?.()
@@ -958,6 +958,11 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     }
     return [...selectedIds].map((id) => byId.get(id)).filter(Boolean)
   }, [savedLeads, filtered, boardLeadsByStatus, selectedIds])
+
+  const canAssign = useMemo(
+    () => canAssignPipelineLeads(user, selectedLeads),
+    [user, selectedLeads]
+  )
 
   const selectedEmailCount = useMemo(
     () => selectedLeads.filter(leadHasSendableEmail).length,
