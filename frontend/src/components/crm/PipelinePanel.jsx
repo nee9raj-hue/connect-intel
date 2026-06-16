@@ -696,11 +696,6 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   useDebouncedPipelineSearch(search, (q) => {
     if (q === appliedSearch) return
     applyFilters({ search: q })
-    if (serverSidePipeline) {
-      loadPipelineList(buildServerFilters(advancedFilters, q), { append: false, silent: true }).catch(
-        () => {}
-      )
-    }
   })
 
   const removeAppliedFilter = useCallback(
