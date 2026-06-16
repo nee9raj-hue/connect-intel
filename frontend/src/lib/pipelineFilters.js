@@ -7,6 +7,7 @@ import {
 import {
   pipelineEntryMatchesOwnerFilter,
   pipelineOwnerUserId,
+  repPipelineEntryVisible,
 } from '../../../lib/pipelineOwner.js'
 import { leadHasSendableEmail, leadDisplayName, leadEmailBounced } from './emailUtils'
 
@@ -97,16 +98,11 @@ export function leadMatchesAssignee(lead, assigneeUserId) {
   return pipelineEntryMatchesOwnerFilter(lead, assigneeUserId)
 }
 
-/** Rep safety net: own assigned leads + org unassigned pool only. */
+/** Rep safety net: own leads + open pool (no indexed owner). */
 export function filterRepPipelineLeads(leads, user, { isOrgAdmin = false, isTeamManager = false } = {}) {
   if (!user?.id || user.accountType !== 'company') return leads || []
   if (isOrgAdmin || isTeamManager) return leads || []
-  const uid = String(user.id)
-  return (leads || []).filter((lead) => {
-    const assigned = lead?.assignedToUserId
-    if (assigned == null || String(assigned).trim() === '') return true
-    return String(assigned) === uid
-  })
+  return (leads || []).filter((lead) => repPipelineEntryVisible(lead, user.id))
 }
 
 function matchesAnyLocationField(value, filterList) {
