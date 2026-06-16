@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-16T05:42:19.662Z",
-  "updatedAtIst": "16/06/2026, 11:12:19",
+  "updatedAt": "2026-06-16T06:19:31.663Z",
+  "updatedAtIst": "16/06/2026, 11:49:31",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "78551ea",
+  "currentProductionCommit": "6b123fe",
   "entries": [
+    {
+      "logId": "20260616-1149-6b123fe",
+      "commit": "6b123fe",
+      "commitFull": "6b123fe10067870fc84e3d6ae6ada3f9b30b8c50",
+      "message": "Show full pipeline stages for all company members.",
+      "deployedAt": "2026-06-16T06:19:09.291Z",
+      "deployedAtIst": "16/06/2026, 11:49:09",
+      "committedAtIst": "16/06/2026, 11:48:36",
+      "vercelPreviewUrl": "https://connect-intel-mr8hm2nmn-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 6b123fe"
+    },
+    {
+      "logId": "20260616-1112-e8d82d1",
+      "commit": "e8d82d1",
+      "commitFull": "e8d82d1040f1579b0fcd402aecf52e48acf564e2",
+      "message": "chore: sync production log after pipeline search handler fix deploy",
+      "deployedAt": "2026-06-16T05:42:55.468Z",
+      "deployedAtIst": "16/06/2026, 11:12:55",
+      "committedAtIst": "16/06/2026, 11:12:24",
+      "vercelPreviewUrl": "https://connect-intel-4islq618v-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- e8d82d1"
+    },
     {
       "logId": "20260616-1112-78551ea",
       "commit": "78551ea",
@@ -15,7 +43,7 @@
       "committedAtIst": "16/06/2026, 11:11:35",
       "vercelPreviewUrl": "https://connect-intel-70cf03lw5-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 78551ea"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 269076b"
-    },
-    {
-      "logId": "20260614-1514-5f2d3b3",
-      "commit": "5f2d3b3",
-      "commitFull": "5f2d3b365c0744d0605f192f5e6468120b736ec3",
-      "message": "Redesign lead record panel with icon tabs and premium workspace UI.",
-      "deployedAt": "2026-06-14T09:44:25.420Z",
-      "deployedAtIst": "14/06/2026, 15:14:25",
-      "committedAtIst": "14/06/2026, 15:13:55",
-      "vercelPreviewUrl": "https://connect-intel-llrszyt11-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 5f2d3b3"
-    },
-    {
-      "logId": "20260614-1502-444a32e",
-      "commit": "444a32e",
-      "commitFull": "444a32ed1505e9cff5f72392189b26a3e99a8f2e",
-      "message": "Remove duplicate lead count from pipeline filter bar.",
-      "deployedAt": "2026-06-14T09:32:49.822Z",
-      "deployedAtIst": "14/06/2026, 15:02:49",
-      "committedAtIst": "14/06/2026, 15:02:19",
-      "vercelPreviewUrl": "https://connect-intel-rljvis9m2-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 444a32e"
     }
   ]
 }
