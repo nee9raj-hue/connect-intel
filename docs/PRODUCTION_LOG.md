@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 7ac4bfb
+npm run prod:rollback -- cffaac3
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 7ac4bfb
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `4d87a84` |
-| Log updated (IST) | 16/06/2026, 11:03:41 |
+| Commit | `78551ea` |
+| Log updated (IST) | 16/06/2026, 11:12:19 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 7ac4bfb
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 16/06/2026, 11:03:31 | `4d87a84` | Fix pipeline search fallback and CRM notification email subjects. | [preview](https://connect-intel-jdajkoc0y-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4d87a84` | **← LIVE**
+| 16/06/2026, 11:12:07 | `78551ea` | Fix pipeline text search returning unfiltered list page. | [preview](https://connect-intel-70cf03lw5-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 78551ea` | **← LIVE**
+| 16/06/2026, 11:04:18 | `cffaac3` | chore: sync production log after pipeline search and email fixes deploy | [preview](https://connect-intel-9qprteqen-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- cffaac3` |
+| 16/06/2026, 11:03:31 | `4d87a84` | Fix pipeline search fallback and CRM notification email subjects. | [preview](https://connect-intel-jdajkoc0y-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4d87a84` |
 | 16/06/2026, 10:12:45 | `7ac4bfb` | chore: sync production log after team invite timeout fix deploy | [preview](https://connect-intel-2h98isjkv-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7ac4bfb` |
 | 16/06/2026, 10:11:52 | `daac694` | Fix team invite timeouts for large org workspaces. | [preview](https://connect-intel-9262aj2pv-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- daac694` |
 | 14/06/2026, 16:48:32 | `a49e07f` | chore: sync production log after pipeline owner filter fix deploy | [preview](https://connect-intel-a8ljh4fwj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a49e07f` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 7ac4bfb
 | 14/06/2026, 15:22:33 | `269076b` | Redesign lead Deals tab with compact cards and icon controls. | [preview](https://connect-intel-ghq3uemsi-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 269076b` |
 | 14/06/2026, 15:14:25 | `5f2d3b3` | Redesign lead record panel with icon tabs and premium workspace UI. | [preview](https://connect-intel-llrszyt11-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5f2d3b3` |
 | 14/06/2026, 15:02:49 | `444a32e` | Remove duplicate lead count from pipeline filter bar. | [preview](https://connect-intel-rljvis9m2-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 444a32e` |
-| 14/06/2026, 14:57:43 | `4f75292` | Move pipeline view settings to header actions away from filter bar. | [preview](https://connect-intel-3s8joap34-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4f75292` |
-| 14/06/2026, 14:48:33 | `dfd3e32` | Move pipeline view settings to top-right header actions. | [preview](https://connect-intel-490gpx13g-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- dfd3e32` |
 
 ---
 

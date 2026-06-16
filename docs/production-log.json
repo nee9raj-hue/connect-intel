@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-16T05:33:41.207Z",
-  "updatedAtIst": "16/06/2026, 11:03:41",
+  "updatedAt": "2026-06-16T05:42:19.662Z",
+  "updatedAtIst": "16/06/2026, 11:12:19",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "4d87a84",
+  "currentProductionCommit": "78551ea",
   "entries": [
+    {
+      "logId": "20260616-1112-78551ea",
+      "commit": "78551ea",
+      "commitFull": "78551eaa9254d78337d21b59d463177efde5c40b",
+      "message": "Fix pipeline text search returning unfiltered list page.",
+      "deployedAt": "2026-06-16T05:42:07.674Z",
+      "deployedAtIst": "16/06/2026, 11:12:07",
+      "committedAtIst": "16/06/2026, 11:11:35",
+      "vercelPreviewUrl": "https://connect-intel-70cf03lw5-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 78551ea"
+    },
+    {
+      "logId": "20260616-1104-cffaac3",
+      "commit": "cffaac3",
+      "commitFull": "cffaac322945e2b6d2bf8adc03035bf6181997a8",
+      "message": "chore: sync production log after pipeline search and email fixes deploy",
+      "deployedAt": "2026-06-16T05:34:18.160Z",
+      "deployedAtIst": "16/06/2026, 11:04:18",
+      "committedAtIst": "16/06/2026, 11:03:46",
+      "vercelPreviewUrl": "https://connect-intel-9qprteqen-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- cffaac3"
+    },
     {
       "logId": "20260616-1103-4d87a84",
       "commit": "4d87a84",
@@ -15,7 +43,7 @@
       "committedAtIst": "16/06/2026, 11:02:57",
       "vercelPreviewUrl": "https://connect-intel-jdajkoc0y-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 4d87a84"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 444a32e"
-    },
-    {
-      "logId": "20260614-1457-4f75292",
-      "commit": "4f75292",
-      "commitFull": "4f752928d069c62647feda3bb172c563529f7b5d",
-      "message": "Move pipeline view settings to header actions away from filter bar.",
-      "deployedAt": "2026-06-14T09:27:43.895Z",
-      "deployedAtIst": "14/06/2026, 14:57:43",
-      "committedAtIst": "14/06/2026, 14:57:13",
-      "vercelPreviewUrl": "https://connect-intel-3s8joap34-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 4f75292"
-    },
-    {
-      "logId": "20260614-1448-dfd3e32",
-      "commit": "dfd3e32",
-      "commitFull": "dfd3e32025a8ec7ecd913aff608f5fb7e563e491",
-      "message": "Move pipeline view settings to top-right header actions.",
-      "deployedAt": "2026-06-14T09:18:33.103Z",
-      "deployedAtIst": "14/06/2026, 14:48:33",
-      "committedAtIst": "14/06/2026, 14:47:57",
-      "vercelPreviewUrl": "https://connect-intel-490gpx13g-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- dfd3e32"
     }
   ]
 }
