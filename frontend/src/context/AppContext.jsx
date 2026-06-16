@@ -48,12 +48,32 @@ export function storeInviteToken(token) {
   }
 }
 
+function mergeLightLeadPatch(prev, incoming) {
+  if (!incoming?.listLight) return incoming
+  const prevCrm = prev.crm || {}
+  const incCrm = incoming.crm || {}
+  return {
+    ...prev,
+    ...incoming,
+    crm: {
+      ...prevCrm,
+      ...incCrm,
+      tasks: incCrm.tasks?.length ? incCrm.tasks : prevCrm.tasks,
+      meetings: incCrm.meetings?.length ? incCrm.meetings : prevCrm.meetings,
+      deals: Array.isArray(incCrm.deals) ? incCrm.deals : prevCrm.deals,
+      activities: incCrm.activities?.length ? incCrm.activities : prevCrm.activities,
+      emails: prevCrm.emails,
+    },
+  }
+}
+
 function mergeLeadInList(prev, lead) {
   if (!lead?.id) return prev
   const index = prev.findIndex((entry) => entry.id === lead.id)
   if (index < 0) return [...prev, lead]
   const next = [...prev]
-  next[index] = lead
+  const existing = prev[index]
+  next[index] = existing?.listLight || lead.listLight ? mergeLightLeadPatch(existing, lead) : lead
   return next
 }
 
@@ -693,7 +713,6 @@ export function AppProvider({ children }) {
     ])
     const needsFullReload = Boolean(
       body?.contact ||
-        body?.deal ||
         (body?.crm &&
           Object.keys(body.crm).some((k) => !CRM_PATCH_WITHOUT_RELOAD.has(k)))
     )
@@ -713,12 +732,10 @@ export function AppProvider({ children }) {
         setSavedLeads((current) => mergeLeadInList(current, lead))
       }
       if (body?.deal) {
-        try {
-          const summary = await api.getPipelineSummary({ silent: true })
-          setPipelineSummary(normalizePipelineSummary(summary))
-        } catch {
-          // dashboard counts refresh is best-effort
-        }
+        void api
+          .getPipelineSummary({ silent: true })
+          .then((summary) => setPipelineSummary(normalizePipelineSummary(summary)))
+          .catch(() => {})
       }
       return lead
     } catch (error) {
