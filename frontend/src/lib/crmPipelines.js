@@ -45,14 +45,5 @@ export function getPipelineStages(settings, pipelineId) {
 export function getVisiblePipelineColumnsForSettings(user, settings, pipelineId) {
   if (!user || user.accountType !== 'company') return CRM_STATUSES
   const stages = getPipelineStages(settings, pipelineId)
-  if (!stages.length) return CRM_STATUSES
-
-  if (user.isOrgAdmin || user.orgRole === 'org_admin' || user.isPlatformAdmin) return stages
-
-  const role = user.pipelineRole || 'member'
-  if (role === 'sales') {
-    const early = new Set(['new', 'contacted', 'follow_up'])
-    return stages.filter((col) => early.has(col.id))
-  }
-  return stages
+  return stages.length ? stages : CRM_STATUSES
 }

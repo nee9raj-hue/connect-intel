@@ -44,15 +44,9 @@ export function getDealStageMeta(stage, { freightOrg = false } = {}) {
   return DEAL_STAGES.find((s) => s.id === stage) || DEAL_STAGES[0]
 }
 
-const PIPELINE_ROLE_COLUMNS = {
-  org_admin: ['new', 'contacted', 'follow_up', 'replied', 'won', 'active_trading', 'lost'],
-  member: ['new', 'contacted', 'follow_up', 'replied', 'won', 'active_trading', 'lost'],
-  sales: ['new', 'contacted', 'follow_up'],
-}
-
 export const TEAM_PIPELINE_ROLES = [
-  { id: 'member', label: 'Full pipeline', description: 'New through Replied and Lost' },
-  { id: 'sales', label: 'Sales rep', description: 'Early funnel only' },
+  { id: 'member', label: 'Team member', description: 'Full pipeline: all lead stages' },
+  { id: 'manager', label: 'Manager', description: 'Full pipeline with team visibility' },
 ]
 
 /** SQL hierarchy roles (profiles.role) — drives pipeline data scoping. */
@@ -64,10 +58,7 @@ export const HIERARCHY_SQL_ROLES = [
 
 export function getVisiblePipelineColumns(user) {
   if (!user || user.accountType !== 'company') return CRM_STATUSES
-  if (user.isOrgAdmin || user.orgRole === 'org_admin' || user.isPlatformAdmin) return CRM_STATUSES
-  const role = user.pipelineRole || 'member'
-  const allowed = PIPELINE_ROLE_COLUMNS[role] || PIPELINE_ROLE_COLUMNS.member
-  return CRM_STATUSES.filter((col) => allowed.includes(col.id))
+  return CRM_STATUSES
 }
 
 export const EMAIL_PURPOSES = [
