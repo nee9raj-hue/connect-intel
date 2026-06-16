@@ -158,7 +158,6 @@ export function isNavTargetActive(activePanel, panelOptions, target) {
 function buildFreightPipelineChildren(columns, pipelineCounts, openDealCounts = {}, allDealCounts = {}) {
   const open = openDealCounts || {}
   const all = allDealCounts || {}
-  const leadColumns = columns.filter((col) => col.id !== 'active_trading' && col.id !== 'won' && col.id !== 'lost')
 
   const items = [
     {
@@ -173,7 +172,7 @@ function buildFreightPipelineChildren(columns, pipelineCounts, openDealCounts = 
           view: 'leads',
           badge: pipelineCounts.all,
         },
-        ...leadColumns.map((col) => ({
+        ...columns.map((col) => ({
           id: `pipeline-${col.id}-leads`,
           label: col.label,
           panel: 'pipeline',
@@ -234,9 +233,6 @@ function buildStandardPipelineChildren(
 ) {
   const open = openDealCounts || {}
   const all = allDealCounts || {}
-  const leadColumns = columns.filter(
-    (col) => col.id !== 'active_trading' && col.id !== 'won' && col.id !== 'lost'
-  )
 
   return [
     {
@@ -251,7 +247,7 @@ function buildStandardPipelineChildren(
           view: 'leads',
           badge: pipelineCounts.all,
         },
-        ...leadColumns.map((col) => ({
+        ...columns.map((col) => ({
           id: `pipeline-${col.id}-leads`,
           label: col.label,
           panel: 'pipeline',
