@@ -494,8 +494,6 @@ export function AppProvider({ children }) {
           }
           setSessionError(null)
 
-          void api.getCrmNotifications(undefined, { silent: true }).catch(() => {})
-
           if (user.organizationId && user.accountType === 'company') {
             const data = await api.getTeamMembers({ silent: true })
             if (!cancelled) setTeamMembers(data.members || [])

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 
-const POLL_MS = 45 * 1000
+const POLL_MS = 60 * 1000
 const INITIAL_DELAY_MS = 5 * 1000
 const AUTH_FAIL_PAUSE_MS = 2 * 60 * 1000
 const FOCUS_SYNC_MIN_GAP_MS = 90 * 1000
@@ -81,7 +81,10 @@ export function useWorkspaceSync({
 
     sinceRef.current = new Date(Date.now() - 30 * 1000).toISOString()
     const initialTimer = setTimeout(run, INITIAL_DELAY_MS)
-    const intervalId = setInterval(run, POLL_MS)
+    const intervalId = setInterval(() => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return
+      run()
+    }, POLL_MS)
 
     const onVisible = () => {
       if (document.visibilityState !== 'visible') return

@@ -158,6 +158,30 @@ Expected when complete:
 
 ---
 
+## App-side concurrency (shipped in code)
+
+These reduce load **before** infra upgrades; safe for all orgs:
+
+| Optimization | Effect |
+|--------------|--------|
+| Session user cache (60s) | Fewer auth DB reads per API call |
+| Session GET refresh at most every 5 min | Less `/api/auth/session` load |
+| Notification poll loads **recent + due follow-ups** only | Not full 6k+ lead shard every 60s |
+| Pipeline bootstrap / dashboard request dedup | Tab focus + mount storms coalesce |
+| Background poll pauses when tab hidden | Saves bandwidth per active user |
+| Pipeline text search via scoped SQL | Search without full-shard scan |
+
+**Production env (enable when backfill complete):**
+
+```
+USE_PIPELINE_LEADS_TABLE=true
+USE_PIPELINE_HIERARCHY_RBAC=true
+REDIS_URL=...          # shared dashboard cache across instances
+MEILI_HOST=...         # optional faster search
+```
+
+---
+
 ## 7. Smoke test (Xindus-scale org)
 
 1. Pipeline search — should return `provider: "meilisearch"` in network tab

@@ -8,6 +8,18 @@ import {
 } from './workspaceUploadPrep'
 
 let refreshInFlight = null
+const inFlightGets = new Map()
+
+function dedupeGet(key, factory) {
+  if (inFlightGets.has(key)) return inFlightGets.get(key)
+  const promise = Promise.resolve()
+    .then(factory)
+    .finally(() => {
+      inFlightGets.delete(key)
+    })
+  inFlightGets.set(key, promise)
+  return promise
+}
 
 async function touchSession() {
   if (refreshInFlight) return refreshInFlight
@@ -204,7 +216,10 @@ export const api = {
     if (minLeadScore != null && minLeadScore !== '') qs.set('minLeadScore', String(minLeadScore))
     if (followUpDue) qs.set('followUpDue', '1')
     if (overdueFollowUp) qs.set('overdueFollowUp', '1')
-    return request(`/api/pipeline/bootstrap?${qs}`, { timeoutMs: 60_000 }, { silent })
+    const path = `/api/pipeline/bootstrap?${qs}`
+    return dedupeGet(`pipeline-bootstrap:${path}`, () =>
+      request(path, { timeoutMs: 60_000 }, { silent })
+    )
   },
 
   fetchPipelineDeals: ({ dealStage = 'all', offset = 0, limit = 100, silent = false } = {}) => {
@@ -360,7 +375,10 @@ export const api = {
     request(`/api/crm/activity-timeline?${appendTimeZoneToQuery(query)}`, { timeoutMs: 20_000 }),
   getCrmMyDay: (query = '') =>
     request(`/api/crm/my-day?${appendTimeZoneToQuery(query)}`, { timeoutMs: 15_000 }),
-  getDashboardBootstrap: () => request('/api/dashboard/bootstrap', { timeoutMs: 30_000 }),
+  getDashboardBootstrap: () =>
+    dedupeGet('dashboard-bootstrap', () =>
+      request('/api/dashboard/bootstrap', { timeoutMs: 30_000 })
+    ),
   postWorkspacePulse: (body = {}) =>
     request('/api/crm/workspace-pulse', { method: 'POST', body }, { silent: true }),
   ackMeetingReminder: (leadId, meetingId, { silent = false } = {}) =>
