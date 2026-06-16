@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 9306c85
+npm run prod:rollback -- 4fb1b3d
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 9306c85
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `0244832` |
-| Log updated (IST) | 16/06/2026, 13:46:49 |
+| Commit | `64556ea` |
+| Log updated (IST) | 16/06/2026, 14:49:51 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 9306c85
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 16/06/2026, 13:46:48 | `0244832` | Fix bulk assign ReferenceError for readPipelineLeadsByIds. | [preview](https://connect-intel-6e9q299ow-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0244832` | **← LIVE**
+| 16/06/2026, 14:49:48 | `64556ea` | Fix reps seeing other owners' pipeline leads. | [preview](https://connect-intel-cubn7in34-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 64556ea` | **← LIVE**
+| 16/06/2026, 13:47:24 | `4fb1b3d` | chore: sync production log after bulk assign fix deploy | [preview](https://connect-intel-dliythwaj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4fb1b3d` |
+| 16/06/2026, 13:46:48 | `0244832` | Fix bulk assign ReferenceError for readPipelineLeadsByIds. | [preview](https://connect-intel-6e9q299ow-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0244832` |
 | 16/06/2026, 13:44:11 | `9306c85` | chore: sync production log after deal creation schema fix deploy | [preview](https://connect-intel-q78isqt47-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9306c85` |
 | 16/06/2026, 13:43:01 | `0b6d729` | Fix deal creation failing on pipeline_leads schema mismatch. | [preview](https://connect-intel-5eiavmyhd-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0b6d729` |
 | 16/06/2026, 13:36:30 | `d4001a3` | chore: sync production log after lead assignment persistence deploy | [preview](https://connect-intel-pqn1qeylf-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d4001a3` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 9306c85
 | 16/06/2026, 11:12:55 | `e8d82d1` | chore: sync production log after pipeline search handler fix deploy | [preview](https://connect-intel-4islq618v-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e8d82d1` |
 | 16/06/2026, 11:12:07 | `78551ea` | Fix pipeline text search returning unfiltered list page. | [preview](https://connect-intel-70cf03lw5-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 78551ea` |
 | 16/06/2026, 11:04:18 | `cffaac3` | chore: sync production log after pipeline search and email fixes deploy | [preview](https://connect-intel-9qprteqen-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- cffaac3` |
-| 16/06/2026, 11:03:31 | `4d87a84` | Fix pipeline search fallback and CRM notification email subjects. | [preview](https://connect-intel-jdajkoc0y-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4d87a84` |
-| 16/06/2026, 10:12:45 | `7ac4bfb` | chore: sync production log after team invite timeout fix deploy | [preview](https://connect-intel-2h98isjkv-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7ac4bfb` |
 
 ---
 
