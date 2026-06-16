@@ -1035,6 +1035,24 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     }))
   }, [])
 
+  const boardAwareStatusCounts = useMemo(() => {
+    if (
+      serverSidePipeline &&
+      view === 'board' &&
+      !stageListMode &&
+      boardColumnTotals &&
+      Object.keys(boardColumnTotals).length
+    ) {
+      return boardColumnTotals
+    }
+    return (
+      pipelineSummary?.byStatus?.reduce?.((acc, row) => {
+        if (row?.status) acc[row.status] = row.count
+        return acc
+      }, {}) || {}
+    )
+  }, [serverSidePipeline, view, stageListMode, boardColumnTotals, pipelineSummary?.byStatus])
+
   const byStatus = useMemo(() => {
     if (serverSidePipeline && boardLeadsByStatus) return boardLeadsByStatus
     const map = Object.fromEntries(columns.map((s) => [s.id, []]))
@@ -1457,10 +1475,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               ownerFilter={effectiveAssigneeFilter}
               ownerOptions={ownerFilterOptions}
               onOwnerFilterChange={(id) => setPipelineAssigneeFilter?.(id)}
-              statusCounts={pipelineSummary?.byStatus?.reduce?.((acc, row) => {
-                if (row?.status) acc[row.status] = row.count
-                return acc
-              }, {}) || {}}
+              statusCounts={boardAwareStatusCounts}
             />
           )}
         </header>
