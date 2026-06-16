@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-16T06:19:31.663Z",
-  "updatedAtIst": "16/06/2026, 11:49:31",
+  "updatedAt": "2026-06-16T06:27:08.033Z",
+  "updatedAtIst": "16/06/2026, 11:57:08",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "6b123fe",
+  "currentProductionCommit": "3c50e86",
   "entries": [
+    {
+      "logId": "20260616-1156-3c50e86",
+      "commit": "3c50e86",
+      "commitFull": "3c50e866e1b6fbbb84caba2ce6337533215fe3c3",
+      "message": "Allow admins, managers, and lead owners to reassign pipeline leads.",
+      "deployedAt": "2026-06-16T06:26:57.596Z",
+      "deployedAtIst": "16/06/2026, 11:56:57",
+      "committedAtIst": "16/06/2026, 11:56:24",
+      "vercelPreviewUrl": "https://connect-intel-ggl4tmm59-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 3c50e86"
+    },
+    {
+      "logId": "20260616-1150-94c902a",
+      "commit": "94c902a",
+      "commitFull": "94c902a4ce150a327a45a1336e5c6aa578821576",
+      "message": "chore: sync production log after pipeline stages fix deploy",
+      "deployedAt": "2026-06-16T06:20:40.517Z",
+      "deployedAtIst": "16/06/2026, 11:50:40",
+      "committedAtIst": "16/06/2026, 11:50:06",
+      "vercelPreviewUrl": "https://connect-intel-mwgr2gq94-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 94c902a"
+    },
     {
       "logId": "20260616-1149-6b123fe",
       "commit": "6b123fe",
@@ -15,7 +43,7 @@
       "committedAtIst": "16/06/2026, 11:48:36",
       "vercelPreviewUrl": "https://connect-intel-mr8hm2nmn-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 6b123fe"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 6759962"
-    },
-    {
-      "logId": "20260614-1529-c3d521c",
-      "commit": "c3d521c",
-      "commitFull": "c3d521c29c1602512a8602f3df8d79fbb97bb662",
-      "message": "Fix timeline rail dots clipped on the left in lead panel.",
-      "deployedAt": "2026-06-14T09:59:30.768Z",
-      "deployedAtIst": "14/06/2026, 15:29:30",
-      "committedAtIst": "14/06/2026, 15:29:01",
-      "vercelPreviewUrl": "https://connect-intel-jvbn5675n-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- c3d521c"
-    },
-    {
-      "logId": "20260614-1522-269076b",
-      "commit": "269076b",
-      "commitFull": "269076b4636ab0db6d16a22fcc4c69363b18d8c0",
-      "message": "Redesign lead Deals tab with compact cards and icon controls.",
-      "deployedAt": "2026-06-14T09:52:33.955Z",
-      "deployedAtIst": "14/06/2026, 15:22:33",
-      "committedAtIst": "14/06/2026, 15:22:03",
-      "vercelPreviewUrl": "https://connect-intel-ghq3uemsi-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 269076b"
     }
   ]
 }
