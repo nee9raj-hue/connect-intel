@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-16T11:10:54.100Z",
-  "updatedAtIst": "16/06/2026, 16:40:54",
+  "updatedAt": "2026-06-16T11:21:01.611Z",
+  "updatedAtIst": "16/06/2026, 16:51:01",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "5137f25",
+  "currentProductionCommit": "0fff6f9",
   "entries": [
+    {
+      "logId": "20260616-1650-0fff6f9",
+      "commit": "0fff6f9",
+      "commitFull": "0fff6f9ae8fc8c81515cdb2285ac06af3e76e76c",
+      "message": "Speed up CRM deal, task, and call saves with table-first fast persist.",
+      "deployedAt": "2026-06-16T11:20:50.637Z",
+      "deployedAtIst": "16/06/2026, 16:50:50",
+      "committedAtIst": "16/06/2026, 16:50:11",
+      "vercelPreviewUrl": "https://connect-intel-6k8x92g8c-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 0fff6f9"
+    },
+    {
+      "logId": "20260616-1641-39967dd",
+      "commit": "39967dd",
+      "commitFull": "39967dd433a5a047e9b147520c538f0420bb21d7",
+      "message": "chore: sync production log after pipeline board fix deploy",
+      "deployedAt": "2026-06-16T11:11:42.183Z",
+      "deployedAtIst": "16/06/2026, 16:41:42",
+      "committedAtIst": "16/06/2026, 16:41:06",
+      "vercelPreviewUrl": "https://connect-intel-dy1ybakd3-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 39967dd"
+    },
     {
       "logId": "20260616-1640-5137f25",
       "commit": "5137f25",
@@ -15,7 +43,7 @@
       "committedAtIst": "16/06/2026, 16:40:02",
       "vercelPreviewUrl": "https://connect-intel-9cp132sck-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 5137f25"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 5997bb7"
-    },
-    {
-      "logId": "20260616-1200-f354208",
-      "commit": "f354208",
-      "commitFull": "f3542088b22d623e3712c6704d3fd7cca3238c46",
-      "message": "Show all lead pipeline stages in the sidebar for every role.",
-      "deployedAt": "2026-06-16T06:30:34.442Z",
-      "deployedAtIst": "16/06/2026, 12:00:34",
-      "committedAtIst": "16/06/2026, 12:00:02",
-      "vercelPreviewUrl": "https://connect-intel-lrv1ah915-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- f354208"
-    },
-    {
-      "logId": "20260616-1158-9018a97",
-      "commit": "9018a97",
-      "commitFull": "9018a97a1a39c2ae69e0c254a1430f4918f07e09",
-      "message": "chore: sync production log after lead reassignment fix deploy",
-      "deployedAt": "2026-06-16T06:28:47.275Z",
-      "deployedAtIst": "16/06/2026, 11:58:47",
-      "committedAtIst": "16/06/2026, 11:58:10",
-      "vercelPreviewUrl": "https://connect-intel-11g0veckl-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 9018a97"
     }
   ]
 }

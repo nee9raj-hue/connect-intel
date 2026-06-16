@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- e8f11b7
+npm run prod:rollback -- 39967dd
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- e8f11b7
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `5137f25` |
-| Log updated (IST) | 16/06/2026, 16:40:54 |
+| Commit | `0fff6f9` |
+| Log updated (IST) | 16/06/2026, 16:51:01 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- e8f11b7
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 16/06/2026, 16:40:43 | `5137f25` | Fix pipeline board showing duplicate leads across every stage column. | [preview](https://connect-intel-9cp132sck-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5137f25` | **← LIVE**
+| 16/06/2026, 16:50:50 | `0fff6f9` | Speed up CRM deal, task, and call saves with table-first fast persist. | [preview](https://connect-intel-6k8x92g8c-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0fff6f9` | **← LIVE**
+| 16/06/2026, 16:41:42 | `39967dd` | chore: sync production log after pipeline board fix deploy | [preview](https://connect-intel-dy1ybakd3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 39967dd` |
+| 16/06/2026, 16:40:43 | `5137f25` | Fix pipeline board showing duplicate leads across every stage column. | [preview](https://connect-intel-9cp132sck-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5137f25` |
 | 16/06/2026, 15:50:57 | `e8f11b7` | Harden CRM data isolation across search, bulk email, and store loads. | [preview](https://connect-intel-kbl117giv-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e8f11b7` |
 | 16/06/2026, 15:50:31 | `2071690` | chore: sync production log after CRM isolation hardening deploy | [preview](https://connect-intel-3bj7pk8qw-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2071690` |
 | 16/06/2026, 15:36:25 | `39e4fd9` | chore: sync production log after owner_id rep visibility deploy | [preview](https://connect-intel-3d9ni0hid-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 39e4fd9` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- e8f11b7
 | 16/06/2026, 12:11:28 | `aef8ae6` | chore: sync production log after pipeline search performance deploy | [preview](https://connect-intel-j59djd7w8-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- aef8ae6` |
 | 16/06/2026, 12:10:36 | `2861496` | Speed up pipeline lead search with scoped SQL instead of full shard scans. | [preview](https://connect-intel-enqcrzjoe-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2861496` |
 | 16/06/2026, 12:01:24 | `5997bb7` | chore: sync production log after sidebar pipeline stages deploy | [preview](https://connect-intel-jmz83f0ss-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5997bb7` |
-| 16/06/2026, 12:00:34 | `f354208` | Show all lead pipeline stages in the sidebar for every role. | [preview](https://connect-intel-lrv1ah915-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f354208` |
-| 16/06/2026, 11:58:47 | `9018a97` | chore: sync production log after lead reassignment fix deploy | [preview](https://connect-intel-11g0veckl-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9018a97` |
 
 ---
 
