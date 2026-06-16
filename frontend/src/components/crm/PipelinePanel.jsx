@@ -27,6 +27,7 @@ import {
   applyPipelineFilters,
   collectLocationOptions,
   countActiveFilters,
+  filterRepPipelineLeads,
   getFilterCities,
   getFilterStates,
   leadMatchesAssignee,
@@ -513,12 +514,23 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const serverSidePipeline = pipelineSummary.total > 120
 
   const scopedLeads = useMemo(() => {
-    const base = marketingSliceLeads ?? pipelineScopedLeads
+    let base = marketingSliceLeads ?? pipelineScopedLeads
+    if (!effectiveAssigneeFilter && !isOrgAdmin && !isTeamManager) {
+      base = filterRepPipelineLeads(base, user)
+    }
     if (!effectiveAssigneeFilter) return base
     // Large orgs fetch owner-scoped pages from the server; client re-filter drops rows after unfiltered refreshes.
     if (serverSidePipeline) return base
     return base.filter((l) => leadMatchesAssignee(l, effectiveAssigneeFilter))
-  }, [marketingSliceLeads, pipelineScopedLeads, effectiveAssigneeFilter, serverSidePipeline])
+  }, [
+    marketingSliceLeads,
+    pipelineScopedLeads,
+    effectiveAssigneeFilter,
+    serverSidePipeline,
+    isOrgAdmin,
+    isTeamManager,
+    user,
+  ])
 
   const locationOptions = useMemo(() => {
     const fromLoaded = collectLocationOptions(scopedLeads)

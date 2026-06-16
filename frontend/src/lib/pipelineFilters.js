@@ -97,6 +97,18 @@ export function leadMatchesAssignee(lead, assigneeUserId) {
   return pipelineEntryMatchesOwnerFilter(lead, assigneeUserId)
 }
 
+/** Rep safety net: own assigned leads + org unassigned pool only. */
+export function filterRepPipelineLeads(leads, user, { isOrgAdmin = false, isTeamManager = false } = {}) {
+  if (!user?.id || user.accountType !== 'company') return leads || []
+  if (isOrgAdmin || isTeamManager) return leads || []
+  const uid = String(user.id)
+  return (leads || []).filter((lead) => {
+    const assigned = lead?.assignedToUserId
+    if (assigned == null || String(assigned).trim() === '') return true
+    return String(assigned) === uid
+  })
+}
+
 function matchesAnyLocationField(value, filterList) {
   const list = Array.isArray(filterList) ? filterList.filter(Boolean) : []
   if (!list.length) return true
