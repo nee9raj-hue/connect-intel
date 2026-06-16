@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-16T08:13:26.235Z",
-  "updatedAtIst": "16/06/2026, 13:43:26",
+  "updatedAt": "2026-06-16T08:16:49.084Z",
+  "updatedAtIst": "16/06/2026, 13:46:49",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "0b6d729",
+  "currentProductionCommit": "0244832",
   "entries": [
+    {
+      "logId": "20260616-1346-0244832",
+      "commit": "0244832",
+      "commitFull": "024483217203f6020352d28faaec064bb438c4eb",
+      "message": "Fix bulk assign ReferenceError for readPipelineLeadsByIds.",
+      "deployedAt": "2026-06-16T08:16:48.459Z",
+      "deployedAtIst": "16/06/2026, 13:46:48",
+      "committedAtIst": "16/06/2026, 13:46:07",
+      "vercelPreviewUrl": "https://connect-intel-6e9q299ow-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 0244832"
+    },
+    {
+      "logId": "20260616-1344-9306c85",
+      "commit": "9306c85",
+      "commitFull": "9306c85524437d0cc2b125538166d07498083a9f",
+      "message": "chore: sync production log after deal creation schema fix deploy",
+      "deployedAt": "2026-06-16T08:14:11.590Z",
+      "deployedAtIst": "16/06/2026, 13:44:11",
+      "committedAtIst": "16/06/2026, 13:43:34",
+      "vercelPreviewUrl": "https://connect-intel-q78isqt47-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 9306c85"
+    },
     {
       "logId": "20260616-1343-0b6d729",
       "commit": "0b6d729",
@@ -15,7 +43,7 @@
       "committedAtIst": "16/06/2026, 13:42:27",
       "vercelPreviewUrl": "https://connect-intel-5eiavmyhd-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 0b6d729"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 7ac4bfb"
-    },
-    {
-      "logId": "20260616-1011-daac694",
-      "commit": "daac694",
-      "commitFull": "daac6949c15343faefa14100cb796a960fe25694",
-      "message": "Fix team invite timeouts for large org workspaces.",
-      "deployedAt": "2026-06-16T04:41:52.571Z",
-      "deployedAtIst": "16/06/2026, 10:11:52",
-      "committedAtIst": "16/06/2026, 10:11:20",
-      "vercelPreviewUrl": "https://connect-intel-9262aj2pv-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- daac694"
-    },
-    {
-      "logId": "20260614-1648-a49e07f",
-      "commit": "a49e07f",
-      "commitFull": "a49e07f35e9922fe3a7c825e98eb4150be09f47c",
-      "message": "chore: sync production log after pipeline owner filter fix deploy",
-      "deployedAt": "2026-06-14T11:18:32.519Z",
-      "deployedAtIst": "14/06/2026, 16:48:32",
-      "committedAtIst": "14/06/2026, 16:47:55",
-      "vercelPreviewUrl": "https://connect-intel-a8ljh4fwj-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- a49e07f"
     }
   ]
 }
