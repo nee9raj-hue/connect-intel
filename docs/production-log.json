@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-16T11:35:49.433Z",
-  "updatedAtIst": "16/06/2026, 17:05:49",
+  "updatedAt": "2026-06-16T13:40:28.626Z",
+  "updatedAtIst": "16/06/2026, 19:10:28",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "0c7ee4a",
+  "currentProductionCommit": "51f7d71",
   "entries": [
+    {
+      "logId": "20260616-1910-51f7d71",
+      "commit": "51f7d71",
+      "commitFull": "51f7d71b88db8987f56e45da29e97b37bd903bd1",
+      "message": "Fix Team Intelligence activity feed using indexed pipeline activities.",
+      "deployedAt": "2026-06-16T13:40:16.514Z",
+      "deployedAtIst": "16/06/2026, 19:10:16",
+      "committedAtIst": "16/06/2026, 19:09:43",
+      "vercelPreviewUrl": "https://connect-intel-ppp2qwuv1-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 51f7d71"
+    },
+    {
+      "logId": "20260616-1706-13b07be",
+      "commit": "13b07be",
+      "commitFull": "13b07be01b06c908c6f8597621cd6814beccc340",
+      "message": "chore: sync production log after pipeline tag filter fix deploy",
+      "deployedAt": "2026-06-16T11:36:20.002Z",
+      "deployedAtIst": "16/06/2026, 17:06:20",
+      "committedAtIst": "16/06/2026, 17:05:49",
+      "vercelPreviewUrl": "https://connect-intel-bj00vnspn-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 13b07be"
+    },
     {
       "logId": "20260616-1705-0c7ee4a",
       "commit": "0c7ee4a",
@@ -15,7 +43,7 @@
       "committedAtIst": "16/06/2026, 17:05:05",
       "vercelPreviewUrl": "https://connect-intel-7sb5j138r-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 0c7ee4a"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 23960d5"
-    },
-    {
-      "logId": "20260616-1238-510bec5",
-      "commit": "510bec5",
-      "commitFull": "510bec5750880ba2a6abf0601c91a0d6ff77f2de",
-      "message": "Harden concurrent multi-user load without changing CRM workflows.",
-      "deployedAt": "2026-06-16T07:08:06.927Z",
-      "deployedAtIst": "16/06/2026, 12:38:06",
-      "committedAtIst": "16/06/2026, 12:37:34",
-      "vercelPreviewUrl": "https://connect-intel-l5nyhqc4v-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 510bec5"
-    },
-    {
-      "logId": "20260616-1211-aef8ae6",
-      "commit": "aef8ae6",
-      "commitFull": "aef8ae6ca7b3745d8aa699ab8a19e2f0b2f283e8",
-      "message": "chore: sync production log after pipeline search performance deploy",
-      "deployedAt": "2026-06-16T06:41:28.863Z",
-      "deployedAtIst": "16/06/2026, 12:11:28",
-      "committedAtIst": "16/06/2026, 12:10:48",
-      "vercelPreviewUrl": "https://connect-intel-j59djd7w8-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- aef8ae6"
     }
   ]
 }
