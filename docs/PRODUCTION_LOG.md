@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- aef8ae6
+npm run prod:rollback -- 23960d5
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- aef8ae6
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `510bec5` |
-| Log updated (IST) | 16/06/2026, 12:38:13 |
+| Commit | `71060bb` |
+| Log updated (IST) | 16/06/2026, 13:35:43 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- aef8ae6
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 16/06/2026, 12:38:06 | `510bec5` | Harden concurrent multi-user load without changing CRM workflows. | [preview](https://connect-intel-l5nyhqc4v-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 510bec5` | **← LIVE**
+| 16/06/2026, 13:35:02 | `71060bb` | Fix lead assignment not persisting after refresh. | [preview](https://connect-intel-gxxdsvrmm-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 71060bb` | **← LIVE**
+| 16/06/2026, 12:38:51 | `23960d5` | chore: sync production log after concurrent load hardening deploy | [preview](https://connect-intel-j13jxrxgm-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 23960d5` |
+| 16/06/2026, 12:38:06 | `510bec5` | Harden concurrent multi-user load without changing CRM workflows. | [preview](https://connect-intel-l5nyhqc4v-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 510bec5` |
 | 16/06/2026, 12:11:28 | `aef8ae6` | chore: sync production log after pipeline search performance deploy | [preview](https://connect-intel-j59djd7w8-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- aef8ae6` |
 | 16/06/2026, 12:10:36 | `2861496` | Speed up pipeline lead search with scoped SQL instead of full shard scans. | [preview](https://connect-intel-enqcrzjoe-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2861496` |
 | 16/06/2026, 12:01:24 | `5997bb7` | chore: sync production log after sidebar pipeline stages deploy | [preview](https://connect-intel-jmz83f0ss-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5997bb7` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- aef8ae6
 | 14/06/2026, 16:48:32 | `a49e07f` | chore: sync production log after pipeline owner filter fix deploy | [preview](https://connect-intel-a8ljh4fwj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a49e07f` |
 | 14/06/2026, 16:47:31 | `ba87104` | Fix pipeline owner filter clearing after background refresh. | [preview](https://connect-intel-24nh970t6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ba87104` |
 | 14/06/2026, 16:36:14 | `dd4329e` | chore: sync production log after SQL filter columns deploy | [preview](https://connect-intel-8kx10vau0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- dd4329e` |
-| 14/06/2026, 16:29:11 | `c7a99e2` | Add SQL-backed city, state, score filters and paginated deals loading. | [preview](https://connect-intel-k1gfn51ok-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c7a99e2` |
-| 14/06/2026, 16:19:46 | `fcca7f7` | chore: sync production log after pipeline performance deploy | [preview](https://connect-intel-o2ir0a51z-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- fcca7f7` |
 
 ---
 
