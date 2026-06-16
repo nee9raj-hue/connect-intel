@@ -653,6 +653,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       assigneeUserId: effectiveAssigneeFilter || undefined,
       teamId: panelOptions?.teamId || undefined,
       tagIds: adv.tagIds?.length ? adv.tagIds : undefined,
+      tagMode: adv.tagMode || 'any',
       ...pipelineServerFilterExtras(adv, smartViewFilters),
     }),
     [filter, listStatusFilter, effectiveAssigneeFilter, smartViewFilters, panelOptions?.teamId]
@@ -786,7 +787,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       cities: serverSidePipeline ? [] : getFilterCities(appliedAdvanced),
       states: serverSidePipeline ? [] : getFilterStates(appliedAdvanced),
       contact: appliedAdvanced.contact,
-      tagIds: serverSidePipeline ? [] : appliedAdvanced.tagIds,
+      tagIds: appliedAdvanced.tagIds,
       tagMode: appliedAdvanced.tagMode,
       search: serverSidePipeline ? '' : appliedSearch,
       smartTags: appliedAdvanced.smartTags,

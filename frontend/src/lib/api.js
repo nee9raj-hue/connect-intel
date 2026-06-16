@@ -268,6 +268,7 @@ export const api = {
     states,
     assigneeUserId,
     tagIds,
+    tagMode = 'any',
     minLeadScore,
     followUpDue,
     overdueFollowUp,
@@ -297,6 +298,7 @@ export const api = {
     }
     if (assigneeUserId) qs.set('assigneeUserId', assigneeUserId)
     for (const id of tagIds || []) qs.append('tagId', id)
+    if (tagMode && tagMode !== 'any') qs.set('tagMode', String(tagMode))
     if (minLeadScore != null && minLeadScore !== '') qs.set('minLeadScore', String(minLeadScore))
     if (followUpDue) qs.set('followUpDue', '1')
     if (overdueFollowUp) qs.set('overdueFollowUp', '1')
