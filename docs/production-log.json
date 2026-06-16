@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-16T06:27:08.033Z",
-  "updatedAtIst": "16/06/2026, 11:57:08",
+  "updatedAt": "2026-06-16T06:30:41.918Z",
+  "updatedAtIst": "16/06/2026, 12:00:41",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "3c50e86",
+  "currentProductionCommit": "f354208",
   "entries": [
+    {
+      "logId": "20260616-1200-f354208",
+      "commit": "f354208",
+      "commitFull": "f3542088b22d623e3712c6704d3fd7cca3238c46",
+      "message": "Show all lead pipeline stages in the sidebar for every role.",
+      "deployedAt": "2026-06-16T06:30:34.442Z",
+      "deployedAtIst": "16/06/2026, 12:00:34",
+      "committedAtIst": "16/06/2026, 12:00:02",
+      "vercelPreviewUrl": "https://connect-intel-lrv1ah915-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- f354208"
+    },
+    {
+      "logId": "20260616-1158-9018a97",
+      "commit": "9018a97",
+      "commitFull": "9018a97a1a39c2ae69e0c254a1430f4918f07e09",
+      "message": "chore: sync production log after lead reassignment fix deploy",
+      "deployedAt": "2026-06-16T06:28:47.275Z",
+      "deployedAtIst": "16/06/2026, 11:58:47",
+      "committedAtIst": "16/06/2026, 11:58:10",
+      "vercelPreviewUrl": "https://connect-intel-11g0veckl-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 9018a97"
+    },
     {
       "logId": "20260616-1156-3c50e86",
       "commit": "3c50e86",
@@ -15,7 +43,7 @@
       "committedAtIst": "16/06/2026, 11:56:24",
       "vercelPreviewUrl": "https://connect-intel-ggl4tmm59-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 3c50e86"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- a031e25"
-    },
-    {
-      "logId": "20260614-1547-f2949dc",
-      "commit": "f2949dc",
-      "commitFull": "f2949dc4a7ab1ae1403b91698a275e7371177879",
-      "message": "Polish pipeline list view with premium icons, motion, and empty states.",
-      "deployedAt": "2026-06-14T10:17:25.260Z",
-      "deployedAtIst": "14/06/2026, 15:47:25",
-      "committedAtIst": "14/06/2026, 15:46:48",
-      "vercelPreviewUrl": "https://connect-intel-4bxe1ngx4-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- f2949dc"
-    },
-    {
-      "logId": "20260614-1537-6759962",
-      "commit": "6759962",
-      "commitFull": "675996298f4338248ce5b17a0f2dda4410cceef7",
-      "message": "Replace pipeline row ellipsis with labeled Actions trigger.",
-      "deployedAt": "2026-06-14T10:07:50.968Z",
-      "deployedAtIst": "14/06/2026, 15:37:50",
-      "committedAtIst": "14/06/2026, 15:37:11",
-      "vercelPreviewUrl": "https://connect-intel-7lfzqqtvh-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 6759962"
     }
   ]
 }
