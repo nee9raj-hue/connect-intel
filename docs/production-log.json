@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-14T11:17:46.441Z",
-  "updatedAtIst": "14/06/2026, 16:47:46",
+  "updatedAt": "2026-06-16T04:42:10.279Z",
+  "updatedAtIst": "16/06/2026, 10:12:10",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "ba87104",
+  "currentProductionCommit": "daac694",
   "entries": [
+    {
+      "logId": "20260616-1011-daac694",
+      "commit": "daac694",
+      "commitFull": "daac6949c15343faefa14100cb796a960fe25694",
+      "message": "Fix team invite timeouts for large org workspaces.",
+      "deployedAt": "2026-06-16T04:41:52.571Z",
+      "deployedAtIst": "16/06/2026, 10:11:52",
+      "committedAtIst": "16/06/2026, 10:11:20",
+      "vercelPreviewUrl": "https://connect-intel-9262aj2pv-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- daac694"
+    },
+    {
+      "logId": "20260614-1648-a49e07f",
+      "commit": "a49e07f",
+      "commitFull": "a49e07f35e9922fe3a7c825e98eb4150be09f47c",
+      "message": "chore: sync production log after pipeline owner filter fix deploy",
+      "deployedAt": "2026-06-14T11:18:32.519Z",
+      "deployedAtIst": "14/06/2026, 16:48:32",
+      "committedAtIst": "14/06/2026, 16:47:55",
+      "vercelPreviewUrl": "https://connect-intel-a8ljh4fwj-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- a49e07f"
+    },
     {
       "logId": "20260614-1647-ba87104",
       "commit": "ba87104",
@@ -15,7 +43,7 @@
       "committedAtIst": "14/06/2026, 16:46:58",
       "vercelPreviewUrl": "https://connect-intel-24nh970t6-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- ba87104"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 384e859"
-    },
-    {
-      "logId": "20260614-1428-374efad",
-      "commit": "374efad",
-      "commitFull": "374efad007453d0d36afda95e5818a0d004a505f",
-      "message": "Style pipeline email addresses in blue for quick visual scan.",
-      "deployedAt": "2026-06-14T08:58:15.385Z",
-      "deployedAtIst": "14/06/2026, 14:28:15",
-      "committedAtIst": "14/06/2026, 14:27:45",
-      "vercelPreviewUrl": "https://connect-intel-l2d77sjpt-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 374efad"
-    },
-    {
-      "logId": "20260614-1217-419f7e1",
-      "commit": "419f7e1",
-      "commitFull": "419f7e1fd1cced74a5f44ee7cac9fc5c961d17b5",
-      "message": "Add Team review block on dashboard for managers and admins.",
-      "deployedAt": "2026-06-14T06:47:31.493Z",
-      "deployedAtIst": "14/06/2026, 12:17:31",
-      "committedAtIst": "14/06/2026, 12:17:01",
-      "vercelPreviewUrl": "https://connect-intel-okxixc3lp-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 419f7e1"
     }
   ]
 }
