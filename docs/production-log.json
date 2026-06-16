@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-16T11:21:01.611Z",
-  "updatedAtIst": "16/06/2026, 16:51:01",
+  "updatedAt": "2026-06-16T11:35:49.433Z",
+  "updatedAtIst": "16/06/2026, 17:05:49",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "0fff6f9",
+  "currentProductionCommit": "0c7ee4a",
   "entries": [
+    {
+      "logId": "20260616-1705-0c7ee4a",
+      "commit": "0c7ee4a",
+      "commitFull": "0c7ee4a5093961cf5fb96043eb1b05a3a032cc81",
+      "message": "Fix pipeline tag filters with fast SQL path and correct any/all matching.",
+      "deployedAt": "2026-06-16T11:35:37.815Z",
+      "deployedAtIst": "16/06/2026, 17:05:37",
+      "committedAtIst": "16/06/2026, 17:05:05",
+      "vercelPreviewUrl": "https://connect-intel-7sb5j138r-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 0c7ee4a"
+    },
+    {
+      "logId": "20260616-1651-b84a2b5",
+      "commit": "b84a2b5",
+      "commitFull": "b84a2b53a2a02bb7dd8756a09775956c42f5d93e",
+      "message": "chore: sync production log after CRM fast-save deploy",
+      "deployedAt": "2026-06-16T11:21:42.938Z",
+      "deployedAtIst": "16/06/2026, 16:51:42",
+      "committedAtIst": "16/06/2026, 16:51:08",
+      "vercelPreviewUrl": "https://connect-intel-nda2len06-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- b84a2b5"
+    },
     {
       "logId": "20260616-1650-0fff6f9",
       "commit": "0fff6f9",
@@ -15,7 +43,7 @@
       "committedAtIst": "16/06/2026, 16:50:11",
       "vercelPreviewUrl": "https://connect-intel-6k8x92g8c-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 0fff6f9"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- aef8ae6"
-    },
-    {
-      "logId": "20260616-1210-2861496",
-      "commit": "2861496",
-      "commitFull": "286149600e461dd1ab60766959b7f0428510e25f",
-      "message": "Speed up pipeline lead search with scoped SQL instead of full shard scans.",
-      "deployedAt": "2026-06-16T06:40:36.292Z",
-      "deployedAtIst": "16/06/2026, 12:10:36",
-      "committedAtIst": "16/06/2026, 12:10:04",
-      "vercelPreviewUrl": "https://connect-intel-enqcrzjoe-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 2861496"
-    },
-    {
-      "logId": "20260616-1201-5997bb7",
-      "commit": "5997bb7",
-      "commitFull": "5997bb7a0708e05b61917bc46d49820d064acccf",
-      "message": "chore: sync production log after sidebar pipeline stages deploy",
-      "deployedAt": "2026-06-16T06:31:24.451Z",
-      "deployedAtIst": "16/06/2026, 12:01:24",
-      "committedAtIst": "16/06/2026, 12:00:49",
-      "vercelPreviewUrl": "https://connect-intel-jmz83f0ss-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 5997bb7"
     }
   ]
 }

@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 39967dd
+npm run prod:rollback -- b84a2b5
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 39967dd
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `0fff6f9` |
-| Log updated (IST) | 16/06/2026, 16:51:01 |
+| Commit | `0c7ee4a` |
+| Log updated (IST) | 16/06/2026, 17:05:49 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 39967dd
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 16/06/2026, 16:50:50 | `0fff6f9` | Speed up CRM deal, task, and call saves with table-first fast persist. | [preview](https://connect-intel-6k8x92g8c-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0fff6f9` | **← LIVE**
+| 16/06/2026, 17:05:37 | `0c7ee4a` | Fix pipeline tag filters with fast SQL path and correct any/all matching. | [preview](https://connect-intel-7sb5j138r-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0c7ee4a` | **← LIVE**
+| 16/06/2026, 16:51:42 | `b84a2b5` | chore: sync production log after CRM fast-save deploy | [preview](https://connect-intel-nda2len06-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b84a2b5` |
+| 16/06/2026, 16:50:50 | `0fff6f9` | Speed up CRM deal, task, and call saves with table-first fast persist. | [preview](https://connect-intel-6k8x92g8c-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0fff6f9` |
 | 16/06/2026, 16:41:42 | `39967dd` | chore: sync production log after pipeline board fix deploy | [preview](https://connect-intel-dy1ybakd3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 39967dd` |
 | 16/06/2026, 16:40:43 | `5137f25` | Fix pipeline board showing duplicate leads across every stage column. | [preview](https://connect-intel-9cp132sck-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5137f25` |
 | 16/06/2026, 15:50:57 | `e8f11b7` | Harden CRM data isolation across search, bulk email, and store loads. | [preview](https://connect-intel-kbl117giv-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e8f11b7` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 39967dd
 | 16/06/2026, 12:38:51 | `23960d5` | chore: sync production log after concurrent load hardening deploy | [preview](https://connect-intel-j13jxrxgm-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 23960d5` |
 | 16/06/2026, 12:38:06 | `510bec5` | Harden concurrent multi-user load without changing CRM workflows. | [preview](https://connect-intel-l5nyhqc4v-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 510bec5` |
 | 16/06/2026, 12:11:28 | `aef8ae6` | chore: sync production log after pipeline search performance deploy | [preview](https://connect-intel-j59djd7w8-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- aef8ae6` |
-| 16/06/2026, 12:10:36 | `2861496` | Speed up pipeline lead search with scoped SQL instead of full shard scans. | [preview](https://connect-intel-enqcrzjoe-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2861496` |
-| 16/06/2026, 12:01:24 | `5997bb7` | chore: sync production log after sidebar pipeline stages deploy | [preview](https://connect-intel-jmz83f0ss-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5997bb7` |
 
 ---
 
