@@ -105,7 +105,8 @@ export const api = {
   completeOnboarding: (payload) =>
     request('/api/onboarding/complete', { method: 'POST', body: payload }),
   getTeamMembers: ({ silent = false } = {}) => request('/api/team/members', {}, { silent }),
-  inviteTeamMember: (payload) => request('/api/team/invite', { method: 'POST', body: payload }),
+  inviteTeamMember: (payload) =>
+    request('/api/team/invite', { method: 'POST', body: payload, timeoutMs: 60_000 }),
   getInviteEmailDiagnostics: () => request('/api/team/invite-email'),
   sendInviteTestEmail: () => request('/api/team/invite-email', { method: 'POST' }),
   startInviteEmailOAuth: () => request('/api/team/email-oauth/start'),

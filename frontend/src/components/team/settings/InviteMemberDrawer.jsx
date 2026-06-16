@@ -45,7 +45,7 @@ export default function InviteMemberDrawer({
     setLoading(true)
     setError(null)
     try {
-      await inviteTeamMember({
+      const data = await inviteTeamMember({
         email: email.trim(),
         name: name.trim() || undefined,
         canSearch: false,
