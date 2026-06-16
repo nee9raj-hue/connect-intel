@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-16T04:42:10.279Z",
-  "updatedAtIst": "16/06/2026, 10:12:10",
+  "updatedAt": "2026-06-16T05:33:41.207Z",
+  "updatedAtIst": "16/06/2026, 11:03:41",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "daac694",
+  "currentProductionCommit": "4d87a84",
   "entries": [
+    {
+      "logId": "20260616-1103-4d87a84",
+      "commit": "4d87a84",
+      "commitFull": "4d87a84a67ba9ad0056e8bbca00abcfc4b234294",
+      "message": "Fix pipeline search fallback and CRM notification email subjects.",
+      "deployedAt": "2026-06-16T05:33:31.701Z",
+      "deployedAtIst": "16/06/2026, 11:03:31",
+      "committedAtIst": "16/06/2026, 11:02:57",
+      "vercelPreviewUrl": "https://connect-intel-jdajkoc0y-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 4d87a84"
+    },
+    {
+      "logId": "20260616-1012-7ac4bfb",
+      "commit": "7ac4bfb",
+      "commitFull": "7ac4bfb2a02f7d0eb869a365ee7246bf0ac5fbf7",
+      "message": "chore: sync production log after team invite timeout fix deploy",
+      "deployedAt": "2026-06-16T04:42:45.630Z",
+      "deployedAtIst": "16/06/2026, 10:12:45",
+      "committedAtIst": "16/06/2026, 10:12:14",
+      "vercelPreviewUrl": "https://connect-intel-2h98isjkv-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 7ac4bfb"
+    },
     {
       "logId": "20260616-1011-daac694",
       "commit": "daac694",
@@ -15,7 +43,7 @@
       "committedAtIst": "16/06/2026, 10:11:20",
       "vercelPreviewUrl": "https://connect-intel-9262aj2pv-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- daac694"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- dfd3e32"
-    },
-    {
-      "logId": "20260614-1443-611c8e0",
-      "commit": "611c8e0",
-      "commitFull": "611c8e0a0839e953c0c9e47eca95435bb1e231f5",
-      "message": "Redesign pipeline filter command bar with icon pills and search.",
-      "deployedAt": "2026-06-14T09:13:07.072Z",
-      "deployedAtIst": "14/06/2026, 14:43:07",
-      "committedAtIst": "14/06/2026, 14:42:35",
-      "vercelPreviewUrl": "https://connect-intel-1xn6uafn3-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 611c8e0"
-    },
-    {
-      "logId": "20260614-1434-384e859",
-      "commit": "384e859",
-      "commitFull": "384e85970c4613283fef24e95ff54a5c0cff9d57",
-      "message": "Fix pipeline email column staying orange due to global link styles.",
-      "deployedAt": "2026-06-14T09:04:05.933Z",
-      "deployedAtIst": "14/06/2026, 14:34:05",
-      "committedAtIst": "14/06/2026, 14:33:36",
-      "vercelPreviewUrl": "https://connect-intel-oycy07gfi-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 384e859"
     }
   ]
 }
