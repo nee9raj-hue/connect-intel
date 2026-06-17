@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-06-16T13:40:28.626Z",
-  "updatedAtIst": "16/06/2026, 19:10:28",
+  "updatedAt": "2026-06-17T06:46:23.699Z",
+  "updatedAtIst": "17/06/2026, 12:16:23",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "51f7d71",
+  "currentProductionCommit": "1f425a0",
   "entries": [
+    {
+      "logId": "20260617-1216-1f425a0",
+      "commit": "1f425a0",
+      "commitFull": "1f425a02f8eac956a8ea463dab1a84f36f322edf",
+      "message": "Add freight deal CBM/clearance fields and pipeline deals filters.",
+      "deployedAt": "2026-06-17T06:46:08.092Z",
+      "deployedAtIst": "17/06/2026, 12:16:08",
+      "committedAtIst": "17/06/2026, 12:15:36",
+      "vercelPreviewUrl": "https://connect-intel-2i1ubj1mw-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 1f425a0"
+    },
+    {
+      "logId": "20260616-1911-0330af9",
+      "commit": "0330af9",
+      "commitFull": "0330af9acf8411f99bf0603939fa91afc154b63f",
+      "message": "chore: sync production log after Team Intelligence activity feed fix deploy",
+      "deployedAt": "2026-06-16T13:41:40.616Z",
+      "deployedAtIst": "16/06/2026, 19:11:40",
+      "committedAtIst": "16/06/2026, 19:11:08",
+      "vercelPreviewUrl": "https://connect-intel-orz5rb8jt-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 0330af9"
+    },
     {
       "logId": "20260616-1910-51f7d71",
       "commit": "51f7d71",
@@ -15,7 +43,7 @@
       "committedAtIst": "16/06/2026, 19:09:43",
       "vercelPreviewUrl": "https://connect-intel-ppp2qwuv1-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 51f7d71"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- d4001a3"
-    },
-    {
-      "logId": "20260616-1335-71060bb",
-      "commit": "71060bb",
-      "commitFull": "71060bb466767d77cf5ced2b26ef03f95959e28d",
-      "message": "Fix lead assignment not persisting after refresh.",
-      "deployedAt": "2026-06-16T08:05:02.962Z",
-      "deployedAtIst": "16/06/2026, 13:35:02",
-      "committedAtIst": "16/06/2026, 13:34:30",
-      "vercelPreviewUrl": "https://connect-intel-gxxdsvrmm-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 71060bb"
-    },
-    {
-      "logId": "20260616-1238-23960d5",
-      "commit": "23960d5",
-      "commitFull": "23960d5d56346026568add7d6e9b2b1b04203c05",
-      "message": "chore: sync production log after concurrent load hardening deploy",
-      "deployedAt": "2026-06-16T07:08:51.340Z",
-      "deployedAtIst": "16/06/2026, 12:38:51",
-      "committedAtIst": "16/06/2026, 12:38:18",
-      "vercelPreviewUrl": "https://connect-intel-j13jxrxgm-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 23960d5"
     }
   ]
 }

@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 13b07be
+npm run prod:rollback -- 0330af9
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 13b07be
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `51f7d71` |
-| Log updated (IST) | 16/06/2026, 19:10:28 |
+| Commit | `1f425a0` |
+| Log updated (IST) | 17/06/2026, 12:16:23 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 13b07be
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 16/06/2026, 19:10:16 | `51f7d71` | Fix Team Intelligence activity feed using indexed pipeline activities. | [preview](https://connect-intel-ppp2qwuv1-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 51f7d71` | **← LIVE**
+| 17/06/2026, 12:16:08 | `1f425a0` | Add freight deal CBM/clearance fields and pipeline deals filters. | [preview](https://connect-intel-2i1ubj1mw-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1f425a0` | **← LIVE**
+| 16/06/2026, 19:11:40 | `0330af9` | chore: sync production log after Team Intelligence activity feed fix deploy | [preview](https://connect-intel-orz5rb8jt-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0330af9` |
+| 16/06/2026, 19:10:16 | `51f7d71` | Fix Team Intelligence activity feed using indexed pipeline activities. | [preview](https://connect-intel-ppp2qwuv1-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 51f7d71` |
 | 16/06/2026, 17:06:20 | `13b07be` | chore: sync production log after pipeline tag filter fix deploy | [preview](https://connect-intel-bj00vnspn-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 13b07be` |
 | 16/06/2026, 17:05:37 | `0c7ee4a` | Fix pipeline tag filters with fast SQL path and correct any/all matching. | [preview](https://connect-intel-7sb5j138r-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0c7ee4a` |
 | 16/06/2026, 16:51:42 | `b84a2b5` | chore: sync production log after CRM fast-save deploy | [preview](https://connect-intel-nda2len06-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b84a2b5` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 13b07be
 | 16/06/2026, 13:44:11 | `9306c85` | chore: sync production log after deal creation schema fix deploy | [preview](https://connect-intel-q78isqt47-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9306c85` |
 | 16/06/2026, 13:43:01 | `0b6d729` | Fix deal creation failing on pipeline_leads schema mismatch. | [preview](https://connect-intel-5eiavmyhd-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0b6d729` |
 | 16/06/2026, 13:36:30 | `d4001a3` | chore: sync production log after lead assignment persistence deploy | [preview](https://connect-intel-pqn1qeylf-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d4001a3` |
-| 16/06/2026, 13:35:02 | `71060bb` | Fix lead assignment not persisting after refresh. | [preview](https://connect-intel-gxxdsvrmm-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 71060bb` |
-| 16/06/2026, 12:38:51 | `23960d5` | chore: sync production log after concurrent load hardening deploy | [preview](https://connect-intel-j13jxrxgm-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 23960d5` |
 
 ---
 
