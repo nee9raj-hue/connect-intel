@@ -6,11 +6,16 @@ export {
 
 import { getFreightCustomerTypeMeta } from '../../../lib/freightDeal.js'
 
+import { formatFreightMeasure } from '../../../lib/freightDeal.js'
+
 export {
   FREIGHT_DEAL_STAGES,
   getFreightDealStageMeta,
   getFreightCustomerTypeMeta,
   isFreightDealOrg,
+  formatFreightMeasure,
+  freightRateUnitLabel,
+  isOceanTransportMode,
 } from '../../../lib/freightDeal.js'
 
 export function freightCustomerTypeLabel(type) {
@@ -24,6 +29,11 @@ export function transportModeLabel(mode) {
   if (mode === 'ocean') return 'Ocean'
   if (mode === 'air_ocean') return 'Air + Ocean'
   return mode ? String(mode) : '—'
+}
+
+export function formatFreightGross(freight) {
+  if (!freight || freight.grossWeightKg == null || freight.grossWeightKg === '') return '—'
+  return formatFreightMeasure(freight.grossWeightKg, freight.transportMode)
 }
 
 export function freightRouteLabel(freight) {

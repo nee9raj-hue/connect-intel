@@ -7,7 +7,7 @@ import {
 } from '../../lib/crmConstants'
 import { formatDealValue } from '../../lib/crmTimeline'
 import { buildAutoDealName } from '../../lib/dealNaming'
-import { emptyFreightRfq, isFreightDealOrg } from '../../lib/freightDeal'
+import { emptyFreightRfq, isFreightDealOrg, freightRateUnitLabel } from '../../lib/freightDeal'
 import FreightDealFields, { formatFreightSummary, freightDealCreateLabel } from './FreightDealFields'
 import { getFreightCustomerTypeMeta } from '../../lib/freightDeal'
 import DealShareActions from './DealShareActions'
@@ -140,7 +140,7 @@ function DealRow({
               min={0}
               defaultValue={deal.amount ?? ''}
               disabled={busy}
-              placeholder={freightOrg ? 'Freight ₹' : 'Amount ₹'}
+              placeholder={freightOrg ? `Freight ${freightRateUnitLabel(deal.freight?.transportMode)}` : 'Amount ₹'}
               aria-label="Amount"
               onBlur={(e) => {
                 const val = e.target.value === '' ? null : Number(e.target.value)
@@ -455,7 +455,7 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
                   ))}
                 </LwSelect>
               </LwField>
-              <LwField label={freightOrg ? 'Freight ₹' : 'Amount ₹'}>
+              <LwField label={freightOrg ? `Freight ${freightRateUnitLabel(freight.transportMode)}` : 'Amount ₹'}>
                 <LwInput
                   type="number"
                   min={0}

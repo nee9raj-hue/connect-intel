@@ -2976,6 +2976,64 @@ button.ci-lead-tag:disabled {
 }
 
 /* Freight deals table — full width, fixed columns */
+.pipeline-deals-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  padding: 0.65rem 0.75rem;
+  background: #f5f8fa;
+  border: 1px solid #dfe3eb;
+  border-radius: 8px;
+}
+
+.pipeline-deals-filters__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 10rem;
+}
+
+.pipeline-deals-filters__label {
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #516f90;
+}
+
+.pipeline-deals-filters__date {
+  font-size: 0.75rem;
+  border: 1px solid #cbd6e2;
+  border-radius: 6px;
+  padding: 0.35rem 0.5rem;
+  background: #fff;
+  color: #33475b;
+}
+
+.pipeline-deals-filters__week-hint {
+  margin: 0;
+  font-size: 0.6875rem;
+  color: #7c98b6;
+  flex: 1 1 12rem;
+  min-width: 10rem;
+}
+
+.pipeline-deals-filters__clear {
+  margin-left: auto;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #0091ae;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem 0.35rem;
+}
+
+.pipeline-deals-filters__clear:hover {
+  text-decoration: underline;
+}
+
 .pipeline-deals-table-wrap {
   width: 100%;
   overflow-x: auto;

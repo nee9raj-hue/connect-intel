@@ -3,6 +3,9 @@ import { formatDealValue } from './crmTimeline'
 import {
   CARGO_READINESS_OPTIONS,
   COURIER_DESTINATION_OPTIONS,
+  freightChargeableMeasure,
+  formatFreightMeasure,
+  freightGrossFieldLabel,
   getFreightCustomerTypeMeta,
   showsCourierFields,
   showsSpotRfqFields,
@@ -73,6 +76,16 @@ function formatCourierBlock(courier) {
   return section('COURIER CONTRACT', rows)
 }
 
+function formatClearance(label, clearance, { optional = false } = {}) {
+  if (!clearance) return null
+  if (optional && !clearance.applicable) return null
+  const rows = []
+  if (clearance.broker) rows.push(line('Broker / CHA', clearance.broker))
+  if (clearance.chargesInr != null) rows.push(line('Charges', `₹${Number(clearance.chargesInr).toLocaleString('en-IN')}`))
+  if (clearance.notes?.trim()) rows.push(line('Notes', clearance.notes.trim()))
+  return rows.length ? section(label, rows) : null
+}
+
 function formatSpotRfqBlock(freight) {
   if (!freight) return ''
   const rows = []
@@ -85,7 +98,27 @@ function formatSpotRfqBlock(freight) {
   const delivery = formatLocation(freight, 'delivery')
   if (pickup) rows.push(line('Pickup', pickup))
   if (delivery) rows.push(line('Delivery', delivery))
-  if (freight.grossWeightKg != null) rows.push(line('Gross weight', `${freight.grossWeightKg} kg`))
+  if (freight.grossWeightKg != null) {
+    rows.push(line(freightGrossFieldLabel(freight.transportMode), formatFreightMeasure(freight.grossWeightKg, freight.transportMode)))
+  }
+  const measure = freightChargeableMeasure({
+    transportMode: freight.transportMode,
+    grossWeightKg: freight.grossWeightKg,
+    boxes: freight.boxes,
+    volumetricDivisor: freight.volumetricDivisor,
+  })
+  if (measure.dimensionalValue != null) {
+    const dimLabel = measure.unit === 'cbm' ? 'Volume from dimensions' : 'Volumetric weight'
+    const dimNote =
+      measure.unit === 'cbm'
+        ? `${measure.dimensionalValue} CBM`
+        : `${measure.dimensionalValue} kg (÷ ${freight.volumetricDivisor ?? 5000})`
+    rows.push(line(dimLabel, dimNote))
+  }
+  if (measure.chargeableValue != null) {
+    const chargeLabel = measure.unit === 'cbm' ? 'Chargeable CBM' : 'Chargeable weight'
+    rows.push(line(chargeLabel, formatFreightMeasure(measure.chargeableValue, freight.transportMode)))
+  }
   if (freight.boxCount != null) rows.push(line('Box count', freight.boxCount))
   const boxDims = formatBoxes(freight.boxes)
   if (boxDims) rows.push(line('Box dimensions', boxDims))
@@ -95,7 +128,12 @@ function formatSpotRfqBlock(freight) {
     rows.push(line('Readiness notes', freight.cargoReadinessNote.trim()))
   }
   if (freight.rfqDetails?.trim()) rows.push(line('RFQ notes', freight.rfqDetails.trim()))
-  return section('SPOT CARGO RFQ', rows)
+  const blocks = [section('SPOT CARGO RFQ', rows)]
+  const origin = formatClearance('ORIGIN CLEARANCE', freight.originClearance)
+  const dest = formatClearance('DESTINATION CLEARANCE', freight.destinationClearance, { optional: true })
+  if (origin) blocks.push(origin)
+  if (dest) blocks.push(dest)
+  return blocks.join('\n\n')
 }
 
 function contactName(lead) {
@@ -122,9 +160,9 @@ export function formatDealSharePlainText({ deal, lead, user, freightOrg = false 
 
   const commercial = []
   if (deal.amount != null && deal.amount > 0) {
-    commercial.push(
-      line(freightOrg ? 'Freight charges' : 'Deal value', formatDealValue(deal.amount, currency))
-    )
+    const amountLabel =
+      freightOrg && freight?.transportMode === 'ocean' ? 'Freight rate (₹/CBM)' : freightOrg ? 'Freight charges' : 'Deal value'
+    commercial.push(line(amountLabel, formatDealValue(deal.amount, currency)))
   }
   if (freightOrg && freight?.invoiceAmount != null && freight.invoiceAmount > 0) {
     commercial.push(line('Invoice amount', formatDealValue(freight.invoiceAmount, currency)))

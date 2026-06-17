@@ -6,6 +6,7 @@ import {
   allDealCountsFromSummary,
   dealCountsFromSummary,
   formatDealValue,
+  formatFreightGross,
   freightCustomerTypeLabel,
   freightRouteLabel,
   isFreightDealOrg,
@@ -28,11 +29,6 @@ const TABS = [
   { id: 'lost', label: 'Lost', stage: 'lost' },
 ]
 
-function formatWeight(kg) {
-  if (kg == null || kg === '') return '—'
-  const n = Number(kg)
-  return Number.isFinite(n) ? `${n.toLocaleString()} kg` : '—'
-}
 
 function StageBadge({ stage }) {
   const meta = getDealStageMeta(stage, { freightOrg: true })
@@ -62,7 +58,7 @@ function DealsTable({ rows, onOpenDeal, emptyLabel }) {
             <th>Customer</th>
             <th>Route</th>
             <th>Mode</th>
-            <th className="is-num">Weight</th>
+            <th className="is-num">Gross</th>
             <th className="is-num">Value</th>
             <th>Stage</th>
           </tr>
@@ -93,7 +89,7 @@ function DealsTable({ rows, onOpenDeal, emptyLabel }) {
                 <td>
                   <span className="dash-home-freight__mode">{transportModeLabel(freight?.transportMode)}</span>
                 </td>
-                <td className="is-num">{formatWeight(freight?.grossWeightKg)}</td>
+                <td className="is-num">{formatFreightGross(freight)}</td>
                 <td className="is-num is-value">{formatDealValue(deal.amount, deal.currency)}</td>
                 <td>
                   <StageBadge stage={deal.stage} />
@@ -168,10 +164,20 @@ export default function FreightDealsDashboard({ user, pipelineSummary, onNavigat
   const lostCount = allCounts.lost ?? lostDeals.length
   const openValue = sumDealAmounts(openDeals)
   const wonValue = sumDealAmounts(wonDeals)
-  const totalWeight = openDeals.reduce(
-    (sum, r) => sum + (Number(r.deal?.freight?.grossWeightKg) || 0),
-    0
+  const openVolume = openDeals.reduce(
+    (acc, r) => {
+      const f = r.deal?.freight
+      const v = Number(f?.grossWeightKg) || 0
+      if (!v) return acc
+      if (f?.transportMode === 'ocean') acc.cbm += v
+      else acc.kg += v
+      return acc
+    },
+    { kg: 0, cbm: 0 }
   )
+  const volumeParts = []
+  if (openVolume.kg > 0) volumeParts.push(`${Math.round(openVolume.kg).toLocaleString()} kg`)
+  if (openVolume.cbm > 0) volumeParts.push(`${openVolume.cbm.toLocaleString()} CBM`)
 
   const tabRows =
     tab === 'won' ? wonDeals.slice(0, 8) : tab === 'lost' ? lostDeals.slice(0, 8) : openDeals.slice(0, 10)
@@ -217,7 +223,7 @@ export default function FreightDealsDashboard({ user, pipelineSummary, onNavigat
               <h2 className="dash-home-freight__title">Freight deals</h2>
               <p className="dash-home-freight__sub">
                 RFQs, quotes, and booked lanes — {openCount} open
-                {totalWeight > 0 ? ` · ${Math.round(totalWeight).toLocaleString()} kg in flight` : ''}
+                {volumeParts.length ? ` · ${volumeParts.join(' · ')} in flight` : ''}
               </p>
             </div>
             <button type="button" className="dash-home__btn dash-home__btn--primary" onClick={() => goDeals('all')}>

@@ -5,14 +5,21 @@ import { getDealStageMeta } from '../../lib/crmConstants'
 import {
   freightRouteLabel,
   formatDealValue,
+  formatFreightGross,
   transportModeLabel,
   freightCustomerTypeLabel,
 } from '../../lib/freightDeals'
+import {
+  DEAL_TRANSPORT_FILTERS,
+  filterPipelineDealRows,
+  formatLocalWeekRangeLabel,
+  parseWeekAnchorFromInput,
+  weekAnchorInputValue,
+} from '../../lib/pipelineDealsFilter'
+import { DashboardSegmented } from '../dashboard/dashboardUi'
 
-function formatWeight(kg) {
-  if (kg == null || kg === '') return '—'
-  const n = Number(kg)
-  return Number.isFinite(n) ? `${n} kg` : '—'
+function formatWeight(freight) {
+  return formatFreightGross(freight)
 }
 
 function dealRowKey({ leadId, deal }) {
@@ -25,7 +32,7 @@ export default function PipelineDealsView({
   onOpenLead,
   assigneeFilter = null,
 }) {
-  const { patchLead } = useApp()
+  const { patchLead, user } = useApp()
   const [rows, setRows] = useState([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -33,6 +40,24 @@ export default function PipelineDealsView({
   const [selected, setSelected] = useState(() => new Set())
   const [bulkBusy, setBulkBusy] = useState(false)
   const [notice, setNotice] = useState(null)
+  const [weekAnchor, setWeekAnchor] = useState(null)
+  const [transportMode, setTransportMode] = useState('all')
+
+  const timeZone = user?.timezone || undefined
+
+  const filteredRows = useMemo(
+    () =>
+      filterPipelineDealRows(rows, {
+        weekAnchorDate: weekAnchor,
+        transportMode,
+        timeZone,
+      }),
+    [rows, weekAnchor, transportMode, timeZone]
+  )
+
+  const filtersActive = Boolean(weekAnchor) || transportMode !== 'all'
+  const weekInputValue = weekAnchorInputValue(weekAnchor || new Date(), timeZone)
+  const weekLabel = weekAnchor ? formatLocalWeekRangeLabel(weekAnchor, timeZone) : ''
 
   const stageMeta = useMemo(() => {
     if (dealStage === 'all') return { label: 'All open deals' }
@@ -70,7 +95,7 @@ export default function PipelineDealsView({
     load()
   }, [load])
 
-  const allSelected = rows.length > 0 && rows.every((row) => selected.has(dealRowKey(row)))
+  const allSelected = filteredRows.length > 0 && filteredRows.every((row) => selected.has(dealRowKey(row)))
 
   const toggleRow = (row, checked) => {
     const key = dealRowKey(row)
@@ -83,13 +108,13 @@ export default function PipelineDealsView({
   }
 
   const toggleAll = (checked) => {
-    if (checked) setSelected(new Set(rows.map(dealRowKey)))
+    if (checked) setSelected(new Set(filteredRows.map(dealRowKey)))
     else setSelected(new Set())
   }
 
   const selectedRows = useMemo(
-    () => rows.filter((row) => selected.has(dealRowKey(row))),
-    [rows, selected]
+    () => filteredRows.filter((row) => selected.has(dealRowKey(row))),
+    [filteredRows, selected]
   )
 
   const runBulk = async (action, { confirmDelete = false, lostReason = '' } = {}) => {
@@ -152,8 +177,53 @@ export default function PipelineDealsView({
           </p>
         </div>
         <p className="text-xs text-gray-500 tabular-nums shrink-0">
-          {total} deal{total === 1 ? '' : 's'}
+          {filteredRows.length}
+          {filtersActive && rows.length !== filteredRows.length ? ` of ${rows.length}` : ''} deal
+          {filteredRows.length === 1 ? '' : 's'}
         </p>
+      </div>
+
+      <div className="pipeline-deals-filters" role="search" aria-label="Deal filters">
+        <label className="pipeline-deals-filters__field">
+          <span className="pipeline-deals-filters__label">Week of</span>
+          <input
+            type="date"
+            className="pipeline-deals-filters__date"
+            value={weekAnchor ? weekInputValue : ''}
+            onChange={(e) => {
+              const next = parseWeekAnchorFromInput(e.target.value, timeZone)
+              setWeekAnchor(next)
+              setSelected(new Set())
+            }}
+            aria-label="Select a date in the week to filter"
+          />
+        </label>
+        {weekLabel ? (
+          <p className="pipeline-deals-filters__week-hint">{weekLabel}</p>
+        ) : (
+          <p className="pipeline-deals-filters__week-hint">Pick any date to filter that calendar week</p>
+        )}
+        <DashboardSegmented
+          value={transportMode}
+          onChange={(mode) => {
+            setTransportMode(mode)
+            setSelected(new Set())
+          }}
+          options={DEAL_TRANSPORT_FILTERS.map((opt) => ({ value: opt.id, label: opt.label }))}
+        />
+        {filtersActive ? (
+          <button
+            type="button"
+            className="pipeline-deals-filters__clear"
+            onClick={() => {
+              setWeekAnchor(null)
+              setTransportMode('all')
+              setSelected(new Set())
+            }}
+          >
+            Clear filters
+          </button>
+        ) : null}
       </div>
 
       {selected.size > 0 && (
@@ -209,13 +279,15 @@ export default function PipelineDealsView({
       {error && (
         <p className="text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{error}</p>
       )}
-      {!loading && !error && rows.length === 0 && (
+      {!loading && !error && filteredRows.length === 0 && (
         <p className="text-xs text-gray-500 py-10 text-center border rounded-xl bg-gray-50">
-          No deals in this stage yet. Create one from a lead&apos;s Deals tab.
+          {rows.length > 0 && filtersActive
+            ? 'No deals match these filters. Try another week or transport mode.'
+            : "No deals in this stage yet. Create one from a lead's Deals tab."}
         </p>
       )}
 
-      {!loading && rows.length > 0 && (
+      {!loading && filteredRows.length > 0 && (
         <div className="pipeline-deals-table-wrap">
           <table className="pipeline-deals-table">
             <colgroup>
@@ -247,13 +319,13 @@ export default function PipelineDealsView({
                 <th className="pipeline-deals-th">Stage</th>
                 <th className="pipeline-deals-th">Mode</th>
                 <th className="pipeline-deals-th">Route / lanes</th>
-                <th className="pipeline-deals-th pipeline-deals-th-num">Weight</th>
+                <th className="pipeline-deals-th pipeline-deals-th-num">Gross</th>
                 <th className="pipeline-deals-th pipeline-deals-th-num">Freight</th>
                 <th className="pipeline-deals-th pipeline-deals-th-num">Invoice</th>
               </tr>
             </thead>
             <tbody>
-              {rows.map((row) => {
+              {filteredRows.map((row) => {
                 const { deal, leadId, leadName, company } = row
                 const key = dealRowKey(row)
                 const meta = getDealStageMeta(deal.stage, { freightOrg: true })
@@ -309,7 +381,7 @@ export default function PipelineDealsView({
                       {freightRouteLabel(freight)}
                     </td>
                     <td className="pipeline-deals-td pipeline-deals-td-num tabular-nums">
-                      {formatWeight(freight?.grossWeightKg)}
+                      {formatWeight(freight)}
                     </td>
                     <td className="pipeline-deals-td pipeline-deals-td-num tabular-nums font-medium">
                       {formatDealValue(deal.amount, deal.currency)}
