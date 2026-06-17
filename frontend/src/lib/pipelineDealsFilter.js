@@ -1,7 +1,7 @@
 export {
   DEAL_TRANSPORT_FILTERS,
   filterPipelineDealRows,
-  formatLocalWeekRangeLabel,
-  parseWeekAnchorFromInput,
-  weekAnchorInputValue,
+  formatLocalDateRangeLabel,
+  parseDealFilterDate,
+  dealFilterDateInputValue,
 } from '../../../lib/pipelineDealsFilter.js'

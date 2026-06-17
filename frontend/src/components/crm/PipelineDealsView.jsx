@@ -12,9 +12,9 @@ import {
 import {
   DEAL_TRANSPORT_FILTERS,
   filterPipelineDealRows,
-  formatLocalWeekRangeLabel,
-  parseWeekAnchorFromInput,
-  weekAnchorInputValue,
+  formatLocalDateRangeLabel,
+  parseDealFilterDate,
+  dealFilterDateInputValue,
 } from '../../lib/pipelineDealsFilter'
 import { DashboardSegmented } from '../dashboard/dashboardUi'
 
@@ -40,7 +40,8 @@ export default function PipelineDealsView({
   const [selected, setSelected] = useState(() => new Set())
   const [bulkBusy, setBulkBusy] = useState(false)
   const [notice, setNotice] = useState(null)
-  const [weekAnchor, setWeekAnchor] = useState(null)
+  const [dateFrom, setDateFrom] = useState(null)
+  const [dateTo, setDateTo] = useState(null)
   const [transportMode, setTransportMode] = useState('all')
 
   const timeZone = user?.timezone || undefined
@@ -48,16 +49,17 @@ export default function PipelineDealsView({
   const filteredRows = useMemo(
     () =>
       filterPipelineDealRows(rows, {
-        weekAnchorDate: weekAnchor,
+        dateFrom,
+        dateTo,
         transportMode,
         timeZone,
       }),
-    [rows, weekAnchor, transportMode, timeZone]
+    [rows, dateFrom, dateTo, transportMode, timeZone]
   )
 
-  const filtersActive = Boolean(weekAnchor) || transportMode !== 'all'
-  const weekInputValue = weekAnchorInputValue(weekAnchor || new Date(), timeZone)
-  const weekLabel = weekAnchor ? formatLocalWeekRangeLabel(weekAnchor, timeZone) : ''
+  const filtersActive = Boolean(dateFrom || dateTo) || transportMode !== 'all'
+  const rangeLabel =
+    dateFrom || dateTo ? formatLocalDateRangeLabel(dateFrom, dateTo, timeZone) : ''
 
   const stageMeta = useMemo(() => {
     if (dealStage === 'all') return { label: 'All open deals' }
@@ -184,24 +186,40 @@ export default function PipelineDealsView({
       </div>
 
       <div className="pipeline-deals-filters" role="search" aria-label="Deal filters">
-        <label className="pipeline-deals-filters__field">
-          <span className="pipeline-deals-filters__label">Week of</span>
-          <input
-            type="date"
-            className="pipeline-deals-filters__date"
-            value={weekAnchor ? weekInputValue : ''}
-            onChange={(e) => {
-              const next = parseWeekAnchorFromInput(e.target.value, timeZone)
-              setWeekAnchor(next)
-              setSelected(new Set())
-            }}
-            aria-label="Select a date in the week to filter"
-          />
-        </label>
-        {weekLabel ? (
-          <p className="pipeline-deals-filters__week-hint">{weekLabel}</p>
+        <div className="pipeline-deals-filters__dates">
+          <label className="pipeline-deals-filters__field">
+            <span className="pipeline-deals-filters__label">From</span>
+            <input
+              type="date"
+              className="pipeline-deals-filters__date"
+              value={dateFrom ? dealFilterDateInputValue(dateFrom, timeZone) : ''}
+              max={dateTo ? dealFilterDateInputValue(dateTo, timeZone) : undefined}
+              onChange={(e) => {
+                setDateFrom(parseDealFilterDate(e.target.value, timeZone))
+                setSelected(new Set())
+              }}
+              aria-label="Filter from date"
+            />
+          </label>
+          <label className="pipeline-deals-filters__field">
+            <span className="pipeline-deals-filters__label">To</span>
+            <input
+              type="date"
+              className="pipeline-deals-filters__date"
+              value={dateTo ? dealFilterDateInputValue(dateTo, timeZone) : ''}
+              min={dateFrom ? dealFilterDateInputValue(dateFrom, timeZone) : undefined}
+              onChange={(e) => {
+                setDateTo(parseDealFilterDate(e.target.value, timeZone))
+                setSelected(new Set())
+              }}
+              aria-label="Filter to date"
+            />
+          </label>
+        </div>
+        {rangeLabel ? (
+          <p className="pipeline-deals-filters__week-hint">{rangeLabel}</p>
         ) : (
-          <p className="pipeline-deals-filters__week-hint">Pick any date to filter that calendar week</p>
+          <p className="pipeline-deals-filters__week-hint">Filter by deal activity date (created or updated)</p>
         )}
         <DashboardSegmented
           value={transportMode}
@@ -216,7 +234,8 @@ export default function PipelineDealsView({
             type="button"
             className="pipeline-deals-filters__clear"
             onClick={() => {
-              setWeekAnchor(null)
+              setDateFrom(null)
+              setDateTo(null)
               setTransportMode('all')
               setSelected(new Set())
             }}
@@ -282,7 +301,7 @@ export default function PipelineDealsView({
       {!loading && !error && filteredRows.length === 0 && (
         <p className="text-xs text-gray-500 py-10 text-center border rounded-xl bg-gray-50">
           {rows.length > 0 && filtersActive
-            ? 'No deals match these filters. Try another week or transport mode.'
+            ? 'No deals match these filters. Try another date range or transport mode.'
             : "No deals in this stage yet. Create one from a lead's Deals tab."}
         </p>
       )}

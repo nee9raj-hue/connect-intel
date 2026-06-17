@@ -2987,6 +2987,13 @@ button.ci-lead-tag:disabled {
   border-radius: 8px;
 }
 
+.pipeline-deals-filters__dates {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.5rem 0.75rem;
+}
+
 .pipeline-deals-filters__field {
   display: flex;
   flex-direction: column;
