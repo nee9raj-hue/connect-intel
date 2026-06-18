@@ -18,6 +18,35 @@ const CRM_FIELDS = [
 
 const STEPS = ['Upload file', 'Map columns', 'Review & import']
 
+function applyColumnMapping(rows, mapping) {
+  return rows.map((row) => {
+    const out = { ...row }
+    for (const [header, field] of Object.entries(mapping || {})) {
+      if (!field || field === 'skip') continue
+      const raw = row[header]
+      if (raw == null || !String(raw).trim()) continue
+      const value = String(raw).trim()
+      if (field === 'tags') {
+        out.tags = out.tags ? `${out.tags}, ${value}` : value
+        out.lead_tags = out.lead_tags ? `${out.lead_tags}, ${value}` : value
+      } else if (field === 'name') {
+        out.contact_name = value
+      } else if (field === 'email') {
+        out.email = value
+      } else if (field === 'phone') {
+        out.phone = value
+      } else if (field === 'company') {
+        out.company = value
+      } else if (field === 'stage') {
+        out.pipeline_status = value
+      } else if (field === 'owner') {
+        out.assignee_email = value
+      }
+    }
+    return out
+  })
+}
+
 export default function ImportLeadsTab({ onImported, onNavigate }) {
   const [step, setStep] = useState(0)
   const [recent, setRecent] = useState([])
@@ -70,6 +99,8 @@ export default function ImportLeadsTab({ onImported, onNavigate }) {
         else if (low.includes('email')) autoMap[h] = 'email'
         else if (low.includes('phone') || low.includes('mobile')) autoMap[h] = 'phone'
         else if (low.includes('stage') || low.includes('status')) autoMap[h] = 'stage'
+        else if (low.includes('tag')) autoMap[h] = 'tags'
+        else if (low.includes('owner') || low.includes('assignee')) autoMap[h] = 'owner'
         else autoMap[h] = 'skip'
       }
       setMapping(autoMap)
@@ -88,7 +119,7 @@ export default function ImportLeadsTab({ onImported, onNavigate }) {
     try {
       const data = await api.importOrgPipeline({
         datasetType: 'general',
-        rows,
+        rows: applyColumnMapping(rows, mapping),
         addToPipeline: true,
         filename: fileName,
       })
