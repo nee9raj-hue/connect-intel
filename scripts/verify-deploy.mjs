@@ -42,6 +42,7 @@ const SERVER_IMPORTS = [
   'lib/server/handlers/org-member-hierarchy.js',
   'lib/server/handlers/org-import-status.js',
   'lib/server/pipelineLeadCounts.js',
+  'lib/server/pipelineListLoad.js',
   'lib/server/pipelineHierarchyProfile.js',
   'lib/server/handlers/pipeline-scoped-leads-example.js',
   'lib/server/handlers/crm-activity-log.js',
