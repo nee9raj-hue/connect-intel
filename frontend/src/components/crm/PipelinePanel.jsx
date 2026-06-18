@@ -782,13 +782,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const filtered = useMemo(() => {
     const base = scopedLeads
     const closingThisMonth = panelOptions?.closing === 'this-month'
-    const statusAlreadyOnServer =
-      serverSidePipeline &&
-      pipelineStatusFilter &&
-      pipelineStatusFilter !== 'all' &&
-      (stageListMode || listStatusFilter !== 'all')
     return applyPipelineFilters(base, {
-      status: statusAlreadyOnServer ? 'all' : pipelineStatusFilter,
+      status: pipelineStatusFilter,
       cities: serverSidePipeline ? [] : getFilterCities(appliedAdvanced),
       states: serverSidePipeline ? [] : getFilterStates(appliedAdvanced),
       contact: appliedAdvanced.contact,
@@ -835,8 +830,6 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     panelOptions?.closing,
     dashboardLeadIds,
     teamMemberIdsForFilter,
-    serverSidePipeline,
-    stageListMode,
   ])
 
   const applySmartView = useCallback((view) => {
