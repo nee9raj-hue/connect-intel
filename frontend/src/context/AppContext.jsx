@@ -702,6 +702,20 @@ export function AppProvider({ children }) {
           lead.id === leadId ? { ...lead, crm: { ...(lead.crm || {}), ...body.crm } } : lead
         )
       }
+      if (body?.emailConsent !== undefined) {
+        const granted = Boolean(body.emailConsent)
+        const at = granted ? new Date().toISOString() : null
+        return current.map((lead) =>
+          lead.id === leadId
+            ? {
+                ...lead,
+                commercialEmailOptIn: granted,
+                commercialEmailConsentAt: at,
+                commercialEmailConsentSource: granted ? 'manual' : null,
+              }
+            : lead
+        )
+      }
       return current
     })
 

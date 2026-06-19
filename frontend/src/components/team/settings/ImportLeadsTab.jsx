@@ -13,6 +13,7 @@ const CRM_FIELDS = [
   { id: 'stage', label: 'Stage' },
   { id: 'owner', label: 'Owner' },
   { id: 'tags', label: 'Tags' },
+  { id: 'email_consent', label: 'Email consent (yes/no)' },
   { id: 'custom', label: 'Custom field' },
 ]
 
@@ -41,6 +42,9 @@ function applyColumnMapping(rows, mapping) {
         out.pipeline_status = value
       } else if (field === 'owner') {
         out.assignee_email = value
+      } else if (field === 'email_consent') {
+        out.email_consent = value
+        out.opt_in = value
       }
     }
     return out
@@ -100,6 +104,8 @@ export default function ImportLeadsTab({ onImported, onNavigate }) {
         else if (low.includes('phone') || low.includes('mobile')) autoMap[h] = 'phone'
         else if (low.includes('stage') || low.includes('status')) autoMap[h] = 'stage'
         else if (low.includes('tag')) autoMap[h] = 'tags'
+        else if (low.includes('consent') || low.includes('opt_in') || low.includes('opt-in') || low === 'can_email')
+          autoMap[h] = 'email_consent'
         else if (low.includes('owner') || low.includes('assignee')) autoMap[h] = 'owner'
         else autoMap[h] = 'skip'
       }

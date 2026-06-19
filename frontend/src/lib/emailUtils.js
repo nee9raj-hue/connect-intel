@@ -8,7 +8,13 @@ import {
   getEmailValidationState,
   leadEmailBounced,
   leadHasSendableEmail,
+  leadCanReceiveCommercialEmail,
 } from '../../../lib/leadEmailSendable.js'
+import {
+  leadHasCommercialEmailConsent,
+  commercialEmailConsentLabel,
+  COMMERCIAL_EMAIL_CONSENT_MESSAGE,
+} from '../../../lib/emailConsent.js'
 
 export {
   hasValidEmail,
@@ -18,6 +24,10 @@ export {
   leadEmailBounced,
   getEmailValidationState,
   leadHasSendableEmail,
+  leadCanReceiveCommercialEmail,
+  leadHasCommercialEmailConsent,
+  commercialEmailConsentLabel,
+  COMMERCIAL_EMAIL_CONSENT_MESSAGE,
 }
 
 export function leadDisplayName(lead) {

@@ -19,6 +19,7 @@ const EMPTY = {
   status: 'new',
   source: 'manual',
   assignedToUserId: '',
+  commercialEmailOptIn: false,
 }
 
 const SOURCE_OPTIONS = [
@@ -194,6 +195,16 @@ export default function AddLeadModal({ open, onClose, onAdded, initialStatus = '
                 </select>
               </label>
             ) : null}
+            <label className="pipeline-drawer__field pipeline-drawer__field--checkbox">
+              <span>
+                <input
+                  type="checkbox"
+                  checked={form.commercialEmailOptIn}
+                  onChange={(e) => set('commercialEmailOptIn', e.target.checked)}
+                />{' '}
+                Contact agreed to receive commercial email
+              </span>
+            </label>
             <label className="pipeline-drawer__field">
               <span>Notes (optional)</span>
               <textarea rows={3} value={form.notes} onChange={(e) => set('notes', e.target.value)} />

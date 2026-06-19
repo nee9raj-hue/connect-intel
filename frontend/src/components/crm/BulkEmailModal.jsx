@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
-import { leadHasSendableEmail } from '../../lib/emailUtils'
+import { leadHasSendableEmail, leadCanReceiveCommercialEmail } from '../../lib/emailUtils'
 import { evaluatePipelineEmail } from '../../lib/resourceProtection.js'
 import { useUsagePolicies } from '../../hooks/useUsagePolicies.js'
 import LostLeadsEmailGuard from '../guardrails/LostLeadsEmailGuard.jsx'
@@ -78,8 +78,9 @@ export default function BulkEmailModal({ open, leadIds, leads, onClose, onDone, 
           emailBouncedAt: lead.emailBouncedAt || null,
           crm: lead.crm,
         })
-        if (leadHasSendableEmail(lead)) sendable.push(leadId)
-        else skip.push({ leadId, reason: 'no_email' })
+        if (leadCanReceiveCommercialEmail(lead)) sendable.push(leadId)
+        else if (!leadHasSendableEmail(lead)) skip.push({ leadId, reason: 'no_email' })
+        else skip.push({ leadId, reason: 'no_consent' })
       }
       fetchedKeyRef.current = leadIdsKey
       setResolvedLeads(resolved)

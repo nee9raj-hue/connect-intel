@@ -3,6 +3,11 @@ import { useApp } from '../../context/AppContext'
 import { useUsagePolicies } from '../../hooks/useUsagePolicies.js'
 import { isPipelineAssignManager } from '../../lib/pipelineAssignAccess'
 import { api } from '../../lib/api'
+import {
+  leadHasCommercialEmailConsent,
+  commercialEmailConsentLabel,
+  COMMERCIAL_EMAIL_CONSENT_MESSAGE,
+} from '../../lib/emailUtils'
 import { leadHasCallablePhone, openWhatsAppChat } from '../../lib/phoneUtils'
 import LeadCallLogCard from './LeadCallLogCard'
 import LeadPhoneCall from './LeadPhoneCall'
@@ -149,7 +154,7 @@ export default function LeadWorkspace({
   const [body, setBody] = useState('')
   const [purpose, setPurpose] = useState('introduction')
   const [generating, setGenerating] = useState(false)
-  const [sending, setSending] = useState(false)
+  const [savingConsent, setSavingConsent] = useState(false)
   const [savingScope, setSavingScope] = useState(null)
   const [scheduleFeedback, setScheduleFeedback] = useState(null)
   const [visitFormKey, setVisitFormKey] = useState(0)
@@ -642,6 +647,10 @@ export default function LeadWorkspace({
       setError(guidance)
       return
     }
+    if (!hasEmailConsent) {
+      setError(COMMERCIAL_EMAIL_CONSENT_MESSAGE)
+      return
+    }
     if (sending) return
     setSending(true)
     setError(null)
@@ -723,7 +732,8 @@ export default function LeadWorkspace({
   const contactId = lead.contactId || lead.id
 
   const canSendEmail = Boolean(gmailStatus.connected || orgEmail?.userCanSend || user?.orgOutboundEmailReady)
-  const busy = saving || sending || generating || connectingGmail || waGenerating || threadSyncing
+  const hasEmailConsent = leadHasCommercialEmailConsent(lead)
+  const busy = saving || sending || generating || connectingGmail || waGenerating || threadSyncing || savingConsent
   const hasLeadPhone = leadHasCallablePhone(lead)
 
   const handleGenerateWhatsApp = async () => {
@@ -749,6 +759,20 @@ export default function LeadWorkspace({
       setError(e.message)
     } finally {
       setWaGenerating(false)
+    }
+  }
+
+  const handleEmailConsentChange = async (next) => {
+    setSavingConsent(true)
+    setError(null)
+    try {
+      await patchLead(lead.id, { emailConsent: next })
+      setNotice(next ? 'Commercial email consent recorded' : 'Commercial email consent removed')
+      await refreshPipelineLead?.(lead.id)
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setSavingConsent(false)
     }
   }
 
@@ -843,6 +867,23 @@ export default function LeadWorkspace({
                   Score <strong>{crm.leadScore}</strong>/100
                 </div>
               )}
+            </LwSection>
+
+            <LwSection icon={MailIcon} title="Commercial email consent">
+              <label className="lw-check-row">
+                <input
+                  type="checkbox"
+                  checked={hasEmailConsent}
+                  disabled={busy}
+                  onChange={(e) => handleEmailConsentChange(e.target.checked)}
+                />
+                <span>This contact agreed to receive commercial email from us</span>
+              </label>
+              <p className="text-xs text-[var(--lw-text-secondary)] mt-2 mb-0">
+                {hasEmailConsent
+                  ? commercialEmailConsentLabel(lead)
+                  : 'Required before Pipeline or marketing email can be sent (Google CRM policy).'}
+              </p>
             </LwSection>
 
             {user?.accountType === 'company' && (
@@ -1352,6 +1393,30 @@ export default function LeadWorkspace({
               </LwNotice>
             )}
 
+            <LwSection icon={MailIcon} title="Commercial email consent">
+              <label className="lw-check-row">
+                <input
+                  type="checkbox"
+                  checked={hasEmailConsent}
+                  disabled={busy}
+                  onChange={(e) => handleEmailConsentChange(e.target.checked)}
+                />
+                <span>This contact agreed to receive commercial email</span>
+              </label>
+              <p className="text-xs text-[var(--lw-text-secondary)] mt-2 mb-0">
+                {hasEmailConsent
+                  ? commercialEmailConsentLabel(lead)
+                  : COMMERCIAL_EMAIL_CONSENT_MESSAGE}
+              </p>
+            </LwSection>
+
+            {!hasEmailConsent && (
+              <LwAlert type="warn">
+                Record consent above before sending. Imports default to no consent until you confirm or map an opt-in
+                column.
+              </LwAlert>
+            )}
+
             <LwSection
               icon={PencilIcon}
               title="Signature"
@@ -1449,7 +1514,13 @@ export default function LeadWorkspace({
                     </ul>
                   )}
                 </div>
-                <LwBtn variant="primary" className="lw-btn--block" icon={MailIcon} onClick={handleSend} disabled={busy || !canSendEmail}>
+                <LwBtn
+                  variant="primary"
+                  className="lw-btn--block"
+                  icon={MailIcon}
+                  onClick={handleSend}
+                  disabled={busy || !canSendEmail || !hasEmailConsent}
+                >
                   {sending ? 'Sending…' : 'Send & log'}
                 </LwBtn>
               </div>
