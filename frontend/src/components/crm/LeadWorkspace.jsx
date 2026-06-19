@@ -5,7 +5,6 @@ import { isPipelineAssignManager } from '../../lib/pipelineAssignAccess'
 import { api } from '../../lib/api'
 import {
   leadHasCommercialEmailConsent,
-  commercialEmailConsentLabel,
   COMMERCIAL_EMAIL_CONSENT_MESSAGE,
 } from '../../lib/emailUtils'
 import { leadHasCallablePhone, openWhatsAppChat } from '../../lib/phoneUtils'
@@ -870,23 +869,6 @@ export default function LeadWorkspace({
               )}
             </LwSection>
 
-            <LwSection icon={MailIcon} title="Commercial email consent">
-              <label className="lw-check-row">
-                <input
-                  type="checkbox"
-                  checked={hasEmailConsent}
-                  disabled={busy}
-                  onChange={(e) => handleEmailConsentChange(e.target.checked)}
-                />
-                <span>This contact agreed to receive commercial email from us</span>
-              </label>
-              <p className="text-xs text-[var(--lw-text-secondary)] mt-2 mb-0">
-                {hasEmailConsent
-                  ? commercialEmailConsentLabel(lead)
-                  : 'Required before Pipeline or marketing email can be sent (Google CRM policy).'}
-              </p>
-            </LwSection>
-
             {user?.accountType === 'company' && (
               <LwSection icon={TaskIcon} title="Tags">
                 <LeadTagsEditor
@@ -1394,27 +1376,18 @@ export default function LeadWorkspace({
               </LwNotice>
             )}
 
-            <LwSection icon={MailIcon} title="Commercial email consent">
-              <label className="lw-check-row">
-                <input
-                  type="checkbox"
-                  checked={hasEmailConsent}
-                  disabled={busy}
-                  onChange={(e) => handleEmailConsentChange(e.target.checked)}
-                />
-                <span>This contact agreed to receive commercial email</span>
-              </label>
-              <p className="text-xs text-[var(--lw-text-secondary)] mt-2 mb-0">
-                {hasEmailConsent
-                  ? commercialEmailConsentLabel(lead)
-                  : COMMERCIAL_EMAIL_CONSENT_MESSAGE}
-              </p>
-            </LwSection>
-
             {!hasEmailConsent && (
               <LwAlert type="warn">
-                Record consent above before sending. Imports default to no consent until you confirm or map an opt-in
-                column.
+                <label className="lw-check-row">
+                  <input
+                    type="checkbox"
+                    checked={hasEmailConsent}
+                    disabled={busy}
+                    onChange={(e) => handleEmailConsentChange(e.target.checked)}
+                  />
+                  <span>Contact agreed to receive commercial email</span>
+                </label>
+                <p className="text-xs mt-2 mb-0 opacity-90">{COMMERCIAL_EMAIL_CONSENT_MESSAGE}</p>
               </LwAlert>
             )}
 

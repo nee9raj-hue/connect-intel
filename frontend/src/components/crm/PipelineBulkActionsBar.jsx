@@ -28,6 +28,7 @@ export default function PipelineBulkActionsBar({
   onEdit,
   onTags,
   onMarkReplied,
+  onApproveEmailConsent,
   onEmail,
   onCreateBatchLists,
   onWhatsApp,
@@ -172,7 +173,7 @@ export default function PipelineBulkActionsBar({
             Delete
           </button>
         )}
-        {showMore && (onMarkReplied || onExport || onDelete) && (
+        {showMore && (onMarkReplied || onApproveEmailConsent || onExport || onDelete) && (
           <div className="relative" ref={moreRef}>
             <button
               type="button"
@@ -195,6 +196,18 @@ export default function PipelineBulkActionsBar({
                     }}
                   >
                     Mark as replied
+                  </button>
+                ) : null}
+                {onApproveEmailConsent ? (
+                  <button
+                    type="button"
+                    className="pipeline-bulk-hs-menu__item"
+                    onClick={() => {
+                      setMoreOpen(false)
+                      onApproveEmailConsent()
+                    }}
+                  >
+                    Approve email consent
                   </button>
                 ) : null}
                 {!floating && onExport ? (

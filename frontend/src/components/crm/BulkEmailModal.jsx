@@ -7,6 +7,7 @@ import { useUsagePolicies } from '../../hooks/useUsagePolicies.js'
 import LostLeadsEmailGuard from '../guardrails/LostLeadsEmailGuard.jsx'
 import { PipelineEmailGuideModal } from '../guardrails/ResourceProtectionModals.jsx'
 import BulkEmailCompose from './BulkEmailCompose'
+import BulkEmailSkipReport from './BulkEmailSkipReport'
 
 export default function BulkEmailModal({ open, leadIds, leads, onClose, onDone, onNavigate }) {
   const { user } = useApp()
@@ -122,12 +123,20 @@ export default function BulkEmailModal({ open, leadIds, leads, onClose, onDone, 
         }
         const fallback = (fallbackLeadsRef.current || []).filter((l) => ids.includes(l.id))
         setResolvedLeads(fallback)
-        setSendableIds(fallback.filter(leadHasSendableEmail).map((l) => l.id))
-        setSkipped(
-          ids
-            .filter((id) => !fallback.some((l) => l.id === id))
-            .map((leadId) => ({ leadId, reason: 'not_loaded' }))
-        )
+        const sendable = []
+        const skip = []
+        for (const leadId of ids) {
+          const lead = fallback.find((l) => l.id === leadId)
+          if (!lead) {
+            skip.push({ leadId, reason: 'not_loaded' })
+            continue
+          }
+          if (leadCanReceiveCommercialEmail(lead)) sendable.push(leadId)
+          else if (!leadHasSendableEmail(lead)) skip.push({ leadId, reason: 'no_email' })
+          else skip.push({ leadId, reason: 'no_consent' })
+        }
+        setSendableIds(sendable)
+        setSkipped(skip)
       })
       .finally(() => {
         if (!cancelled) setResolving(false)
@@ -178,9 +187,11 @@ export default function BulkEmailModal({ open, leadIds, leads, onClose, onDone, 
   if (!open) return null
 
   const noEmail = skipped.filter((s) => s.reason === 'no_email').length
+  const noConsent = skipped.filter((s) => s.reason === 'no_consent').length
   const notFound = skipped.filter((s) => s.reason === 'not_in_pipeline' || s.reason === 'not_loaded').length
   const showLoading = resolving && fetchedKeyRef.current !== leadIdsKey
   const showCompose = !emailGuide.open && !lostGuardOpen && activeSendableIds.length > 0
+  const showSkipOnly = !emailGuide.open && !lostGuardOpen && !showCompose && skipped.length > 0
 
   return (
     <>
@@ -235,6 +246,17 @@ export default function BulkEmailModal({ open, leadIds, leads, onClose, onDone, 
                 <p className="px-5 py-4 text-sm text-[#516f90]">Loading recipients from pipeline…</p>
               ) : lostGuardOpen ? (
                 <p className="px-5 py-4 text-sm text-[#516f90]">Review your audience…</p>
+              ) : showSkipOnly ? (
+                <div className="px-5 py-4">
+                  <p className="text-sm text-[#516f90] mb-2">
+                    No recipients are ready to send. Approve email consent on leads or add valid email addresses.
+                  </p>
+                  <BulkEmailSkipReport
+                    skipped={skipped}
+                    resolvedLeads={resolvedLeads}
+                    pool={leads || []}
+                  />
+                </div>
               ) : !showCompose ? (
                 <p className="px-5 py-4 text-sm text-[#516f90]">
                   No sendable recipients in this selection. Add email addresses or adjust your selection.
@@ -246,12 +268,20 @@ export default function BulkEmailModal({ open, leadIds, leads, onClose, onDone, 
                       Some recipient details could not be refreshed. Counts may be incomplete.
                     </p>
                   )}
-                  {(noEmail > 0 || notFound > 0 || excludedLost) && (
+                  {skipped.length > 0 && (
+                    <BulkEmailSkipReport
+                      skipped={skipped}
+                      resolvedLeads={resolvedLeads}
+                      pool={leads || []}
+                    />
+                  )}
+                  {(noEmail > 0 || noConsent > 0 || notFound > 0 || excludedLost) && (
                     <p className="px-5 pt-3 text-xs text-[#516f90]">
                       {activeSendableIds.length} ready to send
                       {excludedLost && lostLeadIds.length > 0
                         ? ` · ${lostLeadIds.length} lost excluded`
                         : ''}
+                      {noConsent > 0 ? ` · ${noConsent} without consent` : ''}
                       {noEmail > 0 ? ` · ${noEmail} without sendable email` : ''}
                       {notFound > 0 ? ` · ${notFound} not found in pipeline` : ''}
                     </p>

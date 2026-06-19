@@ -34,6 +34,17 @@ export function leadDisplayName(lead) {
   return [lead?.firstName, lead?.lastName].filter(Boolean).join(' ') || lead?.company || 'Lead'
 }
 
+export const BULK_EMAIL_SKIP_LABELS = {
+  no_consent: 'No email consent',
+  no_email: 'No sendable email',
+  not_in_pipeline: 'Not in pipeline',
+  not_loaded: 'Could not load',
+}
+
+export function bulkEmailSkipReasonLabel(reason) {
+  return BULK_EMAIL_SKIP_LABELS[reason] || 'Skipped'
+}
+
 export function emailValidationTooltip(lead) {
   if (leadEmailBounced(lead)) {
     const reason = String(lead?.emailBounceReason || '').trim()

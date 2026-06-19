@@ -1148,6 +1148,12 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
         setBulkNotice(
           count === 1 ? 'Tags updated on 1 lead.' : `Tags updated on ${count} leads.`
         )
+      } else if (actions.approveEmailConsent) {
+        setBulkNotice(
+          count === 1
+            ? 'Email consent approved for 1 contact.'
+            : `Email consent approved for ${count} contacts.`
+        )
       }
       setSelectedIds(new Set())
       setBulkAssignOpen(false)
@@ -1500,6 +1506,13 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               onEdit={() => setBulkEditOpen(true)}
               onTags={orgLeadTags?.length ? () => setBulkTagsOpen(true) : undefined}
               onMarkReplied={() => runBulk({ markReplied: true })}
+              onApproveEmailConsent={() => {
+                const n = selectedIds.size
+                const ok = window.confirm(
+                  `Approve commercial email consent for ${n} selected contact${n === 1 ? '' : 's'}? They can receive pipeline and bulk email after this.`
+                )
+                if (ok) runBulk({ approveEmailConsent: true })
+              }}
               onEmail={openBulkEmail}
               onCreateBatchLists={openBatchListsFlow}
               onWhatsApp={() => setWaOpen(true)}
