@@ -11,13 +11,18 @@ const GREEN = '#16a34a'
 const AMBER = '#d97706'
 const RED = '#dc2626'
 
-export function CommandBarMetric({ metric }) {
+export function CommandBarMetric({ metric, onClick }) {
   const statusColor = metric.status === 'good' ? GREEN : metric.status === 'warn' ? AMBER : RED
   const tone =
     metric.delta != null ? (metric.delta > 0 ? 'up' : metric.delta < 0 ? 'down' : 'flat') : null
 
+  const Tag = onClick ? 'button' : 'article'
+  const props = onClick
+    ? { type: 'button', onClick: () => onClick(metric), className: `ti3-cmd-metric ti3-cmd-metric--${metric.status || 'warn'} ti3-cmd-metric--clickable` }
+    : { className: `ti3-cmd-metric ti3-cmd-metric--${metric.status || 'warn'}` }
+
   return (
-    <article className={`ti3-cmd-metric ti3-cmd-metric--${metric.status || 'warn'}`}>
+    <Tag {...props}>
       <div className="ti3-cmd-metric__head">
         <span className="ti3-cmd-metric__label">{metric.label}</span>
         <span className="ti3-cmd-metric__status" style={{ background: statusColor }} aria-hidden />
@@ -38,7 +43,7 @@ export function CommandBarMetric({ metric }) {
         <Sparkline data={metric.spark} color={ORANGE} height={28} />
         {metric.hint ? <span className="ti3-cmd-metric__hint">{metric.hint}</span> : null}
       </div>
-    </article>
+    </Tag>
   )
 }
 

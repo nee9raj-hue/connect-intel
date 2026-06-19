@@ -12484,6 +12484,39 @@ html[data-pipeline-mobile="1"] .ci-app-header-chip--secondary {
   background: #fff;
 }
 
+.ti3-dash-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.ti3-filter-field--check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8125rem;
+  color: #475569;
+}
+
+.ti3-filter-bar {
+  margin-bottom: 0.75rem;
+}
+
+.ti3-cmd-metric--clickable {
+  cursor: pointer;
+  border: none;
+  text-align: left;
+  width: 100%;
+  font: inherit;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.ti3-cmd-metric--clickable:hover {
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+  transform: translateY(-1px);
+}
+
 .ti3-cockpit {
   max-width: 1600px;
   margin: 0 auto;

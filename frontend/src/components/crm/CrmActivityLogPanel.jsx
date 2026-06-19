@@ -2,7 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { ACTIVITY_LABELS } from '../../lib/crmUiConstants'
-import { DashboardSegmented } from '../dashboard/dashboardUi'
+import { buildActivityLogQuery, navigationForActivityMetric } from '../../lib/activityDashboardNav'
+import ActivityDashboardFilters from './ActivityDashboardFilters'
 import {
   CommandBarMetric,
   InsightsCarousel,
@@ -19,9 +20,21 @@ import {
 } from './ActivityLogHubCharts'
 
 export default function CrmActivityLogPanel({ onNavigate, panelOptions = {}, isActive = true }) {
-  const { user, openPipelineLead, pipelineAssigneeFilter, setPipelineAssigneeFilter, teamMembers } = useApp()
+  const {
+    user,
+    openPipelineLead,
+    pipelineAssigneeFilter,
+    setPipelineAssigneeFilter,
+    teamMembers,
+    orgLeadTags,
+  } = useApp()
   const [period, setPeriod] = useState(panelOptions?.period || 'week')
   const [activityType, setActivityType] = useState(panelOptions?.activityType || null)
+  const [statusFilter, setStatusFilter] = useState(panelOptions?.status || 'all')
+  const [tagFilter, setTagFilter] = useState(panelOptions?.tagId || '')
+  const [useCustomRange, setUseCustomRange] = useState(Boolean(panelOptions?.from && panelOptions?.to))
+  const [fromDate, setFromDate] = useState(panelOptions?.from || '')
+  const [toDate, setToDate] = useState(panelOptions?.to || '')
   const [memberUserId, setMemberUserId] = useState(
     panelOptions?.userId ? String(panelOptions.userId) : pipelineAssigneeFilter ? String(pipelineAssigneeFilter) : ''
   )
@@ -53,10 +66,17 @@ export default function CrmActivityLogPanel({ onNavigate, panelOptions = {}, isA
     setLoading(true)
     setError(null)
     try {
-      const q = new URLSearchParams({ period, limit: '50', offset: '0' })
-      if (memberUserId) q.set('userId', memberUserId)
-      if (activityType) q.set('type', activityType)
-      const data = await api.getCrmActivityLog(q.toString())
+      const query = buildActivityLogQuery({
+        period: useCustomRange ? undefined : period,
+        memberUserId,
+        activityType,
+        status: statusFilter,
+        tagId: tagFilter,
+        from: useCustomRange ? fromDate : '',
+        to: useCustomRange ? toDate : '',
+      })
+      const q = `${query}${query ? '&' : ''}limit=50&offset=0`
+      const data = await api.getCrmActivityLog(q)
       setPayload(data)
       setExpandedFeedId(null)
     } catch (err) {
@@ -64,32 +84,35 @@ export default function CrmActivityLogPanel({ onNavigate, panelOptions = {}, isA
     } finally {
       setLoading(false)
     }
-  }, [memberUserId, activityType, period])
+  }, [memberUserId, activityType, period, statusFilter, tagFilter, useCustomRange, fromDate, toDate])
 
   const loadMore = useCallback(async () => {
     if (loadingMore || !payload?.pagination?.hasMore) return
     setLoadingMore(true)
     try {
-      const nextOffset = (payload?.activities?.length || 0)
-      const q = new URLSearchParams({
-        period,
-        limit: '50',
-        offset: String(nextOffset),
+      const nextOffset = payload?.activities?.length || 0
+      const query = buildActivityLogQuery({
+        period: useCustomRange ? undefined : period,
+        memberUserId,
+        activityType,
+        status: statusFilter,
+        tagId: tagFilter,
+        from: useCustomRange ? fromDate : '',
+        to: useCustomRange ? toDate : '',
       })
-      if (memberUserId) q.set('userId', memberUserId)
-      if (activityType) q.set('type', activityType)
-      const data = await api.getCrmActivityLog(q.toString())
+      const q = `${query}${query ? '&' : ''}limit=50&offset=${nextOffset}`
+      const data = await api.getCrmActivityLog(q)
       setPayload((prev) => ({
         ...data,
         activities: [...(prev?.activities || []), ...(data.activities || [])],
-        hub: prev?.hub || data.hub,
+        hub: data.hub || prev?.hub,
       }))
     } catch (err) {
       setError(err.message || 'Could not load more activity')
     } finally {
       setLoadingMore(false)
     }
-  }, [loadingMore, payload, memberUserId, activityType, period])
+  }, [loadingMore, payload, memberUserId, activityType, period, statusFilter, tagFilter, useCustomRange, fromDate, toDate])
 
   useEffect(() => {
     if (!isActive) return undefined
@@ -156,31 +179,51 @@ export default function CrmActivityLogPanel({ onNavigate, panelOptions = {}, isA
   const totalEvents = pagination?.total ?? activities.length
   const hasMore = pagination?.hasMore ?? false
 
+  const dashboardFilters = useMemo(
+    () => ({
+      period: useCustomRange ? 'custom' : period,
+      memberUserId,
+      status: statusFilter,
+      tagId: tagFilter,
+      from: useCustomRange ? fromDate : '',
+      to: useCustomRange ? toDate : '',
+    }),
+    [period, memberUserId, statusFilter, tagFilter, useCustomRange, fromDate, toDate]
+  )
+
+  const onMetricClick = useCallback(
+    (metric) => {
+      const { panel, opts } = navigationForActivityMetric(metric.id, dashboardFilters)
+      if (panel === 'crm-log') {
+        if (opts.activityType !== undefined) setActivityType(opts.activityType)
+        return
+      }
+      if (opts.assigneeUserId) setPipelineAssigneeFilter?.(opts.assigneeUserId)
+      onNavigate?.(panel, opts)
+    },
+    [dashboardFilters, onNavigate, setPipelineAssigneeFilter]
+  )
+
   const filterControls = (
-    <>
-      {hub?.isAdmin && memberOptions.length > 0 ? (
-        <label className="ti3-filter-field">
-          <span className="sr-only">Rep</span>
-          <select value={memberUserId || ''} onChange={(e) => selectMember(e.target.value)}>
-            <option value="">All team</option>
-            {memberOptions.map((m) => (
-              <option key={m.userId} value={m.userId}>
-                {m.name}
-              </option>
-            ))}
-          </select>
-        </label>
-      ) : null}
-      <DashboardSegmented
-        value={period}
-        onChange={setPeriod}
-        options={[
-          { value: 'day', label: 'Today' },
-          { value: 'week', label: '7d' },
-          { value: 'month', label: '30d' },
-        ]}
-      />
-    </>
+    <ActivityDashboardFilters
+      period={period}
+      onPeriodChange={setPeriod}
+      memberUserId={memberUserId}
+      onMemberChange={selectMember}
+      memberOptions={memberOptions}
+      showMemberFilter={hub?.isAdmin}
+      status={statusFilter}
+      onStatusChange={setStatusFilter}
+      tagId={tagFilter}
+      onTagChange={setTagFilter}
+      orgLeadTags={orgLeadTags || []}
+      fromDate={fromDate}
+      toDate={toDate}
+      onFromDateChange={setFromDate}
+      onToDateChange={setToDate}
+      useCustomRange={useCustomRange}
+      onUseCustomRangeChange={setUseCustomRange}
+    />
   )
 
   if (!isActive) return null
@@ -223,9 +266,10 @@ export default function CrmActivityLogPanel({ onNavigate, panelOptions = {}, isA
           </div>
         ) : (
           <div className="ti3-cockpit ti3-cockpit--dash">
+            <div className="ti3-filter-bar ti3-filter-bar--desktop-hidden">{filterControls}</div>
             <section className="ti3-cmd-strip" aria-label="Activity command bar">
               {(hub?.commandBar || []).map((metric) => (
-                <CommandBarMetric key={metric.id} metric={metric} />
+                <CommandBarMetric key={metric.id} metric={metric} onClick={onMetricClick} />
               ))}
             </section>
 

@@ -8,9 +8,10 @@ import { formatDealValue } from '../../lib/crmTimeline'
 import {
   DashboardKpiCard,
   DashboardSection,
-  DashboardSegmented,
   DashboardEmpty,
 } from '../dashboard/dashboardUi'
+import { buildActivityLogQuery, pipelineOptsFromActivityFilters } from '../../lib/activityDashboardNav'
+import ActivityDashboardFilters from './ActivityDashboardFilters'
 import { formatDelta, formatHours, formatShortDate } from '../../lib/teamIntelligenceConstants'
 import { ACTIVITY_LABELS, formatDateTime } from '../../lib/crmUiConstants'
 import {
@@ -92,9 +93,14 @@ const INSIGHT_STYLES = {
 
 /** Team metrics block — embedded on the main Dashboard for managers and reps. */
 export default function TeamIntelligenceSection({ onNavigate, isActive = true }) {
-  const { user, teamMembers, openPipelineLead, setPipelineAssigneeFilter } = useApp()
+  const { user, teamMembers, openPipelineLead, setPipelineAssigneeFilter, orgLeadTags } = useApp()
   const [period, setPeriod] = useState('week')
   const [intelMemberId, setIntelMemberId] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all')
+  const [tagFilter, setTagFilter] = useState('')
+  const [useCustomRange, setUseCustomRange] = useState(false)
+  const [fromDate, setFromDate] = useState('')
+  const [toDate, setToDate] = useState('')
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -127,16 +133,22 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
     setLoading(true)
     setError(null)
     try {
-      const q = new URLSearchParams({ period })
-      if (memberUserId) q.set('userId', memberUserId)
-      const res = await api.getCrmTeamMetrics(q.toString())
+      const query = buildActivityLogQuery({
+        period: useCustomRange ? undefined : period,
+        memberUserId: memberUserId,
+        status: statusFilter,
+        tagId: tagFilter,
+        from: useCustomRange ? fromDate : '',
+        to: useCustomRange ? toDate : '',
+      })
+      const res = await api.getCrmTeamMetrics(query)
       setData(res)
     } catch (e) {
       setError(e.message || 'Could not load team metrics')
     } finally {
       setLoading(false)
     }
-  }, [period, memberUserId])
+  }, [period, memberUserId, statusFilter, tagFilter, useCustomRange, fromDate, toDate])
 
   useEffect(() => {
     if (!isActive) return undefined
@@ -167,15 +179,21 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
   )
 
   const drillTo = (nav, options = {}) => {
+    const filterOpts = pipelineOptsFromActivityFilters({
+      period: useCustomRange ? 'custom' : period,
+      memberUserId: scopedUserId,
+      status: statusFilter,
+      tagId: tagFilter,
+    })
     const sharedOpts = scopedUserId ? { userId: scopedUserId, assigneeUserId: scopedUserId } : {}
 
     if (options.status) {
       if (scopedUserId && nav === 'pipeline') setPipelineAssigneeFilter?.(scopedUserId)
       if (nav === 'pipeline' && options.status === 'won' && freightOrg) {
-        onNavigate?.('pipeline', { view: 'deals', dealStage: 'won', ...sharedOpts })
+        onNavigate?.('pipeline', { view: 'deals', dealStage: 'won', ...filterOpts, ...sharedOpts })
         return
       }
-      onNavigate?.(nav, { status: options.status, ...sharedOpts })
+      onNavigate?.(nav, { status: options.status, ...filterOpts, ...sharedOpts })
       return
     }
     if (nav === 'crm-calendar') {
@@ -186,7 +204,11 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
       if (scopedUserId) setPipelineAssigneeFilter?.(scopedUserId)
       onNavigate?.(nav, {
         activityType: options.activityType || null,
-        period,
+        period: useCustomRange ? undefined : period,
+        from: useCustomRange ? fromDate : undefined,
+        to: useCustomRange ? toDate : undefined,
+        status: statusFilter !== 'all' ? statusFilter : undefined,
+        tagId: tagFilter || undefined,
         ...sharedOpts,
       })
       return
@@ -194,7 +216,7 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
     if (scopedUserId && nav === 'pipeline') {
       setPipelineAssigneeFilter?.(scopedUserId)
     }
-    onNavigate?.(nav, { ...options, ...sharedOpts })
+    onNavigate?.(nav, { ...filterOpts, ...options, ...sharedOpts })
   }
 
   const onMemberRow = (m) => {
@@ -243,8 +265,7 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
     return rows
   }, [recentActivities])
 
-  const periodLabelText =
-    intel?.periodLabel ||
+  const periodLabelText = data?.periodLabel || intel?.periodLabel ||
     (period === 'day' ? 'Today' : period === 'month' ? 'This month' : 'This week')
   const activityHighlights = useMemo(
     () => [
@@ -276,14 +297,28 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
           </p>
         </div>
         <div className="team-intelligence-embedded__controls">
-          <DashboardSegmented
-            value={period}
-            onChange={setPeriod}
-            options={[
-              { value: 'day', label: 'Today' },
-              { value: 'week', label: 'This week' },
-              { value: 'month', label: 'This month' },
-            ]}
+          <ActivityDashboardFilters
+            period={period}
+            onPeriodChange={setPeriod}
+            memberUserId={intelMemberId}
+            onMemberChange={(id) => {
+              setIntelMemberId(id || '')
+              setExpandedMember(null)
+              setPipelineAssigneeFilter?.(id || null)
+            }}
+            memberOptions={memberOptions}
+            showMemberFilter={isManagerView}
+            status={statusFilter}
+            onStatusChange={setStatusFilter}
+            tagId={tagFilter}
+            onTagChange={setTagFilter}
+            orgLeadTags={orgLeadTags || []}
+            fromDate={fromDate}
+            toDate={toDate}
+            onFromDateChange={setFromDate}
+            onToDateChange={setToDate}
+            useCustomRange={useCustomRange}
+            onUseCustomRangeChange={setUseCustomRange}
           />
           {isManagerView ? (
             <button
@@ -310,41 +345,6 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
           </div>
         ))}
       </div>
-
-      {isManagerView && memberOptions.length > 0 ? (
-        <div className="team-member-filter-bar">
-          <label className="team-member-filter-bar__label">
-            <span className="team-member-filter-bar__text">Team member</span>
-            <select
-              value={memberUserId}
-              onChange={onMemberSelect}
-              disabled={loading}
-              className="team-member-filter-bar__select dashboard-select"
-              aria-label="Filter dashboard by team member"
-            >
-              <option value="">All team members</option>
-              {memberOptions.map((m) => (
-                <option key={m.userId} value={m.userId}>
-                  {m.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          {memberUserId && memberName ? (
-            <button
-              type="button"
-              className="dashboard-team-filter-banner__clear"
-              onClick={() => {
-                setIntelMemberId('')
-                setExpandedMember(null)
-                setPipelineAssigneeFilter?.(null)
-              }}
-            >
-              Clear filter
-            </button>
-          ) : null}
-        </div>
-      ) : null}
 
       {activeMemberId && memberName ? (
         <div className="dashboard-team-filter-banner" role="status">
