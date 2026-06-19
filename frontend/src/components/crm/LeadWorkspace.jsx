@@ -154,6 +154,7 @@ export default function LeadWorkspace({
   const [body, setBody] = useState('')
   const [purpose, setPurpose] = useState('introduction')
   const [generating, setGenerating] = useState(false)
+  const [sending, setSending] = useState(false)
   const [savingConsent, setSavingConsent] = useState(false)
   const [savingScope, setSavingScope] = useState(null)
   const [scheduleFeedback, setScheduleFeedback] = useState(null)
