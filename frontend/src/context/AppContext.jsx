@@ -273,10 +273,7 @@ export function AppProvider({ children }) {
         })
         const leads = bootstrap.leads || []
         const summary = bootstrap.summary || {}
-        // Keep org-wide sidebar counts when an owner filter is active.
-        if (!assigneeUserId) {
-          setPipelineSummary(normalizePipelineSummary(summary))
-        }
+        setPipelineSummary(normalizePipelineSummary(summary))
         setSavedLeads(leads)
         setSessionError(null)
         setPipelineLoad({
@@ -302,6 +299,26 @@ export function AppProvider({ children }) {
     },
     [pipelineAssigneeFilter]
   )
+
+  const refreshPipelineSummary = useCallback(async (filters = {}) => {
+    try {
+      const data = await api.getPipelineBootstrap({
+        summaryOnly: true,
+        silent: true,
+        status: 'all',
+        assigneeUserId: filters.assigneeUserId || undefined,
+        tagIds: filters.tagIds,
+        q: filters.q || undefined,
+        cities: filters.cities,
+        states: filters.states,
+      })
+      if (data?.summary) {
+        setPipelineSummary(normalizePipelineSummary(data.summary))
+      }
+    } catch {
+      // keep last summary
+    }
+  }, [])
 
   const mergeNotificationItems = useCallback((newItems) => {
     if (!newItems?.length) return []
@@ -1051,6 +1068,7 @@ export function AppProvider({ children }) {
         pipelineSummary,
         pipelineLoad,
         loadPipelineList,
+        refreshPipelineSummary,
         loadMorePipelineLeads,
         toggleSaveLead,
         updateSavedLeadCrm,

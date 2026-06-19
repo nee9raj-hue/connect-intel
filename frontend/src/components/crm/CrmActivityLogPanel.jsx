@@ -266,7 +266,12 @@ export default function CrmActivityLogPanel({ onNavigate, panelOptions = {}, isA
           </div>
         ) : (
           <div className="ti3-cockpit ti3-cockpit--dash">
-            <div className="ti3-filter-bar ti3-filter-bar--desktop-hidden">{filterControls}</div>
+            {statusFilter && statusFilter !== 'all' ? (
+              <p className="ti3-filter-note">
+                Stage filter shows activity on leads currently in this stage. Set stage to{' '}
+                <strong>All stages</strong> to see all logged calls and emails.
+              </p>
+            ) : null}
             <section className="ti3-cmd-strip" aria-label="Activity command bar">
               {(hub?.commandBar || []).map((metric) => (
                 <CommandBarMetric key={metric.id} metric={metric} onClick={onMetricClick} />

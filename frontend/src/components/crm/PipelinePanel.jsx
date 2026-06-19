@@ -87,6 +87,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     pipelineSummary,
     loadPipelineList,
     loadMorePipelineLeads,
+    refreshPipelineSummary,
     toggleSaveLead,
     pipelineLeadId,
     closePipelineLead,
@@ -753,6 +754,25 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       .catch(() => {})
       .finally(() => setFilterApplying(false))
   }, [serverSidePipeline, serverFilters, loadPipelineList, hasActiveServerFilters])
+
+  useEffect(() => {
+    if (!serverSidePipeline) return undefined
+    void refreshPipelineSummary({
+      assigneeUserId: serverFilters.assigneeUserId,
+      tagIds: serverFilters.tagIds,
+      q: serverFilters.q,
+      cities: serverFilters.cities,
+      states: serverFilters.states,
+    })
+  }, [
+    serverSidePipeline,
+    refreshPipelineSummary,
+    serverFilters.assigneeUserId,
+    serverFilters.tagIds,
+    serverFilters.q,
+    serverFilters.cities,
+    serverFilters.states,
+  ])
 
   useEffect(() => {
     if (!serverSidePipeline || view !== 'board' || stageListMode) {
