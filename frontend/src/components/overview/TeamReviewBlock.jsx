@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { dashboardNavOptions } from '../../lib/dashboardNavigation'
-import { formatDateTime } from '../../lib/crmUiConstants'
+import { formatDateTime, ACTIVITY_LABELS } from '../../lib/crmUiConstants'
 import { timelineTypeLabel } from '../../lib/teamIntelligenceConstants'
 
 const PERIOD_API = { '7d': 'week', '30d': 'month' }
@@ -252,6 +253,7 @@ export default function TeamReviewBlock({
   onNavigate,
   onLead,
 }) {
+  const { teamMembers, refreshTeam } = useApp()
   const isAdmin = role === 'org_admin'
   const apiPeriod = PERIOD_API[period] || 'week'
   const [tab, setTab] = useState(isAdmin ? 'teams' : 'reps')
@@ -260,6 +262,10 @@ export default function TeamReviewBlock({
   const [metricsLoading, setMetricsLoading] = useState(true)
   const [timeline, setTimeline] = useState([])
   const [timelineLoading, setTimelineLoading] = useState(false)
+
+  useEffect(() => {
+    void refreshTeam()
+  }, [refreshTeam])
 
   const runAction = useCallback(
     (action = {}) => {
@@ -303,12 +309,25 @@ export default function TeamReviewBlock({
     if (tab !== 'activity') return undefined
     let cancelled = false
     setTimelineLoading(true)
-    const q = new URLSearchParams({ period: apiPeriod })
+    const q = new URLSearchParams({ period: apiPeriod, limit: '25', offset: '0' })
     if (repFilter) q.set('userId', repFilter)
     api
-      .getCrmActivityTimeline(q.toString())
+      .getCrmActivityLog(q.toString())
       .then((res) => {
-        if (!cancelled) setTimeline((res.activityTimeline || []).slice(0, 25))
+        if (cancelled) return
+        const rows = (res.activities || []).map((act) => ({
+          id: act.id || `act-${act.leadId}-${act.createdAt}`,
+          at: act.createdAt,
+          actorName: act.createdByName,
+          title: act.leadName,
+          company: act.company,
+          type: act.type,
+          kind: 'activity',
+          body: act.summary,
+          leadId: act.leadId,
+          meta: { typeLabel: ACTIVITY_LABELS[act.type] || act.type },
+        }))
+        setTimeline(rows)
       })
       .catch(() => {
         if (!cancelled) setTimeline([])
@@ -330,28 +349,31 @@ export default function TeamReviewBlock({
       const intel = intelByUser.get(String(row.userId)) || {}
       return {
         ...row,
-        ...intel,
-        activities7d: row.activities7d,
-        activitiesTotal: intel.activitiesTotal ?? row.activities7d,
         emails: intel.emails,
         calls: intel.calls,
+        activitiesTotal: intel.activitiesTotal ?? row.activities7d,
         lastActiveAt: intel.lastActiveAt || row.lastActiveAt,
         needsHelp: intel.activitiesTotal === 0 && (intel.hoursInApp || 0) > 0,
       }
     })
   }, [viewData.repPerformance, intelByUser])
 
-  const memberOptions = metrics?.memberOptions?.length
-    ? metrics.memberOptions
-    : repRows.map((r) => ({ userId: r.userId, name: r.name }))
+  const memberOptions = useMemo(() => {
+    const map = new Map()
+    for (const m of teamMembers || []) {
+      if ((m.status || 'active') === 'active') map.set(String(m.userId), { userId: m.userId, name: m.name })
+    }
+    for (const m of metrics?.memberOptions || []) map.set(String(m.userId), m)
+    for (const r of viewData.repPerformance || []) {
+      if (r.userId && r.name) map.set(String(r.userId), { userId: r.userId, name: r.name })
+    }
+    return [...map.values()].sort((a, b) => String(a.name).localeCompare(String(b.name)))
+  }, [teamMembers, metrics?.memberOptions, viewData.repPerformance])
 
-  const reviewRep = useCallback(
-    (userId) => {
-      setRepFilter(String(userId))
-      setTab('activity')
-    },
-    []
-  )
+  const reviewRep = useCallback((userId) => {
+    setRepFilter(String(userId))
+    setTab('activity')
+  }, [])
 
   const periodLabel = period === '30d' ? '30 days' : '7 days'
   const rollup = metrics?.teamIntelligence?.rollup

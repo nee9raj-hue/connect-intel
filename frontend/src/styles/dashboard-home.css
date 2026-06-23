@@ -1591,3 +1591,19 @@
     align-items: stretch;
   }
 }
+
+.team-activity-hub__chrome .dash-home__eyebrow {
+  margin: 0 0 0.25rem;
+}
+
+.team-activity-hub__rollup {
+  margin: 0 0 1rem;
+}
+
+.team-activity-hub__review {
+  margin-bottom: 0.5rem;
+}
+
+.team-activity-hub .ti3-panel__head h2 {
+  font-size: 1.05rem;
+}
