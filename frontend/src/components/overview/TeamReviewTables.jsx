@@ -37,7 +37,7 @@ export function RollupStrip({ rollup, comparison }) {
   )
 }
 
-export function RepPerformanceTable({ rows, onSelectRep, onPipelineAction, periodLabel }) {
+export function RepPerformanceTable({ rows, onSelectRep, onReviewRep, onPipelineAction, periodLabel }) {
   if (!rows?.length) {
     return <p className="dash-home__empty">No rep activity in {periodLabel || 'this period'} yet.</p>
   }
@@ -107,7 +107,11 @@ export function RepPerformanceTable({ rows, onSelectRep, onPipelineAction, perio
               </td>
               <td className="is-muted">{relTime(row.lastActiveAt)}</td>
               <td className="is-action">
-                <button type="button" className="dash-home-team__row-action" onClick={() => onSelectRep?.(row.userId)}>
+                <button
+                  type="button"
+                  className="dash-home-team__row-action"
+                  onClick={() => (onReviewRep || onSelectRep)?.(row.userId)}
+                >
                   Review →
                 </button>
               </td>

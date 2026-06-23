@@ -153,6 +153,17 @@ export default function TeamActivityHubPanel({ onNavigate, panelOptions = {}, is
     loadData()
   }, [isActive, loadData])
 
+  const openRepReview = useCallback(
+    (userId) => {
+      onNavigate?.('crm-rep-review', {
+        userId: String(userId),
+        period,
+        returnTo: 'overview',
+      })
+    },
+    [onNavigate, period]
+  )
+
   const selectMember = useCallback((uid) => {
     setMemberUserId(uid ? String(uid) : '')
     setFilterDrawerOpen(false)
@@ -328,6 +339,7 @@ export default function TeamActivityHubPanel({ onNavigate, panelOptions = {}, is
                   rows={repRows}
                   periodLabel={periodLabel(period)}
                   onSelectRep={selectMember}
+                  onReviewRep={openRepReview}
                   onPipelineAction={(action) => onNavigate?.(action.panel, dashboardNavOptions(action, user))}
                 />
               </section>

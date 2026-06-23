@@ -28,6 +28,7 @@ import PlatformAdminHome from '../admin/PlatformAdminHome'
 import LoadingExperience from '../ui/LoadingExperience'
 
 const TeamDashboardPanel = lazy(() => import('../crm/TeamDashboardPanel'))
+const RepReviewPanel = lazy(() => import('../overview/RepReviewPanel'))
 const PipelinePanel = lazy(() => import('../crm/PipelinePanel'))
 
 const PANELS = {
@@ -44,6 +45,7 @@ const PANELS = {
   'team-notes': ChithiPanel,
   'team-tasks': ChithiPanel,
   'crm-dashboard': TeamDashboardPanel,
+  'crm-rep-review': RepReviewPanel,
   'crm-log': CrmActivityLogPanel,
   'crm-calendar': CrmCalendarPanel,
   marketing: MarketingPanel,
@@ -77,7 +79,7 @@ function PanelLoader() {
 }
 
 function renderPanel(panelId, Panel, props) {
-  if (panelId === 'crm-dashboard' || panelId === 'pipeline' || panelId === 'crm-calendar') {
+  if (panelId === 'crm-dashboard' || panelId === 'pipeline' || panelId === 'crm-calendar' || panelId === 'crm-rep-review') {
     return (
       <Suspense fallback={<PanelLoader />}>
         <Panel {...props} />

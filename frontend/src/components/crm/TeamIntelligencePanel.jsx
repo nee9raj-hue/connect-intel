@@ -58,14 +58,14 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
 
   const intel = data?.teamIntelligence
   const v3 = data?.intelligenceV3
-  const isManagerView = Boolean(v3?.isManagerView ?? (data?.isAdmin && !data?.memberUserId))
+  const isManagerView = Boolean(data?.isAdmin || v3?.isManagerView)
 
   const memberOptions = useMemo(() => {
     if (data?.memberOptions?.length) return data.memberOptions
     return (teamMembers || []).map((m) => ({ userId: m.userId, name: m.name }))
   }, [data?.memberOptions, teamMembers])
 
-  const activeMemberId = data?.memberUserId ?? memberUserId
+  const activeMemberId = memberUserId || data?.memberUserId || ''
 
   const memberName = useMemo(() => {
     if (!activeMemberId) return null

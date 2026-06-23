@@ -370,10 +370,16 @@ export default function TeamReviewBlock({
     return [...map.values()].sort((a, b) => String(a.name).localeCompare(String(b.name)))
   }, [teamMembers, metrics?.memberOptions, viewData.repPerformance])
 
-  const reviewRep = useCallback((userId) => {
-    setRepFilter(String(userId))
-    setTab('activity')
-  }, [])
+  const reviewRep = useCallback(
+    (userId) => {
+      onNavigate?.('crm-rep-review', {
+        userId: String(userId),
+        period: apiPeriod,
+        returnTo: 'overview',
+      })
+    },
+    [onNavigate, apiPeriod]
+  )
 
   const periodLabel = period === '30d' ? '30 days' : '7 days'
   const rollup = metrics?.teamIntelligence?.rollup
@@ -459,7 +465,7 @@ export default function TeamReviewBlock({
                 ))}
               </select>
               {repFilter ? (
-                <button type="button" className="dash-home__link" onClick={() => openFullReport(repFilter)}>
+                <button type="button" className="dash-home__link" onClick={() => reviewRep(repFilter)}>
                   Rep report →
                 </button>
               ) : null}
