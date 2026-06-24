@@ -21,6 +21,7 @@
     "deploy:copy": "node scripts/copy-to-root.js",
     "prod:log": "node scripts/production-log.mjs sync",
     "prod:log:list": "node scripts/production-log.mjs list",
+    "prod:verify-live": "node scripts/production-log.mjs verify-live",
     "prod:rollback": "node scripts/production-log.mjs rollback",
     "prod:tag": "node scripts/production-log.mjs tag",
     "prod:verify": "node scripts/verify-deploy.mjs",
@@ -36,6 +37,7 @@
     "dash:warm": "node scripts/warm-dashboard-snapshots.mjs",
     "marketing:queue-worker": "node scripts/marketing-queue-worker.mjs",
     "infra:verify": "node scripts/infra-verify.mjs",
+    "tenant:audit": "node scripts/tenant-audit.mjs",
     "railway:connect": "node scripts/railway-connect.mjs",
     "build:standalone": "cd frontend && STANDALONE=1 npm run build",
     "open": "open index.html 2>/dev/null || xdg-open index.html 2>/dev/null || echo 'Open index.html in your browser'"
