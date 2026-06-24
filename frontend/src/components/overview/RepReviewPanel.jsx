@@ -154,7 +154,8 @@ export default function RepReviewPanel({ onNavigate, panelOptions = {}, isActive
 
   return (
     <div className="panel-shell rep-review-page team-intel-page--v3">
-      <div className="ti3-scroll panel-body-scroll rep-review-page__inner">
+      <div className="ti3-scroll panel-body-scroll rep-review-page__scroll">
+        <div className="rep-review-page__inner">
         <header className="rep-review-page__header">
           <button type="button" className="rep-review-page__back" onClick={goBack}>
             ← Team review
@@ -282,6 +283,7 @@ export default function RepReviewPanel({ onNavigate, panelOptions = {}, isActive
               ) : null}
             </div>
           </main>
+        </div>
         </div>
       </div>
     </div>

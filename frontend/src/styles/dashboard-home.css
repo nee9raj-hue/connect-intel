@@ -1608,11 +1608,22 @@
   font-size: 1.05rem;
 }
 
-/* Rep review detail page */
+/* Rep review detail page — match ti3-cockpit width; keep max-width off the scroll layer */
+.rep-review-page.panel-shell {
+  width: 100%;
+}
+
+.rep-review-page__scroll {
+  width: 100%;
+  scrollbar-gutter: stable;
+}
+
 .rep-review-page__inner {
-  padding: 1rem 1.25rem 2rem;
-  max-width: 1400px;
+  width: 100%;
+  max-width: 1600px;
   margin: 0 auto;
+  padding: 1rem 1.5rem 2rem;
+  box-sizing: border-box;
 }
 
 .rep-review-page__header {
@@ -1655,6 +1666,11 @@
   grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 0.5rem;
   margin-bottom: 1rem;
+  width: 100%;
+}
+
+.rep-review-page .dash-home-team__rollup {
+  width: 100%;
 }
 
 .rep-review-page__stat {
@@ -1682,10 +1698,12 @@
 
 .rep-review-page__layout {
   display: grid;
-  grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
+  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
   gap: 1rem;
-  align-items: start;
+  align-items: stretch;
   margin-top: 1rem;
+  width: 100%;
+  min-height: min(560px, calc(100vh - 320px));
 }
 
 .rep-review-page__leads {
@@ -1693,7 +1711,9 @@
   border: 1px solid #e2e8f0;
   border-radius: 12px;
   overflow: hidden;
-  max-height: calc(100vh - 280px);
+  min-height: 0;
+  height: 100%;
+  max-height: none;
   display: flex;
   flex-direction: column;
 }
@@ -1778,6 +1798,15 @@
   border-radius: 12px;
   padding: 0.75rem 1rem 1rem;
   min-width: 0;
+  min-height: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.rep-review-page__detail .dash-home-team__table-wrap {
+  flex: 1;
+  min-height: 0;
 }
 
 .rep-review-page__detail-head {
