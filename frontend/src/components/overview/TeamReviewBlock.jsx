@@ -8,6 +8,7 @@ import { formatDateTime, ACTIVITY_LABELS } from '../../lib/crmUiConstants'
 import { timelineTypeLabel } from '../../lib/teamIntelligenceConstants'
 import { teamReviewActivityQuery } from '../../lib/rollingActivityRange'
 import { prefetchRepReview } from '../../lib/repPrefetch'
+import { canonicalActivityPeriod } from '../../lib/crmActivityScope'
 
 const PERIOD_API = { '7d': '7d', '30d': '30d' }
 
@@ -368,7 +369,7 @@ export default function TeamReviewBlock({
     (userId) => {
       onNavigate?.('crm-rep-review', {
         userId: String(userId),
-        period: apiPeriod,
+        period: canonicalActivityPeriod(apiPeriod),
         returnTo: 'overview',
       })
     },

@@ -24,6 +24,7 @@ import {
 } from '../crm/ActivityLogHubCharts'
 import { RepPerformanceTable, RollupStrip } from './TeamReviewTables'
 import { prefetchRepReview } from '../../lib/repPrefetch'
+import { canonicalActivityPeriod } from '../../lib/crmActivityScope'
 import '../../styles/dashboard-home.css'
 
 function periodLabel(period) {
@@ -139,7 +140,7 @@ export default function TeamActivityHubPanel({ onNavigate, panelOptions = {}, is
     (userId) => {
       onNavigate?.('crm-rep-review', {
         userId: String(userId),
-        period,
+        period: canonicalActivityPeriod(period),
         returnTo: 'overview',
       })
     },

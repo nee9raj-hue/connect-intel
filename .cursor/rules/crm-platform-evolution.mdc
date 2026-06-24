@@ -35,6 +35,8 @@ Run `npm run prod:ship`. Do not commit Android/Capacitor unless deploy scope inc
 
 When building rep/team metrics, **Last active** must mean the latest CRM action **performed by that user** (`actor_id` / strict `createdByUserId`). Never use lead assignee, workspace pulse, or login alone for that column.
 
-- **Last active (CRM):** `resolveLastCrmActivityMap` / `enrichIntelMembersLastActive` — SQL per-actor + same entry scan as activity log
-- **In-app time:** `aggregateWorkspaceUsage().lastInAppAt` (pulse/login) — separate from CRM last active
-- Never scope last-active scans by lead assignee only (reps log activity on others' leads)
+- **Period filters:** use `canonicalActivityPeriod` — `day` | `7d` | `30d` (map `week`→`7d`, `month`→`30d`; never mix calendar week with rolling 7d).
+- **Rep review / scoped rep:** one scope via `buildRepReviewPayload` or `readActivityLogCached` + `overlayScopedMemberIntelligence` — rollup and activity feed must share the same `since`/`until` and actor filter.
+- **Last active (CRM):** `resolveLastCrmActivityMap` — SQL per-actor + org activity-log entry scan.
+- **In-app time:** `aggregateWorkspaceUsage().lastInAppAt` — separate from CRM last active.
+- Never scope activity scans by lead assignee only when reporting rep work (reps log on any lead they touch).

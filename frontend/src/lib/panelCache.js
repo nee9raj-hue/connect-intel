@@ -42,5 +42,5 @@ export function teamReviewCacheKey(orgId, period) {
 }
 
 export function repReviewCacheKey(orgId, userId, period) {
-  return `rep-review:${orgId || 'solo'}:${userId}:${period || 'week'}`
+  return `rep-review:${orgId || 'solo'}:${userId}:${period || '7d'}`
 }

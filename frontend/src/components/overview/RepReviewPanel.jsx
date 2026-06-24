@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { ACTIVITY_LABELS, formatDateTime } from '../../lib/crmUiConstants'
-import { buildActivityLogQuery } from '../../lib/activityDashboardNav'
+import { canonicalActivityPeriod, REP_REVIEW_PERIODS } from '../../lib/crmActivityScope'
 import { readPanelCache, writePanelCache, repReviewCacheKey } from '../../lib/panelCache'
 import { DashboardSegmented } from '../dashboard/dashboardUi'
 import { RollupStrip } from './TeamReviewTables'
@@ -37,13 +37,13 @@ function groupActivitiesByLead(activities = []) {
 }
 
 export default function RepReviewPanel({ onNavigate, panelOptions = {}, isActive = true }) {
-  const { user, teamMembers, openPipelineLead } = useApp()
+  const { user, openPipelineLead } = useApp()
   const repUserId = panelOptions?.userId ? String(panelOptions.userId) : ''
-  const [period, setPeriod] = useState(panelOptions?.period || 'week')
+  const [period, setPeriod] = useState(() =>
+    canonicalActivityPeriod(panelOptions?.period || '7d')
+  )
   const [selectedLeadId, setSelectedLeadId] = useState(null)
-  const [metrics, setMetrics] = useState(null)
-  const [activityPayload, setActivityPayload] = useState(null)
-  const [repSnapshot, setRepSnapshot] = useState(null)
+  const [review, setReview] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
@@ -52,28 +52,16 @@ export default function RepReviewPanel({ onNavigate, panelOptions = {}, isActive
 
   useEffect(() => {
     if (panelOptions?.userId) setSelectedLeadId(null)
-    if (panelOptions?.period) setPeriod(panelOptions.period)
+    if (panelOptions?.period) setPeriod(canonicalActivityPeriod(panelOptions.period))
   }, [panelOptions?.userId, panelOptions?.period])
-
-  const repName = useMemo(() => {
-    if (!repUserId) return 'Team member'
-    const fromMetrics = metrics?.teamIntelligence?.members?.find(
-      (m) => String(m.userId) === repUserId
-    )?.name
-    if (fromMetrics) return fromMetrics
-    const fromTeam = teamMembers?.find((m) => String(m.userId) === repUserId)?.name
-    if (fromTeam) return fromTeam
-    return activityPayload?.hub?.memberName || 'Team member'
-  }, [repUserId, metrics, teamMembers, activityPayload])
 
   const load = useCallback(async () => {
     if (!repUserId || !canView) return
-    const cacheKey = repReviewCacheKey(user?.organizationId, repUserId, period)
+    const periodNorm = canonicalActivityPeriod(period)
+    const cacheKey = repReviewCacheKey(user?.organizationId, repUserId, periodNorm)
     const cached = readPanelCache(cacheKey)
-    if (cached?.data) {
-      setMetrics(cached.data.metrics || null)
-      setActivityPayload(cached.data.activity || null)
-      setRepSnapshot(cached.data.repSnapshot || null)
+    if (cached?.data?.review) {
+      setReview(cached.data.review)
       setLoading(false)
       if (!cached.stale) return
     } else {
@@ -81,34 +69,9 @@ export default function RepReviewPanel({ onNavigate, panelOptions = {}, isActive
     }
     setError(null)
     try {
-      const metricsQ = new URLSearchParams({ period, userId: repUserId })
-      const activityQ = buildActivityLogQuery({ period, memberUserId: repUserId })
-      const [summaryRes, metricsRes, activityRes] = await Promise.all([
-        api.getCrmRepSummary(repUserId, period),
-        api.getCrmTeamMetrics(metricsQ.toString()),
-        api.getCrmActivityLog(`${activityQ}${activityQ ? '&' : ''}limit=200&offset=0`),
-      ])
-      setMetrics(metricsRes)
-      setActivityPayload(activityRes)
-      const summary = summaryRes?.summary
-      const repSnap = summary
-        ? {
-            userId: repUserId,
-            name: summary.name,
-            open: summary.open,
-            followups: summary.followups,
-            wonMonth: summary.wonMonth,
-            activities7d: summary.activities7d ?? 0,
-            lastActiveAt: summary.lastActiveAt,
-          }
-        : null
-      setRepSnapshot(repSnap)
-      writePanelCache(cacheKey, {
-        summary: summaryRes,
-        metrics: metricsRes,
-        activity: activityRes,
-        repSnapshot: repSnap,
-      })
+      const payload = await api.getCrmRepReview(repUserId, periodNorm)
+      setReview(payload)
+      writePanelCache(cacheKey, { review: payload })
     } catch (e) {
       setError(e.message || 'Could not load rep review')
     } finally {
@@ -121,7 +84,7 @@ export default function RepReviewPanel({ onNavigate, panelOptions = {}, isActive
     load()
   }, [isActive, repUserId, load])
 
-  const activities = activityPayload?.activities || []
+  const activities = review?.activities || []
   const leadGroups = useMemo(() => groupActivitiesByLead(activities), [activities])
 
   const visibleActivities = useMemo(() => {
@@ -129,37 +92,21 @@ export default function RepReviewPanel({ onNavigate, panelOptions = {}, isActive
     return activities.filter((a) => String(a.leadId) === String(selectedLeadId))
   }, [activities, selectedLeadId])
 
-  const intelMember = useMemo(
-    () => metrics?.teamIntelligence?.members?.find((m) => String(m.userId) === repUserId),
-    [metrics, repUserId]
-  )
-
-  const rollup = useMemo(() => {
-    if (intelMember) {
-      return {
-        activitiesTotal: intelMember.activitiesTotal,
-        emails: intelMember.emails,
-        calls: intelMember.calls,
-        tasksCreated: intelMember.tasksCreated,
-        contactsOpened: intelMember.contactsOpened ?? intelMember.leadsTouched,
-        hoursInApp: intelMember.hoursInApp,
-      }
-    }
-    return metrics?.teamIntelligence?.rollup || activityPayload?.hub?.summary
-  }, [intelMember, metrics, activityPayload])
-
-  const comparison = metrics?.teamIntelligence?.comparison
+  const repName = review?.rep?.name || 'Team member'
+  const rollup = review?.rollup
+  const comparison = review?.comparison
+  const rep = review?.rep
 
   const headerStats = useMemo(
     () => [
-      { label: 'Open leads', value: repSnapshot?.open ?? '—' },
-      { label: 'Follow-up', value: repSnapshot?.followups ?? '—' },
+      { label: 'Open leads', value: rep?.open ?? '—' },
+      { label: 'Follow-up', value: rep?.followups ?? '—' },
       { label: 'Emails', value: rollup?.emails ?? 0 },
       { label: 'Calls', value: rollup?.calls ?? 0 },
       { label: 'Activities', value: rollup?.activitiesTotal ?? 0 },
       { label: 'Leads touched', value: rollup?.contactsOpened ?? rollup?.leadsTouched ?? 0 },
     ],
-    [repSnapshot, rollup]
+    [rep, rollup]
   )
 
   const goBack = useCallback(() => {
@@ -216,18 +163,14 @@ export default function RepReviewPanel({ onNavigate, panelOptions = {}, isActive
             <p className="dash-home__eyebrow">Rep review</p>
             <h1>{repName}</h1>
             <p className="rep-review-page__sub">
-              {activityPayload?.hub?.periodLabel || period}
+              {review?.periodLabel || period}
               {loading ? ' · loading…' : ` · ${leadGroups.length} customers with activity`}
             </p>
           </div>
           <DashboardSegmented
-            value={period}
-            onChange={setPeriod}
-            options={[
-              { value: 'day', label: 'Today' },
-              { value: 'week', label: '7d' },
-              { value: 'month', label: '30d' },
-            ]}
+            value={canonicalActivityPeriod(period)}
+            onChange={(v) => setPeriod(canonicalActivityPeriod(v))}
+            options={REP_REVIEW_PERIODS}
           />
         </header>
 
