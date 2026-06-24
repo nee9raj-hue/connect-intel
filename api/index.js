@@ -57,6 +57,7 @@ const ROUTES = {
   'admin/support-overview': () => import('../lib/server/handlers/admin-support-overview.js'),
   'admin/support-tickets': () => import('../lib/server/handlers/admin-support-tickets.js'),
   'admin/customers': () => import('../lib/server/handlers/admin-customers.js'),
+  'admin/tenant-audit': () => import('../lib/server/handlers/admin-tenant-audit.js'),
   'admin/whatsapp-cloud': () => import('../lib/server/handlers/admin-whatsapp-cloud.js'),
   'crm-generate-email': () => import('../lib/server/handlers/crm-generate-email.js'),
   'crm-send-email': () => import('../lib/server/handlers/crm-send-email.js'),
