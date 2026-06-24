@@ -264,6 +264,7 @@ export default function TeamReviewBlock({
   const [metricsLoading, setMetricsLoading] = useState(true)
   const [timeline, setTimeline] = useState([])
   const [timelineLoading, setTimelineLoading] = useState(false)
+  const [activityMemberOptions, setActivityMemberOptions] = useState([])
 
   useEffect(() => {
     void refreshTeam()
@@ -317,6 +318,7 @@ export default function TeamReviewBlock({
       .getCrmActivityLog(q.toString())
       .then((res) => {
         if (cancelled) return
+        setActivityMemberOptions(res.memberOptions || [])
         const rows = (res.activities || []).map((act) => ({
           id: act.id || `act-${act.leadId}-${act.createdAt}`,
           at: act.createdAt,
@@ -351,10 +353,11 @@ export default function TeamReviewBlock({
         teamMembers,
         repRoster,
         metricsMemberOptions: metrics?.memberOptions,
+        activityMemberOptions,
         intelMembers,
         repPerformance: viewData.repPerformance,
       }),
-    [teamMembers, repRoster, metrics?.memberOptions, intelMembers, viewData.repPerformance]
+    [teamMembers, repRoster, metrics?.memberOptions, activityMemberOptions, intelMembers, viewData.repPerformance]
   )
 
   const repRows = useMemo(() => {
