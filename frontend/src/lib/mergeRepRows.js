@@ -44,7 +44,7 @@ export function mergeRepPerformanceRows(repPerformance = [], teamMembers = [], i
       emails: intel.emails ?? 0,
       calls: intel.calls ?? 0,
       activitiesTotal: intel.activitiesTotal ?? 0,
-      lastActiveAt: intel.lastActiveAt || perf.lastActiveAt || null,
+      lastActiveAt: intel.lastActiveAt ?? perf.lastActiveAt ?? null,
       needsHelp: (intel.activitiesTotal ?? 0) === 0 && (intel.hoursInApp || 0) > 0,
       action: actions.action,
       cellActions: actions.cellActions || defaultActions(id).cellActions,

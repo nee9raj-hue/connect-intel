@@ -30,3 +30,11 @@ Reuse marketing graph runner + `AutomationCanvas` patterns for CRM workflows. Wi
 ## Before shipping
 
 Run `npm run prod:ship`. Do not commit Android/Capacitor unless deploy scope includes mobile.
+
+## CRM activity attribution (all orgs)
+
+When building rep/team metrics, **Last active** must mean the latest CRM action **performed by that user** (`actor_id` / strict `createdByUserId`). Never use lead assignee, workspace pulse, or login alone for that column.
+
+- **Last active (CRM):** `memberLastCrmActivity.js`, `lastCrmActivityAtForUser`, `fetchLastCrmActivityAtByActors`
+- **In-app time:** `aggregateWorkspaceUsage().lastInAppAt` (pulse/login) — separate from CRM last active
+- Enrich team metrics members via `enrichIntelMembersLastActive` before returning API responses
