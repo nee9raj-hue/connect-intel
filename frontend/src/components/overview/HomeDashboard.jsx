@@ -12,8 +12,8 @@ import TeamReviewBlock from './TeamReviewBlock'
 import '../../styles/dashboard-home.css'
 
 const PERIODS = [
-  { id: '7d', label: '7 days', api: 'week' },
-  { id: '30d', label: '30 days', api: 'month' },
+  { id: '7d', label: '7 days', api: '7d' },
+  { id: '30d', label: '30 days', api: '30d' },
 ]
 
 function initials(name) {

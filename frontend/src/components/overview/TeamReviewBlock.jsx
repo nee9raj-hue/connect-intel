@@ -7,7 +7,7 @@ import { mergeRepPerformanceRows } from '../../lib/mergeRepRows'
 import { formatDateTime, ACTIVITY_LABELS } from '../../lib/crmUiConstants'
 import { timelineTypeLabel } from '../../lib/teamIntelligenceConstants'
 
-const PERIOD_API = { '7d': 'week', '30d': 'month' }
+const PERIOD_API = { '7d': '7d', '30d': '30d' }
 
 function relTime(iso) {
   if (!iso) return '—'
@@ -219,7 +219,7 @@ function LeadActivityTable({ items, onLead, onOpenLog, loading, emptyLabel }) {
         <tbody>
           {items.map((item) => (
             <tr key={item.id}>
-              <td className="is-muted is-nowrap">{relTime(item.at)}</td>
+              <td className="is-muted is-nowrap">{formatDateTime(item.at)}</td>
               <td>{item.actorName || '—'}</td>
               <td>
                 <button type="button" className="dash-home-team__lead-btn" onClick={() => onLead(item.leadId)}>
@@ -312,25 +312,27 @@ export default function TeamReviewBlock({
     if (tab !== 'activity') return undefined
     let cancelled = false
     setTimelineLoading(true)
-    const q = new URLSearchParams({ period: apiPeriod, limit: '50', offset: '0' })
+    const q = new URLSearchParams({ period: apiPeriod, limit: '100', offset: '0' })
     if (repFilter) q.set('userId', repFilter)
     api
       .getCrmActivityLog(q.toString())
       .then((res) => {
         if (cancelled) return
         setActivityMemberOptions(res.memberOptions || [])
-        const rows = (res.activities || []).map((act) => ({
-          id: act.id || `act-${act.leadId}-${act.createdAt}`,
-          at: act.createdAt,
-          actorName: act.createdByName,
-          title: act.leadName,
-          company: act.company,
-          type: act.type,
-          kind: 'activity',
-          body: act.summary,
-          leadId: act.leadId,
-          meta: { typeLabel: ACTIVITY_LABELS[act.type] || act.type },
-        }))
+        const rows = (res.activities || [])
+          .map((act) => ({
+            id: act.id || `act-${act.leadId}-${act.createdAt}`,
+            at: act.createdAt,
+            actorName: act.createdByName,
+            title: act.leadName,
+            company: act.company,
+            type: act.type,
+            kind: 'activity',
+            body: act.summary,
+            leadId: act.leadId,
+            meta: { typeLabel: ACTIVITY_LABELS[act.type] || act.type },
+          }))
+          .sort((a, b) => new Date(b.at || 0).getTime() - new Date(a.at || 0).getTime())
         setTimeline(rows)
       })
       .catch(() => {
