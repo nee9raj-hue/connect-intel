@@ -41,11 +41,11 @@ export function mergeRepPerformanceRows(repPerformance = [], teamMembers = [], i
       followups: perf.followups ?? 0,
       activities7d: perf.activities7d ?? 0,
       wonMonth: perf.wonMonth ?? 0,
-      emails: intel.emails,
-      calls: intel.calls,
-      activitiesTotal: intel.activitiesTotal ?? perf.activities7d ?? 0,
+      emails: intel.emails ?? 0,
+      calls: intel.calls ?? 0,
+      activitiesTotal: intel.activitiesTotal ?? 0,
       lastActiveAt: intel.lastActiveAt || perf.lastActiveAt || null,
-      needsHelp: intel.activitiesTotal === 0 && (intel.hoursInApp || 0) > 0,
+      needsHelp: (intel.activitiesTotal ?? 0) === 0 && (intel.hoursInApp || 0) > 0,
       action: actions.action,
       cellActions: actions.cellActions || defaultActions(id).cellActions,
     })
@@ -62,7 +62,6 @@ export function mergeRepPerformanceRows(repPerformance = [], teamMembers = [], i
   }
 
   return rows.sort(
-    (a, b) =>
-      (b.activitiesTotal ?? b.activities7d ?? 0) - (a.activitiesTotal ?? a.activities7d ?? 0)
+    (a, b) => (b.activitiesTotal ?? 0) - (a.activitiesTotal ?? 0)
   )
 }

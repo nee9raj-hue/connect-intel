@@ -158,11 +158,11 @@ function RepsTable({ rows, onAction, onReviewRep, periodLabel }) {
                   {row.followups ?? 0}
                 </button>
               </td>
-              <td className="is-num">{row.emails ?? '—'}</td>
-              <td className="is-num">{row.calls ?? '—'}</td>
+              <td className="is-num">{row.emails ?? 0}</td>
+              <td className="is-num">{row.calls ?? 0}</td>
               <td className="is-num">
                 <button type="button" className="dash-home-team__cell-btn" onClick={() => onAction(row.cellActions?.activities || row.action)}>
-                  {row.activitiesTotal ?? row.activities7d ?? 0}
+                  {row.activitiesTotal ?? 0}
                 </button>
               </td>
               <td className="is-num">
@@ -311,7 +311,7 @@ export default function TeamReviewBlock({
     if (tab !== 'activity') return undefined
     let cancelled = false
     setTimelineLoading(true)
-    const q = new URLSearchParams({ period: apiPeriod, limit: '25', offset: '0' })
+    const q = new URLSearchParams({ period: apiPeriod, limit: '50', offset: '0' })
     if (repFilter) q.set('userId', repFilter)
     api
       .getCrmActivityLog(q.toString())
@@ -345,21 +345,27 @@ export default function TeamReviewBlock({
   const intelMembers = metrics?.teamIntelligence?.members || []
   const intelByUser = useMemo(() => new Map(intelMembers.map((m) => [String(m.userId), m])), [intelMembers])
 
-  const memberOptions = useMemo(
+  const baseMemberOptions = useMemo(
     () =>
       mergeMemberOptions(
         teamMembers,
         metrics?.memberOptions,
+        intelMembers,
         (viewData.repPerformance || []).map((r) =>
           r.userId && r.name ? { userId: r.userId, name: r.name } : null
         )
       ),
-    [teamMembers, metrics?.memberOptions, viewData.repPerformance]
+    [teamMembers, metrics?.memberOptions, intelMembers, viewData.repPerformance]
   )
 
   const repRows = useMemo(() => {
-    return mergeRepPerformanceRows(viewData.repPerformance, memberOptions, intelByUser)
-  }, [viewData.repPerformance, memberOptions, intelByUser])
+    return mergeRepPerformanceRows(viewData.repPerformance, baseMemberOptions, intelByUser)
+  }, [viewData.repPerformance, baseMemberOptions, intelByUser])
+
+  const memberOptions = useMemo(
+    () => mergeMemberOptions(baseMemberOptions, repRows),
+    [baseMemberOptions, repRows]
+  )
 
   const reviewRep = useCallback(
     (userId) => {
