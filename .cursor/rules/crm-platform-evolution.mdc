@@ -35,6 +35,6 @@ Run `npm run prod:ship`. Do not commit Android/Capacitor unless deploy scope inc
 
 When building rep/team metrics, **Last active** must mean the latest CRM action **performed by that user** (`actor_id` / strict `createdByUserId`). Never use lead assignee, workspace pulse, or login alone for that column.
 
-- **Last active (CRM):** `memberLastCrmActivity.js`, `lastCrmActivityAtForUser`, `fetchLastCrmActivityAtByActors`
+- **Last active (CRM):** `resolveLastCrmActivityMap` / `enrichIntelMembersLastActive` — SQL per-actor + same entry scan as activity log
 - **In-app time:** `aggregateWorkspaceUsage().lastInAppAt` (pulse/login) — separate from CRM last active
-- Enrich team metrics members via `enrichIntelMembersLastActive` before returning API responses
+- Never scope last-active scans by lead assignee only (reps log activity on others' leads)

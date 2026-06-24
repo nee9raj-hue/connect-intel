@@ -1,4 +1,6 @@
 /** Merge bootstrap rep stats with live team roster so new members always appear in review tables. */
+import { pickLatestCrmActivityAt } from './crmLastActive'
+
 export function mergeRepPerformanceRows(repPerformance = [], teamMembers = [], intelByUser = new Map()) {
   const perfById = new Map((repPerformance || []).map((r) => [String(r.userId), r]))
   const seen = new Set()
@@ -44,7 +46,7 @@ export function mergeRepPerformanceRows(repPerformance = [], teamMembers = [], i
       emails: intel.emails ?? 0,
       calls: intel.calls ?? 0,
       activitiesTotal: intel.activitiesTotal ?? 0,
-      lastActiveAt: intel.lastActiveAt ?? perf.lastActiveAt ?? null,
+      lastActiveAt: pickLatestCrmActivityAt(intel.lastActiveAt, perf.lastActiveAt),
       needsHelp: (intel.activitiesTotal ?? 0) === 0 && (intel.hoursInApp || 0) > 0,
       action: actions.action,
       cellActions: actions.cellActions || defaultActions(id).cellActions,
