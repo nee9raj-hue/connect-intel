@@ -6,6 +6,7 @@ import { buildDashboardMemberOptions } from '../../lib/memberOptions'
 import { mergeRepPerformanceRows } from '../../lib/mergeRepRows'
 import { formatDateTime, ACTIVITY_LABELS } from '../../lib/crmUiConstants'
 import { timelineTypeLabel } from '../../lib/teamIntelligenceConstants'
+import { teamReviewActivityQuery, teamReviewMetricsQuery } from '../../lib/rollingActivityRange'
 
 const PERIOD_API = { '7d': '7d', '30d': '30d' }
 
@@ -289,11 +290,13 @@ export default function TeamReviewBlock({
     [runAction, apiPeriod]
   )
 
+  const reviewDays = period === '30d' ? 30 : 7
+
   useEffect(() => {
     let cancelled = false
     setMetricsLoading(true)
     api
-      .getCrmTeamMetrics(`period=${apiPeriod}`)
+      .getCrmTeamMetrics(teamReviewMetricsQuery(reviewDays))
       .then((res) => {
         if (!cancelled) setMetrics(res)
       })
@@ -306,16 +309,16 @@ export default function TeamReviewBlock({
     return () => {
       cancelled = true
     }
-  }, [apiPeriod])
+  }, [apiPeriod, reviewDays])
 
   useEffect(() => {
     if (tab !== 'activity') return undefined
     let cancelled = false
     setTimelineLoading(true)
-    const q = new URLSearchParams({ period: apiPeriod, limit: '100', offset: '0' })
-    if (repFilter) q.set('userId', repFilter)
     api
-      .getCrmActivityLog(q.toString())
+      .getCrmActivityLog(
+        teamReviewActivityQuery({ days: reviewDays, userId: repFilter || '', limit: 100 })
+      )
       .then((res) => {
         if (cancelled) return
         setActivityMemberOptions(res.memberOptions || [])
@@ -344,7 +347,7 @@ export default function TeamReviewBlock({
     return () => {
       cancelled = true
     }
-  }, [tab, apiPeriod, repFilter])
+  }, [tab, reviewDays, repFilter])
 
   const intelMembers = metrics?.teamIntelligence?.members || []
   const intelByUser = useMemo(() => new Map(intelMembers.map((m) => [String(m.userId), m])), [intelMembers])
