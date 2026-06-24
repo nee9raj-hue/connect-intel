@@ -16,6 +16,7 @@ export function teamReviewActivityQuery({ days = 7, userId = '', limit = 100 } =
     offset: '0',
     fresh: '1',
     source: 'crm',
+    _v: '2',
   })
   if (userId) q.set('userId', String(userId))
   return q.toString()
@@ -23,5 +24,5 @@ export function teamReviewActivityQuery({ days = 7, userId = '', limit = 100 } =
 
 export function teamReviewMetricsQuery(days = 7) {
   const { from, to } = rollingActivityRange(days)
-  return `from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&fresh=1`
+  return `from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&fresh=1&_v=2`
 }

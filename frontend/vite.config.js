@@ -7,6 +7,16 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 const standalone = process.env.STANDALONE === '1'
 
+function htmlBuildStampPlugin() {
+  const stamp = new Date().toISOString()
+  return {
+    name: 'html-build-stamp',
+    transformIndexHtml(html) {
+      return html.replace('<head>', `<head>\n    <!-- ci-build ${stamp} -->`)
+    },
+  }
+}
+
 function pwaStubPlugin() {
   return {
     name: 'pwa-register-stub',
@@ -25,6 +35,7 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
+    ...(standalone ? [] : [htmlBuildStampPlugin()]),
     ...(standalone
       ? [viteSingleFile(), pwaStubPlugin()]
       : [
