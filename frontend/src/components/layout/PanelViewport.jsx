@@ -1,4 +1,4 @@
-import { lazy, Suspense, useRef } from 'react'
+import { lazy, Suspense } from 'react'
 import useIsMobile from '../../hooks/useIsMobile'
 import PeopleSearch from '../search/PeopleSearch'
 import SavedLeadsPanel from '../saved/SavedLeadsPanel'
@@ -93,7 +93,6 @@ export default function PanelViewport({ activePanel, panelOptions, onNavigate, o
   const isMobile = useIsMobile()
   const panelId = resolvePanelId(activePanel)
   const Panel = PANELS[panelId] || PeopleSearch
-  const visitedRef = useRef(new Set([panelId]))
 
   if (!isMobile) {
     return (
@@ -109,28 +108,14 @@ export default function PanelViewport({ activePanel, panelOptions, onNavigate, o
     )
   }
 
-  visitedRef.current.add(panelId)
-
   return (
     <div className="relative flex-1 min-h-0 h-full overflow-hidden">
-      {[...visitedRef.current].map((panelId) => {
-        const Panel = PANELS[panelId] || PeopleSearch
-        const isActive = resolvePanelId(activePanel) === panelId
-        return (
-          <div
-            key={panelId}
-            className={`absolute inset-0 flex flex-col min-h-0 min-w-0 ${isActive ? 'z-10' : 'z-0 hidden'}`}
-            aria-hidden={!isActive}
-          >
-            {renderPanel(panelId, Panel, {
-              onNavigate,
-              activePanel,
-              panelOptions,
-              isActive,
-              onOpenCrmMenu,
-            })}
-          </div>
-        )
+      {renderPanel(panelId, Panel, {
+        onNavigate,
+        activePanel,
+        panelOptions,
+        isActive: true,
+        onOpenCrmMenu,
       })}
     </div>
   )

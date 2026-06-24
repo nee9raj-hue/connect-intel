@@ -41,7 +41,7 @@ function useIsMobile(breakpoint = 768) {
 }
 
 export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, isActive = true }) {
-  const { user, teamMembers, repRoster, openPipelineLead, setPipelineAssigneeFilter, refreshTeam } = useApp()
+  const { user, teamMembers, repRoster, openPipelineLead, setPipelineAssigneeFilter } = useApp()
   const policies = useUsagePolicies()
   const timelinePageSize = policies.timelineInitial ?? DEFAULT_TIMELINE_PAGE
   const [period, setPeriod] = useState(panelOptions?.period || 'week')
@@ -71,11 +71,6 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
       }),
     [teamMembers, repRoster, data?.memberOptions, intel?.members]
   )
-
-  useEffect(() => {
-    if (!isActive) return undefined
-    void refreshTeam()
-  }, [isActive, refreshTeam])
 
   const activeMemberId = memberUserId || data?.memberUserId || ''
 
@@ -130,9 +125,9 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
   }, [period, memberUserId])
 
   useEffect(() => {
-    if (!isActive || summaryLoading || !data) return undefined
+    if (!isActive) return undefined
     loadTimeline()
-  }, [isActive, summaryLoading, data, loadTimeline])
+  }, [isActive, period, memberUserId, loadTimeline])
 
   useEffect(() => {
     if (!isActive || summaryLoading || !panelOptions?.teamIntelScrollY || !scrollRef.current) return undefined

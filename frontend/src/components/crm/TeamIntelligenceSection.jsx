@@ -94,7 +94,7 @@ const INSIGHT_STYLES = {
 
 /** Team metrics block — embedded on the main Dashboard for managers and reps. */
 export default function TeamIntelligenceSection({ onNavigate, isActive = true }) {
-  const { user, teamMembers, repRoster, openPipelineLead, setPipelineAssigneeFilter, orgLeadTags, refreshTeam } = useApp()
+  const { user, teamMembers, repRoster, openPipelineLead, setPipelineAssigneeFilter, orgLeadTags } = useApp()
   const [period, setPeriod] = useState('week')
   const [intelMemberId, setIntelMemberId] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -127,11 +127,6 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
       }),
     [teamMembers, repRoster, data?.memberOptions, intel?.members]
   )
-
-  useEffect(() => {
-    if (!isActive) return undefined
-    void refreshTeam()
-  }, [isActive, refreshTeam])
 
   const memberName = useMemo(() => {
     if (!activeMemberId) return null

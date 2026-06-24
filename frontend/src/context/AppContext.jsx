@@ -104,6 +104,10 @@ export function AppProvider({ children }) {
   const pendingLeadOpenRef = useRef({ leadId: null, tab: null })
   const workspaceLoadedAtRef = useRef(0)
   const workspaceLoadInFlightRef = useRef(null)
+  const teamFetchAtRef = useRef(0)
+  const teamFetchInFlightRef = useRef(null)
+  const teamMembersRef = useRef(teamMembers)
+  teamMembersRef.current = teamMembers
   const [pipelineSummary, setPipelineSummary] = useState(() =>
     normalizePipelineSummary({ total: 0, byStatus: [], cities: [], states: [] })
   )
@@ -171,22 +175,36 @@ export function AppProvider({ children }) {
     }
   }, [])
 
-  const refreshTeam = useCallback(async () => {
+  const refreshTeam = useCallback(async ({ force = false, silent = true } = {}) => {
     if (!user?.organizationId || user?.accountType !== 'company') {
       setTeamMembers([])
       setRepRoster([])
       return []
     }
-    try {
-      const data = await api.getTeamMembers()
-      setTeamMembers(data.members || [])
-      setRepRoster(data.repRoster || data.members || [])
-      return data.members || []
-    } catch {
-      setTeamMembers([])
-      setRepRoster([])
-      return []
+    const now = Date.now()
+    if (!force && teamMembersRef.current.length && now - (teamFetchAtRef.current || 0) < 60_000) {
+      return teamMembersRef.current
     }
+    if (teamFetchInFlightRef.current) {
+      return teamFetchInFlightRef.current
+    }
+    teamFetchInFlightRef.current = (async () => {
+      try {
+        const data = await api.getTeamMembers({ silent })
+        const members = data.members || []
+        setTeamMembers(members)
+        setRepRoster(data.repRoster || members)
+        teamFetchAtRef.current = Date.now()
+        return members
+      } catch {
+        setTeamMembers([])
+        setRepRoster([])
+        return []
+      } finally {
+        teamFetchInFlightRef.current = null
+      }
+    })()
+    return teamFetchInFlightRef.current
   }, [user?.organizationId, user?.accountType])
 
   useEffect(() => {
@@ -662,7 +680,7 @@ export function AppProvider({ children }) {
     async (payload) => {
       const data = await api.inviteTeamMember(payload)
       if (data.user) setUser(data.user)
-      await refreshTeam()
+      await refreshTeam({ force: true })
       return data
     },
     [refreshTeam]

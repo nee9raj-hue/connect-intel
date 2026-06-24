@@ -82,8 +82,8 @@ export default function TeamPanel({ onNavigate, panelOptions = {} }) {
     if (!user?.isOrgAdmin || user?.accountType !== 'company') return
     api.getTeamMembers({ silent: true }).then((data) => {
       if (data?.members?.length) return
-      refreshTeam()
-    }).catch(() => refreshTeam())
+      refreshTeam({ force: true })
+    }).catch(() => refreshTeam({ force: true }))
   }, [user?.isOrgAdmin, user?.accountType, refreshTeam])
 
   useEffect(() => {
@@ -235,7 +235,7 @@ export default function TeamPanel({ onNavigate, panelOptions = {} }) {
               onHierarchyChange={setHierarchy}
               updateMemberPermissions={updateMemberPermissions}
               onMembersChanged={async () => {
-                await refreshTeam()
+                await refreshTeam({ force: true })
                 await loadHierarchy({ force: true })
               }}
               onNotice={showToast}

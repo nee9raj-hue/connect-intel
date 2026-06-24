@@ -183,13 +183,6 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
 
   useEffect(() => {
     if (!isActive) return undefined
-    load()
-    const t = setInterval(() => load(true), 90_000)
-    return () => clearInterval(t)
-  }, [isActive, load])
-
-  useEffect(() => {
-    if (!data) return undefined
     const apiPeriod = PERIODS.find((p) => p.id === period)?.api || '7d'
     let cancelled = false
     setTeamMetricsLoading(true)
@@ -215,6 +208,17 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
       cancelled = true
     }
   }, [data, period])
+
+  useEffect(() => {
+    if (!isActive) return undefined
+    load()
+    const tick = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return
+      load(true)
+    }
+    const t = setInterval(tick, 90_000)
+    return () => clearInterval(t)
+  }, [isActive, load])
 
   const displayData = useMemo(() => {
     if (!data) return null

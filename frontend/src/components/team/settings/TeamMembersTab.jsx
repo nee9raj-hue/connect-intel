@@ -187,7 +187,7 @@ export default function TeamMembersTab({
       setBusyId(member.userId)
       try {
         await updateMemberPermissions({ userId: member.userId, status: next === 'inactive' ? 'inactive' : 'active' })
-        await refreshTeam()
+        await refreshTeam({ force: true })
       } finally {
         setBusyId(null)
       }

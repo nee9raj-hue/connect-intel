@@ -29,7 +29,6 @@ export default function CrmActivityLogPanel({ onNavigate, panelOptions = {}, isA
     teamMembers,
     repRoster,
     orgLeadTags,
-    refreshTeam,
   } = useApp()
   const [period, setPeriod] = useState(panelOptions?.period || 'week')
   const [activityType, setActivityType] = useState(panelOptions?.activityType || null)
@@ -62,11 +61,6 @@ export default function CrmActivityLogPanel({ onNavigate, panelOptions = {}, isA
       }),
     [teamMembers, repRoster, payload?.memberOptions, payload?.hub?.repActivity]
   )
-
-  useEffect(() => {
-    if (!isActive) return undefined
-    void refreshTeam()
-  }, [isActive, refreshTeam])
 
   useEffect(() => {
     if (panelOptions?.period) setPeriod(panelOptions.period)

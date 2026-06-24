@@ -32,9 +32,7 @@ function periodLabel(period) {
 }
 
 export default function TeamActivityHubPanel({ onNavigate, panelOptions = {}, isActive = true, footer = null }) {
-  const { user, teamMembers, repRoster, refreshTeam, openPipelineLead, orgLeadTags } = useApp()
-
-  const [bootstrap, setBootstrap] = useState(null)
+  const { user, teamMembers, repRoster, openPipelineLead, orgLeadTags } = useApp()
   const [period, setPeriod] = useState(panelOptions?.period || 'week')
   const [activityType, setActivityType] = useState(null)
   const [statusFilter, setStatusFilter] = useState('all')
@@ -50,14 +48,10 @@ export default function TeamActivityHubPanel({ onNavigate, panelOptions = {}, is
   const [expandedFeedId, setExpandedFeedId] = useState(null)
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false)
 
+  const [bootstrap, setBootstrap] = useState(null)
   const role = bootstrap?.role || 'rep'
   const isManager = role === 'manager' || role === 'org_admin'
   const scopedMemberId = isManager ? memberUserId : String(user?.id || '')
-
-  useEffect(() => {
-    if (!isActive) return undefined
-    void refreshTeam()
-  }, [isActive, refreshTeam])
 
   useEffect(() => {
     if (!isManager && user?.id) setMemberUserId(String(user.id))
