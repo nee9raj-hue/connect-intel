@@ -20,7 +20,7 @@ import {
   PipelineFunnelChart,
   TeamHoursBarChart,
 } from './TeamIntelligenceCharts'
-import { mergeMemberOptions } from '../../lib/memberOptions'
+import { buildDashboardMemberOptions } from '../../lib/memberOptions'
 import { isFreightDealOrg } from '../../lib/freightDeal'
 
 const TEAM_KPIS = [
@@ -94,7 +94,7 @@ const INSIGHT_STYLES = {
 
 /** Team metrics block — embedded on the main Dashboard for managers and reps. */
 export default function TeamIntelligenceSection({ onNavigate, isActive = true }) {
-  const { user, teamMembers, openPipelineLead, setPipelineAssigneeFilter, orgLeadTags, refreshTeam } = useApp()
+  const { user, teamMembers, repRoster, openPipelineLead, setPipelineAssigneeFilter, orgLeadTags, refreshTeam } = useApp()
   const [period, setPeriod] = useState('week')
   const [intelMemberId, setIntelMemberId] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -118,8 +118,14 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
   )
 
   const memberOptions = useMemo(
-    () => mergeMemberOptions(teamMembers, data?.memberOptions),
-    [teamMembers, data?.memberOptions]
+    () =>
+      buildDashboardMemberOptions({
+        teamMembers,
+        repRoster,
+        metricsMemberOptions: data?.memberOptions,
+        intelMembers: intel?.members,
+      }),
+    [teamMembers, repRoster, data?.memberOptions, intel?.members]
   )
 
   useEffect(() => {

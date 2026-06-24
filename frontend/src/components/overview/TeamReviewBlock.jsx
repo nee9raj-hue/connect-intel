@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { dashboardNavOptions } from '../../lib/dashboardNavigation'
-import { mergeMemberOptions } from '../../lib/memberOptions'
+import { buildDashboardMemberOptions } from '../../lib/memberOptions'
 import { mergeRepPerformanceRows } from '../../lib/mergeRepRows'
 import { formatDateTime, ACTIVITY_LABELS } from '../../lib/crmUiConstants'
 import { timelineTypeLabel } from '../../lib/teamIntelligenceConstants'
@@ -255,7 +255,7 @@ export default function TeamReviewBlock({
   onNavigate,
   onLead,
 }) {
-  const { teamMembers, refreshTeam } = useApp()
+  const { teamMembers, repRoster, refreshTeam } = useApp()
   const isAdmin = role === 'org_admin'
   const apiPeriod = PERIOD_API[period] || 'week'
   const [tab, setTab] = useState(isAdmin ? 'teams' : 'reps')
@@ -347,15 +347,14 @@ export default function TeamReviewBlock({
 
   const baseMemberOptions = useMemo(
     () =>
-      mergeMemberOptions(
+      buildDashboardMemberOptions({
         teamMembers,
-        metrics?.memberOptions,
+        repRoster,
+        metricsMemberOptions: metrics?.memberOptions,
         intelMembers,
-        (viewData.repPerformance || []).map((r) =>
-          r.userId && r.name ? { userId: r.userId, name: r.name } : null
-        )
-      ),
-    [teamMembers, metrics?.memberOptions, intelMembers, viewData.repPerformance]
+        repPerformance: viewData.repPerformance,
+      }),
+    [teamMembers, repRoster, metrics?.memberOptions, intelMembers, viewData.repPerformance]
   )
 
   const repRows = useMemo(() => {
@@ -363,7 +362,7 @@ export default function TeamReviewBlock({
   }, [viewData.repPerformance, baseMemberOptions, intelByUser])
 
   const memberOptions = useMemo(
-    () => mergeMemberOptions(baseMemberOptions, repRows),
+    () => buildDashboardMemberOptions({ metricsMemberOptions: baseMemberOptions, repRows }),
     [baseMemberOptions, repRows]
   )
 

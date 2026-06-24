@@ -83,6 +83,7 @@ export function AppProvider({ children }) {
   const [savedLeads, setSavedLeads] = useState([])
   const [searchHistory, setSearchHistory] = useState([])
   const [teamMembers, setTeamMembers] = useState([])
+  const [repRoster, setRepRoster] = useState([])
   const [orgLeadTags, setOrgLeadTags] = useState([])
   const [ready, setReady] = useState(() => Boolean(getSessionToken()))
   const [authBusy, setAuthBusy] = useState(false)
@@ -173,14 +174,17 @@ export function AppProvider({ children }) {
   const refreshTeam = useCallback(async () => {
     if (!user?.organizationId || user?.accountType !== 'company') {
       setTeamMembers([])
+      setRepRoster([])
       return []
     }
     try {
       const data = await api.getTeamMembers()
       setTeamMembers(data.members || [])
+      setRepRoster(data.repRoster || data.members || [])
       return data.members || []
     } catch {
       setTeamMembers([])
+      setRepRoster([])
       return []
     }
   }, [user?.organizationId, user?.accountType])
@@ -489,7 +493,8 @@ export function AppProvider({ children }) {
         setSavedLeads([])
         setSearchHistory([])
         setTeamMembers([])
-          setPipelineSummary(normalizePipelineSummary({ total: 0, byStatus: [], cities: [], states: [] }))
+        setRepRoster([])
+        setPipelineSummary(normalizePipelineSummary({ total: 0, byStatus: [], cities: [], states: [] }))
         setPipelineLoad({ total: 0, loaded: 0, hasMore: false, loadingMore: false })
         workspaceLoadedAtRef.current = 0
         return
@@ -533,7 +538,10 @@ export function AppProvider({ children }) {
 
           if (user.organizationId && user.accountType === 'company') {
             const data = await api.getTeamMembers({ silent: true })
-            if (!cancelled) setTeamMembers(data.members || [])
+            if (!cancelled) {
+              setTeamMembers(data.members || [])
+              setRepRoster(data.repRoster || data.members || [])
+            }
           }
         } catch (error) {
           if (!cancelled) {
@@ -636,6 +644,7 @@ export function AppProvider({ children }) {
     setSavedLeads([])
     setSearchHistory([])
     setTeamMembers([])
+    setRepRoster([])
     setPipelineLeadId(null)
     setScreen('landing')
   }, [])
@@ -667,6 +676,7 @@ export function AppProvider({ children }) {
     async (payload) => {
       const data = await api.updateMemberPermissions(payload)
       setTeamMembers(data.members || [])
+      setRepRoster(data.repRoster || data.members || [])
       return data
     },
     []
@@ -1107,6 +1117,7 @@ export function AppProvider({ children }) {
         addSearchHistory,
         completeOnboarding,
         teamMembers,
+        repRoster,
         orgLeadTags,
         refreshOrgLeadTags,
         refreshTeam,

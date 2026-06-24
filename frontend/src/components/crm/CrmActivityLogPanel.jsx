@@ -3,7 +3,7 @@ import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { ACTIVITY_LABELS } from '../../lib/crmUiConstants'
 import { buildActivityLogQuery, navigationForActivityMetric } from '../../lib/activityDashboardNav'
-import { mergeMemberOptions } from '../../lib/memberOptions'
+import { buildDashboardMemberOptions } from '../../lib/memberOptions'
 import ActivityDashboardFilters from './ActivityDashboardFilters'
 import {
   CommandBarMetric,
@@ -27,6 +27,7 @@ export default function CrmActivityLogPanel({ onNavigate, panelOptions = {}, isA
     pipelineAssigneeFilter,
     setPipelineAssigneeFilter,
     teamMembers,
+    repRoster,
     orgLeadTags,
     refreshTeam,
   } = useApp()
@@ -50,8 +51,16 @@ export default function CrmActivityLogPanel({ onNavigate, panelOptions = {}, isA
   const activities = payload?.activities || []
 
   const memberOptions = useMemo(
-    () => mergeMemberOptions(teamMembers, payload?.memberOptions),
-    [teamMembers, payload?.memberOptions]
+    () =>
+      buildDashboardMemberOptions({
+        teamMembers,
+        repRoster,
+        activityMemberOptions: payload?.memberOptions,
+        intelMembers: payload?.hub?.repActivity?.map((r) =>
+          r.userId ? { userId: r.userId, name: r.name } : null
+        ),
+      }),
+    [teamMembers, repRoster, payload?.memberOptions, payload?.hub?.repActivity]
   )
 
   useEffect(() => {

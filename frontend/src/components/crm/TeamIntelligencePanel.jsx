@@ -7,7 +7,7 @@ import {
   countTimelineFilters,
   matchesTimelineFilter,
 } from '../../lib/teamIntelligenceFilters'
-import { mergeMemberOptions } from '../../lib/memberOptions'
+import { buildDashboardMemberOptions } from '../../lib/memberOptions'
 import { saveTeamIntelReturn } from '../../lib/teamIntelReturn'
 import TeamIntelligenceDetailModal from './TeamIntelligenceDetailModal'
 import { useUsagePolicies } from '../../hooks/useUsagePolicies.js'
@@ -41,7 +41,7 @@ function useIsMobile(breakpoint = 768) {
 }
 
 export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, isActive = true }) {
-  const { user, teamMembers, openPipelineLead, setPipelineAssigneeFilter, refreshTeam } = useApp()
+  const { user, teamMembers, repRoster, openPipelineLead, setPipelineAssigneeFilter, refreshTeam } = useApp()
   const policies = useUsagePolicies()
   const timelinePageSize = policies.timelineInitial ?? DEFAULT_TIMELINE_PAGE
   const [period, setPeriod] = useState(panelOptions?.period || 'week')
@@ -62,8 +62,14 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
   const isManagerView = Boolean(data?.isAdmin || data?.isManager || v3?.isManagerView)
 
   const memberOptions = useMemo(
-    () => mergeMemberOptions(teamMembers, data?.memberOptions),
-    [teamMembers, data?.memberOptions]
+    () =>
+      buildDashboardMemberOptions({
+        teamMembers,
+        repRoster,
+        metricsMemberOptions: data?.memberOptions,
+        intelMembers: intel?.members,
+      }),
+    [teamMembers, repRoster, data?.memberOptions, intel?.members]
   )
 
   useEffect(() => {

@@ -4,7 +4,7 @@ import { api } from '../../lib/api'
 import { ACTIVITY_LABELS } from '../../lib/crmUiConstants'
 import { buildActivityLogQuery, navigationForActivityMetric } from '../../lib/activityDashboardNav'
 import { dashboardNavOptions } from '../../lib/dashboardNavigation'
-import { mergeMemberOptions } from '../../lib/memberOptions'
+import { buildDashboardMemberOptions } from '../../lib/memberOptions'
 import { mergeRepPerformanceRows } from '../../lib/mergeRepRows'
 import ActivityDashboardFilters from '../crm/ActivityDashboardFilters'
 import {
@@ -32,7 +32,7 @@ function periodLabel(period) {
 }
 
 export default function TeamActivityHubPanel({ onNavigate, panelOptions = {}, isActive = true }) {
-  const { user, teamMembers, refreshTeam, openPipelineLead, orgLeadTags } = useApp()
+  const { user, teamMembers, repRoster, refreshTeam, openPipelineLead, orgLeadTags } = useApp()
 
   const [bootstrap, setBootstrap] = useState(null)
   const [period, setPeriod] = useState(panelOptions?.period || 'week')
@@ -69,16 +69,6 @@ export default function TeamActivityHubPanel({ onNavigate, panelOptions = {}, is
     }
     if (panelOptions?.period) setPeriod(panelOptions.period)
   }, [panelOptions?.userId, panelOptions?.period])
-
-  const memberOptions = useMemo(
-    () => mergeMemberOptions(teamMembers, metrics?.memberOptions, activityPayload?.memberOptions),
-    [teamMembers, metrics?.memberOptions, activityPayload?.memberOptions]
-  )
-
-  const memberName = useMemo(() => {
-    if (!scopedMemberId) return null
-    return memberOptions.find((m) => String(m.userId) === String(scopedMemberId))?.name || 'Team member'
-  }, [scopedMemberId, memberOptions])
 
   const loadBootstrap = useCallback(async () => {
     try {
@@ -175,11 +165,40 @@ export default function TeamActivityHubPanel({ onNavigate, panelOptions = {}, is
   const intelMembers = intel?.members || []
   const intelByUser = useMemo(() => new Map(intelMembers.map((m) => [String(m.userId), m])), [intelMembers])
 
+  const baseMemberOptions = useMemo(
+    () =>
+      buildDashboardMemberOptions({
+        teamMembers,
+        repRoster,
+        metricsMemberOptions: metrics?.memberOptions,
+        activityMemberOptions: activityPayload?.memberOptions,
+        intelMembers,
+        repPerformance: bootstrap?.repPerformance,
+      }),
+    [
+      teamMembers,
+      repRoster,
+      metrics?.memberOptions,
+      activityPayload?.memberOptions,
+      intelMembers,
+      bootstrap?.repPerformance,
+    ]
+  )
+
   const repRows = useMemo(() => {
     if (!isManager) return []
-    const roster = [...memberOptions]
-    return mergeRepPerformanceRows(bootstrap?.repPerformance, roster, intelByUser)
-  }, [isManager, bootstrap?.repPerformance, memberOptions, intelByUser])
+    return mergeRepPerformanceRows(bootstrap?.repPerformance, baseMemberOptions, intelByUser)
+  }, [isManager, bootstrap?.repPerformance, baseMemberOptions, intelByUser])
+
+  const memberOptions = useMemo(
+    () => buildDashboardMemberOptions({ metricsMemberOptions: baseMemberOptions, repRows }),
+    [baseMemberOptions, repRows]
+  )
+
+  const memberName = useMemo(() => {
+    if (!scopedMemberId) return null
+    return memberOptions.find((m) => String(m.userId) === String(scopedMemberId))?.name || 'Team member'
+  }, [scopedMemberId, memberOptions])
 
   const matrixRows = useMemo(() => {
     const rows = v3?.performanceMatrix || []
