@@ -4,6 +4,8 @@ import { api } from '../../lib/api'
 import { ACTIVITY_LABELS } from '../../lib/crmUiConstants'
 import { buildActivityLogQuery, navigationForActivityMetric } from '../../lib/activityDashboardNav'
 import { dashboardNavOptions } from '../../lib/dashboardNavigation'
+import { mergeMemberOptions } from '../../lib/memberOptions'
+import { mergeRepPerformanceRows } from '../../lib/mergeRepRows'
 import ActivityDashboardFilters from '../crm/ActivityDashboardFilters'
 import {
   CommandBarMetric,
@@ -68,15 +70,10 @@ export default function TeamActivityHubPanel({ onNavigate, panelOptions = {}, is
     if (panelOptions?.period) setPeriod(panelOptions.period)
   }, [panelOptions?.userId, panelOptions?.period])
 
-  const memberOptions = useMemo(() => {
-    const map = new Map()
-    for (const m of teamMembers || []) {
-      if ((m.status || 'active') === 'active') map.set(String(m.userId), { userId: m.userId, name: m.name })
-    }
-    for (const m of metrics?.memberOptions || []) map.set(String(m.userId), m)
-    for (const m of activityPayload?.memberOptions || []) map.set(String(m.userId), m)
-    return [...map.values()].sort((a, b) => String(a.name).localeCompare(String(b.name)))
-  }, [teamMembers, metrics?.memberOptions, activityPayload?.memberOptions])
+  const memberOptions = useMemo(
+    () => mergeMemberOptions(teamMembers, metrics?.memberOptions, activityPayload?.memberOptions),
+    [teamMembers, metrics?.memberOptions, activityPayload?.memberOptions]
+  )
 
   const memberName = useMemo(() => {
     if (!scopedMemberId) return null
@@ -180,19 +177,9 @@ export default function TeamActivityHubPanel({ onNavigate, panelOptions = {}, is
 
   const repRows = useMemo(() => {
     if (!isManager) return []
-    const base = bootstrap?.repPerformance || []
-    return base.map((row) => {
-      const intelRow = intelByUser.get(String(row.userId)) || {}
-      return {
-        ...row,
-        emails: intelRow.emails,
-        calls: intelRow.calls,
-        activitiesTotal: intelRow.activitiesTotal ?? row.activities7d,
-        lastActiveAt: intelRow.lastActiveAt || row.lastActiveAt,
-        needsHelp: intelRow.activitiesTotal === 0 && (intelRow.hoursInApp || 0) > 0,
-      }
-    })
-  }, [isManager, bootstrap?.repPerformance, intelByUser])
+    const roster = [...memberOptions]
+    return mergeRepPerformanceRows(bootstrap?.repPerformance, roster, intelByUser)
+  }, [isManager, bootstrap?.repPerformance, memberOptions, intelByUser])
 
   const matrixRows = useMemo(() => {
     const rows = v3?.performanceMatrix || []

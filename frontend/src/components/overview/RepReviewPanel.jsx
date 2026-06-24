@@ -3,6 +3,7 @@ import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { ACTIVITY_LABELS, formatDateTime } from '../../lib/crmUiConstants'
 import { buildActivityLogQuery } from '../../lib/activityDashboardNav'
+import { mergeRepPerformanceRows } from '../../lib/mergeRepRows'
 import { DashboardSegmented } from '../dashboard/dashboardUi'
 import { RollupStrip } from './TeamReviewTables'
 import '../../styles/dashboard-home.css'
@@ -36,7 +37,7 @@ function groupActivitiesByLead(activities = []) {
 }
 
 export default function RepReviewPanel({ onNavigate, panelOptions = {}, isActive = true }) {
-  const { user, teamMembers, openPipelineLead } = useApp()
+  const { user, teamMembers, openPipelineLead, refreshTeam } = useApp()
   const repUserId = panelOptions?.userId ? String(panelOptions.userId) : ''
   const [period, setPeriod] = useState(panelOptions?.period || 'week')
   const [selectedLeadId, setSelectedLeadId] = useState(null)
@@ -48,6 +49,11 @@ export default function RepReviewPanel({ onNavigate, panelOptions = {}, isActive
 
   const isManager = user?.isOrgAdmin || user?.orgRole === 'org_admin' || user?.orgRole === 'manager'
   const canView = isManager || String(user?.id) === repUserId
+
+  useEffect(() => {
+    if (!isActive) return undefined
+    void refreshTeam()
+  }, [isActive, refreshTeam])
 
   useEffect(() => {
     if (panelOptions?.userId) setSelectedLeadId(null)
@@ -79,16 +85,22 @@ export default function RepReviewPanel({ onNavigate, panelOptions = {}, isActive
       ])
       setMetrics(metricsRes)
       setActivityPayload(activityRes)
-      const repRow = bootstrapRes?.dashboard?.repPerformance?.find(
-        (r) => String(r.userId) === repUserId
+      const roster = [
+        ...(teamMembers || []),
+        ...(metricsRes?.memberOptions || []),
+      ]
+      const merged = mergeRepPerformanceRows(
+        bootstrapRes?.dashboard?.repPerformance,
+        roster,
+        new Map((metricsRes?.teamIntelligence?.members || []).map((m) => [String(m.userId), m]))
       )
-      setRepSnapshot(repRow || null)
+      setRepSnapshot(merged.find((r) => String(r.userId) === repUserId) || null)
     } catch (e) {
       setError(e.message || 'Could not load rep review')
     } finally {
       setLoading(false)
     }
-  }, [repUserId, period, canView])
+  }, [repUserId, period, canView, teamMembers])
 
   useEffect(() => {
     if (!isActive || !repUserId) return undefined

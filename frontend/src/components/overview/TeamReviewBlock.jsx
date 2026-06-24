@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { dashboardNavOptions } from '../../lib/dashboardNavigation'
+import { mergeMemberOptions } from '../../lib/memberOptions'
+import { mergeRepPerformanceRows } from '../../lib/mergeRepRows'
 import { formatDateTime, ACTIVITY_LABELS } from '../../lib/crmUiConstants'
 import { timelineTypeLabel } from '../../lib/teamIntelligenceConstants'
 
@@ -343,32 +345,21 @@ export default function TeamReviewBlock({
   const intelMembers = metrics?.teamIntelligence?.members || []
   const intelByUser = useMemo(() => new Map(intelMembers.map((m) => [String(m.userId), m])), [intelMembers])
 
-  const repRows = useMemo(() => {
-    const base = viewData.repPerformance || []
-    return base.map((row) => {
-      const intel = intelByUser.get(String(row.userId)) || {}
-      return {
-        ...row,
-        emails: intel.emails,
-        calls: intel.calls,
-        activitiesTotal: intel.activitiesTotal ?? row.activities7d,
-        lastActiveAt: intel.lastActiveAt || row.lastActiveAt,
-        needsHelp: intel.activitiesTotal === 0 && (intel.hoursInApp || 0) > 0,
-      }
-    })
-  }, [viewData.repPerformance, intelByUser])
+  const memberOptions = useMemo(
+    () =>
+      mergeMemberOptions(
+        teamMembers,
+        metrics?.memberOptions,
+        (viewData.repPerformance || []).map((r) =>
+          r.userId && r.name ? { userId: r.userId, name: r.name } : null
+        )
+      ),
+    [teamMembers, metrics?.memberOptions, viewData.repPerformance]
+  )
 
-  const memberOptions = useMemo(() => {
-    const map = new Map()
-    for (const m of teamMembers || []) {
-      if ((m.status || 'active') === 'active') map.set(String(m.userId), { userId: m.userId, name: m.name })
-    }
-    for (const m of metrics?.memberOptions || []) map.set(String(m.userId), m)
-    for (const r of viewData.repPerformance || []) {
-      if (r.userId && r.name) map.set(String(r.userId), { userId: r.userId, name: r.name })
-    }
-    return [...map.values()].sort((a, b) => String(a.name).localeCompare(String(b.name)))
-  }, [teamMembers, metrics?.memberOptions, viewData.repPerformance])
+  const repRows = useMemo(() => {
+    return mergeRepPerformanceRows(viewData.repPerformance, memberOptions, intelByUser)
+  }, [viewData.repPerformance, memberOptions, intelByUser])
 
   const reviewRep = useCallback(
     (userId) => {

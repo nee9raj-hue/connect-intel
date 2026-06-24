@@ -3,6 +3,7 @@ import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { ACTIVITY_LABELS } from '../../lib/crmUiConstants'
 import { buildActivityLogQuery, navigationForActivityMetric } from '../../lib/activityDashboardNav'
+import { mergeMemberOptions } from '../../lib/memberOptions'
 import ActivityDashboardFilters from './ActivityDashboardFilters'
 import {
   CommandBarMetric,
@@ -27,6 +28,7 @@ export default function CrmActivityLogPanel({ onNavigate, panelOptions = {}, isA
     setPipelineAssigneeFilter,
     teamMembers,
     orgLeadTags,
+    refreshTeam,
   } = useApp()
   const [period, setPeriod] = useState(panelOptions?.period || 'week')
   const [activityType, setActivityType] = useState(panelOptions?.activityType || null)
@@ -47,10 +49,15 @@ export default function CrmActivityLogPanel({ onNavigate, panelOptions = {}, isA
   const hub = payload?.hub
   const activities = payload?.activities || []
 
-  const memberOptions = useMemo(() => {
-    if (payload?.memberOptions?.length) return payload.memberOptions
-    return (teamMembers || []).map((m) => ({ userId: m.userId, name: m.name }))
-  }, [payload?.memberOptions, teamMembers])
+  const memberOptions = useMemo(
+    () => mergeMemberOptions(teamMembers, payload?.memberOptions),
+    [teamMembers, payload?.memberOptions]
+  )
+
+  useEffect(() => {
+    if (!isActive) return undefined
+    void refreshTeam()
+  }, [isActive, refreshTeam])
 
   useEffect(() => {
     if (panelOptions?.period) setPeriod(panelOptions.period)

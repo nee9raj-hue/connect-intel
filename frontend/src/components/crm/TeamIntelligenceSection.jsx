@@ -20,6 +20,7 @@ import {
   PipelineFunnelChart,
   TeamHoursBarChart,
 } from './TeamIntelligenceCharts'
+import { mergeMemberOptions } from '../../lib/memberOptions'
 import { isFreightDealOrg } from '../../lib/freightDeal'
 
 const TEAM_KPIS = [
@@ -93,7 +94,7 @@ const INSIGHT_STYLES = {
 
 /** Team metrics block — embedded on the main Dashboard for managers and reps. */
 export default function TeamIntelligenceSection({ onNavigate, isActive = true }) {
-  const { user, teamMembers, openPipelineLead, setPipelineAssigneeFilter, orgLeadTags } = useApp()
+  const { user, teamMembers, openPipelineLead, setPipelineAssigneeFilter, orgLeadTags, refreshTeam } = useApp()
   const [period, setPeriod] = useState('week')
   const [intelMemberId, setIntelMemberId] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -113,13 +114,18 @@ export default function TeamIntelligenceSection({ onNavigate, isActive = true })
   const isFilteredMember = Boolean(activeMemberId)
 
   const isManagerView = Boolean(
-    user?.isOrgAdmin || user?.orgRole === 'org_admin' || data?.isAdmin
+    user?.isOrgAdmin || user?.orgRole === 'org_admin' || user?.orgRole === 'manager' || data?.isAdmin || data?.isManager
   )
 
-  const memberOptions = useMemo(() => {
-    if (data?.memberOptions?.length) return data.memberOptions
-    return (teamMembers || []).map((m) => ({ userId: m.userId, name: m.name }))
-  }, [data?.memberOptions, teamMembers])
+  const memberOptions = useMemo(
+    () => mergeMemberOptions(teamMembers, data?.memberOptions),
+    [teamMembers, data?.memberOptions]
+  )
+
+  useEffect(() => {
+    if (!isActive) return undefined
+    void refreshTeam()
+  }, [isActive, refreshTeam])
 
   const memberName = useMemo(() => {
     if (!activeMemberId) return null

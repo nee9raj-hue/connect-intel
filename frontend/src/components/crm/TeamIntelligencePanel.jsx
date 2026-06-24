@@ -7,6 +7,7 @@ import {
   countTimelineFilters,
   matchesTimelineFilter,
 } from '../../lib/teamIntelligenceFilters'
+import { mergeMemberOptions } from '../../lib/memberOptions'
 import { saveTeamIntelReturn } from '../../lib/teamIntelReturn'
 import TeamIntelligenceDetailModal from './TeamIntelligenceDetailModal'
 import { useUsagePolicies } from '../../hooks/useUsagePolicies.js'
@@ -40,7 +41,7 @@ function useIsMobile(breakpoint = 768) {
 }
 
 export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, isActive = true }) {
-  const { user, teamMembers, openPipelineLead, setPipelineAssigneeFilter } = useApp()
+  const { user, teamMembers, openPipelineLead, setPipelineAssigneeFilter, refreshTeam } = useApp()
   const policies = useUsagePolicies()
   const timelinePageSize = policies.timelineInitial ?? DEFAULT_TIMELINE_PAGE
   const [period, setPeriod] = useState(panelOptions?.period || 'week')
@@ -58,12 +59,17 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
 
   const intel = data?.teamIntelligence
   const v3 = data?.intelligenceV3
-  const isManagerView = Boolean(data?.isAdmin || v3?.isManagerView)
+  const isManagerView = Boolean(data?.isAdmin || data?.isManager || v3?.isManagerView)
 
-  const memberOptions = useMemo(() => {
-    if (data?.memberOptions?.length) return data.memberOptions
-    return (teamMembers || []).map((m) => ({ userId: m.userId, name: m.name }))
-  }, [data?.memberOptions, teamMembers])
+  const memberOptions = useMemo(
+    () => mergeMemberOptions(teamMembers, data?.memberOptions),
+    [teamMembers, data?.memberOptions]
+  )
+
+  useEffect(() => {
+    if (!isActive) return undefined
+    void refreshTeam()
+  }, [isActive, refreshTeam])
 
   const activeMemberId = memberUserId || data?.memberUserId || ''
 
