@@ -23,6 +23,7 @@ import {
   FilterChips,
 } from '../crm/ActivityLogHubCharts'
 import { RepPerformanceTable, RollupStrip } from './TeamReviewTables'
+import { prefetchRepReview } from '../../lib/repPrefetch'
 import '../../styles/dashboard-home.css'
 
 function periodLabel(period) {
@@ -143,6 +144,13 @@ export default function TeamActivityHubPanel({ onNavigate, panelOptions = {}, is
       })
     },
     [onNavigate, period]
+  )
+
+  const prefetchRep = useCallback(
+    (userId) => {
+      prefetchRepReview(user?.organizationId, userId, period)
+    },
+    [user?.organizationId, period]
   )
 
   const selectMember = useCallback((uid) => {
@@ -340,6 +348,7 @@ export default function TeamActivityHubPanel({ onNavigate, panelOptions = {}, is
                   periodLabel={periodLabel(period)}
                   onSelectRep={selectMember}
                   onReviewRep={openRepReview}
+                  onPrefetchRep={prefetchRep}
                   onPipelineAction={(action) => onNavigate?.(action.panel, dashboardNavOptions(action, user))}
                 />
               </section>

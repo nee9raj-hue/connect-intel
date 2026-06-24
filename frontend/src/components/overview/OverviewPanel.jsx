@@ -14,7 +14,9 @@ export default function OverviewPanel({ onNavigate, panelOptions = {}, isActive 
   const { user, pipelineSummary } = useApp()
   const useUnifiedHub = user?.accountType === 'company' && !isMgmtCompanyUser(user)
 
-  if (!isActive) return null
+  if (!isActive) {
+    return <div className="panel-shell overview-panel-v3 dash-home-shell hidden" aria-hidden />
+  }
 
   const freightBlock = isFreightDealOrg(user) ? (
     <FreightDealsDashboard user={user} pipelineSummary={pipelineSummary} onNavigate={onNavigate} />

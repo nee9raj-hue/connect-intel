@@ -7,6 +7,7 @@ import { mergeRepPerformanceRows } from '../../lib/mergeRepRows'
 import { formatDateTime, ACTIVITY_LABELS } from '../../lib/crmUiConstants'
 import { timelineTypeLabel } from '../../lib/teamIntelligenceConstants'
 import { teamReviewActivityQuery } from '../../lib/rollingActivityRange'
+import { prefetchRepReview } from '../../lib/repPrefetch'
 
 const PERIOD_API = { '7d': '7d', '30d': '30d' }
 
@@ -122,7 +123,7 @@ function TeamsTable({ rows, onAction }) {
   )
 }
 
-function RepsTable({ rows, onAction, onReviewRep, periodLabel }) {
+function RepsTable({ rows, onAction, onReviewRep, onPrefetchRep, periodLabel }) {
   if (!rows?.length) return <p className="dash-home__empty">No rep activity in {periodLabel || 'this period'} yet.</p>
   return (
     <div className="dash-home-team__table-wrap">
@@ -144,7 +145,13 @@ function RepsTable({ rows, onAction, onReviewRep, periodLabel }) {
           {rows.map((row) => (
             <tr key={row.userId}>
               <td>
-                <button type="button" className="dash-home-team__name-btn" onClick={() => onReviewRep(row.userId)}>
+                <button
+                  type="button"
+                  className="dash-home-team__name-btn"
+                  onClick={() => onReviewRep(row.userId)}
+                  onMouseEnter={() => onPrefetchRep?.(row.userId)}
+                  onFocus={() => onPrefetchRep?.(row.userId)}
+                >
                   {row.name}
                 </button>
                 {row.needsHelp ? <span className="dash-home-team__flag">Needs attention</span> : null}
@@ -173,7 +180,13 @@ function RepsTable({ rows, onAction, onReviewRep, periodLabel }) {
               </td>
               <td className="is-muted">{relTime(row.lastActiveAt)}</td>
               <td className="is-action">
-                <button type="button" className="dash-home-team__row-action" onClick={() => onReviewRep(row.userId)}>
+                <button
+                  type="button"
+                  className="dash-home-team__row-action"
+                  onClick={() => onReviewRep(row.userId)}
+                  onMouseEnter={() => onPrefetchRep?.(row.userId)}
+                  onFocus={() => onPrefetchRep?.(row.userId)}
+                >
                   Review →
                 </button>
               </td>
@@ -362,6 +375,13 @@ export default function TeamReviewBlock({
     [onNavigate, apiPeriod]
   )
 
+  const prefetchRep = useCallback(
+    (userId) => {
+      prefetchRepReview(user?.organizationId, userId, apiPeriod)
+    },
+    [user?.organizationId, apiPeriod]
+  )
+
   const periodLabel = period === '30d' ? '30 days' : '7 days'
   const rollup = metrics?.teamIntelligence?.rollup
   const comparison = metrics?.teamIntelligence?.comparison
@@ -463,6 +483,7 @@ export default function TeamReviewBlock({
             rows={repRows}
             onAction={runAction}
             onReviewRep={reviewRep}
+            onPrefetchRep={prefetchRep}
             periodLabel={periodLabel}
           />
         ) : null}

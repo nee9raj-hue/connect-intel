@@ -9,6 +9,7 @@ import {
   PipelineHealthChart,
 } from './DashboardHomeCharts'
 import TeamReviewBlock from './TeamReviewBlock'
+import { readPanelCache, writePanelCache, teamReviewCacheKey } from '../../lib/panelCache'
 import '../../styles/dashboard-home.css'
 
 const PERIODS = [
@@ -166,20 +167,40 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
   const [teamMetricsLoading, setTeamMetricsLoading] = useState(false)
 
   const load = useCallback(async (silent = false) => {
-    if (!silent) setLoading(true)
-    else setRefreshing(true)
+    const cacheKey = teamReviewCacheKey(user?.organizationId, period)
+    if (!silent) {
+      const cached = readPanelCache(cacheKey)
+      if (cached?.data?.bootstrap) {
+        setData(cached.data.bootstrap)
+        if (cached.data.teamMetrics) setTeamMetrics(cached.data.teamMetrics)
+        setLastFetch(cached.at)
+        setLoading(false)
+        if (!cached.stale) return
+      } else {
+        setLoading(true)
+      }
+    } else {
+      setRefreshing(true)
+    }
     setError(null)
     try {
       const res = await api.getDashboardBootstrap()
       setData(res.dashboard)
       setLastFetch(Date.now())
+      const existing = readPanelCache(cacheKey)
+      writePanelCache(cacheKey, {
+        ...(existing?.data || {}),
+        bootstrap: res.dashboard,
+      })
     } catch (e) {
-      setError(e.message || 'Could not load dashboard')
+      if (!silent && !readPanelCache(cacheKey)?.data?.bootstrap) {
+        setError(e.message || 'Could not load dashboard')
+      }
     } finally {
       setLoading(false)
       setRefreshing(false)
     }
-  }, [])
+  }, [user?.organizationId, period])
 
   useEffect(() => {
     if (!isActive) return undefined
@@ -193,7 +214,13 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
         setTeamMetrics(res)
         const days = res?.activityByDay
         if (days?.length) setActivityTrend(days)
-        else setActivityTrend(groupActivityByDay(data.activity))
+        else setActivityTrend(groupActivityByDay(data?.activity))
+        const cacheKey = teamReviewCacheKey(user?.organizationId, period)
+        const existing = readPanelCache(cacheKey)
+        writePanelCache(cacheKey, {
+          ...(existing?.data || {}),
+          teamMetrics: res,
+        })
       })
       .catch(() => {
         if (!cancelled) {
@@ -207,7 +234,7 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
     return () => {
       cancelled = true
     }
-  }, [data, period])
+  }, [data, period, user?.organizationId])
 
   useEffect(() => {
     if (!isActive) return undefined

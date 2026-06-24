@@ -3,7 +3,7 @@ import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { ACTIVITY_LABELS, formatDateTime } from '../../lib/crmUiConstants'
 import { buildActivityLogQuery } from '../../lib/activityDashboardNav'
-import { mergeRepPerformanceRows } from '../../lib/mergeRepRows'
+import { readPanelCache, writePanelCache, repReviewCacheKey } from '../../lib/panelCache'
 import { DashboardSegmented } from '../dashboard/dashboardUi'
 import { RollupStrip } from './TeamReviewTables'
 import '../../styles/dashboard-home.css'
@@ -68,34 +68,53 @@ export default function RepReviewPanel({ onNavigate, panelOptions = {}, isActive
 
   const load = useCallback(async () => {
     if (!repUserId || !canView) return
-    setLoading(true)
+    const cacheKey = repReviewCacheKey(user?.organizationId, repUserId, period)
+    const cached = readPanelCache(cacheKey)
+    if (cached?.data) {
+      setMetrics(cached.data.metrics || null)
+      setActivityPayload(cached.data.activity || null)
+      setRepSnapshot(cached.data.repSnapshot || null)
+      setLoading(false)
+      if (!cached.stale) return
+    } else {
+      setLoading(true)
+    }
     setError(null)
     try {
       const metricsQ = new URLSearchParams({ period, userId: repUserId })
       const activityQ = buildActivityLogQuery({ period, memberUserId: repUserId })
-      const [metricsRes, activityRes, bootstrapRes] = await Promise.all([
+      const [summaryRes, metricsRes, activityRes] = await Promise.all([
+        api.getCrmRepSummary(repUserId, period),
         api.getCrmTeamMetrics(metricsQ.toString()),
         api.getCrmActivityLog(`${activityQ}${activityQ ? '&' : ''}limit=200&offset=0`),
-        api.getDashboardBootstrap().catch(() => null),
       ])
       setMetrics(metricsRes)
       setActivityPayload(activityRes)
-      const roster = [
-        ...(teamMembers || []),
-        ...(metricsRes?.memberOptions || []),
-      ]
-      const merged = mergeRepPerformanceRows(
-        bootstrapRes?.dashboard?.repPerformance,
-        roster,
-        new Map((metricsRes?.teamIntelligence?.members || []).map((m) => [String(m.userId), m]))
-      )
-      setRepSnapshot(merged.find((r) => String(r.userId) === repUserId) || null)
+      const summary = summaryRes?.summary
+      const repSnap = summary
+        ? {
+            userId: repUserId,
+            name: summary.name,
+            open: summary.open,
+            followups: summary.followups,
+            wonMonth: summary.wonMonth,
+            activities7d: summary.activities7d ?? 0,
+            lastActiveAt: summary.lastActiveAt,
+          }
+        : null
+      setRepSnapshot(repSnap)
+      writePanelCache(cacheKey, {
+        summary: summaryRes,
+        metrics: metricsRes,
+        activity: activityRes,
+        repSnapshot: repSnap,
+      })
     } catch (e) {
       setError(e.message || 'Could not load rep review')
     } finally {
       setLoading(false)
     }
-  }, [repUserId, period, canView, teamMembers])
+  }, [repUserId, period, canView, user?.organizationId])
 
   useEffect(() => {
     if (!isActive || !repUserId) return undefined
@@ -156,7 +175,9 @@ export default function RepReviewPanel({ onNavigate, panelOptions = {}, isActive
     [openPipelineLead, onNavigate, repUserId, period]
   )
 
-  if (!isActive) return null
+  if (!isActive) {
+    return <div className="panel-shell rep-review-page hidden" aria-hidden />
+  }
 
   if (!repUserId) {
     return (

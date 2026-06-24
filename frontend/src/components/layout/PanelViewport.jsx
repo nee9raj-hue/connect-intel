@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import useIsMobile from '../../hooks/useIsMobile'
 import PeopleSearch from '../search/PeopleSearch'
 import SavedLeadsPanel from '../saved/SavedLeadsPanel'
@@ -64,6 +64,9 @@ const PANELS = {
   'company-workspace': CompanyWorkspacePanel,
 }
 
+/** Panels kept mounted (hidden) for instant back navigation. */
+const KEEP_ALIVE_PANELS = new Set(['overview', 'crm-rep-review'])
+
 function resolvePanelId(activePanel) {
   return activePanel === 'bulk-email' ? 'marketing' : activePanel
 }
@@ -92,22 +95,66 @@ function renderPanel(panelId, Panel, props) {
 export default function PanelViewport({ activePanel, panelOptions, onNavigate, onOpenCrmMenu }) {
   const isMobile = useIsMobile()
   const panelId = resolvePanelId(activePanel)
-  const Panel = PANELS[panelId] || PeopleSearch
+  const [mountedPanels, setMountedPanels] = useState(() => new Set([panelId]))
+  const repReviewOptionsRef = useRef({})
+
+  useEffect(() => {
+    setMountedPanels((prev) => {
+      if (prev.has(panelId)) return prev
+      const next = new Set(prev)
+      next.add(panelId)
+      return next
+    })
+    if (panelId === 'crm-rep-review') {
+      repReviewOptionsRef.current = panelOptions || {}
+    }
+  }, [panelId, panelOptions])
 
   if (!isMobile) {
+    const aliveIds = [...mountedPanels].filter((id) => KEEP_ALIVE_PANELS.has(id) || id === panelId)
+
+    if (aliveIds.length <= 1) {
+      const Panel = PANELS[panelId] || PeopleSearch
+      return (
+        <div className="flex-1 flex flex-col min-h-0 min-w-0 h-full overflow-hidden">
+          {renderPanel(panelId, Panel, {
+            onNavigate,
+            activePanel,
+            panelOptions,
+            isActive: true,
+            onOpenCrmMenu,
+          })}
+        </div>
+      )
+    }
+
     return (
       <div className="flex-1 flex flex-col min-h-0 min-w-0 h-full overflow-hidden">
-        {renderPanel(panelId, Panel, {
-          onNavigate,
-          activePanel,
-          panelOptions,
-          isActive: true,
-          onOpenCrmMenu,
+        {aliveIds.map((id) => {
+          const Panel = PANELS[id] || PeopleSearch
+          const hidden = id !== panelId
+          const options =
+            id === 'crm-rep-review' ? repReviewOptionsRef.current : id === panelId ? panelOptions : {}
+          return (
+            <div
+              key={id}
+              className={`flex-1 flex flex-col min-h-0 min-w-0 h-full overflow-hidden${hidden ? ' hidden' : ''}`}
+            >
+              {renderPanel(id, Panel, {
+                onNavigate,
+                activePanel: hidden ? id : activePanel,
+                panelOptions: options,
+                isActive: !hidden,
+                onOpenCrmMenu,
+              })}
+            </div>
+          )
         })}
       </div>
     )
   }
 
+  const Panel = PANELS[panelId] || PeopleSearch
   return (
     <div className="relative flex-1 min-h-0 h-full overflow-hidden">
       {renderPanel(panelId, Panel, {

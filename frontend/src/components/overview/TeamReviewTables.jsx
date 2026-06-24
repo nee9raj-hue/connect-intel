@@ -37,7 +37,7 @@ export function RollupStrip({ rollup, comparison }) {
   )
 }
 
-export function RepPerformanceTable({ rows, onSelectRep, onReviewRep, onPipelineAction, periodLabel }) {
+export function RepPerformanceTable({ rows, onSelectRep, onReviewRep, onPrefetchRep, onPipelineAction, periodLabel }) {
   if (!rows?.length) {
     return <p className="dash-home__empty">No rep activity in {periodLabel || 'this period'} yet.</p>
   }
@@ -62,7 +62,13 @@ export function RepPerformanceTable({ rows, onSelectRep, onReviewRep, onPipeline
           {rows.map((row) => (
             <tr key={row.userId}>
               <td>
-                <button type="button" className="dash-home-team__name-btn" onClick={() => onSelectRep?.(row.userId)}>
+                <button
+                  type="button"
+                  className="dash-home-team__name-btn"
+                  onClick={() => onSelectRep?.(row.userId)}
+                  onMouseEnter={() => onPrefetchRep?.(row.userId)}
+                  onFocus={() => onPrefetchRep?.(row.userId)}
+                >
                   {row.name}
                 </button>
                 {row.needsHelp ? <span className="dash-home-team__flag">Needs attention</span> : null}
@@ -111,6 +117,8 @@ export function RepPerformanceTable({ rows, onSelectRep, onReviewRep, onPipeline
                   type="button"
                   className="dash-home-team__row-action"
                   onClick={() => (onReviewRep || onSelectRep)?.(row.userId)}
+                  onMouseEnter={() => onPrefetchRep?.(row.userId)}
+                  onFocus={() => onPrefetchRep?.(row.userId)}
                 >
                   Review →
                 </button>

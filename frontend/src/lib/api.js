@@ -373,6 +373,11 @@ export const api = {
     request(`/api/crm/dashboard-kpi?${appendTimeZoneToQuery(query)}`, { timeoutMs: 15_000 }),
   getCrmTeamMetrics: (query = '') =>
     request(`/api/crm/team-metrics?${appendTimeZoneToQuery(query)}`, { timeoutMs: 45_000 }),
+  getCrmRepSummary: (userId, period = 'week') =>
+    request(
+      `/api/crm/rep-summary?userId=${encodeURIComponent(userId)}&period=${encodeURIComponent(period)}`,
+      { timeoutMs: 15_000 }
+    ),
   getCrmActivityTimeline: (query = '') =>
     request(`/api/crm/activity-timeline?${appendTimeZoneToQuery(query)}`, { timeoutMs: 45_000 }),
   getCrmMyDay: (query = '') =>
