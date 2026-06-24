@@ -16,20 +16,25 @@ export default function OverviewPanel({ onNavigate, panelOptions = {}, isActive 
 
   if (!isActive) return null
 
+  const freightBlock = isFreightDealOrg(user) ? (
+    <FreightDealsDashboard user={user} pipelineSummary={pipelineSummary} onNavigate={onNavigate} />
+  ) : null
+
   return (
     <div className="panel-shell overview-panel-v3 dash-home-shell">
       {useUnifiedHub ? (
-        <TeamActivityHubPanel onNavigate={onNavigate} panelOptions={panelOptions} isActive={isActive} />
+        <TeamActivityHubPanel
+          onNavigate={onNavigate}
+          panelOptions={panelOptions}
+          isActive={isActive}
+          footer={freightBlock}
+        />
       ) : (
         <div className="panel-body-scroll">
           <HomeDashboard onNavigate={onNavigate} isActive={isActive} />
+          {freightBlock}
         </div>
       )}
-      {isFreightDealOrg(user) ? (
-        <div className="panel-body-scroll">
-          <FreightDealsDashboard user={user} pipelineSummary={pipelineSummary} onNavigate={onNavigate} />
-        </div>
-      ) : null}
     </div>
   )
 }

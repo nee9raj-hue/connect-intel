@@ -31,7 +31,7 @@ function periodLabel(period) {
   return '7 days'
 }
 
-export default function TeamActivityHubPanel({ onNavigate, panelOptions = {}, isActive = true }) {
+export default function TeamActivityHubPanel({ onNavigate, panelOptions = {}, isActive = true, footer = null }) {
   const { user, teamMembers, repRoster, refreshTeam, openPipelineLead, orgLeadTags } = useApp()
 
   const [bootstrap, setBootstrap] = useState(null)
@@ -443,6 +443,7 @@ export default function TeamActivityHubPanel({ onNavigate, panelOptions = {}, is
             </section>
           </div>
         )}
+        {footer}
       </div>
 
       {filterDrawerOpen ? (
