@@ -6,7 +6,7 @@ import { buildDashboardMemberOptions } from '../../lib/memberOptions'
 import { mergeRepPerformanceRows } from '../../lib/mergeRepRows'
 import { formatDateTime, ACTIVITY_LABELS } from '../../lib/crmUiConstants'
 import { timelineTypeLabel } from '../../lib/teamIntelligenceConstants'
-import { teamReviewActivityQuery, teamReviewMetricsQuery } from '../../lib/rollingActivityRange'
+import { teamReviewActivityQuery } from '../../lib/rollingActivityRange'
 
 const PERIOD_API = { '7d': '7d', '30d': '30d' }
 
@@ -253,23 +253,19 @@ export default function TeamReviewBlock({
   period = '7d',
   viewData = {},
   user,
+  metrics = null,
+  metricsLoading = false,
   onNavigate,
   onLead,
 }) {
-  const { teamMembers, repRoster, refreshTeam } = useApp()
+  const { teamMembers, repRoster } = useApp()
   const isAdmin = role === 'org_admin'
   const apiPeriod = PERIOD_API[period] || 'week'
   const [tab, setTab] = useState(isAdmin ? 'teams' : 'reps')
   const [repFilter, setRepFilter] = useState('')
-  const [metrics, setMetrics] = useState(null)
-  const [metricsLoading, setMetricsLoading] = useState(true)
   const [timeline, setTimeline] = useState([])
   const [timelineLoading, setTimelineLoading] = useState(false)
   const [activityMemberOptions, setActivityMemberOptions] = useState([])
-
-  useEffect(() => {
-    void refreshTeam()
-  }, [refreshTeam])
 
   const runAction = useCallback(
     (action = {}) => {
@@ -291,25 +287,6 @@ export default function TeamReviewBlock({
   )
 
   const reviewDays = period === '30d' ? 30 : 7
-
-  useEffect(() => {
-    let cancelled = false
-    setMetricsLoading(true)
-    api
-      .getCrmTeamMetrics(teamReviewMetricsQuery(reviewDays))
-      .then((res) => {
-        if (!cancelled) setMetrics(res)
-      })
-      .catch(() => {
-        if (!cancelled) setMetrics(null)
-      })
-      .finally(() => {
-        if (!cancelled) setMetricsLoading(false)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [apiPeriod, reviewDays])
 
   useEffect(() => {
     if (tab !== 'activity') return undefined

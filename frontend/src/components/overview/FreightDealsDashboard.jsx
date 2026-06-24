@@ -112,6 +112,7 @@ export default function FreightDealsDashboard({ user, pipelineSummary, onNavigat
   const [lostDeals, setLostDeals] = useState([])
   const [loading, setLoading] = useState(false)
   const [tab, setTab] = useState('open')
+  const [deferredReady, setDeferredReady] = useState(false)
 
   const openCounts = useMemo(() => dealCountsFromSummary(pipelineSummary) || {}, [pipelineSummary])
   const allCounts = useMemo(() => allDealCountsFromSummary(pipelineSummary) || {}, [pipelineSummary])
@@ -138,8 +139,19 @@ export default function FreightDealsDashboard({ user, pipelineSummary, onNavigat
   }, [freightOrg])
 
   useEffect(() => {
+    if (!freightOrg) return undefined
+    if (typeof requestIdleCallback === 'function') {
+      const id = requestIdleCallback(() => setDeferredReady(true), { timeout: 800 })
+      return () => cancelIdleCallback(id)
+    }
+    const t = setTimeout(() => setDeferredReady(true), 200)
+    return () => clearTimeout(t)
+  }, [freightOrg])
+
+  useEffect(() => {
+    if (!deferredReady) return
     loadDeals()
-  }, [loadDeals])
+  }, [deferredReady, loadDeals])
 
   if (!freightOrg) return null
 

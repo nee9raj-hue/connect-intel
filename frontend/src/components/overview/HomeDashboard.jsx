@@ -162,6 +162,8 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
   const [refreshing, setRefreshing] = useState(false)
   const [period, setPeriod] = useState('7d')
   const [activityTrend, setActivityTrend] = useState([])
+  const [teamMetrics, setTeamMetrics] = useState(null)
+  const [teamMetricsLoading, setTeamMetricsLoading] = useState(false)
 
   const load = useCallback(async (silent = false) => {
     if (!silent) setLoading(true)
@@ -188,18 +190,26 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
 
   useEffect(() => {
     if (!data) return undefined
-    const apiPeriod = PERIODS.find((p) => p.id === period)?.api || 'week'
+    const apiPeriod = PERIODS.find((p) => p.id === period)?.api || '7d'
     let cancelled = false
+    setTeamMetricsLoading(true)
     api
       .getCrmTeamMetrics(`period=${apiPeriod}`)
       .then((res) => {
         if (cancelled) return
+        setTeamMetrics(res)
         const days = res?.activityByDay
         if (days?.length) setActivityTrend(days)
         else setActivityTrend(groupActivityByDay(data.activity))
       })
       .catch(() => {
-        if (!cancelled) setActivityTrend(groupActivityByDay(data.activity))
+        if (!cancelled) {
+          setTeamMetrics(null)
+          setActivityTrend(groupActivityByDay(data.activity))
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setTeamMetricsLoading(false)
       })
     return () => {
       cancelled = true
@@ -385,6 +395,8 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
             period={period}
             viewData={viewData}
             user={user}
+            metrics={teamMetrics}
+            metricsLoading={teamMetricsLoading}
             onNavigate={onNavigate}
             onLead={onLead}
           />

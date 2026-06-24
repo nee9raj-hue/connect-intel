@@ -6,23 +6,20 @@ export function rollingActivityRange(days = 7) {
   return { from: fmt(from), to: fmt(to) }
 }
 
-/** Team review / dashboard lead-activity — always live CRM, explicit date window. */
+/** Team review lead-activity — rolling window via period (server-cached, CRM fallback when index stale). */
 export function teamReviewActivityQuery({ days = 7, userId = '', limit = 100 } = {}) {
-  const { from, to } = rollingActivityRange(days)
+  const period = days >= 30 ? '30d' : '7d'
   const q = new URLSearchParams({
-    from,
-    to,
+    period,
     limit: String(limit),
     offset: '0',
-    fresh: '1',
-    source: 'crm',
-    _v: '2',
   })
   if (userId) q.set('userId', String(userId))
   return q.toString()
 }
 
+/** Rolling team metrics — use period so responses hit the shared dashboard cache. */
 export function teamReviewMetricsQuery(days = 7) {
-  const { from, to } = rollingActivityRange(days)
-  return `from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&fresh=1&_v=2`
+  const period = days >= 30 ? '30d' : '7d'
+  return `period=${period}`
 }
