@@ -625,7 +625,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
         setNotice(partial ? 'Draft saved' : 'Campaign created as draft')
       }
       if (!keepEditing) resetCampaignForm()
-      await load()
+      await load().catch(() => {})
       return campaignId
     } catch (e) {
       setError(e.message)

@@ -66,6 +66,10 @@
     {
       "path": "/api/marketing/cron",
       "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/marketing/cron?queue=1",
+      "schedule": "*/10 * * * *"
     }
   ]
 }
