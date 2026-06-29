@@ -222,11 +222,13 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
     [savedLeads]
   )
 
-  const load = useCallback(async () => {
-    setLoading(true)
-    setError(null)
+  const load = useCallback(async ({ silent = false } = {}) => {
+    if (!silent) {
+      setLoading(true)
+      setError(null)
+    }
     try {
-      const data = await api.getMarketingOverview({ light: true, timeoutMs: 45_000 })
+      const data = await api.getMarketingOverview({ light: true, timeoutMs: 90_000 })
       setLists(data.lists || [])
       setTemplates(data.templates || [])
       const all = data.campaigns || []
@@ -237,9 +239,9 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
       setPermissions(data.permissions || null)
       setSummary(data.summary || null)
     } catch (e) {
-      setError(e.message || 'Could not load marketing')
+      if (!silent) setError(e.message || 'Could not load marketing')
     } finally {
-      setLoading(false)
+      if (!silent) setLoading(false)
     }
   }, [])
 
@@ -625,7 +627,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
         setNotice(partial ? 'Draft saved' : 'Campaign created as draft')
       }
       if (!keepEditing) resetCampaignForm()
-      await load().catch(() => {})
+      void load({ silent: true })
       return campaignId
     } catch (e) {
       setError(e.message)
@@ -873,12 +875,12 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
 
       if (data.submittedForApproval) {
         setNotice(data.message || 'Submitted for approval')
-        await load()
+        void load({ silent: true })
         return
       }
       if (data.scheduled) {
         setNotice(data.message || 'Campaign scheduled')
-        await load()
+        void load({ silent: true })
         return
       }
       const isWa = data.campaign?.channel === 'whatsapp'
@@ -894,7 +896,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
             data.workerHint ||
               `Campaign queued — ${enrolled} recipients. Emails send in the background; you can close this tab.`
           )
-          await load()
+          void load({ silent: true })
           return
         }
         if (sqlQueue && initialSent > 0) {
@@ -904,8 +906,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
                 pending > 0 ? `, ${pending} remaining` : ''
               }.`
           )
-          if (pending > 0) void load().catch(() => {})
-          else void load().catch(() => {})
+          void load({ silent: true })
           refreshSavedLeads?.()
           return
         }
@@ -913,7 +914,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
           data.mode === 'browser_drain' || (pending > 0 && !data.background && data.mode !== 'queued')
         if (browserDrain && pending > 0) {
           setNotice(`Sending to ${enrolled} recipients — keep this tab open.`)
-          await load()
+          void load({ silent: true })
           await drainCampaignQueue(id, enrolled, {
             sent: initialSent,
             failed: initialFailed,
@@ -929,7 +930,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
               ? `Campaign queued — ${enrolled} recipients. Workers send in the background; you can close this tab.`
               : `Campaign queued — ${enrolled} recipients. Ensure Railway workers are running (see System status).`
           )
-          await load()
+          void load({ silent: true })
           return
         } else if (initialSent === 0 && (initialFailed > 0 || enrolled > 0)) {
           setError(
@@ -954,7 +955,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
         )
       }
       if (isWa) setTab('reports')
-      void load().catch(() => {})
+      void load({ silent: true })
       refreshSavedLeads?.()
     } catch (e) {
       setError(e.message)
@@ -964,7 +965,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
   }
 
   const createAndStart = async () => {
-    const id = await createCampaign()
+    const id = await createCampaign({ keepEditing: true })
     if (id) await startCampaign(id)
   }
 
@@ -1396,7 +1397,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
         isBuilderTab ? 'marketing-campaigns-shell' : ''
       } ${hideMarketingHeader ? 'marketing-immersive-shell' : ''}`}
     >
-      {(error || notice) && hideMarketingHeader && (
+      {(error || notice) && hideMarketingHeader && campaignDesktopPhase === 'editor' && (
         <div className="shrink-0 px-3 py-2 bg-white border-b border-[#e8ecf1]">
           {error && <p className="crm-alert crm-alert-error mb-0">{error}</p>}
           {notice && <p className="crm-alert crm-alert-success mt-2 mb-0">{notice}</p>}
