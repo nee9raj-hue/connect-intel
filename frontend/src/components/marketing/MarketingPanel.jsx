@@ -889,12 +889,24 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
 
       if (!isWa && enrolled > 0) {
         const sqlQueue = data.mode === 'sql_queue'
-        if (sqlQueue && pending > 0) {
+        if (sqlQueue && pending > 0 && initialSent === 0) {
           setNotice(
             data.workerHint ||
               `Campaign queued — ${enrolled} recipients. Emails send in the background; you can close this tab.`
           )
           await load()
+          return
+        }
+        if (sqlQueue && initialSent > 0) {
+          setNotice(
+            data.workerHint ||
+              `Campaign sending — ${initialSent} sent${initialFailed ? `, ${initialFailed} failed` : ''}${
+                pending > 0 ? `, ${pending} remaining` : ''
+              }.`
+          )
+          if (pending > 0) void load().catch(() => {})
+          else void load().catch(() => {})
+          refreshSavedLeads?.()
           return
         }
         const browserDrain =
@@ -919,11 +931,13 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
           )
           await load()
           return
-        } else if (initialSent === 0 && initialFailed > 0) {
+        } else if (initialSent === 0 && (initialFailed > 0 || enrolled > 0)) {
           setError(
             data.sendResult?.firstError ||
               data.firstError ||
-              'No emails were sent. Connect Work email in the sidebar, then try again.'
+              (enrolled === 0
+                ? 'No eligible recipients. Leads need a valid email and commercial consent.'
+                : 'No emails were sent. Connect Work email in the sidebar, then try again.')
           )
         } else {
           setNotice(
