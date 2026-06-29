@@ -768,7 +768,6 @@ export default function LeadWorkspace({
     try {
       await patchLead(lead.id, { emailConsent: next })
       setNotice(next ? 'Commercial email consent recorded' : 'Commercial email consent removed')
-      await refreshPipelineLead?.(lead.id)
     } catch (e) {
       setError(e.message)
     } finally {

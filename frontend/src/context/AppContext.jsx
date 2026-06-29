@@ -55,6 +55,13 @@ function mergeLightLeadPatch(prev, incoming) {
   return {
     ...prev,
     ...incoming,
+    commercialEmailOptIn:
+      incoming.commercialEmailOptIn ??
+      (incoming.commercialEmailConsentAt ? true : prev.commercialEmailOptIn),
+    commercialEmailConsentAt:
+      incoming.commercialEmailConsentAt ?? prev.commercialEmailConsentAt ?? null,
+    commercialEmailConsentSource:
+      incoming.commercialEmailConsentSource ?? prev.commercialEmailConsentSource ?? null,
     crm: {
       ...prevCrm,
       ...incCrm,
@@ -790,6 +797,9 @@ export function AppProvider({ children }) {
       if (lead) {
         setSavedLeads((current) => mergeLeadInList(current, lead))
       }
+      if (body?.emailConsent !== undefined && String(pipelineLeadId) === String(leadId)) {
+        setPipelineLeadDetailAt(Date.now())
+      }
       if (body?.deal) {
         void api
           .getPipelineSummary({ silent: true })
@@ -801,7 +811,7 @@ export function AppProvider({ children }) {
       setSavedLeads(previous)
       throw error
     }
-  }, [])
+  }, [pipelineLeadId])
 
   const updateSavedLeadCrm = useCallback(
     async (leadId, crmPatch) => patchLead(leadId, { crm: crmPatch }),

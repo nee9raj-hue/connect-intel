@@ -591,7 +591,20 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
         return
       }
       let cancelled = false
-      setWorkspaceLead(listLead)
+      setWorkspaceLead((prev) => {
+        const base = prev?.id === listLead.id ? prev : listLead
+        return {
+          ...base,
+          ...listLead,
+          commercialEmailOptIn:
+            listLead.commercialEmailOptIn ??
+            (listLead.commercialEmailConsentAt ? true : base.commercialEmailOptIn),
+          commercialEmailConsentAt:
+            listLead.commercialEmailConsentAt ?? base.commercialEmailConsentAt ?? null,
+          commercialEmailConsentSource:
+            listLead.commercialEmailConsentSource ?? base.commercialEmailConsentSource ?? null,
+        }
+      })
       api
         .getPipelineLead(pipelineLeadId, { silent: true })
         .then((data) => {
