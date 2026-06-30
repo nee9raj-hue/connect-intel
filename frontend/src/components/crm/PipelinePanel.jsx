@@ -815,10 +815,13 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const filtered = useMemo(() => {
     const base = scopedLeads
     const closingThisMonth = panelOptions?.closing === 'this-month'
+    const serverLocationFilter =
+      serverSidePipeline &&
+      (serverFilters.states?.length > 0 || serverFilters.cities?.length > 0)
     return applyPipelineFilters(base, {
       status: pipelineStatusFilter,
-      cities: getFilterCities(appliedAdvanced),
-      states: getFilterStates(appliedAdvanced),
+      cities: serverLocationFilter ? [] : getFilterCities(appliedAdvanced),
+      states: serverLocationFilter ? [] : getFilterStates(appliedAdvanced),
       contact: appliedAdvanced.contact,
       tagIds: appliedAdvanced.tagIds,
       tagMode: appliedAdvanced.tagMode,
@@ -863,6 +866,9 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     panelOptions?.closing,
     dashboardLeadIds,
     teamMemberIdsForFilter,
+    serverSidePipeline,
+    serverFilters.states,
+    serverFilters.cities,
   ])
 
   const applySmartView = useCallback((view) => {
