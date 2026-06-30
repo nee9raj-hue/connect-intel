@@ -817,8 +817,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     const closingThisMonth = panelOptions?.closing === 'this-month'
     return applyPipelineFilters(base, {
       status: pipelineStatusFilter,
-      cities: serverSidePipeline ? [] : getFilterCities(appliedAdvanced),
-      states: serverSidePipeline ? [] : getFilterStates(appliedAdvanced),
+      cities: getFilterCities(appliedAdvanced),
+      states: getFilterStates(appliedAdvanced),
       contact: appliedAdvanced.contact,
       tagIds: appliedAdvanced.tagIds,
       tagMode: appliedAdvanced.tagMode,

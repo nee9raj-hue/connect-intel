@@ -1,6 +1,7 @@
 import {
   getLeadCityFromFields,
   getLeadStateFromFields,
+  leadMatchesStateFilters,
   locationMatchesField,
   normalizeLocationKey,
 } from '../../../lib/pipelineLeadLocation.js'
@@ -457,7 +458,7 @@ export function applyPipelineFilters(
 
   const stateFilters = Array.isArray(states) ? states : getFilterStates({ state })
   if (stateFilters.length) {
-    list = list.filter((l) => matchesAnyLocationField(getLeadState(l), stateFilters))
+    list = list.filter((l) => leadMatchesStateFilters(l, stateFilters))
   }
 
   if (contact && contact !== 'any') {
