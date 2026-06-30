@@ -520,14 +520,11 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       base = filterRepPipelineLeads(base, user)
     }
     if (!effectiveAssigneeFilter) return base
-    // Large orgs fetch owner-scoped pages from the server; client re-filter drops rows after unfiltered refreshes.
-    if (serverSidePipeline) return base
     return base.filter((l) => leadMatchesAssignee(l, effectiveAssigneeFilter))
   }, [
     marketingSliceLeads,
     pipelineScopedLeads,
     effectiveAssigneeFilter,
-    serverSidePipeline,
     isOrgAdmin,
     isTeamManager,
     user,
@@ -1193,6 +1190,16 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
             ? 'Email consent approved for 1 contact.'
             : `Email consent approved for ${count} contacts.`
         )
+      }
+      if (serverSidePipeline && actions.assignToUserId !== undefined && hasActiveServerFilters) {
+        void loadPipelineList(serverFilters, { append: false, silent: true }).catch(() => {})
+        void refreshPipelineSummary({
+          assigneeUserId: serverFilters.assigneeUserId,
+          tagIds: serverFilters.tagIds,
+          q: serverFilters.q,
+          cities: serverFilters.cities,
+          states: serverFilters.states,
+        })
       }
       setSelectedIds(new Set())
       setBulkAssignOpen(false)
