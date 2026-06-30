@@ -5,6 +5,7 @@ import { defaultCrm } from '../lib/crmConstants'
 import { loadReadNotificationIds, saveReadNotificationIds } from '../lib/notificationStorage'
 import { getNotificationTarget } from '../lib/notificationNavigation'
 import { navTargetToOptions, normalizePipelineSummary } from '../lib/navConfig'
+import { resolvePipelineListAssignee, pipelineUserRoleFlags } from '../lib/pipelineFilters'
 import { withTimeout } from '../lib/fetchWithTimeout'
 import { clearAppNavigationState, preparePostLoginNavigation } from '../lib/appHistory'
 
@@ -292,8 +293,11 @@ export function AppProvider({ children }) {
   const refreshSavedLeads = useCallback(
     async () => {
       try {
-        const assigneeUserId =
-          pipelineAssigneeFilter || loadPipelineAssigneeFilter() || undefined
+        const assigneeUserId = resolvePipelineListAssignee(
+          user,
+          pipelineAssigneeFilter || loadPipelineAssigneeFilter(),
+          pipelineUserRoleFlags(user)
+        )
         const bootstrap = await api.getPipelineBootstrap({
           offset: 0,
           limit: 100,
@@ -326,7 +330,7 @@ export function AppProvider({ children }) {
         return null
       }
     },
-    [pipelineAssigneeFilter]
+    [pipelineAssigneeFilter, user]
   )
 
   const refreshPipelineSummary = useCallback(async (filters = {}) => {
@@ -533,7 +537,11 @@ export function AppProvider({ children }) {
       const run = (async () => {
         try {
           const bootstrapGen = pipelineListFetchGenRef.current
-          const assigneeUserId = loadPipelineAssigneeFilter() || undefined
+          const assigneeUserId = resolvePipelineListAssignee(
+            user,
+            loadPipelineAssigneeFilter(),
+            pipelineUserRoleFlags(user)
+          )
           const [bootstrap, historyResult] = await Promise.all([
             api.getPipelineBootstrap({ offset: 0, limit: 100, silent: true, assigneeUserId }),
             api.getSearchHistory({ silent: true }),

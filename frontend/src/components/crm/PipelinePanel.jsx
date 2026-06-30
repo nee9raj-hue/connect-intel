@@ -33,6 +33,7 @@ import {
   leadMatchesAssignee,
   normalizeLocationKey,
   pipelineServerFilterExtras,
+  resolvePipelineListAssignee,
 } from '../../lib/pipelineFilters'
 import { tagMapById } from '../../lib/orgLeadTags'
 import { leadHasCallablePhone } from '../../lib/phoneUtils'
@@ -665,13 +666,16 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       q: q || undefined,
       cities: getFilterCities(adv).length ? getFilterCities(adv) : undefined,
       states: getFilterStates(adv).length ? getFilterStates(adv) : undefined,
-      assigneeUserId: effectiveAssigneeFilter || undefined,
+      assigneeUserId: resolvePipelineListAssignee(user, effectiveAssigneeFilter, {
+        isOrgAdmin,
+        isTeamManager,
+      }),
       teamId: panelOptions?.teamId || undefined,
       tagIds: adv.tagIds?.length ? adv.tagIds : undefined,
       tagMode: adv.tagMode || 'any',
       ...pipelineServerFilterExtras(adv, smartViewFilters),
     }),
-    [filter, listStatusFilter, effectiveAssigneeFilter, smartViewFilters, panelOptions?.teamId]
+    [filter, listStatusFilter, effectiveAssigneeFilter, smartViewFilters, panelOptions?.teamId, user, isOrgAdmin, isTeamManager]
   )
 
   const serverFilters = useMemo(
