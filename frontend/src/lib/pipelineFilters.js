@@ -8,6 +8,7 @@ import {
   isPipelineLeadUnassigned,
   pipelineEntryMatchesOwnerFilter,
   pipelineOwnerUserId,
+  repPipelineEntryVisible,
 } from '../../../lib/pipelineOwner.js'
 import { leadHasSendableEmail, leadDisplayName, leadEmailBounced } from './emailUtils'
 
@@ -99,48 +100,12 @@ export function leadMatchesAssignee(lead, assigneeUserId) {
 }
 
 /** Rep safety net: own assigned leads only (unassigned pool has its own folder). */
-export function isCompanyPipelineRep(user, { isOrgAdmin = false, isTeamManager = false } = {}) {
-  return Boolean(
-    user?.accountType === 'company' && user?.organizationId && user?.id && !isOrgAdmin && !isTeamManager
-  )
-}
-
-/** Server assignee filter for pipeline APIs — reps default to self; admins/managers use nav filter. */
-export function pipelineUserRoleFlags(user) {
-  const isOrgAdmin = Boolean(
-    (user?.isOrgAdmin || user?.orgRole === 'org_admin') && user?.accountType === 'company'
-  )
-  const isTeamManager = Boolean(
-    user?.accountType === 'company' && !isOrgAdmin && user?.pipelineRole === 'manager'
-  )
-  return { isOrgAdmin, isTeamManager }
-}
-
-export function resolvePipelineListAssignee(user, assigneeFilter, roleFlags = {}) {
-  const flags =
-    roleFlags.isOrgAdmin != null || roleFlags.isTeamManager != null
-      ? roleFlags
-      : pipelineUserRoleFlags(user)
-  const filter = assigneeFilter != null && String(assigneeFilter).trim() !== '' ? String(assigneeFilter).trim() : null
-  if (filter === '__unassigned__') return '__unassigned__'
-  if (isCompanyPipelineRep(user, flags)) return filter || String(user.id)
-  return filter || undefined
-}
-
 export function filterRepPipelineLeads(leads, user, { isOrgAdmin = false, isTeamManager = false } = {}) {
   if (!user?.id || user.accountType !== 'company') return leads || []
-  if (isOrgAdmin || isTeamManager) {
-    return (leads || []).filter((lead) => !isPipelineLeadUnassigned(lead))
-  }
-  const uid = String(user.id)
-  return (leads || []).filter((lead) => {
-    if (isPipelineLeadUnassigned(lead)) return false
-    const assigned = lead.assignedToUserId
-    if (assigned != null && String(assigned).trim() !== '') {
-      return String(assigned) === uid
-    }
-    return pipelineOwnerUserId(lead) === uid
-  })
+  if (isOrgAdmin || isTeamManager) return (leads || []).filter((lead) => !isPipelineLeadUnassigned(lead))
+  return (leads || []).filter(
+    (lead) => !isPipelineLeadUnassigned(lead) && repPipelineEntryVisible(lead, user.id)
+  )
 }
 
 function matchesAnyLocationField(value, filterList) {
