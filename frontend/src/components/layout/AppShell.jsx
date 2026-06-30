@@ -142,8 +142,7 @@ export default function AppShell() {
       setPanelOptions(resolved)
       setMobileNavOpen(false)
       const assigneeId = resolved.assigneeUserId || resolved.userId
-      if (resolved.clearAssignee) setPipelineAssigneeFilter(null)
-      else if (assigneeId) setPipelineAssigneeFilter(assigneeId)
+      if (assigneeId) setPipelineAssigneeFilter(assigneeId)
       const normalizedLeadId = normalizeLeadId(leadId)
       if (normalizedLeadId) openPipelineLead(normalizedLeadId)
       else setPipelineLeadId(null)

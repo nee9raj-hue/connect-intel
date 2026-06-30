@@ -5,7 +5,6 @@ import {
   normalizeLocationKey,
 } from '../../../lib/pipelineLeadLocation.js'
 import {
-  isPipelineLeadUnassigned,
   pipelineEntryMatchesOwnerFilter,
   pipelineOwnerUserId,
   repPipelineEntryVisible,
@@ -99,13 +98,11 @@ export function leadMatchesAssignee(lead, assigneeUserId) {
   return pipelineEntryMatchesOwnerFilter(lead, assigneeUserId)
 }
 
-/** Rep safety net: own assigned leads only (unassigned pool has its own folder). */
+/** Rep safety net: own leads + open pool (no indexed owner). */
 export function filterRepPipelineLeads(leads, user, { isOrgAdmin = false, isTeamManager = false } = {}) {
   if (!user?.id || user.accountType !== 'company') return leads || []
-  if (isOrgAdmin || isTeamManager) return (leads || []).filter((lead) => !isPipelineLeadUnassigned(lead))
-  return (leads || []).filter(
-    (lead) => !isPipelineLeadUnassigned(lead) && repPipelineEntryVisible(lead, user.id)
-  )
+  if (isOrgAdmin || isTeamManager) return leads || []
+  return (leads || []).filter((lead) => repPipelineEntryVisible(lead, user.id))
 }
 
 function matchesAnyLocationField(value, filterList) {
