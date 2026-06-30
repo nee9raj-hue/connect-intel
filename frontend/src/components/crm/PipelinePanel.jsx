@@ -237,7 +237,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     }
     if (panelOptions?.scopeOwner === 'me' && user?.id) return String(user.id)
     if (isTeamManager) return null
-    // Reps: null = my assigned leads + team unassigned pool (server-scoped)
+    // Reps: scoped to own assigned leads; unassigned pool is a separate nav folder.
     return null
   }, [
     pipelineAssigneeFilter,
@@ -483,6 +483,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   }, [bulkNotice])
 
   const assigneeName = useMemo(() => {
+    if (effectiveAssigneeFilter === '__unassigned__') return 'Unassigned'
     if (!effectiveAssigneeFilter) return null
     const m = teamMembers.find((t) => String(t.userId) === String(effectiveAssigneeFilter))
     if (m?.name) return m.name

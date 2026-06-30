@@ -17,18 +17,24 @@ export function countPipelineByStatus(leads = []) {
 export function pipelineCountsFromSummary(pipelineSummary, savedLeads = []) {
   if (Array.isArray(pipelineSummary?.byStatus) && pipelineSummary.byStatus.length) {
     const counts = { all: Number(pipelineSummary.total) || 0 }
+    counts.unassigned = Number(pipelineSummary.unassignedTotal) || 0
     for (const row of pipelineSummary.byStatus) {
       if (row?.status) counts[row.status] = Number(row.count) || 0
     }
     return counts
   }
-  return countPipelineByStatus(savedLeads)
+  const counts = countPipelineByStatus(savedLeads)
+  counts.unassigned = (savedLeads || []).filter(
+    (lead) => !lead.assignedToUserId || String(lead.assignedToUserId).trim() === ''
+  ).length
+  return counts
 }
 
 /** Preserve deal-count fields from GET /api/saved-leads?summary=1 */
 export function normalizePipelineSummary(summary = {}) {
   return {
     total: summary.total ?? 0,
+    unassignedTotal: summary.unassignedTotal ?? 0,
     byStatus: summary.byStatus || [],
     cities: summary.cities || [],
     states: summary.states || [],
@@ -61,6 +67,8 @@ export function pipelineSidebarNavOptions(target = {}) {
     return options
   }
   if (target.status) options.status = target.status
+  if (target.assigneeUserId) options.assigneeUserId = target.assigneeUserId
+  if (target.clearAssignee) options.clearAssignee = true
   return options
 }
 
@@ -106,6 +114,8 @@ export function navTargetToOptions(target = {}) {
   if (target.openedCampaignId) options.openedCampaignId = target.openedCampaignId
   if (target.clickedCampaignId) options.clickedCampaignId = target.clickedCampaignId
   if (target.marketingTab) options.marketingTab = target.marketingTab
+  if (target.assigneeUserId) options.assigneeUserId = target.assigneeUserId
+  if (target.clearAssignee) options.clearAssignee = true
   return options
 }
 
@@ -132,8 +142,14 @@ export function isNavTargetActive(activePanel, panelOptions, target) {
       const targetStage = target.dealStage || 'all'
       return stage === targetStage
     }
+    const panelAssignee = panelOptions?.assigneeUserId || null
+    const targetAssignee = target.assigneeUserId || null
+    if (targetAssignee === '__unassigned__') {
+      return panelAssignee === '__unassigned__' && (panelOptions?.status || 'all') === (target.status || 'all')
+    }
+    if (panelAssignee === '__unassigned__') return false
     if (target.status && (panelOptions?.status || 'all') !== target.status) return false
-    if (!target.status) return (panelOptions?.status || 'all') === 'all'
+    if (!target.status) return (panelOptions?.status || 'all') === 'all' && !panelAssignee
     return true
   }
 
@@ -170,7 +186,17 @@ function buildFreightPipelineChildren(columns, pipelineCounts, openDealCounts = 
           panel: 'pipeline',
           status: 'all',
           view: 'leads',
+          clearAssignee: true,
           badge: pipelineCounts.all,
+        },
+        {
+          id: 'pipeline-unassigned',
+          label: 'Unassigned',
+          panel: 'pipeline',
+          status: 'all',
+          view: 'leads',
+          assigneeUserId: '__unassigned__',
+          badge: pipelineCounts.unassigned || null,
         },
         ...columns.map((col) => ({
           id: `pipeline-${col.id}-leads`,
@@ -245,7 +271,17 @@ function buildStandardPipelineChildren(
           panel: 'pipeline',
           status: 'all',
           view: 'leads',
+          clearAssignee: true,
           badge: pipelineCounts.all,
+        },
+        {
+          id: 'pipeline-unassigned',
+          label: 'Unassigned',
+          panel: 'pipeline',
+          status: 'all',
+          view: 'leads',
+          assigneeUserId: '__unassigned__',
+          badge: pipelineCounts.unassigned || null,
         },
         ...columns.map((col) => ({
           id: `pipeline-${col.id}-leads`,
