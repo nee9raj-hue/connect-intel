@@ -948,6 +948,15 @@ export function AppProvider({ children }) {
     return data
   }, [])
 
+  const bulkDeletePipeline = useCallback(async (leadIds) => {
+    const data = await api.bulkDeletePipeline({ leadIds })
+    const removed = new Set((data.deletedIds || []).map(String))
+    if (removed.size) {
+      setSavedLeads((current) => current.filter((lead) => !removed.has(String(lead.id))))
+    }
+    return data
+  }, [])
+
   const syncEmailThread = useCallback(async (leadId) => {
     const data = await api.syncCrmEmailThread(leadId)
     if (data.lead) {
@@ -1117,6 +1126,7 @@ export function AppProvider({ children }) {
         logCrmEmailSend,
         sendBulkEmail,
         bulkUpdatePipeline,
+        bulkDeletePipeline,
         syncEmailThread,
         logEmailReply,
         generateWhatsAppDraft,

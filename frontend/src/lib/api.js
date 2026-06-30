@@ -809,6 +809,8 @@ export const api = {
     request(`/api/team/mention-leads?q=${encodeURIComponent(q)}&limit=12`),
   bulkUpdatePipeline: (payload) =>
     request('/api/crm/bulk-update', { method: 'POST', body: payload, timeoutMs: 90_000 }),
+  bulkDeletePipeline: (payload) =>
+    request('/api/crm/bulk-delete', { method: 'POST', body: payload, timeoutMs: 120_000 }),
   syncCrmEmailThread: (leadId) =>
     request('/api/crm/sync-email-thread', { method: 'POST', body: { leadId } }),
   logCrmEmailReply: (leadId, payload) =>

@@ -100,6 +100,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     teamMembers,
     refreshTeam,
     bulkUpdatePipeline,
+    bulkDeletePipeline,
     patchLead,
     orgLeadTags,
     notifications,
@@ -1567,21 +1568,43 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               onClear={() => setSelectedIds(new Set())}
               onExport={() => downloadLeadsCsv(selectedLeads)}
               onDelete={async () => {
+                const n = selectedIds.size
                 if (
                   !window.confirm(
-                    `Remove ${selectedIds.size} lead${selectedIds.size === 1 ? '' : 's'} from pipeline?`
+                    `Permanently remove ${n} lead${n === 1 ? '' : 's'} from the pipeline? This cannot be undone.`
                   )
                 ) {
                   return
                 }
                 setBulkBusy(true)
                 try {
-                  for (const id of selectedIds) {
-                    const lead = findLeadInLists(id)
-                    if (lead) await toggleSaveLead(lead)
-                  }
+                  const data = await bulkDeletePipeline([...selectedIds])
                   setSelectedIds(new Set())
-                  await refreshSavedLeads()
+                  const deleted = data.deleted ?? 0
+                  const skipped = data.skipped ?? 0
+                  if (deleted > 0) {
+                    setBulkNotice(
+                      skipped > 0
+                        ? `Removed ${deleted} lead${deleted === 1 ? '' : 's'} (${skipped} skipped — no permission or not found).`
+                        : `Removed ${deleted} lead${deleted === 1 ? '' : 's'} from pipeline.`
+                    )
+                  } else {
+                    window.alert('No leads were removed. You may not have permission for the selected rows.')
+                  }
+                  if (serverSidePipeline && hasActiveServerFilters) {
+                    void loadPipelineList(serverFilters, { append: false, silent: true }).catch(() => {})
+                    void refreshPipelineSummary({
+                      assigneeUserId: serverFilters.assigneeUserId,
+                      tagIds: serverFilters.tagIds,
+                      q: serverFilters.q,
+                      cities: serverFilters.cities,
+                      states: serverFilters.states,
+                    })
+                  } else {
+                    await refreshSavedLeads()
+                  }
+                } catch (e) {
+                  window.alert(e.message || 'Bulk delete failed')
                 } finally {
                   setBulkBusy(false)
                 }
