@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-07-01T18:55:05.031Z",
-  "updatedAtIst": "02/07/2026, 00:25:05",
+  "updatedAt": "2026-07-01T19:06:13.351Z",
+  "updatedAtIst": "02/07/2026, 00:36:13",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "94619ac",
+  "currentProductionCommit": "135b030",
   "entries": [
+    {
+      "logId": "20260702-0036-135b030",
+      "commit": "135b030",
+      "commitFull": "135b030d8344be6314fe52a49e3872c41dfba4bc",
+      "message": "Ship Deploy 4: workflow runs, inactivity triggers, and audit log UI.",
+      "deployedAt": "2026-07-01T19:06:03.019Z",
+      "deployedAtIst": "02/07/2026, 00:36:03",
+      "committedAtIst": "02/07/2026, 00:35:29",
+      "vercelPreviewUrl": "https://connect-intel-5t99whwwl-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 135b030"
+    },
+    {
+      "logId": "20260702-0026-9a95c23",
+      "commit": "9a95c23",
+      "commitFull": "9a95c235d8df840bdc68fc1214997a27418c6f86",
+      "message": "Update production log for Deploy 3 (94619ac).",
+      "deployedAt": "2026-07-01T18:56:00.499Z",
+      "deployedAtIst": "02/07/2026, 00:26:00",
+      "committedAtIst": "02/07/2026, 00:25:28",
+      "vercelPreviewUrl": "https://connect-intel-2q59ow73u-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 9a95c23"
+    },
     {
       "logId": "20260702-0024-94619ac",
       "commit": "94619ac",
@@ -15,7 +43,7 @@
       "committedAtIst": "02/07/2026, 00:24:16",
       "vercelPreviewUrl": "https://connect-intel-rc3p3k61c-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 94619ac"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- ccd8fd6"
-    },
-    {
-      "logId": "20260701-2217-54a9de5",
-      "commit": "54a9de5",
-      "commitFull": "54a9de508f6ca9510e880c1ae3d7f01eb8040288",
-      "message": "Update production log after P1 RBAC and bootstrap deploy.",
-      "deployedAt": "2026-07-01T16:47:30.765Z",
-      "deployedAtIst": "01/07/2026, 22:17:30",
-      "committedAtIst": "01/07/2026, 22:16:52",
-      "vercelPreviewUrl": "https://connect-intel-1098jjnyl-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 54a9de5"
-    },
-    {
-      "logId": "20260701-2216-d55cdf7",
-      "commit": "d55cdf7",
-      "commitFull": "d55cdf7cda51b15368dd4664106c892ced49db65",
-      "message": "Enforce P1 RBAC and speed up pipeline bootstrap for new orgs.",
-      "deployedAt": "2026-07-01T16:46:39.484Z",
-      "deployedAtIst": "01/07/2026, 22:16:39",
-      "committedAtIst": "01/07/2026, 22:16:08",
-      "vercelPreviewUrl": "https://connect-intel-gsyppqixe-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- d55cdf7"
     }
   ]
 }
