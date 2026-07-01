@@ -3,7 +3,7 @@ import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import {
   C,
-  SETTINGS_TABS,
+  getVisibleSettingsTabs,
   normalizeSettingsTab,
 } from './settings/settingsTheme'
 import { PrimaryButton, Toast } from './settings/SettingsUi'
@@ -180,7 +180,7 @@ export default function TeamPanel({ onNavigate, panelOptions = {} }) {
             borderTop: `0.5px solid ${C.border}`,
           }}
         >
-          {SETTINGS_TABS.map((tab) => {
+          {getVisibleSettingsTabs().map((tab) => {
             const isActive = activeTab === tab.id
             return (
               <button

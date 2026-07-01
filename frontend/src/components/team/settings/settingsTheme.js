@@ -1,4 +1,5 @@
 import { brand } from '../../../lib/brandTokens'
+import { BILLING_IN_CRM_UI_ENABLED } from '../../../lib/crmProductFlags'
 
 /** Shared tokens for Org Admin / Settings hub (HubSpot-style). */
 
@@ -82,8 +83,17 @@ export const SETTINGS_TABS = [
   { id: 'billing', label: 'Billing' },
 ]
 
+export function getVisibleSettingsTabs() {
+  return SETTINGS_TABS.map((tab) =>
+    tab.id === 'billing' && !BILLING_IN_CRM_UI_ENABLED
+      ? { ...tab, label: 'Workspace' }
+      : tab
+  )
+}
+
 export function normalizeSettingsTab(tab) {
   if (!tab || tab === 'team') return 'members'
   if (tab === 'hierarchy') return 'teams'
+  if (tab === 'workspace' && !BILLING_IN_CRM_UI_ENABLED) return 'billing'
   return tab
 }

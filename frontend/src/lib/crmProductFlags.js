@@ -11,3 +11,6 @@ export const CREDITS_IN_CRM_UI_ENABLED = false
 
 /** Post-onboarding Gmail connect modal — off until Google sensitive-scope verification is approved. */
 export const GMAIL_ONBOARDING_PROMPT_ENABLED = false
+
+/** Paid plans, Stripe, invoices, and subscription chip — CRM go-live is included/free. */
+export const BILLING_IN_CRM_UI_ENABLED = false

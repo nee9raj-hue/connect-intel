@@ -1,7 +1,7 @@
 import { useApp } from '../../context/AppContext'
 import NotificationBell from './NotificationBell'
 import SidebarToggleButton from './SidebarToggleButton'
-import { CREDITS_IN_CRM_UI_ENABLED } from '../../lib/crmProductFlags'
+import { BILLING_IN_CRM_UI_ENABLED, CREDITS_IN_CRM_UI_ENABLED } from '../../lib/crmProductFlags'
 
 export default function AppHeader({
   onNavigate,
@@ -43,35 +43,37 @@ export default function AppHeader({
             <span className="sm:hidden tabular-nums">Rs {credits}</span>
           </button>
         ) : null}
-        <button
-          type="button"
-          onClick={() => onNavigate?.('team')}
-          className={`ci-app-header-chip ci-app-header-chip--secondary inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1.5 md:px-3 text-sm font-semibold tracking-[-0.015em] transition-colors ${
-            subscriptionActive
-              ? 'border-[#b8e3d2] bg-[#eefaf5] text-[#0f6a4c]'
-              : 'border-[#d9dee5] bg-white text-[#536072] hover:bg-[#f7f9fb]'
-          }`}
-          title={
-            subscriptionActive
-              ? 'Paid subscription active'
-              : 'Core CRM is free for your workspace'
-          }
-          aria-label={
-            subscriptionActive
-              ? 'Subscription active'
-              : crmFree
-                ? 'CRM free mode'
-                : 'Subscription inactive'
-          }
-        >
-          <span
-            className={`w-1.5 h-1.5 rounded-full ${subscriptionActive ? 'bg-[#0f6a4c]' : 'bg-[#7f8b99]'}`}
-          />
-          <span className="hidden sm:inline">
-            Subscription: {subscriptionActive ? 'Active' : crmFree ? 'CRM free mode' : 'Inactive'}
-          </span>
-          <span className="sm:hidden">{subscriptionActive ? 'Pro' : crmFree ? 'Free' : 'Off'}</span>
-        </button>
+        {BILLING_IN_CRM_UI_ENABLED ? (
+          <button
+            type="button"
+            onClick={() => onNavigate?.('team')}
+            className={`ci-app-header-chip ci-app-header-chip--secondary inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1.5 md:px-3 text-sm font-semibold tracking-[-0.015em] transition-colors ${
+              subscriptionActive
+                ? 'border-[#b8e3d2] bg-[#eefaf5] text-[#0f6a4c]'
+                : 'border-[#d9dee5] bg-white text-[#536072] hover:bg-[#f7f9fb]'
+            }`}
+            title={
+              subscriptionActive
+                ? 'Paid subscription active'
+                : 'Core CRM is free for your workspace'
+            }
+            aria-label={
+              subscriptionActive
+                ? 'Subscription active'
+                : crmFree
+                  ? 'CRM free mode'
+                  : 'Subscription inactive'
+            }
+          >
+            <span
+              className={`w-1.5 h-1.5 rounded-full ${subscriptionActive ? 'bg-[#0f6a4c]' : 'bg-[#7f8b99]'}`}
+            />
+            <span className="hidden sm:inline">
+              Subscription: {subscriptionActive ? 'Active' : crmFree ? 'CRM free mode' : 'Inactive'}
+            </span>
+            <span className="sm:hidden">{subscriptionActive ? 'Pro' : crmFree ? 'Free' : 'Off'}</span>
+          </button>
+        ) : null}
       </div>
     </header>
   )
