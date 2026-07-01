@@ -7,6 +7,11 @@ import { getNotificationTarget } from '../lib/notificationNavigation'
 import { navTargetToOptions, normalizePipelineSummary } from '../lib/navConfig'
 import { withTimeout } from '../lib/fetchWithTimeout'
 import { clearAppNavigationState, preparePostLoginNavigation } from '../lib/appHistory'
+import {
+  pipelineBootstrapCacheKey,
+  readBootstrapCache,
+  writeBootstrapCache,
+} from '../lib/bootstrapCache'
 import { CHITHI_IN_CRM_ENABLED } from '../lib/crmProductFlags'
 
 const AppContext = createContext(null)
@@ -539,6 +544,29 @@ export function AppProvider({ children }) {
         try {
           const bootstrapGen = pipelineListFetchGenRef.current
           const assigneeUserId = loadPipelineAssigneeFilter() || undefined
+          const cacheKey = pipelineBootstrapCacheKey(user, { assigneeUserId })
+          const cachedBootstrap = readBootstrapCache(cacheKey)
+
+          if (cachedBootstrap?.data && !cancelled) {
+            const cached = cachedBootstrap.data
+            const leads = cached.leads || []
+            const summary = cached.summary || {}
+            setPipelineSummary(normalizePipelineSummary(summary))
+            if (!cachedBootstrap.stale) {
+              setSavedLeads(leads)
+              setPipelineLoad({
+                total: cached.total ?? summary.total ?? cached.pipelineTotal ?? leads.length,
+                loaded: leads.length,
+                hasMore: Boolean(cached.hasMore),
+                loadingMore: false,
+              })
+              loadedCountRef.current = leads.length
+              pipelineCursorRef.current = cached.nextCursor || null
+              workspaceLoadedAtRef.current = Date.now()
+              setWorkspaceReady(true)
+            }
+          }
+
           const teamPromise =
             user.organizationId && user.accountType === 'company'
               ? api.getTeamMembers({ silent: true })
@@ -551,6 +579,8 @@ export function AppProvider({ children }) {
           ])
 
           if (cancelled) return
+
+          writeBootstrapCache(cacheKey, bootstrap)
 
           const leads = bootstrap.leads || []
           const summary = bootstrap.summary || {}

@@ -1326,16 +1326,26 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     URL.revokeObjectURL(url)
   }, [])
 
+  const canExportLeads =
+    !user?.organizationId ||
+    user?.accountType !== 'company' ||
+    !user?.orgPermissions ||
+    Boolean(user.orgPermissions.export_leads)
+
   const exportVisibleLeads = useCallback(() => {
     const rows = filtered
     if (!rows.length) return
+    if (!canExportLeads) {
+      setBulkNotice('Export is disabled for your role. Ask your admin in Team → Permissions.')
+      return
+    }
     const mode = evaluateExport(rows.length, user, policies)
     if (mode === 'instant') {
       downloadLeadsCsv(rows)
       return
     }
     setExportGuard({ open: true, mode, preparing: mode === 'background' })
-  }, [filtered, user, policies, downloadLeadsCsv])
+  }, [filtered, user, policies, downloadLeadsCsv, canExportLeads])
 
   const runProtectedExport = useCallback(() => {
     const rows = filtered
@@ -1566,7 +1576,13 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               emailCount={selectedEmailCount}
               phoneCount={selectedPhoneCount}
               onClear={() => setSelectedIds(new Set())}
-              onExport={() => downloadLeadsCsv(selectedLeads)}
+              onExport={() => {
+                if (!canExportLeads) {
+                  setBulkNotice('Export is disabled for your role. Ask your admin in Team → Permissions.')
+                  return
+                }
+                downloadLeadsCsv(selectedLeads)
+              }}
               onDelete={async () => {
                 const n = selectedIds.size
                 if (
