@@ -543,6 +543,21 @@ export const api = {
   getOrgPermissions: () => request('/api/org/permissions'),
   updateOrgPermission: (body) =>
     request('/api/org/permissions', { method: 'PUT', body }),
+  getOrgAuditLog: ({ limit = 50, action } = {}) => {
+    const params = new URLSearchParams()
+    if (limit) params.set('limit', String(limit))
+    if (action) params.set('action', action)
+    const q = params.toString()
+    return request(`/api/org/audit-log${q ? `?${q}` : ''}`)
+  },
+  getWorkflowRuns: ({ limit = 50, trigger, leadId } = {}) => {
+    const params = new URLSearchParams()
+    if (limit) params.set('limit', String(limit))
+    if (trigger) params.set('trigger', trigger)
+    if (leadId) params.set('leadId', leadId)
+    const q = params.toString()
+    return request(`/api/workflow/runs${q ? `?${q}` : ''}`)
+  },
   getActiveTradingOverview: () => request('/api/org/active-trading'),
   importActiveTrading: (body) =>
     request('/api/org/active-trading', { method: 'POST', body }),

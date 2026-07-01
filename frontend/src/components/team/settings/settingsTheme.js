@@ -78,6 +78,7 @@ export const SETTINGS_TABS = [
   { id: 'members', label: 'Team members' },
   { id: 'teams', label: 'Teams & departments' },
   { id: 'permissions', label: 'Permissions' },
+  { id: 'audit', label: 'Audit log' },
   { id: 'integrations', label: 'Integrations' },
   { id: 'import', label: 'Import leads' },
   { id: 'billing', label: 'Billing' },

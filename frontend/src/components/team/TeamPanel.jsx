@@ -11,6 +11,7 @@ import InviteMemberDrawer from './settings/InviteMemberDrawer'
 import TeamMembersTab from './settings/TeamMembersTab'
 import TeamsDepartmentsTab from './settings/TeamsDepartmentsTab'
 import PermissionsTab from './settings/PermissionsTab'
+import AuditLogTab from './settings/AuditLogTab'
 import IntegrationsTab from './settings/IntegrationsTab'
 import ImportLeadsTab from './settings/ImportLeadsTab'
 import BillingTab from './settings/BillingTab'
@@ -243,6 +244,9 @@ export default function TeamPanel({ onNavigate, panelOptions = {} }) {
           )}
           {activeTab === 'permissions' && (
             <PermissionsTab teamMembers={teamMembers} />
+          )}
+          {activeTab === 'audit' && (
+            <AuditLogTab teamMembers={teamMembers} />
           )}
           {activeTab === 'integrations' && (
             <IntegrationsTab onNavigate={onNavigate} />
