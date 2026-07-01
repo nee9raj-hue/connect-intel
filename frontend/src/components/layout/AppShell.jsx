@@ -27,7 +27,6 @@ import { GMAIL_ONBOARDING_PROMPT_ENABLED } from '../../lib/crmProductFlags'
 import ConnectAssistant from '../assistant/ConnectAssistant'
 import CommandPalette from '../platform/CommandPalette'
 import MobileNavPill from './MobileNavPill'
-import DesktopNavPill from './DesktopNavPill'
 import EmailSendDock from '../crm/EmailSendDock'
 import NotificationBell from './NotificationBell'
 import useIsMobile from '../../hooks/useIsMobile'
@@ -417,11 +416,7 @@ export default function AppShell() {
           visible={mobilePillVisible}
         />
       )}
-      <DesktopNavPill
-        activePanel={activePanel}
-        panelOptions={panelOptions}
-        onNavigate={navigate}
-      />
+
       {user && !user.isPlatformAdmin && !needsOnboarding && (
         <EmailSendDock sidebarMode={sidebarMode} onNavigate={navigate} />
       )}
