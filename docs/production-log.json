@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-07-01T17:28:11.144Z",
-  "updatedAtIst": "01/07/2026, 22:58:11",
+  "updatedAt": "2026-07-01T17:37:59.711Z",
+  "updatedAtIst": "01/07/2026, 23:07:59",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "45b3250",
+  "currentProductionCommit": "b3264c7",
   "entries": [
+    {
+      "logId": "20260701-2307-b3264c7",
+      "commit": "b3264c7",
+      "commitFull": "b3264c7df0589e8b0bff9aa54d68e19e547a3620",
+      "message": "Add enterprise dashboard P2: customizable widgets, live pulse, and Opportunities hub.",
+      "deployedAt": "2026-07-01T17:37:49.420Z",
+      "deployedAtIst": "01/07/2026, 23:07:49",
+      "committedAtIst": "01/07/2026, 23:07:05",
+      "vercelPreviewUrl": "https://connect-intel-2j8yne4um-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- b3264c7"
+    },
+    {
+      "logId": "20260701-2258-74ee142",
+      "commit": "74ee142",
+      "commitFull": "74ee1425d813280a35a61a4d79721a2cd314f983",
+      "message": "Update production log after enterprise dashboard UI deploy.",
+      "deployedAt": "2026-07-01T17:28:42.192Z",
+      "deployedAtIst": "01/07/2026, 22:58:42",
+      "committedAtIst": "01/07/2026, 22:58:11",
+      "vercelPreviewUrl": "https://connect-intel-694ra8jbd-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 74ee142"
+    },
     {
       "logId": "20260701-2257-45b3250",
       "commit": "45b3250",
@@ -15,7 +43,7 @@
       "committedAtIst": "01/07/2026, 22:57:26",
       "vercelPreviewUrl": "https://connect-intel-bedfdcaex-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 45b3250"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 465c54f"
-    },
-    {
-      "logId": "20260701-1502-d1c0373",
-      "commit": "d1c0373",
-      "commitFull": "d1c0373be4afabb91baed6d654cf8f8efaf6ae02",
-      "message": "Hide subscription UI during CRM go-live and show included workspace tab.",
-      "deployedAt": "2026-07-01T09:32:57.869Z",
-      "deployedAtIst": "01/07/2026, 15:02:57",
-      "committedAtIst": "01/07/2026, 15:02:22",
-      "vercelPreviewUrl": "https://connect-intel-ej9kzk0fv-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- d1c0373"
-    },
-    {
-      "logId": "20260701-1452-59e7693",
-      "commit": "59e7693",
-      "commitFull": "59e769367da19f458d286ad55ed4c0af85defea1",
-      "message": "Focus CRM on core workflow: email signup, no onboarding Gmail prompt.",
-      "deployedAt": "2026-07-01T09:22:03.096Z",
-      "deployedAtIst": "01/07/2026, 14:52:03",
-      "committedAtIst": "01/07/2026, 14:51:25",
-      "vercelPreviewUrl": "https://connect-intel-3ikalathf-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 59e7693"
     }
   ]
 }

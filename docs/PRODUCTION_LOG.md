@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 33f9985
+npm run prod:rollback -- 74ee142
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 33f9985
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `45b3250` |
-| Log updated (IST) | 01/07/2026, 22:58:11 |
+| Commit | `b3264c7` |
+| Log updated (IST) | 01/07/2026, 23:07:59 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 33f9985
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 01/07/2026, 22:57:59 | `45b3250` | Upgrade home dashboard to enterprise CRM layout and UX. | [preview](https://connect-intel-bedfdcaex-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 45b3250` | **← LIVE**
+| 01/07/2026, 23:07:49 | `b3264c7` | Add enterprise dashboard P2: customizable widgets, live pulse, and Opportunities hub. | [preview](https://connect-intel-2j8yne4um-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b3264c7` | **← LIVE**
+| 01/07/2026, 22:58:42 | `74ee142` | Update production log after enterprise dashboard UI deploy. | [preview](https://connect-intel-694ra8jbd-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 74ee142` |
+| 01/07/2026, 22:57:59 | `45b3250` | Upgrade home dashboard to enterprise CRM layout and UX. | [preview](https://connect-intel-bedfdcaex-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 45b3250` |
 | 01/07/2026, 22:36:20 | `33f9985` | Update production log after enterprise dashboard deploy. | [preview](https://connect-intel-fq1qraxam-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 33f9985` |
 | 01/07/2026, 22:35:36 | `ccd8fd6` | Align manager dashboard with enterprise snapshot architecture. | [preview](https://connect-intel-mok8r1neh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ccd8fd6` |
 | 01/07/2026, 22:17:30 | `54a9de5` | Update production log after P1 RBAC and bootstrap deploy. | [preview](https://connect-intel-1098jjnyl-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 54a9de5` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 33f9985
 | 01/07/2026, 15:47:34 | `e7615bf` | Remove desktop floating Nav pill; sidebar remains primary navigation. | [preview](https://connect-intel-8ev2cge0d-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e7615bf` |
 | 01/07/2026, 15:31:17 | `7951641` | Run solo CRM on free infra only: skip crons and paid API paths. | [preview](https://connect-intel-hlqka4ric-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7951641` |
 | 01/07/2026, 15:08:07 | `465c54f` | Enforce solo free CRM tier and strip paid plan signals from user sessions. | [preview](https://connect-intel-dl1t6n37r-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 465c54f` |
-| 01/07/2026, 15:02:57 | `d1c0373` | Hide subscription UI during CRM go-live and show included workspace tab. | [preview](https://connect-intel-ej9kzk0fv-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d1c0373` |
-| 01/07/2026, 14:52:03 | `59e7693` | Focus CRM on core workflow: email signup, no onboarding Gmail prompt. | [preview](https://connect-intel-3ikalathf-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 59e7693` |
 
 ---
 
