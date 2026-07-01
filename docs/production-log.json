@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-07-01T10:39:42.291Z",
-  "updatedAtIst": "01/07/2026, 16:09:42",
+  "updatedAt": "2026-07-01T10:54:04.392Z",
+  "updatedAtIst": "01/07/2026, 16:24:04",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "701ef11",
+  "currentProductionCommit": "4f56ffc",
   "entries": [
+    {
+      "logId": "20260701-1623-4f56ffc",
+      "commit": "4f56ffc",
+      "commitFull": "4f56ffc45a8f3fc5218ab55c096525cd59f491fc",
+      "message": "Restore Google sign-in on auth login tab for existing workspaces.",
+      "deployedAt": "2026-07-01T10:53:37.675Z",
+      "deployedAtIst": "01/07/2026, 16:23:37",
+      "committedAtIst": "01/07/2026, 16:23:04",
+      "vercelPreviewUrl": "https://connect-intel-ay8jua9zf-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 4f56ffc"
+    },
+    {
+      "logId": "20260701-1610-8f6e7e6",
+      "commit": "8f6e7e6",
+      "commitFull": "8f6e7e6f7cbc7e10a39cc69a151cf78caa574775",
+      "message": "Update production log after landing page redesign deploy.",
+      "deployedAt": "2026-07-01T10:40:25.135Z",
+      "deployedAtIst": "01/07/2026, 16:10:25",
+      "committedAtIst": "01/07/2026, 16:09:44",
+      "vercelPreviewUrl": "https://connect-intel-46mskutkg-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 8f6e7e6"
+    },
     {
       "logId": "20260701-1609-701ef11",
       "commit": "701ef11",
@@ -15,7 +43,7 @@
       "committedAtIst": "01/07/2026, 16:08:56",
       "vercelPreviewUrl": "https://connect-intel-9c5bq0pri-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 701ef11"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 20e2d5c"
-    },
-    {
-      "logId": "20260630-1101-b7229ab",
-      "commit": "b7229ab",
-      "commitFull": "b7229ab6acbd3fcdb8a01452a663669ceb22c5a9",
-      "message": "Fix rep pipeline scoping so only own leads show outside Unassigned folder.",
-      "deployedAt": "2026-06-30T05:31:34.875Z",
-      "deployedAtIst": "30/06/2026, 11:01:34",
-      "committedAtIst": "30/06/2026, 11:01:04",
-      "vercelPreviewUrl": "https://connect-intel-84zxlr7xh-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- b7229ab"
-    },
-    {
-      "logId": "20260630-1051-8498c23",
-      "commit": "8498c23",
-      "commitFull": "8498c2365eee96781835d988f6267287053d66b8",
-      "message": "Add Unassigned leads folder to speed up default CRM pipeline and search.",
-      "deployedAt": "2026-06-30T05:21:19.771Z",
-      "deployedAtIst": "30/06/2026, 10:51:19",
-      "committedAtIst": "30/06/2026, 10:50:35",
-      "vercelPreviewUrl": "https://connect-intel-jpo6dekml-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 8498c23"
     }
   ]
 }
