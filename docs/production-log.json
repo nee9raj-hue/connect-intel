@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-07-01T16:37:11.154Z",
-  "updatedAtIst": "01/07/2026, 22:07:11",
+  "updatedAt": "2026-07-01T16:46:52.226Z",
+  "updatedAtIst": "01/07/2026, 22:16:52",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "69e268e",
+  "currentProductionCommit": "d55cdf7",
   "entries": [
+    {
+      "logId": "20260701-2216-d55cdf7",
+      "commit": "d55cdf7",
+      "commitFull": "d55cdf7cda51b15368dd4664106c892ced49db65",
+      "message": "Enforce P1 RBAC and speed up pipeline bootstrap for new orgs.",
+      "deployedAt": "2026-07-01T16:46:39.484Z",
+      "deployedAtIst": "01/07/2026, 22:16:39",
+      "committedAtIst": "01/07/2026, 22:16:08",
+      "vercelPreviewUrl": "https://connect-intel-gsyppqixe-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- d55cdf7"
+    },
+    {
+      "logId": "20260701-2207-ece83c5",
+      "commit": "ece83c5",
+      "commitFull": "ece83c5df95b915fe762bc38da1cafa5a22a0f81",
+      "message": "Update production log after multi-tenant RBAC deploy.",
+      "deployedAt": "2026-07-01T16:37:52.836Z",
+      "deployedAtIst": "01/07/2026, 22:07:52",
+      "committedAtIst": "01/07/2026, 22:07:11",
+      "vercelPreviewUrl": "https://connect-intel-h3x19mm6i-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- ece83c5"
+    },
     {
       "logId": "20260701-2206-69e268e",
       "commit": "69e268e",
@@ -15,7 +43,7 @@
       "committedAtIst": "01/07/2026, 22:06:25",
       "vercelPreviewUrl": "https://connect-intel-ljlmhrznl-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 69e268e"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- a8f1b6f"
-    },
-    {
-      "logId": "20260630-1218-bfe0a22",
-      "commit": "bfe0a22",
-      "commitFull": "bfe0a2296d44bc299276ccd98c717f5a2e5fe53b",
-      "message": "Keep owner filter enforced when leads are reassigned in the pipeline list.",
-      "deployedAt": "2026-06-30T06:48:11.207Z",
-      "deployedAtIst": "30/06/2026, 12:18:11",
-      "committedAtIst": "30/06/2026, 12:17:35",
-      "vercelPreviewUrl": "https://connect-intel-nfub5ev6i-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- bfe0a22"
-    },
-    {
-      "logId": "20260630-1211-940b559",
-      "commit": "940b559",
-      "commitFull": "940b5591945f547897c4edebed80914ef69ac8b3",
-      "message": "Fix pipeline state/city filters returning empty lists with wrong match counts.",
-      "deployedAt": "2026-06-30T06:41:08.865Z",
-      "deployedAtIst": "30/06/2026, 12:11:08",
-      "committedAtIst": "30/06/2026, 12:10:37",
-      "vercelPreviewUrl": "https://connect-intel-89k7bvymu-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 940b559"
     }
   ]
 }
