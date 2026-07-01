@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-07-01T16:46:52.226Z",
-  "updatedAtIst": "01/07/2026, 22:16:52",
+  "updatedAt": "2026-07-01T17:05:49.407Z",
+  "updatedAtIst": "01/07/2026, 22:35:49",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "d55cdf7",
+  "currentProductionCommit": "ccd8fd6",
   "entries": [
+    {
+      "logId": "20260701-2235-ccd8fd6",
+      "commit": "ccd8fd6",
+      "commitFull": "ccd8fd69018cef90360e32c03100db53152a5430",
+      "message": "Align manager dashboard with enterprise snapshot architecture.",
+      "deployedAt": "2026-07-01T17:05:36.684Z",
+      "deployedAtIst": "01/07/2026, 22:35:36",
+      "committedAtIst": "01/07/2026, 22:35:04",
+      "vercelPreviewUrl": "https://connect-intel-mok8r1neh-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- ccd8fd6"
+    },
+    {
+      "logId": "20260701-2217-54a9de5",
+      "commit": "54a9de5",
+      "commitFull": "54a9de508f6ca9510e880c1ae3d7f01eb8040288",
+      "message": "Update production log after P1 RBAC and bootstrap deploy.",
+      "deployedAt": "2026-07-01T16:47:30.765Z",
+      "deployedAtIst": "01/07/2026, 22:17:30",
+      "committedAtIst": "01/07/2026, 22:16:52",
+      "vercelPreviewUrl": "https://connect-intel-1098jjnyl-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 54a9de5"
+    },
     {
       "logId": "20260701-2216-d55cdf7",
       "commit": "d55cdf7",
@@ -15,7 +43,7 @@
       "committedAtIst": "01/07/2026, 22:16:08",
       "vercelPreviewUrl": "https://connect-intel-gsyppqixe-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- d55cdf7"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 63e1480"
-    },
-    {
-      "logId": "20260701-1354-339cf57",
-      "commit": "339cf57",
-      "commitFull": "339cf57dc083d1fc9bc5cab634b4a075574947db",
-      "message": "Add production fresh-start reset to wipe all org CRM data for go-live.",
-      "deployedAt": "2026-07-01T08:24:54.865Z",
-      "deployedAtIst": "01/07/2026, 13:54:54",
-      "committedAtIst": "01/07/2026, 13:54:19",
-      "vercelPreviewUrl": "https://connect-intel-fpot2yaib-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 339cf57"
-    },
-    {
-      "logId": "20260630-1333-a8f1b6f",
-      "commit": "a8f1b6f",
-      "commitFull": "a8f1b6fdc7133e036a5a2cbb528ada565221c04d",
-      "message": "Add bulk pipeline delete so orgs can remove unused leads in batches.",
-      "deployedAt": "2026-06-30T08:03:55.825Z",
-      "deployedAtIst": "30/06/2026, 13:33:55",
-      "committedAtIst": "30/06/2026, 13:33:23",
-      "vercelPreviewUrl": "https://connect-intel-oe0tz2vsg-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- a8f1b6f"
     }
   ]
 }

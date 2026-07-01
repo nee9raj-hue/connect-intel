@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- ece83c5
+npm run prod:rollback -- 54a9de5
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- ece83c5
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `d55cdf7` |
-| Log updated (IST) | 01/07/2026, 22:16:52 |
+| Commit | `ccd8fd6` |
+| Log updated (IST) | 01/07/2026, 22:35:49 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- ece83c5
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 01/07/2026, 22:16:39 | `d55cdf7` | Enforce P1 RBAC and speed up pipeline bootstrap for new orgs. | [preview](https://connect-intel-gsyppqixe-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d55cdf7` | **← LIVE**
+| 01/07/2026, 22:35:36 | `ccd8fd6` | Align manager dashboard with enterprise snapshot architecture. | [preview](https://connect-intel-mok8r1neh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ccd8fd6` | **← LIVE**
+| 01/07/2026, 22:17:30 | `54a9de5` | Update production log after P1 RBAC and bootstrap deploy. | [preview](https://connect-intel-1098jjnyl-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 54a9de5` |
+| 01/07/2026, 22:16:39 | `d55cdf7` | Enforce P1 RBAC and speed up pipeline bootstrap for new orgs. | [preview](https://connect-intel-gsyppqixe-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d55cdf7` |
 | 01/07/2026, 22:07:52 | `ece83c5` | Update production log after multi-tenant RBAC deploy. | [preview](https://connect-intel-h3x19mm6i-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ece83c5` |
 | 01/07/2026, 22:06:56 | `69e268e` | Enforce multi-tenant CRM RBAC and org-scoped master data. | [preview](https://connect-intel-ljlmhrznl-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 69e268e` |
 | 01/07/2026, 21:54:37 | `9af7286` | Update production log after CRM boot performance deploy. | [preview](https://connect-intel-edxmz7hu3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9af7286` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- ece83c5
 | 01/07/2026, 14:52:03 | `59e7693` | Focus CRM on core workflow: email signup, no onboarding Gmail prompt. | [preview](https://connect-intel-3ikalathf-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 59e7693` |
 | 01/07/2026, 14:20:49 | `7012ce7` | Add ops tooling to transfer org admin and demote mistaken first signup. | [preview](https://connect-intel-mocvyr7g7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7012ce7` |
 | 01/07/2026, 14:11:03 | `63e1480` | Remove Chithi from CRM shell and add per-org CRM clean for go-live. | [preview](https://connect-intel-aidn89hjl-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 63e1480` |
-| 01/07/2026, 13:54:54 | `339cf57` | Add production fresh-start reset to wipe all org CRM data for go-live. | [preview](https://connect-intel-fpot2yaib-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 339cf57` |
-| 30/06/2026, 13:33:55 | `a8f1b6f` | Add bulk pipeline delete so orgs can remove unused leads in batches. | [preview](https://connect-intel-oe0tz2vsg-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a8f1b6f` |
 
 ---
 
