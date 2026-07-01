@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-07-01T19:06:13.351Z",
-  "updatedAtIst": "02/07/2026, 00:36:13",
+  "updatedAt": "2026-07-01T19:13:38.388Z",
+  "updatedAtIst": "02/07/2026, 00:43:38",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "135b030",
+  "currentProductionCommit": "64d9197",
   "entries": [
+    {
+      "logId": "20260702-0043-64d9197",
+      "commit": "64d9197",
+      "commitFull": "64d919768a1dbf5f859fcec53f10168defec7e24",
+      "message": "Ship Deploy 5: SQL deals table, sync/backfill, and indexed lead timeline.",
+      "deployedAt": "2026-07-01T19:13:30.443Z",
+      "deployedAtIst": "02/07/2026, 00:43:30",
+      "committedAtIst": "02/07/2026, 00:42:53",
+      "vercelPreviewUrl": "https://connect-intel-to9ynd3fp-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 64d9197"
+    },
+    {
+      "logId": "20260702-0036-7c84a1e",
+      "commit": "7c84a1e",
+      "commitFull": "7c84a1e10306f566aca244817f4207392f73cda5",
+      "message": "Update production log for Deploy 4 (135b030).",
+      "deployedAt": "2026-07-01T19:06:56.444Z",
+      "deployedAtIst": "02/07/2026, 00:36:56",
+      "committedAtIst": "02/07/2026, 00:36:19",
+      "vercelPreviewUrl": "https://connect-intel-3oqbgncoh-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 7c84a1e"
+    },
     {
       "logId": "20260702-0036-135b030",
       "commit": "135b030",
@@ -15,7 +43,7 @@
       "committedAtIst": "02/07/2026, 00:35:29",
       "vercelPreviewUrl": "https://connect-intel-5t99whwwl-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 135b030"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 45b3250"
-    },
-    {
-      "logId": "20260701-2236-33f9985",
-      "commit": "33f9985",
-      "commitFull": "33f9985374a7e2e88b8596c12885bc5403208c9d",
-      "message": "Update production log after enterprise dashboard deploy.",
-      "deployedAt": "2026-07-01T17:06:20.574Z",
-      "deployedAtIst": "01/07/2026, 22:36:20",
-      "committedAtIst": "01/07/2026, 22:35:49",
-      "vercelPreviewUrl": "https://connect-intel-fq1qraxam-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 33f9985"
-    },
-    {
-      "logId": "20260701-2235-ccd8fd6",
-      "commit": "ccd8fd6",
-      "commitFull": "ccd8fd69018cef90360e32c03100db53152a5430",
-      "message": "Align manager dashboard with enterprise snapshot architecture.",
-      "deployedAt": "2026-07-01T17:05:36.684Z",
-      "deployedAtIst": "01/07/2026, 22:35:36",
-      "committedAtIst": "01/07/2026, 22:35:04",
-      "vercelPreviewUrl": "https://connect-intel-mok8r1neh-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- ccd8fd6"
     }
   ]
 }
