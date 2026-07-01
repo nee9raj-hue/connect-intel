@@ -26,6 +26,19 @@ const PERIODS = [
   { id: '30d', label: '30 days', api: '30d' },
 ]
 
+function isCompanyRepUser(user) {
+  if (!user || user.accountType !== 'company') return false
+  if (user.isOrgAdmin || user.orgRole === 'org_admin') return false
+  return String(user.pipelineRole || '').toLowerCase() !== 'manager'
+}
+
+function teamMetricsQuery(user, apiPeriod) {
+  if (!user?.organizationId) return null
+  const qs = new URLSearchParams({ period: apiPeriod })
+  if (isCompanyRepUser(user)) qs.set('userId', user.id)
+  return qs.toString()
+}
+
 function initials(name) {
   const p = String(name || '?').trim().split(/\s+/)
   if (p.length >= 2) return `${p[0][0]}${p[1][0]}`.toUpperCase()
@@ -160,8 +173,9 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
   const { layout, saveLayout, isVisible, visibleOrder } = useDashboardLayout(user?.id)
 
   const load = useCallback(async (silent = false) => {
-    const cacheKey = teamReviewCacheKey(user?.organizationId, period)
+    const cacheKey = teamReviewCacheKey(user?.organizationId || user?.id, period)
     const apiPeriod = PERIODS.find((p) => p.id === period)?.api || '7d'
+    const metricsQuery = teamMetricsQuery(user, apiPeriod)
     if (!silent) {
       const cached = readPanelCache(cacheKey)
       if (cached?.data?.bootstrap) {
@@ -177,13 +191,11 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
       setRefreshing(true)
     }
     setError(null)
-    setTeamMetricsLoading(Boolean(user?.organizationId))
+    setTeamMetricsLoading(Boolean(metricsQuery))
     try {
       const [bootstrapRes, teamRes] = await Promise.all([
         api.getDashboardBootstrap(),
-        user?.organizationId
-          ? api.getCrmTeamMetrics(`period=${apiPeriod}`)
-          : Promise.resolve(null),
+        metricsQuery ? api.getCrmTeamMetrics(metricsQuery) : Promise.resolve(null),
       ])
       setData(bootstrapRes.dashboard)
       setLastFetch(Date.now())
@@ -208,7 +220,7 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
       setRefreshing(false)
       setTeamMetricsLoading(false)
     }
-  }, [user?.organizationId, period])
+  }, [user?.organizationId, user?.id, user?.accountType, user?.pipelineRole, user?.isOrgAdmin, user?.orgRole, period])
 
   const refreshDashboard = useCallback(() => load(true), [load])
   useDashboardLive({ enabled: isActive && Boolean(data), onStale: refreshDashboard })
