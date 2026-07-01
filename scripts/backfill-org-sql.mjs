@@ -9,7 +9,7 @@
 
 import { readStore } from '../lib/server/store.js'
 import { isOrgSqlSyncEnabled, syncAllOrganizationsToSql } from '../lib/server/orgSqlSync.js'
-import { listOrganizationsNeedingSqlSync } from '../lib/server/orgSqlResolve.js'
+import { listOrganizationsNeedingSqlSync, listProfilesNeedingSqlSync } from '../lib/server/orgSqlResolve.js'
 
 const args = process.argv.slice(2)
 const orgIdFlag = args.find((a) => a.startsWith('--org-id='))
@@ -25,7 +25,9 @@ async function main() {
     only: ['users', 'organizations', 'organizationMemberships'],
   })
   const pending = listOrganizationsNeedingSqlSync(store)
+  const profilesPending = listProfilesNeedingSqlSync(store, { orgId: onlyOrgId })
   console.log(`Organizations pending SQL UUID: ${pending.length}`)
+  console.log(`Profiles pending sqlProfileId: ${profilesPending.length}`)
 
   const result = await syncAllOrganizationsToSql({ store, orgId: onlyOrgId })
   console.log(
