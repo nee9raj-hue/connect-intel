@@ -7,16 +7,16 @@ export function RevenueLeakInfographic() {
       <div className="flex flex-col sm:flex-row items-stretch gap-4">
         <div className="flex-1 rounded-xl bg-red-50 border border-red-100 p-4 text-center">
           <div className="text-3xl font-bold text-red-700">68%</div>
-          <p className="text-xs text-red-800 mt-1 leading-snug">of deals slip when follow-ups are late or forgotten</p>
+          <p className="text-xs text-red-800 mt-1 leading-snug">of B2B deals stall when follow-ups are late or forgotten</p>
         </div>
         <div className="hidden sm:flex items-center text-2xl text-gray-300">→</div>
         <div className="flex-1 rounded-xl bg-[#fff4ee] border border-[#ffd4b8] p-4 text-center">
           <div className="text-3xl font-bold text-[#FF773D]">CI</div>
-          <p className="text-xs text-[#64748B] mt-1 leading-snug">Connect Intel logs every touch & reminds you 30 min before</p>
+          <p className="text-xs text-[#64748B] mt-1 leading-snug">One pipeline, timed reminders, full activity trail</p>
         </div>
       </div>
-      <p className="text-xs text-gray-500 mt-4 text-center">
-        Companies lose revenue simply by losing a prospect in the follow-up gap.
+      <p className="text-xs text-gray-600 mt-4 text-center">
+        Revenue is rarely lost on the first call—it is lost in the follow-up gap.
       </p>
     </div>
   )
@@ -24,14 +24,14 @@ export function RevenueLeakInfographic() {
 
 export function FollowUpTimeline() {
   const steps = [
-    { time: 'Day 1', label: 'AI finds lead', color: 'bg-amber-100 text-amber-900' },
-    { time: 'Day 2', label: 'Email + WhatsApp', color: 'bg-blue-100 text-blue-900' },
-    { time: 'Day 5', label: 'Auto reminder', color: 'bg-violet-100 text-violet-900' },
-    { time: '−30 min', label: 'Alert before call', color: 'bg-slate-100 text-[#64748B]' },
+    { time: 'Import', label: 'CSV → pipeline', color: 'bg-slate-100 text-slate-800' },
+    { time: 'Assign', label: 'Owner + stage', color: 'bg-amber-100 text-amber-900' },
+    { time: 'Touch', label: 'Call / WhatsApp', color: 'bg-blue-100 text-blue-900' },
+    { time: '−30 min', label: 'Meeting alert', color: 'bg-violet-100 text-violet-900' },
   ]
   return (
     <div className="rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-amber-50/40 p-6">
-      <p className="text-sm font-semibold text-gray-900 mb-4">Never miss a follow-up again</p>
+      <p className="text-sm font-semibold text-gray-900 mb-4">A typical week in Connect Intel</p>
       <div className="flex flex-wrap gap-2">
         {steps.map((s, i) => (
           <div key={s.time} className="flex items-center gap-2">
@@ -47,57 +47,44 @@ export function FollowUpTimeline() {
   )
 }
 
-export function IndiaLeadMapVisual() {
+export function ImportPipelineVisual() {
   return (
-    <div className="relative rounded-2xl border border-gray-200 bg-[#0f172a] p-6 overflow-hidden text-white min-h-[220px]">
-      <div className="absolute inset-0 opacity-20" aria-hidden>
-        <svg viewBox="0 0 400 280" className="w-full h-full" fill="none">
-          <ellipse cx="200" cy="140" rx="160" ry="120" stroke="#FF773D" strokeWidth="1" strokeDasharray="4 4" />
-          {[
-            [120, 80],
-            [200, 60],
-            [280, 90],
-            [160, 150],
-            [240, 170],
-            [190, 200],
-          ].map(([x, y], i) => (
-            <g key={i}>
-              <circle cx={x} cy={y} r="6" fill="#FF773D" opacity="0.9" />
-              <circle cx={x} cy={y} r="12" fill="#FF773D" opacity="0.2" />
-            </g>
-          ))}
-        </svg>
-      </div>
+    <div className="relative rounded-2xl border border-gray-200 bg-gradient-to-br from-[#1f1d1c] to-[#2d2a28] p-6 overflow-hidden text-white min-h-[240px]">
+      <div className="absolute top-0 right-0 w-32 h-32 bg-[#FF773D]/20 rounded-full blur-3xl" aria-hidden />
       <div className="relative z-10">
-        <p className="text-xs font-bold uppercase tracking-wider text-amber-300">AI lead discovery</p>
-        <h3 className="text-xl font-bold mt-1">High-quality B2B leads across India</h3>
-        <p className="text-sm text-gray-300 mt-2 max-w-xs">
-          Filter by state, industry, role, and exporter profile. Connect Intel AI ranks the best fits.
+        <p className="text-xs font-bold uppercase tracking-wider text-amber-300">Bring what you already have</p>
+        <h3 className="text-xl font-bold mt-1">Import leads in minutes—not days</h3>
+        <p className="text-sm text-gray-300 mt-2 max-w-md leading-relaxed">
+          Upload a CSV from your trade show list, IndiaMART export, or internal sheet. Map columns once; leads land in
+          pipeline with stages ready for your team.
         </p>
-        <div className="flex flex-wrap gap-2 mt-4">
-          {['Rajasthan', 'Gujarat', 'Tamil Nadu', 'Maharashtra'].map((s) => (
-            <span key={s} className="text-xs px-2 py-1 rounded-full bg-white/10 border border-white/20">
-              {s}
-            </span>
-          ))}
+        <div className="mt-5 grid sm:grid-cols-2 gap-3">
+          <div className="rounded-lg bg-white/10 border border-white/15 p-3">
+            <p className="text-xs text-gray-400 mb-1">Before</p>
+            <p className="text-sm font-medium">Scattered spreadsheets & personal notes</p>
+          </div>
+          <div className="rounded-lg bg-[#FF773D]/20 border border-[#FF773D]/40 p-3">
+            <p className="text-xs text-amber-200 mb-1">After</p>
+            <p className="text-sm font-medium">One pipeline with owners & history</p>
+          </div>
         </div>
       </div>
     </div>
   )
 }
 
-export function EmailCrmFlow() {
+export function WorkEmailFlow() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
       {[
-        { icon: '✨', title: 'AI writes', sub: 'Agenda-driven drafts in your voice' },
-        { icon: '📧', title: 'Official email', sub: 'Send from your company domain' },
-        { icon: '📋', title: 'CRM records', sub: 'Every email logged automatically' },
+        { icon: '✉️', title: 'Sign up with work email', sub: 'No Gmail permissions on day one' },
+        { icon: '🔗', title: 'Connect Gmail later', sub: 'Optional—when you need CRM send/receive' },
+        { icon: '📋', title: 'Logged on the lead', sub: 'Every touch stays on the customer record' },
       ].map((step) => (
         <div key={step.title} className="rounded-xl border border-gray-200 bg-white p-4 text-center shadow-sm">
           <div className="text-2xl mb-2">{step.icon}</div>
           <p className="text-sm font-semibold text-gray-900">{step.title}</p>
-          <p className="text-xs text-gray-500 mt-1">{step.sub}</p>
+          <p className="text-xs text-gray-600 mt-1 leading-relaxed">{step.sub}</p>
         </div>
       ))}
     </div>
@@ -111,17 +98,18 @@ export function WhatsAppOneClick() {
         💬
       </div>
       <div className="flex-1">
-        <h3 className="font-bold text-gray-900">WhatsApp from desktop or phone</h3>
-        <p className="text-sm text-gray-600 mt-1 leading-relaxed">
-          AI drafts your follow-up in one click. Proofread, tap send from your number — activity saved in CRM.
+        <h3 className="font-bold text-gray-900">WhatsApp with full lead context</h3>
+        <p className="text-sm text-gray-700 mt-1 leading-relaxed">
+          Open WhatsApp from any lead record—company name, last note, and next step on screen. Works on desktop and
+          phone; log the conversation back to CRM.
         </p>
         <p className="text-xs font-semibold text-[#64748B] mt-2">
-          Sharper follow-ups can lift reply rates significantly*
+          Built for teams where WhatsApp is the real sales channel
         </p>
       </div>
-      <div className="w-full md:w-48 rounded-xl bg-white border border-gray-200 p-3 text-xs shadow-sm font-mono">
-        <p className="text-gray-400 mb-1">Draft ready</p>
-        <p className="text-gray-800 leading-snug">Hi Priya, following up on our export discussion…</p>
+      <div className="w-full md:w-48 rounded-xl bg-white border border-gray-200 p-3 text-xs shadow-sm">
+        <p className="text-gray-500 mb-1">Priya Sharma · Rajasthan Handicrafts</p>
+        <p className="text-gray-800 leading-snug">Last: pricing sent · Next: follow-up call 4pm</p>
         <button type="button" className="mt-2 w-full py-1.5 rounded bg-[#25D366] text-white font-semibold text-xs">
           Open WhatsApp
         </button>
@@ -139,18 +127,18 @@ export function ManagerDashboardPreview() {
   return (
     <div className="rounded-2xl border border-gray-200 bg-white shadow-lg overflow-hidden">
       <div className="px-5 py-3 border-b bg-gray-50 flex items-center justify-between">
-        <span className="text-sm font-semibold text-gray-900">Manager dashboard</span>
+        <span className="text-sm font-semibold text-gray-900">Team dashboard</span>
         <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 font-semibold">Live</span>
       </div>
       <div className="p-4 grid grid-cols-3 gap-3 border-b bg-white">
         {[
-          { label: 'Team pipeline', value: '128' },
-          { label: 'Contacted this week', value: '89%' },
-          { label: 'Meetings today', value: '7' },
+          { label: 'Open pipeline', value: '128' },
+          { label: 'Touched this week', value: '89%' },
+          { label: 'Calls today', value: '7' },
         ].map((m) => (
           <div key={m.label} className="text-center p-2 rounded-lg bg-gray-50">
             <div className="text-lg font-bold text-gray-900">{m.value}</div>
-            <div className="text-xs text-gray-500">{m.label}</div>
+            <div className="text-xs text-gray-600">{m.label}</div>
           </div>
         ))}
       </div>
@@ -158,7 +146,7 @@ export function ManagerDashboardPreview() {
         {team.map((m) => (
           <div key={m.name} className="px-4 py-3 flex flex-wrap items-center gap-3 text-xs">
             <span className="font-semibold text-gray-900 w-16">{m.name}</span>
-            <span className="text-gray-500">{m.leads} leads</span>
+            <span className="text-gray-600">{m.leads} leads</span>
             <span className="text-blue-600">{m.contacted} touched</span>
             <span className="text-[#FF773D]">{m.won} won</span>
             <span
@@ -184,7 +172,7 @@ export function CrmPipelineMini() {
   ]
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
-      <p className="text-xs font-semibold text-gray-500 mb-3">Pipeline · Team CRM</p>
+      <p className="text-xs font-semibold text-gray-600 mb-3">Pipeline · shared by your team</p>
       <div className="grid grid-cols-4 gap-2">
         {cols.map((c) => (
           <div key={c.name} className={`rounded-lg border-2 ${c.color} bg-gray-50/80 p-2 min-h-[72px]`}>
@@ -192,6 +180,39 @@ export function CrmPipelineMini() {
             <p className="text-lg font-bold text-gray-900 mt-1">{c.count}</p>
           </div>
         ))}
+      </div>
+    </div>
+  )
+}
+
+export function BeforeAfterCompare() {
+  return (
+    <div className="grid sm:grid-cols-2 gap-4">
+      <div className="rounded-xl border border-red-100 bg-red-50/50 p-5">
+        <p className="text-xs font-bold uppercase tracking-wide text-red-700 mb-3">Without a CRM</p>
+        <ul className="space-y-2 text-sm text-gray-800">
+          {['Leads in 3 different sheets', 'WhatsApp chats with no owner', 'Managers ask “did you call them?”', 'Deals die in silence'].map(
+            (t) => (
+              <li key={t} className="flex gap-2">
+                <span className="text-red-500 shrink-0">✕</span>
+                {t}
+              </li>
+            )
+          )}
+        </ul>
+      </div>
+      <div className="rounded-xl border border-[#FF773D]/30 bg-[#fff9f5] p-5">
+        <p className="text-xs font-bold uppercase tracking-wide text-[#c2410c] mb-3">With Connect Intel</p>
+        <ul className="space-y-2 text-sm text-gray-800">
+          {['One pipeline per company', 'Owner + stage on every lead', 'Activity log managers can trust', 'Reminders before every meeting'].map(
+            (t) => (
+              <li key={t} className="flex gap-2">
+                <span className="text-[#FF773D] shrink-0">✓</span>
+                {t}
+              </li>
+            )
+          )}
+        </ul>
       </div>
     </div>
   )
