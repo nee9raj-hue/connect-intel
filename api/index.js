@@ -125,6 +125,7 @@ const ROUTES = {
   'org/active-trading': () => import('../lib/server/handlers/org-active-trading.js'),
   'org/workspace': () => import('../lib/server/handlers/org-workspace.js'),
   'org/company-workspace': () => import('../lib/server/handlers/org-company-workspace.js'),
+  'org/plan-upgrade': () => import('../lib/server/handlers/org-plan-upgrade.js'),
   'invite/preview': () => import('../lib/server/handlers/invite-preview.js'),
   'invite/accept': () => import('../lib/server/handlers/invite-accept.js'),
   'auth/session': () => import('../lib/server/handlers/auth-session.js'),

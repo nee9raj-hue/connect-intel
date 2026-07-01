@@ -1,20 +1,24 @@
+import { useState } from 'react'
 import { useApp } from '../../../context/AppContext'
+import { api } from '../../../lib/api'
 import { C } from './settingsTheme'
 import { PrimaryButton, SettingsBadge, SettingsCard } from './SettingsUi'
 import { AI_PROSPECTING_IN_CRM_ENABLED, BILLING_IN_CRM_UI_ENABLED } from '../../../lib/crmProductFlags'
+import { FREE_PLAN, GROWTH_PLAN } from '../../../lib/crmPlanLimits'
 
-function UsageBar({ label, used, total }) {
+function UsageBar({ label, used, total, warn }) {
   const pct = total > 0 ? Math.min(100, Math.round((used / total) * 100)) : 0
+  const barColor = warn ? '#c2410c' : C.accent
   return (
     <div style={{ marginBottom: 16 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 6 }}>
         <span style={{ color: C.textSecondary }}>{label}</span>
-        <span style={{ color: C.textMuted }}>
+        <span style={{ color: warn ? '#c2410c' : C.textMuted }}>
           {used.toLocaleString()} / {total.toLocaleString()} used
         </span>
       </div>
       <div style={{ height: 6, background: '#e8e8e6', borderRadius: 3, overflow: 'hidden' }}>
-        <div style={{ height: '100%', width: `${pct}%`, background: C.accent, borderRadius: 3 }} />
+        <div style={{ height: '100%', width: `${pct}%`, background: barColor, borderRadius: 3 }} />
       </div>
     </div>
   )
@@ -23,32 +27,109 @@ function UsageBar({ label, used, total }) {
 const PLACEHOLDER_INVOICES = []
 
 function CrmWorkspaceTab() {
-  const { user } = useApp()
+  const { user, teamMembers, refreshSession } = useApp()
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState(null)
+
   const orgName = user?.organizationName || user?.company || 'Your workspace'
+  const planUsage = user?.planUsage
+  const upgradeQuote = user?.upgradeQuote
+  const pendingPayment = user?.pendingPayment
+  const isGrowth = user?.planTier === 'growth'
+  const seats = planUsage?.seats ?? teamMembers.length
+  const maxSeats = planUsage?.maxSeats ?? FREE_PLAN.maxSeats
+  const leads = planUsage?.leads ?? 0
+  const maxLeads = planUsage?.maxLeads ?? FREE_PLAN.maxLeads
+  const showUpgrade = Boolean(planUsage?.showUpgradePrompt && upgradeQuote && user?.isOrgAdmin)
+  const seatWarn = planUsage?.atSeatLimit || (planUsage?.seatPct ?? 0) >= 80
+  const leadWarn = planUsage?.atLeadLimit || (planUsage?.leadPct ?? 0) >= 80
+
+  const handleConfirmUpgrade = async () => {
+    if (!window.confirm(`Confirm Team CRM upgrade at ${upgradeQuote?.amountDisplay}? Limits increase immediately; payment is collected separately.`)) {
+      return
+    }
+    setBusy(true)
+    setError(null)
+    try {
+      await api.confirmOrgPlanUpgrade()
+      await refreshSession()
+    } catch (err) {
+      setError(err.message || 'Could not confirm upgrade')
+    } finally {
+      setBusy(false)
+    }
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       <SettingsCard>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-          <span style={{ fontSize: 18, fontWeight: 500 }}>Free CRM</span>
+          <span style={{ fontSize: 18, fontWeight: 500 }}>{isGrowth ? GROWTH_PLAN.label : 'Free CRM'}</span>
           <SettingsBadge bg="#eaf3de" color="#27500a">
-            Included
+            {isGrowth ? 'Active' : 'Included'}
           </SettingsBadge>
         </div>
         <p style={{ fontSize: 13, color: C.textSecondary, margin: 0, lineHeight: 1.5 }}>
-          <strong>{orgName}</strong> runs on Connect Intel&apos;s free CRM tier — pipeline, contacts,
-          calendar, and imports. Built for solo reps and small teams with a light lead list. No subscription,
-          credits, or paid add-ons in this workspace.
+          <strong>{orgName}</strong> runs on Connect Intel&apos;s {isGrowth ? 'Team CRM' : 'free'} tier — pipeline,
+          contacts, calendar, and imports. {isGrowth ? 'Higher seat and lead limits are active.' : 'Upgrade when you outgrow the free limits below.'}
         </p>
       </SettingsCard>
 
       <SettingsCard>
+        <p style={{ fontSize: 14, fontWeight: 500, margin: '0 0 16px' }}>Usage</p>
+        <UsageBar label="Team seats" used={seats} total={maxSeats} warn={seatWarn} />
+        <UsageBar label="Pipeline leads" used={leads} total={maxLeads} warn={leadWarn} />
+        {!user?.isOrgAdmin && planUsage?.showUpgradePrompt ? (
+          <p style={{ fontSize: 12, color: C.textMuted, margin: '8px 0 0' }}>
+            Ask your workspace admin to confirm a Team CRM upgrade if you need more capacity.
+          </p>
+        ) : null}
+      </SettingsCard>
+
+      {pendingPayment?.status === 'pending' ? (
+        <SettingsCard>
+          <p style={{ fontSize: 14, fontWeight: 500, margin: '0 0 8px' }}>Payment due</p>
+          <p style={{ fontSize: 24, fontWeight: 600, margin: '0 0 8px', color: C.textPrimary }}>
+            {pendingPayment.amountDisplay}
+            <span style={{ fontSize: 14, fontWeight: 400, color: C.textSecondary }}> / {pendingPayment.period || 'month'}</span>
+          </p>
+          <p style={{ fontSize: 13, color: C.textSecondary, margin: 0, lineHeight: 1.5 }}>
+            Your Team CRM limits are active. We will share payment instructions separately—no card was charged at upgrade confirm.
+          </p>
+        </SettingsCard>
+      ) : null}
+
+      {showUpgrade ? (
+        <SettingsCard>
+          <p style={{ fontSize: 14, fontWeight: 500, margin: '0 0 8px' }}>Upgrade to Team CRM</p>
+          <p style={{ fontSize: 13, color: C.textSecondary, margin: '0 0 12px', lineHeight: 1.5 }}>
+            You are near or at the free tier limit ({FREE_PLAN.maxSeats} seats, {FREE_PLAN.maxLeads} leads). Confirm
+            to raise limits to {GROWTH_PLAN.maxSeats} seats and {GROWTH_PLAN.maxLeads.toLocaleString('en-IN')} leads.
+          </p>
+          <p style={{ fontSize: 22, fontWeight: 600, margin: '0 0 12px' }}>
+            {upgradeQuote.amountDisplay}
+          </p>
+          <ul style={{ margin: '0 0 16px', paddingLeft: 18, fontSize: 13, color: C.textSecondary, lineHeight: 1.6 }}>
+            {(upgradeQuote.includes || []).map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
+          {error ? (
+            <p style={{ fontSize: 12, color: '#b42318', margin: '0 0 12px' }}>{error}</p>
+          ) : null}
+          <PrimaryButton onClick={handleConfirmUpgrade} disabled={busy}>
+            {busy ? 'Confirming…' : 'Confirm Team CRM upgrade'}
+          </PrimaryButton>
+        </SettingsCard>
+      ) : null}
+
+      <SettingsCard>
         <p style={{ fontSize: 14, fontWeight: 500, margin: '0 0 8px' }}>What&apos;s included</p>
         <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13, color: C.textSecondary, lineHeight: 1.6 }}>
-          <li>Unlimited pipeline leads for normal use</li>
-          <li>Team invites when you need a colleague</li>
+          <li>Pipeline, contacts, and calendar</li>
           <li>CSV import and manual lead entry</li>
-          <li>Work Gmail connect when Google verification completes (optional)</li>
+          <li>Team invites with roles</li>
+          <li>Work Gmail connect when you need CRM email (optional)</li>
         </ul>
       </SettingsCard>
     </div>

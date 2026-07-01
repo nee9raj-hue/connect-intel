@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { GoogleLogin } from '@react-oauth/google'
 import { useApp } from '../../context/AppContext'
+import { GOOGLE_SIGNIN_IN_UI_ENABLED } from '../../lib/crmProductFlags'
 import { getBuiltInGoogleClientId, resolveGoogleClientId } from '../../lib/googleAuthConfig'
 
 const IS_PROD = import.meta.env.PROD
@@ -107,6 +108,8 @@ export default function GoogleSignIn({
         ? 'Sign in with Google'
         : 'Continue with Google')
 
+  if (!GOOGLE_SIGNIN_IN_UI_ENABLED) return null
+
   if (!ready) {
     return (
       <div ref={containerRef} className="w-full min-h-[44px] flex items-center justify-center text-sm text-gray-500">
@@ -202,6 +205,8 @@ export function GoogleSignInCompact({ onBeforeLogin }) {
       alert(error.message || 'Google sign-in failed.')
     }
   }
+
+  if (!GOOGLE_SIGNIN_IN_UI_ENABLED) return null
 
   if (!ready) {
     return <span className="text-xs text-gray-500 px-2">…</span>

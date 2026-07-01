@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useApp } from '../context/AppContext'
-import GoogleSignIn from '../components/auth/GoogleSignIn'
 import InviteBanner from '../components/auth/InviteBanner'
 import { BRAND_LOGO_MARK_TRANSPARENT, BRAND_LOGO_MARK_CLASS } from '../lib/brandAssets'
+import { CRM_ONBOARDING_STEPS, FREE_PLAN, FREE_TIER_HIGHLIGHTS } from '../lib/crmPlanLimits'
 
 export default function AuthPage({ inviteToken = null }) {
   const { login, setScreen, authBusy } = useApp()
@@ -35,34 +35,51 @@ export default function AuthPage({ inviteToken = null }) {
 
   return (
     <div className="min-h-screen flex bg-white">
-      <div className="hidden lg:flex lg:w-[44%] bg-ci-nav text-white flex-col justify-between p-12">
+      <div className="hidden lg:flex lg:w-[44%] bg-[#1f1d1c] text-white flex-col justify-between p-12">
         <div>
-          <button onClick={() => setScreen('landing')} className="flex items-center gap-2 mb-20">
+          <button onClick={() => setScreen('landing')} className="flex items-center gap-2 mb-12">
             <img
               src={BRAND_LOGO_MARK_TRANSPARENT}
               alt="Connect Intel"
               className={`h-11 w-auto max-w-[240px] ${BRAND_LOGO_MARK_CLASS}`}
             />
           </button>
-          <h2 className="text-3xl font-bold leading-tight mb-4">
+          <h2 className="text-3xl font-bold leading-tight mb-4 text-white">
             Run your pipeline
             <br />
             without email setup first
           </h2>
-          <p className="text-gray-400 max-w-sm text-[15px] leading-relaxed">
+          <p className="text-gray-300 max-w-sm text-[15px] leading-relaxed">
             Sign up with work email, set up your CRM, invite the team, and import leads. Connect work Gmail later
             when you are ready to send and receive from the CRM.
           </p>
+
+          <div className="mt-8 space-y-3">
+            {FREE_TIER_HIGHLIGHTS.map((item) => (
+              <div
+                key={item.title}
+                className="rounded-lg border border-white/10 bg-white/5 px-4 py-3"
+              >
+                <p className="text-sm font-semibold text-white">{item.title}</p>
+                <p className="text-xs text-gray-300 mt-0.5">{item.detail}</p>
+              </div>
+            ))}
+          </div>
+
+          <p className="mt-6 text-xs text-gray-400 leading-relaxed max-w-sm">
+            Free includes up to {FREE_PLAN.maxSeats} seats and {FREE_PLAN.maxLeads} leads. When you outgrow that,
+            your admin can confirm a Team CRM upgrade and see the monthly amount before payment is collected.
+          </p>
         </div>
-        <div className="grid grid-cols-3 gap-4 text-center">
-          {[
-            { n: 'Pipeline', l: 'Leads & deals' },
-            { n: 'Team', l: 'Invites & roles' },
-            { n: 'Later', l: 'Work Gmail' },
-          ].map((s) => (
-            <div key={s.l}>
-              <div className="text-xl font-bold text-ci-yellow">{s.n}</div>
-              <div className="text-xs text-gray-500">{s.l}</div>
+
+        <div className="grid grid-cols-2 gap-3 mt-10">
+          {CRM_ONBOARDING_STEPS.map((s) => (
+            <div key={s.step} className="rounded-lg border border-white/10 bg-white/5 p-3 text-left">
+              <div className="text-[10px] font-bold uppercase tracking-wide text-ci-yellow mb-1">
+                Step {s.step}
+              </div>
+              <div className="text-sm font-semibold text-white">{s.title}</div>
+              <div className="text-xs text-gray-300 mt-0.5">{s.detail}</div>
             </div>
           ))}
         </div>
@@ -72,7 +89,7 @@ export default function AuthPage({ inviteToken = null }) {
         <div className="w-full max-w-[400px]">
           <button
             onClick={() => setScreen('landing')}
-            className="text-sm text-gray-500 hover:text-gray-800 mb-8"
+            className="text-sm text-gray-600 hover:text-gray-900 mb-8"
           >
             ← Back
           </button>
@@ -80,9 +97,9 @@ export default function AuthPage({ inviteToken = null }) {
           <h1 className="text-2xl font-bold text-ci-dark mb-1">
             {mode === 'signup' ? 'Create your workspace' : 'Welcome back'}
           </h1>
-          <p className="text-sm text-gray-500 mb-6">
+          <p className="text-sm text-gray-600 mb-6">
             {mode === 'signup'
-              ? 'Use your work email — no Gmail permissions required yet.'
+              ? 'Use your work email and password — Gmail connect comes later in settings.'
               : 'Sign in to your CRM workspace'}
           </p>
 
@@ -101,7 +118,7 @@ export default function AuthPage({ inviteToken = null }) {
                   setError(null)
                 }}
                 className={`py-2 text-sm font-semibold rounded-md transition-colors ${
-                  mode === tab.id ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-800'
+                  mode === tab.id ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
                 {tab.label}
@@ -112,7 +129,7 @@ export default function AuthPage({ inviteToken = null }) {
           <form onSubmit={handleEmailAuth} className="space-y-4">
             {mode === 'signup' ? (
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1.5">Your name</label>
+                <label className="block text-xs font-semibold text-gray-700 mb-1.5">Your name</label>
                 <input
                   type="text"
                   required
@@ -124,7 +141,7 @@ export default function AuthPage({ inviteToken = null }) {
               </div>
             ) : null}
             <div>
-              <label className="block text-xs font-semibold text-gray-600 mb-1.5">Work email</label>
+              <label className="block text-xs font-semibold text-gray-700 mb-1.5">Work email</label>
               <input
                 type="email"
                 required
@@ -136,7 +153,7 @@ export default function AuthPage({ inviteToken = null }) {
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-600 mb-1.5">Password</label>
+              <label className="block text-xs font-semibold text-gray-700 mb-1.5">Password</label>
               <input
                 type="password"
                 required
@@ -150,7 +167,7 @@ export default function AuthPage({ inviteToken = null }) {
             </div>
             {mode === 'signup' ? (
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1.5">Confirm password</label>
+                <label className="block text-xs font-semibold text-gray-700 mb-1.5">Confirm password</label>
                 <input
                   type="password"
                   required
@@ -177,20 +194,12 @@ export default function AuthPage({ inviteToken = null }) {
             </button>
           </form>
 
-          <div className="flex items-center gap-3 my-6">
-            <div className="flex-1 h-px bg-gray-200" />
-            <span className="text-xs text-gray-400 font-medium">or</span>
-            <div className="flex-1 h-px bg-gray-200" />
-          </div>
-
-          <GoogleSignIn text={mode === 'signup' ? 'signup_with' : 'signin_with'} layout="block" />
-
-          <p className="mt-4 text-xs text-gray-500 text-center leading-relaxed">
-            Google sign-in uses only your name and email — not Gmail send/receive. Link work Gmail from{' '}
-            <strong>Work email</strong> in the sidebar when you need CRM email.
+          <p className="mt-6 text-xs text-gray-500 text-center leading-relaxed">
+            After signup you will confirm company details and mobile in setup. Work Gmail uses normal Google scopes
+            only when you choose to connect it.
           </p>
 
-          <p className="mt-6 text-sm text-gray-400 text-center leading-relaxed">
+          <p className="mt-4 text-sm text-gray-500 text-center leading-relaxed">
             By continuing, you agree to our Terms of Service and Privacy Policy.
           </p>
         </div>
@@ -200,4 +209,4 @@ export default function AuthPage({ inviteToken = null }) {
 }
 
 const inputCls =
-  'w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ci-yellow/40 focus:border-ci-yellow bg-white'
+  'w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-ci-yellow/40 focus:border-ci-yellow bg-white'

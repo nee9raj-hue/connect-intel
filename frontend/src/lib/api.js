@@ -128,6 +128,8 @@ export const api = {
   updateTeamBranding: (payload) => request('/api/team/branding', { method: 'PATCH', body: payload }),
   getOrgLeadTags: ({ silent = false } = {}) => request('/api/org/lead-tags', {}, { silent }),
   getOrgWorkspaceSettings: () => request('/api/org/workspace'),
+  confirmOrgPlanUpgrade: () => request('/api/org/plan-upgrade', { method: 'POST' }),
+  getOrgPlanUsage: () => request('/api/org/plan-upgrade'),
   updateOrgWorkspaceSettings: (body) =>
     request('/api/org/workspace', { method: 'PATCH', body }),
   getCompanyWorkspace: () =>

@@ -1,7 +1,7 @@
 import { useApp } from '../../context/AppContext'
-import GoogleSignIn from '../auth/GoogleSignIn'
+import { FREE_PLAN } from '../../lib/crmPlanLimits'
 
-/** Aligned hero CTAs: equal-width buttons + full-width Google sign-in. */
+/** Hero CTAs — email/password signup only (no Google on landing). */
 export default function HeroAuthCta({ id }) {
   const { setScreen } = useApp()
 
@@ -23,16 +23,8 @@ export default function HeroAuthCta({ id }) {
         </a>
       </div>
 
-      <div className="flex items-center gap-3 w-full" aria-hidden>
-        <div className="flex-1 h-px bg-gray-200" />
-        <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">or</span>
-        <div className="flex-1 h-px bg-gray-200" />
-      </div>
-
-      <GoogleSignIn text="signup_with" theme="outline" layout="block" />
-
-      <p className="text-xs text-gray-400 text-center leading-relaxed">
-        Email sign-up · Google (profile only) · Work Gmail connects later
+      <p className="text-xs text-gray-600 text-center leading-relaxed">
+        Free for up to {FREE_PLAN.maxSeats} seats and {FREE_PLAN.maxLeads} leads · Email sign-up · No card required
       </p>
     </div>
   )

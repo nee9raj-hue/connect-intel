@@ -1,7 +1,5 @@
 import { useApp } from '../context/AppContext'
-import { GoogleSignInCompact } from '../components/auth/GoogleSignIn'
 import HeroAuthCta from '../components/landing/HeroAuthCta'
-import GoogleSignIn from '../components/auth/GoogleSignIn'
 import {
   CrmPipelineMini,
   EmailCrmFlow,
@@ -18,37 +16,38 @@ import {
   BRAND_LOGO_HERO_MARK,
   BRAND_LOGO_MARK_CLASS,
 } from '../lib/brandAssets'
+import { FREE_PLAN, GROWTH_PLAN } from '../lib/crmPlanLimits'
 
 const PILLARS = [
   {
-    id: 'leads',
-    title: 'AI lead search across India',
-    desc: 'Discover verified exporters, manufacturers, and B2B buyers by state, industry, and role. Our AI models surface high-intent prospects—not random lists.',
-    tag: 'Discovery',
+    id: 'pipeline',
+    title: 'Pipeline & deals in one place',
+    desc: 'Import leads, assign owners, track stages, and open every record from a single workspace—no spreadsheets.',
+    tag: 'CRM',
   },
   {
-    id: 'email',
-    title: 'AI email that sounds like you',
-    desc: 'Tell Connect Intel your agenda; AI drafts convincing outreach in your company voice. Connect your official email so every send is logged in CRM automatically.',
-    tag: 'Outreach',
+    id: 'team',
+    title: 'Team invites & roles',
+    desc: 'Add colleagues when you are ready. Admins see the full org pipeline; reps see their assigned leads.',
+    tag: 'Team',
   },
   {
     id: 'followup',
     title: 'Never miss a follow-up',
-    desc: 'Reminders 30 minutes before every meeting or call. Browser alerts keep reps on time—managers see the full activity trail.',
+    desc: 'Reminders 30 minutes before every meeting or call. Browser alerts keep reps on time—managers see the activity trail.',
     tag: 'Reminders',
+  },
+  {
+    id: 'email',
+    title: 'Work Gmail when you need it',
+    desc: 'Start with email/password signup. Connect work Gmail later with normal Google scopes when you want send/receive from the CRM.',
+    tag: 'Email',
   },
   {
     id: 'whatsapp',
     title: 'WhatsApp in one click',
-    desc: 'AI drafts follow-ups; open WhatsApp from desktop or phone with pre-filled text. Log every touch so nothing falls through the cracks.',
+    desc: 'Open WhatsApp from desktop or phone with context on screen. Log every touch so nothing falls through the cracks.',
     tag: 'WhatsApp',
-  },
-  {
-    id: 'team',
-    title: 'Team & customer records',
-    desc: 'Import your pipeline, add leads manually, assign owners, and run productive sales calls with full context on screen.',
-    tag: 'CRM',
   },
   {
     id: 'managers',
@@ -79,12 +78,14 @@ export default function LandingPage() {
             <a href="#managers" className="hover:text-gray-900 transition-colors">
               For managers
             </a>
+            <a href="#pricing" className="hover:text-gray-900 transition-colors">
+              Pricing
+            </a>
             <a href="#start" className="hover:text-gray-900 transition-colors">
               Get started
             </a>
           </div>
           <div className="flex items-center gap-2">
-            <GoogleSignInCompact />
             <button
               type="button"
               onClick={() => setScreen('auth')}
@@ -112,8 +113,8 @@ export default function LandingPage() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF773D]/50 opacity-60" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF773D]" />
             </span>
-            <span className="text-xs font-semibold text-gray-600">
-              CRM + AI prospecting built for Indian B2B teams
+            <span className="text-xs font-semibold text-gray-700">
+              B2B CRM built for Indian sales teams
             </span>
           </div>
 
@@ -134,23 +135,23 @@ export default function LandingPage() {
             in the <span className="text-[#FF773D]">follow-up gap</span>
           </h1>
 
-          <p className="text-lg md:text-xl text-gray-600 leading-relaxed mb-4 max-w-[640px] mx-auto">
+          <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-4 max-w-[640px] mx-auto">
             Companies lose revenue when potential buyers go quiet—not because the product failed, but because
             nobody followed up on time. Connect Intel keeps your team, customers, and pipeline in one place so
             every call and message moves deals forward.
           </p>
-          <p className="text-sm text-gray-500 mb-10 max-w-[560px] mx-auto leading-relaxed">
-            Search high-quality leads across India with AI · Write emails from your official inbox · WhatsApp
-            follow-ups in one click · Reminders 30 minutes before every meeting.
+          <p className="text-sm text-gray-600 mb-10 max-w-[560px] mx-auto leading-relaxed">
+            Free workspace for small teams · Pipeline & contacts · Team invites · Calendar reminders · Work Gmail
+            when you are ready · WhatsApp follow-ups in one click
           </p>
 
           <HeroAuthCta />
         </div>
 
         <div className="max-w-[1000px] mx-auto mt-14 grid md:grid-cols-3 gap-4">
+          <StatCard value={`${FREE_PLAN.maxSeats} seats`} label="Free for your first teammates" />
+          <StatCard value={`${FREE_PLAN.maxLeads} leads`} label="Pipeline records on the free tier" />
           <StatCard value="30 min" label="Reminder before every meeting & call" />
-          <StatCard value="1-click" label="WhatsApp with AI-drafted follow-ups" />
-          <StatCard value="100%" label="Outreach logged when email is connected" />
         </div>
       </section>
 
@@ -188,10 +189,10 @@ export default function LandingPage() {
         <div className="max-w-[1100px] mx-auto">
           <div className="text-center mb-10">
             <h2 className="font-display text-2xl md:text-3xl font-bold text-gray-900 mb-3">
-              One workspace: search, CRM, outreach
+              One workspace for pipeline, team, and follow-ups
             </h2>
-            <p className="text-gray-600 max-w-xl mx-auto">
-              From AI lead discovery to closed-won—your official email and WhatsApp stay connected to every deal.
+            <p className="text-gray-700 max-w-xl mx-auto">
+              Import leads, assign owners, and run every customer conversation from a single CRM—connect work email when you need it.
             </p>
           </div>
           <div className="grid lg:grid-cols-5 gap-6 items-start">
@@ -331,24 +332,66 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Pricing */}
+      <section id="pricing" className="py-16 px-6 bg-white border-y border-gray-100">
+        <div className="max-w-[900px] mx-auto">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-center text-gray-900 mb-3">
+            Start free. Upgrade when you grow.
+          </h2>
+          <p className="text-center text-gray-700 mb-10 max-w-lg mx-auto">
+            No card at signup. When your team or pipeline outgrows the free tier, your admin confirms the upgrade
+            and sees the monthly amount before payment is collected.
+          </p>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="rounded-2xl border border-gray-200 bg-gray-50 p-6">
+              <p className="text-xs font-bold uppercase tracking-wide text-gray-500 mb-2">Free CRM</p>
+              <p className="text-3xl font-bold text-gray-900 mb-1">{FREE_PLAN.priceDisplay}</p>
+              <p className="text-sm text-gray-600 mb-5">forever for small teams</p>
+              <ul className="space-y-2 text-sm text-gray-700">
+                <li>Up to {FREE_PLAN.maxSeats} team seats</li>
+                <li>Up to {FREE_PLAN.maxLeads} pipeline leads</li>
+                <li>CSV import & manual entry</li>
+                <li>Calendar reminders & team roles</li>
+              </ul>
+            </div>
+            <div className="rounded-2xl border-2 border-[#FF773D]/40 bg-white p-6 shadow-sm">
+              <p className="text-xs font-bold uppercase tracking-wide text-[#FF773D] mb-2">Team CRM</p>
+              <p className="text-3xl font-bold text-gray-900 mb-1">
+                {GROWTH_PLAN.priceDisplay}
+                <span className="text-base font-medium text-gray-600">/month</span>
+              </p>
+              <p className="text-sm text-gray-600 mb-5">when you need more capacity</p>
+              <ul className="space-y-2 text-sm text-gray-700">
+                <li>Up to {GROWTH_PLAN.maxSeats} team seats</li>
+                <li>Up to {GROWTH_PLAN.maxLeads.toLocaleString('en-IN')} pipeline leads</li>
+                <li>Admin confirms upgrade in workspace settings</li>
+                <li>Amount shown before payment is due</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section id="start" className="py-20 px-6 bg-gradient-to-b from-amber-50 to-white border-t border-amber-100">
         <div className="max-w-xl mx-auto text-center">
           <h2 className="font-display text-2xl md:text-3xl font-bold text-gray-900 mb-3">
             Stop losing prospects. Start following up on time.
           </h2>
-          <p className="text-gray-600 mb-8">
-            Join teams using Connect Intel to search India B2B leads, run CRM, and close with AI-powered outreach.
+          <p className="text-gray-700 mb-8">
+            Join teams using Connect Intel to run pipeline, follow up on time, and keep every customer conversation in one CRM.
           </p>
           <div className="max-w-[420px] mx-auto">
             <button
               type="button"
               onClick={() => setScreen('auth')}
-              className="w-full min-h-[48px] py-3.5 mb-4 bg-[#0f0f0f] text-white font-semibold rounded-lg hover:bg-[#2a2a2a]"
+              className="w-full min-h-[48px] py-3.5 mb-2 bg-[#0f0f0f] text-white font-semibold rounded-lg hover:bg-[#2a2a2a]"
             >
               Create free account
             </button>
-            <GoogleSignIn text="signup_with" theme="outline" layout="block" />
+            <p className="text-xs text-gray-600">
+              Email & password sign-up · {FREE_PLAN.maxSeats} seats · {FREE_PLAN.maxLeads} leads included
+            </p>
           </div>
         </div>
       </section>
@@ -356,7 +399,7 @@ export default function LandingPage() {
       <footer className="py-10 px-6 border-t border-gray-200 bg-white">
         <div className="max-w-[1100px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-500">
           <Logo />
-          <p>© {new Date().getFullYear()} Connect Intel · B2B CRM & AI prospecting for India</p>
+          <p>© {new Date().getFullYear()} Connect Intel · B2B CRM for India</p>
           <a href="https://connectintel.net/privacy.html" className="hover:text-gray-800">
             Privacy
           </a>
