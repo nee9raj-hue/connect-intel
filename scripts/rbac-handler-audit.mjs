@@ -23,6 +23,7 @@ const SELF_SERVICE_OK = new Set([
   'crm-email-oauth-start.js',
   'crm-saved-views.js',
   'crm-workspace-pulse.js',
+  'dashboard-layout.js',
   'lead-unlocks.js',
   'onboarding-complete.js',
   'search-history.js',

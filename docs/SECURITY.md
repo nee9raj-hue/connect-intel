@@ -34,6 +34,24 @@ Connect Intel is a **multi-tenant B2B SaaS** platform. Security goals align with
 - Invite tokens in URL → `sessionStorage` → accepted on onboarding
 - `team/invite`, `invite-accept` handlers
 
+### MFA roadmap (Phase 2 — planned)
+
+Multi-factor authentication is **not enabled** today. Planned rollout:
+
+| Phase | Scope | Approach |
+|-------|-------|----------|
+| **2a** | Platform admins | TOTP (authenticator app) required for `isPlatformAdmin` |
+| **2b** | Org admins | Optional TOTP; org policy to require for `org_admin` |
+| **2c** | All company users | SMS or email OTP on new device / risk signal |
+
+**Implementation notes (when approved):**
+- Store `mfaSecret` / `mfaEnabled` on `users` (or SQL `profiles`)
+- Step-up challenge after primary OAuth/password before full session
+- Recovery codes (one-time, hashed at rest)
+- Session claim `mfaVerifiedAt` with shorter TTL for sensitive actions (`manage_billing`, `team/invite`)
+
+**Out of scope for Phase 2:** WebAuthn/passkeys (Phase 24 hardening).
+
 ---
 
 ## 3. Multi-tenancy enforcement

@@ -5,8 +5,10 @@ import AutomationCanvas from './AutomationCanvas'
 
 const TRIGGERS = [
   { id: 'contact_added', label: 'Contact added to pipeline' },
-  { id: 'form_submitted', label: 'Form submitted' },
   { id: 'lead_created', label: 'Lead created' },
+  { id: 'status_enter', label: 'Pipeline stage entered' },
+  { id: 'deal_won', label: 'Deal won' },
+  { id: 'form_submitted', label: 'Form submitted' },
   { id: 'email_opened', label: 'Email opened' },
   { id: 'link_clicked', label: 'Link clicked' },
 ]

@@ -93,6 +93,7 @@ const ROUTES = {
   'crm/activity-timeline': () => import('../lib/server/handlers/crm-activity-timeline.js'),
   'crm/my-day': () => import('../lib/server/handlers/crm-my-day.js'),
   'dashboard/bootstrap': () => import('../lib/server/handlers/dashboard-bootstrap.js'),
+  'dashboard/layout': () => import('../lib/server/handlers/dashboard-layout.js'),
   'dashboard/pulse': () => import('../lib/server/handlers/dashboard-pulse.js'),
   'opportunities/hub': () => import('../lib/server/handlers/opportunities-hub.js'),
   'crm/dashboard-warm-cron': () => import('../lib/server/handlers/crm-dashboard-warm-cron.js'),

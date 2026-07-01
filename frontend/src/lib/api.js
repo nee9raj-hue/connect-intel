@@ -395,6 +395,10 @@ export const api = {
       request('/api/dashboard/bootstrap', { timeoutMs: 30_000 })
     ),
   getDashboardPulse: () => request('/api/dashboard/pulse', { timeoutMs: 10_000 }, { silent: true }),
+  getDashboardLayout: () =>
+    dedupeGet('dashboard-layout', () => request('/api/dashboard/layout', { timeoutMs: 12_000 })),
+  saveDashboardLayout: (layout) =>
+    request('/api/dashboard/layout', { method: 'PATCH', body: { layout }, timeoutMs: 12_000 }),
   subscribeDashboardPulse: async ({ onPulse, signal } = {}) => {
     const token = getSessionToken()
     const headers = { Accept: 'text/event-stream' }
