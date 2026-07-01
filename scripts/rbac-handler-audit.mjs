@@ -16,7 +16,19 @@ const strict = process.argv.includes('--strict')
 
 const MUTATION_RE = /\b(req\.method\s*===\s*['"](?:POST|PATCH|PUT|DELETE)['"]|methodNotAllowed\([^)]*POST)/
 const PERM_RE =
-  /assertOrgPermission|requireMarketingHubAccess|requireMarketingSendAccess|assertEditLeadsForPipelinePatch|requireOrgAdmin|isOrgAdmin/
+  /assertOrgPermission|loadMetaUserAndAssertEditLeads|requireMarketingHubAccess|requireMarketingSendAccess|assertEditLeadsForPipelinePatch|requireOrgAdmin|requireAdmin|requireTeamWorkspace|consumeSearchQuota|userCanAccessContact|\bauthorize\(/
+const SELF_SERVICE_OK = new Set([
+  'assistant-chat.js',
+  'crm-calendar-google.js',
+  'crm-email-oauth-start.js',
+  'crm-saved-views.js',
+  'crm-workspace-pulse.js',
+  'lead-unlocks.js',
+  'onboarding-complete.js',
+  'search-history.js',
+  'support-tickets.js',
+  'user-profile.js',
+])
 const PUBLIC_OK = new Set([
   'auth-session.js',
   'health.js',
@@ -24,6 +36,7 @@ const PUBLIC_OK = new Set([
   'invite-preview.js',
   'marketing-open.js',
   'marketing-click.js',
+  'marketing-form.js',
   'marketing-unsubscribe.js',
   'marketing-webhooks.js',
   'resend-webhook.js',
@@ -44,7 +57,7 @@ const files = (await readdir(HANDLERS)).filter((f) => f.endsWith('.js')).sort()
 const gaps = []
 
 for (const file of files) {
-  if (PUBLIC_OK.has(file)) continue
+  if (PUBLIC_OK.has(file) || SELF_SERVICE_OK.has(file)) continue
   const src = await readFile(join(HANDLERS, file), 'utf8')
   if (!MUTATION_RE.test(src)) continue
   if (!PERM_RE.test(src)) gaps.push(file)

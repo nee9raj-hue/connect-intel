@@ -37,7 +37,7 @@ jobs:
         run: npm test
 
       - name: RBAC handler audit
-        run: npm run rbac:audit
+        run: npm run rbac:audit -- --strict
 
       - name: Verify deploy-critical files
         run: node scripts/verify-deploy.mjs --skip-build
