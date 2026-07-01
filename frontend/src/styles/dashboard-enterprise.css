@@ -1,0 +1,364 @@
+/* Enterprise CRM dashboard — Salesforce-inspired layout on platform tokens */
+
+.dash-home--enterprise {
+  --dash-bg: var(--ci-platform-surface-muted, #f7f9fb);
+  --dash-card: var(--ci-platform-surface, #fff);
+  --dash-border: var(--ci-platform-border, #e5e9ee);
+  --dash-text: var(--ci-platform-text, #202938);
+  --dash-muted: var(--ci-platform-text-muted, #516f90);
+  --dash-link: #007c89;
+  --dash-primary: #17191c;
+}
+
+/* ── Top bar ── */
+.dash-ent__topbar {
+  margin-bottom: 1rem;
+}
+
+.dash-ent__topbar-main {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.dash-ent__topbar-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.35rem;
+}
+
+.dash-ent__role-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.625rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: #17191c;
+  color: #fff;
+}
+
+.dash-ent__scope-badge {
+  display: inline-flex;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: var(--ci-platform-surface-muted, #f1f5f9);
+  color: var(--dash-muted);
+  border: 1px solid var(--dash-border);
+}
+
+.dash-ent__page-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: var(--dash-text);
+}
+
+.dash-ent__page-meta {
+  margin: 0.35rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--dash-muted);
+}
+
+.dash-ent__cta {
+  flex-shrink: 0;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  padding: 0.55rem 1rem;
+  border-radius: var(--ci-platform-radius-md, 12px);
+  border: none;
+  background: var(--dash-primary);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: var(--ci-platform-shadow-sm);
+}
+
+.dash-ent__cta:hover {
+  filter: brightness(1.08);
+}
+
+.dash-ent__topbar-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  background: var(--dash-card);
+  border: 1px solid var(--dash-border);
+  border-radius: var(--ci-platform-radius-md, 12px);
+}
+
+/* ── Executive KPIs ── */
+.dash-ent__kpi-section {
+  margin-bottom: 1rem;
+}
+
+.dash-ent__kpi-row {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.dash-ent__kpi {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+  padding: 1rem 1rem 0.9rem;
+  background: var(--dash-card);
+  border: 1px solid var(--dash-border);
+  border-radius: var(--ci-platform-radius-md, 12px);
+  border-top: 3px solid var(--kpi-accent, var(--ci-platform-focus));
+  text-align: left;
+  cursor: pointer;
+  transition: box-shadow 0.15s, transform 0.15s;
+  box-shadow: var(--ci-platform-shadow-sm);
+}
+
+.dash-ent__kpi:hover {
+  box-shadow: var(--ci-platform-shadow-md);
+  transform: translateY(-1px);
+}
+
+.dash-ent__kpi.is-alert {
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+
+.dash-ent__kpi-icon {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--kpi-accent, var(--ci-platform-focus));
+  line-height: 1;
+}
+
+.dash-ent__kpi-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--dash-muted);
+}
+
+.dash-ent__kpi-value {
+  font-size: 1.75rem;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--dash-text);
+}
+
+.dash-ent__kpi-link {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--dash-link);
+  margin-top: 0.15rem;
+}
+
+/* ── Sales pipeline snapshot ── */
+.dash-ent__pipeline {
+  margin-bottom: 1rem;
+  padding: 1.1rem 1.25rem;
+  background: var(--dash-card);
+  border: 1px solid var(--dash-border);
+  border-radius: var(--ci-platform-radius-md, 12px);
+  box-shadow: var(--ci-platform-shadow-sm);
+}
+
+.dash-ent__pipeline-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.dash-ent__section-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.dash-ent__section-sub {
+  margin: 0.2rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--dash-muted);
+}
+
+.dash-ent__pipeline-funnel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.dash-ent__pipeline-stage {
+  display: grid;
+  grid-template-columns: 7rem 1fr 2.5rem;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 0.35rem 0.25rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 8px;
+  text-align: left;
+}
+
+.dash-ent__pipeline-stage:hover {
+  background: var(--ci-platform-surface-muted, #f8fafc);
+}
+
+.dash-ent__pipeline-stage-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--dash-text);
+}
+
+.dash-ent__pipeline-stage-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #007c89 0%, #0ea5e9 100%);
+  width: var(--w, 20%);
+  min-width: 4px;
+  transition: width 0.2s ease;
+}
+
+.dash-ent__pipeline-stage-count {
+  font-size: 0.875rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  color: var(--dash-text);
+}
+
+/* ── Analytics grid label ── */
+.dash-ent__analytics-label {
+  margin: 0 0 0.65rem;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--dash-muted);
+}
+
+.dash-ent__aside-rail {
+  position: sticky;
+  top: 0.5rem;
+}
+
+.dash-ent__timeline-card .dash-home__feed {
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+/* ── Skeletons ── */
+@keyframes dash-ent-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.dash-ent__skel {
+  border-radius: 8px;
+  background: linear-gradient(90deg, #e8edf2 25%, #f4f6f8 50%, #e8edf2 75%);
+  background-size: 200% 100%;
+  animation: dash-ent-shimmer 1.4s ease-in-out infinite;
+}
+
+.dash-ent__skel-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.dash-ent__skel-eyebrow { width: 6rem; height: 0.65rem; margin-bottom: 0.5rem; }
+.dash-ent__skel-title { width: 14rem; height: 1.5rem; margin-bottom: 0.4rem; }
+.dash-ent__skel-meta { width: 10rem; height: 0.75rem; }
+.dash-ent__skel-btn { width: 7rem; height: 2.25rem; border-radius: 12px; }
+
+.dash-ent__skel-toolbar {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: #fff;
+  border-radius: 12px;
+}
+
+.dash-ent__skel-pill { width: 4.5rem; height: 1.75rem; border-radius: 999px; }
+
+.dash-ent__skel-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.dash-ent__skel-kpi { height: 5.5rem; border-radius: 12px; }
+
+.dash-ent__skel-charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.dash-ent__skel-chart { height: 18rem; border-radius: 14px; }
+
+.dash-ent__skel-main {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 1rem;
+}
+
+.dash-ent__skel-card { height: 12rem; border-radius: 14px; }
+.dash-ent__skel-card--tall { height: 20rem; }
+
+@media (max-width: 1100px) {
+  .dash-ent__kpi-row,
+  .dash-ent__skel-kpi-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .dash-ent__skel-charts {
+    grid-template-columns: 1fr;
+  }
+
+  .dash-ent__skel-main {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .dash-ent__kpi-row,
+  .dash-ent__skel-kpi-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dash-ent__pipeline-stage {
+    grid-template-columns: 5.5rem 1fr 2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dash-ent__skel {
+    animation: none;
+    background: #e8edf2;
+  }
+
+  .dash-ent__kpi:hover {
+    transform: none;
+  }
+}

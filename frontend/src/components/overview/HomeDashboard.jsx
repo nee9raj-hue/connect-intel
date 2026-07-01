@@ -11,7 +11,12 @@ import {
 import TeamReviewBlock from './TeamReviewBlock'
 import CrmGettingStarted from './CrmGettingStarted'
 import { readPanelCache, writePanelCache, teamReviewCacheKey } from '../../lib/panelCache'
+import DashboardSkeleton from './enterprise/DashboardSkeleton'
+import DashboardTopBar from './enterprise/DashboardTopBar'
+import ExecutiveKpiStrip from './enterprise/ExecutiveKpiStrip'
+import SalesPipelineSnapshot from './enterprise/SalesPipelineSnapshot'
 import '../../styles/dashboard-home.css'
+import '../../styles/dashboard-enterprise.css'
 
 const PERIODS = [
   { id: '7d', label: '7 days', api: '7d' },
@@ -33,25 +38,7 @@ function relTime(iso) {
 }
 
 function StatStrip({ items, onAction }) {
-  return (
-    <div className="dash-home__kpi-row">
-      {items.map((s) => (
-        <button
-          key={s.id}
-          type="button"
-          className={`dash-home__kpi${s.highlight ? ' is-alert' : ''}`}
-          onClick={() => onAction(s.action)}
-        >
-          <span className="dash-home__kpi-label">{s.label}</span>
-          <span className="dash-home__kpi-value">
-            {s.count}
-            {s.suffix || ''}
-          </span>
-          <span className="dash-home__kpi-link">{s.linkLabel} →</span>
-        </button>
-      ))}
-    </div>
-  )
+  return <ExecutiveKpiStrip items={items} onAction={onAction} />
 }
 
 function PrioritiesCard({ priorities, onAction, onLead, title, subtitle }) {
@@ -296,13 +283,7 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
   }, [viewData?.role])
 
   if (loading && !data) {
-    return (
-      <div className="dash-home">
-        <div className="dash-home__inner">
-          <p className="dash-home__empty">Loading dashboard…</p>
-        </div>
-      </div>
-    )
+    return <DashboardSkeleton />
   }
 
   if (error && !data) {
@@ -319,61 +300,37 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
   }
 
   return (
-    <div className="dash-home">
+    <div className="dash-home dash-home--enterprise">
       <div className="dash-home__inner">
-        <header className="dash-home__header">
-          <div>
-            <p className="dash-home__eyebrow">Command center</p>
-            <h1 className="dash-home__title">
-              {viewData.greeting}, {viewData.user?.firstName || 'there'}
-            </h1>
-            <p className="dash-home__meta">
-              Updated {freshnessLabel}
-              {refreshing ? ' · refreshing…' : ''}
-              {viewData.scopeLabel ? ` · ${viewData.scopeLabel}` : ''}
-              <button type="button" className="dash-home__link" onClick={() => load(true)} aria-label="Refresh">
-                ↺ Refresh
-              </button>
-            </p>
-          </div>
-          <div className="dash-home__header-actions">
-            {primaryAction ? (
-              <button type="button" className="dash-home__btn dash-home__btn--primary" onClick={() => runAction(primaryAction.action)}>
-                {primaryAction.label}
-              </button>
-            ) : null}
-          </div>
-        </header>
+        <DashboardTopBar
+          greeting={viewData.greeting}
+          firstName={viewData.user?.firstName}
+          role={role}
+          scopeLabel={viewData.scopeLabel}
+          freshnessLabel={freshnessLabel}
+          refreshing={refreshing}
+          primaryAction={primaryAction}
+          onRefresh={() => load(true)}
+          onPrimaryAction={() => runAction(primaryAction.action)}
+          period={period}
+          periods={PERIODS}
+          onPeriodChange={setPeriod}
+          quickActions={viewData.quickActions || []}
+          onAction={runAction}
+        />
 
         <CrmGettingStarted onNavigate={runAction} pipelineSummary={ps} />
 
-        <div className="dash-home__toolbar">
-          <div className="dash-home__filters">
-            <span className="dash-home__filters-label">Period</span>
-            {PERIODS.map((p) => (
-              <button
-                key={p.id}
-                type="button"
-                className={`dash-home__filter-pill${period === p.id ? ' is-active' : ''}`}
-                onClick={() => setPeriod(p.id)}
-              >
-                {p.label}
-              </button>
-            ))}
-          </div>
-          {viewData.quickActions?.length ? (
-            <div className="dash-home__quick-actions">
-              {viewData.quickActions.map((q) => (
-                <button key={q.id} type="button" className="dash-home__btn" onClick={() => runAction(q.action)}>
-                  {q.label}
-                </button>
-              ))}
-            </div>
-          ) : null}
-        </div>
-
         <StatStrip items={viewData.statStrip || []} onAction={runAction} />
 
+        <SalesPipelineSnapshot
+          stages={ps.stages}
+          total={ps.leadCount}
+          role={role}
+          onStageClick={runAction}
+        />
+
+        <p className="dash-ent__analytics-label">Analytics</p>
         <div className="dash-home__charts">
           <section className="dash-home__panel">
             <div className="dash-home__panel-head">
@@ -449,9 +406,12 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
               </section>
             ) : null}
 
-            <section className="dash-home__card">
+            <section className="dash-home__card dash-ent__timeline-card">
               <div className="dash-home__card-head">
-                <h3 className="dash-home__card-title">Recent activity</h3>
+                <div>
+                  <h3 className="dash-home__card-title">Activity timeline</h3>
+                  <p className="dash-home__card-sub">Calls, emails, tasks, and notes across your workspace</p>
+                </div>
                 <button type="button" className="dash-home__link" onClick={() => runAction({ panel: 'crm-log', returnTo: 'overview' })}>
                   View all →
                 </button>
@@ -460,7 +420,7 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
             </section>
           </div>
 
-          <aside className="dash-home__aside">
+          <aside className="dash-home__aside dash-ent__aside-rail">
             <WeekProgressCard thisWeek={viewData.thisWeek} label={role === 'manager' ? 'Team CRM actions' : 'Your CRM actions'} />
 
             {role === 'rep' ? <LeadFocusGrid leadFocus={viewData.leadFocus} leadFocusActions={viewData.leadFocusActions} onAction={runAction} /> : null}
