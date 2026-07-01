@@ -41,6 +41,7 @@ import { MenuIcon, SettingsGearIcon } from '../ui/icons'
 export default function AppShell() {
   const {
     user,
+    workspaceReady,
     syncWorkspace,
     setPanelNavigate,
     openPipelineLead,
@@ -97,6 +98,7 @@ export default function AppShell() {
 
   useWorkspaceSync({
     enabled: Boolean(user?.onboardingComplete || user?.isPlatformAdmin),
+    workspaceReady,
     userId: user?.id,
     syncWorkspace,
     onNewNotifications: (items) => {
@@ -114,6 +116,7 @@ export default function AppShell() {
 
   useWorkspacePulse({
     enabled: Boolean(user?.onboardingComplete || user?.isPlatformAdmin),
+    workspaceReady,
     userId: user?.id,
     panel: activePanel,
   })

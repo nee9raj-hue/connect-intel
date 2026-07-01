@@ -94,6 +94,7 @@ export function AppProvider({ children }) {
   const [repRoster, setRepRoster] = useState([])
   const [orgLeadTags, setOrgLeadTags] = useState([])
   const [ready, setReady] = useState(() => Boolean(getSessionToken()))
+  const [workspaceReady, setWorkspaceReady] = useState(false)
   const [authBusy, setAuthBusy] = useState(false)
   const [pipelineLeadId, setPipelineLeadId] = useState(null)
   const [pipelineLeadDetailAt, setPipelineLeadDetailAt] = useState(0)
@@ -523,8 +524,11 @@ export function AppProvider({ children }) {
         setPipelineSummary(normalizePipelineSummary({ total: 0, byStatus: [], cities: [], states: [] }))
         setPipelineLoad({ total: 0, loaded: 0, hasMore: false, loadingMore: false })
         workspaceLoadedAtRef.current = 0
+        setWorkspaceReady(false)
         return
       }
+
+      setWorkspaceReady(false)
 
       if (workspaceLoadInFlightRef.current) {
         await workspaceLoadInFlightRef.current
@@ -535,9 +539,15 @@ export function AppProvider({ children }) {
         try {
           const bootstrapGen = pipelineListFetchGenRef.current
           const assigneeUserId = loadPipelineAssigneeFilter() || undefined
-          const [bootstrap, historyResult] = await Promise.all([
+          const teamPromise =
+            user.organizationId && user.accountType === 'company'
+              ? api.getTeamMembers({ silent: true })
+              : Promise.resolve(null)
+
+          const [bootstrap, historyResult, teamData] = await Promise.all([
             api.getPipelineBootstrap({ offset: 0, limit: 100, silent: true, assigneeUserId }),
             api.getSearchHistory({ silent: true }),
+            teamPromise,
           ])
 
           if (cancelled) return
@@ -546,6 +556,11 @@ export function AppProvider({ children }) {
           const summary = bootstrap.summary || {}
           setPipelineSummary(normalizePipelineSummary(summary))
           setSearchHistory(historyResult.history || [])
+
+          if (teamData) {
+            setTeamMembers(teamData.members || [])
+            setRepRoster(teamData.repRoster || teamData.members || [])
+          }
 
           const listSuperseded = bootstrapGen !== pipelineListFetchGenRef.current
           if (!listSuperseded) {
@@ -559,16 +574,9 @@ export function AppProvider({ children }) {
             loadedCountRef.current = leads.length
             pipelineCursorRef.current = bootstrap.nextCursor || null
             workspaceLoadedAtRef.current = Date.now()
+            setWorkspaceReady(true)
           }
           setSessionError(null)
-
-          if (user.organizationId && user.accountType === 'company') {
-            const data = await api.getTeamMembers({ silent: true })
-            if (!cancelled) {
-              setTeamMembers(data.members || [])
-              setRepRoster(data.repRoster || data.members || [])
-            }
-          }
         } catch (error) {
           if (!cancelled) {
             if (error?.status === 401) {
@@ -1103,6 +1111,7 @@ export function AppProvider({ children }) {
       value={{
         user,
         ready,
+        workspaceReady,
         authBusy,
         screen,
         setScreen,

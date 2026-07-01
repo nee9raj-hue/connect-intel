@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 
 const POLL_MS = 60 * 1000
-const INITIAL_DELAY_MS = 5 * 1000
+const INITIAL_DELAY_MS = 2 * 1000
 const AUTH_FAIL_PAUSE_MS = 2 * 60 * 1000
 const FOCUS_SYNC_MIN_GAP_MS = 90 * 1000
 
@@ -19,6 +19,7 @@ function showBrowserNotification(item) {
 
 export function useWorkspaceSync({
   enabled,
+  workspaceReady = true,
   userId,
   syncWorkspace,
   onNewNotifications,
@@ -34,7 +35,7 @@ export function useWorkspaceSync({
   notifyRef.current = onNewNotifications
 
   useEffect(() => {
-    if (!enabled || !userId) return undefined
+    if (!enabled || !userId || !workspaceReady) return undefined
 
     if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
       Notification.requestPermission().catch(() => {})
@@ -101,5 +102,5 @@ export function useWorkspaceSync({
       document.removeEventListener('visibilitychange', onVisible)
       window.removeEventListener('focus', onVisible)
     }
-  }, [enabled, userId])
+  }, [enabled, workspaceReady, userId])
 }

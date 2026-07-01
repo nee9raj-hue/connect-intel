@@ -4,12 +4,12 @@ import { api } from '../lib/api'
 const PULSE_MS = 60 * 1000
 
 /** Track active workspace time and panel usage for team intelligence (managers). */
-export function useWorkspacePulse({ enabled, userId, panel = null }) {
+export function useWorkspacePulse({ enabled, workspaceReady = true, userId, panel = null }) {
   const panelRef = useRef(panel)
   panelRef.current = panel
 
   useEffect(() => {
-    if (!enabled || !userId) return undefined
+    if (!enabled || !userId || !workspaceReady) return undefined
 
     const send = () => {
       if (document.visibilityState !== 'visible') return
@@ -27,5 +27,5 @@ export function useWorkspacePulse({ enabled, userId, panel = null }) {
       clearInterval(id)
       document.removeEventListener('visibilitychange', onVisible)
     }
-  }, [enabled, userId])
+  }, [enabled, workspaceReady, userId])
 }
