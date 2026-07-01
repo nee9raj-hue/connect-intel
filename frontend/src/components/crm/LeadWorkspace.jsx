@@ -207,6 +207,7 @@ export default function LeadWorkspace({
   const [editingVisitMeetingId, setEditingVisitMeetingId] = useState(null)
   const [timelineFilter, setTimelineFilter] = useState('all')
   const [marketingTimeline, setMarketingTimeline] = useState([])
+  const [indexedActivities, setIndexedActivities] = useState([])
 
   const isManager = isPipelineAssignManager(user)
   const isUnassignedLead = !lead?.assignedToUserId
@@ -218,8 +219,12 @@ export default function LeadWorkspace({
   const fieldVisitExpensesEnabled = hasWorkspaceFeature(user, 'fieldVisitExpenses')
   const crm = lead.crm || {}
   const timeline = useMemo(
-    () => filterTimelineItems(buildUnifiedTimeline(crm, { marketingEvents: marketingTimeline }), timelineFilter),
-    [crm, marketingTimeline, timelineFilter]
+    () =>
+      filterTimelineItems(
+        buildUnifiedTimeline(crm, { marketingEvents: marketingTimeline, indexedActivities }),
+        timelineFilter
+      ),
+    [crm, marketingTimeline, indexedActivities, timelineFilter]
   )
   const statusMeta = getStatusMeta(status)
   const saving = savingScope !== null
@@ -278,12 +283,17 @@ export default function LeadWorkspace({
   }, [tab])
 
   useEffect(() => {
-    if (tab !== 'notes') return
     api
       .getCrmLeadTimeline(lead.id)
-      .then((data) => setMarketingTimeline(data.marketingEvents || []))
-      .catch(() => setMarketingTimeline([]))
-  }, [tab, lead.id])
+      .then((data) => {
+        setMarketingTimeline(data.marketingEvents || [])
+        setIndexedActivities(data.indexedActivities || [])
+      })
+      .catch(() => {
+        setMarketingTimeline([])
+        setIndexedActivities([])
+      })
+  }, [lead.id])
 
   useEffect(() => {
     if (tab !== 'email') return undefined

@@ -16,10 +16,12 @@ function marketingEventTitle(ev) {
   return ev.type || 'Marketing event'
 }
 
-export function buildUnifiedTimeline(crm = {}, { marketingEvents = [] } = {}) {
+export function buildUnifiedTimeline(crm = {}, { marketingEvents = [], indexedActivities = [] } = {}) {
   const items = []
+  const seenActivityIds = new Set()
 
   for (const act of crm.activities || []) {
+    if (act?.id) seenActivityIds.add(act.id)
     items.push({
       id: act.id,
       kind: 'activity',
@@ -28,6 +30,21 @@ export function buildUnifiedTimeline(crm = {}, { marketingEvents = [] } = {}) {
       at: act.createdAt,
       title: act.summary,
       subtitle: act.createdByName,
+      meta: act.meta,
+    })
+  }
+
+  for (const act of indexedActivities || []) {
+    if (!act?.id || seenActivityIds.has(act.id)) continue
+    seenActivityIds.add(act.id)
+    items.push({
+      id: act.id,
+      kind: act.kind || 'activity',
+      category: act.type === 'note' ? 'notes' : 'activity',
+      type: act.type,
+      at: act.at || act.createdAt,
+      title: act.body || act.title,
+      subtitle: act.actorName || act.createdByName,
       meta: act.meta,
     })
   }

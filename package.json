@@ -31,6 +31,7 @@
     "meili:backfill": "node scripts/backfill-meilisearch.mjs",
     "pipeline:backfill": "node scripts/backfill-pipeline-leads.mjs",
     "pipeline:sync": "node scripts/pipeline-sync.mjs",
+    "deals:sync": "node scripts/deals-sync.mjs",
     "activities:backfill": "node scripts/backfill-pipeline-activities.mjs",
     "activities:indexes": "node scripts/apply-activities-indexes.mjs",
     "enterprise:backfill": "node scripts/backfill-enterprise-crm.mjs",
