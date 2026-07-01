@@ -14,3 +14,6 @@ export const GMAIL_ONBOARDING_PROMPT_ENABLED = false
 
 /** Paid plans, Stripe, invoices, and subscription chip — CRM go-live is included/free. */
 export const BILLING_IN_CRM_UI_ENABLED = false
+
+/** Solo/small-team CRM — no paid tier, credits, or subscription flags exposed to users. */
+export const CRM_SOLO_FREE_TIER = true

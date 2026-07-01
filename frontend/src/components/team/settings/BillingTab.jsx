@@ -23,31 +23,33 @@ function UsageBar({ label, used, total }) {
 const PLACEHOLDER_INVOICES = []
 
 function CrmWorkspaceTab() {
-  const { user, teamMembers } = useApp()
-  const seatLimit = user?.seatLimit ?? 20
+  const { user } = useApp()
   const orgName = user?.organizationName || user?.company || 'Your workspace'
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       <SettingsCard>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-          <span style={{ fontSize: 18, fontWeight: 500 }}>CRM included</span>
+          <span style={{ fontSize: 18, fontWeight: 500 }}>Free CRM</span>
           <SettingsBadge bg="#eaf3de" color="#27500a">
-            Active
+            Included
           </SettingsBadge>
         </div>
         <p style={{ fontSize: 13, color: C.textSecondary, margin: 0, lineHeight: 1.5 }}>
-          <strong>{orgName}</strong> is on Connect Intel CRM at no charge during go-live — pipeline, contacts,
-          calendar, team invites, and imports. Paid plans and invoices will appear here when billing opens.
+          <strong>{orgName}</strong> runs on Connect Intel&apos;s free CRM tier — pipeline, contacts,
+          calendar, and imports. Built for solo reps and small teams with a light lead list. No subscription,
+          credits, or paid add-ons in this workspace.
         </p>
       </SettingsCard>
 
       <SettingsCard>
-        <p style={{ fontSize: 14, fontWeight: 500, margin: '0 0 16px' }}>Workspace usage</p>
-        <UsageBar label="Team seats" used={teamMembers.length} total={seatLimit} />
-        <p style={{ fontSize: 12, color: C.textMuted, margin: 0, lineHeight: 1.5 }}>
-          Invite teammates from the Team members tab. AI lead search and marketing add-ons are separate products.
-        </p>
+        <p style={{ fontSize: 14, fontWeight: 500, margin: '0 0 8px' }}>What&apos;s included</p>
+        <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13, color: C.textSecondary, lineHeight: 1.6 }}>
+          <li>Unlimited pipeline leads for normal use</li>
+          <li>Team invites when you need a colleague</li>
+          <li>CSV import and manual lead entry</li>
+          <li>Work Gmail connect when Google verification completes (optional)</li>
+        </ul>
       </SettingsCard>
     </div>
   )
