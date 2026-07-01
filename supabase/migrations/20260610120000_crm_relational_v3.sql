@@ -2,19 +2,22 @@
 -- Run in Supabase SQL editor. Enable reads/writes with USE_PIPELINE_LEADS_TABLE=true after backfill.
 
 -- ─── Core pipeline row (one lead per row) ───────────────────────────────────
+-- Table may already exist from 20260609120000 — add missing columns before indexes.
 CREATE TABLE IF NOT EXISTS public.pipeline_leads (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   lead_id TEXT NOT NULL,
   shard_name TEXT NOT NULL,
   organization_id TEXT,
   user_id TEXT,
-  owner_id TEXT,
-  email TEXT,
-  phone TEXT,
   entry JSONB NOT NULL DEFAULT '{}'::jsonb,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   CONSTRAINT pipeline_leads_shard_lead_unique UNIQUE (shard_name, lead_id)
 );
+
+ALTER TABLE public.pipeline_leads
+  ADD COLUMN IF NOT EXISTS owner_id TEXT,
+  ADD COLUMN IF NOT EXISTS email TEXT,
+  ADD COLUMN IF NOT EXISTS phone TEXT;
 
 CREATE INDEX IF NOT EXISTS idx_pipeline_leads_org ON public.pipeline_leads (organization_id);
 CREATE INDEX IF NOT EXISTS idx_pipeline_leads_owner ON public.pipeline_leads (owner_id);
