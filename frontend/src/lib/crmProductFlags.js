@@ -18,5 +18,8 @@ export const BILLING_IN_CRM_UI_ENABLED = false
 /** Solo/small-team CRM — no paid tier, credits, or subscription flags exposed to users. */
 export const CRM_SOLO_FREE_TIER = true
 
-/** Google OAuth on landing/auth — off until basic scopes + mandatory profile fields ship. */
+/** Google on landing + signup — off for new email-first onboarding. */
 export const GOOGLE_SIGNIN_IN_UI_ENABLED = false
+
+/** Google sign-in on auth login tab — existing workspaces that registered with Google. */
+export const GOOGLE_SIGNIN_ON_LOGIN_ENABLED = true

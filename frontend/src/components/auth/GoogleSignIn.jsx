@@ -76,6 +76,7 @@ export default function GoogleSignIn({
   text = 'continue_with',
   layout = 'block',
   label,
+  enabled = GOOGLE_SIGNIN_IN_UI_ENABLED,
 }) {
   const { login, authBusy } = useApp()
   const [containerRef, btnWidth] = useButtonWidth()
@@ -108,7 +109,7 @@ export default function GoogleSignIn({
         ? 'Sign in with Google'
         : 'Continue with Google')
 
-  if (!GOOGLE_SIGNIN_IN_UI_ENABLED) return null
+  if (!enabled) return null
 
   if (!ready) {
     return (

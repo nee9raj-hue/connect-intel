@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useApp } from '../context/AppContext'
+import GoogleSignIn from '../components/auth/GoogleSignIn'
 import InviteBanner from '../components/auth/InviteBanner'
+import { GOOGLE_SIGNIN_ON_LOGIN_ENABLED } from '../lib/crmProductFlags'
 import { BRAND_LOGO_MARK_TRANSPARENT, BRAND_LOGO_MARK_CLASS } from '../lib/brandAssets'
 import { CRM_ONBOARDING_STEPS, FREE_PLAN, FREE_TIER_HIGHLIGHTS } from '../lib/crmPlanLimits'
 
@@ -100,7 +102,7 @@ export default function AuthPage({ inviteToken = null }) {
           <p className="text-sm text-gray-600 mb-6">
             {mode === 'signup'
               ? 'Use your work email and password — Gmail connect comes later in settings.'
-              : 'Sign in to your CRM workspace'}
+              : 'Work email + password, or Google if you originally signed up that way.'}
           </p>
 
           {inviteToken && <InviteBanner token={inviteToken} />}
@@ -194,10 +196,29 @@ export default function AuthPage({ inviteToken = null }) {
             </button>
           </form>
 
-          <p className="mt-6 text-xs text-gray-500 text-center leading-relaxed">
-            After signup you will confirm company details and mobile in setup. Work Gmail uses normal Google scopes
-            only when you choose to connect it.
-          </p>
+          {mode === 'login' && GOOGLE_SIGNIN_ON_LOGIN_ENABLED ? (
+            <>
+              <div className="flex items-center gap-3 my-6">
+                <div className="flex-1 h-px bg-gray-200" />
+                <span className="text-xs text-gray-500 font-medium">or</span>
+                <div className="flex-1 h-px bg-gray-200" />
+              </div>
+
+              <GoogleSignIn text="signin_with" layout="block" enabled />
+
+              <p className="mt-4 text-xs text-gray-600 text-center leading-relaxed">
+                For teams already on Connect Intel (e.g. registered with Google). Uses profile only — work Gmail
+                for send/receive connects separately in settings.
+              </p>
+            </>
+          ) : null}
+
+          {mode === 'signup' ? (
+            <p className="mt-6 text-xs text-gray-500 text-center leading-relaxed">
+              After signup you will confirm company details and mobile in setup. Work Gmail uses normal Google scopes
+              only when you choose to connect it.
+            </p>
+          ) : null}
 
           <p className="mt-4 text-sm text-gray-500 text-center leading-relaxed">
             By continuing, you agree to our Terms of Service and Privacy Policy.
