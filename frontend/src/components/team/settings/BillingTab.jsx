@@ -1,6 +1,7 @@
 import { useApp } from '../../../context/AppContext'
 import { C } from './settingsTheme'
 import { PrimaryButton, SettingsBadge, SettingsCard } from './SettingsUi'
+import { AI_PROSPECTING_IN_CRM_ENABLED } from '../../../lib/crmProductFlags'
 
 function UsageBar({ label, used, total }) {
   const pct = total > 0 ? Math.min(100, Math.round((used / total) * 100)) : 0
@@ -59,7 +60,9 @@ export default function BillingTab() {
 
       <SettingsCard>
         <p style={{ fontSize: 14, fontWeight: 500, margin: '0 0 16px' }}>Usage</p>
-        <UsageBar label="AI searches" used={searchesUsed} total={searchesTotal} />
+        {AI_PROSPECTING_IN_CRM_ENABLED ? (
+          <UsageBar label="AI searches" used={searchesUsed} total={searchesTotal} />
+        ) : null}
         <UsageBar label="Team seats" used={teamMembers.length} total={seatLimit} />
         <UsageBar label="Emails sent" used={emailsSent} total={emailLimit} />
       </SettingsCard>

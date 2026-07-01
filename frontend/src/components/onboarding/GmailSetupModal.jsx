@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
+import { GMAIL_ONBOARDING_PROMPT_ENABLED } from '../../lib/crmProductFlags'
 
 const STORAGE_KEY = 'ci_gmail_setup_done'
 
@@ -17,7 +18,7 @@ export function useGmailSetupNeeded(user) {
   const [status, setStatus] = useState(null)
 
   useEffect(() => {
-    if (!user?.onboardingComplete || user?.isPlatformAdmin) {
+    if (!GMAIL_ONBOARDING_PROMPT_ENABLED || !user?.onboardingComplete || user?.isPlatformAdmin) {
       setNeeded(false)
       return
     }

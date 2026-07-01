@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { PRODUCT } from '../../lib/productCopy'
+import { AI_PROSPECTING_IN_CRM_ENABLED } from '../../lib/crmProductFlags'
 import InviteEmailSetup from '../team/InviteEmailSetup'
 import OrgWhatsAppCloudSetup from '../team/OrgWhatsAppCloudSetup'
 
@@ -69,8 +70,8 @@ export default function IntegrationsPanel() {
         <div className="panel-body-scroll p-6 max-w-3xl">
         <h1 className="text-lg font-semibold text-gray-900 mb-2">Connected services</h1>
         <p className="text-sm text-gray-600 mb-6 leading-relaxed">
-          {PRODUCT.tagline} Your workspace includes AI prospect search, pipeline CRM, and optional work
-          email for sending. Company admins manage team access and imports under <strong>Team</strong>.
+          {PRODUCT.tagline} Your workspace includes pipeline CRM, contacts, calendar, and optional work email
+          for sending. Company admins manage team access under <strong>Team</strong>.
         </p>
         {isCompanyAdmin && (
           <section className="mb-6 rounded-xl border border-[#25D366]/40 bg-white p-4 space-y-2">
@@ -83,7 +84,7 @@ export default function IntegrationsPanel() {
           </section>
         )}
         <div className="space-y-4">
-          {PARTNERS.filter((p) => p.status === 'active').map((partner) => (
+          {PARTNERS.filter((p) => p.status === 'active' && (AI_PROSPECTING_IN_CRM_ENABLED || p.id !== 'ai')).map((partner) => (
             <PartnerCard key={partner.id} partner={partner} />
           ))}
         </div>

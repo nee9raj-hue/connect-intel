@@ -5,23 +5,32 @@ import InviteBanner from '../components/auth/InviteBanner'
 import { BRAND_LOGO_MARK_TRANSPARENT, BRAND_LOGO_MARK_CLASS } from '../lib/brandAssets'
 
 export default function AuthPage({ inviteToken = null }) {
-  const { login, setScreen } = useApp()
-  const [showEmail, setShowEmail] = useState(false)
-  const [form, setForm] = useState({ email: '', password: '' })
+  const { login, setScreen, authBusy } = useApp()
+  const [mode, setMode] = useState('signup')
+  const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '' })
+  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(false)
 
-  const handleEmailLogin = (e) => {
+  const handleEmailAuth = async (e) => {
     e.preventDefault()
-    if (!form.email) return
-    login({
-      demoProfile: {
-        name: form.email.split('@')[0],
-        email: form.email,
-        company: form.email.split('@')[1]?.split('.')[0] || 'Your Company',
-        plan: 'free',
-        searchesLeft: 25,
-        authProvider: 'email-demo',
-      },
-    })
+    setError(null)
+    if (mode === 'signup' && form.password !== form.confirm) {
+      setError('Passwords do not match')
+      return
+    }
+    setLoading(true)
+    try {
+      await login({
+        mode,
+        email: form.email.trim(),
+        password: form.password,
+        ...(mode === 'signup' ? { name: form.name.trim() } : {}),
+      })
+    } catch (err) {
+      setError(err.message || 'Could not sign in')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -36,19 +45,20 @@ export default function AuthPage({ inviteToken = null }) {
             />
           </button>
           <h2 className="text-3xl font-bold leading-tight mb-4">
-            The smarter way to
+            Run your pipeline
             <br />
-            find B2B leads
+            without email setup first
           </h2>
           <p className="text-gray-400 max-w-sm text-[15px] leading-relaxed">
-            Search, score, and save prospects. One login gets you into the full workspace instantly.
+            Sign up with work email, set up your CRM, invite the team, and import leads. Connect work Gmail later
+            when you are ready to send and receive from the CRM.
           </p>
         </div>
         <div className="grid grid-cols-3 gap-4 text-center">
           {[
-            { n: '2.4M+', l: 'Contacts' },
-            { n: '25', l: 'Free searches' },
-            { n: 'CSV', l: 'Export' },
+            { n: 'Pipeline', l: 'Leads & deals' },
+            { n: 'Team', l: 'Invites & roles' },
+            { n: 'Later', l: 'Work Gmail' },
           ].map((s) => (
             <div key={s.l}>
               <div className="text-xl font-bold text-ci-yellow">{s.n}</div>
@@ -67,12 +77,105 @@ export default function AuthPage({ inviteToken = null }) {
             ← Back
           </button>
 
-          <h1 className="text-2xl font-bold text-ci-dark mb-1">Welcome</h1>
-          <p className="text-sm text-gray-500 mb-8">Sign in to access your workspace</p>
+          <h1 className="text-2xl font-bold text-ci-dark mb-1">
+            {mode === 'signup' ? 'Create your workspace' : 'Welcome back'}
+          </h1>
+          <p className="text-sm text-gray-500 mb-6">
+            {mode === 'signup'
+              ? 'Use your work email — no Gmail permissions required yet.'
+              : 'Sign in to your CRM workspace'}
+          </p>
 
           {inviteToken && <InviteBanner token={inviteToken} />}
 
-          <GoogleSignIn text="continue_with" layout="block" />
+          <div className="grid grid-cols-2 gap-2 mb-6 p-1 bg-gray-100 rounded-lg">
+            {[
+              { id: 'signup', label: 'Sign up' },
+              { id: 'login', label: 'Sign in' },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => {
+                  setMode(tab.id)
+                  setError(null)
+                }}
+                className={`py-2 text-sm font-semibold rounded-md transition-colors ${
+                  mode === tab.id ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-800'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          <form onSubmit={handleEmailAuth} className="space-y-4">
+            {mode === 'signup' ? (
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1.5">Your name</label>
+                <input
+                  type="text"
+                  required
+                  className={inputCls}
+                  placeholder="Neeraj Kumar"
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                />
+              </div>
+            ) : null}
+            <div>
+              <label className="block text-xs font-semibold text-gray-600 mb-1.5">Work email</label>
+              <input
+                type="email"
+                required
+                autoComplete="email"
+                className={inputCls}
+                placeholder="you@company.com"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-600 mb-1.5">Password</label>
+              <input
+                type="password"
+                required
+                minLength={8}
+                autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
+                className={inputCls}
+                placeholder="At least 8 characters"
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+              />
+            </div>
+            {mode === 'signup' ? (
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1.5">Confirm password</label>
+                <input
+                  type="password"
+                  required
+                  minLength={8}
+                  autoComplete="new-password"
+                  className={inputCls}
+                  placeholder="Repeat password"
+                  value={form.confirm}
+                  onChange={(e) => setForm({ ...form, confirm: e.target.value })}
+                />
+              </div>
+            ) : null}
+
+            {error ? (
+              <p className="text-xs text-red-700 bg-red-50 border border-red-100 rounded px-2 py-1.5">{error}</p>
+            ) : null}
+
+            <button
+              type="submit"
+              disabled={loading || authBusy}
+              className="w-full py-3 bg-ci-nav text-white font-semibold rounded-lg hover:bg-gray-800 disabled:opacity-60"
+            >
+              {loading || authBusy ? 'Please wait…' : mode === 'signup' ? 'Create account →' : 'Sign in →'}
+            </button>
+          </form>
 
           <div className="flex items-center gap-3 my-6">
             <div className="flex-1 h-px bg-gray-200" />
@@ -80,47 +183,14 @@ export default function AuthPage({ inviteToken = null }) {
             <div className="flex-1 h-px bg-gray-200" />
           </div>
 
-          {!showEmail ? (
-            <button
-              type="button"
-              onClick={() => setShowEmail(true)}
-              className="w-full py-3 border border-gray-300 rounded-lg text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50"
-            >
-              Continue with email
-            </button>
-          ) : (
-            <form onSubmit={handleEmailLogin} className="space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1.5">Work email</label>
-                <input
-                  type="email"
-                  required
-                  className={inputCls}
-                  placeholder="you@company.com"
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1.5">Password</label>
-                <input
-                  type="password"
-                  className={inputCls}
-                  placeholder="••••••••"
-                  value={form.password}
-                  onChange={(e) => setForm({ ...form, password: e.target.value })}
-                />
-              </div>
-              <button
-                type="submit"
-                className="w-full py-3 bg-ci-nav text-white font-semibold rounded-lg hover:bg-gray-800"
-              >
-                Sign in →
-              </button>
-            </form>
-          )}
+          <GoogleSignIn text={mode === 'signup' ? 'signup_with' : 'signin_with'} layout="block" />
 
-          <p className="mt-8 text-sm text-gray-400 text-center leading-relaxed">
+          <p className="mt-4 text-xs text-gray-500 text-center leading-relaxed">
+            Google sign-in uses only your name and email — not Gmail send/receive. Link work Gmail from{' '}
+            <strong>Work email</strong> in the sidebar when you need CRM email.
+          </p>
+
+          <p className="mt-6 text-sm text-gray-400 text-center leading-relaxed">
             By continuing, you agree to our Terms of Service and Privacy Policy.
           </p>
         </div>

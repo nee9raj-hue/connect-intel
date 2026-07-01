@@ -11,6 +11,7 @@ import {
   normalizeMemberStatus,
 } from './settingsTheme'
 import { SettingsBadge, SettingsCard, SettingsInput, SettingsSelect, SettingsStatCard, TextButton } from './SettingsUi'
+import { AI_PROSPECTING_IN_CRM_ENABLED } from '../../../lib/crmProductFlags'
 
 const PAGE_SIZE = 25
 
@@ -280,17 +281,25 @@ export default function TeamMembersTab({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 12 }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: `repeat(${AI_PROSPECTING_IN_CRM_ENABLED ? 4 : 3}, minmax(0, 1fr))`,
+          gap: 12,
+        }}
+      >
         <SettingsStatCard
           label="Total members"
           value={teamMembers.length}
           subtitle={`${stats.admins} admin · ${stats.managers} manager${stats.managers === 1 ? '' : 's'}`}
         />
-        <SettingsStatCard
-          label="AI searches used"
-          value={searchesUsed}
-          subtitle="Remaining in pool"
-        />
+        {AI_PROSPECTING_IN_CRM_ENABLED ? (
+          <SettingsStatCard
+            label="AI searches used"
+            value={searchesUsed}
+            subtitle="Remaining in pool"
+          />
+        ) : null}
         <SettingsStatCard
           label="Lead tags"
           value={orgLeadTags?.length ?? 0}
@@ -299,7 +308,7 @@ export default function TeamMembersTab({
         <SettingsStatCard
           label="Invite domain"
           value={<span style={{ fontSize: 13 }}>{domain}</span>}
-          subtitle="Auto-join enabled"
+          subtitle="Invite teammates by work email"
         />
       </div>
 

@@ -23,6 +23,7 @@ import { useWorkspaceSync } from '../../hooks/useWorkspaceSync'
 import { useWorkspacePulse } from '../../hooks/useWorkspacePulse'
 import SessionReconnectBanner from './SessionReconnectBanner'
 import GmailSetupModal, { markGmailSetupDone, useGmailSetupNeeded } from '../onboarding/GmailSetupModal'
+import { GMAIL_ONBOARDING_PROMPT_ENABLED } from '../../lib/crmProductFlags'
 import ConnectAssistant from '../assistant/ConnectAssistant'
 import CommandPalette from '../platform/CommandPalette'
 import MobileNavPill from './MobileNavPill'
@@ -425,7 +426,7 @@ export default function AppShell() {
         <EmailSendDock sidebarMode={sidebarMode} onNavigate={navigate} />
       )}
       {needsOnboarding && <OnboardingModal />}
-      {needsGmailSetup && !needsOnboarding && (
+      {GMAIL_ONBOARDING_PROMPT_ENABLED && needsGmailSetup && !needsOnboarding && (
         <GmailSetupModal onDone={() => setNeedsGmailSetup(false)} />
       )}
       {user && !needsOnboarding && !(isMobile && hideMobileFloatingChrome) && (

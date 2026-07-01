@@ -71,6 +71,8 @@ function resolvePanelId(activePanel) {
   return activePanel === 'bulk-email' ? 'marketing' : activePanel
 }
 
+const DEFAULT_PANEL = OverviewPanel
+
 function PanelLoader() {
   return (
     <LoadingExperience
@@ -114,7 +116,7 @@ export default function PanelViewport({ activePanel, panelOptions, onNavigate, o
     const aliveIds = [...mountedPanels].filter((id) => KEEP_ALIVE_PANELS.has(id) || id === panelId)
 
     if (aliveIds.length <= 1) {
-      const Panel = PANELS[panelId] || PeopleSearch
+      const Panel = PANELS[panelId] || DEFAULT_PANEL
       return (
         <div className="flex-1 flex flex-col min-h-0 min-w-0 h-full overflow-hidden">
           {renderPanel(panelId, Panel, {
@@ -154,7 +156,7 @@ export default function PanelViewport({ activePanel, panelOptions, onNavigate, o
     )
   }
 
-  const Panel = PANELS[panelId] || PeopleSearch
+  const Panel = PANELS[panelId] || DEFAULT_PANEL
   return (
     <div className="relative flex-1 min-h-0 h-full overflow-hidden">
       {renderPanel(panelId, Panel, {

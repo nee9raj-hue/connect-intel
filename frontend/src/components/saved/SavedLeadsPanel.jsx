@@ -1,5 +1,6 @@
 import { useApp } from '../../context/AppContext'
 import { formatCrmDate, getStatusMeta } from '../../lib/crmConstants'
+import { AI_PROSPECTING_IN_CRM_ENABLED } from '../../lib/crmProductFlags'
 
 export default function SavedLeadsPanel({ onNavigate }) {
   const { savedLeads, toggleSaveLead, openPipelineLead } = useApp()
@@ -76,13 +77,17 @@ export default function SavedLeadsPanel({ onNavigate }) {
         <div className="text-center py-20 bg-white rounded-xl border border-gray-200">
           <div className="text-4xl mb-3">★</div>
           <h3 className="font-semibold text-gray-900 mb-1">No saved leads yet</h3>
-          <p className="text-sm text-gray-500 mb-4">Save leads from People Search, then work them in Pipeline</p>
+          <p className="text-sm text-gray-500 mb-4">
+            {AI_PROSPECTING_IN_CRM_ENABLED
+              ? 'Save leads from People Search, then work them in Pipeline'
+              : 'Import leads or add them in Pipeline — that is where your team works deals'}
+          </p>
           <button
             type="button"
-            onClick={() => onNavigate?.('search')}
+            onClick={() => onNavigate?.(AI_PROSPECTING_IN_CRM_ENABLED ? 'search' : 'pipeline')}
             className="px-4 py-2 text-sm font-semibold bg-[#FF773D] text-[#242424] rounded-lg"
           >
-            Find people
+            {AI_PROSPECTING_IN_CRM_ENABLED ? 'Find people' : 'Open pipeline'}
           </button>
         </div>
       ) : (

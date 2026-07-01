@@ -1,6 +1,7 @@
 import { useApp } from '../../context/AppContext'
 import NotificationBell from './NotificationBell'
 import SidebarToggleButton from './SidebarToggleButton'
+import { CREDITS_IN_CRM_UI_ENABLED } from '../../lib/crmProductFlags'
 
 export default function AppHeader({
   onNavigate,
@@ -29,17 +30,19 @@ export default function AppHeader({
       </button>
       <div className="ci-app-header-chips flex items-center justify-end gap-2 flex-1 min-w-0 md:flex-none">
         <NotificationBell />
-        <button
-          type="button"
-          onClick={() => onNavigate?.('search')}
-          className="ci-app-header-chip ci-app-header-chip--secondary inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#d9dee5] bg-[#f7f9fb] px-2.5 py-1.5 md:px-3 text-sm font-semibold tracking-[-0.015em] text-[#202938] transition-colors hover:bg-[#eef2f6]"
-          title={`AI credits: Rs ${credits}`}
-          aria-label={`AI credits: Rs ${credits}`}
-        >
-          <span className="w-1.5 h-1.5 rounded-full bg-[#17191c]" />
-          <span className="hidden sm:inline">AI credits: Rs {credits}</span>
-          <span className="sm:hidden tabular-nums">Rs {credits}</span>
-        </button>
+        {CREDITS_IN_CRM_UI_ENABLED ? (
+          <button
+            type="button"
+            onClick={() => onNavigate?.('search')}
+            className="ci-app-header-chip ci-app-header-chip--secondary inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#d9dee5] bg-[#f7f9fb] px-2.5 py-1.5 md:px-3 text-sm font-semibold tracking-[-0.015em] text-[#202938] transition-colors hover:bg-[#eef2f6]"
+            title={`AI credits: Rs ${credits}`}
+            aria-label={`AI credits: Rs ${credits}`}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-[#17191c]" />
+            <span className="hidden sm:inline">AI credits: Rs {credits}</span>
+            <span className="sm:hidden tabular-nums">Rs {credits}</span>
+          </button>
+        ) : null}
         <button
           type="button"
           onClick={() => onNavigate?.('team')}
@@ -50,8 +53,8 @@ export default function AppHeader({
           }`}
           title={
             subscriptionActive
-              ? 'Paid subscription — full prospect access'
-              : 'CRM is free. Subscribe to unlock full AI prospect details.'
+              ? 'Paid subscription active'
+              : 'Core CRM is free for your workspace'
           }
           aria-label={
             subscriptionActive

@@ -1,5 +1,9 @@
 import { CRM_STATUSES, getVisiblePipelineColumns } from './crmConstants'
-import { CHITHI_IN_CRM_ENABLED } from './crmProductFlags'
+import {
+  AI_PROSPECTING_IN_CRM_ENABLED,
+  CHITHI_IN_CRM_ENABLED,
+  CREDITS_IN_CRM_UI_ENABLED,
+} from './crmProductFlags'
 import { isChithiPanel } from './chithiNav'
 import { hasWorkspaceFeature } from './workspaceFeatures'
 import { isFreightDealOrg, FREIGHT_DEAL_STAGES } from './freightDeal'
@@ -363,7 +367,7 @@ export function buildCustomerNavSections(
       title: 'CRM / Sales',
       groups: [
         { id: 'pipeline', label: 'Pipeline', icon: 'pipeline', children: pipelineChildren },
-        ...(isCompany
+        ...(isCompany && hasWorkspaceFeature(user, 'panelActiveCustomers')
           ? [{ id: 'active-customers', label: 'Active customers', icon: 'chart', panel: 'active-customers' }]
           : []),
         { id: 'contacts', label: 'Contacts', icon: 'people', panel: 'contacts' },
@@ -400,19 +404,23 @@ export function buildCustomerNavSections(
           },
         ]
       : []),
-    {
-      title: 'AI prospecting',
-      groups: [
-        { id: 'search', label: 'AI prospect search', icon: 'spark', panel: 'search' },
-        {
-          id: 'saved',
-          label: 'Saved leads',
-          icon: 'list',
-          panel: 'saved',
-          badgeKey: 'saved',
-        },
-      ],
-    },
+    ...(AI_PROSPECTING_IN_CRM_ENABLED
+      ? [
+          {
+            title: 'AI prospecting',
+            groups: [
+              { id: 'search', label: 'AI prospect search', icon: 'spark', panel: 'search' },
+              {
+                id: 'saved',
+                label: 'Saved leads',
+                icon: 'list',
+                panel: 'saved',
+                badgeKey: 'saved',
+              },
+            ],
+          },
+        ]
+      : []),
   ]
 
   if (user?.isOrgAdmin && isCompany) {
@@ -474,7 +482,9 @@ export function buildOperatorNavSections() {
         { id: 'overview', label: 'Home', icon: 'home', panel: 'overview' },
         { id: 'pipeline', label: 'Pipeline', icon: 'pipeline', panel: 'pipeline', muted: true },
         { id: 'marketing', label: 'Marketing', icon: 'mail', panel: 'marketing', muted: true },
-        { id: 'search', label: 'AI search', icon: 'spark', panel: 'search', muted: true },
+        ...(AI_PROSPECTING_IN_CRM_ENABLED
+          ? [{ id: 'search', label: 'AI search', icon: 'spark', panel: 'search', muted: true }]
+          : []),
       ],
     },
     {
@@ -528,7 +538,9 @@ export const MOBILE_NAV_PILL_PRIMARY_ITEMS = [
   { id: 'home', label: 'Home', panel: 'overview', icon: 'home' },
   { id: 'pipeline', label: 'Leads', panel: 'pipeline', icon: 'pipeline', matchPanelOnly: true },
   { id: 'contacts', label: 'Contacts', panel: 'contacts', icon: 'people' },
-  { id: 'search', label: 'Search', panel: 'search', icon: 'spark' },
+  ...(AI_PROSPECTING_IN_CRM_ENABLED
+    ? [{ id: 'search', label: 'Search', panel: 'search', icon: 'spark' }]
+    : [{ id: 'calendar', label: 'Calendar', panel: 'crm-calendar', icon: 'calendar' }]),
 ]
 
 /** Secondary mobile nav shortcuts — horizontal scroll beside primary row. */
@@ -547,7 +559,6 @@ export const MOBILE_NAV_PILL_ITEMS = [
 
 export const QUICK_NAV_TILES = [
   { id: 'pipeline', label: 'Pipeline', panel: 'pipeline', icon: 'pipeline', desc: 'Manage leads' },
-  { id: 'search', label: 'AI search', panel: 'search', icon: 'spark', desc: 'Find prospects' },
   { id: 'marketing', label: 'Marketing', panel: 'marketing', tab: 'overview', icon: 'mail', desc: 'Marketing Hub' },
   { id: 'contacts', label: 'Contacts', panel: 'contacts', icon: 'people', desc: 'Master records' },
   {
@@ -559,4 +570,9 @@ export const QUICK_NAV_TILES = [
     desc: 'Upcoming',
   },
   { id: 'crm-log', label: 'Activity', panel: 'crm-log', icon: 'log', desc: 'Recent actions' },
+  ...(AI_PROSPECTING_IN_CRM_ENABLED
+    ? [
+        { id: 'search', label: 'AI search', panel: 'search', icon: 'spark', desc: 'Find prospects' },
+      ]
+    : []),
 ]

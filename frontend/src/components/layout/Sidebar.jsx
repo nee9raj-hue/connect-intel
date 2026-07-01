@@ -350,7 +350,9 @@ export default function Sidebar({
                 <p className="mt-0.5 truncate text-[10px] text-[#f3b562]">
                   {isOperator
                     ? 'Platform admin'
-                    : `${user?.accountType === 'company' ? 'Company' : 'Individual'} · Searches: ${user?.searchesLeft ?? 0}`}
+                    : user?.accountType === 'company'
+                      ? `Company${user?.isOrgAdmin ? ' · Admin' : user?.pipelineRole === 'manager' ? ' · Manager' : ''}`
+                      : 'Individual'}
                 </p>
               </div>
             )}

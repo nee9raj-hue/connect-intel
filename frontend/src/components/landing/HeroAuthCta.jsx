@@ -32,7 +32,7 @@ export default function HeroAuthCta({ id }) {
       <GoogleSignIn text="signup_with" theme="outline" layout="block" />
 
       <p className="text-xs text-gray-400 text-center leading-relaxed">
-        Google sign-in · No credit card · Live in minutes
+        Email sign-up · Google (profile only) · Work Gmail connects later
       </p>
     </div>
   )

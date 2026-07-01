@@ -9,6 +9,7 @@ import {
   PipelineHealthChart,
 } from './DashboardHomeCharts'
 import TeamReviewBlock from './TeamReviewBlock'
+import CrmGettingStarted from './CrmGettingStarted'
 import { readPanelCache, writePanelCache, teamReviewCacheKey } from '../../lib/panelCache'
 import '../../styles/dashboard-home.css'
 
@@ -362,6 +363,8 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
             ) : null}
           </div>
         </header>
+
+        <CrmGettingStarted onNavigate={runAction} pipelineSummary={ps} />
 
         <div className="dash-home__toolbar">
           <div className="dash-home__filters">

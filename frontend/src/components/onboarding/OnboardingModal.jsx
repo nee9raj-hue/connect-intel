@@ -37,14 +37,14 @@ export default function OnboardingModal() {
         <div>
           <h2 className="text-xl font-semibold text-gray-900">Welcome to Connect Intel</h2>
           <p className="text-sm text-gray-500 mt-1">
-            Tell us how you work so we can set up your workspace — solo prospecting or a shared team CRM.
+            Set up your sales workspace — pipeline, team, and email. AI lead search is a separate product you can add later.
           </p>
         </div>
 
         <div className="grid grid-cols-2 gap-2">
           {[
-            { id: 'individual', title: 'Individual', sub: 'Solo lead gen & CRM' },
-            { id: 'company', title: 'Company', sub: 'Invite team, assign leads' },
+            { id: 'individual', title: 'Individual', sub: 'Solo CRM — your own pipeline' },
+            { id: 'company', title: 'Company', sub: 'Shared CRM — invite your team' },
           ].map((opt) => (
             <button
               key={opt.id}
@@ -98,7 +98,8 @@ export default function OnboardingModal() {
               />
             </div>
             <p className="text-xs text-gray-500">
-              You are the company admin. Invite teammates later from Team — searches and credits use your company pool.
+              You become the company admin. Invite teammates from Team → Members. If your company already uses Connect
+              Intel, ask your admin for an invite instead of signing up again.
             </p>
           </div>
         )}
