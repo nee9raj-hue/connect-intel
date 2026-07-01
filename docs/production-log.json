@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-07-01T16:23:54.736Z",
-  "updatedAtIst": "01/07/2026, 21:53:54",
+  "updatedAt": "2026-07-01T16:37:11.154Z",
+  "updatedAtIst": "01/07/2026, 22:07:11",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "8502312",
+  "currentProductionCommit": "69e268e",
   "entries": [
+    {
+      "logId": "20260701-2206-69e268e",
+      "commit": "69e268e",
+      "commitFull": "69e268e69cd3aac583e82d84d594e43fb27c7a40",
+      "message": "Enforce multi-tenant CRM RBAC and org-scoped master data.",
+      "deployedAt": "2026-07-01T16:36:56.667Z",
+      "deployedAtIst": "01/07/2026, 22:06:56",
+      "committedAtIst": "01/07/2026, 22:06:25",
+      "vercelPreviewUrl": "https://connect-intel-ljlmhrznl-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 69e268e"
+    },
+    {
+      "logId": "20260701-2154-9af7286",
+      "commit": "9af7286",
+      "commitFull": "9af72865c9345213a55e4b6dfc122c318824a81f",
+      "message": "Update production log after CRM boot performance deploy.",
+      "deployedAt": "2026-07-01T16:24:37.137Z",
+      "deployedAtIst": "01/07/2026, 21:54:37",
+      "committedAtIst": "01/07/2026, 21:53:54",
+      "vercelPreviewUrl": "https://connect-intel-edxmz7hu3-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 9af7286"
+    },
     {
       "logId": "20260701-2153-8502312",
       "commit": "8502312",
@@ -15,7 +43,7 @@
       "committedAtIst": "01/07/2026, 21:53:09",
       "vercelPreviewUrl": "https://connect-intel-gjj3gfxle-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 8502312"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 940b559"
-    },
-    {
-      "logId": "20260630-1201-e999fdb",
-      "commit": "e999fdb",
-      "commitFull": "e999fdb6a639136e59d9ef9c608d1a71488daed7",
-      "message": "Fix assignment emails: proper HTML formatting and one digest per bulk assign.",
-      "deployedAt": "2026-06-30T06:31:00.715Z",
-      "deployedAtIst": "30/06/2026, 12:01:00",
-      "committedAtIst": "30/06/2026, 12:00:29",
-      "vercelPreviewUrl": "https://connect-intel-1xtiqki2n-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- e999fdb"
-    },
-    {
-      "logId": "20260630-1147-29802e9",
-      "commit": "29802e9",
-      "commitFull": "29802e9bf4546b43f634b507fa966b879bd3db6a",
-      "message": "Fix pipeline state filter so location and GUJRAT spelling match correctly.",
-      "deployedAt": "2026-06-30T06:17:32.200Z",
-      "deployedAtIst": "30/06/2026, 11:47:32",
-      "committedAtIst": "30/06/2026, 11:47:00",
-      "vercelPreviewUrl": "https://connect-intel-b25fx2h5d-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 29802e9"
     }
   ]
 }

@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- c15fc1a
+npm run prod:rollback -- 9af7286
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- c15fc1a
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `8502312` |
-| Log updated (IST) | 01/07/2026, 21:53:54 |
+| Commit | `69e268e` |
+| Log updated (IST) | 01/07/2026, 22:07:11 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- c15fc1a
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 01/07/2026, 21:53:40 | `8502312` | Speed up CRM boot with parallel loads and lighter store paths. | [preview](https://connect-intel-gjj3gfxle-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8502312` | **← LIVE**
+| 01/07/2026, 22:06:56 | `69e268e` | Enforce multi-tenant CRM RBAC and org-scoped master data. | [preview](https://connect-intel-ljlmhrznl-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 69e268e` | **← LIVE**
+| 01/07/2026, 21:54:37 | `9af7286` | Update production log after CRM boot performance deploy. | [preview](https://connect-intel-edxmz7hu3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9af7286` |
+| 01/07/2026, 21:53:40 | `8502312` | Speed up CRM boot with parallel loads and lighter store paths. | [preview](https://connect-intel-gjj3gfxle-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8502312` |
 | 01/07/2026, 16:24:43 | `c15fc1a` | Update production log after Google login tab deploy. | [preview](https://connect-intel-rnrsk6euj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c15fc1a` |
 | 01/07/2026, 16:23:37 | `4f56ffc` | Restore Google sign-in on auth login tab for existing workspaces. | [preview](https://connect-intel-ay8jua9zf-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4f56ffc` |
 | 01/07/2026, 16:10:25 | `8f6e7e6` | Update production log after landing page redesign deploy. | [preview](https://connect-intel-46mskutkg-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8f6e7e6` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- c15fc1a
 | 30/06/2026, 13:33:55 | `a8f1b6f` | Add bulk pipeline delete so orgs can remove unused leads in batches. | [preview](https://connect-intel-oe0tz2vsg-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a8f1b6f` |
 | 30/06/2026, 12:18:11 | `bfe0a22` | Keep owner filter enforced when leads are reassigned in the pipeline list. | [preview](https://connect-intel-nfub5ev6i-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- bfe0a22` |
 | 30/06/2026, 12:11:08 | `940b559` | Fix pipeline state/city filters returning empty lists with wrong match counts. | [preview](https://connect-intel-89k7bvymu-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 940b559` |
-| 30/06/2026, 12:01:00 | `e999fdb` | Fix assignment emails: proper HTML formatting and one digest per bulk assign. | [preview](https://connect-intel-1xtiqki2n-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e999fdb` |
-| 30/06/2026, 11:47:32 | `29802e9` | Fix pipeline state filter so location and GUJRAT spelling match correctly. | [preview](https://connect-intel-b25fx2h5d-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 29802e9` |
 
 ---
 
