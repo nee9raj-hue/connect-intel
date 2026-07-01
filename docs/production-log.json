@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-07-01T17:42:16.426Z",
-  "updatedAtIst": "01/07/2026, 23:12:16",
+  "updatedAt": "2026-07-01T17:53:03.214Z",
+  "updatedAtIst": "01/07/2026, 23:23:03",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "9ea5b20",
+  "currentProductionCommit": "548cdb9",
   "entries": [
+    {
+      "logId": "20260701-2322-548cdb9",
+      "commit": "548cdb9",
+      "commitFull": "548cdb9f8624e8e030a11cdacf6329f57dd5fd67",
+      "message": "Add enterprise architecture documentation and constitution gap analysis.",
+      "deployedAt": "2026-07-01T17:52:53.238Z",
+      "deployedAtIst": "01/07/2026, 23:22:53",
+      "committedAtIst": "01/07/2026, 23:22:19",
+      "vercelPreviewUrl": "https://connect-intel-4rwq4ysnw-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 548cdb9"
+    },
+    {
+      "logId": "20260701-2312-6376deb",
+      "commit": "6376deb",
+      "commitFull": "6376debd66662bf05016dde4c4b3c7d6b9b143a1",
+      "message": "Update production log after rep and solo dashboard deploy.",
+      "deployedAt": "2026-07-01T17:42:58.506Z",
+      "deployedAtIst": "01/07/2026, 23:12:58",
+      "committedAtIst": "01/07/2026, 23:12:20",
+      "vercelPreviewUrl": "https://connect-intel-d9uf4ekp2-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 6376deb"
+    },
     {
       "logId": "20260701-2312-9ea5b20",
       "commit": "9ea5b20",
@@ -15,7 +43,7 @@
       "committedAtIst": "01/07/2026, 23:11:32",
       "vercelPreviewUrl": "https://connect-intel-m36y6tpey-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 9ea5b20"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 89d2f20"
-    },
-    {
-      "logId": "20260701-1559-253962d",
-      "commit": "253962d",
-      "commitFull": "253962d03788526a65ad896166420962b315ee45",
-      "message": "Ship email-only auth, free-tier limits, and admin upgrade flow.",
-      "deployedAt": "2026-07-01T10:29:34.827Z",
-      "deployedAtIst": "01/07/2026, 15:59:34",
-      "committedAtIst": "01/07/2026, 15:59:00",
-      "vercelPreviewUrl": "https://connect-intel-oj6uvx4dp-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 253962d"
-    },
-    {
-      "logId": "20260701-1547-e7615bf",
-      "commit": "e7615bf",
-      "commitFull": "e7615bffcd8eebb6fad03a52eab8debaebf05e21",
-      "message": "Remove desktop floating Nav pill; sidebar remains primary navigation.",
-      "deployedAt": "2026-07-01T10:17:34.139Z",
-      "deployedAtIst": "01/07/2026, 15:47:34",
-      "committedAtIst": "01/07/2026, 15:47:02",
-      "vercelPreviewUrl": "https://connect-intel-8ev2cge0d-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- e7615bf"
     }
   ]
 }

@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 70c758b
+npm run prod:rollback -- 6376deb
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 70c758b
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `9ea5b20` |
-| Log updated (IST) | 01/07/2026, 23:12:16 |
+| Commit | `548cdb9` |
+| Log updated (IST) | 01/07/2026, 23:23:03 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 70c758b
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 01/07/2026, 23:12:04 | `9ea5b20` | Give reps and solo users the enterprise home dashboard. | [preview](https://connect-intel-m36y6tpey-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9ea5b20` | **← LIVE**
+| 01/07/2026, 23:22:53 | `548cdb9` | Add enterprise architecture documentation and constitution gap analysis. | [preview](https://connect-intel-4rwq4ysnw-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 548cdb9` | **← LIVE**
+| 01/07/2026, 23:12:58 | `6376deb` | Update production log after rep and solo dashboard deploy. | [preview](https://connect-intel-d9uf4ekp2-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6376deb` |
+| 01/07/2026, 23:12:04 | `9ea5b20` | Give reps and solo users the enterprise home dashboard. | [preview](https://connect-intel-m36y6tpey-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9ea5b20` |
 | 01/07/2026, 23:08:47 | `70c758b` | Update production log after P2 enterprise dashboard deploy. | [preview](https://connect-intel-9vl6v2nit-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 70c758b` |
 | 01/07/2026, 23:07:49 | `b3264c7` | Add enterprise dashboard P2: customizable widgets, live pulse, and Opportunities hub. | [preview](https://connect-intel-2j8yne4um-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b3264c7` |
 | 01/07/2026, 22:58:42 | `74ee142` | Update production log after enterprise dashboard UI deploy. | [preview](https://connect-intel-694ra8jbd-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 74ee142` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 70c758b
 | 01/07/2026, 16:10:25 | `8f6e7e6` | Update production log after landing page redesign deploy. | [preview](https://connect-intel-46mskutkg-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8f6e7e6` |
 | 01/07/2026, 16:09:27 | `701ef11` | Redesign landing page with clearer CRM context for new and returning users. | [preview](https://connect-intel-9c5bq0pri-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 701ef11` |
 | 01/07/2026, 16:00:25 | `89d2f20` | Update production log after email-auth and free-tier deploy. | [preview](https://connect-intel-8ig776ol3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 89d2f20` |
-| 01/07/2026, 15:59:34 | `253962d` | Ship email-only auth, free-tier limits, and admin upgrade flow. | [preview](https://connect-intel-oj6uvx4dp-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 253962d` |
-| 01/07/2026, 15:47:34 | `e7615bf` | Remove desktop floating Nav pill; sidebar remains primary navigation. | [preview](https://connect-intel-8ev2cge0d-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e7615bf` |
 
 ---
 
