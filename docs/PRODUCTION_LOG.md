@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 8f6e7e6
+npm run prod:rollback -- c15fc1a
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 8f6e7e6
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `4f56ffc` |
-| Log updated (IST) | 01/07/2026, 16:24:04 |
+| Commit | `8502312` |
+| Log updated (IST) | 01/07/2026, 21:53:54 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 8f6e7e6
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 01/07/2026, 16:23:37 | `4f56ffc` | Restore Google sign-in on auth login tab for existing workspaces. | [preview](https://connect-intel-ay8jua9zf-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4f56ffc` | **← LIVE**
+| 01/07/2026, 21:53:40 | `8502312` | Speed up CRM boot with parallel loads and lighter store paths. | [preview](https://connect-intel-gjj3gfxle-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8502312` | **← LIVE**
+| 01/07/2026, 16:24:43 | `c15fc1a` | Update production log after Google login tab deploy. | [preview](https://connect-intel-rnrsk6euj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c15fc1a` |
+| 01/07/2026, 16:23:37 | `4f56ffc` | Restore Google sign-in on auth login tab for existing workspaces. | [preview](https://connect-intel-ay8jua9zf-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4f56ffc` |
 | 01/07/2026, 16:10:25 | `8f6e7e6` | Update production log after landing page redesign deploy. | [preview](https://connect-intel-46mskutkg-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8f6e7e6` |
 | 01/07/2026, 16:09:27 | `701ef11` | Redesign landing page with clearer CRM context for new and returning users. | [preview](https://connect-intel-9c5bq0pri-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 701ef11` |
 | 01/07/2026, 16:00:25 | `89d2f20` | Update production log after email-auth and free-tier deploy. | [preview](https://connect-intel-8ig776ol3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 89d2f20` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 8f6e7e6
 | 30/06/2026, 12:11:08 | `940b559` | Fix pipeline state/city filters returning empty lists with wrong match counts. | [preview](https://connect-intel-89k7bvymu-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 940b559` |
 | 30/06/2026, 12:01:00 | `e999fdb` | Fix assignment emails: proper HTML formatting and one digest per bulk assign. | [preview](https://connect-intel-1xtiqki2n-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e999fdb` |
 | 30/06/2026, 11:47:32 | `29802e9` | Fix pipeline state filter so location and GUJRAT spelling match correctly. | [preview](https://connect-intel-b25fx2h5d-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 29802e9` |
-| 30/06/2026, 11:32:35 | `3b75051` | Fix bulk assign crash: rows is not defined in pipeline upsert. | [preview](https://connect-intel-594ccqe67-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3b75051` |
-| 30/06/2026, 11:21:46 | `20e2d5c` | Revert "Add Unassigned leads folder to speed up default CRM pipeline and search." | [preview](https://connect-intel-cg2v80un7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 20e2d5c` |
 
 ---
 

@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-07-01T10:54:04.392Z",
-  "updatedAtIst": "01/07/2026, 16:24:04",
+  "updatedAt": "2026-07-01T16:23:54.736Z",
+  "updatedAtIst": "01/07/2026, 21:53:54",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "4f56ffc",
+  "currentProductionCommit": "8502312",
   "entries": [
+    {
+      "logId": "20260701-2153-8502312",
+      "commit": "8502312",
+      "commitFull": "85023128383c4600fc87fa9852b761ae1cb3c596",
+      "message": "Speed up CRM boot with parallel loads and lighter store paths.",
+      "deployedAt": "2026-07-01T16:23:40.755Z",
+      "deployedAtIst": "01/07/2026, 21:53:40",
+      "committedAtIst": "01/07/2026, 21:53:09",
+      "vercelPreviewUrl": "https://connect-intel-gjj3gfxle-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 8502312"
+    },
+    {
+      "logId": "20260701-1624-c15fc1a",
+      "commit": "c15fc1a",
+      "commitFull": "c15fc1ae5cd2e3c0d8807949b16c5147d7c9de27",
+      "message": "Update production log after Google login tab deploy.",
+      "deployedAt": "2026-07-01T10:54:43.180Z",
+      "deployedAtIst": "01/07/2026, 16:24:43",
+      "committedAtIst": "01/07/2026, 16:24:04",
+      "vercelPreviewUrl": "https://connect-intel-rnrsk6euj-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- c15fc1a"
+    },
     {
       "logId": "20260701-1623-4f56ffc",
       "commit": "4f56ffc",
@@ -15,7 +43,7 @@
       "committedAtIst": "01/07/2026, 16:23:04",
       "vercelPreviewUrl": "https://connect-intel-ay8jua9zf-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 4f56ffc"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 29802e9"
-    },
-    {
-      "logId": "20260630-1132-3b75051",
-      "commit": "3b75051",
-      "commitFull": "3b75051b214a784492a3bb132f7f197b3d9fdb41",
-      "message": "Fix bulk assign crash: rows is not defined in pipeline upsert.",
-      "deployedAt": "2026-06-30T06:02:35.091Z",
-      "deployedAtIst": "30/06/2026, 11:32:35",
-      "committedAtIst": "30/06/2026, 11:32:03",
-      "vercelPreviewUrl": "https://connect-intel-594ccqe67-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 3b75051"
-    },
-    {
-      "logId": "20260630-1121-20e2d5c",
-      "commit": "20e2d5c",
-      "commitFull": "20e2d5c3fa3882de981552661b21509c799fae16",
-      "message": "Revert \"Add Unassigned leads folder to speed up default CRM pipeline and search.\"",
-      "deployedAt": "2026-06-30T05:51:46.990Z",
-      "deployedAtIst": "30/06/2026, 11:21:46",
-      "committedAtIst": "30/06/2026, 11:21:08",
-      "vercelPreviewUrl": "https://connect-intel-cg2v80un7-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 20e2d5c"
     }
   ]
 }
