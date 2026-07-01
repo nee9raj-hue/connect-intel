@@ -169,6 +169,7 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
 
   const load = useCallback(async (silent = false) => {
     const cacheKey = teamReviewCacheKey(user?.organizationId, period)
+    const apiPeriod = PERIODS.find((p) => p.id === period)?.api || '7d'
     if (!silent) {
       const cached = readPanelCache(cacheKey)
       if (cached?.data?.bootstrap) {
@@ -184,14 +185,27 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
       setRefreshing(true)
     }
     setError(null)
+    setTeamMetricsLoading(Boolean(user?.organizationId))
     try {
-      const res = await api.getDashboardBootstrap()
-      setData(res.dashboard)
+      const [bootstrapRes, teamRes] = await Promise.all([
+        api.getDashboardBootstrap(),
+        user?.organizationId
+          ? api.getCrmTeamMetrics(`period=${apiPeriod}`)
+          : Promise.resolve(null),
+      ])
+      setData(bootstrapRes.dashboard)
       setLastFetch(Date.now())
-      const existing = readPanelCache(cacheKey)
+      if (teamRes) {
+        setTeamMetrics(teamRes)
+        const days = teamRes?.activityByDay
+        if (days?.length) setActivityTrend(days)
+        else setActivityTrend(groupActivityByDay(bootstrapRes.dashboard?.activity))
+      } else {
+        setActivityTrend(groupActivityByDay(bootstrapRes.dashboard?.activity))
+      }
       writePanelCache(cacheKey, {
-        ...(existing?.data || {}),
-        bootstrap: res.dashboard,
+        bootstrap: bootstrapRes.dashboard,
+        teamMetrics: teamRes,
       })
     } catch (e) {
       if (!silent && !readPanelCache(cacheKey)?.data?.bootstrap) {
@@ -200,42 +214,9 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
     } finally {
       setLoading(false)
       setRefreshing(false)
+      setTeamMetricsLoading(false)
     }
   }, [user?.organizationId, period])
-
-  useEffect(() => {
-    if (!isActive) return undefined
-    const apiPeriod = PERIODS.find((p) => p.id === period)?.api || '7d'
-    let cancelled = false
-    setTeamMetricsLoading(true)
-    api
-      .getCrmTeamMetrics(`period=${apiPeriod}`)
-      .then((res) => {
-        if (cancelled) return
-        setTeamMetrics(res)
-        const days = res?.activityByDay
-        if (days?.length) setActivityTrend(days)
-        else setActivityTrend(groupActivityByDay(data?.activity))
-        const cacheKey = teamReviewCacheKey(user?.organizationId, period)
-        const existing = readPanelCache(cacheKey)
-        writePanelCache(cacheKey, {
-          ...(existing?.data || {}),
-          teamMetrics: res,
-        })
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setTeamMetrics(null)
-          setActivityTrend(groupActivityByDay(data.activity))
-        }
-      })
-      .finally(() => {
-        if (!cancelled) setTeamMetricsLoading(false)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [data, period, user?.organizationId])
 
   useEffect(() => {
     if (!isActive) return undefined
