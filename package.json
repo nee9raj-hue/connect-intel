@@ -33,6 +33,7 @@
     "activities:backfill": "node scripts/backfill-pipeline-activities.mjs",
     "activities:indexes": "node scripts/apply-activities-indexes.mjs",
     "enterprise:backfill": "node scripts/backfill-enterprise-crm.mjs",
+    "org:sql-backfill": "node scripts/backfill-org-sql.mjs",
     "enterprise:setup": "node scripts/run-enterprise-setup.mjs",
     "dash:warm": "node scripts/warm-dashboard-snapshots.mjs",
     "marketing:queue-worker": "node scripts/marketing-queue-worker.mjs",
