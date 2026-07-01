@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- e7615bf
+npm run prod:rollback -- 89d2f20
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- e7615bf
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `253962d` |
-| Log updated (IST) | 01/07/2026, 15:59:42 |
+| Commit | `701ef11` |
+| Log updated (IST) | 01/07/2026, 16:09:42 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- e7615bf
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 01/07/2026, 15:59:34 | `253962d` | Ship email-only auth, free-tier limits, and admin upgrade flow. | [preview](https://connect-intel-oj6uvx4dp-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 253962d` | **← LIVE**
+| 01/07/2026, 16:09:27 | `701ef11` | Redesign landing page with clearer CRM context for new and returning users. | [preview](https://connect-intel-9c5bq0pri-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 701ef11` | **← LIVE**
+| 01/07/2026, 16:00:25 | `89d2f20` | Update production log after email-auth and free-tier deploy. | [preview](https://connect-intel-8ig776ol3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 89d2f20` |
+| 01/07/2026, 15:59:34 | `253962d` | Ship email-only auth, free-tier limits, and admin upgrade flow. | [preview](https://connect-intel-oj6uvx4dp-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 253962d` |
 | 01/07/2026, 15:47:34 | `e7615bf` | Remove desktop floating Nav pill; sidebar remains primary navigation. | [preview](https://connect-intel-8ev2cge0d-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e7615bf` |
 | 01/07/2026, 15:31:17 | `7951641` | Run solo CRM on free infra only: skip crons and paid API paths. | [preview](https://connect-intel-hlqka4ric-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7951641` |
 | 01/07/2026, 15:08:07 | `465c54f` | Enforce solo free CRM tier and strip paid plan signals from user sessions. | [preview](https://connect-intel-dl1t6n37r-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 465c54f` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- e7615bf
 | 30/06/2026, 11:21:46 | `20e2d5c` | Revert "Add Unassigned leads folder to speed up default CRM pipeline and search." | [preview](https://connect-intel-cg2v80un7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 20e2d5c` |
 | 30/06/2026, 11:01:34 | `b7229ab` | Fix rep pipeline scoping so only own leads show outside Unassigned folder. | [preview](https://connect-intel-84zxlr7xh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b7229ab` |
 | 30/06/2026, 10:51:19 | `8498c23` | Add Unassigned leads folder to speed up default CRM pipeline and search. | [preview](https://connect-intel-jpo6dekml-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8498c23` |
-| 30/06/2026, 10:36:48 | `b6ae036` | Fix CRM and marketing Gmail sends missing inbound reply imports. | [preview](https://connect-intel-or0zf9e69-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b6ae036` |
-| 30/06/2026, 00:06:19 | `a846560` | Fix commercial email consent checkbox not persisting on leads. | [preview](https://connect-intel-1co2pz9k0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a846560` |
 
 ---
 

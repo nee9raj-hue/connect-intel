@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-07-01T10:29:42.973Z",
-  "updatedAtIst": "01/07/2026, 15:59:42",
+  "updatedAt": "2026-07-01T10:39:42.291Z",
+  "updatedAtIst": "01/07/2026, 16:09:42",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "253962d",
+  "currentProductionCommit": "701ef11",
   "entries": [
+    {
+      "logId": "20260701-1609-701ef11",
+      "commit": "701ef11",
+      "commitFull": "701ef116595f91b30dce66ffc566723783c99b48",
+      "message": "Redesign landing page with clearer CRM context for new and returning users.",
+      "deployedAt": "2026-07-01T10:39:27.521Z",
+      "deployedAtIst": "01/07/2026, 16:09:27",
+      "committedAtIst": "01/07/2026, 16:08:56",
+      "vercelPreviewUrl": "https://connect-intel-9c5bq0pri-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 701ef11"
+    },
+    {
+      "logId": "20260701-1600-89d2f20",
+      "commit": "89d2f20",
+      "commitFull": "89d2f20ee46613efb3baee21735ea34d428c4f0b",
+      "message": "Update production log after email-auth and free-tier deploy.",
+      "deployedAt": "2026-07-01T10:30:25.940Z",
+      "deployedAtIst": "01/07/2026, 16:00:25",
+      "committedAtIst": "01/07/2026, 15:59:53",
+      "vercelPreviewUrl": "https://connect-intel-8ig776ol3-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 89d2f20"
+    },
     {
       "logId": "20260701-1559-253962d",
       "commit": "253962d",
@@ -15,7 +43,7 @@
       "committedAtIst": "01/07/2026, 15:59:00",
       "vercelPreviewUrl": "https://connect-intel-oj6uvx4dp-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 253962d"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 8498c23"
-    },
-    {
-      "logId": "20260630-1036-b6ae036",
-      "commit": "b6ae036",
-      "commitFull": "b6ae036eb201f9ca03c23283cc20efaa447463e3",
-      "message": "Fix CRM and marketing Gmail sends missing inbound reply imports.",
-      "deployedAt": "2026-06-30T05:06:48.634Z",
-      "deployedAtIst": "30/06/2026, 10:36:48",
-      "committedAtIst": "30/06/2026, 10:36:15",
-      "vercelPreviewUrl": "https://connect-intel-or0zf9e69-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- b6ae036"
-    },
-    {
-      "logId": "20260630-0006-a846560",
-      "commit": "a846560",
-      "commitFull": "a8465602e1d3b92799ca63354b2e47d4399441a6",
-      "message": "Fix commercial email consent checkbox not persisting on leads.",
-      "deployedAt": "2026-06-29T18:36:19.116Z",
-      "deployedAtIst": "30/06/2026, 00:06:19",
-      "committedAtIst": "30/06/2026, 00:05:45",
-      "vercelPreviewUrl": "https://connect-intel-1co2pz9k0-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- a846560"
     }
   ]
 }
