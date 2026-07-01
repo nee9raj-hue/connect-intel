@@ -394,6 +394,16 @@ export const api = {
     dedupeGet('dashboard-bootstrap', () =>
       request('/api/dashboard/bootstrap', { timeoutMs: 30_000 })
     ),
+  getDashboardPulse: () => request('/api/dashboard/pulse', { timeoutMs: 10_000 }, { silent: true }),
+  getOpportunitiesHub: ({ q = '', dealStage = 'all', limit = 50, offset = 0 } = {}) => {
+    const qs = new URLSearchParams({
+      q,
+      dealStage,
+      limit: String(limit),
+      offset: String(offset),
+    })
+    return request(`/api/opportunities/hub?${qs}`, { timeoutMs: 45_000 })
+  },
   postWorkspacePulse: (body = {}) =>
     request('/api/crm/workspace-pulse', { method: 'POST', body }, { silent: true }),
   ackMeetingReminder: (leadId, meetingId, { silent = false } = {}) =>

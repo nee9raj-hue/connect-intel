@@ -51,6 +51,7 @@ export default function SalesPipelineSnapshot({ stages = [], role = 'rep', total
             key={row.id}
             type="button"
             className="dash-ent__pipeline-stage"
+            aria-label={`${STAGE_LABELS[row.id] || row.id}: ${row.count} leads`}
             onClick={() =>
               onStageClick({
                 panel: 'pipeline',

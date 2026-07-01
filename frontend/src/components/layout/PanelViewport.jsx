@@ -18,6 +18,7 @@ import TeamNotesPanel from '../team/TeamNotesPanel'
 import TeamTasksPanel from '../team/TeamTasksPanel'
 import ContactsPanel from '../contacts/ContactsPanel'
 import CompaniesPanel from '../companies/CompaniesPanel'
+import OpportunitiesPanel from '../opportunities/OpportunitiesPanel'
 import CrmSequencesPanel from '../crm/CrmSequencesPanel'
 import CrmAutomationPanel from '../crm/CrmAutomationPanel'
 import ActiveCustomersPanel from '../crm/ActiveCustomersPanel'
@@ -40,6 +41,7 @@ const PANELS = {
   'field-expenses': FieldExpensesPanel,
   contacts: ContactsPanel,
   companies: CompaniesPanel,
+  opportunities: OpportunitiesPanel,
   chithi: ChithiPanel,
   'team-hub': ChithiPanel,
   'team-notes': ChithiPanel,
@@ -65,7 +67,7 @@ const PANELS = {
 }
 
 /** Panels kept mounted (hidden) for instant back navigation. */
-const KEEP_ALIVE_PANELS = new Set(['overview', 'crm-rep-review'])
+const KEEP_ALIVE_PANELS = new Set(['overview', 'crm-rep-review', 'opportunities'])
 
 function resolvePanelId(activePanel) {
   return activePanel === 'bulk-email' ? 'marketing' : activePanel

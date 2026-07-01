@@ -22,6 +22,7 @@ export default function ExecutiveKpiStrip({ items = [], onAction }) {
               className={`dash-ent__kpi${s.highlight ? ' is-alert' : ''}`}
               style={{ '--kpi-accent': meta.accent }}
               onClick={() => onAction(s.action)}
+              aria-label={`${s.label}: ${s.count}${s.suffix || ''}. ${s.linkLabel}`}
             >
               <span className="dash-ent__kpi-icon" aria-hidden>
                 {meta.icon}

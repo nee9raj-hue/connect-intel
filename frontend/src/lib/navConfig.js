@@ -372,7 +372,10 @@ export function buildCustomerNavSections(
           : []),
         { id: 'contacts', label: 'Contacts', icon: 'people', panel: 'contacts' },
         ...(isCompany
-          ? [{ id: 'companies', label: 'Companies', icon: 'chart', panel: 'companies' }]
+          ? [
+              { id: 'companies', label: 'Accounts', icon: 'chart', panel: 'companies' },
+              { id: 'opportunities', label: 'Opportunities', icon: 'pipeline', panel: 'opportunities' },
+            ]
           : []),
         { id: 'marketing', label: 'Marketing', icon: 'mail', children: marketingChildren },
         { id: 'calendar', label: 'Calendar', icon: 'calendar', children: calendarChildren },

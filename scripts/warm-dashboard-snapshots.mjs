@@ -10,39 +10,26 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const storeUrl = pathToFileURL(join(ROOT, 'lib/server/store.js')).href
-const snapUrl = pathToFileURL(join(ROOT, 'lib/server/dashboardSnapshots.js')).href
-
-const { readStore } = await import(storeUrl)
-const { refreshDashboardSnapshotsForUser } = await import(snapUrl)
+const warmUrl = pathToFileURL(join(ROOT, 'lib/server/dashboardWarm.js')).href
 
 const orgArg = process.argv.find((a) => a.startsWith('--org='))?.split('=')[1]
 
-const store = await readStore({ only: ['organizations', 'users'] })
-const orgs = orgArg
-  ? (store.organizations || []).filter((o) => o.id === orgArg)
-  : store.organizations || []
+const { warmAllDashboardSnapshots } = await import(warmUrl)
 
-console.log(`Warming dashboard snapshots for ${orgs.length} organization(s)…\n`)
+console.log(`Warming dashboard snapshots${orgArg ? ` for org ${orgArg}` : ''}…\n`)
 
-for (const org of orgs) {
-  const admin =
-    (store.users || []).find(
-      (u) => u.organizationId === org.id && (u.orgRole === 'org_admin' || u.isOrgAdmin)
-    ) || (store.users || []).find((u) => u.organizationId === org.id)
-  if (!admin) {
-    console.warn(`  skip ${org.name || org.id}: no user`)
+const { orgCount, results } = await warmAllDashboardSnapshots({ orgId: orgArg || null })
+
+for (const row of results) {
+  if (row.skipped) {
+    console.warn(`  skip ${row.orgId}: ${row.reason}`)
     continue
   }
-  const started = Date.now()
-  try {
-    const result = await refreshDashboardSnapshotsForUser(admin, 'week')
-    console.log(
-      `  ✓ ${org.name || org.id}: ${result?.entryCount ?? 0} leads (${Date.now() - started}ms)`
-    )
-  } catch (error) {
-    console.error(`  ✗ ${org.name || org.id}:`, error?.message || error)
+  if (row.ok) {
+    console.log(`  ✓ ${row.orgId}: ${row.entryCount ?? 0} leads`)
+  } else {
+    console.error(`  ✗ ${row.orgId}:`, row.error)
   }
 }
 
-console.log('\nDone.')
+console.log(`\nDone. ${orgCount} organization(s) processed.`)

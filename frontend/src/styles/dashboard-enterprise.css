@@ -1,6 +1,7 @@
 /* Enterprise CRM dashboard — Salesforce-inspired layout on platform tokens */
 
 .dash-home--enterprise {
+  position: relative;
   --dash-bg: var(--ci-platform-surface-muted, #f7f9fb);
   --dash-card: var(--ci-platform-surface, #fff);
   --dash-border: var(--ci-platform-border, #e5e9ee);
@@ -361,4 +362,124 @@
   .dash-ent__kpi:hover {
     transform: none;
   }
+}
+
+/* ── Accessibility ── */
+.dash-ent__skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  padding: 0.5rem 1rem;
+  background: #17191c;
+  color: #fff;
+  font-weight: 700;
+  border-radius: 0 0 8px 8px;
+}
+
+.dash-ent__skip-link:focus {
+  left: 1rem;
+}
+
+.dash-home--enterprise :is(button, a, input, [tabindex]):focus-visible {
+  outline: 2px solid #007c89;
+  outline-offset: 2px;
+}
+
+/* ── Customize panel ── */
+.dash-ent__customize-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.dash-ent__customize {
+  width: min(28rem, 100%);
+  max-height: min(32rem, 90vh);
+  overflow: auto;
+  background: var(--dash-card);
+  border: 1px solid var(--dash-border);
+  border-radius: 14px;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18);
+}
+
+.dash-ent__customize-head {
+  position: relative;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--dash-border);
+}
+
+.dash-ent__customize-head h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.dash-ent__customize-head p {
+  margin: 0.35rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--dash-muted);
+}
+
+.dash-ent__customize-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  border: none;
+  background: transparent;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--dash-muted);
+}
+
+.dash-ent__customize-list {
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem 0;
+}
+
+.dash-ent__customize-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1rem;
+  border-bottom: 1px solid var(--dash-border);
+}
+
+.dash-ent__customize-row.is-hidden {
+  opacity: 0.55;
+}
+
+.dash-ent__customize-grip {
+  cursor: grab;
+  color: var(--dash-muted);
+  user-select: none;
+}
+
+.dash-ent__customize-label {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.dash-ent__customize-move {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.dash-ent__customize-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--dash-border);
 }

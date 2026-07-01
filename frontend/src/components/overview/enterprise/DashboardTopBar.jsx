@@ -20,6 +20,7 @@ export default function DashboardTopBar({
   onPeriodChange,
   quickActions = [],
   onAction,
+  onCustomize,
 }) {
   const roleLabel = ROLE_LABELS[role] || 'Workspace'
 
@@ -71,6 +72,11 @@ export default function DashboardTopBar({
               </button>
             ))}
           </div>
+        ) : null}
+        {onCustomize ? (
+          <button type="button" className="dash-home__btn" onClick={onCustomize}>
+            Customize
+          </button>
         ) : null}
       </div>
     </header>

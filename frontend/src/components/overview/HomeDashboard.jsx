@@ -15,6 +15,9 @@ import DashboardSkeleton from './enterprise/DashboardSkeleton'
 import DashboardTopBar from './enterprise/DashboardTopBar'
 import ExecutiveKpiStrip from './enterprise/ExecutiveKpiStrip'
 import SalesPipelineSnapshot from './enterprise/SalesPipelineSnapshot'
+import DashboardCustomizePanel from './enterprise/DashboardCustomizePanel'
+import { useDashboardLayout } from '../../hooks/useDashboardLayout'
+import { useDashboardLive } from '../../hooks/useDashboardLive'
 import '../../styles/dashboard-home.css'
 import '../../styles/dashboard-enterprise.css'
 
@@ -153,6 +156,8 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
   const [activityTrend, setActivityTrend] = useState([])
   const [teamMetrics, setTeamMetrics] = useState(null)
   const [teamMetricsLoading, setTeamMetricsLoading] = useState(false)
+  const [customizeOpen, setCustomizeOpen] = useState(false)
+  const { layout, saveLayout, isVisible, visibleOrder } = useDashboardLayout(user?.id)
 
   const load = useCallback(async (silent = false) => {
     const cacheKey = teamReviewCacheKey(user?.organizationId, period)
@@ -204,6 +209,9 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
       setTeamMetricsLoading(false)
     }
   }, [user?.organizationId, period])
+
+  const refreshDashboard = useCallback(() => load(true), [load])
+  useDashboardLive({ enabled: isActive && Boolean(data), onStale: refreshDashboard })
 
   useEffect(() => {
     if (!isActive) return undefined
@@ -282,6 +290,154 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
     return { label: 'Open pipeline', action: { panel: 'pipeline', scopeOwner: 'me', returnTo: 'overview' } }
   }, [viewData?.role])
 
+  const topSectionOrder = useMemo(
+    () => visibleOrder.filter((id) => ['getting_started', 'kpis', 'pipeline', 'analytics', 'team_review'].includes(id)),
+    [visibleOrder]
+  )
+
+  const mainWidgetOrder = useMemo(
+    () => visibleOrder.filter((id) => ['priorities', 'marketing', 'activity'].includes(id)),
+    [visibleOrder]
+  )
+
+  const showMainGrid = useMemo(
+    () =>
+      isVisible('priorities') ||
+      isVisible('marketing') ||
+      isVisible('activity') ||
+      isVisible('sidebar'),
+    [isVisible]
+  )
+
+  const renderTopSection = (sectionId) => {
+    switch (sectionId) {
+      case 'getting_started':
+        return isVisible('getting_started') ? (
+          <CrmGettingStarted key="getting_started" onNavigate={runAction} pipelineSummary={ps} />
+        ) : null
+      case 'kpis':
+        return isVisible('kpis') ? (
+          <StatStrip key="kpis" items={viewData.statStrip || []} onAction={runAction} />
+        ) : null
+      case 'pipeline':
+        return isVisible('pipeline') ? (
+          <SalesPipelineSnapshot
+            key="pipeline"
+            stages={ps.stages}
+            total={ps.leadCount}
+            role={role}
+            onStageClick={runAction}
+          />
+        ) : null
+      case 'analytics':
+        return isVisible('analytics') ? (
+          <div key="analytics">
+            <p className="dash-ent__analytics-label">Analytics</p>
+            <div className="dash-home__charts">
+              <section className="dash-home__panel">
+                <div className="dash-home__panel-head">
+                  <div>
+                    <h2 className="dash-home__panel-title">Pipeline health</h2>
+                    <p className="dash-home__panel-sub">
+                      {ps.leadCount?.toLocaleString() || 0} leads · ₹{ps.dealValue?.toLocaleString() || 0} pipeline · {ps.stuck || 0} stuck
+                    </p>
+                  </div>
+                  <button type="button" className="dash-home__btn" onClick={() => runAction({ panel: 'crm-dashboard', returnTo: 'overview' })}>
+                    Full report
+                  </button>
+                </div>
+                <PipelineHealthChart stages={ps.stages} role={role} onStageClick={runAction} />
+              </section>
+
+              <section className="dash-home__panel">
+                <div className="dash-home__panel-head">
+                  <div>
+                    <h2 className="dash-home__panel-title">CRM activity</h2>
+                    <p className="dash-home__panel-sub">Emails, calls, tasks, and notes over time</p>
+                  </div>
+                  <button type="button" className="dash-home__btn" onClick={() => runAction({ panel: 'crm-log', period: period === '30d' ? 'month' : 'week', returnTo: 'overview' })}>
+                    Activity log
+                  </button>
+                </div>
+                <ActivityTrendChart activityByDay={activityTrend} />
+              </section>
+            </div>
+          </div>
+        ) : null
+      case 'team_review':
+        return role === 'manager' || role === 'org_admin' ? (
+          isVisible('team_review') ? (
+            <TeamReviewBlock
+              key="team_review"
+              role={role}
+              period={period}
+              viewData={viewData}
+              user={user}
+              metrics={teamMetrics}
+              metricsLoading={teamMetricsLoading}
+              onNavigate={onNavigate}
+              onLead={onLead}
+            />
+          ) : null
+        ) : null
+      default:
+        return null
+    }
+  }
+
+  const renderMainWidget = (widgetId) => {
+    switch (widgetId) {
+      case 'priorities':
+        return role === 'rep' && isVisible('priorities') ? (
+          <PrioritiesCard
+            key="priorities"
+            title="My priorities"
+            subtitle="Tasks and follow-ups ranked by urgency"
+            priorities={viewData.priorities}
+            onAction={runAction}
+            onLead={onLead}
+          />
+        ) : null
+      case 'marketing':
+        return role === 'marketing_manager' && isVisible('marketing') ? (
+          <section key="marketing" className="dash-home__card">
+            <h3 className="dash-home__card-title">Recent campaigns</h3>
+            {(viewData.marketing?.campaigns || []).map((c) => (
+              <button
+                key={c.id}
+                type="button"
+                className="dash-home__feed-item"
+                onClick={() => runAction({ panel: 'marketing', tab: 'reports', report: c.id, returnTo: 'overview' })}
+              >
+                <span className="dash-home__feed-body">
+                  <strong>{c.name}</strong>
+                  <span>{c.status}</span>
+                </span>
+              </button>
+            ))}
+            {!viewData.marketing?.campaigns?.length ? <p className="dash-home__empty">No campaigns yet.</p> : null}
+          </section>
+        ) : null
+      case 'activity':
+        return isVisible('activity') ? (
+          <section key="activity" className="dash-home__card dash-ent__timeline-card">
+            <div className="dash-home__card-head">
+              <div>
+                <h3 className="dash-home__card-title">Activity timeline</h3>
+                <p className="dash-home__card-sub">Calls, emails, tasks, and notes across your workspace</p>
+              </div>
+              <button type="button" className="dash-home__link" onClick={() => runAction({ panel: 'crm-log', returnTo: 'overview' })}>
+                View all →
+              </button>
+            </div>
+            <ActivityFeed items={(viewData.activity || []).slice(0, 10)} onLead={onLead} />
+          </section>
+        ) : null
+      default:
+        return null
+    }
+  }
+
   if (loading && !data) {
     return <DashboardSkeleton />
   }
@@ -301,6 +457,9 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
 
   return (
     <div className="dash-home dash-home--enterprise">
+      <a href="#dash-main-content" className="dash-ent__skip-link">
+        Skip to dashboard content
+      </a>
       <div className="dash-home__inner">
         <DashboardTopBar
           greeting={viewData.greeting}
@@ -317,148 +476,65 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
           onPeriodChange={setPeriod}
           quickActions={viewData.quickActions || []}
           onAction={runAction}
+          onCustomize={() => setCustomizeOpen(true)}
         />
 
-        <CrmGettingStarted onNavigate={runAction} pipelineSummary={ps} />
+        <main id="dash-main-content" aria-label="CRM dashboard">
+          {topSectionOrder.map((sectionId) => renderTopSection(sectionId))}
 
-        <StatStrip items={viewData.statStrip || []} onAction={runAction} />
-
-        <SalesPipelineSnapshot
-          stages={ps.stages}
-          total={ps.leadCount}
-          role={role}
-          onStageClick={runAction}
-        />
-
-        <p className="dash-ent__analytics-label">Analytics</p>
-        <div className="dash-home__charts">
-          <section className="dash-home__panel">
-            <div className="dash-home__panel-head">
-              <div>
-                <h2 className="dash-home__panel-title">Pipeline health</h2>
-                <p className="dash-home__panel-sub">
-                  {ps.leadCount?.toLocaleString() || 0} leads · ₹{ps.dealValue?.toLocaleString() || 0} pipeline · {ps.stuck || 0} stuck
-                </p>
+          {showMainGrid ? (
+            <div className="dash-home__main">
+              <div className="dash-home__main-col">
+                {mainWidgetOrder.map((widgetId) => renderMainWidget(widgetId))}
               </div>
-              <button type="button" className="dash-home__btn" onClick={() => runAction({ panel: 'crm-dashboard', returnTo: 'overview' })}>
-                Full report
-              </button>
+
+              {isVisible('sidebar') ? (
+                <aside className="dash-home__aside dash-ent__aside-rail" aria-label="Dashboard insights">
+                  <WeekProgressCard thisWeek={viewData.thisWeek} label={role === 'manager' ? 'Team CRM actions' : 'Your CRM actions'} />
+
+                  {role === 'rep' ? <LeadFocusGrid leadFocus={viewData.leadFocus} leadFocusActions={viewData.leadFocusActions} onAction={runAction} /> : null}
+
+                  {viewData.topRep ? (
+                    <section className="dash-home__card dash-home__card--compact">
+                      <h3 className="dash-home__card-title">Top rep this week</h3>
+                      <p className="dash-home__top-rep-name">{viewData.topRep.name}</p>
+                      <p className="dash-home__card-sub">{viewData.topRep.activities7d} activities</p>
+                      <button type="button" className="dash-home__link" onClick={() => runAction(viewData.topRep.action)}>
+                        View pipeline →
+                      </button>
+                    </section>
+                  ) : null}
+
+                  {role === 'org_admin' && viewData.revenue ? (
+                    <section className="dash-home__card dash-home__card--compact">
+                      <h3 className="dash-home__card-title">Revenue progress</h3>
+                      <p className="dash-home__revenue-pct">{viewData.revenue.progressPct || 0}% of target</p>
+                      <p className="dash-home__card-sub">
+                        ₹{viewData.revenue.achieved?.toLocaleString() || 0} / ₹{viewData.revenue.monthlyTarget?.toLocaleString() || 0}
+                      </p>
+                    </section>
+                  ) : null}
+
+                  {(viewData.insights || []).map((ins) => (
+                    <div key={ins.text} className={`dash-home__insight dash-home__insight--${ins.kind}`}>
+                      {ins.text}
+                      {ins.action ? (
+                        <button type="button" className="dash-home__link" onClick={() => runAction(ins.action)}>
+                          View →
+                        </button>
+                      ) : null}
+                    </div>
+                  ))}
+                </aside>
+              ) : null}
             </div>
-            <PipelineHealthChart stages={ps.stages} role={role} onStageClick={runAction} />
-          </section>
-
-          <section className="dash-home__panel">
-            <div className="dash-home__panel-head">
-              <div>
-                <h2 className="dash-home__panel-title">CRM activity</h2>
-                <p className="dash-home__panel-sub">Emails, calls, tasks, and notes over time</p>
-              </div>
-              <button type="button" className="dash-home__btn" onClick={() => runAction({ panel: 'crm-log', period: period === '30d' ? 'month' : 'week', returnTo: 'overview' })}>
-                Activity log
-              </button>
-            </div>
-            <ActivityTrendChart activityByDay={activityTrend} />
-          </section>
-        </div>
-
-        {role === 'manager' || role === 'org_admin' ? (
-          <TeamReviewBlock
-            role={role}
-            period={period}
-            viewData={viewData}
-            user={user}
-            metrics={teamMetrics}
-            metricsLoading={teamMetricsLoading}
-            onNavigate={onNavigate}
-            onLead={onLead}
-          />
-        ) : null}
-
-        <div className="dash-home__main">
-          <div className="dash-home__main-col">
-            {role === 'rep' ? (
-              <PrioritiesCard
-                title="My priorities"
-                subtitle="Tasks and follow-ups ranked by urgency"
-                priorities={viewData.priorities}
-                onAction={runAction}
-                onLead={onLead}
-              />
-            ) : null}
-
-            {role === 'marketing_manager' ? (
-              <section className="dash-home__card">
-                <h3 className="dash-home__card-title">Recent campaigns</h3>
-                {(viewData.marketing?.campaigns || []).map((c) => (
-                  <button
-                    key={c.id}
-                    type="button"
-                    className="dash-home__feed-item"
-                    onClick={() => runAction({ panel: 'marketing', tab: 'reports', report: c.id, returnTo: 'overview' })}
-                  >
-                    <span className="dash-home__feed-body">
-                      <strong>{c.name}</strong>
-                      <span>{c.status}</span>
-                    </span>
-                  </button>
-                ))}
-                {!viewData.marketing?.campaigns?.length ? <p className="dash-home__empty">No campaigns yet.</p> : null}
-              </section>
-            ) : null}
-
-            <section className="dash-home__card dash-ent__timeline-card">
-              <div className="dash-home__card-head">
-                <div>
-                  <h3 className="dash-home__card-title">Activity timeline</h3>
-                  <p className="dash-home__card-sub">Calls, emails, tasks, and notes across your workspace</p>
-                </div>
-                <button type="button" className="dash-home__link" onClick={() => runAction({ panel: 'crm-log', returnTo: 'overview' })}>
-                  View all →
-                </button>
-              </div>
-              <ActivityFeed items={(viewData.activity || []).slice(0, 10)} onLead={onLead} />
-            </section>
-          </div>
-
-          <aside className="dash-home__aside dash-ent__aside-rail">
-            <WeekProgressCard thisWeek={viewData.thisWeek} label={role === 'manager' ? 'Team CRM actions' : 'Your CRM actions'} />
-
-            {role === 'rep' ? <LeadFocusGrid leadFocus={viewData.leadFocus} leadFocusActions={viewData.leadFocusActions} onAction={runAction} /> : null}
-
-            {viewData.topRep ? (
-              <section className="dash-home__card dash-home__card--compact">
-                <h3 className="dash-home__card-title">Top rep this week</h3>
-                <p className="dash-home__top-rep-name">{viewData.topRep.name}</p>
-                <p className="dash-home__card-sub">{viewData.topRep.activities7d} activities</p>
-                <button type="button" className="dash-home__link" onClick={() => runAction(viewData.topRep.action)}>
-                  View pipeline →
-                </button>
-              </section>
-            ) : null}
-
-            {role === 'org_admin' && viewData.revenue ? (
-              <section className="dash-home__card dash-home__card--compact">
-                <h3 className="dash-home__card-title">Revenue progress</h3>
-                <p className="dash-home__revenue-pct">{viewData.revenue.progressPct || 0}% of target</p>
-                <p className="dash-home__card-sub">
-                  ₹{viewData.revenue.achieved?.toLocaleString() || 0} / ₹{viewData.revenue.monthlyTarget?.toLocaleString() || 0}
-                </p>
-              </section>
-            ) : null}
-
-            {(viewData.insights || []).map((ins) => (
-              <div key={ins.text} className={`dash-home__insight dash-home__insight--${ins.kind}`}>
-                {ins.text}
-                {ins.action ? (
-                  <button type="button" className="dash-home__link" onClick={() => runAction(ins.action)}>
-                    View →
-                  </button>
-                ) : null}
-              </div>
-            ))}
-          </aside>
-        </div>
+          ) : null}
+        </main>
       </div>
+
+      {customizeOpen ? (
+        <DashboardCustomizePanel layout={layout} onSave={saveLayout} onClose={() => setCustomizeOpen(false)} />
+      ) : null}
     </div>
   )
 }

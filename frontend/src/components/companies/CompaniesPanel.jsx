@@ -53,9 +53,9 @@ export default function CompaniesPanel({ onNavigate }) {
   return (
     <div className="panel-shell">
       <header className="shrink-0 bg-white border-b border-gray-200 px-5 py-4">
-        <h1 className="text-lg font-semibold text-gray-900">Companies</h1>
+        <h1 className="text-lg font-semibold text-gray-900">Accounts</h1>
         <p className="text-xs text-gray-500 mt-0.5">
-          Accounts aggregated from your pipeline — contacts, deals, and activity rolled up by company name.
+          Company accounts aggregated from your pipeline — contacts, deals, and activity rolled up by name.
         </p>
       </header>
 
