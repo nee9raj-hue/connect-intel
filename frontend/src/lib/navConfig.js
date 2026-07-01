@@ -1,4 +1,5 @@
 import { CRM_STATUSES, getVisiblePipelineColumns } from './crmConstants'
+import { CHITHI_IN_CRM_ENABLED } from './crmProductFlags'
 import { isChithiPanel } from './chithiNav'
 import { hasWorkspaceFeature } from './workspaceFeatures'
 import { isFreightDealOrg, FREIGHT_DEAL_STAGES } from './freightDeal'
@@ -112,6 +113,7 @@ export function navTargetToOptions(target = {}) {
 export function isNavTargetActive(activePanel, panelOptions, target) {
   if (!target?.panel) return false
   if (
+    CHITHI_IN_CRM_ENABLED &&
     target.panel === 'chithi' &&
     (isChithiPanel(activePanel) ||
       (activePanel === 'team-notes' && (!target.tab || target.tab === 'notes')) ||
@@ -382,11 +384,11 @@ export function buildCustomerNavSections(
       title: 'Analytics & reports',
       groups: analyticsGroups,
     },
-    {
-      title: 'Collaboration',
-      groups: [
-        ...(isCompany
-          ? [
+    ...(CHITHI_IN_CRM_ENABLED && isCompany
+      ? [
+          {
+            title: 'Collaboration',
+            groups: [
               {
                 id: 'chithi',
                 label: 'Chithi',
@@ -394,10 +396,10 @@ export function buildCustomerNavSections(
                 panel: 'chithi',
                 badgeKey: 'chithi',
               },
-            ]
-          : []),
-      ],
-    },
+            ],
+          },
+        ]
+      : []),
     {
       title: 'AI prospecting',
       groups: [
@@ -512,7 +514,7 @@ export function getDesktopPillSubmenuTargets(pillItem, sections = []) {
   if (pillItem.panel === 'crm-dashboard' || pillItem.panel === 'crm-log') {
     return []
   }
-  if (pillItem.panel === 'chithi' || pillItem.panel === 'team-tasks' || pillItem.panel === 'team-notes') {
+  if (CHITHI_IN_CRM_ENABLED && (pillItem.panel === 'chithi' || pillItem.panel === 'team-tasks' || pillItem.panel === 'team-notes')) {
     return [
       { id: 'chithi-chat', label: 'Messages', panel: 'chithi' },
       { id: 'chithi-tasks', label: 'Tasks', panel: 'chithi', tab: 'tasks' },
@@ -534,7 +536,6 @@ export const MOBILE_NAV_PILL_MORE_ITEMS = [
   { id: 'marketing', label: 'Mail', panel: 'marketing', tab: 'overview', icon: 'mail' },
   { id: 'whatsapp', label: 'WA', panel: 'marketing', tab: 'inbox', icon: 'whatsapp' },
   { id: 'calendar', label: 'Meetings', panel: 'crm-calendar', upcomingOnly: true, icon: 'calendar' },
-  { id: 'tasks', label: 'Tasks', panel: 'team-tasks', icon: 'task' },
   { id: 'app-settings', label: 'Display', panel: 'app-settings', icon: 'settings' },
 ]
 
@@ -558,6 +559,4 @@ export const QUICK_NAV_TILES = [
     desc: 'Upcoming',
   },
   { id: 'crm-log', label: 'Activity', panel: 'crm-log', icon: 'log', desc: 'Recent actions' },
-  { id: 'team-notes', label: 'Notes', panel: 'team-notes', icon: 'note', desc: 'Team inbox' },
-  { id: 'team-tasks', label: 'Tasks', panel: 'team-tasks', icon: 'task', desc: 'Assignments' },
 ]

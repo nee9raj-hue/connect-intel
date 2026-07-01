@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { cycleSidebarMode, loadSidebarMode, saveSidebarMode } from '../../lib/sidebarLayout'
-import { isChithiPanel } from '../../lib/chithiNav'
+import { isChithiPanel, normalizeCrmPanel } from '../../lib/chithiNav'
 import {
   appLocationKey,
   normalizeLeadId,
@@ -32,11 +32,10 @@ import NotificationBell from './NotificationBell'
 import useIsMobile from '../../hooks/useIsMobile'
 import useMobileNavGenie from '../../hooks/useMobileNavGenie'
 import usePanelPreferences from '../../hooks/usePanelPreferences'
-import useChithiAlerts from '../../hooks/useChithiAlerts'
 import useAppKeyboardShortcuts from '../../hooks/useAppKeyboardShortcuts'
 import PwaInstallBanner from './PwaInstallBanner'
 import PwaUpdateBanner from './PwaUpdateBanner'
-import ChithiPushBanner from './ChithiPushBanner'
+import { CHITHI_IN_CRM_ENABLED } from '../../lib/crmProductFlags'
 import { MenuIcon, SettingsGearIcon } from '../ui/icons'
 
 export default function AppShell() {
@@ -90,13 +89,6 @@ export default function AppShell() {
     !hideMobileFloatingChrome
   const mobilePillVisible = useMobileNavGenie(showMobileNavPill)
   usePanelPreferences(user?.id)
-  useChithiAlerts({
-    enabled: Boolean(user?.accountType === 'company' && user?.organizationId),
-    activePanel,
-    chithiUnread,
-    refreshChithiUnread,
-  })
-
   useAppKeyboardShortcuts({
     enabled: Boolean(user && !needsOnboarding),
     activePanel,
@@ -115,7 +107,7 @@ export default function AppShell() {
         items.find((i) => i.type === 'team_task')
       if (hit) setLiveToast(hit.title)
       if (items.some((i) => i.type === 'team_note' || i.type === 'team_task')) {
-        void refreshChithiUnread()
+        if (CHITHI_IN_CRM_ENABLED) void refreshChithiUnread()
       }
     },
   })
@@ -137,8 +129,9 @@ export default function AppShell() {
   const applyLocation = useCallback(
     (location) => {
       const { panel, panelOptions: opts = {}, leadId } = location || {}
-      const resolved = resolvePanelOptions(panel || 'overview', opts)
-      setActivePanel(panel || 'overview')
+      const panelId = normalizeCrmPanel(panel || 'overview')
+      const resolved = resolvePanelOptions(panelId, opts)
+      setActivePanel(panelId)
       setPanelOptions(resolved)
       setMobileNavOpen(false)
       const assigneeId = resolved.assigneeUserId || resolved.userId
@@ -228,20 +221,21 @@ export default function AppShell() {
   const navigate = useCallback(
     (id, options = {}, navOpts = {}) => {
       const replace = Boolean(navOpts.replace)
-      const leavingChithi = isChithiPanel(activePanel) && !isChithiPanel(id)
+      const panelId = normalizeCrmPanel(id)
+      const leavingChithi = isChithiPanel(activePanel) && !isChithiPanel(panelId)
       if (leavingChithi && sidebarMode === 'rail') {
         setSidebarMode('expanded')
         saveSidebarMode('expanded')
       }
 
-      const resolvedOptions = resolvePanelOptions(id, options || {})
+      const resolvedOptions = resolvePanelOptions(panelId, options || {})
       const assigneeId = resolvedOptions.assigneeUserId || resolvedOptions.userId
       if (assigneeId) setPipelineAssigneeFilter(assigneeId)
 
-      const loc = { panel: id, panelOptions: resolvedOptions, leadId: null }
+      const loc = { panel: panelId, panelOptions: resolvedOptions, leadId: null }
 
       if (pipelineLeadId) setPipelineLeadId(null)
-      setActivePanel(id)
+      setActivePanel(panelId)
       setPanelOptions(resolvedOptions)
       setMobileNavOpen(false)
 
@@ -391,9 +385,6 @@ export default function AppShell() {
         <PwaUpdateBanner />
         {user && !user.isPlatformAdmin && !needsOnboarding && (
           <PwaInstallBanner enabled={!chithiFocus && !marketingFocus} />
-        )}
-        {user && !user.isPlatformAdmin && !needsOnboarding && user?.accountType === 'company' && (
-          <ChithiPushBanner enabled={!chithiFocus && !marketingFocus} />
         )}
         {liveToast && (
           <div

@@ -1,5 +1,7 @@
 /** Browser history + URL helpers for in-app panel navigation. */
 
+import { CHITHI_IN_CRM_ENABLED } from './crmProductFlags'
+import { normalizeCrmPanel } from './chithiNav'
 const OAUTH_QUERY_KEYS = ['email_oauth', 'crm_gmail', 'mailbox', 'invite']
 const LAST_LOCATION_KEY = 'ci_last_app_location'
 const POST_LOGIN_NAV_KEY = 'ci_post_login_nav'
@@ -44,12 +46,16 @@ export function parseAppLocation(search = '', pathname = '/') {
   let panel = pathPanel || String(params.get('panel') || 'overview').trim() || 'overview'
   const panelOptions = {}
 
-  if (panel === 'team-notes' || panel === 'team-hub') {
-    panel = 'chithi'
-    panelOptions.tab = 'notes'
-  } else if (panel === 'team-tasks') {
-    panel = 'chithi'
-    panelOptions.tab = 'tasks'
+  panel = normalizeCrmPanel(panel)
+
+  if (CHITHI_IN_CRM_ENABLED) {
+    if (panel === 'team-notes' || panel === 'team-hub') {
+      panel = 'chithi'
+      panelOptions.tab = 'notes'
+    } else if (panel === 'team-tasks') {
+      panel = 'chithi'
+      panelOptions.tab = 'tasks'
+    }
   }
 
   if (params.get('tab')) panelOptions.tab = params.get('tab')

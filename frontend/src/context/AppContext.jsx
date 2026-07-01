@@ -7,6 +7,7 @@ import { getNotificationTarget } from '../lib/notificationNavigation'
 import { navTargetToOptions, normalizePipelineSummary } from '../lib/navConfig'
 import { withTimeout } from '../lib/fetchWithTimeout'
 import { clearAppNavigationState, preparePostLoginNavigation } from '../lib/appHistory'
+import { CHITHI_IN_CRM_ENABLED } from '../lib/crmProductFlags'
 
 const AppContext = createContext(null)
 
@@ -129,7 +130,7 @@ export function AppProvider({ children }) {
   const [chithiUnread, setChithiUnread] = useState({ messages: 0, tasks: 0, total: 0 })
 
   const refreshChithiUnread = useCallback(async () => {
-    if (user?.accountType !== 'company' || !user?.organizationId) {
+    if (!CHITHI_IN_CRM_ENABLED || user?.accountType !== 'company' || !user?.organizationId) {
       setChithiUnread({ messages: 0, tasks: 0, total: 0 })
       return
     }
@@ -215,7 +216,7 @@ export function AppProvider({ children }) {
   }, [user?.organizationId, user?.accountType])
 
   useEffect(() => {
-    if (user?.accountType === 'company' && user?.organizationId) {
+    if (CHITHI_IN_CRM_ENABLED && user?.accountType === 'company' && user?.organizationId) {
       void refreshChithiUnread()
     } else {
       setChithiUnread({ messages: 0, tasks: 0, total: 0 })
