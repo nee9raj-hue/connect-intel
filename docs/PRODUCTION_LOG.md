@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 0330af9
+npm run prod:rollback -- e7615bf
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 0330af9
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `1f425a0` |
-| Log updated (IST) | 17/06/2026, 12:16:23 |
+| Commit | `253962d` |
+| Log updated (IST) | 01/07/2026, 15:59:42 |
 
 ---
 
@@ -44,26 +44,26 @@ npm run prod:rollback -- 0330af9
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 17/06/2026, 12:16:08 | `1f425a0` | Add freight deal CBM/clearance fields and pipeline deals filters. | [preview](https://connect-intel-2i1ubj1mw-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1f425a0` | **← LIVE**
-| 16/06/2026, 19:11:40 | `0330af9` | chore: sync production log after Team Intelligence activity feed fix deploy | [preview](https://connect-intel-orz5rb8jt-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0330af9` |
-| 16/06/2026, 19:10:16 | `51f7d71` | Fix Team Intelligence activity feed using indexed pipeline activities. | [preview](https://connect-intel-ppp2qwuv1-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 51f7d71` |
-| 16/06/2026, 17:06:20 | `13b07be` | chore: sync production log after pipeline tag filter fix deploy | [preview](https://connect-intel-bj00vnspn-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 13b07be` |
-| 16/06/2026, 17:05:37 | `0c7ee4a` | Fix pipeline tag filters with fast SQL path and correct any/all matching. | [preview](https://connect-intel-7sb5j138r-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0c7ee4a` |
-| 16/06/2026, 16:51:42 | `b84a2b5` | chore: sync production log after CRM fast-save deploy | [preview](https://connect-intel-nda2len06-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b84a2b5` |
-| 16/06/2026, 16:50:50 | `0fff6f9` | Speed up CRM deal, task, and call saves with table-first fast persist. | [preview](https://connect-intel-6k8x92g8c-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0fff6f9` |
-| 16/06/2026, 16:41:42 | `39967dd` | chore: sync production log after pipeline board fix deploy | [preview](https://connect-intel-dy1ybakd3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 39967dd` |
-| 16/06/2026, 16:40:43 | `5137f25` | Fix pipeline board showing duplicate leads across every stage column. | [preview](https://connect-intel-9cp132sck-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5137f25` |
-| 16/06/2026, 15:50:57 | `e8f11b7` | Harden CRM data isolation across search, bulk email, and store loads. | [preview](https://connect-intel-kbl117giv-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e8f11b7` |
-| 16/06/2026, 15:50:31 | `2071690` | chore: sync production log after CRM isolation hardening deploy | [preview](https://connect-intel-3bj7pk8qw-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2071690` |
-| 16/06/2026, 15:36:25 | `39e4fd9` | chore: sync production log after owner_id rep visibility deploy | [preview](https://connect-intel-3d9ni0hid-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 39e4fd9` |
-| 16/06/2026, 15:35:47 | `db23345` | Fix rep pipeline leak via owner_id instead of assignee-null pool. | [preview](https://connect-intel-92hyxb9kb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- db23345` |
-| 16/06/2026, 14:50:39 | `915f42c` | chore: sync production log after rep pipeline visibility fix deploy | [preview](https://connect-intel-ey3hj3myd-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 915f42c` |
-| 16/06/2026, 14:49:48 | `64556ea` | Fix reps seeing other owners' pipeline leads. | [preview](https://connect-intel-cubn7in34-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 64556ea` |
-| 16/06/2026, 13:47:24 | `4fb1b3d` | chore: sync production log after bulk assign fix deploy | [preview](https://connect-intel-dliythwaj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4fb1b3d` |
-| 16/06/2026, 13:46:48 | `0244832` | Fix bulk assign ReferenceError for readPipelineLeadsByIds. | [preview](https://connect-intel-6e9q299ow-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0244832` |
-| 16/06/2026, 13:44:11 | `9306c85` | chore: sync production log after deal creation schema fix deploy | [preview](https://connect-intel-q78isqt47-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9306c85` |
-| 16/06/2026, 13:43:01 | `0b6d729` | Fix deal creation failing on pipeline_leads schema mismatch. | [preview](https://connect-intel-5eiavmyhd-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0b6d729` |
-| 16/06/2026, 13:36:30 | `d4001a3` | chore: sync production log after lead assignment persistence deploy | [preview](https://connect-intel-pqn1qeylf-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d4001a3` |
+| 01/07/2026, 15:59:34 | `253962d` | Ship email-only auth, free-tier limits, and admin upgrade flow. | [preview](https://connect-intel-oj6uvx4dp-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 253962d` | **← LIVE**
+| 01/07/2026, 15:47:34 | `e7615bf` | Remove desktop floating Nav pill; sidebar remains primary navigation. | [preview](https://connect-intel-8ev2cge0d-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e7615bf` |
+| 01/07/2026, 15:31:17 | `7951641` | Run solo CRM on free infra only: skip crons and paid API paths. | [preview](https://connect-intel-hlqka4ric-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7951641` |
+| 01/07/2026, 15:08:07 | `465c54f` | Enforce solo free CRM tier and strip paid plan signals from user sessions. | [preview](https://connect-intel-dl1t6n37r-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 465c54f` |
+| 01/07/2026, 15:02:57 | `d1c0373` | Hide subscription UI during CRM go-live and show included workspace tab. | [preview](https://connect-intel-ej9kzk0fv-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d1c0373` |
+| 01/07/2026, 14:52:03 | `59e7693` | Focus CRM on core workflow: email signup, no onboarding Gmail prompt. | [preview](https://connect-intel-3ikalathf-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 59e7693` |
+| 01/07/2026, 14:20:49 | `7012ce7` | Add ops tooling to transfer org admin and demote mistaken first signup. | [preview](https://connect-intel-mocvyr7g7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7012ce7` |
+| 01/07/2026, 14:11:03 | `63e1480` | Remove Chithi from CRM shell and add per-org CRM clean for go-live. | [preview](https://connect-intel-aidn89hjl-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 63e1480` |
+| 01/07/2026, 13:54:54 | `339cf57` | Add production fresh-start reset to wipe all org CRM data for go-live. | [preview](https://connect-intel-fpot2yaib-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 339cf57` |
+| 30/06/2026, 13:33:55 | `a8f1b6f` | Add bulk pipeline delete so orgs can remove unused leads in batches. | [preview](https://connect-intel-oe0tz2vsg-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a8f1b6f` |
+| 30/06/2026, 12:18:11 | `bfe0a22` | Keep owner filter enforced when leads are reassigned in the pipeline list. | [preview](https://connect-intel-nfub5ev6i-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- bfe0a22` |
+| 30/06/2026, 12:11:08 | `940b559` | Fix pipeline state/city filters returning empty lists with wrong match counts. | [preview](https://connect-intel-89k7bvymu-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 940b559` |
+| 30/06/2026, 12:01:00 | `e999fdb` | Fix assignment emails: proper HTML formatting and one digest per bulk assign. | [preview](https://connect-intel-1xtiqki2n-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e999fdb` |
+| 30/06/2026, 11:47:32 | `29802e9` | Fix pipeline state filter so location and GUJRAT spelling match correctly. | [preview](https://connect-intel-b25fx2h5d-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 29802e9` |
+| 30/06/2026, 11:32:35 | `3b75051` | Fix bulk assign crash: rows is not defined in pipeline upsert. | [preview](https://connect-intel-594ccqe67-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3b75051` |
+| 30/06/2026, 11:21:46 | `20e2d5c` | Revert "Add Unassigned leads folder to speed up default CRM pipeline and search." | [preview](https://connect-intel-cg2v80un7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 20e2d5c` |
+| 30/06/2026, 11:01:34 | `b7229ab` | Fix rep pipeline scoping so only own leads show outside Unassigned folder. | [preview](https://connect-intel-84zxlr7xh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b7229ab` |
+| 30/06/2026, 10:51:19 | `8498c23` | Add Unassigned leads folder to speed up default CRM pipeline and search. | [preview](https://connect-intel-jpo6dekml-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8498c23` |
+| 30/06/2026, 10:36:48 | `b6ae036` | Fix CRM and marketing Gmail sends missing inbound reply imports. | [preview](https://connect-intel-or0zf9e69-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b6ae036` |
+| 30/06/2026, 00:06:19 | `a846560` | Fix commercial email consent checkbox not persisting on leads. | [preview](https://connect-intel-1co2pz9k0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a846560` |
 
 ---
 
