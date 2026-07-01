@@ -1,10 +1,52 @@
 {
-  "updatedAt": "2026-07-01T19:13:38.388Z",
-  "updatedAtIst": "02/07/2026, 00:43:38",
+  "updatedAt": "2026-07-01T19:29:09.277Z",
+  "updatedAtIst": "02/07/2026, 00:59:09",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "64d9197",
+  "currentProductionCommit": "3be6c3a",
   "entries": [
+    {
+      "logId": "20260702-0058-3be6c3a",
+      "commit": "3be6c3a",
+      "commitFull": "3be6c3a8a136343aea198fe01aa7e6c430f89fb4",
+      "message": "Ship Deploy 6: SQL companies table, sync/backfill, and Accounts hub reads.",
+      "deployedAt": "2026-07-01T19:28:55.501Z",
+      "deployedAtIst": "02/07/2026, 00:58:55",
+      "committedAtIst": "02/07/2026, 00:58:23",
+      "vercelPreviewUrl": "https://connect-intel-btng3k6i8-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 3be6c3a"
+    },
+    {
+      "logId": "20260702-0053-c235302",
+      "commit": "c235302",
+      "commitFull": "c2353022ad4b1c49c20ff5f773c30b9f0519b94f",
+      "message": "Add production schema repair migration and harden crm_relational_v3.",
+      "deployedAt": "2026-07-01T19:23:13.375Z",
+      "deployedAtIst": "02/07/2026, 00:53:13",
+      "committedAtIst": "02/07/2026, 00:52:09",
+      "vercelPreviewUrl": "https://connect-intel-fjemwvy51-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- c235302"
+    },
+    {
+      "logId": "20260702-0044-2c536af",
+      "commit": "2c536af",
+      "commitFull": "2c536aff16a1deb0e6b7ea1226316e5ca7acbbf0",
+      "message": "Update production log for Deploy 5 (64d9197).",
+      "deployedAt": "2026-07-01T19:14:15.124Z",
+      "deployedAtIst": "02/07/2026, 00:44:15",
+      "committedAtIst": "02/07/2026, 00:43:38",
+      "vercelPreviewUrl": "https://connect-intel-40q2c1lx2-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 2c536af"
+    },
     {
       "logId": "20260702-0043-64d9197",
       "commit": "64d9197",
@@ -15,7 +57,7 @@
       "committedAtIst": "02/07/2026, 00:42:53",
       "vercelPreviewUrl": "https://connect-intel-to9ynd3fp-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 64d9197"
     },
@@ -242,48 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 70c758b"
-    },
-    {
-      "logId": "20260701-2307-b3264c7",
-      "commit": "b3264c7",
-      "commitFull": "b3264c7df0589e8b0bff9aa54d68e19e547a3620",
-      "message": "Add enterprise dashboard P2: customizable widgets, live pulse, and Opportunities hub.",
-      "deployedAt": "2026-07-01T17:37:49.420Z",
-      "deployedAtIst": "01/07/2026, 23:07:49",
-      "committedAtIst": "01/07/2026, 23:07:05",
-      "vercelPreviewUrl": "https://connect-intel-2j8yne4um-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- b3264c7"
-    },
-    {
-      "logId": "20260701-2258-74ee142",
-      "commit": "74ee142",
-      "commitFull": "74ee1425d813280a35a61a4d79721a2cd314f983",
-      "message": "Update production log after enterprise dashboard UI deploy.",
-      "deployedAt": "2026-07-01T17:28:42.192Z",
-      "deployedAtIst": "01/07/2026, 22:58:42",
-      "committedAtIst": "01/07/2026, 22:58:11",
-      "vercelPreviewUrl": "https://connect-intel-694ra8jbd-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 74ee142"
-    },
-    {
-      "logId": "20260701-2257-45b3250",
-      "commit": "45b3250",
-      "commitFull": "45b3250e0831a7fa0d17b3fae0cf2f6d6b08a768",
-      "message": "Upgrade home dashboard to enterprise CRM layout and UX.",
-      "deployedAt": "2026-07-01T17:27:59.524Z",
-      "deployedAtIst": "01/07/2026, 22:57:59",
-      "committedAtIst": "01/07/2026, 22:57:26",
-      "vercelPreviewUrl": "https://connect-intel-bedfdcaex-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 45b3250"
     }
   ]
 }

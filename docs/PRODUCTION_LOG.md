@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 7c84a1e
+npm run prod:rollback -- c235302
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 7c84a1e
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `64d9197` |
-| Log updated (IST) | 02/07/2026, 00:43:38 |
+| Commit | `3be6c3a` |
+| Log updated (IST) | 02/07/2026, 00:59:09 |
 
 ---
 
@@ -44,7 +44,10 @@ npm run prod:rollback -- 7c84a1e
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 02/07/2026, 00:43:30 | `64d9197` | Ship Deploy 5: SQL deals table, sync/backfill, and indexed lead timeline. | [preview](https://connect-intel-to9ynd3fp-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 64d9197` | **← LIVE**
+| 02/07/2026, 00:58:55 | `3be6c3a` | Ship Deploy 6: SQL companies table, sync/backfill, and Accounts hub reads. | [preview](https://connect-intel-btng3k6i8-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3be6c3a` | **← LIVE**
+| 02/07/2026, 00:53:13 | `c235302` | Add production schema repair migration and harden crm_relational_v3. | [preview](https://connect-intel-fjemwvy51-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c235302` |
+| 02/07/2026, 00:44:15 | `2c536af` | Update production log for Deploy 5 (64d9197). | [preview](https://connect-intel-40q2c1lx2-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2c536af` |
+| 02/07/2026, 00:43:30 | `64d9197` | Ship Deploy 5: SQL deals table, sync/backfill, and indexed lead timeline. | [preview](https://connect-intel-to9ynd3fp-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 64d9197` |
 | 02/07/2026, 00:36:56 | `7c84a1e` | Update production log for Deploy 4 (135b030). | [preview](https://connect-intel-3oqbgncoh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7c84a1e` |
 | 02/07/2026, 00:36:03 | `135b030` | Ship Deploy 4: workflow runs, inactivity triggers, and audit log UI. | [preview](https://connect-intel-5t99whwwl-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 135b030` |
 | 02/07/2026, 00:26:00 | `9a95c23` | Update production log for Deploy 3 (94619ac). | [preview](https://connect-intel-2q59ow73u-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9a95c23` |
@@ -61,9 +64,6 @@ npm run prod:rollback -- 7c84a1e
 | 01/07/2026, 23:12:58 | `6376deb` | Update production log after rep and solo dashboard deploy. | [preview](https://connect-intel-d9uf4ekp2-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6376deb` |
 | 01/07/2026, 23:12:04 | `9ea5b20` | Give reps and solo users the enterprise home dashboard. | [preview](https://connect-intel-m36y6tpey-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9ea5b20` |
 | 01/07/2026, 23:08:47 | `70c758b` | Update production log after P2 enterprise dashboard deploy. | [preview](https://connect-intel-9vl6v2nit-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 70c758b` |
-| 01/07/2026, 23:07:49 | `b3264c7` | Add enterprise dashboard P2: customizable widgets, live pulse, and Opportunities hub. | [preview](https://connect-intel-2j8yne4um-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b3264c7` |
-| 01/07/2026, 22:58:42 | `74ee142` | Update production log after enterprise dashboard UI deploy. | [preview](https://connect-intel-694ra8jbd-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 74ee142` |
-| 01/07/2026, 22:57:59 | `45b3250` | Upgrade home dashboard to enterprise CRM layout and UX. | [preview](https://connect-intel-bedfdcaex-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 45b3250` |
 
 ---
 
