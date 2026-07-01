@@ -61,15 +61,5 @@
       "source": "/((?!api/|assets/|setup-dns|privacy|terms|connect-intel-|favicon|icons\\.svg|robots\\.txt|manifest\\.json|manifest\\.webmanifest|sw\\.js|workbox-|pwa-|apple-touch-icon|chithi-menu-icon|chithi-push-sw).*)",
       "destination": "/index.html"
     }
-  ],
-  "crons": [
-    {
-      "path": "/api/marketing/cron",
-      "schedule": "0 9 * * *"
-    },
-    {
-      "path": "/api/marketing/cron?queue=1",
-      "schedule": "*/10 * * * *"
-    }
   ]
 }
