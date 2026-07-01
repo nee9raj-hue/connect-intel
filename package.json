@@ -38,6 +38,7 @@
     "marketing:queue-worker": "node scripts/marketing-queue-worker.mjs",
     "infra:verify": "node scripts/infra-verify.mjs",
     "tenant:audit": "node scripts/tenant-audit.mjs",
+    "fresh:start": "node scripts/fresh-start-reset.mjs",
     "railway:connect": "node scripts/railway-connect.mjs",
     "build:standalone": "cd frontend && STANDALONE=1 npm run build",
     "open": "open index.html 2>/dev/null || xdg-open index.html 2>/dev/null || echo 'Open index.html in your browser'"
