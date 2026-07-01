@@ -395,6 +395,33 @@ export const api = {
       request('/api/dashboard/bootstrap', { timeoutMs: 30_000 })
     ),
   getDashboardPulse: () => request('/api/dashboard/pulse', { timeoutMs: 10_000 }, { silent: true }),
+  subscribeDashboardPulse: async ({ onPulse, signal } = {}) => {
+    const token = getSessionToken()
+    const headers = { Accept: 'text/event-stream' }
+    if (token) headers.Authorization = `Bearer ${token}`
+    const res = await fetch('/api/dashboard/pulse?stream=1', { headers, signal, credentials: 'include' })
+    if (!res.ok || !res.body) throw new Error('pulse_stream_unavailable')
+    const reader = res.body.getReader()
+    const decoder = new TextDecoder()
+    let buffer = ''
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      buffer += decoder.decode(value, { stream: true })
+      const parts = buffer.split('\n\n')
+      buffer = parts.pop() || ''
+      for (const chunk of parts) {
+        const line = chunk.split('\n').find((l) => l.startsWith('data: '))
+        if (!line) continue
+        try {
+          const payload = JSON.parse(line.slice(6))
+          onPulse?.(payload)
+        } catch {
+          /* ignore malformed chunk */
+        }
+      }
+    }
+  },
   getOpportunitiesHub: ({ q = '', dealStage = 'all', limit = 50, offset = 0 } = {}) => {
     const qs = new URLSearchParams({
       q,

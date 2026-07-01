@@ -33,6 +33,12 @@ jobs:
           npm ci
           cd frontend && NODE_OPTIONS=--disable-warning=DEP0040 npm ci
 
+      - name: Unit tests
+        run: npm test
+
+      - name: RBAC handler audit
+        run: npm run rbac:audit
+
       - name: Verify deploy-critical files
         run: node scripts/verify-deploy.mjs --skip-build
 

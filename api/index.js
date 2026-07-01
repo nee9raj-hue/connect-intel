@@ -2,6 +2,7 @@ import { applyCors, handleOptions, sendJson } from '../lib/server/http.js'
 import { captureException } from '../lib/server/infra/sentry.js'
 import { observeHistogram } from '../lib/server/infra/metrics.js'
 import {
+  getInfraStatus,
   isMarketingSqlQueueEnabled,
   isPipelineHierarchyRbacEnabled,
   isPipelineLeadsTableEnabled,
@@ -19,9 +20,11 @@ function warnProductionSqlFlags() {
   if (!isMarketingSqlQueueEnabled()) disabled.push('USE_MARKETING_SQL_QUEUE')
 
   if (disabled.length) {
+    const infra = getInfraStatus()
     console.warn(
-      '[Connect Intel] Production SQL flags disabled — pipeline/marketing may load JSON shards:',
-      disabled.join(', ')
+      '[Connect Intel] Production SQL path disabled — enable Supabase env vars or set USE_* flags:',
+      disabled.join(', '),
+      infra
     )
   }
   prodSqlFlagsWarned = true

@@ -37,6 +37,8 @@
     "dash:warm": "node scripts/warm-dashboard-snapshots.mjs",
     "marketing:queue-worker": "node scripts/marketing-queue-worker.mjs",
     "infra:verify": "node scripts/infra-verify.mjs",
+    "test": "node --test 'lib/**/*.test.js' 'lib/server/**/*.test.js'",
+    "rbac:audit": "node scripts/rbac-handler-audit.mjs",
     "tenant:audit": "node scripts/tenant-audit.mjs",
     "fresh:start": "node scripts/fresh-start-reset.mjs",
     "org:clean": "node scripts/org-crm-clean.mjs",
