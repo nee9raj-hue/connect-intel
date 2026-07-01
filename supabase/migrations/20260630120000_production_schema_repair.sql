@@ -53,6 +53,20 @@ CREATE INDEX IF NOT EXISTS idx_pipeline_deals_org_updated
 
 COMMENT ON TABLE public.pipeline_deals IS 'Normalized CRM deals — one row per deal; synced from pipeline entry JSON.';
 
+-- ─── 2b. pipeline_companies (Deploy 6) ────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS public.pipeline_companies (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  organization_id TEXT NOT NULL,
+  company_id TEXT NOT NULL,
+  name TEXT,
+  domain TEXT,
+  metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_pipeline_companies_org_company_id
+  ON public.pipeline_companies (organization_id, company_id);
+
 -- ─── 3. Deploy 3–4 tables (if not applied yet) ────────────────────────────────
 CREATE TABLE IF NOT EXISTS public.audit_events (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -120,6 +134,8 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_workflow_runs_idempotency
 SELECT 'pipeline_leads' AS tbl, count(*)::bigint AS rows FROM public.pipeline_leads
 UNION ALL
 SELECT 'pipeline_deals', count(*)::bigint FROM public.pipeline_deals
+UNION ALL
+SELECT 'pipeline_companies', count(*)::bigint FROM public.pipeline_companies
 UNION ALL
 SELECT 'pipeline_activities', count(*)::bigint FROM public.pipeline_activities
 UNION ALL
