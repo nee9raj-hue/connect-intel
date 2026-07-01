@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 54a9de5
+npm run prod:rollback -- 33f9985
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 54a9de5
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `ccd8fd6` |
-| Log updated (IST) | 01/07/2026, 22:35:49 |
+| Commit | `45b3250` |
+| Log updated (IST) | 01/07/2026, 22:58:11 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 54a9de5
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 01/07/2026, 22:35:36 | `ccd8fd6` | Align manager dashboard with enterprise snapshot architecture. | [preview](https://connect-intel-mok8r1neh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ccd8fd6` | **← LIVE**
+| 01/07/2026, 22:57:59 | `45b3250` | Upgrade home dashboard to enterprise CRM layout and UX. | [preview](https://connect-intel-bedfdcaex-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 45b3250` | **← LIVE**
+| 01/07/2026, 22:36:20 | `33f9985` | Update production log after enterprise dashboard deploy. | [preview](https://connect-intel-fq1qraxam-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 33f9985` |
+| 01/07/2026, 22:35:36 | `ccd8fd6` | Align manager dashboard with enterprise snapshot architecture. | [preview](https://connect-intel-mok8r1neh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ccd8fd6` |
 | 01/07/2026, 22:17:30 | `54a9de5` | Update production log after P1 RBAC and bootstrap deploy. | [preview](https://connect-intel-1098jjnyl-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 54a9de5` |
 | 01/07/2026, 22:16:39 | `d55cdf7` | Enforce P1 RBAC and speed up pipeline bootstrap for new orgs. | [preview](https://connect-intel-gsyppqixe-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d55cdf7` |
 | 01/07/2026, 22:07:52 | `ece83c5` | Update production log after multi-tenant RBAC deploy. | [preview](https://connect-intel-h3x19mm6i-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ece83c5` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 54a9de5
 | 01/07/2026, 15:08:07 | `465c54f` | Enforce solo free CRM tier and strip paid plan signals from user sessions. | [preview](https://connect-intel-dl1t6n37r-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 465c54f` |
 | 01/07/2026, 15:02:57 | `d1c0373` | Hide subscription UI during CRM go-live and show included workspace tab. | [preview](https://connect-intel-ej9kzk0fv-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d1c0373` |
 | 01/07/2026, 14:52:03 | `59e7693` | Focus CRM on core workflow: email signup, no onboarding Gmail prompt. | [preview](https://connect-intel-3ikalathf-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 59e7693` |
-| 01/07/2026, 14:20:49 | `7012ce7` | Add ops tooling to transfer org admin and demote mistaken first signup. | [preview](https://connect-intel-mocvyr7g7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7012ce7` |
-| 01/07/2026, 14:11:03 | `63e1480` | Remove Chithi from CRM shell and add per-org CRM clean for go-live. | [preview](https://connect-intel-aidn89hjl-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 63e1480` |
 
 ---
 

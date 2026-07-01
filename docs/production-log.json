@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-07-01T17:05:49.407Z",
-  "updatedAtIst": "01/07/2026, 22:35:49",
+  "updatedAt": "2026-07-01T17:28:11.144Z",
+  "updatedAtIst": "01/07/2026, 22:58:11",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "ccd8fd6",
+  "currentProductionCommit": "45b3250",
   "entries": [
+    {
+      "logId": "20260701-2257-45b3250",
+      "commit": "45b3250",
+      "commitFull": "45b3250e0831a7fa0d17b3fae0cf2f6d6b08a768",
+      "message": "Upgrade home dashboard to enterprise CRM layout and UX.",
+      "deployedAt": "2026-07-01T17:27:59.524Z",
+      "deployedAtIst": "01/07/2026, 22:57:59",
+      "committedAtIst": "01/07/2026, 22:57:26",
+      "vercelPreviewUrl": "https://connect-intel-bedfdcaex-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 45b3250"
+    },
+    {
+      "logId": "20260701-2236-33f9985",
+      "commit": "33f9985",
+      "commitFull": "33f9985374a7e2e88b8596c12885bc5403208c9d",
+      "message": "Update production log after enterprise dashboard deploy.",
+      "deployedAt": "2026-07-01T17:06:20.574Z",
+      "deployedAtIst": "01/07/2026, 22:36:20",
+      "committedAtIst": "01/07/2026, 22:35:49",
+      "vercelPreviewUrl": "https://connect-intel-fq1qraxam-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 33f9985"
+    },
     {
       "logId": "20260701-2235-ccd8fd6",
       "commit": "ccd8fd6",
@@ -15,7 +43,7 @@
       "committedAtIst": "01/07/2026, 22:35:04",
       "vercelPreviewUrl": "https://connect-intel-mok8r1neh-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- ccd8fd6"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 59e7693"
-    },
-    {
-      "logId": "20260701-1420-7012ce7",
-      "commit": "7012ce7",
-      "commitFull": "7012ce74ed9ce24362750b14b39abd17b95e07b0",
-      "message": "Add ops tooling to transfer org admin and demote mistaken first signup.",
-      "deployedAt": "2026-07-01T08:50:49.048Z",
-      "deployedAtIst": "01/07/2026, 14:20:49",
-      "committedAtIst": "01/07/2026, 14:20:17",
-      "vercelPreviewUrl": "https://connect-intel-mocvyr7g7-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 7012ce7"
-    },
-    {
-      "logId": "20260701-1411-63e1480",
-      "commit": "63e1480",
-      "commitFull": "63e14802a41537c599d989e7bfa9216e651c8dd1",
-      "message": "Remove Chithi from CRM shell and add per-org CRM clean for go-live.",
-      "deployedAt": "2026-07-01T08:41:03.205Z",
-      "deployedAtIst": "01/07/2026, 14:11:03",
-      "committedAtIst": "01/07/2026, 14:10:23",
-      "vercelPreviewUrl": "https://connect-intel-aidn89hjl-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 63e1480"
     }
   ]
 }
