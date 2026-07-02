@@ -18,6 +18,10 @@ import SalesPipelineSnapshot from './enterprise/SalesPipelineSnapshot'
 import DashboardCustomizePanel from './enterprise/DashboardCustomizePanel'
 import { useDashboardLayout } from '../../hooks/useDashboardLayout'
 import { useDashboardLive } from '../../hooks/useDashboardLive'
+import {
+  TEAM_INTELLIGENCE_IN_CRM_ENABLED,
+  ACTIVITY_LOG_HUB_IN_CRM_ENABLED,
+} from '../../lib/crmProductFlags'
 import '../../styles/dashboard-home.css'
 import '../../styles/dashboard-enterprise.css'
 
@@ -175,7 +179,7 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
   const load = useCallback(async (silent = false) => {
     const cacheKey = teamReviewCacheKey(user?.organizationId || user?.id, period)
     const apiPeriod = PERIODS.find((p) => p.id === period)?.api || '7d'
-    const metricsQuery = teamMetricsQuery(user, apiPeriod)
+    const metricsQuery = TEAM_INTELLIGENCE_IN_CRM_ENABLED ? teamMetricsQuery(user, apiPeriod) : null
     if (!silent) {
       const cached = readPanelCache(cacheKey)
       if (cached?.data?.bootstrap) {
@@ -271,7 +275,7 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
           onNavigate?.('pipeline', dashboardNavOptions({ panel: 'pipeline', unreadOnly: true, ...action }, user))
           return
         }
-        onNavigate?.('crm-log', dashboardNavOptions({ panel: 'crm-log', period: 'day', returnTo: 'overview' }, user))
+        onNavigate?.('pipeline', dashboardNavOptions({ panel: 'pipeline', returnTo: 'overview' }, user))
         return
       }
       const opts = dashboardNavOptions({ ...action, returnTo: action.returnTo || 'overview' }, user)
@@ -296,14 +300,23 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
 
   const primaryAction = useMemo(() => {
     if (!viewData?.role) return null
-    if (viewData.role === 'org_admin') return { label: 'Full org report', action: { panel: 'crm-dashboard', returnTo: 'overview' } }
-    if (viewData.role === 'manager') return { label: 'Team intelligence', action: { panel: 'crm-dashboard', returnTo: 'overview' } }
-    if (viewData.role === 'marketing_manager') return { label: 'Marketing analytics', action: { panel: 'marketing', tab: 'analytics', returnTo: 'overview' } }
+    if (viewData.role === 'org_admin' && TEAM_INTELLIGENCE_IN_CRM_ENABLED) {
+      return { label: 'Full org report', action: { panel: 'crm-dashboard', returnTo: 'overview' } }
+    }
+    if (viewData.role === 'manager' && TEAM_INTELLIGENCE_IN_CRM_ENABLED) {
+      return { label: 'Team intelligence', action: { panel: 'crm-dashboard', returnTo: 'overview' } }
+    }
+    if (viewData.role === 'marketing_manager') {
+      return { label: 'Marketing analytics', action: { panel: 'marketing', tab: 'analytics', returnTo: 'overview' } }
+    }
     return { label: 'Open pipeline', action: { panel: 'pipeline', scopeOwner: 'me', returnTo: 'overview' } }
   }, [viewData?.role])
 
   const topSectionOrder = useMemo(
-    () => visibleOrder.filter((id) => ['getting_started', 'kpis', 'pipeline', 'analytics', 'team_review'].includes(id)),
+    () =>
+      visibleOrder.filter((id) =>
+        ['getting_started', 'kpis', 'pipeline', 'analytics', ...(TEAM_INTELLIGENCE_IN_CRM_ENABLED ? ['team_review'] : [])].includes(id)
+      ),
     [visibleOrder]
   )
 
@@ -354,9 +367,15 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
                       {ps.leadCount?.toLocaleString() || 0} leads · ₹{ps.dealValue?.toLocaleString() || 0} pipeline · {ps.stuck || 0} stuck
                     </p>
                   </div>
-                  <button type="button" className="dash-home__btn" onClick={() => runAction({ panel: 'crm-dashboard', returnTo: 'overview' })}>
-                    Full report
-                  </button>
+                  {TEAM_INTELLIGENCE_IN_CRM_ENABLED ? (
+                    <button type="button" className="dash-home__btn" onClick={() => runAction({ panel: 'crm-dashboard', returnTo: 'overview' })}>
+                      Full report
+                    </button>
+                  ) : (
+                    <button type="button" className="dash-home__btn" onClick={() => runAction({ panel: 'pipeline', returnTo: 'overview' })}>
+                      Open pipeline
+                    </button>
+                  )}
                 </div>
                 <PipelineHealthChart stages={ps.stages} role={role} onStageClick={runAction} />
               </section>
@@ -367,9 +386,11 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
                     <h2 className="dash-home__panel-title">CRM activity</h2>
                     <p className="dash-home__panel-sub">Emails, calls, tasks, and notes over time</p>
                   </div>
-                  <button type="button" className="dash-home__btn" onClick={() => runAction({ panel: 'crm-log', period: period === '30d' ? 'month' : 'week', returnTo: 'overview' })}>
-                    Activity log
-                  </button>
+                  {ACTIVITY_LOG_HUB_IN_CRM_ENABLED ? (
+                    <button type="button" className="dash-home__btn" onClick={() => runAction({ panel: 'crm-log', period: period === '30d' ? 'month' : 'week', returnTo: 'overview' })}>
+                      Activity log
+                    </button>
+                  ) : null}
                 </div>
                 <ActivityTrendChart activityByDay={activityTrend} />
               </section>
@@ -377,7 +398,7 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
           </div>
         ) : null
       case 'team_review':
-        return role === 'manager' || role === 'org_admin' ? (
+        return TEAM_INTELLIGENCE_IN_CRM_ENABLED && (role === 'manager' || role === 'org_admin') ? (
           isVisible('team_review') ? (
             <TeamReviewBlock
               key="team_review"
@@ -438,9 +459,11 @@ export default function HomeDashboard({ onNavigate, isActive = true }) {
                 <h3 className="dash-home__card-title">Activity timeline</h3>
                 <p className="dash-home__card-sub">Calls, emails, tasks, and notes across your workspace</p>
               </div>
-              <button type="button" className="dash-home__link" onClick={() => runAction({ panel: 'crm-log', returnTo: 'overview' })}>
-                View all →
-              </button>
+              {ACTIVITY_LOG_HUB_IN_CRM_ENABLED ? (
+                <button type="button" className="dash-home__link" onClick={() => runAction({ panel: 'crm-log', returnTo: 'overview' })}>
+                  View all →
+                </button>
+              ) : null}
             </div>
             <ActivityFeed items={(viewData.activity || []).slice(0, 10)} onLead={onLead} />
           </section>

@@ -35,7 +35,7 @@ import usePanelPreferences from '../../hooks/usePanelPreferences'
 import useAppKeyboardShortcuts from '../../hooks/useAppKeyboardShortcuts'
 import PwaInstallBanner from './PwaInstallBanner'
 import PwaUpdateBanner from './PwaUpdateBanner'
-import { CHITHI_IN_CRM_ENABLED } from '../../lib/crmProductFlags'
+import { CHITHI_IN_CRM_ENABLED, TEAM_INTELLIGENCE_IN_CRM_ENABLED } from '../../lib/crmProductFlags'
 import { MenuIcon, SettingsGearIcon } from '../ui/icons'
 
 export default function AppShell() {
@@ -115,7 +115,9 @@ export default function AppShell() {
   })
 
   useWorkspacePulse({
-    enabled: Boolean(user?.onboardingComplete || user?.isPlatformAdmin),
+    enabled:
+      TEAM_INTELLIGENCE_IN_CRM_ENABLED &&
+      Boolean(user?.onboardingComplete || user?.isPlatformAdmin),
     workspaceReady,
     userId: user?.id,
     panel: activePanel,

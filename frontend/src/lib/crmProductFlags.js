@@ -23,3 +23,10 @@ export const GOOGLE_SIGNIN_IN_UI_ENABLED = false
 
 /** Google sign-in on auth login tab — existing workspaces that registered with Google. */
 export const GOOGLE_SIGNIN_ON_LOGIN_ENABLED = true
+
+export {
+  TEAM_INTELLIGENCE_IN_CRM_ENABLED,
+  ACTIVITY_LOG_HUB_IN_CRM_ENABLED,
+  isTeamIntelligenceHubEnabled,
+  isActivityLogHubEnabled,
+} from '../../../lib/crmUiFlags.js'

@@ -248,7 +248,7 @@ export default function BulkEmailCompose({
         const isQueued = data.mode === 'queued'
         if (data.done || (sent > 0 && pending <= 0 && !isQueued)) {
           setNotice(
-            `Completed — ${sent} email${sent === 1 ? '' : 's'} sent${failed ? `, ${failed} failed` : ''}. Check activity log; inbox may take a few minutes.`
+            `Completed — ${sent} email${sent === 1 ? '' : 's'} sent${failed ? `, ${failed} failed` : ''}. Check each lead timeline; inbox may take a few minutes.`
           )
         } else if (isQueued) {
           setNotice(

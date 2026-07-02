@@ -1,5 +1,9 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import useIsMobile from '../../hooks/useIsMobile'
+import {
+  TEAM_INTELLIGENCE_IN_CRM_ENABLED,
+  ACTIVITY_LOG_HUB_IN_CRM_ENABLED,
+} from '../../lib/crmProductFlags'
 import PeopleSearch from '../search/PeopleSearch'
 import SavedLeadsPanel from '../saved/SavedLeadsPanel'
 import TeamPanel from '../team/TeamPanel'
@@ -67,10 +71,21 @@ const PANELS = {
 }
 
 /** Panels kept mounted (hidden) for instant back navigation. */
-const KEEP_ALIVE_PANELS = new Set(['overview', 'crm-rep-review', 'opportunities'])
+const KEEP_ALIVE_PANELS = new Set([
+  'overview',
+  ...(TEAM_INTELLIGENCE_IN_CRM_ENABLED ? ['crm-rep-review'] : []),
+  'opportunities',
+])
 
 function resolvePanelId(activePanel) {
-  return activePanel === 'bulk-email' ? 'marketing' : activePanel
+  let id = activePanel === 'bulk-email' ? 'marketing' : activePanel
+  if (!TEAM_INTELLIGENCE_IN_CRM_ENABLED && (id === 'crm-dashboard' || id === 'crm-rep-review')) {
+    id = 'overview'
+  }
+  if (!ACTIVITY_LOG_HUB_IN_CRM_ENABLED && id === 'crm-log') {
+    id = 'overview'
+  }
+  return id
 }
 
 const DEFAULT_PANEL = OverviewPanel

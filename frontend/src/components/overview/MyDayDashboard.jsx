@@ -18,6 +18,10 @@ import {
 import MyDayDetailDrawer from './MyDayDetailDrawer'
 import { useGreetingDayPart } from '../../hooks/useGreetingDayPart'
 import { useThrottledRefresh } from '../../hooks/useThrottledRefresh.js'
+import {
+  TEAM_INTELLIGENCE_IN_CRM_ENABLED,
+  ACTIVITY_LOG_HUB_IN_CRM_ENABLED,
+} from '../../lib/crmProductFlags'
 
 function useIsMobile(bp = 768) {
   const [m, setM] = useState(() => (typeof window !== 'undefined' ? window.innerWidth < bp : false))
@@ -79,7 +83,7 @@ export default function MyDayDashboard({ onNavigate, isActive = true }) {
         if (first) {
           navigateToNotification(first)
         } else {
-          onNavigate?.('crm-log', { period: 'day', userId: user?.id, returnTo: 'overview' })
+          onNavigate?.('pipeline', { returnTo: 'overview' })
         }
         setDrawer(null)
         return
@@ -213,7 +217,7 @@ export default function MyDayDashboard({ onNavigate, isActive = true }) {
                 : myDay?.greeting || 'What should you do next?')}
           </p>
         </div>
-        {myDay?.teamIntelLink ? (
+        {TEAM_INTELLIGENCE_IN_CRM_ENABLED && myDay?.teamIntelLink ? (
           <button type="button" className="myday-header__intel" onClick={() => go('crm-dashboard')}>
             Team intelligence →
           </button>
@@ -305,9 +309,11 @@ export default function MyDayDashboard({ onNavigate, isActive = true }) {
               items={myDay?.recentActivity}
               onOpen={(item) => item.leadId && navigateWithReturn({ leadId: item.leadId, panel: 'pipeline' })}
             />
-            <button type="button" className="myday-link-btn" onClick={() => go('crm-log')}>
-              Full activity log →
-            </button>
+            {ACTIVITY_LOG_HUB_IN_CRM_ENABLED ? (
+              <button type="button" className="myday-link-btn" onClick={() => go('crm-log')}>
+                Full activity log →
+              </button>
+            ) : null}
           </section>
 
           {!isMobile ? (

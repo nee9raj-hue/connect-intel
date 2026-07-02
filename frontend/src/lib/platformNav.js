@@ -80,13 +80,6 @@ export const QUICK_ACTIONS = [
     options: {},
   },
   {
-    id: 'qa-activity',
-    label: 'Open activity log',
-    group: 'Quick actions',
-    panel: 'crm-log',
-    options: {},
-  },
-  {
     id: 'qa-calendar',
     label: 'Open calendar',
     group: 'Quick actions',

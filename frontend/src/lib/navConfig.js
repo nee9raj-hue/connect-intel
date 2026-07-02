@@ -3,6 +3,8 @@ import {
   AI_PROSPECTING_IN_CRM_ENABLED,
   CHITHI_IN_CRM_ENABLED,
   CREDITS_IN_CRM_UI_ENABLED,
+  TEAM_INTELLIGENCE_IN_CRM_ENABLED,
+  ACTIVITY_LOG_HUB_IN_CRM_ENABLED,
 } from './crmProductFlags'
 import { isChithiPanel } from './chithiNav'
 import { hasWorkspaceFeature } from './workspaceFeatures'
@@ -345,7 +347,9 @@ export function buildCustomerNavSections(
   ]
 
   const analyticsGroups = [
-    ...(isCompany && hasWorkspaceFeature(user, 'homeTeamMetrics')
+    ...(isCompany &&
+    TEAM_INTELLIGENCE_IN_CRM_ENABLED &&
+    hasWorkspaceFeature(user, 'homeTeamMetrics')
       ? [
           {
             id: 'team-intelligence',
@@ -355,7 +359,9 @@ export function buildCustomerNavSections(
           },
         ]
       : []),
-    { id: 'activity-log', label: 'Activity log', icon: 'log', panel: 'crm-log' },
+    ...(ACTIVITY_LOG_HUB_IN_CRM_ENABLED
+      ? [{ id: 'activity-log', label: 'Activity log', icon: 'log', panel: 'crm-log' }]
+      : []),
   ]
 
   const sections = [
@@ -383,10 +389,14 @@ export function buildCustomerNavSections(
           : []),
       ],
     },
-    {
-      title: 'Analytics & reports',
-      groups: analyticsGroups,
-    },
+    ...(analyticsGroups.length
+      ? [
+          {
+            title: 'Analytics & reports',
+            groups: analyticsGroups,
+          },
+        ]
+      : []),
     ...(CHITHI_IN_CRM_ENABLED && isCompany
       ? [
           {
@@ -569,7 +579,9 @@ export const QUICK_NAV_TILES = [
     icon: 'calendar',
     desc: 'Upcoming',
   },
-  { id: 'crm-log', label: 'Activity', panel: 'crm-log', icon: 'log', desc: 'Recent actions' },
+  ...(ACTIVITY_LOG_HUB_IN_CRM_ENABLED
+    ? [{ id: 'crm-log', label: 'Activity', panel: 'crm-log', icon: 'log', desc: 'Recent actions' }]
+    : []),
   ...(AI_PROSPECTING_IN_CRM_ENABLED
     ? [
         { id: 'search', label: 'AI search', panel: 'search', icon: 'spark', desc: 'Find prospects' },
