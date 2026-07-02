@@ -105,9 +105,14 @@ https://connectintel.net/api/metrics?secret=YOUR_SECRET
 
 Key metrics:
 - `connectintel_api_request_duration_seconds`
+- `connectintel_api_pipeline_duration_seconds` (CRM/marketing routes)
+- `connectintel_api_pipeline_total` (status label: ok/error)
+- `connectintel_pipeline_rows_read` (histogram by route + source)
 - `connectintel_platform_search_duration_seconds`
 - `connectintel_pipeline_bootstrap_duration_seconds`
 - `connectintel_queue_jobs_total`
+
+**Vercel logs:** filter `event":"api_pipeline"` for per-request `durationMs`, `pipelineRowsRead`, and `pipelineSource`.
 
 ### Sentry (optional)
 
@@ -117,6 +122,8 @@ SENTRY_TRACES_SAMPLE_RATE=0.1
 ```
 
 Browser errors POST to `/api/client-error` automatically via ErrorBoundary.
+
+CRM and marketing API routes emit Sentry performance spans when `SENTRY_DSN` is set (`withRequestSpan` in `api/index.js`).
 
 ### Supabase alerts
 

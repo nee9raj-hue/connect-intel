@@ -108,11 +108,11 @@ API: `GET /api/crm/team-metrics?summary=1` (snapshot-first, skips live rollup); 
 
 ---
 
-## Step 9 — Observability 📋
+## Step 9 — Observability ✅
 
-- Structured `api_pipeline` logs (`durationMs`, `pipelineRowsRead`, `source`)
-- `PROMETHEUS_METRICS=true` + Grafana
-- Sentry performance on `/api/crm/*`, `/api/marketing/*`
+- Structured `api_pipeline` logs (`durationMs`, `pipelineRowsRead`, `source`) on `/api/crm/*` and `/api/marketing/*`
+- `PROMETHEUS_METRICS=true` → `connectintel_api_pipeline_*` + `connectintel_pipeline_rows_read` histograms
+- Sentry performance spans on `/api/crm/*`, `/api/marketing/*` when `SENTRY_DSN` is set
 
 ---
 

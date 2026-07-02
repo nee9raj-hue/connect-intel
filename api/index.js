@@ -1,6 +1,11 @@
 import { applyCors, handleOptions, sendJson } from '../lib/server/http.js'
-import { captureException } from '../lib/server/infra/sentry.js'
+import { captureException, isTracedApiRoute, withRequestSpan } from '../lib/server/infra/sentry.js'
 import { observeHistogram } from '../lib/server/infra/metrics.js'
+import {
+  finalizeApiPipelineRequest,
+  isObservabilityApiRoute,
+  runWithApiPipelineContext,
+} from '../lib/server/infra/apiPipelineContext.js'
 import {
   getInfraStatus,
   isMarketingSqlQueueEnabled,
@@ -46,6 +51,12 @@ function resolvePath(req) {
   return pathname.replace(/^\/api\/?/, '').replace(/\/$/, '')
 }
 
+function routeGroup(pathKey) {
+  if (pathKey.startsWith('crm/')) return 'crm'
+  if (pathKey.startsWith('marketing')) return 'marketing'
+  return 'other'
+}
+
 export default async function handler(req, res) {
   if (handleOptions(req, res)) return
   applyCors(req, res)
@@ -54,15 +65,23 @@ export default async function handler(req, res) {
   const pathKey = resolvePath(req)
   const started = performance.now()
 
+  const invoke = async () =>
+    runWithApiPipelineContext(pathKey, async () => {
+      const load = API_ROUTES[pathKey]
+
+      if (!load) {
+        return sendJson(res, 404, { error: `Unknown API route: ${pathKey || '(empty)'}` })
+      }
+
+      const mod = await load()
+      return mod.default(req, res)
+    })
+
   try {
-    const load = API_ROUTES[pathKey]
-
-    if (!load) {
-      return sendJson(res, 404, { error: `Unknown API route: ${pathKey || '(empty)'}` })
+    if (isTracedApiRoute(pathKey)) {
+      return await withRequestSpan({ name: pathKey || 'unknown' }, invoke)
     }
-
-    const mod = await load()
-    return await mod.default(req, res)
+    return await invoke()
   } catch (error) {
     console.error(`API ${pathKey || '(empty)'} failed:`, error)
     void captureException(error, { route: pathKey || '(empty)' })
@@ -71,10 +90,19 @@ export default async function handler(req, res) {
       route: pathKey || null,
     })
   } finally {
+    const durationMs = performance.now() - started
+    const group = routeGroup(pathKey)
     observeHistogram(
       'connectintel_api_request_duration_seconds',
-      (performance.now() - started) / 1000,
-      { route: pathKey || 'unknown' }
+      durationMs / 1000,
+      { route: pathKey || 'unknown', group }
     )
+    if (isObservabilityApiRoute(pathKey)) {
+      finalizeApiPipelineRequest({
+        route: pathKey,
+        durationMs,
+        statusCode: res.statusCode,
+      })
+    }
   }
 }
