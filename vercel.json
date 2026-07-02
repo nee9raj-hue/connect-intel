@@ -16,6 +16,10 @@
     {
       "path": "/api/crm/dashboard-warm-cron",
       "schedule": "0 4 * * *"
+    },
+    {
+      "path": "/api/crm/meili-sync-cron",
+      "schedule": "30 4 * * *"
     }
   ],
   "redirects": [

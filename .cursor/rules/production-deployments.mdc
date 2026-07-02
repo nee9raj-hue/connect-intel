@@ -14,9 +14,10 @@ Production: **https://connectintel.net** (Vercel `connect-intel`).
 
 ## After push (Vercel Production Ready)
 
-1. Run `npm run prod:log` — updates `docs/PRODUCTION_LOG.md`.
+1. Run `npm run prod:log` — updates `docs/PRODUCTION_LOG.md` and auto-triggers `prod:ops` (Meilisearch sync) on new LIVE commit.
 2. Confirm new commit shows **← LIVE**.
-3. Optional known-good marker: `npm run prod:tag -- <commit>` then `git push origin --tags`.
+3. If search/index ops did not run, manually: `npm run prod:ops` (all orgs) or `npm run prod:ops -- --name=Xindus`.
+4. Optional known-good marker: `npm run prod:tag -- <commit>` then `git push origin --tags`.
 
 ## If production breaks
 

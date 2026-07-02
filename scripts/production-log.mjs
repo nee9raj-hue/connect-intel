@@ -146,6 +146,18 @@ function syncLog() {
   console.log(`Synced ${entries.length} production snapshot(s). Current: ${data.currentProductionCommit || '—'}`)
   console.log(`Log: docs/production-log.json`)
   console.log(`Guide: docs/PRODUCTION_LOG.md`)
+
+  const prevCommit = existing.currentProductionCommit
+  const newCommit = data.currentProductionCommit
+  if (newCommit && newCommit !== prevCommit && process.env.PROD_SKIP_OPS !== '1') {
+    console.log('\nNew production deploy detected — triggering Meilisearch sync on Vercel…')
+    try {
+      run('node scripts/prod-ops.mjs')
+    } catch (err) {
+      console.warn('prod:ops failed (retry manually: npm run prod:ops):', err.message || err)
+    }
+  }
+
   return data
 }
 
