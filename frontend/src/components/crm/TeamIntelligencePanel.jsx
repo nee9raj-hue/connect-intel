@@ -24,9 +24,21 @@ import {
   ActionCenterPanel,
   ActivityFeed,
   SkeletonBlock,
+  ForecastPanel,
+  CoachingPanel,
 } from './TeamIntelligenceV3Charts'
 
 const DEFAULT_TIMELINE_PAGE = 20
+
+const TI_TABS = [
+  { id: 'overview', label: 'Summary' },
+  { id: 'pipeline', label: 'Pipeline' },
+  { id: 'performance', label: 'Reps' },
+  { id: 'forecast', label: 'Forecast' },
+  { id: 'risk', label: 'Risk' },
+  { id: 'activity', label: 'Activity' },
+  { id: 'coaching', label: 'Coaching' },
+]
 
 function useIsMobile(breakpoint = 768) {
   const [mobile, setMobile] = useState(() =>
@@ -51,6 +63,8 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
   const [expandedFeedId, setExpandedFeedId] = useState(null)
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false)
   const [detailItem, setDetailItem] = useState(null)
+  const [activeTab, setActiveTab] = useState('overview')
+  const [loadedTabs, setLoadedTabs] = useState(() => new Set(['overview']))
   const scrollRef = useRef(null)
   const [data, setData] = useState(null)
   const [timelineLoading, setTimelineLoading] = useState(false)
@@ -86,7 +100,7 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
   const loadSummary = useCallback(async () => {
     setError(null)
     try {
-      const q = new URLSearchParams({ period })
+      const q = new URLSearchParams({ period, summary: '1' })
       if (memberUserId) q.set('userId', memberUserId)
       const res = await api.getCrmTeamMetrics(q.toString())
       setData(res)
@@ -126,8 +140,18 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
 
   useEffect(() => {
     if (!isActive) return undefined
+    if (!loadedTabs.has('activity')) return undefined
     loadTimeline()
-  }, [isActive, period, memberUserId, loadTimeline])
+  }, [isActive, period, memberUserId, loadTimeline, loadedTabs])
+
+  useEffect(() => {
+    setLoadedTabs((prev) => {
+      if (prev.has(activeTab)) return prev
+      const next = new Set(prev)
+      next.add(activeTab)
+      return next
+    })
+  }, [activeTab])
 
   useEffect(() => {
     if (!isActive || summaryLoading || !panelOptions?.teamIntelScrollY || !scrollRef.current) return undefined
@@ -213,6 +237,7 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
       const panel = act.panel || 'pipeline'
       if (panel === 'coaching' && item.userIds?.[0]) {
         selectMember(item.userIds[0])
+        setActiveTab('coaching')
         return
       }
       navigateAction(panel, {
@@ -245,6 +270,15 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
     return rows
   }, [v3?.performanceMatrix, activeMemberId])
 
+  const coachingReps = useMemo(() => {
+    const rows = v3?.coaching?.length ? v3.coaching : (v3?.performanceMatrix || []).filter(
+      (r) => r.badge === 'coaching' || r.status === 'attention'
+    )
+    if (activeMemberId) return rows.filter((r) => String(r.userId) === String(activeMemberId))
+    return rows
+  }, [v3?.coaching, v3?.performanceMatrix, activeMemberId])
+
+  const showTab = (id) => loadedTabs.has(id)
   const winning =
     (v3?.commandBar?.find((m) => m.id === 'teamHealth')?.value ?? 0) >= 60 &&
     (v3?.commandBar?.find((m) => m.id === 'pipeline')?.status ?? 'risk') !== 'risk'
@@ -314,140 +348,181 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
           </div>
         ) : (
           <div className="ti3-cockpit">
-            {/* SECTION 1 — Executive command bar (sticky) */}
+            <nav className="ti3-tabs" aria-label="Team intelligence sections">
+              {TI_TABS.map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  className={`ti3-tabs__btn${activeTab === tab.id ? ' is-active' : ''}`}
+                  onClick={() => setActiveTab(tab.id)}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </nav>
+
             <section className="ti3-cmd-strip" aria-label="Executive command bar">
               {(v3?.commandBar || []).map((metric) => (
                 <CommandBarMetric key={metric.id} metric={metric} />
               ))}
             </section>
 
-            {/* SECTION 2 — AI insights */}
-            <section className="ti3-panel ti3-panel--insights" aria-label="Intelligence insights">
-              <header className="ti3-panel__head">
-                <h2>Insights</h2>
-                <span className="ti3-panel__tag">AI intelligence</span>
-              </header>
-              {summaryLoading ? <SkeletonBlock className="ti3-skeleton--insights" /> : (
-                <InsightsCarousel
-                  insights={v3?.insights}
-                  onSelect={(userId, action) => {
-                    if (userId) selectMember(userId)
-                    else if (action?.panel) navigateAction(action.panel, { status: action.status })
-                  }}
-                />
-              )}
-            </section>
+            {activeTab === 'overview' && showTab('overview') ? (
+              <>
+                <section className="ti3-panel ti3-panel--insights" aria-label="Intelligence insights">
+                  <header className="ti3-panel__head">
+                    <h2>Insights</h2>
+                    <span className="ti3-panel__tag">AI intelligence</span>
+                  </header>
+                  {summaryLoading ? <SkeletonBlock className="ti3-skeleton--insights" /> : (
+                    <InsightsCarousel
+                      insights={v3?.insights}
+                      onSelect={(userId, action) => {
+                        if (userId) selectMember(userId)
+                        else if (action?.panel) navigateAction(action.panel, { status: action.status })
+                      }}
+                    />
+                  )}
+                </section>
+                <section className="ti3-panel ti3-span-12 ti3-panel--actions ti3-action-desktop" aria-label="Action center">
+                  <header className="ti3-panel__head">
+                    <h2>Action center</h2>
+                    <p>Priority-ordered management tasks</p>
+                  </header>
+                  <ActionCenterPanel items={v3?.actionCenter} onAction={handleCenterAction} />
+                </section>
+              </>
+            ) : null}
 
-            <div className="ti3-grid">
-              {/* SECTION 3 — Performance matrix */}
-              <section className="ti3-panel ti3-span-12" aria-label="Team performance matrix">
+            {activeTab === 'pipeline' && showTab('pipeline') ? (
+              <div className="ti3-grid">
+                <section className="ti3-panel ti3-span-7" aria-label="Pipeline health">
+                  <header className="ti3-panel__head">
+                    <h2>Pipeline health</h2>
+                    <p>Volume, conversion, and bottlenecks</p>
+                  </header>
+                  <PipelineHealthFunnel pipeline={v3?.pipelineHealth} />
+                </section>
+                <section className="ti3-panel ti3-span-5" aria-label="Team capacity">
+                  <header className="ti3-panel__head">
+                    <h2>Capacity & workload</h2>
+                    <p>Leads · tasks · deals · meetings</p>
+                  </header>
+                  <CapacityChart rows={v3?.capacity} onSelect={selectMember} />
+                </section>
+              </div>
+            ) : null}
+
+            {activeTab === 'performance' && showTab('performance') ? (
+              <div className="ti3-grid">
+                <section className="ti3-panel ti3-span-12" aria-label="Team performance matrix">
+                  <header className="ti3-panel__head">
+                    <h2>{activeMemberId ? 'Your performance' : 'Team performance'}</h2>
+                    <p>Who is strong — who needs coaching</p>
+                  </header>
+                  <PerformanceMatrix rows={matrixRows} onSelectRep={selectMember} mobile={isMobile} />
+                </section>
+                {isManagerView && !activeMemberId ? (
+                  <section className="ti3-panel ti3-span-12" aria-label="CRM adoption">
+                    <header className="ti3-panel__head">
+                      <h2>CRM adoption</h2>
+                      <p>Logins, notes, calls, meetings, deals</p>
+                    </header>
+                    <AdoptionPanel adoption={v3?.adoption} />
+                  </section>
+                ) : null}
+              </div>
+            ) : null}
+
+            {activeTab === 'forecast' && showTab('forecast') ? (
+              <section className="ti3-panel ti3-span-12" aria-label="Revenue forecast">
                 <header className="ti3-panel__head">
-                  <h2>{activeMemberId ? 'Your performance' : 'Team performance'}</h2>
-                  <p>Who is strong — who needs coaching</p>
+                  <h2>Revenue forecast</h2>
+                  <p>Weighted pipeline and 30/90-day outlook</p>
                 </header>
-                <PerformanceMatrix rows={matrixRows} onSelectRep={selectMember} mobile={isMobile} />
+                <ForecastPanel forecast={v3?.forecast} />
               </section>
+            ) : null}
 
-              {/* SECTION 4 — Pipeline health */}
-              <section className="ti3-panel ti3-span-7" aria-label="Pipeline health">
-                <header className="ti3-panel__head">
-                  <h2>Pipeline health</h2>
-                  <p>Volume, conversion, and bottlenecks</p>
-                </header>
-                <PipelineHealthFunnel pipeline={v3?.pipelineHealth} />
-              </section>
-
-              {/* SECTION 5 — Revenue leak detector */}
-              <section className="ti3-panel ti3-span-5 ti3-panel--risk" aria-label="Revenue leak detector">
+            {activeTab === 'risk' && showTab('risk') ? (
+              <section className="ti3-panel ti3-span-12 ti3-panel--risk" aria-label="Revenue leak detector">
                 <header className="ti3-panel__head">
                   <h2>Revenue leaks</h2>
                   <p>Action required</p>
                 </header>
                 <RevenueLeakGrid leaks={v3?.revenueLeaks} onAction={handleLeak} />
               </section>
+            ) : null}
 
-              {/* SECTION 6 — Capacity */}
-              <section className="ti3-panel ti3-span-6" aria-label="Team capacity">
-                <header className="ti3-panel__head">
-                  <h2>Capacity & workload</h2>
-                  <p>Leads · tasks · deals · meetings</p>
-                </header>
-                <CapacityChart rows={v3?.capacity} onSelect={selectMember} />
-              </section>
-
-              {/* SECTION 7 — CRM adoption */}
-              {isManagerView && !activeMemberId ? (
-                <section className="ti3-panel ti3-span-6" aria-label="CRM adoption">
+            {activeTab === 'activity' && showTab('activity') ? (
+              <>
+                <section className="ti3-panel ti3-span-12" aria-label="Activity effectiveness">
                   <header className="ti3-panel__head">
-                    <h2>CRM adoption</h2>
-                    <p>Logins, notes, calls, meetings, deals</p>
+                    <h2>Activity effectiveness</h2>
+                    <p>Outcomes — not just volume</p>
                   </header>
-                  <AdoptionPanel adoption={v3?.adoption} />
+                  <EffectivenessGrid rows={v3?.activityEffectiveness} />
                 </section>
-              ) : null}
-
-              {/* SECTION 8 — Activity effectiveness */}
-              <section className={`ti3-panel ${isManagerView && !activeMemberId ? 'ti3-span-12' : 'ti3-span-6'}`} aria-label="Activity effectiveness">
-                <header className="ti3-panel__head">
-                  <h2>Activity effectiveness</h2>
-                  <p>Outcomes — not just volume</p>
-                </header>
-                <EffectivenessGrid rows={v3?.activityEffectiveness} />
-              </section>
-
-              {/* SECTION 9 — Action center (desktop inline) */}
-              <section className="ti3-panel ti3-span-12 ti3-panel--actions ti3-action-desktop" aria-label="Action center">
-                <header className="ti3-panel__head">
-                  <h2>Action center</h2>
-                  <p>Priority-ordered management tasks</p>
-                </header>
-                <ActionCenterPanel items={v3?.actionCenter} onAction={handleCenterAction} />
-              </section>
-            </div>
-
-            {/* Activity feed */}
-            <section className="ti3-panel ti3-panel--feed" aria-label="Activity feed">
-              <header className="ti3-panel__head ti3-panel__head--row">
-                <div>
-                  <h2>Activity feed</h2>
-                  <p>{filteredTimeline.length} events · {intel?.periodLabel || period}</p>
-                </div>
-                <div className="ti3-feed-filters">
-                  {TIMELINE_FILTERS.map((f) => (
+                <section className="ti3-panel ti3-panel--feed" aria-label="Activity feed">
+                  <header className="ti3-panel__head ti3-panel__head--row">
+                    <div>
+                      <h2>Activity feed</h2>
+                      <p>{filteredTimeline.length} events · {intel?.periodLabel || period}</p>
+                    </div>
+                    <div className="ti3-feed-filters">
+                      {TIMELINE_FILTERS.map((f) => (
+                        <button
+                          key={f.id}
+                          type="button"
+                          className={`ti3-feed-filter${timelineFilter === f.id ? ' is-active' : ''}`}
+                          onClick={() => setTimelineFilter(f.id)}
+                        >
+                          {f.label}
+                          <span>{timelineCounts[f.id] ?? 0}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </header>
+                  {timelineLoading && !filteredTimeline.length ? (
+                    <SkeletonBlock className="ti3-skeleton--panel" />
+                  ) : (
+                    <ActivityFeed
+                      items={visibleTimeline}
+                      expandedId={expandedFeedId}
+                      onToggle={(id) => setExpandedFeedId((cur) => (cur === id ? null : id))}
+                      onOpen={(item) => setDetailItem(item)}
+                    />
+                  )}
+                  {timelineRemaining > 0 ? (
                     <button
-                      key={f.id}
                       type="button"
-                      className={`ti3-feed-filter${timelineFilter === f.id ? ' is-active' : ''}`}
-                      onClick={() => setTimelineFilter(f.id)}
+                      className="ti3-load-more"
+                      onClick={() =>
+                        setTimelineVisible((n) => Math.min(filteredTimeline.length, n + timelinePageSize))
+                      }
                     >
-                      {f.label}
-                      <span>{timelineCounts[f.id] ?? 0}</span>
+                      Load {Math.min(timelinePageSize, timelineRemaining)} more
                     </button>
-                  ))}
-                </div>
-              </header>
-              {timelineLoading && !filteredTimeline.length ? (
-                <SkeletonBlock className="ti3-skeleton--panel" />
-              ) : (
-                <ActivityFeed
-                  items={visibleTimeline}
-                  expandedId={expandedFeedId}
-                  onToggle={(id) => setExpandedFeedId((cur) => (cur === id ? null : id))}
-                  onOpen={(item) => setDetailItem(item)}
+                  ) : null}
+                </section>
+              </>
+            ) : null}
+
+            {activeTab === 'coaching' && showTab('coaching') ? (
+              <section className="ti3-panel ti3-span-12" aria-label="Coaching queue">
+                <header className="ti3-panel__head">
+                  <h2>Coaching queue</h2>
+                  <p>Reps flagged for follow-up discipline or low activity</p>
+                </header>
+                <CoachingPanel
+                  reps={coachingReps}
+                  onSelectRep={(uid) => {
+                    selectMember(uid)
+                    setActiveTab('performance')
+                  }}
                 />
-              )}
-              {timelineRemaining > 0 ? (
-                <button
-                  type="button"
-                  className="ti3-load-more"
-                  onClick={() =>
-                    setTimelineVisible((n) => Math.min(filteredTimeline.length, n + timelinePageSize))
-                  }
-                >
-                  Load {Math.min(timelinePageSize, timelineRemaining)} more
-                </button>
-              ) : null}
-            </section>
+              </section>
+            ) : null}
           </div>
         )}
       </div>

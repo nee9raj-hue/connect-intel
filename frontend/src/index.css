@@ -12545,6 +12545,116 @@ html[data-pipeline-mobile="1"] .ci-app-header-chip--secondary {
   font-size: 0.875rem;
 }
 
+.ti3-tabs {
+  display: flex;
+  gap: 0.35rem;
+  overflow-x: auto;
+  padding: 0 0 0.75rem;
+  margin-bottom: 0.25rem;
+  scrollbar-width: none;
+}
+
+.ti3-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.ti3-tabs__btn {
+  flex: 0 0 auto;
+  border: 1px solid #dfe3eb;
+  background: #fff;
+  color: #516f90;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.ti3-tabs__btn.is-active {
+  background: #ff7a59;
+  border-color: #ff7a59;
+  color: #fff;
+}
+
+.ti3-forecast-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+}
+
+.ti3-forecast-card {
+  background: #f5f8fa;
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.ti3-forecast-card__label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #516f90;
+}
+
+.ti3-forecast-card__value {
+  font-size: 1.1rem;
+  color: #33475b;
+}
+
+.ti3-forecast-card__hint {
+  font-size: 0.7rem;
+  color: #7c98b6;
+}
+
+.ti3-forecast-card--risk {
+  background: #fff5f3;
+}
+
+.ti3-coaching-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ti3-coaching-row {
+  width: 100%;
+  text-align: left;
+  border: 1px solid #eaf0f6;
+  background: #fff;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+}
+
+.ti3-coaching-row:hover {
+  border-color: #ff7a59;
+}
+
+.ti3-coaching-row__name {
+  display: block;
+  font-weight: 600;
+  color: #33475b;
+}
+
+.ti3-coaching-row__focus {
+  display: block;
+  font-size: 0.8rem;
+  color: #516f90;
+  margin-top: 0.15rem;
+}
+
+.ti3-coaching-row__scores {
+  display: block;
+  font-size: 0.72rem;
+  color: #7c98b6;
+  margin-top: 0.35rem;
+}
+
 /* Sticky command bar */
 .ti3-cmd-strip {
   display: flex;

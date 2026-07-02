@@ -98,11 +98,13 @@ UI: `CampaignSendProgress` + `useCampaignSendProgress` (3s polling; SSE later). 
 
 ---
 
-## Step 8 — Team Intelligence redesign 📋
+## Step 8 — Team Intelligence redesign ✅ (Deploy 14)
 
-Sections: Executive Summary, Pipeline Health, Rep Performance, Forecast, Risk, Activity, Coaching.
+Enabled: `TEAM_INTELLIGENCE_IN_CRM_ENABLED` + `homeTeamMetrics` on `general_crm` preset.
 
-Pattern: summary API first, lazy detail tabs. Target: &lt;1s initial render.
+Sections (lazy tabs): Executive Summary, Pipeline Health, Rep Performance, Forecast, Risk, Activity, Coaching.
+
+API: `GET /api/crm/team-metrics?summary=1` (snapshot-first, skips live rollup); activity timeline lazy via `GET /api/crm/activity-timeline`.
 
 ---
 

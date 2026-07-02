@@ -395,3 +395,57 @@ export function ActivityFeed({ items = [], onOpen, expandedId, onToggle }) {
 export function SkeletonBlock({ className = '' }) {
   return <div className={`ti3-skeleton ${className}`.trim()} aria-hidden />
 }
+
+export function ForecastPanel({ forecast }) {
+  if (!forecast) return <p className="ti3-empty">Forecast builds as pipeline value grows.</p>
+  return (
+    <div className="ti3-forecast-grid">
+      <article className="ti3-forecast-card">
+        <span className="ti3-forecast-card__label">Weighted pipeline</span>
+        <strong className="ti3-forecast-card__value">{formatDealValue(forecast.weightedPipeline)}</strong>
+      </article>
+      <article className="ti3-forecast-card">
+        <span className="ti3-forecast-card__label">30-day forecast</span>
+        <strong className="ti3-forecast-card__value">{formatDealValue(forecast.forecast30d)}</strong>
+      </article>
+      <article className="ti3-forecast-card">
+        <span className="ti3-forecast-card__label">90-day forecast</span>
+        <strong className="ti3-forecast-card__value">{formatDealValue(forecast.forecast90d)}</strong>
+      </article>
+      <article className="ti3-forecast-card">
+        <span className="ti3-forecast-card__label">Won (period)</span>
+        <strong className="ti3-forecast-card__value">{formatDealValue(forecast.wonValue)}</strong>
+      </article>
+      <article className="ti3-forecast-card ti3-forecast-card--meta">
+        <span className="ti3-forecast-card__label">Win rate</span>
+        <strong className="ti3-forecast-card__value">{forecast.winRate ?? 0}%</strong>
+        <span className="ti3-forecast-card__hint">Confidence: {forecast.confidence || 'low'}</span>
+      </article>
+      {forecast.atRiskValue > 0 ? (
+        <article className="ti3-forecast-card ti3-forecast-card--risk">
+          <span className="ti3-forecast-card__label">At-risk value</span>
+          <strong className="ti3-forecast-card__value">{formatDealValue(forecast.atRiskValue)}</strong>
+        </article>
+      ) : null}
+    </div>
+  )
+}
+
+export function CoachingPanel({ reps = [], onSelectRep }) {
+  if (!reps.length) return <p className="ti3-empty">No reps flagged for coaching this period.</p>
+  return (
+    <ul className="ti3-coaching-list">
+      {reps.map((rep) => (
+        <li key={rep.userId}>
+          <button type="button" className="ti3-coaching-row" onClick={() => onSelectRep?.(rep.userId)}>
+            <span className="ti3-coaching-row__name">{rep.name}</span>
+            <span className="ti3-coaching-row__focus">{rep.focus}</span>
+            <span className="ti3-coaching-row__scores">
+              Health {rep.healthScore} · Activity {rep.activityScore}
+            </span>
+          </button>
+        </li>
+      ))}
+    </ul>
+  )
+}
