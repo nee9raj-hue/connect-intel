@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-07-02T03:43:14.793Z",
-  "updatedAtIst": "02/07/2026, 09:13:14",
+  "updatedAt": "2026-07-02T04:09:56.993Z",
+  "updatedAtIst": "02/07/2026, 09:39:56",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "36b403d",
+  "currentProductionCommit": "0e69a91",
   "entries": [
+    {
+      "logId": "20260702-0939-0e69a91",
+      "commit": "0e69a91",
+      "commitFull": "0e69a918cc13449c3638a3490b3c1c1ad9f3146e",
+      "message": "Hide team intelligence and activity log hubs for lean core CRM.",
+      "deployedAt": "2026-07-02T04:09:44.902Z",
+      "deployedAtIst": "02/07/2026, 09:39:44",
+      "committedAtIst": "02/07/2026, 09:39:14",
+      "vercelPreviewUrl": "https://connect-intel-202fa2129-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 0e69a91"
+    },
+    {
+      "logId": "20260702-0926-8e03ec2",
+      "commit": "8e03ec2",
+      "commitFull": "8e03ec2da23f4529421278c86834266ed2a0efc7",
+      "message": "Update production log for Deploy 7 (36b403d).",
+      "deployedAt": "2026-07-02T03:56:35.577Z",
+      "deployedAtIst": "02/07/2026, 09:26:35",
+      "committedAtIst": "02/07/2026, 09:13:45",
+      "vercelPreviewUrl": "https://connect-intel-p8nityw2v-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 8e03ec2"
+    },
     {
       "logId": "20260702-0913-36b403d",
       "commit": "36b403d",
@@ -15,7 +43,7 @@
       "committedAtIst": "02/07/2026, 09:12:24",
       "vercelPreviewUrl": "https://connect-intel-7evfeqmm0-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 36b403d"
     },
@@ -242,48 +270,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 49da0b7"
-    },
-    {
-      "logId": "20260701-2323-dc4d264",
-      "commit": "dc4d264",
-      "commitFull": "dc4d264910ec713fdc2f0018579d2f0750cb7bd6",
-      "message": "Update production log after architecture documentation deploy.",
-      "deployedAt": "2026-07-01T17:53:45.397Z",
-      "deployedAtIst": "01/07/2026, 23:23:45",
-      "committedAtIst": "01/07/2026, 23:23:13",
-      "vercelPreviewUrl": "https://connect-intel-9awk8izua-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- dc4d264"
-    },
-    {
-      "logId": "20260701-2322-548cdb9",
-      "commit": "548cdb9",
-      "commitFull": "548cdb9f8624e8e030a11cdacf6329f57dd5fd67",
-      "message": "Add enterprise architecture documentation and constitution gap analysis.",
-      "deployedAt": "2026-07-01T17:52:53.238Z",
-      "deployedAtIst": "01/07/2026, 23:22:53",
-      "committedAtIst": "01/07/2026, 23:22:19",
-      "vercelPreviewUrl": "https://connect-intel-4rwq4ysnw-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 548cdb9"
-    },
-    {
-      "logId": "20260701-2312-6376deb",
-      "commit": "6376deb",
-      "commitFull": "6376debd66662bf05016dde4c4b3c7d6b9b143a1",
-      "message": "Update production log after rep and solo dashboard deploy.",
-      "deployedAt": "2026-07-01T17:42:58.506Z",
-      "deployedAtIst": "01/07/2026, 23:12:58",
-      "committedAtIst": "01/07/2026, 23:12:20",
-      "vercelPreviewUrl": "https://connect-intel-d9uf4ekp2-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 6376deb"
     }
   ]
 }

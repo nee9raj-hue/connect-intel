@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 97b5263
+npm run prod:rollback -- 8e03ec2
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 97b5263
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `36b403d` |
-| Log updated (IST) | 02/07/2026, 09:13:14 |
+| Commit | `0e69a91` |
+| Log updated (IST) | 02/07/2026, 09:39:56 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 97b5263
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 02/07/2026, 09:13:01 | `36b403d` | Ship Deploy 7: Meilisearch sync on save, SQL-aware backfill, and meili-sync ops. | [preview](https://connect-intel-7evfeqmm0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 36b403d` | **← LIVE**
+| 02/07/2026, 09:39:44 | `0e69a91` | Hide team intelligence and activity log hubs for lean core CRM. | [preview](https://connect-intel-202fa2129-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0e69a91` | **← LIVE**
+| 02/07/2026, 09:26:35 | `8e03ec2` | Update production log for Deploy 7 (36b403d). | [preview](https://connect-intel-p8nityw2v-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8e03ec2` |
+| 02/07/2026, 09:13:01 | `36b403d` | Ship Deploy 7: Meilisearch sync on save, SQL-aware backfill, and meili-sync ops. | [preview](https://connect-intel-7evfeqmm0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 36b403d` |
 | 02/07/2026, 00:59:40 | `97b5263` | Update production log for Deploy 6 (3be6c3a). | [preview](https://connect-intel-ddnac0gun-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 97b5263` |
 | 02/07/2026, 00:58:55 | `3be6c3a` | Ship Deploy 6: SQL companies table, sync/backfill, and Accounts hub reads. | [preview](https://connect-intel-btng3k6i8-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3be6c3a` |
 | 02/07/2026, 00:53:13 | `c235302` | Add production schema repair migration and harden crm_relational_v3. | [preview](https://connect-intel-fjemwvy51-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c235302` |
@@ -61,9 +63,6 @@ npm run prod:rollback -- 97b5263
 | 01/07/2026, 23:46:02 | `b905e10` | Ship Phase 2: server dashboard layouts, CRM workflow bridge, and auth tests. | [preview](https://connect-intel-n4kytyow6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b905e10` |
 | 01/07/2026, 23:38:51 | `2f563f0` | Close RBAC audit gaps with matrix gates and strict CI enforcement. | [preview](https://connect-intel-mha6tjqyh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2f563f0` |
 | 01/07/2026, 23:28:33 | `49da0b7` | Ship Phase 1 foundation: CI tests, RBAC gates, and dashboard SSE pulse. | [preview](https://connect-intel-ap2to6fzx-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 49da0b7` |
-| 01/07/2026, 23:23:45 | `dc4d264` | Update production log after architecture documentation deploy. | [preview](https://connect-intel-9awk8izua-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- dc4d264` |
-| 01/07/2026, 23:22:53 | `548cdb9` | Add enterprise architecture documentation and constitution gap analysis. | [preview](https://connect-intel-4rwq4ysnw-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 548cdb9` |
-| 01/07/2026, 23:12:58 | `6376deb` | Update production log after rep and solo dashboard deploy. | [preview](https://connect-intel-d9uf4ekp2-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6376deb` |
 
 ---
 
