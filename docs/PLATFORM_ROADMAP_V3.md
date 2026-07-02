@@ -30,15 +30,21 @@ See `docs/EMAIL_INFRASTRUCTURE_V3.md`.
 
 ---
 
-## Step 3 — Relational CRM tables 📋 (migration ready)
+## Step 3 — Relational CRM tables ✅ (Deploy 11 — tasks/meetings SQL)
 
-Migration: `supabase/migrations/20260610120000_crm_relational_v3.sql`
+Migrations: `20260610120000_crm_relational_v3.sql`, `20260702120000_pipeline_tasks_meetings_deploy11.sql`
 
-Tables: `pipeline_leads`, `pipeline_deals`, `pipeline_notes`, `pipeline_tasks`, `pipeline_meetings`, `pipeline_activities`, `pipeline_companies`
+| Table | Runtime |
+|-------|---------|
+| `pipeline_leads` | ✅ read/write |
+| `pipeline_deals` | ✅ dual-write + backfill |
+| `pipeline_companies` | ✅ dual-write + backfill |
+| `pipeline_activities` | ✅ dual-write + timeline SQL reads |
+| `pipeline_tasks` | ✅ dual-write + My Day SQL reads |
+| `pipeline_meetings` | ✅ dual-write + My Day SQL reads |
+| `pipeline_notes` | ⏭ skipped — notes stay in `crm.notes` + `pipeline_activities` |
 
-**Zero downtime:** dual-write → backfill → dual-read → cutover. See migration file comments.
-
-Backfill: `npm run pipeline:backfill` (see `docs/INFRA_SETUP.md`).
+Backfill: `POST /api/infra/bootstrap` action `tasks-meetings-sync` (org optional). Leads: `npm run pipeline:backfill`.
 
 ---
 
