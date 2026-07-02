@@ -16,7 +16,7 @@ See `docs/EMAIL_INFRASTRUCTURE_V3.md`.
 
 ---
 
-## Step 2 — Remove full pipeline reads 🔄 (partial)
+## Step 2 — Remove full pipeline reads ✅ (Deploy 8)
 
 | Done | Item |
 |------|------|
@@ -24,9 +24,9 @@ See `docs/EMAIL_INFRASTRUCTURE_V3.md`.
 | ✅ | `readPipelineLeadsByIds` + `readPipelineLeadById` |
 | ✅ | `loadPipelineStoreForLeadIds` uses table when `USE_PIPELINE_LEADS_TABLE=true` |
 | ✅ | Bulk email queue uses targeted load |
-| ⏳ | `PATCH /api/saved-leads` → table row patch |
-| ⏳ | `crm-notifications` → stop full shard on poll |
-| ⏳ | `platform/search` → Meili-only when enabled |
+| ✅ | `PATCH /api/saved-leads` → table row patch (no full-shard fallback) |
+| ✅ | `crm-notifications` → SQL slice only (no full-shard error fallback) |
+| ✅ | `platform/search` → Meili + table search (no full pipeline load) |
 
 ---
 
