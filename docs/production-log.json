@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-07-02T04:09:56.993Z",
-  "updatedAtIst": "02/07/2026, 09:39:56",
+  "updatedAt": "2026-07-02T04:13:57.158Z",
+  "updatedAtIst": "02/07/2026, 09:43:57",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "0e69a91",
+  "currentProductionCommit": "a051761",
   "entries": [
+    {
+      "logId": "20260702-0943-a051761",
+      "commit": "a051761",
+      "commitFull": "a0517612502007d168115fe1006352bd77395180",
+      "message": "Fix marketing hub access for sales reps and org members on core CRM.",
+      "deployedAt": "2026-07-02T04:13:45.040Z",
+      "deployedAtIst": "02/07/2026, 09:43:45",
+      "committedAtIst": "02/07/2026, 09:43:09",
+      "vercelPreviewUrl": "https://connect-intel-cmb7vlnp5-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- a051761"
+    },
+    {
+      "logId": "20260702-0940-3fcb997",
+      "commit": "3fcb997",
+      "commitFull": "3fcb997cb9bdb005c594d0f7c544de69ac2dc1f6",
+      "message": "Update production log for lean CRM trim (0e69a91).",
+      "deployedAt": "2026-07-02T04:10:34.148Z",
+      "deployedAtIst": "02/07/2026, 09:40:34",
+      "committedAtIst": "02/07/2026, 09:40:03",
+      "vercelPreviewUrl": "https://connect-intel-qyhuzs66e-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 3fcb997"
+    },
     {
       "logId": "20260702-0939-0e69a91",
       "commit": "0e69a91",
@@ -15,7 +43,7 @@
       "committedAtIst": "02/07/2026, 09:39:14",
       "vercelPreviewUrl": "https://connect-intel-202fa2129-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 0e69a91"
     },
@@ -242,34 +270,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- b905e10"
-    },
-    {
-      "logId": "20260701-2338-2f563f0",
-      "commit": "2f563f0",
-      "commitFull": "2f563f055692a3b51989543c46f3c9cee677f398",
-      "message": "Close RBAC audit gaps with matrix gates and strict CI enforcement.",
-      "deployedAt": "2026-07-01T18:08:51.756Z",
-      "deployedAtIst": "01/07/2026, 23:38:51",
-      "committedAtIst": "01/07/2026, 23:38:20",
-      "vercelPreviewUrl": "https://connect-intel-mha6tjqyh-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 2f563f0"
-    },
-    {
-      "logId": "20260701-2328-49da0b7",
-      "commit": "49da0b7",
-      "commitFull": "49da0b71b4c49ea9d3bcbcd130b1d69a0686b050",
-      "message": "Ship Phase 1 foundation: CI tests, RBAC gates, and dashboard SSE pulse.",
-      "deployedAt": "2026-07-01T17:58:33.287Z",
-      "deployedAtIst": "01/07/2026, 23:28:33",
-      "committedAtIst": "01/07/2026, 23:28:00",
-      "vercelPreviewUrl": "https://connect-intel-ap2to6fzx-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 49da0b7"
     }
   ]
 }
