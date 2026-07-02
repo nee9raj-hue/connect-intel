@@ -52,7 +52,7 @@ Workers process recipients in batches; **never** load `pipeline_org_*` during se
 
 ---
 
-## Step 5 — HubSpot-style dashboards 📋
+## Step 5 — HubSpot-style dashboards ✅ (Deploy 9)
 
 Snapshots (existing + planned):
 
@@ -61,10 +61,10 @@ Snapshots (existing + planned):
 | `dashboard_snapshot_{org}` | ✅ |
 | `team_snapshot_{org}_{period}` | ✅ |
 | `activity_snapshot_*` | ✅ |
-| `pipeline_snapshot_{org}` | ⏳ alias of `pipeline_index_*` |
-| `marketing_snapshot_{org}` | ⏳ |
+| `pipeline_snapshot_{org}` | ✅ alias of `pipeline_index_*` |
+| `marketing_snapshot_{org}` | ✅ |
 
-Refresh: on CRM write + 5-min worker cron. Target: dashboard &lt;500ms.
+Refresh: on CRM write + 5-min worker cron + dashboard warm cron. Target: dashboard &lt;500ms.
 
 ---
 
