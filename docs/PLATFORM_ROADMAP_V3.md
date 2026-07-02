@@ -48,9 +48,13 @@ Backfill: `POST /api/infra/bootstrap` action `tasks-meetings-sync` (org optional
 
 ---
 
-## Step 4 — Campaign Engine V3 📋
+## Step 4 — Campaign Engine V3 ✅ (Deploy 12)
 
-Tables in same migration: `campaigns_v3`, `campaign_recipients`, `campaign_events`, `campaign_stats`
+Tables: `campaigns_v3`, `campaign_recipients`, `campaign_events`, `campaign_stats`
+
+Dual-write from enroll + send; SQL due-recipient path skips `pipeline_org_*` reads when recipients exist in SQL.
+
+Backfill: `POST /api/infra/bootstrap` action `campaigns-v3-sync` (org optional). Migrate: `campaigns-v3-migrate`.
 
 Providers: Gmail, M365, Resend, SES, SendGrid (adapter pattern in `marketingSend.js`).
 
