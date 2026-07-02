@@ -31,20 +31,23 @@ const qs = params.toString()
 const cronPath = qs ? `${path}?${qs}` : path
 
 function loadCronSecret() {
-  if (process.env.CRON_SECRET) return process.env.CRON_SECRET
-  if (process.env.MARKETING_CRON_SECRET) return process.env.MARKETING_CRON_SECRET
+  if (process.env.CRON_SECRET != null) return process.env.CRON_SECRET
+  if (process.env.MARKETING_CRON_SECRET != null) return process.env.MARKETING_CRON_SECRET
   const envFile = join(ROOT, '.env.vercel.production')
   if (!existsSync(envFile)) return null
   for (const line of readFileSync(envFile, 'utf8').split('\n')) {
-    const m = line.match(/^CRON_SECRET=(?:"([^"]*)"|'([^']*)'|(.+))$/)
-    if (m) return (m[1] || m[2] || m[3] || '').trim()
+    if (!line.startsWith('CRON_SECRET=')) continue
+    const raw = line.slice('CRON_SECRET='.length).trim()
+    if (raw.startsWith('"') && raw.endsWith('"')) return raw.slice(1, -1)
+    if (raw.startsWith("'") && raw.endsWith("'")) return raw.slice(1, -1)
+    return raw
   }
   return null
 }
 
 async function triggerViaHttp() {
   const secret = loadCronSecret()
-  if (!secret) {
+  if (secret === null) {
     console.error('Set CRON_SECRET or run: vercel env pull .env.vercel.production --environment=production')
     process.exit(1)
   }
@@ -57,19 +60,32 @@ async function triggerViaHttp() {
   })
   const data = await res.json().catch(() => ({}))
   console.log(JSON.stringify(data, null, 2))
-  if (!res.ok) process.exit(1)
+  if (!res.ok) {
+    const err = new Error(data?.error || `HTTP ${res.status}`)
+    err.response = data
+    throw err
+  }
 }
 
 console.log(`Triggering production cron: ${cronPath}\n`)
 
+async function triggerViaVercelCron() {
+  execSync(`vercel crons run "${path}"`, { cwd: ROOT, stdio: 'inherit' })
+  console.log('\nCron triggered. Check Vercel → connect-intel → Logs for results.')
+}
+
 if (qs) {
-  await triggerViaHttp()
+  try {
+    await triggerViaHttp()
+  } catch (err) {
+    console.warn(`HTTP trigger failed (${err?.message || err}) — running full cron (all orgs, includes filter target).\n`)
+    triggerViaVercelCron()
+  }
   process.exit(0)
 }
 
 try {
-  execSync(`vercel crons run "${path}"`, { cwd: ROOT, stdio: 'inherit' })
-  console.log('\nCron triggered. Check Vercel → connect-intel → Logs for results.')
+  triggerViaVercelCron()
 } catch {
   console.warn('vercel crons run failed — falling back to HTTP trigger.\n')
   await triggerViaHttp()

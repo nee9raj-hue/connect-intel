@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 3fcb997
+npm run prod:rollback -- bd8eb2e
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 3fcb997
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `a051761` |
-| Log updated (IST) | 02/07/2026, 09:43:57 |
+| Commit | `318efc2` |
+| Log updated (IST) | 02/07/2026, 17:27:35 |
 
 ---
 
@@ -44,7 +44,14 @@ npm run prod:rollback -- 3fcb997
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 02/07/2026, 09:43:45 | `a051761` | Fix marketing hub access for sales reps and org members on core CRM. | [preview](https://connect-intel-cmb7vlnp5-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a051761` | **← LIVE**
+| 02/07/2026, 17:24:56 | `318efc2` | Fix Meili sync cron import and improve prod:ops HTTP trigger. | [preview](https://connect-intel-ldzna043q-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 318efc2` | **← LIVE**
+| 02/07/2026, 10:32:53 | `bd8eb2e` | Add automated production Meilisearch sync via Vercel cron and prod:ops. | [preview](https://connect-intel-iiaha1cz7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- bd8eb2e` |
+| 02/07/2026, 10:18:32 | `b199074` | Ship Deploy 10: expand Meilisearch to contacts, companies, and deals. | [preview](https://connect-intel-jpp7eio01-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b199074` |
+| 02/07/2026, 10:04:31 | `b01563d` | Ship Deploy 9: pipeline and marketing snapshot materialization. | [preview](https://connect-intel-9inhrn9it-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b01563d` |
+| 02/07/2026, 09:59:09 | `f69515d` | Ship Deploy 8: table-first PATCH, search, notifications, and RBAC hardening. | [preview](https://connect-intel-d9iu760n0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f69515d` |
+| 02/07/2026, 09:49:14 | `02163af` | Fix manual lead add for orgs with no existing pipeline shard. | [preview](https://connect-intel-omtvcqjn5-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 02163af` |
+| 02/07/2026, 09:44:26 | `3ff2bb6` | Update production log for marketing RBAC fix (a051761). | [preview](https://connect-intel-luxxma4ft-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3ff2bb6` |
+| 02/07/2026, 09:43:45 | `a051761` | Fix marketing hub access for sales reps and org members on core CRM. | [preview](https://connect-intel-cmb7vlnp5-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a051761` |
 | 02/07/2026, 09:40:34 | `3fcb997` | Update production log for lean CRM trim (0e69a91). | [preview](https://connect-intel-qyhuzs66e-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3fcb997` |
 | 02/07/2026, 09:39:44 | `0e69a91` | Hide team intelligence and activity log hubs for lean core CRM. | [preview](https://connect-intel-202fa2129-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0e69a91` |
 | 02/07/2026, 09:26:35 | `8e03ec2` | Update production log for Deploy 7 (36b403d). | [preview](https://connect-intel-p8nityw2v-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8e03ec2` |
@@ -56,13 +63,6 @@ npm run prod:rollback -- 3fcb997
 | 02/07/2026, 00:43:30 | `64d9197` | Ship Deploy 5: SQL deals table, sync/backfill, and indexed lead timeline. | [preview](https://connect-intel-to9ynd3fp-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 64d9197` |
 | 02/07/2026, 00:36:56 | `7c84a1e` | Update production log for Deploy 4 (135b030). | [preview](https://connect-intel-3oqbgncoh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7c84a1e` |
 | 02/07/2026, 00:36:03 | `135b030` | Ship Deploy 4: workflow runs, inactivity triggers, and audit log UI. | [preview](https://connect-intel-5t99whwwl-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 135b030` |
-| 02/07/2026, 00:26:00 | `9a95c23` | Update production log for Deploy 3 (94619ac). | [preview](https://connect-intel-2q59ow73u-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9a95c23` |
-| 02/07/2026, 00:24:56 | `94619ac` | Ship Deploy 3: unified workflow engine, audit stream, and OpenAPI registry. | [preview](https://connect-intel-rc3p3k61c-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 94619ac` |
-| 02/07/2026, 00:19:19 | `ad01db2` | Ship P0 pipeline: table-first PATCH, targeted shard reads, and pipeline-sync ops. | [preview](https://connect-intel-1fv0hor8i-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ad01db2` |
-| 02/07/2026, 00:14:26 | `6a81c44` | Ship Phase 4: profile SQL sync on all membership paths and lazy repair. | [preview](https://connect-intel-rjdjo2242-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6a81c44` |
-| 01/07/2026, 23:57:01 | `1cbfe58` | Ship Phase 3+ SQL UUID resolution, legacy org backfill, and lazy repair. | [preview](https://connect-intel-9gpdc7a8a-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1cbfe58` |
-| 01/07/2026, 23:52:30 | `f333c3d` | Ship Phase 3 org SQL sync for onboarding, invites, and tenant guards. | [preview](https://connect-intel-4clvah8g7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f333c3d` |
-| 01/07/2026, 23:46:02 | `b905e10` | Ship Phase 2: server dashboard layouts, CRM workflow bridge, and auth tests. | [preview](https://connect-intel-n4kytyow6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b905e10` |
 
 ---
 
