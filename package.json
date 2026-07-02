@@ -29,6 +29,7 @@
     "prod:ship": "node scripts/ship-production.mjs",
     "workers": "node workers/index.mjs",
     "meili:backfill": "node scripts/backfill-meilisearch.mjs",
+    "meili:sync": "node scripts/meili-sync.mjs",
     "pipeline:backfill": "node scripts/backfill-pipeline-leads.mjs",
     "pipeline:sync": "node scripts/pipeline-sync.mjs",
     "deals:sync": "node scripts/deals-sync.mjs",
