@@ -34,6 +34,7 @@
     "pipeline:backfill": "node scripts/backfill-pipeline-leads.mjs",
     "pipeline:sync": "node scripts/pipeline-sync.mjs",
     "deals:sync": "node scripts/deals-sync.mjs",
+    "tasks:sync": "node scripts/tasks-meetings-sync.mjs",
     "companies:sync": "node scripts/companies-sync.mjs",
     "activities:backfill": "node scripts/backfill-pipeline-activities.mjs",
     "activities:indexes": "node scripts/apply-activities-indexes.mjs",
