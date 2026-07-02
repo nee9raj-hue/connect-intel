@@ -90,11 +90,11 @@ Target: &lt;200ms; platform search Meili-first when enabled.
 
 ---
 
-## Step 7 — Real-time campaign monitoring 📋
+## Step 7 — Real-time campaign monitoring ✅ (Deploy 13)
 
-UI: `CampaignSendProgress` + `useCampaignSendProgress` (polling today; SSE later).
+`GET /api/campaign-send/status` prefers `campaign_stats` SQL aggregates when tables exist; falls back to stats shards.
 
-Metrics from `campaign_stats` aggregates — not raw event replay.
+UI: `CampaignSendProgress` + `useCampaignSendProgress` (3s polling; SSE later). Shown on campaign cards, reports, bulk compose, and global `EmailSendDock`.
 
 ---
 

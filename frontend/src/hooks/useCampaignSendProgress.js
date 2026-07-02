@@ -3,11 +3,16 @@ import { api } from '../lib/api.js'
 
 const TERMINAL = new Set(['completed', 'failed', 'cancelled', 'stopped', 'archived'])
 
-export function useCampaignSendProgress(campaignId, { enabled = true, pollMs = 3000 } = {}) {
+export function useCampaignSendProgress(
+  campaignId,
+  { enabled = true, pollMs = 3000, onDone = null } = {}
+) {
   const [progress, setProgress] = useState(null)
   const [error, setError] = useState(null)
   const [polling, setPolling] = useState(false)
   const timerRef = useRef(null)
+  const onDoneRef = useRef(onDone)
+  onDoneRef.current = onDone
 
   const load = useCallback(async () => {
     if (!campaignId) return null
@@ -39,6 +44,7 @@ export function useCampaignSendProgress(campaignId, { enabled = true, pollMs = 3
       if (data.done || TERMINAL.has(status)) {
         setPolling(false)
         if (timerRef.current) clearInterval(timerRef.current)
+        onDoneRef.current?.(data)
       }
     }
 

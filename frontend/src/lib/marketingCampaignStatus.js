@@ -1,5 +1,18 @@
 /** Campaign list status + analytics labels (merged stats + test sends). */
 
+export function isCampaignSendInFlight(campaign) {
+  if (!campaign || campaign.channel === 'whatsapp') return false
+  const stats = campaign?.stats || campaign?.analytics || {}
+  const sent = Math.max(stats.sent || 0, stats.recipientsSent || 0)
+  const enrolled = stats.enrolled || 0
+  const sendStatus = String(campaign?.sendStatus || stats.sendStatus || '').toLowerCase()
+  const base = String(campaign?.status || 'draft').toLowerCase()
+
+  if (['queued', 'preparing', 'sending'].includes(sendStatus)) return true
+  if (['active', 'paused'].includes(base) && enrolled > sent + (stats.failed || 0)) return true
+  return false
+}
+
 export function campaignListStatus(campaign) {
   const stats = campaign?.stats || campaign?.analytics || {}
   const sent = Math.max(stats.sent || 0, stats.recipientsSent || 0)

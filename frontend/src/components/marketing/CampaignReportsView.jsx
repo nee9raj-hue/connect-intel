@@ -17,6 +17,8 @@ import {
 } from '../../../../lib/marketingCampaignRecipientFilter.js'
 import { navigateToMarketingPipeline } from '../../lib/marketingNavigation'
 import { openMarketingCampaignReport } from '../../lib/marketingReportUrls'
+import { isCampaignSendInFlight } from '../../lib/marketingCampaignStatus'
+import CampaignSendProgress from './CampaignSendProgress.jsx'
 import {
   ReportActivityChart,
   ReportEngagementFunnel,
@@ -588,6 +590,18 @@ function CampaignDetailReport({
           </button>
         </div>
       </header>
+
+      {report?.campaign && isCampaignSendInFlight(report.campaign) ? (
+        <CampaignSendProgress
+          campaignId={campaignId}
+          enabled
+          className="mb-3"
+          onDone={() => {
+            void load()
+            onReload?.()
+          }}
+        />
+      ) : null}
 
       {report?.revenue?.attributedRevenue > 0 && (
         <p className="mc-report-revenue">

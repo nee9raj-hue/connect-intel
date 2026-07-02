@@ -18,8 +18,13 @@ function formatEta(ms) {
   return `about ${min} minutes`
 }
 
-export default function CampaignSendProgress({ campaignId, enabled = true, className = '' }) {
-  const { progress, error, polling } = useCampaignSendProgress(campaignId, { enabled })
+export default function CampaignSendProgress({
+  campaignId,
+  enabled = true,
+  className = '',
+  onDone,
+}) {
+  const { progress, error, polling } = useCampaignSendProgress(campaignId, { enabled, onDone })
 
   if (!campaignId || !enabled) return null
   if (error) {
@@ -37,7 +42,10 @@ export default function CampaignSendProgress({ campaignId, enabled = true, class
   return (
     <div className={`text-xs text-[#33475b] bg-[#eaf0f6] rounded-lg px-3 py-2 space-y-2 ${className}`}>
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-        <span className="font-medium">{statusLabel}</span>
+        <span className="font-medium">
+          {statusLabel}
+          {polling ? <span className="text-[#516f90] font-normal"> · updating</span> : null}
+        </span>
         <span className="text-sm font-semibold tabular-nums text-[#33475b]">
           {processed} of {total || '—'} sent
           {remaining > 0 ? ` · ${remaining} remaining` : ''}

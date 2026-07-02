@@ -6,7 +6,9 @@ import {
   campaignListStatus,
   campaignMetrics,
   campaignSummaryCounts,
+  isCampaignSendInFlight,
 } from '../../lib/marketingCampaignStatus'
+import CampaignSendProgress from './CampaignSendProgress.jsx'
 import { CAMPAIGN_STATUS, campaignInitials } from './marketingTheme'
 import {
   MailIcon,
@@ -81,9 +83,11 @@ function CampaignCard({
   onOpenReport,
   onDuplicate,
   onNavigate,
+  onReload,
 }) {
   const display = campaignListStatus(campaign)
   const m = campaignMetrics(campaign)
+  const inFlight = isCampaignSendInFlight(campaign)
   const canEdit = display.key === 'draft' || display.key === 'scheduled'
   const hasReport = m.sent > 0 || display.key === 'completed' || display.key === 'active'
 
@@ -116,6 +120,14 @@ function CampaignCard({
           </div>
         </div>
       </button>
+      {inFlight ? (
+        <CampaignSendProgress
+          campaignId={campaign.id}
+          enabled
+          className="mc-camp-card__progress"
+          onDone={() => onReload?.()}
+        />
+      ) : null}
       <footer className="mc-camp-card__foot">
         {canEdit ? (
           <button type="button" className="mc-camp-card__action" onClick={() => onEdit?.(campaign)}>
@@ -158,6 +170,7 @@ export default function MarketingCampaigns({
   onOpenReport,
   onDuplicate,
   onNavigate,
+  onReload,
 }) {
   const [query, setQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
@@ -367,6 +380,7 @@ export default function MarketingCampaigns({
                 onOpenReport={onOpenReport}
                 onDuplicate={onDuplicate}
                 onNavigate={onNavigate}
+                onReload={onReload}
               />
             )
           })}

@@ -9,6 +9,9 @@ import CampaignReportsView, { campaignToForm } from './CampaignReportsView'
 import MarketingReportsListPage from './MarketingReportsListPage'
 import MarketingCampaignReportPage from './MarketingCampaignReportPage'
 import { openMarketingCampaignReport } from '../../lib/marketingReportUrls'
+import { saveActivePipelineEmailCampaign } from '../../lib/pipelineEmailCampaign.js'
+import CampaignSendProgress from './CampaignSendProgress.jsx'
+import { isCampaignSendInFlight } from '../../lib/marketingCampaignStatus.js'
 import MarketingListsPanel from './MarketingListsPanel'
 import WhatsAppInboxPanel from './WhatsAppInboxPanel'
 import MarketingCreatorBadge, { marketingOptionLabel } from './MarketingCreatorBadge'
@@ -892,6 +895,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
       if (!isWa && enrolled > 0) {
         const sqlQueue = data.mode === 'sql_queue'
         if (sqlQueue && pending > 0 && initialSent === 0) {
+          saveActivePipelineEmailCampaign(id)
           setNotice(
             data.workerHint ||
               `Campaign queued — ${enrolled} recipients. Emails send in the background; you can close this tab.`
@@ -900,6 +904,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
           return
         }
         if (sqlQueue && initialSent > 0) {
+          saveActivePipelineEmailCampaign(id)
           setNotice(
             data.workerHint ||
               `Campaign sending — ${initialSent} sent${initialFailed ? `, ${initialFailed} failed` : ''}${
@@ -925,6 +930,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
           return
         }
         if (pending > 0 || data.background) {
+          if (pending > 0 || data.background) saveActivePipelineEmailCampaign(id)
           setNotice(
             data.background
               ? `Campaign queued — ${enrolled} recipients. Workers send in the background; you can close this tab.`
@@ -1144,6 +1150,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
                     permissions={permissions}
                     onApprove={approveCampaign}
                     onReject={rejectCampaign}
+                    onReload={() => load({ silent: true })}
                   />
                 ))
               )}
@@ -1213,6 +1220,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
           onEdit={openCampaignEditor}
           onOpenReport={(c) => openMarketingCampaignReport(c.id)}
           onDuplicate={duplicateCampaignForResend}
+          onReload={() => load({ silent: true })}
         />
       )
     }
@@ -1615,6 +1623,7 @@ function CampaignCard({
   permissions,
   onApprove,
   onReject,
+  onReload,
 }) {
   const statusClass = {
     draft: 'crm-status-draft',
@@ -1629,6 +1638,7 @@ function CampaignCard({
   const enrolled = stats.enrolled || 0
   const sent = stats.recipientsSent ?? stats.sent ?? 0
   const stillQueued = enrolled > sent && ['active', 'paused'].includes(campaign.status)
+  const inFlight = isCampaignSendInFlight(campaign)
 
   return (
     <div className="crm-campaign-card text-sm">
@@ -1661,6 +1671,14 @@ function CampaignCard({
           {campaign.status}
         </span>
       </div>
+      {inFlight ? (
+        <CampaignSendProgress
+          campaignId={campaign.id}
+          enabled
+          className="mt-2"
+          onDone={() => onReload?.()}
+        />
+      ) : null}
       <div className="mt-2 flex flex-wrap gap-3">
         {(sent > 0 ||
           campaign.status === 'completed' ||

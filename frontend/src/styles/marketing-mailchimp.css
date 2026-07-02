@@ -854,6 +854,11 @@
   background: #fafafa;
 }
 
+.mc-camp-card__progress {
+  margin: 0 12px 10px;
+  border-radius: 8px;
+}
+
 .mc-camp-card__action {
   display: inline-flex;
   align-items: center;
