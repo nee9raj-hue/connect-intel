@@ -68,13 +68,15 @@ Refresh: on CRM write + 5-min worker cron + dashboard warm cron. Target: dashboa
 
 ---
 
-## Step 6 — Meilisearch global search 📋
+## Step 6 — Meilisearch global search ✅ (Deploy 10)
 
-Indexes: contacts, companies, deals, tasks, meetings, campaigns, notes, messages.
+Indexes: leads, deals, **contacts**, **companies**, campaigns, tasks, notes, messages.
 
-Enable: `MEILI_HOST`, `MEILI_API_KEY`, `npm run meili:backfill`.
+Enable: `MEILI_HOST`, `MEILI_API_KEY`, `npm run meili:sync` / infra `meili-sync`.
 
-Target: &lt;200ms; no `pipeline_org_*` on search path.
+Save-time sync: pipeline leads, contacts PATCH, pipeline_companies rebuild.
+
+Target: &lt;200ms; platform search Meili-first when enabled.
 
 ---
 
