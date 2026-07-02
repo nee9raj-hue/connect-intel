@@ -12,6 +12,7 @@
     "bullmq": "^5.40.0",
     "ioredis": "^5.4.2",
     "nodemailer": "^7.0.3",
+    "pg": "^8.22.0",
     "web-push": "^3.6.7"
   },
   "scripts": {
@@ -35,6 +36,7 @@
     "pipeline:sync": "node scripts/pipeline-sync.mjs",
     "deals:sync": "node scripts/deals-sync.mjs",
     "tasks:sync": "node scripts/tasks-meetings-sync.mjs",
+    "tasks:migrate": "node scripts/apply-tasks-meetings-migration.mjs",
     "companies:sync": "node scripts/companies-sync.mjs",
     "activities:backfill": "node scripts/backfill-pipeline-activities.mjs",
     "activities:indexes": "node scripts/apply-activities-indexes.mjs",
