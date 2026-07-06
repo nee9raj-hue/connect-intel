@@ -85,9 +85,15 @@ const workers = queues.map(({ name, concurrency }) => {
 
 console.log(`Connect Intel workers started (${workers.length} queues) — ${redisUrl.replace(/:[^:@]+@/, ':***@')}`)
 
-await writeWorkerHeartbeat({ queues: queues.map((q) => q.name), startedAt: new Date().toISOString() })
+try {
+  await writeWorkerHeartbeat({ queues: queues.map((q) => q.name), startedAt: new Date().toISOString() })
+} catch (error) {
+  console.warn('Worker heartbeat skipped:', error?.message || error)
+}
 setInterval(() => {
-  void writeWorkerHeartbeat({ queues: queues.map((q) => q.name) })
+  void writeWorkerHeartbeat({ queues: queues.map((q) => q.name) }).catch((error) => {
+    console.warn('Worker heartbeat failed:', error?.message || error)
+  })
 }, 30_000)
 
 async function shutdown() {

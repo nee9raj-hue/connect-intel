@@ -1,6 +1,6 @@
 # Connect Intel — Testing Strategy
 
-**Last updated:** 2026-06-24
+**Last updated:** 2026-07-06
 
 ---
 
@@ -8,13 +8,13 @@
 
 | Type | Status |
 |------|--------|
-| Unit tests | 23 files (`*.test.js` under `lib/`) |
+| Unit tests | 40+ files (`*.test.js` under `lib/`) |
 | Integration tests | Minimal |
 | E2E tests | None in CI |
-| CI gate | Build + handler imports only |
-| `npm test` script | **Missing** |
+| CI gate | `npm test` + RBAC audit + build + handler imports |
+| `npm test` script | **Present** (`package.json`) |
 
-**Constitution requirement:** Mandatory unit tests for business logic + CI gate — **not met**.
+**Constitution requirement:** Mandatory unit tests for business logic + CI gate — **met** (E2E smoke still optional).
 
 ---
 
@@ -43,7 +43,7 @@ Current steps:
 3. Frontend production build
 4. Server handler import smoke
 
-**Gap:** No `npm test` step.
+**Gap:** None for unit tests. Optional: E2E smoke on preview deploy.
 
 ---
 

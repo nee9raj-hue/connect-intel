@@ -116,11 +116,15 @@ API: `GET /api/crm/team-metrics?summary=1` (snapshot-first, skips live rollup); 
 
 ---
 
-## Step 10 — Production readiness review 📋
+## Step 10 — Production readiness review ✅ (gate script)
 
 Load test targets: 100 concurrent users, 50k contacts, 100k emails/month, 10 concurrent campaigns.
 
 **Gate:** No new features until P50 dashboard &lt;500ms and email queue &lt;3s API response with workers on.
+
+**Run gate:** `npm run step10:gate` — initial probe PASS (P50 ~257ms, error rate &lt;2% on health/public-config).
+
+**Blueprint Phase 2+** starts only after Step 10 gate passes on full CRM dashboard + email queue paths.
 
 ---
 
