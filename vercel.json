@@ -14,6 +14,10 @@
   },
   "crons": [
     {
+      "path": "/api/grafana/metrics-cron",
+      "schedule": "*/5 * * * *"
+    },
+    {
       "path": "/api/crm/dashboard-warm-cron",
       "schedule": "0 4 * * *"
     },

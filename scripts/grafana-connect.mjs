@@ -103,6 +103,28 @@ function syncMetricsSecretToVercel(metricsSecret) {
   console.log('✓ METRICS_SECRET synced to Vercel + .env.deploy.local')
 }
 
+function syncVercelEnvVar(key, value) {
+  try {
+    run(`vercel env rm ${key} production --yes`, { silent: true })
+  } catch {
+    /* may not exist */
+  }
+  const result = spawnSync(
+    'sh',
+    ['-c', `printf '%s' '${String(value).replace(/'/g, "'\\''")}' | vercel env add ${key} production`],
+    { cwd: ROOT, stdio: 'inherit' }
+  )
+  if (result.status !== 0) throw new Error(`Failed to set Vercel env ${key}`)
+}
+
+function syncGrafanaVarsToVercel({ promUrl, promUser, promPass }) {
+  console.log('Syncing Grafana Cloud remote_write vars on Vercel production…')
+  syncVercelEnvVar('GRAFANA_CLOUD_PROMETHEUS_URL', promUrl)
+  syncVercelEnvVar('GRAFANA_CLOUD_PROMETHEUS_USERNAME', promUser)
+  syncVercelEnvVar('GRAFANA_CLOUD_PROMETHEUS_PASSWORD', promPass)
+  console.log('✓ Grafana remote_write vars synced to Vercel')
+}
+
 async function verifyMetricsScrape(secret) {
   const url = `${PRODUCTION}/api/metrics?secret=${encodeURIComponent(secret)}`
   const res = await fetch(url, { signal: AbortSignal.timeout(20_000) })
@@ -240,6 +262,8 @@ Copy .env.grafana.secrets.example → .env.grafana.secrets and re-run:
     process.exit(1)
   }
 
+  syncGrafanaVarsToVercel({ promUrl, promUser, promPass })
+
   ensureGrafanaAlloyService()
   console.log('Setting Railway Alloy variables…')
   setRailwayVar('CONNECTINTEL_METRICS_SECRET', metricsSecret)
@@ -261,8 +285,8 @@ Railway deploy: in connect-intel-workers project, create service "grafana-alloy"
     console.log(`\nImport dashboard manually: ${DASHBOARD_PATH}`)
   }
 
-  console.log('\nDone. Grafana Alloy scrapes connectintel.net every 30s → Grafana Cloud.')
-  console.log('Logs: npx @railway/cli logs -s grafana-alloy')
+  console.log('\nDone. Vercel cron pushes /api/metrics → Grafana Cloud every 5 min.')
+  console.log('Fallback: Railway grafana-alloy (if deployed). Logs: npx @railway/cli logs -s grafana-alloy')
 }
 
 main().catch((err) => {

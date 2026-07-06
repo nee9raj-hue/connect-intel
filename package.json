@@ -13,6 +13,7 @@
     "ioredis": "^5.4.2",
     "nodemailer": "^7.0.3",
     "pg": "^8.22.0",
+    "prometheus-remote-write": "^0.5.1",
     "web-push": "^3.6.7"
   },
   "scripts": {
@@ -42,6 +43,7 @@
     "step10:gate": "node scripts/step10-load-gate.mjs",
     "constitution:ops": "node scripts/constitution-ops.mjs",
     "db:probe": "node scripts/db-probe.mjs",
+    "db:sync-vercel": "node scripts/db-sync-vercel.mjs",
     "grafana:verify": "node scripts/grafana-verify.mjs",
     "grafana:connect": "node scripts/grafana-connect.mjs",
     "companies:sync": "node scripts/companies-sync.mjs",
@@ -56,6 +58,7 @@
     "infra:verify": "node scripts/infra-verify.mjs",
     "test": "node --test 'lib/**/*.test.js' 'lib/server/**/*.test.js'",
     "rbac:audit": "node scripts/rbac-handler-audit.mjs",
+    "blueprint:phase2": "node scripts/blueprint-phase2.mjs",
     "tenant:audit": "node scripts/tenant-audit.mjs",
     "fresh:start": "node scripts/fresh-start-reset.mjs",
     "org:clean": "node scripts/org-crm-clean.mjs",

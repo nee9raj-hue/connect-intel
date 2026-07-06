@@ -33,6 +33,7 @@ const TARGETS = {
 
 function loadEnvValue(key) {
   if (process.env[key]) return process.env[key]
+  let found = ''
   for (const file of [
     '.env.deploy.local',
     '.env.vercel.production',
@@ -42,29 +43,42 @@ function loadEnvValue(key) {
   ]) {
     const path = join(ROOT, file)
     if (!existsSync(path)) continue
-    const line = readFileSync(path, 'utf8').split('\n').find((l) => l.startsWith(`${key}=`))
-    if (!line) continue
-    let v = line.slice(key.length + 1).trim()
-    if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) {
-      v = v.slice(1, -1)
+    for (const line of readFileSync(path, 'utf8').split('\n')) {
+      if (!line.startsWith(`${key}=`)) continue
+      let v = line.slice(key.length + 1).trim()
+      if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) {
+        v = v.slice(1, -1)
+      }
+      if (v) found = v
     }
-    if (v) return v
   }
-  return ''
+  return found
 }
 
-function resolveBearerToken() {
+function loadCronSecret() {
+  return (
+    loadEnvValue('CRON_SECRET') ||
+    loadEnvValue('METRICS_SECRET') ||
+    loadEnvValue('MARKETING_CRON_SECRET') ||
+    ''
+  )
+}
+
+function resolveBearerToken(probeUser) {
   const explicit = process.env.STEP10_BEARER_TOKEN || process.env.STEP10_SESSION_TOKEN
   if (explicit) return explicit
 
   const secret = loadEnvValue('SESSION_SECRET')
-  const adminRaw = loadEnvValue('ADMIN_EMAILS')
-  const email = adminRaw.split(',')[0]?.trim().toLowerCase()
-  if (!secret || !email) return null
+  const probeUserId = probeUser?.userId || loadEnvValue('STEP10_USER_ID')
+  const email =
+    probeUser?.email ||
+    loadEnvValue('ADMIN_EMAILS').split(',')[0]?.trim().toLowerCase() ||
+    ''
+  if (!secret || !email || !probeUserId) return null
 
   process.env.SESSION_SECRET = secret
   return signSessionToken({
-    id: 'step10-probe',
+    id: probeUserId,
     email,
     name: 'Step10 probe',
     accountType: 'company',
@@ -76,6 +90,26 @@ function resolveBearerToken() {
     onboardingComplete: true,
     canSearch: true,
   })
+}
+
+async function resolveStep10UserId(adminEmail, cronSecret) {
+  const fromEnv = loadEnvValue('STEP10_USER_ID')
+  if (fromEnv) return { userId: fromEnv, email: adminEmail }
+  if (!cronSecret) return null
+
+  const res = await fetch(`${BASE}/api/infra/bootstrap?action=step10-probe-user`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${cronSecret}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email: adminEmail || undefined }),
+    signal: AbortSignal.timeout(30_000),
+  })
+  if (!res.ok) return null
+  const data = await res.json().catch(() => ({}))
+  if (!data?.userId) return null
+  return { userId: data.userId, email: data.email || adminEmail }
 }
 
 function buildRoutes(bearer) {
@@ -150,7 +184,10 @@ async function worker(route, until) {
   return samples
 }
 
-const bearer = resolveBearerToken()
+const cronSecret = loadCronSecret()
+const adminEmail = loadEnvValue('ADMIN_EMAILS').split(',')[0]?.trim().toLowerCase() || ''
+const probeUser = await resolveStep10UserId(adminEmail, cronSecret)
+const bearer = resolveBearerToken(probeUser)
 const routes = buildRoutes(bearer)
 const emailWorker = await probeEmailWorker()
 
