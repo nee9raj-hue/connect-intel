@@ -7,18 +7,14 @@
 import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { buildPgConnectionString, resolvePgConnectionString } from '../lib/server/supabaseSqlApply.js'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const sqlPath = join(ROOT, 'supabase/migrations/20260617120000_pipeline_activities_indexes.sql')
 const sql = readFileSync(sqlPath, 'utf8')
 
-const url = process.env.DATABASE_URL || process.env.SUPABASE_DB_URL
-let connectionString = url
-if (!connectionString && process.env.SUPABASE_DB_PASSWORD && process.env.SUPABASE_URL) {
-  const host = new URL(process.env.SUPABASE_URL).hostname
-  const projectRef = host.split('.')[0]
-  connectionString = `postgresql://postgres:${encodeURIComponent(process.env.SUPABASE_DB_PASSWORD)}@db.${projectRef}.supabase.co:5432/postgres`
-}
+const resolved = await resolvePgConnectionString()
+const connectionString = resolved.connectionString || buildPgConnectionString()
 
 if (!connectionString) {
   console.log('No DATABASE_URL / SUPABASE_DB_PASSWORD — run this SQL in Supabase SQL editor:\n')

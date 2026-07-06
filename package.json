@@ -41,6 +41,8 @@
     "campaigns:sql-ops": "node scripts/campaigns-v3-sql-ops.mjs",
     "step10:gate": "node scripts/step10-load-gate.mjs",
     "constitution:ops": "node scripts/constitution-ops.mjs",
+    "db:probe": "node scripts/db-probe.mjs",
+    "grafana:verify": "node scripts/grafana-verify.mjs",
     "companies:sync": "node scripts/companies-sync.mjs",
     "activities:backfill": "node scripts/backfill-pipeline-activities.mjs",
     "activities:indexes": "node scripts/apply-activities-indexes.mjs",

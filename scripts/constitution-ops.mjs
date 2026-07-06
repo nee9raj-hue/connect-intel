@@ -31,6 +31,14 @@ const h = await health()
 console.log('Worker:', h.worker?.ok ?? h.readiness?.worker, '| Email V3:', h.emailV3?.ready)
 console.log('Prometheus:', h.infra?.prometheus, '| Sentry:', h.infra?.sentry)
 
+const grafana = run('node', ['scripts/grafana-verify.mjs'])
+if (!grafana.ok) {
+  console.log(grafana.out)
+  console.log('Grafana: see docs/GRAFANA_SETUP.md — deploy infra/grafana/alloy.config on Railway.\n')
+} else {
+  console.log('✓ Prometheus metrics scrape OK (Grafana-ready)\n')
+}
+
 if (!h.worker?.ok) {
   console.log(`
 ⚠ Worker down — Upstash Redis quota exceeded (adjusted-raccoon) or archived DB (living-snail).

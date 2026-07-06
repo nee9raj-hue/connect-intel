@@ -124,6 +124,10 @@ Health: `GET /api/health` includes Supabase circuit breaker, Redis, Meilisearch.
 
 Scrape Prometheus from Grafana Cloud or self-hosted Prometheus.
 
+**Grafana:** `npm run grafana:verify` then `docs/GRAFANA_SETUP.md` (Alloy on Railway + dashboard import).
+
+**DB migrations:** Set `SUPABASE_DB_PASSWORD` + pooler host from Supabase dashboard (`SUPABASE_DB_HOST` or `DIRECT_URL`). Probe: `npm run db:probe`.
+
 ---
 
 ## Rollout order

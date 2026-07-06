@@ -97,11 +97,13 @@ PROMETHEUS_METRICS=true
 METRICS_SECRET=<random-32-chars>
 ```
 
-Grafana Cloud → Add Prometheus data source → scrape:
+Grafana Cloud → Add Prometheus data source → scrape via **Grafana Alloy** (see `docs/GRAFANA_SETUP.md`):
 
 ```
 https://connectintel.net/api/metrics?secret=YOUR_SECRET
 ```
+
+Preflight: `npm run grafana:verify`
 
 Key metrics:
 - `connectintel_api_request_duration_seconds`
