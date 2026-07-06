@@ -111,7 +111,10 @@ export default function PipelineFiltersBar({
   }))
   const tagOptions = orgLeadTags.map((t) => ({ label: t.name, value: t.id }))
   const smartOptions = SMART_TAG_OPTIONS.map((o) => ({ label: o.label, value: o.id }))
-  const savedViewOptions = savedViews.map((v) => ({ label: v.name, value: v.id }))
+  const savedViewOptions = savedViews.map((v) => ({
+    label: v.shared ? `${v.name} (Team)` : v.name,
+    value: v.id,
+  }))
 
   const appliedCities = getFilterCities(appliedFilters)
   const appliedStates = getFilterStates(appliedFilters)

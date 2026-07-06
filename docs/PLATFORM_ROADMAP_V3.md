@@ -122,9 +122,9 @@ Load test targets: 100 concurrent users, 50k contacts, 100k emails/month, 10 con
 
 **Gate:** No new features until P50 dashboard &lt;500ms and email queue &lt;3s API response with workers on.
 
-**Run gate:** `npm run step10:gate` — initial probe PASS (P50 ~257ms, error rate &lt;2% on health/public-config).
+**Run gate:** `npm run step10:gate` — probes health, public-config, infra/queue (email), and authenticated dashboard bootstrap + team-metrics when `SESSION_SECRET` + `ADMIN_EMAILS` are available locally.
 
-**Blueprint Phase 2+** starts only after Step 10 gate passes on full CRM dashboard + email queue paths.
+**Blueprint Phase 2+** starts after Step 10 full gate passes (dashboard + email queue paths).
 
 ---
 

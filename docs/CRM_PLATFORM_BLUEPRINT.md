@@ -260,7 +260,7 @@ Every list view should support:
 - [x] Bulk actions
 - [ ] Column picker + persist
 - [ ] Grouping
-- [ ] Org-shared views
+- [x] Org-shared views
 - [x] Export (marketing reports; pipeline partial)
 
 ---
@@ -310,8 +310,8 @@ Every list view should support:
 - [x] CRM visual workflow builder (AutomationCanvas mode)
 - [x] Timeline filters + marketing events on lead timeline
 - [x] Configurable lead scoring (org-defined point rules)
-- [ ] Org-shared saved views
-- [ ] Hook deal-won automation triggers
+- [x] Org-shared saved views
+- [x] Hook deal-won automation triggers
 
 ### Phase 2 — Workflow unification (4–6 weeks)
 
