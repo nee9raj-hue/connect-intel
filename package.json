@@ -43,6 +43,7 @@
     "constitution:ops": "node scripts/constitution-ops.mjs",
     "db:probe": "node scripts/db-probe.mjs",
     "grafana:verify": "node scripts/grafana-verify.mjs",
+    "grafana:connect": "node scripts/grafana-connect.mjs",
     "companies:sync": "node scripts/companies-sync.mjs",
     "activities:backfill": "node scripts/backfill-pipeline-activities.mjs",
     "activities:indexes": "node scripts/apply-activities-indexes.mjs",

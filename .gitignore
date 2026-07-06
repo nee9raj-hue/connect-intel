@@ -6,6 +6,7 @@ frontend/dist/
 .env.*
 !.env.example
 !.env.railway.secrets.example
+!.env.grafana.secrets.example
 *.log
 
 # Built output (Vercel builds these on deploy)
@@ -36,3 +37,4 @@ android/captures/
 .env*.local
 .env.railway.secrets
 .env.railway.sync
+.env.grafana.secrets

@@ -2,15 +2,32 @@
 
 Production metrics: `GET https://connectintel.net/api/metrics` (requires `METRICS_SECRET` or `CRON_SECRET`).
 
-## 1. Preflight
+## 1. One-command wiring
+
+```bash
+npm run grafana:connect
+```
+
+This script:
+1. Syncs `METRICS_SECRET` on Vercel (same as `CRON_SECRET` in `.env.deploy.local`)
+2. Runs `npm run grafana:verify`
+3. Deploys Railway `grafana-alloy` (Dockerfile in `infra/grafana/`)
+4. Imports the dashboard when `.env.grafana.secrets` has Grafana Cloud API creds
+
+### Grafana Cloud credentials (one-time)
+
+1. Sign up free: https://grafana.com/auth/sign-up/create-user (use **Google** → nee9raj@gmail.com)
+2. Stack slug is your subdomain, e.g. `yourstack` → `yourstack.grafana.net`
+3. **Prometheus → Details** → copy Remote write URL + Instance ID
+4. **Administration → Cloud access policies** → token with `metrics:write`
+5. Copy `.env.grafana.secrets.example` → `.env.grafana.secrets` and fill values
+6. Re-run `npm run grafana:connect`
+
+## 2. Preflight only
 
 ```bash
 npm run grafana:verify
 ```
-
-Requires `PROMETHEUS_METRICS=true` on Vercel (already set) and a scrape secret.
-
-## 2. Grafana Cloud — Alloy scraper (recommended)
 
 Run [Grafana Alloy](https://grafana.com/docs/alloy/latest/) on Railway (or any always-on host). It scrapes Vercel `/api/metrics` and remote-writes to Grafana Cloud Prometheus.
 
