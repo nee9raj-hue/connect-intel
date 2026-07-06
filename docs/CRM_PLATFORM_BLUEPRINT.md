@@ -317,7 +317,7 @@ Every list view should support:
 
 - CRM visual workflow builder (reuse canvas)
 - Configurable lead scoring rules
-- Website tracking pixel + UTM attribution
+- [x] Website tracking pixel + UTM attribution
 
 ### Phase 3 — Analytics & AI (6–8 weeks)
 

@@ -734,6 +734,7 @@ export const api = {
     return request(`/api/marketing/analytics?${q}`, { timeoutMs: 60_000 })
   },
   getMarketingDomains: () => request('/api/marketing/domains'),
+  getMarketingSiteTracking: () => request('/api/marketing/tracking'),
   verifyMarketingDomain: (action = 'verify') =>
     request('/api/marketing/domains', { method: 'POST', body: { action } }),
   getMarketingBulkSends: () => request('/api/marketing/bulk-sends'),

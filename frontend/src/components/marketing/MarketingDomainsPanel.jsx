@@ -38,15 +38,18 @@ export default function MarketingDomainsPanel({ user }) {
   const [error, setError] = useState(null)
   const [gmailStatus, setGmailStatus] = useState(null)
   const [orgEmail, setOrgEmail] = useState(null)
+  const [siteTracking, setSiteTracking] = useState(null)
 
   const load = useCallback(async () => {
     try {
-      const [gmail, domain] = await Promise.all([
+      const [gmail, domain, tracking] = await Promise.all([
         api.getCrmGmailStatus().catch(() => null),
         api.getOrgEmailDomain().catch(() => null),
+        api.getMarketingSiteTracking().catch(() => null),
       ])
       setGmailStatus(gmail)
       setOrgEmail(domain)
+      setSiteTracking(tracking)
     } catch {
       /* optional */
     }
@@ -134,6 +137,32 @@ export default function MarketingDomainsPanel({ user }) {
           Note: Work email is for individual sends. For team-wide sending, set up company DNS below.
         </p>
       </section>
+
+      {isAdmin && siteTracking?.snippet && (
+        <section className="mhub-v3-card mhub-v3-domain-section">
+          <h3>Website tracking</h3>
+          <p>
+            Install the Connect Intel pixel on your site to capture page views and UTM attribution. Form
+            submissions on your landing pages automatically attach first/last touch UTM to leads.
+          </p>
+          <p style={{ fontSize: 12, color: '#666', marginBottom: 8 }}>
+            Page views (30d): <strong>{siteTracking.pageviews30d ?? 0}</strong>
+          </p>
+          <textarea
+            readOnly
+            value={siteTracking.snippet}
+            rows={3}
+            style={{ width: '100%', fontFamily: 'monospace', fontSize: 12, marginBottom: 8 }}
+          />
+          <button
+            type="button"
+            className="mhub-v3-btn mhub-v3-btn--secondary"
+            onClick={() => navigator.clipboard.writeText(siteTracking.snippet)}
+          >
+            Copy snippet
+          </button>
+        </section>
+      )}
 
       {isAdmin && (
         <section className="mhub-v3-card mhub-v3-domain-section">
