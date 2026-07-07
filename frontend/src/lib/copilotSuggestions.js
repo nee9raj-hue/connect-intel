@@ -1,9 +1,9 @@
 /** Context-aware suggestion chips — mirrors server copilot/contextSuggestions.js */
 
 const MARKET = [
+  'I need toys exporter from Delhi NCR',
   'Find toy exporters in Mumbai exporting to USA',
   'Research a prospect company',
-  'Latest news about a competitor',
   'Decision makers at a target company',
 ]
 
@@ -77,9 +77,9 @@ export const COPILOT_TABS = [
 ]
 
 export const PROGRESS_STEPS = {
-  copilot: ['Checking CRM…', 'Searching sources…', 'Building answer…'],
-  market: ['Searching web…', 'Cross-checking CRM…', 'Enriching company data…'],
-  crm: ['Querying CRM…', 'Loading workspace…', 'Summarizing…'],
+  copilot: ['Detecting sales intent…', 'Checking CRM…', 'Searching companies…', 'Preparing results…'],
+  market: ['Parsing product & location…', 'Searching TradeIndia & IndiaMART…', 'Cross-checking CRM…', 'Ranking companies…'],
+  crm: ['Querying your pipeline…', 'Loading follow-ups…', 'Summarizing…'],
   actions: ['Understanding request…', 'Preparing action…', 'Ready…'],
 }
 

@@ -1,0 +1,170 @@
+function initials(name) {
+  const parts = String(name || '')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+  if (!parts.length) return '?'
+  return parts
+    .slice(0, 2)
+    .map((p) => p[0])
+    .join('')
+    .toUpperCase()
+}
+
+function hostFromUrl(url) {
+  try {
+    return new URL(url.startsWith('http') ? url : `https://${url}`).hostname.replace(/^www\./, '')
+  } catch {
+    return String(url || '').slice(0, 24)
+  }
+}
+
+function CompanyRow({ company, onAction }) {
+  const name = company.company || company.name
+  const website = company.website || company.companyDomain
+  const href = website ? (website.startsWith('http') ? website : `https://${website}`) : null
+
+  return (
+    <article className="ci-copilot-list__card">
+      <div className="ci-copilot-list__card-head">
+        <span className="ci-copilot-list__logo" aria-hidden>
+          {initials(name)}
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="ci-copilot-list__name">{name}</p>
+          {company.contactName || company.title ? (
+            <p className="ci-copilot-list__contact">
+              {[company.contactName, company.title].filter(Boolean).join(' · ')}
+            </p>
+          ) : null}
+          {href ? (
+            <a href={href} target="_blank" rel="noopener noreferrer" className="ci-copilot-list__web">
+              {hostFromUrl(href)}
+            </a>
+          ) : null}
+        </div>
+        <span
+          className={`ci-copilot-list__crm${company.inCrm ? ' ci-copilot-list__crm--in' : ''}`}
+        >
+          {company.crmStatus || (company.inCrm ? 'In CRM' : 'New')}
+        </span>
+      </div>
+
+      <div className="ci-copilot-list__meta">
+        {company.city || company.state ? (
+          <span>{[company.city, company.state].filter(Boolean).join(', ')}</span>
+        ) : null}
+        {company.industry ? <span>{company.industry}</span> : null}
+        {company.exportMarkets ? <span>Exports: {company.exportMarkets}</span> : null}
+        {company.email ? <span>{company.email}</span> : null}
+        {company.phone ? <span>{company.phone}</span> : null}
+      </div>
+
+      <div className="ci-copilot-list__actions">
+        {company.leadId ? (
+          <button
+            type="button"
+            className="ci-copilot-list__btn"
+            onClick={() =>
+              onAction?.({ type: 'navigate', panel: 'pipeline', leadId: company.leadId, label: 'Open' })
+            }
+          >
+            Open CRM
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="ci-copilot-list__btn ci-copilot-list__btn--primary"
+            onClick={() =>
+              onAction?.({
+                type: 'create_lead',
+                label: 'Add lead',
+                payload: {
+                  company: name,
+                  website: company.website || company.companyDomain || '',
+                  industry: company.industry || '',
+                  city: company.city || '',
+                  state: company.state || '',
+                  email: company.email || '',
+                  phone: company.phone || '',
+                  firstName: company.firstName || '',
+                  lastName: company.lastName || '',
+                },
+              })
+            }
+          >
+            Add to CRM
+          </button>
+        )}
+        {company.linkedinUrl ? (
+          <a
+            href={company.linkedinUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ci-copilot-list__btn ci-copilot-list__btn--ghost"
+          >
+            LinkedIn
+          </a>
+        ) : null}
+        {company.leadId ? (
+          <button
+            type="button"
+            className="ci-copilot-list__btn ci-copilot-list__btn--ghost"
+            onClick={() =>
+              onAction?.({
+                type: 'navigate',
+                panel: 'pipeline',
+                leadId: company.leadId,
+                leadTab: 'email',
+                label: 'Email',
+              })
+            }
+          >
+            Draft email
+          </button>
+        ) : null}
+      </div>
+    </article>
+  )
+}
+
+export default function CopilotCompanyList({ companies, discoveryMeta, onAction }) {
+  if (!companies?.length) return null
+  const total = discoveryMeta?.total || companies.length
+
+  return (
+    <div className="ci-copilot-list">
+      <div className="ci-copilot-list__header">
+        <p className="ci-copilot-list__title">
+          Found <strong>{total}</strong> companies
+        </p>
+        {discoveryMeta?.inCrm != null ? (
+          <p className="ci-copilot-list__sub">
+            {discoveryMeta.inCrm} in CRM · {discoveryMeta.newLeads ?? total - discoveryMeta.inCrm} new
+          </p>
+        ) : null}
+      </div>
+      <div className="ci-copilot-list__scroll">
+        {companies.map((c) => (
+          <CompanyRow key={c.id || c.company || c.name} company={c} onAction={onAction} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export function CopilotPlanSteps({ steps }) {
+  if (!steps?.length) return null
+  return (
+    <ul className="ci-copilot-plan" aria-label="Search progress">
+      {steps.map((step) => (
+        <li key={step.id} className={`ci-copilot-plan__step ci-copilot-plan__step--${step.status || 'done'}`}>
+          <span className="ci-copilot-plan__check" aria-hidden>
+            ✓
+          </span>
+          {step.label}
+        </li>
+      ))}
+    </ul>
+  )
+}

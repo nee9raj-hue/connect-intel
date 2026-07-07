@@ -7,6 +7,7 @@ import { getContextualSuggestions, COPILOT_TABS, PROGRESS_STEPS, pushRecentSearc
 import { CI_OPEN_AI_EVENT } from '../../lib/openConnectAI'
 import { CrmAiIcon } from './ConnectAIFab'
 import CopilotCompanyCard from './CopilotCompanyCard'
+import CopilotCompanyList, { CopilotPlanSteps } from './CopilotCompanyList'
 import {
   renderAssistantMarkdown,
   sourceBadgesFromMessage,
@@ -34,9 +35,6 @@ function MessageBubble({ msg, onAction }) {
           ) : null}
         </div>
       ) : null}
-      {!isUser && msg.companyCard ? (
-        <CopilotCompanyCard card={msg.companyCard} onAction={onAction} />
-      ) : null}
       <div className={`ci-ai-msg__bubble${isUser ? ' ci-ai-msg__bubble--user' : ''}`}>
         {isUser ? msg.content : <div className="ci-ai-md">{renderAssistantMarkdown(msg.content)}</div>}
         {!isUser && msg.actions?.length > 0 && (
@@ -54,6 +52,17 @@ function MessageBubble({ msg, onAction }) {
           </div>
         )}
       </div>
+      {!isUser && msg.planSteps?.length > 0 ? <CopilotPlanSteps steps={msg.planSteps} /> : null}
+      {!isUser && msg.companies?.length > 0 ? (
+        <CopilotCompanyList
+          companies={msg.companies}
+          discoveryMeta={msg.discoveryMeta}
+          onAction={onAction}
+        />
+      ) : null}
+      {!isUser && msg.companyCard && !msg.companies?.length ? (
+        <CopilotCompanyCard card={msg.companyCard} onAction={onAction} />
+      ) : null}
     </div>
   )
 }
