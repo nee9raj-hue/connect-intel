@@ -301,26 +301,47 @@ class ConnectIntelPageWidget {
 
   readContext() {
     const extract = globalThis.__connectIntelExtractGmail
-    if (typeof extract !== 'function') return { emails: [], subject: '', recipientNames: [] }
-    return extract()
+    if (typeof extract !== 'function') {
+      return { emails: [], subject: '', recipientNames: [], threadId: '', domainHints: [] }
+    }
+    try {
+      return extract()
+    } catch {
+      return { emails: [], subject: '', recipientNames: [], threadId: '', domainHints: [] }
+    }
   }
 
   async tick() {
-    if (!runtime()?.isExtensionContextAlive()) {
-      this.renderContextInvalidated()
-      return
-    }
+    try {
+      if (!runtime()?.isExtensionContextAlive()) {
+        this.renderContextInvalidated()
+        return
+      }
 
-    const context = this.readContext()
-    const key = threadKey(context)
-    if (key === this.lastThreadKey) return
-    this.lastThreadKey = key
-    this.context = context
+      const context = this.readContext()
+      const key = threadKey(context)
+      if (key === this.lastThreadKey) return
+      this.lastThreadKey = key
+      this.context = context
 
-    if (this.open) {
-      await this.refresh()
-    } else {
-      await this.refreshBadge()
+      const hasSignal =
+        (context.emails?.length || 0) > 0 ||
+        String(context.subject || '').trim().length >= 2 ||
+        (context.recipientNames?.length || 0) > 0
+      if (!hasSignal) {
+        this.els.badge.hidden = true
+        return
+      }
+
+      if (this.open) {
+        await this.refresh()
+      } else {
+        await this.refreshBadge()
+      }
+    } catch (err) {
+      if (runtime()?.isContextInvalidatedError?.(err?.message)) {
+        this.renderContextInvalidated()
+      }
     }
   }
 

@@ -147,43 +147,53 @@ function domainHintsFromEmails(emails) {
 }
 
 function extractGmailThreadParticipants() {
-  const threadId = location.hash || ''
-  const scope = findThreadScope()
+  try {
+    const threadId = location.hash || ''
+    const scope = findThreadScope()
 
-  if (!scope) {
+    if (!scope) {
+      return {
+        emails: [],
+        subject: '',
+        recipientNames: [],
+        threadId,
+        domainHints: [],
+      }
+    }
+
+    const emails = new Set()
+    collectDomEmails(scope, emails)
+    collectAriaParticipantEmails(scope, emails)
+
+    const headerRoot =
+      scope.querySelector('h2[data-thread-perm-id]')?.closest('div')?.parentElement || scope
+    const headerText = (headerRoot.innerText || '').slice(0, 4000)
+    for (const match of headerText.matchAll(EMAIL_RE)) addEmail(emails, match[0])
+
+    const firstMessage = scope.querySelector('[data-message-id]')
+    if (firstMessage) {
+      const messageHeader = firstMessage.parentElement || firstMessage
+      const messageText = (messageHeader.innerText || '').slice(0, 2500)
+      for (const match of messageText.matchAll(EMAIL_RE)) addEmail(emails, match[0])
+    }
+
+    const emailList = [...emails].slice(0, 20)
+
+    return {
+      emails: emailList,
+      subject: extractSubject(scope),
+      recipientNames: extractRecipientNames(scope),
+      threadId,
+      domainHints: domainHintsFromEmails(emailList),
+    }
+  } catch {
     return {
       emails: [],
       subject: '',
       recipientNames: [],
-      threadId,
+      threadId: location.hash || '',
       domainHints: [],
     }
-  }
-
-  const emails = new Set()
-  collectDomEmails(scope, emails)
-  collectAriaParticipantEmails(scope, emails)
-
-  const headerRoot =
-    scope.querySelector('h2[data-thread-perm-id]')?.closest('div')?.parentElement || scope
-  const headerText = (headerRoot.innerText || '').slice(0, 4000)
-  for (const match of headerText.matchAll(EMAIL_RE)) addEmail(emails, match[0])
-
-  const firstMessage = scope.querySelector('[data-message-id]')
-  if (firstMessage) {
-    const messageHeader = firstMessage.parentElement || firstMessage
-    const messageText = (messageHeader.innerText || '').slice(0, 2500)
-    for (const match of messageText.matchAll(EMAIL_RE)) addEmail(emails, match[0])
-  }
-
-  const emailList = [...emails].slice(0, 20)
-
-  return {
-    emails: emailList,
-    subject: extractSubject(scope),
-    recipientNames: extractRecipientNames(scope),
-    threadId,
-    domainHints: domainHintsFromEmails(emailList),
   }
 }
 

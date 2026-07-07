@@ -18,6 +18,15 @@ function excludeEmailsForBoot(boot) {
 }
 
 async function matchThreadContext(context = {}) {
+  const hasSignal =
+    (context.emails?.length || 0) > 0 ||
+    String(context.subject || '').trim().length >= 2 ||
+    (context.recipientNames?.length || 0) > 0 ||
+    (context.domainHints?.length || 0) > 0
+  if (!hasSignal) {
+    return { matches: [], emails: [], searchQuery: '', matchedBy: null }
+  }
+
   const boot = await extensionBootstrap()
   const result = await matchLeadsByEmails({
     emails: context.emails || [],
@@ -35,32 +44,40 @@ async function matchThreadContext(context = {}) {
   return result
 }
 
+function reply(sendResponse, payload) {
+  try {
+    sendResponse(payload)
+  } catch {
+    /* message channel may already be closed */
+  }
+}
+
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message?.type === 'GMAIL_PARTICIPANTS') {
     matchThreadContext(message)
-      .then((result) => sendResponse({ ok: true, result }))
-      .catch((err) => sendResponse({ ok: false, error: err.message }))
+      .then((result) => reply(sendResponse, { ok: true, result }))
+      .catch((err) => reply(sendResponse, { ok: false, error: err.message }))
     return true
   }
 
   if (message?.type === 'CI_BOOTSTRAP') {
     extensionBootstrap()
-      .then((result) => sendResponse({ ok: true, result }))
-      .catch((err) => sendResponse({ ok: false, error: err.message }))
+      .then((result) => reply(sendResponse, { ok: true, result }))
+      .catch((err) => reply(sendResponse, { ok: false, error: err.message }))
     return true
   }
 
   if (message?.type === 'CI_MATCH_THREAD') {
     matchThreadContext(message.context || {})
-      .then((result) => sendResponse({ ok: true, result }))
-      .catch((err) => sendResponse({ ok: false, error: err.message }))
+      .then((result) => reply(sendResponse, { ok: true, result }))
+      .catch((err) => reply(sendResponse, { ok: false, error: err.message }))
     return true
   }
 
   if (message?.type === 'CI_SYNC_TRAIL') {
     syncEmailTrail(message.leadId)
-      .then((result) => sendResponse({ ok: true, result }))
-      .catch((err) => sendResponse({ ok: false, error: err.message }))
+      .then((result) => reply(sendResponse, { ok: true, result }))
+      .catch((err) => reply(sendResponse, { ok: false, error: err.message }))
     return true
   }
 
@@ -69,20 +86,20 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       leadId: message.leadId || null,
       metadata: message.metadata || {},
     })
-      .then((result) => sendResponse({ ok: true, result }))
-      .catch((err) => sendResponse({ ok: false, error: err.message }))
+      .then((result) => reply(sendResponse, { ok: true, result }))
+      .catch((err) => reply(sendResponse, { ok: false, error: err.message }))
     return true
   }
 
   if (message?.type === 'OPEN_SIGN_IN') {
     chrome.tabs.create({ url: `${API_BASE}/?extension=1` })
-    sendResponse({ ok: true })
+    reply(sendResponse, { ok: true })
     return false
   }
 
   if (message?.type === 'OPEN_TAB' && message.url) {
     chrome.tabs.create({ url: message.url })
-    sendResponse({ ok: true })
+    reply(sendResponse, { ok: true })
     return false
   }
 

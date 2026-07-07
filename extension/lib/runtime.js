@@ -10,7 +10,9 @@ function isContextInvalidatedError(message) {
   return (
     msg.includes('Extension context invalidated') ||
     msg.includes('Receiving end does not exist') ||
-    msg.includes('Could not establish connection')
+    msg.includes('Could not establish connection') ||
+    msg.includes('message port closed') ||
+    msg.includes('Message port closed')
   )
 }
 
@@ -48,16 +50,18 @@ function safeSendMessage(message, callback) {
     return
   }
 
+  const onResponse = (response) => {
+    const err = chrome.runtime.lastError
+    if (err) {
+      if (isContextInvalidatedError(err.message)) invalidateExtensionContext()
+      callback?.(null, err)
+      return
+    }
+    callback?.(response, null)
+  }
+
   try {
-    chrome.runtime.sendMessage(message, (response) => {
-      const err = chrome.runtime.lastError
-      if (err) {
-        if (isContextInvalidatedError(err.message)) invalidateExtensionContext()
-        callback?.(null, err)
-        return
-      }
-      callback?.(response, null)
-    })
+    chrome.runtime.sendMessage(message, onResponse)
   } catch (err) {
     invalidateExtensionContext()
     callback?.(null, err)
