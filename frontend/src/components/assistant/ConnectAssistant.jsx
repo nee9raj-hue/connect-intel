@@ -5,48 +5,39 @@ import { api } from '../../lib/api'
 import { applyAssistantAction } from '../../lib/assistantNavigation'
 import { CI_OPEN_AI_EVENT } from '../../lib/openConnectAI'
 import { CrmAiIcon } from './ConnectAIFab'
+import { renderAssistantMarkdown, sourceBadgeLabel } from './assistantMessageRender'
 
 const CRM_PROMPTS = [
-  'CRM vs Marketing email?',
   'How many leads in my pipeline?',
+  'CRM vs Marketing email?',
   'How do I connect work Gmail?',
-  'Bulk email from Pipeline',
+  'Bulk email limits from Pipeline',
 ]
 
 const RESEARCH_PROMPTS = [
-  'Research this company on the web',
-  'Find LinkedIn profile for a contact',
-  'Amazon best sellers in this category',
-  'Latest news about a prospect company',
+  'Logistics managers at Innovist — names & LinkedIn',
+  'Latest funding news for [company name]',
+  'Amazon bestsellers in organic snacks India',
+  'Who is the CEO of [company] — profile link',
 ]
 
 const CAPABILITY_AREAS = [
-  { id: 'crm', label: 'CRM help', prompt: 'How does Pipeline bulk email work?' },
-  { id: 'marketing', label: 'Marketing', prompt: 'CRM vs Marketing email?' },
-  { id: 'research', label: 'Web research', prompt: 'Research a company on LinkedIn' },
-  { id: 'setup', label: 'Gmail setup', prompt: 'How do I connect work Gmail?' },
+  { id: 'crm', label: 'Pipeline & leads', prompt: 'How many leads in my pipeline and by stage?' },
+  { id: 'marketing', label: 'Marketing vs CRM', prompt: 'CRM bulk email vs Marketing campaigns — differences?' },
+  { id: 'setup', label: 'Gmail setup', prompt: 'How do I connect work Gmail step by step?' },
 ]
-
-function renderSimpleMarkdown(text) {
-  const parts = String(text || '').split(/(\*\*[^*]+\*\*)/g)
-  return parts.map((part, i) => {
-    if (part.startsWith('**') && part.endsWith('**')) {
-      return (
-        <strong key={i} className="font-semibold">
-          {part.slice(2, -2)}
-        </strong>
-      )
-    }
-    return part
-  })
-}
 
 function MessageBubble({ msg, onAction }) {
   const isUser = msg.role === 'user'
+  const badge = !isUser ? sourceBadgeLabel(msg.source) : null
+
   return (
     <div className={`ci-ai-msg ${isUser ? 'ci-ai-msg--user' : 'ci-ai-msg--bot'}`}>
+      {!isUser && badge ? (
+        <span className={`ci-ai-msg__badge ci-ai-msg__badge--${badge.tone}`}>{badge.label}</span>
+      ) : null}
       <div className={`ci-ai-msg__bubble${isUser ? ' ci-ai-msg__bubble--user' : ''}`}>
-        {isUser ? msg.content : renderSimpleMarkdown(msg.content)}
+        {isUser ? msg.content : <div className="ci-ai-md">{renderAssistantMarkdown(msg.content)}</div>}
         {!isUser && msg.actions?.length > 0 && (
           <div className="ci-ai-msg__actions">
             {msg.actions.map((action, i) => (
@@ -111,12 +102,20 @@ export default function ConnectAssistant({
       setWebResearchAvailable(Boolean(data.webResearchAvailable))
       const lastAssistant = [...(data.messages || [])].reverse().find((m) => m.role === 'assistant')
       if (lastAssistant?.suggestions?.length) {
-        setSuggestions(lastAssistant.suggestions)
+        const webish = lastAssistant.source === 'web' || lastAssistant.source === 'web_error'
+        if ((aiMode === 'research' && webish) || (aiMode === 'crm' && !webish)) {
+          setSuggestions(lastAssistant.suggestions)
+        }
       }
     } catch {
       /* first visit */
     }
-  }, [])
+  }, [aiMode])
+
+  const switchMode = (mode) => {
+    setAiMode(mode)
+    setSuggestions(mode === 'research' ? RESEARCH_PROMPTS : CRM_PROMPTS)
+  }
 
   useEffect(() => {
     const onGlobalOpen = () => onOpenChange?.(true)
@@ -241,16 +240,17 @@ export default function ConnectAssistant({
   )
 
   const onCapabilityClick = (cap) => {
-    if (cap.id === 'research') {
-      setAiMode('research')
-      setSuggestions(RESEARCH_PROMPTS)
-      sendMessage(cap.prompt)
-      return
-    }
     setAiMode('crm')
     setSuggestions(CRM_PROMPTS)
     sendMessage(cap.prompt)
   }
+
+  const modeHint =
+    aiMode === 'research'
+      ? webResearchAvailable
+        ? 'Live web search — names, companies, LinkedIn, Amazon, news'
+        : 'Web research needs server setup — CRM help still works'
+      : 'Your pipeline counts, Gmail status, and product how-to'
 
   if (!user || user.isPlatformAdmin) return null
 
@@ -281,7 +281,7 @@ export default function ConnectAssistant({
             </span>
             <div className="min-w-0">
               <p className="ci-ai-panel__title">CRM AI</p>
-              <p className="ci-ai-panel__sub">Product expert · live web research</p>
+              <p className="ci-ai-panel__sub">{modeHint}</p>
             </div>
           </div>
           <button
@@ -294,28 +294,30 @@ export default function ConnectAssistant({
           </button>
         </header>
 
-        <div className="ci-ai-mode-bar">
+        <div className="ci-ai-mode-bar" role="tablist" aria-label="CRM AI mode">
           <button
             type="button"
+            role="tab"
+            aria-selected={aiMode === 'crm'}
             className={`ci-ai-mode-bar__btn${aiMode === 'crm' ? ' is-active' : ''}`}
-            onClick={() => {
-              setAiMode('crm')
-              setSuggestions(CRM_PROMPTS)
-            }}
+            onClick={() => switchMode('crm')}
           >
-            CRM help
+            <span className="ci-ai-mode-bar__label">CRM help</span>
+            <span className="ci-ai-mode-bar__hint">Your data & product</span>
           </button>
           <button
             type="button"
-            className={`ci-ai-mode-bar__btn${aiMode === 'research' ? ' is-active' : ''}`}
-            onClick={() => {
-              setAiMode('research')
-              setSuggestions(RESEARCH_PROMPTS)
-            }}
+            role="tab"
+            aria-selected={aiMode === 'research'}
+            className={`ci-ai-mode-bar__btn ci-ai-mode-bar__btn--research${aiMode === 'research' ? ' is-active' : ''}`}
+            onClick={() => switchMode('research')}
             title={webResearchAvailable ? 'Search the web' : 'Web research requires server setup'}
           >
-            Web research
-            {!webResearchAvailable ? <span className="ci-ai-mode-bar__dot" /> : null}
+            <span className="ci-ai-mode-bar__label">
+              Web research
+              {!webResearchAvailable ? <span className="ci-ai-mode-bar__dot" /> : null}
+            </span>
+            <span className="ci-ai-mode-bar__hint">LinkedIn · Amazon · news</span>
           </button>
         </div>
 
@@ -339,25 +341,47 @@ export default function ConnectAssistant({
           {showWelcome && (
             <div className="ci-ai-welcome">
               <p className="ci-ai-welcome__hi">
-                Hi{user.name ? `, ${user.name.split(' ')[0]}` : ''} — I&apos;m your CRM AI.
+                Hi{user.name ? `, ${user.name.split(' ')[0]}` : ''} — ask something specific.
               </p>
-              <p className="ci-ai-welcome__copy">
-                **CRM help** uses your workspace data and product knowledge (constitution-aligned).
-                **Web research** searches LinkedIn, Amazon, news, and the open web for B2B context.
-              </p>
-              <div className="ci-ai-capabilities">
-                {CAPABILITY_AREAS.map((c) => (
-                  <button
-                    key={c.id}
-                    type="button"
-                    className="ci-ai-capabilities__chip"
-                    disabled={loading}
-                    onClick={() => onCapabilityClick(c)}
-                  >
-                    {c.label}
-                  </button>
-                ))}
-              </div>
+              {aiMode === 'research' ? (
+                <>
+                  <p className="ci-ai-welcome__copy">
+                    Name the **company**, **role**, or **product**. I return facts and links — not search tutorials.
+                  </p>
+                  <div className="ci-ai-capabilities">
+                    {RESEARCH_PROMPTS.map((prompt) => (
+                      <button
+                        key={prompt}
+                        type="button"
+                        className="ci-ai-capabilities__chip ci-ai-capabilities__chip--research"
+                        disabled={loading}
+                        onClick={() => sendMessage(prompt)}
+                      >
+                        {prompt}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="ci-ai-welcome__copy">
+                    I use **your workspace numbers** and product rules — lead counts, Gmail, campaigns, consent.
+                  </p>
+                  <div className="ci-ai-capabilities">
+                    {CAPABILITY_AREAS.map((c) => (
+                      <button
+                        key={c.id}
+                        type="button"
+                        className="ci-ai-capabilities__chip"
+                        disabled={loading}
+                        onClick={() => onCapabilityClick(c)}
+                      >
+                        {c.label}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
           )}
 
@@ -368,7 +392,7 @@ export default function ConnectAssistant({
           {loading && (
             <div className="ci-ai-thinking">
               <span className="ci-ai-thinking__dot" />
-              Thinking…
+              {aiMode === 'research' ? 'Searching the web…' : 'Checking your CRM…'}
             </div>
           )}
 
@@ -437,8 +461,8 @@ export default function ConnectAssistant({
               onChange={(e) => setInput(e.target.value)}
               placeholder={
                 aiMode === 'research'
-                  ? 'Research company, LinkedIn, Amazon, news…'
-                  : 'Ask about CRM, Marketing, your data…'
+                  ? 'e.g. Supply chain managers at Innovist — names & LinkedIn URLs'
+                  : 'e.g. How many leads in my pipeline by stage?'
               }
               className="ci-ai-compose__input"
               disabled={loading}
