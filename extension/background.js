@@ -5,27 +5,38 @@ import {
   logExtensionAction,
   matchLeadsByEmails,
   syncEmailTrail,
+  captureLead,
 } from './lib/api.js'
 
 const GMAIL_URL_PATTERN = 'https://mail.google.com/*'
+const LINKEDIN_URL_PATTERN = 'https://www.linkedin.com/in/*'
 
 function isGmailTab(tab) {
   const url = String(tab?.url || tab?.pendingUrl || '')
   return url.includes('mail.google.com')
 }
 
-async function reloadGmailTabs() {
+function isLinkedInProfileTab(tab) {
+  const url = String(tab?.url || tab?.pendingUrl || '')
+  return /linkedin\.com\/in\//i.test(url)
+}
+
+async function reloadExtensionTabs() {
   try {
-    let tabs = await chrome.tabs.query({ url: GMAIL_URL_PATTERN })
+    let tabs = await chrome.tabs.query({ url: [GMAIL_URL_PATTERN, LINKEDIN_URL_PATTERN] })
     if (!tabs.length) {
-      tabs = (await chrome.tabs.query({})).filter(isGmailTab)
+      tabs = (await chrome.tabs.query({})).filter((t) => isGmailTab(t) || isLinkedInProfileTab(t))
     }
     await Promise.all(
       tabs.map((tab) => (tab.id ? chrome.tabs.reload(tab.id).catch(() => {}) : Promise.resolve()))
     )
   } catch (err) {
-    console.warn('Connect Intel: could not reload Gmail tabs', err?.message || err)
+    console.warn('Connect Intel: could not reload extension tabs', err?.message || err)
   }
+}
+
+async function reloadGmailTabs() {
+  return reloadExtensionTabs()
 }
 
 chrome.runtime.onInstalled.addListener((details) => {
@@ -97,6 +108,13 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
   if (message?.type === 'CI_SYNC_TRAIL') {
     syncEmailTrail(message.leadId)
+      .then((result) => reply(sendResponse, { ok: true, result }))
+      .catch((err) => reply(sendResponse, { ok: false, error: err.message }))
+    return true
+  }
+
+  if (message?.type === 'CI_CAPTURE_LEAD') {
+    captureLead(message.fields || {})
       .then((result) => reply(sendResponse, { ok: true, result }))
       .catch((err) => reply(sendResponse, { ok: false, error: err.message }))
     return true

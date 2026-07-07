@@ -12,6 +12,7 @@ import TeamMembersTab from './settings/TeamMembersTab'
 import TeamsDepartmentsTab from './settings/TeamsDepartmentsTab'
 import PermissionsTab from './settings/PermissionsTab'
 import AuditLogTab from './settings/AuditLogTab'
+import EmailSendsTab from './settings/EmailSendsTab'
 import IntegrationsTab from './settings/IntegrationsTab'
 import ImportLeadsTab from './settings/ImportLeadsTab'
 import BillingTab from './settings/BillingTab'
@@ -248,6 +249,7 @@ export default function TeamPanel({ onNavigate, panelOptions = {} }) {
           {activeTab === 'audit' && (
             <AuditLogTab teamMembers={teamMembers} />
           )}
+          {activeTab === 'email-sends' && <EmailSendsTab />}
           {activeTab === 'integrations' && (
             <IntegrationsTab onNavigate={onNavigate} />
           )}

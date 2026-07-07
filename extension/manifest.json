@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Connect Intel for Gmail",
-  "version": "0.2.5",
-  "description": "Link Gmail threads to your Connect Intel pipeline — trail sync, activity log, no bulk inbox import.",
+  "name": "Connect Intel",
+  "version": "0.3.0",
+  "description": "Gmail trail sync, LinkedIn capture, and pipeline tools for Connect Intel CRM.",
   "icons": {
     "48": "icons/icon-48.png",
     "128": "icons/icon-48.png"
@@ -10,7 +10,9 @@
   "permissions": ["storage", "cookies", "activeTab", "scripting", "tabs"],
   "host_permissions": [
     "https://connectintel.net/*",
-    "https://mail.google.com/*"
+    "https://mail.google.com/*",
+    "https://www.linkedin.com/*",
+    "https://linkedin.com/*"
   ],
   "background": {
     "service_worker": "background.js",
@@ -28,12 +30,17 @@
       "matches": ["https://mail.google.com/*"],
       "js": ["lib/runtime.js", "lib/gmailParticipants.js", "content/pageWidget.js"],
       "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.linkedin.com/in/*", "https://linkedin.com/in/*"],
+      "js": ["lib/runtime.js", "lib/pageCapture.js", "content/captureWidget.js"],
+      "run_at": "document_idle"
     }
   ],
   "web_accessible_resources": [
     {
       "resources": ["icons/*"],
-      "matches": ["https://mail.google.com/*"]
+      "matches": ["https://mail.google.com/*", "https://www.linkedin.com/*", "https://linkedin.com/*"]
     }
   ]
 }

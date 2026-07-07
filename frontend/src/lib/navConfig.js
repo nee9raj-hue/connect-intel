@@ -445,6 +445,7 @@ export function buildCustomerNavSections(
             { id: 'team-hierarchy', label: 'Teams & departments', panel: 'team', teamTab: 'teams' },
             { id: 'team-permissions', label: 'Permissions', panel: 'team', teamTab: 'permissions' },
             { id: 'team-audit', label: 'Audit log', panel: 'team', teamTab: 'audit' },
+            { id: 'team-email-sends', label: 'Email sends', panel: 'team', teamTab: 'email-sends' },
           ],
         },
         { id: 'whatsapp-settings', label: 'WhatsApp API', icon: 'whatsapp', panel: 'whatsapp-settings' },

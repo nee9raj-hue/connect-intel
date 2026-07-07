@@ -60,3 +60,7 @@ export async function logExtensionAction(action, { leadId = null, metadata = {} 
 export async function syncEmailTrail(leadId) {
   return apiFetch('/api/crm/sync-email-thread', { method: 'POST', body: { leadId } })
 }
+
+export async function captureLead(fields) {
+  return apiFetch('/api/extension/capture-lead', { method: 'POST', body: fields })
+}
