@@ -16,7 +16,7 @@ const strict = process.argv.includes('--strict')
 
 const MUTATION_RE = /\b(req\.method\s*===\s*['"](?:POST|PATCH|PUT|DELETE)['"]|methodNotAllowed\([^)]*POST)/
 const PERM_RE =
-  /assertOrgPermission|loadMetaUserAndAssertEditLeads|requireMarketingHubAccess|requireMarketingSendAccess|assertEditLeadsForPipelinePatch|requireOrgAdmin|requireAdmin|requireTeamWorkspace|consumeSearchQuota|userCanAccessContact|\bauthorize\(/
+  /assertOrgPermission|loadMetaUserAndAssertEditLeads|requireMarketingHubAccess|requireMarketingSendAccess|assertEditLeadsForPipelinePatch|requireOrgAdmin|requireAdmin|requireTeamWorkspace|consumeSearchQuota|userCanAccessContact|assertPipelineHubAccess|\bauthorize\(/
 const SELF_SERVICE_OK = new Set([
   'assistant-chat.js',
   'crm-calendar-google.js',

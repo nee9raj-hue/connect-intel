@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Connect Intel</title>
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        margin: 0;
+        padding: 14px;
+        width: 320px;
+        color: #0f172a;
+        background: #f8fafc;
+      }
+      h1 { font-size: 15px; margin: 0 0 4px; }
+      p { font-size: 12px; color: #64748b; margin: 0 0 12px; line-height: 1.4; }
+      .card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 12px;
+        margin-bottom: 10px;
+      }
+      button {
+        width: 100%;
+        border: none;
+        border-radius: 8px;
+        padding: 9px 12px;
+        font-size: 13px;
+        cursor: pointer;
+        margin-top: 6px;
+      }
+      .primary { background: #2563eb; color: #fff; }
+      .secondary { background: #e2e8f0; color: #0f172a; }
+      .lead { font-weight: 600; font-size: 13px; }
+      .muted { font-size: 11px; color: #64748b; }
+      .error { color: #b91c1c; font-size: 12px; }
+      .ok { color: #15803d; font-size: 12px; }
+    </style>
+  </head>
+  <body>
+    <h1>Connect Intel</h1>
+    <p>Trail-only email sync · workspace-scoped · audited</p>
+    <div id="status" class="card muted">Loading…</div>
+    <div id="lead" class="card" hidden></div>
+    <div id="actions" hidden>
+      <button id="openApp" class="secondary">Open in Connect Intel</button>
+      <button id="syncTrail" class="primary">Sync email trail</button>
+    </div>
+    <button id="signIn" class="primary" hidden>Sign in to Connect Intel</button>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

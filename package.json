@@ -40,6 +40,7 @@
     "tasks:migrate": "node scripts/apply-tasks-meetings-migration.mjs",
     "campaigns:migrate": "node scripts/apply-campaigns-v3-migration.mjs",
     "email:sends-migrate": "node scripts/apply-email-sends-migration.mjs",
+    "extension:verify": "node --check extension/background.js && node --check extension/popup.js && node --check extension/lib/api.js",
     "campaigns:sql-ops": "node scripts/campaigns-v3-sql-ops.mjs",
     "step10:gate": "node scripts/step10-load-gate.mjs",
     "constitution:ops": "node scripts/constitution-ops.mjs",
