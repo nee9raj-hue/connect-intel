@@ -1402,8 +1402,6 @@ export default function LeadWorkspace({
               </LwAlert>
             )}
 
-            <LwDivider label="Thread" />
-
             <CrmEmailThread
               lead={lead}
               emails={crm.emails || []}

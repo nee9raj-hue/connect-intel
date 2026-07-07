@@ -1,6 +1,17 @@
 import { useState } from 'react'
 import { formatCrmDate } from '../../lib/crmConstants'
 import { formatDateTime } from '../../lib/crmUiConstants'
+import { MailIcon } from '../ui/icons'
+import {
+  LwSection,
+  LwBtn,
+  LwNotice,
+  LwEmpty,
+  LwField,
+  LwInput,
+  LwTextarea,
+  LwLinkBtn,
+} from './leadWorkspaceUi'
 
 function formatAttachmentSize(bytes) {
   if (!bytes || bytes < 1024) return `${bytes || 0} B`
@@ -53,177 +64,165 @@ export default function CrmEmailThread({
   const syncLabel = busy
     ? 'Syncing…'
     : gmailConnected
-      ? '↻ Sync from Gmail'
-      : '↻ Connect Gmail to sync'
+      ? 'Sync from Gmail'
+      : 'Connect Gmail to sync'
+
+  const syncTitle = gmailConnected
+    ? inboundReplySync
+      ? 'Pull this thread from Gmail (use if an automatic reply did not appear)'
+      : 'Sync trail mail for this lead'
+    : 'Connect your work Gmail to pull sent mail and replies into CRM'
 
   return (
-    <section className="rounded-xl border border-gray-200 bg-white overflow-hidden">
-      <div className="px-3 py-2.5 border-b border-gray-100 flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <h3 className="text-xs font-semibold uppercase text-gray-500">Email thread</h3>
-          <p className="text-xs text-gray-400 mt-0.5">
-            {autoReplySync
-              ? 'Replies log in CRM automatically and forward to your work inbox'
-              : 'Trail mail — CRM sends and replies for this lead'}
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-1.5">
-          <button
-            type="button"
+    <LwSection
+      icon={MailIcon}
+      title="Email thread"
+      action={
+        <div className="lw-btn-row lw-email-thread__actions">
+          <LwBtn
+            variant={gmailConnected ? 'secondary' : 'brand'}
             disabled={busy || (!gmailConnected && !gmailConnectAvailable)}
             onClick={handleSyncClick}
-            className="text-xs font-semibold px-2 py-1 rounded-md border border-gray-200 hover:bg-gray-50 disabled:opacity-50"
-            title={
-              gmailConnected
-                ? inboundReplySync
-                  ? 'Pull this thread from Gmail (use if an automatic reply did not appear)'
-                  : 'Sync trail mail for this lead'
-                : 'Connect your work Gmail to pull sent mail and replies into CRM'
-            }
+            title={syncTitle}
           >
             {syncLabel}
-          </button>
-          <button
-            type="button"
-            disabled={busy}
-            onClick={() => setShowReplyForm((v) => !v)}
-            className="text-xs font-semibold px-2 py-1 rounded-md bg-violet-50 text-violet-800 border border-violet-200"
-          >
-            + Log reply
-          </button>
+          </LwBtn>
+          <LwBtn variant="secondary" disabled={busy} onClick={() => setShowReplyForm((v) => !v)}>
+            {showReplyForm ? 'Cancel reply' : '+ Log reply'}
+          </LwBtn>
         </div>
-      </div>
+      }
+    >
+      <p className="lw-email-thread__hint">
+        {autoReplySync
+          ? 'Replies log in CRM automatically and forward to your work inbox.'
+          : 'Trail mail — CRM sends and replies for this lead.'}
+        {lead?.email ? (
+          <>
+            {' '}
+            Thread with <strong>{lead.email}</strong>
+          </>
+        ) : null}
+      </p>
 
       {inboundReplySync && (
-        <div className="text-xs text-emerald-900 bg-emerald-50 border-b border-emerald-100 px-3 py-2 leading-relaxed">
+        <LwNotice type="info">
           {gmailConnected
             ? 'Replies to your CRM routing address log automatically. If a reply is missing, use Sync from Gmail or Log reply.'
-            : 'Connect work Gmail below to sync replies from your inbox, or use Log reply to paste a message.'}
-        </div>
+            : 'Connect work Gmail to sync replies from your inbox, or use Log reply to paste a message.'}
+        </LwNotice>
       )}
 
       {!gmailConnected && !inboundReplySync && (
-        <div className="text-xs text-slate-700 bg-slate-50 border-b border-slate-100 px-3 py-2 leading-relaxed">
+        <LwNotice type="info">
           Connect work Gmail to pull sent mail and replies from your inbox into this thread.
-        </div>
+        </LwNotice>
       )}
 
       {showReplyForm && (
-        <div className="p-3 border-b border-gray-100 bg-violet-50/40 space-y-2">
-          <input
-            value={replySubject}
-            onChange={(e) => setReplySubject(e.target.value)}
-            placeholder="Subject (optional)"
-            className="w-full text-xs border border-gray-200 rounded-lg px-2 py-1.5"
-          />
-          <textarea
-            value={replyBody}
-            onChange={(e) => setReplyBody(e.target.value)}
-            rows={4}
-            placeholder="Paste the lead's reply here…"
-            className="w-full text-xs border border-gray-200 rounded-lg px-2 py-1.5"
-          />
-          <div className="flex gap-2">
-            <button
-              type="button"
-              disabled={busy || !replyBody.trim()}
-              onClick={submitReply}
-              className="text-xs font-semibold px-3 py-1.5 bg-violet-700 text-white rounded-lg disabled:opacity-50"
-            >
+        <div className="lw-email-thread__reply-form">
+          <LwField label="Subject (optional)">
+            <LwInput
+              value={replySubject}
+              onChange={(e) => setReplySubject(e.target.value)}
+              placeholder="Re: your last email"
+            />
+          </LwField>
+          <LwField label="Reply text">
+            <LwTextarea
+              value={replyBody}
+              onChange={(e) => setReplyBody(e.target.value)}
+              rows={4}
+              placeholder="Paste the lead's reply here…"
+            />
+          </LwField>
+          <div className="lw-btn-row">
+            <LwBtn variant="brand" disabled={busy || !replyBody.trim()} onClick={submitReply}>
               Save reply to CRM
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowReplyForm(false)}
-              className="text-xs text-gray-500 underline"
-            >
-              Cancel
-            </button>
+            </LwBtn>
+            <LwLinkBtn onClick={() => setShowReplyForm(false)}>Cancel</LwLinkBtn>
           </div>
         </div>
       )}
 
-      <div className="max-h-64 overflow-y-auto p-3 space-y-2">
+      <div className="lw-email-thread__list" aria-live="polite">
         {sorted.length === 0 ? (
-          <p className="text-xs text-gray-500 text-center py-4">
+          <LwEmpty>
             {autoReplySync
               ? 'No emails yet. Send from below — replies will sync automatically.'
               : 'No emails logged yet. Send from below, then sync trail mail for replies.'}
-          </p>
+          </LwEmpty>
         ) : (
-          sorted.map((msg) => {
-            const inbound = msg.direction === 'inbound'
-            const open = expandedId === msg.id
-            return (
-              <div
-                key={msg.id}
-                className={`rounded-lg border text-xs ${
-                  inbound
-                    ? 'border-violet-200 bg-violet-50/60 ml-2'
-                    : 'border-gray-200 bg-gray-50 mr-2'
-                }`}
-              >
-                <button
-                  type="button"
-                  onClick={() => setExpandedId(open ? null : msg.id)}
-                  className="w-full text-left px-3 py-2"
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <span
-                      className={`text-xs font-bold uppercase px-1.5 py-0.5 rounded ${
-                        msg.isBounce
-                          ? 'bg-red-200 text-red-900'
-                          : inbound
-                            ? 'bg-violet-200 text-violet-900'
-                            : 'bg-gray-200 text-gray-700'
-                      }`}
+          <ul className="lw-email-thread__messages">
+            {sorted.map((msg) => {
+              const inbound = msg.direction === 'inbound'
+              const open = expandedId === msg.id
+              const badge = msg.isBounce ? 'Bounced' : inbound ? 'Reply' : 'Sent'
+              const badgeClass = msg.isBounce
+                ? 'is-bounce'
+                : inbound
+                  ? 'is-inbound'
+                  : 'is-outbound'
+
+              return (
+                <li key={msg.id}>
+                  <article
+                    className={`lw-email-thread__card ${inbound ? 'is-inbound' : 'is-outbound'} ${open ? 'is-open' : ''}`}
+                  >
+                    <button
+                      type="button"
+                      className="lw-email-thread__card-toggle"
+                      onClick={() => setExpandedId(open ? null : msg.id)}
+                      aria-expanded={open}
                     >
-                      {msg.isBounce ? 'Bounced' : inbound ? 'Reply' : 'Sent'}
-                    </span>
-                    <span className="text-xs text-gray-500 shrink-0">
-                      {formatDateTime(msg.sentAt) || formatCrmDate(msg.sentAt)}
-                    </span>
-                  </div>
-                  <p className="font-semibold text-gray-900 mt-1 truncate">{msg.subject || '(No subject)'}</p>
-                  {msg.fromMailbox && (
-                    <p className="text-xs text-gray-500 mt-0.5 truncate">{msg.fromMailbox}</p>
-                  )}
-                  {!open && (
-                    <p className="text-gray-600 mt-1 line-clamp-2 whitespace-pre-wrap">
-                      {msg.bodyPreview || msg.body || ''}
-                    </p>
-                  )}
-                  {!open && msg.attachments?.length > 0 && (
-                    <p className="text-xs text-gray-500 mt-1">
-                      📎 {msg.attachments.length} attachment{msg.attachments.length === 1 ? '' : 's'}
-                    </p>
-                  )}
-                </button>
-                {open && (
-                  <div className="px-3 pb-3 border-t border-gray-200/60">
-                    <pre className="text-xs text-gray-700 whitespace-pre-wrap font-sans leading-relaxed mt-2">
-                      {msg.body || msg.bodyPreview || ''}
-                    </pre>
-                    {msg.attachments?.length > 0 && (
-                      <div className="mt-2 flex flex-wrap gap-1.5">
-                        {msg.attachments.map((file, index) => (
-                          <span
-                            key={`${file.filename}-${index}`}
-                            className="text-xs px-2 py-0.5 rounded-md bg-gray-200 text-gray-800"
-                          >
-                            📎 {file.filename}
-                            {file.sizeBytes ? ` (${formatAttachmentSize(file.sizeBytes)})` : ''}
-                          </span>
-                        ))}
+                      <div className="lw-email-thread__card-head">
+                        <span className={`lw-email-thread__badge ${badgeClass}`}>{badge}</span>
+                        <time className="lw-email-thread__time">
+                          {formatDateTime(msg.sentAt) || formatCrmDate(msg.sentAt)}
+                        </time>
                       </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            )
-          })
+                      <p className="lw-email-thread__subject">{msg.subject || '(No subject)'}</p>
+                      {msg.fromMailbox ? (
+                        <p className="lw-email-thread__from">{msg.fromMailbox}</p>
+                      ) : null}
+                      {!open && (
+                        <p className="lw-email-thread__preview">
+                          {msg.bodyPreview || msg.body || ''}
+                        </p>
+                      )}
+                      {!open && msg.attachments?.length > 0 ? (
+                        <p className="lw-email-thread__attachments-meta">
+                          {msg.attachments.length} attachment{msg.attachments.length === 1 ? '' : 's'}
+                        </p>
+                      ) : null}
+                    </button>
+                    {open ? (
+                      <div className="lw-email-thread__card-body">
+                        <pre className="lw-email-thread__body-text">
+                          {msg.body || msg.bodyPreview || ''}
+                        </pre>
+                        {msg.attachments?.length > 0 ? (
+                          <div className="lw-email-thread__attachments">
+                            {msg.attachments.map((file, index) => (
+                              <span
+                                key={`${file.filename}-${index}`}
+                                className="lw-email-thread__attachment"
+                              >
+                                {file.filename}
+                                {file.sizeBytes ? ` (${formatAttachmentSize(file.sizeBytes)})` : ''}
+                              </span>
+                            ))}
+                          </div>
+                        ) : null}
+                      </div>
+                    ) : null}
+                  </article>
+                </li>
+              )
+            })}
+          </ul>
         )}
       </div>
-    </section>
+    </LwSection>
   )
 }
