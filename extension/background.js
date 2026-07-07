@@ -7,8 +7,19 @@ chrome.runtime.onInstalled.addListener(() => {
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message?.type === 'GMAIL_PARTICIPANTS') {
     import('./lib/api.js')
-      .then(({ matchLeadsByEmails, logExtensionAction }) =>
-        matchLeadsByEmails(message.emails)
+      .then(({ matchLeadsByEmails, logExtensionAction, extensionBootstrap }) =>
+        extensionBootstrap()
+          .then((boot) => {
+            const excludeEmails = [boot?.user?.email, boot?.integrations?.workGmailEmail]
+              .map((e) => String(e || '').trim().toLowerCase())
+              .filter((e) => e.includes('@'))
+            return matchLeadsByEmails({
+              emails: message.emails || [],
+              excludeEmails,
+              subject: message.subject || '',
+              recipientNames: message.recipientNames || [],
+            })
+          })
           .then(async (result) => {
             if (result.matches?.length) {
               await logExtensionAction('extension.lead_matched', {

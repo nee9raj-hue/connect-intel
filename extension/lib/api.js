@@ -42,8 +42,12 @@ export async function extensionBootstrap() {
   return apiFetch('/api/extension/bootstrap')
 }
 
-export async function matchLeadsByEmails(emails) {
-  return apiFetch('/api/extension/lead-match', { method: 'POST', body: { emails } })
+export async function matchLeadsByEmails(emailsOrContext) {
+  const body =
+    emailsOrContext && typeof emailsOrContext === 'object' && !Array.isArray(emailsOrContext)
+      ? emailsOrContext
+      : { emails: emailsOrContext }
+  return apiFetch('/api/extension/lead-match', { method: 'POST', body })
 }
 
 export async function logExtensionAction(action, { leadId = null, metadata = {} } = {}) {

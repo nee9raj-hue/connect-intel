@@ -18,26 +18,26 @@ function setStatus(html, className = 'muted') {
   statusEl.className = `card ${className}`
 }
 
+function excludeEmailsForUser(boot) {
+  return [boot?.user?.email, boot?.integrations?.workGmailEmail]
+    .map((e) => String(e || '').trim().toLowerCase())
+    .filter((e) => e.includes('@'))
+}
+
 async function loadGmailContext() {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
   if (!tab?.id || !String(tab.url || '').includes('mail.google.com')) {
-    return { emails: [] }
+    return { emails: [], subject: '', recipientNames: [] }
   }
   try {
     const [{ result }] = await chrome.scripting.executeScript({
       target: { tabId: tab.id },
-      func: () => {
-        const emails = new Set()
-        const re = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g
-        const header = document.querySelector('[role="main"]') || document.body
-        const text = header.innerText?.slice(0, 8000) || ''
-        for (const match of text.matchAll(re)) emails.add(match[0].toLowerCase())
-        return { emails: [...emails].slice(0, 12) }
-      },
+      files: ['lib/gmailParticipants.js'],
+      func: () => globalThis.__connectIntelExtractGmail?.() || { emails: [], subject: '', recipientNames: [] },
     })
-    return result || { emails: [] }
+    return result || { emails: [], subject: '', recipientNames: [] }
   } catch {
-    return { emails: [] }
+    return { emails: [], subject: '', recipientNames: [] }
   }
 }
 
@@ -64,8 +64,14 @@ async function init() {
     )
     signInEl.hidden = true
 
-    const { emails } = await loadGmailContext()
-    if (!emails.length) {
+    const context = await loadGmailContext()
+    const excludeEmails = excludeEmailsForUser(boot)
+    const hasSignals =
+      (context.emails?.length || 0) > 0 ||
+      String(context.subject || '').trim().length >= 2 ||
+      (context.recipientNames?.length || 0) > 0
+
+    if (!hasSignals) {
       setStatus(
         (statusEl.innerHTML || '') +
           '<br/><span class="muted">Open a Gmail thread to match a pipeline lead.</span>',
@@ -74,10 +80,26 @@ async function init() {
       return
     }
 
-    const { matches } = await matchLeadsByEmails(emails)
+    const { matches, searchQuery, matchedBy } = await matchLeadsByEmails({
+      emails: context.emails || [],
+      excludeEmails,
+      subject: context.subject || '',
+      recipientNames: context.recipientNames || [],
+    })
+
     if (!matches?.length) {
+      const participantHint = (context.emails || [])
+        .filter((e) => !excludeEmails.includes(String(e).toLowerCase()))
+        .slice(0, 3)
+        .join(', ')
+      const searchHint = searchQuery ? `Searched: ${searchQuery}` : ''
+      const parts = [
+        participantHint ? `Participants: ${participantHint}` : '',
+        searchHint,
+        context.subject ? `Subject: ${context.subject}` : '',
+      ].filter(Boolean)
       setStatus(
-        `No pipeline lead matched this thread.<br/><span class="muted">Participants: ${emails.slice(0, 3).join(', ')}</span>`,
+        `No pipeline lead matched this thread.<br/><span class="muted">${parts.join(' · ')}</span>`,
         'muted'
       )
       return
@@ -86,6 +108,8 @@ async function init() {
     renderLead(matches[0])
     if (matches.length > 1) {
       setStatus(`Matched ${matches.length} leads — showing top match`, 'ok')
+    } else if (matchedBy === 'search') {
+      setStatus(`Matched via subject/name search${searchQuery ? `: ${searchQuery}` : ''}`, 'ok')
     }
   } catch (err) {
     if (err.message === 'not_signed_in') {
