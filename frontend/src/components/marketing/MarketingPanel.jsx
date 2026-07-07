@@ -19,6 +19,8 @@ import WorkEmailOptions from '../team/WorkEmailOptions'
 import { LOADING_MESSAGES } from '../../lib/loadingQuotes'
 import { leadHasCallablePhone } from '../../lib/phoneUtils'
 import useIsMobile from '../../hooks/useIsMobile'
+import { useAudiencePreview } from '../../hooks/useAudiencePreview'
+import { formatAudienceEligibilityLine } from '../../lib/marketingCampaignChecklist'
 import MarketingCampaignSetupFields from './MarketingCampaignSetupFields'
 import MarketingCampaignWizardModal from './MarketingCampaignWizardModal'
 import MarketingHubShell from './MarketingHubShell'
@@ -174,6 +176,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
     design: { ...DEFAULT_THEME },
     step2Design: { ...DEFAULT_THEME },
   })
+  const { audiencePreview, audiencePreviewLoading } = useAudiencePreview(campaignForm)
   const totalContacts = useMemo(() => {
     const fromSummary = summary?.enrolled
     if (fromSummary != null) return fromSummary
@@ -1102,6 +1105,16 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
               onTestSend={handleTestSend}
               testSendBusy={busy}
             />
+            {audiencePreviewLoading ? (
+              <p className="text-xs text-slate-500 mt-2">Checking audience eligibility…</p>
+            ) : formatAudienceEligibilityLine(audiencePreview) ? (
+              <p className="text-xs text-slate-600 mt-2">{formatAudienceEligibilityLine(audiencePreview)}</p>
+            ) : null}
+            {audiencePreview?.eligible === 0 && audiencePreview?.total > 0 ? (
+              <p className="text-xs text-amber-700 mt-1">
+                No eligible recipients — fix consent, email, or suppression before sending.
+              </p>
+            ) : null}
             <div className="marketing-mobile-setup-actions">
               <button type="button" onClick={resetCampaignForm} className="crm-btn crm-btn-secondary">
                 Start fresh
@@ -1163,7 +1176,10 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
               setCampaignEmailStep={setCampaignEmailStep}
               forms={forms}
               lists={lists}
+              segments={segments}
               templates={templates}
+              audiencePreview={audiencePreview}
+              audiencePreviewLoading={audiencePreviewLoading}
               busy={busy}
               canSaveCampaignDraft={canSaveCampaignDraft}
               saveHint={campaignSaveHint}

@@ -1,9 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
-import { api } from '../../lib/api'
 import { renderEmailCanvasHtml, STARTER_TEMPLATES } from '../../lib/marketingEmailDesign'
 import {
   audienceCount,
-  audienceLabel,
   canSendCampaign,
   checklistProgress,
   defaultFromFields,
@@ -12,6 +10,7 @@ import {
   stepSummary,
   visibleChecklistSteps,
 } from '../../lib/marketingCampaignChecklist'
+import { useAudiencePreview } from '../../hooks/useAudiencePreview'
 import { marketingOptionLabel } from './MarketingCreatorBadge'
 import MarketingTemplateMarketplace from './MarketingTemplateMarketplace'
 import MarketingSendConfirmModal from './MarketingSendConfirmModal'
@@ -73,8 +72,7 @@ export default function MarketingCampaignChecklistBuilder({
   const [sendConfirmOpen, setSendConfirmOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [mobilePreview, setMobilePreview] = useState(false)
-  const [audiencePreview, setAudiencePreview] = useState(null)
-  const [audiencePreviewLoading, setAudiencePreviewLoading] = useState(false)
+  const { audiencePreview, audiencePreviewLoading } = useAudiencePreview(campaignForm)
 
   const gmailConnected = Boolean(gmailStatus?.connected)
   const progress = useMemo(
@@ -109,43 +107,6 @@ export default function MarketingCampaignChecklistBuilder({
   const channelLists = lists.filter((l) => (l.channel || 'email') === campaignForm.channel)
   const channelSegments = segments.filter((s) => (s.channel || 'email') === campaignForm.channel)
   const audienceMode = campaignForm.audienceMode || (campaignForm.segmentId ? 'segment' : campaignForm.listId ? 'list' : 'all')
-
-  useEffect(() => {
-    const canPreview =
-      audienceMode === 'all' ||
-      (audienceMode === 'segment' && campaignForm.segmentId) ||
-      (audienceMode === 'list' && campaignForm.listId)
-    if (!canPreview) {
-      setAudiencePreview(null)
-      return undefined
-    }
-    let cancelled = false
-    const timer = setTimeout(async () => {
-      setAudiencePreviewLoading(true)
-      try {
-        const data = await api.previewMarketingAudience({
-          audienceMode,
-          listId: campaignForm.listId || undefined,
-          segmentId: campaignForm.segmentId || undefined,
-          channel: campaignForm.channel || 'email',
-        })
-        if (!cancelled) setAudiencePreview(data)
-      } catch {
-        if (!cancelled) setAudiencePreview(null)
-      } finally {
-        if (!cancelled) setAudiencePreviewLoading(false)
-      }
-    }, 400)
-    return () => {
-      cancelled = true
-      clearTimeout(timer)
-    }
-  }, [
-    audienceMode,
-    campaignForm.listId,
-    campaignForm.segmentId,
-    campaignForm.channel,
-  ])
 
   const applyStarter = (tpl) => {
     if (!tpl) return

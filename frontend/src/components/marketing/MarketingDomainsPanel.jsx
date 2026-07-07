@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { api } from '../../lib/api'
 import CrmGmailConnectCard from '../team/CrmGmailConnectCard'
 import MarketingSuppressionPanel from './MarketingSuppressionPanel'
+import MarketingSendInfraCard from './MarketingSendInfraCard'
 
 function DnsRecordBlock({ title, type, name, value }) {
   const copy = () => {
@@ -112,6 +113,7 @@ export default function MarketingDomainsPanel({ user, permissions }) {
         <section className="mhub-v3-card mhub-v3-domain-section">
           <MarketingSuppressionPanel user={user} permissions={permissions} />
         </section>
+        <MarketingSendInfraCard />
       </div>
     )
   }
@@ -245,6 +247,8 @@ export default function MarketingDomainsPanel({ user, permissions }) {
       <section className="mhub-v3-card mhub-v3-domain-section">
         <MarketingSuppressionPanel user={user} permissions={permissions} />
       </section>
+
+      <MarketingSendInfraCard />
     </div>
   )
 }

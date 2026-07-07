@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import MarketingTemplateBuilder, { FOLLOW_UP_STARTER } from './MarketingTemplateBuilder'
+import { audienceLabel, formatAudienceEligibilityLine } from '../../lib/marketingCampaignChecklist'
+
 const PAGE_LABELS = ['Design', 'Follow-up', 'Review']
 
 export default function MarketingCampaignWizardModal({
@@ -11,7 +13,10 @@ export default function MarketingCampaignWizardModal({
   setCampaignEmailStep,
   forms,
   lists,
+  segments = [],
   templates,
+  audiencePreview,
+  audiencePreviewLoading,
   busy,
   canSaveCampaignDraft,
   saveHint = null,
@@ -26,8 +31,8 @@ export default function MarketingCampaignWizardModal({
   const [stepError, setStepError] = useState(null)
   const pageCount = 3
 
-  const listLabel =
-    lists.find((l) => l.id === campaignForm.listId)?.name || '—'
+  const audienceName = audienceLabel(campaignForm, lists, segments) || '—'
+  const eligibilityLine = formatAudienceEligibilityLine(audiencePreview)
   const tplLabel = campaignForm.templateId
     ? templates.find((t) => t.id === campaignForm.templateId)?.name || 'Template'
     : 'Custom design'
@@ -68,12 +73,11 @@ export default function MarketingCampaignWizardModal({
   const goNext = () => {
     setStepError(null)
     if (page === 0) {
-      const isWa = campaignForm.channel === 'whatsapp'
       if (!campaignForm.blocks?.length && !campaignForm.body.trim()) {
-        setStepError(isWa ? 'Add message content (blocks or text).' : 'Add at least one block to your email.')
+        setStepError('Add at least one block to your email.')
         return
       }
-      if (!isWa && !campaignForm.subject.trim()) {
+      if (!campaignForm.subject.trim()) {
         setStepError('Enter a subject line at the top of the Design step.')
         return
       }
@@ -101,8 +105,8 @@ export default function MarketingCampaignWizardModal({
 
   if (!open) return null
 
-  const isWa = campaignForm.channel === 'whatsapp'
   const page2Active = campaignForm.useSequence
+  const sendBlocked = audiencePreview?.eligible === 0
 
   return createPortal(
     <div className="marketing-wizard-overlay" role="dialog" aria-modal="true" aria-label="Campaign builder">
@@ -156,7 +160,7 @@ export default function MarketingCampaignWizardModal({
                   fillHeight={false}
                   showNameField={false}
                   showSavedTemplates={false}
-                  title={isWa ? 'WhatsApp message' : 'Email design'}
+                  title="Email design"
                   value={{
                     subject: campaignForm.subject,
                     blocks: campaignForm.blocks,
@@ -189,12 +193,8 @@ export default function MarketingCampaignWizardModal({
                   fillHeight={false}
                   showNameField={false}
                   showSavedTemplates={false}
-                  title={isWa ? 'Follow-up WhatsApp' : 'Follow-up email'}
-                  starterOptions={
-                    isWa
-                      ? undefined
-                      : [{ id: 'followup', name: 'Follow-up check-in', ...FOLLOW_UP_STARTER }]
-                  }
+                  title="Follow-up email"
+                  starterOptions={[{ id: 'followup', name: 'Follow-up check-in', ...FOLLOW_UP_STARTER }]}
                   value={{
                     subject: campaignForm.step2Subject,
                     blocks: campaignForm.step2Blocks,
@@ -231,20 +231,18 @@ export default function MarketingCampaignWizardModal({
                           ...p,
                           useSequence: checked,
                           step2Blocks:
-                            checked && !p.step2Blocks?.length && !isWa
+                            checked && !p.step2Blocks?.length
                               ? FOLLOW_UP_STARTER.blocks.map((b) => ({
                                   ...b,
                                   id: `blk-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
                                 }))
                               : p.step2Blocks,
                           step2Subject:
-                            checked && !p.step2Subject && !isWa
-                              ? FOLLOW_UP_STARTER.subject
-                              : p.step2Subject,
+                            checked && !p.step2Subject ? FOLLOW_UP_STARTER.subject : p.step2Subject,
                         }))
                       }}
                     />
-                    Add follow-up {isWa ? 'WhatsApp' : 'email'}
+                    Add follow-up email
                   </label>
                   {campaignForm.useSequence && (
                     <label className="flex items-center gap-2 text-xs text-gray-600">
@@ -290,23 +288,28 @@ export default function MarketingCampaignWizardModal({
                     <dd>{campaignForm.name.trim() || '—'}</dd>
                   </div>
                   <div>
-                    <dt>Channel</dt>
-                    <dd>{isWa ? 'WhatsApp' : 'Email'}</dd>
+                    <dt>Audience</dt>
+                    <dd>{audienceName}</dd>
                   </div>
+                  {audiencePreviewLoading ? (
+                    <div>
+                      <dt>Eligible</dt>
+                      <dd>Checking consent…</dd>
+                    </div>
+                  ) : eligibilityLine ? (
+                    <div>
+                      <dt>Eligible</dt>
+                      <dd>{eligibilityLine}</dd>
+                    </div>
+                  ) : null}
                   <div>
-                    <dt>List</dt>
-                    <dd>{listLabel}</dd>
-                  </div>
-                  <div>
-                    <dt>Starter</dt>
+                    <dt>Template</dt>
                     <dd>{tplLabel}</dd>
                   </div>
-                  {!isWa && (
-                    <div>
-                      <dt>Subject</dt>
-                      <dd>{campaignForm.subject.trim() || '—'}</dd>
-                    </div>
-                  )}
+                  <div>
+                    <dt>Subject</dt>
+                    <dd>{campaignForm.subject.trim() || '—'}</dd>
+                  </div>
                   <div>
                     <dt>Follow-up</dt>
                     <dd>
@@ -363,10 +366,10 @@ export default function MarketingCampaignWizardModal({
               <button
                 type="button"
                 className="crm-btn crm-btn-primary"
-                disabled={busy || !canSaveCampaignDraft}
+                disabled={busy || !canSaveCampaignDraft || sendBlocked}
                 onClick={() => void onSend?.()}
               >
-                {busy ? 'Working…' : isWa ? 'Send WhatsApp' : 'Send campaign'}
+                {busy ? 'Working…' : 'Send campaign'}
               </button>
             </div>
           )}

@@ -61,6 +61,7 @@
     "marketing:queue-worker": "node scripts/marketing-queue-worker.mjs",
     "infra:verify": "node scripts/infra-verify.mjs",
     "test": "node --test 'lib/**/*.test.js' 'lib/server/**/*.test.js'",
+    "test:e2e": "playwright test",
     "rbac:audit": "node scripts/rbac-handler-audit.mjs",
     "blueprint:phase2": "node scripts/blueprint-phase2.mjs",
     "tenant:audit": "node scripts/tenant-audit.mjs",
@@ -71,5 +72,8 @@
     "railway:connect": "node scripts/railway-connect.mjs",
     "build:standalone": "cd frontend && STANDALONE=1 npm run build",
     "open": "open index.html 2>/dev/null || xdg-open index.html 2>/dev/null || echo 'Open index.html in your browser'"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.52.0"
   }
 }
