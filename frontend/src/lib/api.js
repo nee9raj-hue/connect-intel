@@ -550,6 +550,25 @@ export const api = {
     const q = params.toString()
     return request(`/api/org/audit-log${q ? `?${q}` : ''}`)
   },
+  getOrgEmailSends: ({ limit = 50, source, leadId } = {}) => {
+    const params = new URLSearchParams()
+    if (limit) params.set('limit', String(limit))
+    if (source) params.set('source', source)
+    if (leadId) params.set('leadId', leadId)
+    const q = params.toString()
+    return request(`/api/org/email-sends${q ? `?${q}` : ''}`)
+  },
+  getCrmDeals: ({ q = '', dealStage = 'all', limit = 50, offset = 0, dealId } = {}) => {
+    const params = new URLSearchParams({
+      dealStage,
+      limit: String(limit),
+      offset: String(offset),
+    })
+    if (q) params.set('q', q)
+    if (dealId) params.set('dealId', dealId)
+    return request(`/api/crm/deals?${params}`, { timeoutMs: 45_000 })
+  },
+  patchCrmDeal: (body) => request('/api/crm/deals', { method: 'PATCH', body, timeoutMs: 30_000 }),
   getWorkflowRuns: ({ limit = 50, trigger, leadId } = {}) => {
     const params = new URLSearchParams()
     if (limit) params.set('limit', String(limit))

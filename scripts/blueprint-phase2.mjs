@@ -75,6 +75,9 @@ try {
   if (health.infra?.auditEvents) pass('Production: audit_events enabled')
   else console.log('  · audit_events: disabled or Supabase off')
 
+  if (health.infra?.emailSends) pass('Production: email_sends enabled')
+  else console.log('  · email_sends: disabled or table not migrated')
+
   if (health.infra?.pipelineDealsTable) pass('Production: pipeline_deals SQL path')
   if (health.infra?.pipelineCompaniesTable) pass('Production: pipeline_companies SQL path')
 
