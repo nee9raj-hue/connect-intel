@@ -1,4 +1,140 @@
-/* Connect Intel AI — full workspace panel (replaces floating chat FAB) */
+/* Connect Intel AI — CRM panel + smart floating FAB */
+
+.ci-ai-fab {
+  position: fixed;
+  z-index: 78;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.ci-ai-fab:hover {
+  transform: translateY(-2px);
+}
+
+.ci-ai-fab.is-open {
+  z-index: 92;
+}
+
+.ci-ai-fab__glow {
+  position: absolute;
+  inset: -4px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.35), transparent 70%);
+  opacity: 0.85;
+  pointer-events: none;
+  animation: ci-ai-fab-pulse 2.8s ease-in-out infinite;
+}
+
+.ci-ai-fab.is-open .ci-ai-fab__glow {
+  opacity: 0.4;
+  animation: none;
+}
+
+@keyframes ci-ai-fab-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.75;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+
+.ci-ai-fab__inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  background: linear-gradient(145deg, #17191c 0%, #1e293b 100%);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  box-shadow:
+    0 8px 24px rgba(15, 23, 42, 0.28),
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+  color: #fff;
+}
+
+.ci-ai-fab.is-open .ci-ai-fab__inner {
+  background: #334155;
+}
+
+.ci-ai-fab__close {
+  font-size: 1.25rem;
+  line-height: 1;
+  font-weight: 500;
+}
+
+.ci-ai-fab__label {
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #475569;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+  pointer-events: none;
+}
+
+.ci-ai-fab.is-shifted .ci-ai-fab__label {
+  display: none;
+}
+
+.ci-ai-mode-bar {
+  display: flex;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #0f172a;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+  shrink: 0;
+}
+
+.ci-ai-mode-bar__btn {
+  flex: 1;
+  padding: 7px 10px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 8px;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.ci-ai-mode-bar__btn:hover {
+  color: #e2e8f0;
+  border-color: rgba(148, 163, 184, 0.45);
+}
+
+.ci-ai-mode-bar__btn.is-active {
+  background: rgba(99, 102, 241, 0.2);
+  border-color: rgba(129, 140, 248, 0.55);
+  color: #e0e7ff;
+}
+
+.ci-ai-mode-bar__dot {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-left: 4px;
+  border-radius: 999px;
+  background: #f59e0b;
+  vertical-align: middle;
+}
 
 .ci-ai-backdrop {
   position: fixed;
@@ -61,8 +197,8 @@
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  background: linear-gradient(135deg, #ffcb2b 0%, #f59e0b 100%);
-  color: #17191c;
+  background: #0f172a;
+  border: 1px solid rgba(148, 163, 184, 0.25);
   shrink: 0;
 }
 

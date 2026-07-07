@@ -918,7 +918,12 @@ export const api = {
   sendAssistantMessage: (message, uiContext = {}) =>
     request('/api/assistant/chat', {
       method: 'POST',
-      body: { message, panel: uiContext.panel, tab: uiContext.tab },
+      body: {
+        message,
+        panel: uiContext.panel,
+        tab: uiContext.tab,
+        mode: uiContext.mode,
+      },
     }),
   escalateAssistantSupport: (payload) =>
     request('/api/assistant/chat', { method: 'POST', body: { action: 'escalate', ...payload } }),

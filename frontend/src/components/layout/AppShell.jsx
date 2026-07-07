@@ -25,6 +25,7 @@ import SessionReconnectBanner from './SessionReconnectBanner'
 import GmailSetupModal, { markGmailSetupDone, useGmailSetupNeeded } from '../onboarding/GmailSetupModal'
 import { GMAIL_ONBOARDING_PROMPT_ENABLED } from '../../lib/crmProductFlags'
 import ConnectAssistant, { ConnectAIButton } from '../assistant/ConnectAssistant'
+import ConnectAIFab from '../assistant/ConnectAIFab'
 import CommandPalette from '../platform/CommandPalette'
 import MobileNavPill from './MobileNavPill'
 import EmailSendDock from '../crm/EmailSendDock'
@@ -434,6 +435,14 @@ export default function AppShell() {
       {needsOnboarding && <OnboardingModal />}
       {GMAIL_ONBOARDING_PROMPT_ENABLED && needsGmailSetup && !needsOnboarding && (
         <GmailSetupModal onDone={() => setNeedsGmailSetup(false)} />
+      )}
+      {user && !needsOnboarding && !user.isPlatformAdmin && (
+        <ConnectAIFab
+          open={aiOpen}
+          onOpen={() => setAiOpen((v) => !v)}
+          isMobile={isMobile}
+          mobilePillVisible={showMobileNavPill && mobilePillVisible}
+        />
       )}
       {user && !needsOnboarding && (
         <ConnectAssistant

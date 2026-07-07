@@ -167,7 +167,7 @@ export default function MarketingHubShell({
         </button>
         <button type="button" className="mc-nav__exit" onClick={() => openConnectAI()}>
           <BoltIcon className="mc-nav__icon" />
-          {!collapsed ? <span>Ask AI</span> : null}
+          {!collapsed ? <span>CRM AI</span> : null}
         </button>
       </div>
     </aside>

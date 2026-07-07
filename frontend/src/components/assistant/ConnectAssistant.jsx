@@ -3,40 +3,29 @@ import { useApp } from '../../context/AppContext'
 import useIsMobile from '../../hooks/useIsMobile'
 import { api } from '../../lib/api'
 import { applyAssistantAction } from '../../lib/assistantNavigation'
-import { ASSISTANT_QUICK_PROMPTS } from '../../lib/assistantQuickPrompts'
 import { CI_OPEN_AI_EVENT } from '../../lib/openConnectAI'
+import { CrmAiIcon } from './ConnectAIFab'
 
-const CAPABILITY_AREAS = [
-  { id: 'crm', label: 'CRM & Pipeline', prompt: 'How does Pipeline bulk email work?' },
-  { id: 'marketing', label: 'Marketing Hub', prompt: 'CRM vs Marketing email?' },
-  { id: 'setup', label: 'Gmail & setup', prompt: 'How do I connect work Gmail?' },
-  { id: 'team', label: 'Team', prompt: 'How do I invite a teammate?' },
+const CRM_PROMPTS = [
+  'CRM vs Marketing email?',
+  'How many leads in my pipeline?',
+  'How do I connect work Gmail?',
+  'Bulk email from Pipeline',
 ]
 
-function SparklesIcon({ className = 'w-5 h-5' }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden>
-      <path
-        d="M12 2l1.4 4.2L17.6 8 13.4 9.4 12 13.6 10.6 9.4 6.4 8l4.2-1.8L12 2Z"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M5 14l.9 2.7L8.6 18l-2.7.9L5 21.6 3.4 18.9.7 18l2.7-.9L5 14Z"
-        stroke="currentColor"
-        strokeWidth="1.3"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M19 12l.7 2.1 2.1.7-2.1.7L19 17.6l-.7-2.1-2.1-.7 2.1-.7L19 12Z"
-        stroke="currentColor"
-        strokeWidth="1.3"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
+const RESEARCH_PROMPTS = [
+  'Research this company on the web',
+  'Find LinkedIn profile for a contact',
+  'Amazon best sellers in this category',
+  'Latest news about a prospect company',
+]
+
+const CAPABILITY_AREAS = [
+  { id: 'crm', label: 'CRM help', prompt: 'How does Pipeline bulk email work?' },
+  { id: 'marketing', label: 'Marketing', prompt: 'CRM vs Marketing email?' },
+  { id: 'research', label: 'Web research', prompt: 'Research a company on LinkedIn' },
+  { id: 'setup', label: 'Gmail setup', prompt: 'How do I connect work Gmail?' },
+]
 
 function renderSimpleMarkdown(text) {
   const parts = String(text || '').split(/(\*\*[^*]+\*\*)/g)
@@ -99,7 +88,9 @@ export default function ConnectAssistant({
   const [loading, setLoading] = useState(false)
   const [escalating, setEscalating] = useState(false)
   const [status, setStatus] = useState(null)
-  const [suggestions, setSuggestions] = useState(ASSISTANT_QUICK_PROMPTS)
+  const [suggestions, setSuggestions] = useState(CRM_PROMPTS)
+  const [aiMode, setAiMode] = useState('crm')
+  const [webResearchAvailable, setWebResearchAvailable] = useState(false)
   const [showRaiseForm, setShowRaiseForm] = useState(false)
   const [concernText, setConcernText] = useState('')
   const bottomRef = useRef(null)
@@ -108,6 +99,7 @@ export default function ConnectAssistant({
   const uiContext = {
     panel: activePanel || null,
     tab: panelOptions?.tab || null,
+    mode: aiMode,
   }
 
   const loadHistory = useCallback(async () => {
@@ -116,6 +108,7 @@ export default function ConnectAssistant({
       setMessages(data.messages || [])
       setThreadId(data.threadId || null)
       setMyTickets(data.myTickets || [])
+      setWebResearchAvailable(Boolean(data.webResearchAvailable))
       const lastAssistant = [...(data.messages || [])].reverse().find((m) => m.role === 'assistant')
       if (lastAssistant?.suggestions?.length) {
         setSuggestions(lastAssistant.suggestions)
@@ -239,13 +232,25 @@ export default function ConnectAssistant({
         if (data.myTickets?.length) setMyTickets(data.myTickets)
       } catch (err) {
         setMessages((prev) => prev.filter((m) => m.id !== optimistic.id))
-        setStatus(err.message || 'Could not reach Connect Intel AI')
+        setStatus(err.message || 'Could not reach CRM AI')
       } finally {
         setLoading(false)
       }
     },
-    [loading, loadHistory, uiContext]
+    [loading, loadHistory, uiContext, aiMode]
   )
+
+  const onCapabilityClick = (cap) => {
+    if (cap.id === 'research') {
+      setAiMode('research')
+      setSuggestions(RESEARCH_PROMPTS)
+      sendMessage(cap.prompt)
+      return
+    }
+    setAiMode('crm')
+    setSuggestions(CRM_PROMPTS)
+    sendMessage(cap.prompt)
+  }
 
   if (!user || user.isPlatformAdmin) return null
 
@@ -258,7 +263,7 @@ export default function ConnectAssistant({
         <button
           type="button"
           className="ci-ai-backdrop"
-          aria-label="Close Connect Intel AI"
+          aria-label="Close CRM AI"
           onClick={() => onOpenChange?.(false)}
         />
       )}
@@ -266,17 +271,17 @@ export default function ConnectAssistant({
       <aside
         className={`ci-ai-panel connect-assistant-panel${open ? ' is-open' : ''}${isMobile ? ' ci-ai-panel--mobile' : ''}`}
         role="dialog"
-        aria-label="Connect Intel AI"
+        aria-label="CRM AI"
         aria-hidden={!open}
       >
         <header className="ci-ai-panel__head">
           <div className="ci-ai-panel__brand">
             <span className="ci-ai-panel__icon" aria-hidden>
-              <SparklesIcon className="w-5 h-5" />
+              <CrmAiIcon className="w-5 h-5" />
             </span>
             <div className="min-w-0">
-              <p className="ci-ai-panel__title">Connect Intel AI</p>
-              <p className="ci-ai-panel__sub">CRM & Marketing expert · constitution-aligned</p>
+              <p className="ci-ai-panel__title">CRM AI</p>
+              <p className="ci-ai-panel__sub">Product expert · live web research</p>
             </div>
           </div>
           <button
@@ -288,6 +293,31 @@ export default function ConnectAssistant({
             ✕
           </button>
         </header>
+
+        <div className="ci-ai-mode-bar">
+          <button
+            type="button"
+            className={`ci-ai-mode-bar__btn${aiMode === 'crm' ? ' is-active' : ''}`}
+            onClick={() => {
+              setAiMode('crm')
+              setSuggestions(CRM_PROMPTS)
+            }}
+          >
+            CRM help
+          </button>
+          <button
+            type="button"
+            className={`ci-ai-mode-bar__btn${aiMode === 'research' ? ' is-active' : ''}`}
+            onClick={() => {
+              setAiMode('research')
+              setSuggestions(RESEARCH_PROMPTS)
+            }}
+            title={webResearchAvailable ? 'Search the web' : 'Web research requires server setup'}
+          >
+            Web research
+            {!webResearchAvailable ? <span className="ci-ai-mode-bar__dot" /> : null}
+          </button>
+        </div>
 
         <div className="ci-ai-panel__body">
           {activeTickets.length > 0 && (
@@ -309,11 +339,11 @@ export default function ConnectAssistant({
           {showWelcome && (
             <div className="ci-ai-welcome">
               <p className="ci-ai-welcome__hi">
-                Hi{user.name ? `, ${user.name.split(' ')[0]}` : ''} — I know your CRM and Marketing Hub.
+                Hi{user.name ? `, ${user.name.split(' ')[0]}` : ''} — I&apos;m your CRM AI.
               </p>
               <p className="ci-ai-welcome__copy">
-                Ask how anything works, your Pipeline counts, Gmail status, campaigns, forms, or consent rules. I
-                follow Connect Intel&apos;s constitution — no spam, no bypassing opt-in.
+                **CRM help** uses your workspace data and product knowledge (constitution-aligned).
+                **Web research** searches LinkedIn, Amazon, news, and the open web for B2B context.
               </p>
               <div className="ci-ai-capabilities">
                 {CAPABILITY_AREAS.map((c) => (
@@ -322,7 +352,7 @@ export default function ConnectAssistant({
                     type="button"
                     className="ci-ai-capabilities__chip"
                     disabled={loading}
-                    onClick={() => sendMessage(c.prompt)}
+                    onClick={() => onCapabilityClick(c)}
                   >
                     {c.label}
                   </button>
@@ -405,7 +435,11 @@ export default function ConnectAssistant({
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask about CRM, Marketing, your data…"
+              placeholder={
+                aiMode === 'research'
+                  ? 'Research company, LinkedIn, Amazon, news…'
+                  : 'Ask about CRM, Marketing, your data…'
+              }
               className="ci-ai-compose__input"
               disabled={loading}
               maxLength={2000}
@@ -439,11 +473,11 @@ export function ConnectAIButton({ onClick, compact = false }) {
       type="button"
       onClick={onClick}
       className={`ci-ai-trigger${compact ? ' ci-ai-trigger--compact' : ''}`}
-      aria-label="Open Connect Intel AI"
-      title="Connect Intel AI (⌘/)"
+      aria-label="Open CRM AI"
+      title="CRM AI (⌘/)"
     >
-      <SparklesIcon className={compact ? 'w-4 h-4' : 'w-4 h-4'} />
-      {!compact && <span>Ask AI</span>}
+      <CrmAiIcon className="w-4 h-4" />
+      {!compact && <span>CRM AI</span>}
       {!compact && <kbd className="ci-ai-trigger__kbd">⌘/</kbd>}
     </button>
   )
