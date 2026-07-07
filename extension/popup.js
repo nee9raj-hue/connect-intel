@@ -58,7 +58,7 @@ async function loadPageCapture(tab) {
   try {
     const [{ result }] = await chrome.scripting.executeScript({
       target: { tabId: tab.id },
-      files: ['lib/pageCapture.js'],
+      files: ['lib/linkedinCaptureParse.js', 'lib/pageCapture.js'],
       func: async () => {
         const ready = globalThis.__connectIntelExtractPageReady
         const snap = globalThis.__connectIntelExtractPage
@@ -87,12 +87,16 @@ function renderLeadCard(match) {
 function renderCapturePreview(fields) {
   captureFields = fields
   const name = [fields.firstName, fields.lastName].filter(Boolean).join(' ')
+  const location = fields.location || [fields.city, fields.state].filter(Boolean).join(', ')
   leadEl.hidden = false
   leadEl.innerHTML = `
     <div class="lead">${name || fields.company || 'New lead'}</div>
     <div class="muted">${fields.title || ''}</div>
     <div class="muted">${fields.company || ''}</div>
+    <div class="muted">${location || ''}</div>
     <div class="muted">${fields.email || ''}</div>
+    <div class="muted">${fields.phone || ''}</div>
+    <div class="muted">${fields.linkedin || ''}</div>
   `
   actionsEl.hidden = false
   primaryActionEl.textContent = 'Add to pipeline'

@@ -1,8 +1,9 @@
 /**
  * Extract capture fields from LinkedIn profiles and generic web pages.
  * Constitution: visible page metadata only — no hidden DOM scraping beyond active tab.
- * NOTE: Content scripts are classic scripts (no export/import).
  */
+
+const parseApi = () => globalThis.__connectIntelLinkedInParse || {}
 
 function firstText(selectors, root = document) {
   for (const selector of selectors) {
@@ -17,36 +18,19 @@ function firstText(selectors, root = document) {
   return ''
 }
 
-function parseHeadline(headline = '') {
-  const value = String(headline || '').trim()
-  if (!value) return { title: '', company: '' }
-
-  const atMatch = value.match(/^(.+?)\s+at\s+(.+)$/i)
-  if (atMatch) {
-    return { title: atMatch[1].trim(), company: atMatch[2].trim() }
+function allText(selectors, root = document) {
+  const out = []
+  for (const selector of selectors) {
+    try {
+      for (const el of root.querySelectorAll(selector)) {
+        const text = el?.textContent?.trim()
+        if (text) out.push(text)
+      }
+    } catch {
+      /* ignore */
+    }
   }
-
-  const pipeParts = value.split('|').map((p) => p.trim()).filter(Boolean)
-  if (pipeParts.length >= 2) {
-    return { title: pipeParts[0], company: pipeParts[pipeParts.length - 1] }
-  }
-
-  return { title: value, company: '' }
-}
-
-function splitPersonName(fullName = '') {
-  const parts = String(fullName || '')
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean)
-  if (!parts.length) return { firstName: '', lastName: '' }
-  return { firstName: parts[0], lastName: parts.slice(1).join(' ') }
-}
-
-function findEmailOnPage() {
-  const text = document.body?.innerText?.slice(0, 120_000) || ''
-  const match = text.match(/[\w.+-]+@[\w.-]+\.[a-z]{2,}/i)
-  return match ? match[0].toLowerCase() : ''
+  return out
 }
 
 function isLinkedInProfileUrl(url = '') {
@@ -123,42 +107,192 @@ function findLinkedInHeadline() {
   return ''
 }
 
-function findLinkedInCurrentCompany() {
+function isNoiseLocationText(text = '') {
+  return /connection|follower|contact info|^\d+\+?$/i.test(String(text || '').trim())
+}
+
+function findLinkedInLocation() {
+  const candidates = allText(
+    [
+      '.pv-text-details__left-panel span.text-body-small',
+      'main section:first-of-type span.text-body-small',
+      'span.text-body-small.inline.t-black--light.break-words',
+      '.text-body-small.inline.t-black--light',
+      'div.pv-top-card--list-bullet span',
+      'li.text-body-small span',
+    ],
+    document.querySelector('main') || document
+  )
+
+  for (const text of candidates) {
+    if (!text || text.length > 120) continue
+    if (isNoiseLocationText(text)) continue
+    if (/\b(area|india|metropolitan|region)\b/i.test(text) || text.includes(',')) return text
+  }
+
+  return ''
+}
+
+function findLinkedInCompanyFromLinks() {
+  const { cleanCompanyLabel } = parseApi()
+  const clean = cleanCompanyLabel || ((v) => String(v || '').trim())
+
+  const links = document.querySelectorAll('a[href*="/company/"]')
+  for (const a of links) {
+    const label =
+      a.querySelector('span[aria-hidden="true"]')?.textContent?.trim() ||
+      a.getAttribute('aria-label') ||
+      a.textContent?.trim()
+    const company = clean(label)
+    if (company && company.length >= 2 && company.length <= 120 && !/logo|company page/i.test(company)) {
+      return company
+    }
+  }
+  return ''
+}
+
+function findLinkedInCurrentCompanyButton() {
+  const { cleanCompanyLabel } = parseApi()
+  const clean = cleanCompanyLabel || ((v) => String(v || '').trim())
+
   const buttonLabel = firstText([
     'button[aria-label*="Current company"]',
     'button[aria-label*="current company"]',
   ])
-  if (buttonLabel) {
-    const cleaned = buttonLabel
-      .replace(/^current company:\s*/i, '')
-      .replace(/\.\s*click.*$/i, '')
-      .trim()
-    if (cleaned) return cleaned
+  if (buttonLabel) return clean(buttonLabel)
+  return ''
+}
+
+function findLinkedInTopExperience() {
+  const section =
+    document.querySelector('#experience')?.closest('section') ||
+    document.querySelector('section[data-section="experience"]') ||
+    document.querySelector('section:has(#experience)')
+
+  if (!section) return { title: '', company: '' }
+
+  const item = section.querySelector('li, .pvs-list__paged-list-item, .artdeco-list__item')
+  if (!item) return { title: '', company: '' }
+
+  const lines = [...item.querySelectorAll('span[aria-hidden="true"]')]
+    .map((el) => el.textContent?.trim())
+    .filter(Boolean)
+
+  const companyLink = item.querySelector('a[href*="/company/"] span[aria-hidden="true"]')
+  const companyFromLink = companyLink?.textContent?.trim() || ''
+
+  return {
+    title: lines[0] || '',
+    company: companyFromLink || lines[1] || '',
+  }
+}
+
+function findLinkedInIndustry() {
+  const industry = firstText([
+    '#industry ~ div span',
+    'section[data-section="industry"] span',
+    'button[aria-label*="Industry"]',
+  ])
+  return industry.replace(/^industry:\s*/i, '').trim()
+}
+
+function findLinkedInEducationNote() {
+  const section =
+    document.querySelector('#education')?.closest('section') ||
+    document.querySelector('section[data-section="education"]')
+  if (!section) return ''
+
+  const school = section.querySelector('a[href*="/school/"] span[aria-hidden="true"]')
+  const degree = section.querySelector('span.t-14.t-normal span[aria-hidden="true"]')
+  const parts = [school?.textContent?.trim(), degree?.textContent?.trim()].filter(Boolean)
+  return parts.length ? `Education: ${parts.join(' · ')}` : ''
+}
+
+function findMailtoTelAndVisibleContacts() {
+  const { findEmailInText, findPhoneInText, normalizePhone } = parseApi()
+  let email = ''
+  let phone = ''
+
+  for (const a of document.querySelectorAll('a[href^="mailto:"], a[href^="tel:"]')) {
+    const href = a.getAttribute('href') || ''
+    if (!email && href.startsWith('mailto:')) {
+      email = href.replace(/^mailto:/i, '').split('?')[0].trim().toLowerCase()
+    }
+    if (!phone && href.startsWith('tel:')) {
+      phone = normalizePhone ? normalizePhone(href.replace(/^tel:/i, '')) : href.replace(/^tel:/i, '')
+    }
   }
 
-  return firstText([
-    '#experience ~ div li span[aria-hidden="true"]',
-    'section[data-section="experience"] li span[aria-hidden="true"]',
-    'section:has(#experience) li span[aria-hidden="true"]',
-  ])
+  const dialog =
+    document.querySelector('[role="dialog"]') ||
+    document.querySelector('.pv-contact-info') ||
+    document.querySelector('[data-test-modal-id="contact-info"]')
+
+  const contactRoot = dialog || document.body
+  const contactText = contactRoot?.innerText?.slice(0, 40_000) || ''
+
+  if (!email && findEmailInText) email = findEmailInText(contactText)
+  if (!phone && findPhoneInText) phone = findPhoneInText(contactText)
+
+  const pageText = document.body?.innerText?.slice(0, 120_000) || ''
+  if (!email && findEmailInText) email = findEmailInText(pageText)
+  if (!phone && findPhoneInText) phone = findPhoneInText(pageText)
+
+  return { email, phone }
+}
+
+function resolveLinkedInCompany(headlineCompany, experience, linkCompany, buttonCompany) {
+  const { cleanCompanyLabel } = parseApi()
+  const clean = cleanCompanyLabel || ((v) => String(v || '').trim())
+
+  const candidates = [linkCompany, experience?.company, buttonCompany, headlineCompany]
+    .map((c) => clean(c))
+    .filter((c) => c && c.length >= 2 && c.length <= 120)
+
+  for (const c of candidates) {
+    if (!/forbes|consultant|\d+u\d+/i.test(c)) return c
+  }
+  return candidates[0] || ''
+}
+
+function buildLinkedInNotes({ headline, title, education, industry }) {
+  const lines = []
+  if (headline && headline !== title) lines.push(`Headline: ${headline}`)
+  if (industry) lines.push(`Industry: ${industry}`)
+  if (education) lines.push(education)
+  return lines.join('\n').slice(0, 2000)
 }
 
 function extractLinkedInProfile() {
   const url = String(location.href || '').split('?')[0]
   if (!isLinkedInProfileUrl(url)) return null
 
+  const { parseHeadline, splitPersonName, parseLocationToCityState } = parseApi()
+  const parseHeadlineFn = parseHeadline || (() => ({ title: '', company: '' }))
+  const splitNameFn = splitPersonName || (() => ({ firstName: '', lastName: '' }))
+  const parseLocFn = parseLocationToCityState || (() => ({ city: '', state: '', location: '' }))
+
   const name = findLinkedInProfileName()
   const headline = findLinkedInHeadline()
-  const { title, company } = parseHeadline(headline)
-  const { firstName, lastName } = splitPersonName(name)
+  const parsedHeadline = parseHeadlineFn(headline)
+  const experience = findLinkedInTopExperience()
+  const linkCompany = findLinkedInCompanyFromLinks()
+  const buttonCompany = findLinkedInCurrentCompanyButton()
+  const { firstName, lastName } = splitNameFn(name)
 
-  let resolvedCompany = company
-  if (!resolvedCompany) {
-    const experienceCompany = findLinkedInCurrentCompany()
-    if (experienceCompany && experienceCompany.length < 120) {
-      resolvedCompany = experienceCompany
-    }
-  }
+  const title = experience.title || parsedHeadline.title || ''
+  const company = resolveLinkedInCompany(
+    parsedHeadline.company,
+    experience,
+    linkCompany,
+    buttonCompany
+  )
+
+  const locationRaw = findLinkedInLocation()
+  const { city, state, location } = parseLocFn(locationRaw)
+  const industry = findLinkedInIndustry()
+  const education = findLinkedInEducationNote()
+  const { email, phone } = findMailtoTelAndVisibleContacts()
 
   return {
     pageType: 'linkedin_profile',
@@ -166,17 +300,24 @@ function extractLinkedInProfile() {
     firstName,
     lastName,
     title,
-    company: resolvedCompany,
+    company,
+    city,
+    state,
+    location: location || locationRaw,
+    industry: industry || '',
     linkedin: url,
-    email: findEmailOnPage(),
-    notes: headline && headline !== title ? headline : '',
+    email,
+    phone,
+    notes: buildLinkedInNotes({ headline, title, education, industry }),
   }
 }
 
 function extractGenericPage() {
+  const { findEmailInText, findPhoneInText } = parseApi()
   const url = String(location.href || '').split('?')[0]
   const title = String(document.title || '').trim()
   const selection = String(window.getSelection?.()?.toString?.() || '').trim()
+  const pageText = document.body?.innerText?.slice(0, 120_000) || ''
 
   let company = ''
   if (title) {
@@ -195,7 +336,8 @@ function extractGenericPage() {
     sourcePage: url,
     company: company.slice(0, 160),
     companyDomain,
-    email: findEmailOnPage(),
+    email: findEmailInText ? findEmailInText(pageText) : '',
+    phone: findPhoneInText ? findPhoneInText(pageText) : '',
     notes: selection.slice(0, 500),
   }
 }
@@ -213,7 +355,7 @@ function sleep(ms) {
 }
 
 /** LinkedIn is a SPA — profile DOM may render after document_idle. */
-async function extractPageCaptureWhenReady(maxWaitMs = 2500) {
+async function extractPageCaptureWhenReady(maxWaitMs = 4000) {
   const started = Date.now()
   let last = null
 
@@ -221,9 +363,9 @@ async function extractPageCaptureWhenReady(maxWaitMs = 2500) {
     last = extractPageCapture()
     const name = [last?.firstName, last?.lastName].filter(Boolean).join(' ')
     const hasData = Boolean(
-      name || last?.company || last?.title || last?.linkedin || last?.email
+      name || last?.company || last?.title || last?.linkedin || last?.email || last?.city
     )
-    if (hasData) return last
+    if (hasData && (name || last?.company)) return last
     await sleep(400)
   }
 

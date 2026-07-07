@@ -35,6 +35,27 @@ function escapeHtml(value) {
     .replace(/"/g, '&quot;')
 }
 
+function previewRow(label, value) {
+  if (!value) return ''
+  return `<div class="ci-preview__row"><span class="ci-preview__label">${escapeHtml(label)}</span><span>${escapeHtml(value)}</span></div>`
+}
+
+function renderCaptureFields(capture) {
+  const name = [capture.firstName, capture.lastName].filter(Boolean).join(' ')
+  const rows = [
+    previewRow('Name', name),
+    previewRow('Title', capture.title),
+    previewRow('Company', capture.company),
+    previewRow('Location', capture.location || [capture.city, capture.state].filter(Boolean).join(', ')),
+    previewRow('Email', capture.email),
+    previewRow('Phone', capture.phone),
+    previewRow('LinkedIn', capture.linkedin),
+    previewRow('Industry', capture.industry),
+  ].filter(Boolean)
+
+  return rows.length ? rows.join('') : '<div class="ci-preview__row">No fields detected yet.</div>'
+}
+
 class ConnectIntelCaptureWidget {
   constructor() {
     this.open = false
@@ -204,7 +225,18 @@ class ConnectIntelCaptureWidget {
         color: #475569;
       }
       .ci-preview { margin-top: 10px; }
-      .ci-preview__name { font-weight: 700; color: #0f172a; font-size: 13px; }
+      .ci-preview__name { font-weight: 700; color: #0f172a; font-size: 13px; margin-bottom: 8px; }
+      .ci-preview__row {
+        display: grid;
+        grid-template-columns: 72px 1fr;
+        gap: 8px;
+        padding: 4px 0;
+        border-top: 1px solid #f1f5f9;
+        font-size: 11px;
+        line-height: 1.35;
+      }
+      .ci-preview__row:first-child { border-top: 0; }
+      .ci-preview__label { color: #64748b; font-weight: 600; }
       .ci-btn {
         all: unset;
         box-sizing: border-box;
@@ -329,10 +361,7 @@ class ConnectIntelCaptureWidget {
     this.els.preview.hidden = false
     this.els.preview.innerHTML = `
       <div class="ci-preview__name">${escapeHtml(name || this.capture.company || 'New lead')}</div>
-      <div>${escapeHtml(this.capture.title || '')}</div>
-      <div>${escapeHtml(this.capture.company || '')}</div>
-      <div>${escapeHtml(this.capture.email || '')}</div>
-      ${this.capture.linkedin ? `<div>${escapeHtml(this.capture.linkedin)}</div>` : ''}
+      ${renderCaptureFields(this.capture)}
     `
 
     this.els.capture.hidden = !hasMinimum
