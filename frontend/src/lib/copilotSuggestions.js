@@ -77,9 +77,24 @@ export const COPILOT_TABS = [
 ]
 
 export const PROGRESS_STEPS = {
-  copilot: ['Detecting sales intent…', 'Checking CRM…', 'Searching companies…', 'Preparing results…'],
-  market: ['Parsing product & location…', 'Searching TradeIndia & IndiaMART…', 'Cross-checking CRM…', 'Ranking companies…'],
-  crm: ['Querying your pipeline…', 'Loading follow-ups…', 'Summarizing…'],
+  copilot: [
+    'Understanding request…',
+    'Searching CRM…',
+    'Checking duplicate companies…',
+    'Searching public companies…',
+    'Finding decision makers…',
+    'Ranking results…',
+    'Preparing recommendations…',
+  ],
+  market: [
+    'Understanding request…',
+    'Searching CRM…',
+    'Searching verified exporters…',
+    'Finding decision makers…',
+    'Ranking results…',
+    'Preparing CRM-ready results…',
+  ],
+  crm: ['Understanding request…', 'Scanning your pipeline…', 'Preparing recommendations…'],
   actions: ['Understanding request…', 'Preparing action…', 'Ready…'],
 }
 

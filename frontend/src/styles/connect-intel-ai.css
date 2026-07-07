@@ -628,6 +628,22 @@
   margin-bottom: 4px;
 }
 
+.ci-ai-md__section--found {
+  padding-left: 8px;
+  border-left: 3px solid #0d9488;
+  background: #f0fdfa;
+  border-radius: 0 8px 8px 0;
+  margin-bottom: 4px;
+}
+
+.ci-ai-md__section--why {
+  padding-left: 8px;
+  border-left: 3px solid #2563eb;
+  background: #eff6ff;
+  border-radius: 0 8px 8px 0;
+  margin-bottom: 4px;
+}
+
 .ci-ai-md__section--nbsa {
   padding-left: 8px;
   border-left: 3px solid #17191c;
@@ -746,6 +762,60 @@
 .ci-copilot-list__crm--in {
   background: #ede9fe;
   color: #5b21b6;
+}
+
+.ci-copilot-list__tier-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.ci-copilot-list__tier {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.6rem;
+  font-weight: 650;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.ci-copilot-list__tier--top {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.ci-copilot-list__tier--good {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.ci-copilot-list__tier--possible {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.ci-copilot-list__stars {
+  letter-spacing: -1px;
+  font-size: 0.55rem;
+}
+
+.ci-copilot-list__confidence {
+  font-size: 0.58rem;
+  color: #64748b;
+}
+
+.ci-copilot-list__confidence--high {
+  color: #047857;
+}
+
+.ci-copilot-list__reason {
+  margin: 4px 0 0;
+  font-size: 0.62rem;
+  color: #475569;
+  line-height: 1.35;
 }
 
 .ci-copilot-list__meta {

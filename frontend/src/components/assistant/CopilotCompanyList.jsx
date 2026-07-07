@@ -19,6 +19,11 @@ function hostFromUrl(url) {
   }
 }
 
+function starsDisplay(n = 2) {
+  const filled = Math.min(5, Math.max(0, n))
+  return `${'★'.repeat(filled)}${'☆'.repeat(5 - filled)}`
+}
+
 function CompanyRow({ company, onAction }) {
   const name = company.company || company.name
   const website = company.website || company.companyDomain
@@ -49,6 +54,24 @@ function CompanyRow({ company, onAction }) {
           {company.crmStatus || (company.inCrm ? 'In CRM' : 'New')}
         </span>
       </div>
+
+      {company.tierLabel ? (
+        <div className="ci-copilot-list__tier-row">
+          <span className={`ci-copilot-list__tier ci-copilot-list__tier--${company.tier || 'possible'}`}>
+            <span className="ci-copilot-list__stars" aria-hidden>
+              {starsDisplay(company.stars)}
+            </span>
+            {company.tierLabel}
+          </span>
+          {company.confidence ? (
+            <span className={`ci-copilot-list__confidence ci-copilot-list__confidence--${company.confidence}`}>
+              {company.confidence} confidence
+            </span>
+          ) : null}
+        </div>
+      ) : null}
+
+      {company.rankReason ? <p className="ci-copilot-list__reason">{company.rankReason}</p> : null}
 
       <div className="ci-copilot-list__meta">
         {company.city || company.state ? (
@@ -131,14 +154,22 @@ function CompanyRow({ company, onAction }) {
 export default function CopilotCompanyList({ companies, discoveryMeta, onAction }) {
   if (!companies?.length) return null
   const total = discoveryMeta?.total || companies.length
+  const topCount = companies.filter((c) => c.tier === 'top').length
+  const goodCount = companies.filter((c) => c.tier === 'good').length
 
   return (
     <div className="ci-copilot-list">
       <div className="ci-copilot-list__header">
         <p className="ci-copilot-list__title">
-          Found <strong>{total}</strong> companies
+          What I found — <strong>{total}</strong> companies
         </p>
-        {discoveryMeta?.inCrm != null ? (
+        {topCount > 0 || goodCount > 0 ? (
+          <p className="ci-copilot-list__sub">
+            {topCount > 0 ? `${topCount} top recommended` : null}
+            {topCount > 0 && goodCount > 0 ? ' · ' : null}
+            {goodCount > 0 ? `${goodCount} good matches` : null}
+          </p>
+        ) : discoveryMeta?.inCrm != null ? (
           <p className="ci-copilot-list__sub">
             {discoveryMeta.inCrm} in CRM · {discoveryMeta.newLeads ?? total - discoveryMeta.inCrm} new
           </p>

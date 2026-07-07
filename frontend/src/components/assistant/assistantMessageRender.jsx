@@ -104,9 +104,12 @@ export function renderAssistantMarkdown(text) {
 function sectionTone(title) {
   const t = String(title || '').toLowerCase()
   if (t.includes('understanding')) return 'understanding'
-  if (t.includes('recommended')) return 'nbsa'
+  if (t.includes('what i found')) return 'found'
+  if (t.includes('why it matters')) return 'why'
+  if (t.includes('if i were handling') || t.includes('recommended')) return 'nbsa'
+  if (t.includes('actions you can take')) return 'actions'
   if (t.includes('crm')) return 'crm'
-  if (t.includes('web') || t.includes('internet') || t.includes('market')) return 'web'
+  if (t.includes('web') || t.includes('internet') || t.includes('market') || t.includes('public')) return 'web'
   if (t.includes('news')) return 'news'
   if (t.includes('company') || t.includes('intelligence')) return 'intel'
   return ''
