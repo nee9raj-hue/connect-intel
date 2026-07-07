@@ -1,0 +1,486 @@
+/* Connect Intel AI — full workspace panel (replaces floating chat FAB) */
+
+.ci-ai-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 85;
+  border: 0;
+  background: rgba(15, 23, 42, 0.35);
+  cursor: pointer;
+}
+
+.ci-ai-panel {
+  position: fixed;
+  z-index: 90;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(440px, 100vw);
+  display: flex;
+  flex-direction: column;
+  background: #f8f9fb;
+  border-left: 1px solid #e2e8f0;
+  box-shadow: -8px 0 40px rgba(15, 23, 42, 0.12);
+  transform: translateX(100%);
+  transition: transform 0.22s ease;
+  pointer-events: none;
+}
+
+.ci-ai-panel.is-open {
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.ci-ai-panel--mobile {
+  width: 100vw;
+  border-left: none;
+}
+
+.ci-ai-panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  background: #17191c;
+  color: #fff;
+  shrink: 0;
+}
+
+.ci-ai-panel__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.ci-ai-panel__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #ffcb2b 0%, #f59e0b 100%);
+  color: #17191c;
+  shrink: 0;
+}
+
+.ci-ai-panel__title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.ci-ai-panel__sub {
+  margin: 2px 0 0;
+  font-size: 0.7rem;
+  color: #94a3b8;
+}
+
+.ci-ai-panel__close {
+  border: 0;
+  background: transparent;
+  color: #cbd5e1;
+  font-size: 1.1rem;
+  padding: 6px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.ci-ai-panel__close:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.ci-ai-panel__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ci-ai-panel__foot {
+  shrink: 0;
+  padding: 12px 14px 14px;
+  border-top: 1px solid #e2e8f0;
+  background: #fff;
+}
+
+.ci-ai-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid #d9dee5;
+  background: linear-gradient(180deg, #fff 0%, #f7f9fb 100%);
+  color: #17191c;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+
+.ci-ai-trigger:hover {
+  border-color: #ffcb2b;
+  box-shadow: 0 2px 8px rgba(255, 203, 43, 0.25);
+}
+
+.ci-ai-trigger--compact {
+  padding: 6px 8px;
+  border-radius: 10px;
+}
+
+.ci-ai-trigger__kbd {
+  font-size: 0.65rem;
+  font-weight: 500;
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: #eef2f6;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+
+.ci-ai-welcome {
+  padding: 14px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+}
+
+.ci-ai-welcome__hi {
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #0f172a;
+}
+
+.ci-ai-welcome__copy {
+  margin: 8px 0 12px;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: #64748b;
+}
+
+.ci-ai-capabilities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ci-ai-capabilities__chip {
+  font-size: 0.72rem;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #334155;
+  cursor: pointer;
+}
+
+.ci-ai-capabilities__chip:hover {
+  border-color: #ffcb2b;
+  background: #fffbeb;
+}
+
+.ci-ai-msg {
+  display: flex;
+}
+
+.ci-ai-msg--user {
+  justify-content: flex-end;
+}
+
+.ci-ai-msg--bot {
+  justify-content: flex-start;
+}
+
+.ci-ai-msg__bubble {
+  max-width: 92%;
+  padding: 10px 12px;
+  border-radius: 14px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  color: #1e293b;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.ci-ai-msg__bubble--user {
+  background: #17191c;
+  color: #fff;
+  border-color: #17191c;
+  border-bottom-right-radius: 4px;
+}
+
+.ci-ai-msg--bot .ci-ai-msg__bubble {
+  border-bottom-left-radius: 4px;
+}
+
+.ci-ai-msg__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.ci-ai-msg__action {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid #ffe48a;
+  background: #fffbeb;
+  color: #5b4a00;
+  cursor: pointer;
+}
+
+.ci-ai-msg__action--escalate {
+  border-color: #fcd34d;
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.ci-ai-thinking {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: #64748b;
+  padding: 4px 2px;
+}
+
+.ci-ai-thinking__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffcb2b;
+  animation: ci-ai-pulse 1s ease infinite;
+}
+
+@keyframes ci-ai-pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.ci-ai-suggestions {
+  display: flex;
+  gap: 6px;
+  padding: 0 12px 8px;
+  overflow-x: auto;
+  shrink: 0;
+}
+
+.ci-ai-suggestions__chip {
+  shrink: 0;
+  font-size: 0.72rem;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  color: #475569;
+  cursor: pointer;
+}
+
+.ci-ai-suggestions__chip:hover:not(:disabled) {
+  border-color: #ffcb2b;
+}
+
+.ci-ai-compose {
+  display: flex;
+  gap: 8px;
+}
+
+.ci-ai-compose__input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 0.85rem;
+}
+
+.ci-ai-compose__input:focus {
+  outline: 2px solid rgba(255, 203, 43, 0.45);
+  border-color: #ffcb2b;
+}
+
+.ci-ai-compose__send {
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 10px;
+  background: #ffcb2b;
+  color: #17191c;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ci-ai-compose__send:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.ci-ai-support-link {
+  width: 100%;
+  margin-top: 8px;
+  border: 0;
+  background: transparent;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #b45309;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.ci-ai-status {
+  margin: 0;
+  padding: 8px 14px;
+  font-size: 0.75rem;
+  color: #b45309;
+  background: #fffbeb;
+  border-top: 1px solid #fde68a;
+}
+
+.ci-ai-tickets {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  font-size: 0.75rem;
+}
+
+.ci-ai-tickets__label {
+  margin: 0 0 6px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+  font-size: 0.65rem;
+}
+
+.ci-ai-tickets ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ci-ai-tickets li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.ci-ai-ticket {
+  font-size: 0.65rem;
+  padding: 2px 6px;
+  border-radius: 999px;
+  border: 1px solid;
+  text-transform: capitalize;
+}
+
+.ci-ai-ticket--open {
+  background: #fffbeb;
+  border-color: #fde68a;
+  color: #92400e;
+}
+
+.ci-ai-ticket--progress {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1d4ed8;
+}
+
+.ci-ai-ticket--done {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #166534;
+}
+
+.ci-ai-escalate {
+  padding: 12px;
+  border-radius: 10px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+}
+
+.ci-ai-escalate__title {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #92400e;
+}
+
+.ci-ai-escalate__copy {
+  margin: 4px 0 8px;
+  font-size: 0.72rem;
+  color: #a16207;
+}
+
+.ci-ai-escalate__input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  margin-bottom: 8px;
+}
+
+.ci-ai-escalate__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.ci-ai-escalate__submit {
+  flex: 1;
+  padding: 8px;
+  border: 0;
+  border-radius: 8px;
+  background: #ffcb2b;
+  font-weight: 600;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.ci-ai-escalate__cancel {
+  padding: 8px 12px;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+@media (min-width: 900px) {
+  .ci-ai-backdrop {
+    background: transparent;
+    pointer-events: none;
+  }
+
+  .ci-ai-panel.is-open ~ .ci-ai-backdrop,
+  .ci-ai-backdrop:has(+ .ci-ai-panel.is-open) {
+    pointer-events: none;
+  }
+}
+
+/* Desktop: backdrop still clickable on mobile only — fix selector */
+@media (min-width: 900px) {
+  button.ci-ai-backdrop {
+    display: none;
+  }
+}

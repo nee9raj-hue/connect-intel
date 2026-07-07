@@ -12,6 +12,7 @@ export default function useAppKeyboardShortcuts({
   enabled = true,
   activePanel,
   onCommandPalette,
+  onOpenAI,
 } = {}) {
   useEffect(() => {
     if (!enabled) return undefined
@@ -26,6 +27,16 @@ export default function useAppKeyboardShortcuts({
       ) {
         event.preventDefault()
         onCommandPalette?.()
+        return
+      }
+
+      if (
+        (event.metaKey || event.ctrlKey) &&
+        event.key === '/' &&
+        !isEditableTarget(event.target)
+      ) {
+        event.preventDefault()
+        onOpenAI?.()
         return
       }
 
@@ -48,7 +59,7 @@ export default function useAppKeyboardShortcuts({
 
     document.addEventListener('keydown', onKeyDown)
     return () => document.removeEventListener('keydown', onKeyDown)
-  }, [enabled, activePanel, onCommandPalette])
+  }, [enabled, activePanel, onCommandPalette, onOpenAI])
 }
 
 export { PIPELINE_SEARCH_ID }

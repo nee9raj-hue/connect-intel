@@ -24,7 +24,7 @@ import { useWorkspacePulse } from '../../hooks/useWorkspacePulse'
 import SessionReconnectBanner from './SessionReconnectBanner'
 import GmailSetupModal, { markGmailSetupDone, useGmailSetupNeeded } from '../onboarding/GmailSetupModal'
 import { GMAIL_ONBOARDING_PROMPT_ENABLED } from '../../lib/crmProductFlags'
-import ConnectAssistant from '../assistant/ConnectAssistant'
+import ConnectAssistant, { ConnectAIButton } from '../assistant/ConnectAssistant'
 import CommandPalette from '../platform/CommandPalette'
 import MobileNavPill from './MobileNavPill'
 import EmailSendDock from '../crm/EmailSendDock'
@@ -75,6 +75,7 @@ export default function AppShell() {
   }, [])
   const [liveToast, setLiveToast] = useState(null)
   const [commandOpen, setCommandOpen] = useState(false)
+  const [aiOpen, setAiOpen] = useState(false)
   const needsOnboarding = user && !user.onboardingComplete && !user.isPlatformAdmin
   const { needed: needsGmailSetup, setNeeded: setNeedsGmailSetup } = useGmailSetupNeeded(user)
   const chithiFocus = isChithiPanel(activePanel)
@@ -94,6 +95,7 @@ export default function AppShell() {
     enabled: Boolean(user && !needsOnboarding),
     activePanel,
     onCommandPalette: () => setCommandOpen(true),
+    onOpenAI: () => setAiOpen(true),
   })
 
   useWorkspaceSync({
@@ -346,6 +348,9 @@ export default function AppShell() {
           />
           <div id="ci-mobile-top-bar-slot" className="ci-mobile-top-bar-slot min-w-0 flex-1" />
           {!user?.isPlatformAdmin && (
+            <ConnectAIButton compact onClick={() => setAiOpen(true)} />
+          )}
+          {!user?.isPlatformAdmin && (
             <button
               type="button"
               onClick={() => navigate('app-settings')}
@@ -372,6 +377,7 @@ export default function AppShell() {
           <AppHeader
             onNavigate={navigate}
             onOpenCommandPalette={() => setCommandOpen(true)}
+            onOpenAI={() => setAiOpen(true)}
             sidebarMode={sidebarMode}
             onToggleSidebarCollapsed={toggleSidebarCollapsed}
           />
@@ -429,10 +435,13 @@ export default function AppShell() {
       {GMAIL_ONBOARDING_PROMPT_ENABLED && needsGmailSetup && !needsOnboarding && (
         <GmailSetupModal onDone={() => setNeedsGmailSetup(false)} />
       )}
-      {user && !needsOnboarding && !(isMobile && hideMobileFloatingChrome) && (
+      {user && !needsOnboarding && (
         <ConnectAssistant
+          open={aiOpen}
+          onOpenChange={setAiOpen}
           onNavigate={navigate}
-          fabAboveMobilePill={showMobileNavPill && mobilePillVisible}
+          activePanel={activePanel}
+          panelOptions={panelOptions}
         />
       )}
       {user && !needsOnboarding && !user.isPlatformAdmin && (

@@ -4,18 +4,36 @@ import useIsMobile from '../../hooks/useIsMobile'
 import { api } from '../../lib/api'
 import { applyAssistantAction } from '../../lib/assistantNavigation'
 import { ASSISTANT_QUICK_PROMPTS } from '../../lib/assistantQuickPrompts'
-function AssistantIcon({ className = 'w-5 h-5' }) {
+import { CI_OPEN_AI_EVENT } from '../../lib/openConnectAI'
+
+const CAPABILITY_AREAS = [
+  { id: 'crm', label: 'CRM & Pipeline', prompt: 'How does Pipeline bulk email work?' },
+  { id: 'marketing', label: 'Marketing Hub', prompt: 'CRM vs Marketing email?' },
+  { id: 'setup', label: 'Gmail & setup', prompt: 'How do I connect work Gmail?' },
+  { id: 'team', label: 'Team', prompt: 'How do I invite a teammate?' },
+]
+
+function SparklesIcon({ className = 'w-5 h-5' }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden>
       <path
-        d="M12 3c4.97 0 9 3.58 9 8 0 2.65-1.35 5.01-3.47 6.5L17 21l-4.2-2.1c-.52.08-1.05.12-1.6.12-4.97 0-9-3.58-9-8s4.03-8 9-8Z"
+        d="M12 2l1.4 4.2L17.6 8 13.4 9.4 12 13.6 10.6 9.4 6.4 8l4.2-1.8L12 2Z"
         stroke="currentColor"
-        strokeWidth="1.6"
+        strokeWidth="1.5"
         strokeLinejoin="round"
       />
-      <circle cx="9" cy="11" r="1" fill="currentColor" />
-      <circle cx="12" cy="11" r="1" fill="currentColor" />
-      <circle cx="15" cy="11" r="1" fill="currentColor" />
+      <path
+        d="M5 14l.9 2.7L8.6 18l-2.7.9L5 21.6 3.4 18.9.7 18l2.7-.9L5 14Z"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M19 12l.7 2.1 2.1.7-2.1.7L19 17.6l-.7-2.1-2.1-.7 2.1-.7L19 12Z"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinejoin="round"
+      />
     </svg>
   )
 }
@@ -37,27 +55,17 @@ function renderSimpleMarkdown(text) {
 function MessageBubble({ msg, onAction }) {
   const isUser = msg.role === 'user'
   return (
-    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
-      <div
-        className={`max-w-[92%] rounded-2xl px-3 py-2 text-sm leading-relaxed whitespace-pre-wrap ${
-          isUser
-            ? 'bg-[#242424] text-white rounded-br-md'
-            : 'bg-white border border-gray-200 text-gray-800 rounded-bl-md shadow-sm'
-        }`}
-      >
+    <div className={`ci-ai-msg ${isUser ? 'ci-ai-msg--user' : 'ci-ai-msg--bot'}`}>
+      <div className={`ci-ai-msg__bubble${isUser ? ' ci-ai-msg__bubble--user' : ''}`}>
         {isUser ? msg.content : renderSimpleMarkdown(msg.content)}
         {!isUser && msg.actions?.length > 0 && (
-          <div className="mt-2 flex flex-wrap gap-1.5">
+          <div className="ci-ai-msg__actions">
             {msg.actions.map((action, i) => (
               <button
                 key={`${action.type}-${action.panel || action.url || 'esc'}-${i}`}
                 type="button"
                 onClick={() => onAction(action)}
-                className={`text-xs font-medium px-2.5 py-1 rounded-full border ${
-                  action.type === 'escalate'
-                    ? 'bg-amber-100 border-amber-300 text-amber-950 hover:bg-amber-200'
-                    : 'bg-[#fffbeb] border-[#ffe48a] text-[#5b4a00] hover:bg-[#fff4c2]'
-                }`}
+                className={`ci-ai-msg__action${action.type === 'escalate' ? ' ci-ai-msg__action--escalate' : ''}`}
               >
                 {action.label || 'Open'}
               </button>
@@ -70,15 +78,20 @@ function MessageBubble({ msg, onAction }) {
 }
 
 function ticketStatusClass(status) {
-  if (status === 'resolved' || status === 'closed') return 'text-green-700 bg-green-50 border-green-100'
-  if (status === 'in_progress') return 'text-blue-700 bg-blue-50 border-blue-100'
-  return 'text-amber-800 bg-amber-50 border-amber-100'
+  if (status === 'resolved' || status === 'closed') return 'ci-ai-ticket--done'
+  if (status === 'in_progress') return 'ci-ai-ticket--progress'
+  return 'ci-ai-ticket--open'
 }
 
-export default function ConnectAssistant({ onNavigate, fabAboveMobilePill = false }) {
-  const { user, openPipelineLead, pipelineLeadId } = useApp()
+export default function ConnectAssistant({
+  open,
+  onOpenChange,
+  onNavigate,
+  activePanel,
+  panelOptions,
+}) {
+  const { user, openPipelineLead } = useApp()
   const isMobile = useIsMobile()
-  const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState([])
   const [myTickets, setMyTickets] = useState([])
   const [threadId, setThreadId] = useState(null)
@@ -92,6 +105,11 @@ export default function ConnectAssistant({ onNavigate, fabAboveMobilePill = fals
   const bottomRef = useRef(null)
   const inputRef = useRef(null)
 
+  const uiContext = {
+    panel: activePanel || null,
+    tab: panelOptions?.tab || null,
+  }
+
   const loadHistory = useCallback(async () => {
     try {
       const data = await api.getAssistantChat()
@@ -103,20 +121,35 @@ export default function ConnectAssistant({ onNavigate, fabAboveMobilePill = fals
         setSuggestions(lastAssistant.suggestions)
       }
     } catch {
-      // first visit
+      /* first visit */
     }
   }, [])
 
   useEffect(() => {
+    const onGlobalOpen = () => onOpenChange?.(true)
+    window.addEventListener(CI_OPEN_AI_EVENT, onGlobalOpen)
+    return () => window.removeEventListener(CI_OPEN_AI_EVENT, onGlobalOpen)
+  }, [onOpenChange])
+
+  useEffect(() => {
     if (!open || !user) return
     loadHistory()
-    const t = setTimeout(() => inputRef.current?.focus(), 150)
+    const t = setTimeout(() => inputRef.current?.focus(), 120)
     return () => clearTimeout(t)
   }, [open, user, loadHistory])
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (open) bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, loading, open, showRaiseForm])
+
+  useEffect(() => {
+    if (!open) return undefined
+    const onKey = (e) => {
+      if (e.key === 'Escape') onOpenChange?.(false)
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [open, onOpenChange])
 
   const handleEscalate = useCallback(
     async (overrideMessage) => {
@@ -130,7 +163,7 @@ export default function ConnectAssistant({ onNavigate, fabAboveMobilePill = fals
           concernText.trim() ||
           lastUser?.content ||
           input ||
-          'Customer raised a concern via Connect Intel Assistant'
+          'Customer raised a concern via Connect Intel AI'
 
         const data = await api.escalateAssistantSupport({
           message: body,
@@ -147,7 +180,7 @@ export default function ConnectAssistant({ onNavigate, fabAboveMobilePill = fals
 
         const assistantNote =
           data.message ||
-          `${ticketLine} Our support team will respond within **24–48 business hours** at **${user.email}**. Quote your ticket number in any follow-up.`
+          `${ticketLine} Our support team will respond within **24–48 business hours** at **${user.email}**.`
 
         setMessages((prev) => [
           ...prev,
@@ -158,7 +191,6 @@ export default function ConnectAssistant({ onNavigate, fabAboveMobilePill = fals
             createdAt: new Date().toISOString(),
           },
         ])
-        setStatus(null)
       } catch (err) {
         setStatus(err.message || 'Could not create support ticket')
       } finally {
@@ -179,9 +211,9 @@ export default function ConnectAssistant({ onNavigate, fabAboveMobilePill = fals
           if (lastUser?.content) setConcernText(lastUser.content)
         },
       })
-      if (ok && action.type !== 'escalate') setOpen(false)
+      if (ok && action.type !== 'escalate') onOpenChange?.(false)
     },
-    [onNavigate, openPipelineLead, messages]
+    [onNavigate, openPipelineLead, messages, onOpenChange]
   )
 
   const sendMessage = useCallback(
@@ -201,22 +233,21 @@ export default function ConnectAssistant({ onNavigate, fabAboveMobilePill = fals
       setStatus(null)
 
       try {
-        const data = await api.sendAssistantMessage(trimmed)
+        const data = await api.sendAssistantMessage(trimmed, uiContext)
         await loadHistory()
         if (data.suggestions?.length) setSuggestions(data.suggestions)
         if (data.myTickets?.length) setMyTickets(data.myTickets)
       } catch (err) {
         setMessages((prev) => prev.filter((m) => m.id !== optimistic.id))
-        setStatus(err.message || 'Could not reach assistant')
+        setStatus(err.message || 'Could not reach Connect Intel AI')
       } finally {
         setLoading(false)
       }
     },
-    [loading, loadHistory]
+    [loading, loadHistory, uiContext]
   )
 
   if (!user || user.isPlatformAdmin) return null
-  if (isMobile && pipelineLeadId) return null
 
   const showWelcome = open && messages.length === 0 && !loading
   const activeTickets = myTickets.filter((t) => !['resolved', 'closed'].includes(t.status))
@@ -224,46 +255,49 @@ export default function ConnectAssistant({ onNavigate, fabAboveMobilePill = fals
   return (
     <>
       {open && (
-        <div
-          className="fixed inset-0 z-[60] bg-black/20 md:bg-transparent md:pointer-events-none"
-          aria-hidden
-          onClick={() => setOpen(false)}
+        <button
+          type="button"
+          className="ci-ai-backdrop"
+          aria-label="Close Connect Intel AI"
+          onClick={() => onOpenChange?.(false)}
         />
       )}
 
-      <div
-        className={`fixed z-[70] flex flex-col bg-white border border-gray-200 shadow-2xl transition-all duration-200
-          bottom-0 right-0 left-0 max-h-[min(88dvh,680px)] rounded-t-2xl
-          md:bottom-20 md:right-4 md:left-auto md:w-[400px] md:max-h-[min(76dvh,600px)] md:rounded-2xl
-          ${open ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none md:scale-95'}`}
+      <aside
+        className={`ci-ai-panel connect-assistant-panel${open ? ' is-open' : ''}${isMobile ? ' ci-ai-panel--mobile' : ''}`}
         role="dialog"
-        aria-label="Connect Intel Assistant"
+        aria-label="Connect Intel AI"
         aria-hidden={!open}
       >
-        <header className="shrink-0 flex items-center justify-between gap-2 px-4 py-3 border-b border-gray-100 bg-[#242424] text-white rounded-t-2xl md:rounded-t-2xl">
-          <div className="min-w-0">
-            <p className="text-sm font-semibold truncate">Connect Intel Assistant</p>
-            <p className="text-xs text-gray-300 truncate">Help · tickets · 24–48h support SLA</p>
+        <header className="ci-ai-panel__head">
+          <div className="ci-ai-panel__brand">
+            <span className="ci-ai-panel__icon" aria-hidden>
+              <SparklesIcon className="w-5 h-5" />
+            </span>
+            <div className="min-w-0">
+              <p className="ci-ai-panel__title">Connect Intel AI</p>
+              <p className="ci-ai-panel__sub">CRM & Marketing expert · constitution-aligned</p>
+            </div>
           </div>
           <button
             type="button"
-            onClick={() => setOpen(false)}
-            className="p-1.5 rounded-lg hover:bg-white/10 text-gray-200"
-            aria-label="Close assistant"
+            className="ci-ai-panel__close"
+            onClick={() => onOpenChange?.(false)}
+            aria-label="Close"
           >
             ✕
           </button>
         </header>
 
-        <div className="flex-1 min-h-0 overflow-y-auto px-3 py-3 space-y-3 bg-[#f6f7f9]">
+        <div className="ci-ai-panel__body">
           {activeTickets.length > 0 && (
-            <div className="rounded-xl bg-white border border-gray-200 px-3 py-2 shadow-sm">
-              <p className="text-xs font-semibold uppercase text-gray-500">Your open tickets</p>
-              <ul className="mt-1 space-y-1">
+            <div className="ci-ai-tickets">
+              <p className="ci-ai-tickets__label">Open support tickets</p>
+              <ul>
                 {activeTickets.slice(0, 3).map((t) => (
-                  <li key={t.id} className="text-xs flex items-center justify-between gap-2">
-                    <span className="font-mono font-semibold text-gray-900">{t.ticketNumber}</span>
-                    <span className={`px-1.5 py-0.5 rounded border text-xs ${ticketStatusClass(t.status)}`}>
+                  <li key={t.id}>
+                    <span className="font-mono font-semibold">{t.ticketNumber}</span>
+                    <span className={`ci-ai-ticket ${ticketStatusClass(t.status)}`}>
                       {t.status.replace('_', ' ')}
                     </span>
                   </li>
@@ -273,12 +307,27 @@ export default function ConnectAssistant({ onNavigate, fabAboveMobilePill = fals
           )}
 
           {showWelcome && (
-            <div className="rounded-xl bg-white border border-gray-200 px-3 py-3 text-sm text-gray-700 shadow-sm">
-              <p className="font-medium text-gray-900">Hi{user.name ? `, ${user.name.split(' ')[0]}` : ''}!</p>
-              <p className="mt-1 text-gray-600">
-                Ask how to use the product, or describe a problem. For bugs, billing, or access issues we can open a
-                support ticket — you'll get a ticket number and a reply within <strong>24–48 business hours</strong>.
+            <div className="ci-ai-welcome">
+              <p className="ci-ai-welcome__hi">
+                Hi{user.name ? `, ${user.name.split(' ')[0]}` : ''} — I know your CRM and Marketing Hub.
               </p>
+              <p className="ci-ai-welcome__copy">
+                Ask how anything works, your Pipeline counts, Gmail status, campaigns, forms, or consent rules. I
+                follow Connect Intel&apos;s constitution — no spam, no bypassing opt-in.
+              </p>
+              <div className="ci-ai-capabilities">
+                {CAPABILITY_AREAS.map((c) => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    className="ci-ai-capabilities__chip"
+                    disabled={loading}
+                    onClick={() => sendMessage(c.prompt)}
+                  >
+                    {c.label}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 
@@ -287,39 +336,35 @@ export default function ConnectAssistant({ onNavigate, fabAboveMobilePill = fals
           ))}
 
           {loading && (
-            <div className="text-xs text-gray-500 flex items-center gap-2 px-1">
-              <span className="inline-block w-2 h-2 rounded-full bg-[#ffcb2b] animate-pulse" />
+            <div className="ci-ai-thinking">
+              <span className="ci-ai-thinking__dot" />
               Thinking…
             </div>
           )}
 
           {showRaiseForm && (
-            <div className="rounded-xl bg-amber-50 border border-amber-200 p-3 space-y-2">
-              <p className="text-xs font-semibold text-amber-950">Raise a support concern</p>
-              <p className="text-xs text-amber-900">
-                Describe the issue. We respond within 24–48 business hours at {user.email}. No live phone support.
+            <div className="ci-ai-escalate">
+              <p className="ci-ai-escalate__title">Raise a support ticket</p>
+              <p className="ci-ai-escalate__copy">
+                Bugs, billing, or access issues — we reply within 24–48 business hours at {user.email}.
               </p>
               <textarea
                 value={concernText}
                 onChange={(e) => setConcernText(e.target.value)}
                 rows={3}
-                className="w-full text-sm border border-amber-200 rounded-lg px-2 py-1.5 bg-white"
-                placeholder="What went wrong? Include steps if you can…"
+                className="ci-ai-escalate__input"
+                placeholder="Describe the issue…"
               />
-              <div className="flex gap-2">
+              <div className="ci-ai-escalate__actions">
                 <button
                   type="button"
                   disabled={escalating || !concernText.trim()}
                   onClick={() => handleEscalate()}
-                  className="flex-1 text-xs font-semibold py-2 rounded-lg bg-[#ffcb2b] text-[#242424] disabled:opacity-40"
+                  className="ci-ai-escalate__submit"
                 >
-                  {escalating ? 'Creating ticket…' : 'Submit ticket'}
+                  {escalating ? 'Creating…' : 'Submit ticket'}
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setShowRaiseForm(false)}
-                  className="text-xs px-3 py-2 rounded-lg border border-amber-200 text-amber-900"
-                >
+                <button type="button" onClick={() => setShowRaiseForm(false)} className="ci-ai-escalate__cancel">
                   Cancel
                 </button>
               </div>
@@ -330,14 +375,14 @@ export default function ConnectAssistant({ onNavigate, fabAboveMobilePill = fals
         </div>
 
         {suggestions.length > 0 && !showRaiseForm && (
-          <div className="shrink-0 px-3 pb-1 flex gap-1.5 overflow-x-auto no-scrollbar">
-            {suggestions.slice(0, 4).map((s) => (
+          <div className="ci-ai-suggestions">
+            {suggestions.slice(0, 5).map((s) => (
               <button
                 key={s}
                 type="button"
                 disabled={loading}
                 onClick={() => sendMessage(s)}
-                className="shrink-0 text-xs px-2.5 py-1 rounded-full border border-gray-200 bg-white text-gray-600 hover:border-[#ffcb2b] hover:text-gray-900 disabled:opacity-50"
+                className="ci-ai-suggestions__chip"
               >
                 {s}
               </button>
@@ -345,33 +390,27 @@ export default function ConnectAssistant({ onNavigate, fabAboveMobilePill = fals
           </div>
         )}
 
-        {status && (
-          <p className="shrink-0 px-3 text-xs text-amber-800 bg-amber-50 border-t border-amber-100 py-1.5">{status}</p>
-        )}
+        {status && <p className="ci-ai-status">{status}</p>}
 
-        <footer className="shrink-0 border-t border-gray-200 bg-white p-3 space-y-2 rounded-b-2xl">
+        <footer className="ci-ai-panel__foot">
           <form
             onSubmit={(e) => {
               e.preventDefault()
               sendMessage(input)
             }}
-            className="flex gap-2"
+            className="ci-ai-compose"
           >
             <input
               ref={inputRef}
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask or describe an issue…"
-              className="flex-1 min-w-0 text-sm rounded-xl border border-gray-200 px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#ffcb2b]/50"
+              placeholder="Ask about CRM, Marketing, your data…"
+              className="ci-ai-compose__input"
               disabled={loading}
               maxLength={2000}
             />
-            <button
-              type="submit"
-              disabled={loading || !input.trim()}
-              className="shrink-0 px-3 py-2.5 rounded-xl bg-[#ffcb2b] text-[#242424] text-sm font-semibold hover:bg-[#f0bc00] disabled:opacity-40"
-            >
+            <button type="submit" disabled={loading || !input.trim()} className="ci-ai-compose__send">
               Send
             </button>
           </form>
@@ -383,36 +422,29 @@ export default function ConnectAssistant({ onNavigate, fabAboveMobilePill = fals
               if (lastUser?.content && !concernText) setConcernText(lastUser.content)
             }}
             disabled={escalating}
-            className="w-full text-xs text-center font-medium text-amber-900 hover:text-amber-950 py-1 disabled:opacity-50"
+            className="ci-ai-support-link"
           >
-            Raise a concern · get a ticket number (24–48h response)
+            Need human support? Open a ticket (24–48h)
           </button>
         </footer>
-      </div>
-
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        className={`fixed z-[70] right-3 md:right-6 flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-full shadow-lg border-2 transition-transform
-          ${fabAboveMobilePill ? 'bottom-[4.75rem]' : 'bottom-4'}
-          md:bottom-6
-          ${open ? 'bg-gray-800 border-gray-700 text-white scale-95' : 'bg-[#ffcb2b] border-[#f0bc00] text-[#242424] hover:scale-105'}`}
-        aria-expanded={open}
-        aria-label={open ? 'Close assistant' : 'Open Connect Intel Assistant'}
-      >
-        {open ? (
-          <span className="text-lg leading-none">✕</span>
-        ) : (
-          <>
-            <AssistantIcon className="w-7 h-7" />
-            {activeTickets.length > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center">
-                {activeTickets.length}
-              </span>
-            )}
-          </>
-        )}
-      </button>
+      </aside>
     </>
+  )
+}
+
+/** Header / shell trigger button */
+export function ConnectAIButton({ onClick, compact = false }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`ci-ai-trigger${compact ? ' ci-ai-trigger--compact' : ''}`}
+      aria-label="Open Connect Intel AI"
+      title="Connect Intel AI (⌘/)"
+    >
+      <SparklesIcon className={compact ? 'w-4 h-4' : 'w-4 h-4'} />
+      {!compact && <span>Ask AI</span>}
+      {!compact && <kbd className="ci-ai-trigger__kbd">⌘/</kbd>}
+    </button>
   )
 }

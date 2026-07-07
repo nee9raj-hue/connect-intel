@@ -1,11 +1,13 @@
 import { useApp } from '../../context/AppContext'
 import NotificationBell from './NotificationBell'
 import SidebarToggleButton from './SidebarToggleButton'
+import { ConnectAIButton } from '../assistant/ConnectAssistant'
 import { BILLING_IN_CRM_UI_ENABLED, CREDITS_IN_CRM_UI_ENABLED } from '../../lib/crmProductFlags'
 
 export default function AppHeader({
   onNavigate,
   onOpenCommandPalette,
+  onOpenAI,
   sidebarMode = 'expanded',
   onToggleSidebarCollapsed,
 }) {
@@ -28,6 +30,8 @@ export default function AppHeader({
         <span>Search CRM…</span>
         <kbd>⌘K</kbd>
       </button>
+      <div className="hidden md:flex flex-1 min-w-0" />
+      <ConnectAIButton onClick={() => onOpenAI?.()} />
       <div className="ci-app-header-chips flex items-center justify-end gap-2 flex-1 min-w-0 md:flex-none">
         <NotificationBell />
         {CREDITS_IN_CRM_UI_ENABLED ? (

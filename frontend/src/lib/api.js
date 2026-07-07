@@ -915,8 +915,11 @@ export const api = {
   searchContactLinkedin: (contactId, contact) =>
     request('/api/contacts/linkedin-search', { method: 'POST', body: { contactId, contact } }),
   getAssistantChat: () => request('/api/assistant/chat'),
-  sendAssistantMessage: (message) =>
-    request('/api/assistant/chat', { method: 'POST', body: { message } }),
+  sendAssistantMessage: (message, uiContext = {}) =>
+    request('/api/assistant/chat', {
+      method: 'POST',
+      body: { message, panel: uiContext.panel, tab: uiContext.tab },
+    }),
   escalateAssistantSupport: (payload) =>
     request('/api/assistant/chat', { method: 'POST', body: { action: 'escalate', ...payload } }),
   getPipelineSavedViews: () => request('/api/crm/saved-views'),

@@ -7,6 +7,7 @@ import {
 } from '../../lib/marketingHubNav'
 import useIsMobile from '../../hooks/useIsMobile'
 import { BRAND_LOGO_MARK_LIGHT, BRAND_LOGO_MARK_CLASS } from '../../lib/brandAssets'
+import { openConnectAI } from '../../lib/openConnectAI'
 import {
   HomeIcon,
   MailIcon,
@@ -164,6 +165,10 @@ export default function MarketingHubShell({
           <SignOutIcon className="mc-nav__icon" />
           {!collapsed ? <span>Back to CRM</span> : null}
         </button>
+        <button type="button" className="mc-nav__exit" onClick={() => openConnectAI()}>
+          <BoltIcon className="mc-nav__icon" />
+          {!collapsed ? <span>Ask AI</span> : null}
+        </button>
       </div>
     </aside>
   ) : null
@@ -180,6 +185,9 @@ export default function MarketingHubShell({
           {t.short || t.label}
         </button>
       ))}
+      <button type="button" className="mc-mobile-tabs__btn" onClick={() => openConnectAI()}>
+        AI
+      </button>
     </nav>
   ) : null
 
