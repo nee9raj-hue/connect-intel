@@ -24,7 +24,7 @@ function starsDisplay(n = 2) {
   return `${'★'.repeat(filled)}${'☆'.repeat(5 - filled)}`
 }
 
-function CompanyRow({ company, onAction }) {
+function CompanyRow({ company, onAction, knowledgeMode = false }) {
   const name = company.company || company.name
   const website = company.website || company.companyDomain
   const href = website ? (website.startsWith('http') ? website : `https://${website}`) : null
@@ -48,14 +48,16 @@ function CompanyRow({ company, onAction }) {
             </a>
           ) : null}
         </div>
-        <span
-          className={`ci-copilot-list__crm${company.inCrm ? ' ci-copilot-list__crm--in' : ''}`}
-        >
-          {company.crmStatus || (company.inCrm ? 'In CRM' : 'New')}
-        </span>
+        {!knowledgeMode ? (
+          <span
+            className={`ci-copilot-list__crm${company.inCrm ? ' ci-copilot-list__crm--in' : ''}`}
+          >
+            {company.crmStatus || (company.inCrm ? 'In CRM' : 'New')}
+          </span>
+        ) : null}
       </div>
 
-      {company.tierLabel ? (
+      {!knowledgeMode && company.tierLabel ? (
         <div className="ci-copilot-list__tier-row">
           <span className={`ci-copilot-list__tier ci-copilot-list__tier--${company.tier || 'possible'}`}>
             <span className="ci-copilot-list__stars" aria-hidden>
@@ -71,16 +73,17 @@ function CompanyRow({ company, onAction }) {
         </div>
       ) : null}
 
-      {company.rankReason ? <p className="ci-copilot-list__reason">{company.rankReason}</p> : null}
+      {company.rankReason && !knowledgeMode ? <p className="ci-copilot-list__reason">{company.rankReason}</p> : null}
 
       <div className="ci-copilot-list__meta">
+        {company.season ? <span>Season {company.season}</span> : null}
         {company.city || company.state ? (
           <span>{[company.city, company.state].filter(Boolean).join(', ')}</span>
         ) : null}
         {company.industry ? <span>{company.industry}</span> : null}
         {company.exportMarkets ? <span>Exports: {company.exportMarkets}</span> : null}
-        {company.email ? <span>{company.email}</span> : null}
-        {company.phone ? <span>{company.phone}</span> : null}
+        {!knowledgeMode && company.email ? <span>{company.email}</span> : null}
+        {!knowledgeMode && company.phone ? <span>{company.phone}</span> : null}
       </div>
 
       <div className="ci-copilot-list__actions">
@@ -154,16 +157,34 @@ function CompanyRow({ company, onAction }) {
 export default function CopilotCompanyList({ companies, discoveryMeta, onAction }) {
   if (!companies?.length) return null
   const total = discoveryMeta?.total || companies.length
+  const isKnowledge = discoveryMeta?.intent === 'knowledge_lookup'
   const topCount = companies.filter((c) => c.tier === 'top').length
   const goodCount = companies.filter((c) => c.tier === 'good').length
+  const linkedinCount =
+    discoveryMeta?.linkedinCount ?? companies.filter((c) => c.linkedinUrl).length
 
   return (
     <div className="ci-copilot-list">
       <div className="ci-copilot-list__header">
         <p className="ci-copilot-list__title">
-          What I found — <strong>{total}</strong> companies
+          {isKnowledge ? (
+            <>
+              Contestants — <strong>{total}</strong>
+            </>
+          ) : (
+            <>
+              What I found — <strong>{total}</strong> companies
+            </>
+          )}
         </p>
-        {topCount > 0 || goodCount > 0 ? (
+        {isKnowledge ? (
+          <p className="ci-copilot-list__sub">
+            {linkedinCount > 0 ? `${linkedinCount} LinkedIn` : 'LinkedIn where public'}
+            {discoveryMeta?.inCrm != null
+              ? ` · ${discoveryMeta.inCrm} in CRM · ${discoveryMeta.newLeads ?? total - discoveryMeta.inCrm} new`
+              : null}
+          </p>
+        ) : topCount > 0 || goodCount > 0 ? (
           <p className="ci-copilot-list__sub">
             {topCount > 0 ? `${topCount} top recommended` : null}
             {topCount > 0 && goodCount > 0 ? ' · ' : null}
@@ -177,7 +198,12 @@ export default function CopilotCompanyList({ companies, discoveryMeta, onAction 
       </div>
       <div className="ci-copilot-list__scroll">
         {companies.map((c) => (
-          <CompanyRow key={c.id || c.company || c.name} company={c} onAction={onAction} />
+          <CompanyRow
+            key={c.id || c.company || c.name}
+            company={c}
+            onAction={onAction}
+            knowledgeMode={isKnowledge}
+          />
         ))}
       </div>
     </div>
