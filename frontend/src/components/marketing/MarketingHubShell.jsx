@@ -12,6 +12,7 @@ import { CrmAiIcon } from '../assistant/ConnectAIFab'
 import {
   HomeIcon,
   MailIcon,
+  BoltIcon,
   PeopleIcon,
   NoteIcon,
   ChartIcon,
