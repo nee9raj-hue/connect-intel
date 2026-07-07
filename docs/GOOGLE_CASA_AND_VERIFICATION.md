@@ -14,7 +14,7 @@ Google’s current requirement is a **CASA Tier 2 security assessment** (deadlin
 |-------------|--------|
 | **CASA Tier 2 assessment** | Engage an authorized lab (Google suggests **TAC Security** at a negotiated rate). Allow **up to 6 weeks**. |
 | **Reply to Google’s email** | After you **start** the CASA process (or complete it), reply to the same thread so review continues. |
-| **Verification center items** | Keep all non-CASA items green (homepage, privacy, demo video, scopes, domain). |
+| **Chrome extension (v1.0)** | Store package ready — `docs/CHROME_WEB_STORE.md`. Extension uses web app session only; Gmail OAuth remains server-side. |
 
 **Important:** You do **not** need to wait until CASA is finished to reply the first time. Reply to confirm you have **engaged a CASA lab** and give the expected completion date.
 

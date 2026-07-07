@@ -12,6 +12,7 @@ frontend/dist/
 # Built output (Vercel builds these on deploy)
 site/
 site-standalone/
+dist/
 app.html
 assets/
 frontend/dist/

@@ -1,11 +1,11 @@
 {
   "manifest_version": 3,
   "name": "Connect Intel",
-  "version": "0.3.6",
-  "description": "Gmail trail sync, LinkedIn capture, and pipeline tools for Connect Intel CRM.",
+  "version": "1.0.0",
+  "description": "CRM companion for Gmail and LinkedIn — match pipeline leads, sync email trails, capture profiles, and send from Connect Intel.",
   "icons": {
     "48": "icons/icon-48.png",
-    "128": "icons/icon-48.png"
+    "128": "icons/icon-128.png"
   },
   "permissions": ["storage", "cookies", "activeTab", "scripting", "tabs"],
   "host_permissions": [
@@ -21,7 +21,8 @@
     "default_title": "Connect Intel",
     "default_popup": "popup.html",
     "default_icon": {
-      "48": "icons/icon-48.png"
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
     }
   },
   "content_scripts": [
