@@ -1,53 +1,88 @@
 import {
-  FIELD_TYPES,
   createEmptyField,
+  FIELD_TYPES,
   normalizeFields,
-  normalizeFormTheme,
 } from '../../../../lib/marketingFormSchema.js'
 
-function FieldRow({ field, index, total, onChange, onRemove, onMove }) {
+export const FORM_FIELD_GROUPS = [
+  {
+    id: 'lead',
+    label: 'Lead capture',
+    items: [
+      { type: 'text', preset: { id: 'firstName', label: 'First name', placeholder: '' } },
+      { type: 'text', preset: { id: 'lastName', label: 'Last name', placeholder: '' } },
+      { type: 'email', preset: { id: 'email', label: 'Email', placeholder: 'you@company.com', required: true } },
+      { type: 'phone', preset: { id: 'phone', label: 'Phone', placeholder: '' } },
+      { type: 'company', preset: { id: 'company', label: 'Company', placeholder: '' } },
+    ],
+  },
+  {
+    id: 'input',
+    label: 'Questions',
+    items: [
+      { type: 'text' },
+      { type: 'textarea' },
+      { type: 'number' },
+      { type: 'date' },
+      { type: 'select' },
+      { type: 'radio' },
+      { type: 'checkbox' },
+    ],
+  },
+  {
+    id: 'compliance',
+    label: 'Compliance',
+    items: [{ type: 'consent' }],
+  },
+  {
+    id: 'layout',
+    label: 'Layout',
+    items: [{ type: 'section' }],
+  },
+]
+
+function fieldTypeLabel(type) {
+  return FIELD_TYPES.find((t) => t.id === type)?.label || type
+}
+
+function FieldInspector({ field, onChange, onRemove, onMove, index, total }) {
+  if (!field) {
+    return (
+      <div className="mhub-form-inspector mhub-form-inspector--empty">
+        <p className="mhub-form-inspector__hint">Select a field in the preview to edit it, or add a field from the palette.</p>
+      </div>
+    )
+  }
+
   const set = (patch) => onChange({ ...field, ...patch })
   const needsOptions = field.type === 'select' || field.type === 'radio' || field.type === 'checkbox'
+  const isConsent = field.type === 'consent'
+  const isSection = field.type === 'section'
 
   return (
-    <div className="border border-gray-200 rounded-lg p-3 space-y-2 bg-gray-50/50">
-      <div className="flex items-center justify-between gap-2">
-        <span className="text-xs font-bold uppercase text-gray-500">
-          {FIELD_TYPES.find((t) => t.id === field.type)?.label || field.type}
-        </span>
-        <div className="flex gap-1">
-          <button
-            type="button"
-            disabled={index === 0}
-            onClick={() => onMove(index, -1)}
-            className="text-xs px-1.5 py-0.5 border rounded disabled:opacity-30"
-          >
+    <div className="mhub-form-inspector">
+      <div className="mhub-form-inspector__head">
+        <span className="mhub-form-inspector__type">{fieldTypeLabel(field.type)}</span>
+        <div className="mhub-form-inspector__actions">
+          <button type="button" className="mhub-v3-btn mhub-v3-btn--ghost" disabled={index === 0} onClick={() => onMove(-1)} aria-label="Move up">
             ↑
           </button>
-          <button
-            type="button"
-            disabled={index === total - 1}
-            onClick={() => onMove(index, 1)}
-            className="text-xs px-1.5 py-0.5 border rounded disabled:opacity-30"
-          >
+          <button type="button" className="mhub-v3-btn mhub-v3-btn--ghost" disabled={index === total - 1} onClick={() => onMove(1)} aria-label="Move down">
             ↓
           </button>
-          <button
-            type="button"
-            onClick={() => onRemove(index)}
-            className="text-xs px-1.5 py-0.5 border border-red-100 text-red-700 rounded"
-          >
+          <button type="button" className="mhub-v3-btn mhub-v3-btn--ghost mhub-v3-btn--danger" onClick={onRemove}>
             Remove
           </button>
         </div>
       </div>
-      <div className="grid sm:grid-cols-2 gap-2">
-        <label className="text-xs text-gray-500 sm:col-span-2">
+
+      {!isSection ? (
+        <label className="mhub-v3-label">
           Field type
           <select
+            className="mhub-v3-input"
             value={field.type}
             onChange={(e) => onChange({ ...createEmptyField(e.target.value), id: field.id })}
-            className="mt-0.5 w-full text-xs border border-gray-200 rounded-lg px-2 py-1.5 bg-white"
           >
             {FIELD_TYPES.map((t) => (
               <option key={t.id} value={t.id}>
@@ -56,154 +91,157 @@ function FieldRow({ field, index, total, onChange, onRemove, onMove }) {
             ))}
           </select>
         </label>
-        {field.type !== 'section' && (
-          <>
-            <label className="text-xs text-gray-500">
-              Label
-              <input
-                value={field.label}
-                onChange={(e) => set({ label: e.target.value })}
-                className="mt-0.5 w-full text-xs border border-gray-200 rounded-lg px-2 py-1.5 bg-white"
-              />
-            </label>
-            <label className="text-xs text-gray-500 flex items-end gap-2 pb-1">
-              <input
-                type="checkbox"
-                checked={Boolean(field.required)}
-                onChange={(e) => set({ required: e.target.checked })}
-              />
-              Required
-            </label>
-            <label className="text-xs text-gray-500 sm:col-span-2">
-              Placeholder
-              <input
-                value={field.placeholder || ''}
-                onChange={(e) => set({ placeholder: e.target.value })}
-                className="mt-0.5 w-full text-xs border border-gray-200 rounded-lg px-2 py-1.5 bg-white"
-              />
-            </label>
-          </>
-        )}
-        {field.type === 'section' && (
-          <label className="text-xs text-gray-500 sm:col-span-2">
-            Section title
+      ) : null}
+
+      <label className="mhub-v3-label">
+        {isSection ? 'Section title' : isConsent ? 'Consent text' : 'Label'}
+        <input
+          className="mhub-v3-input"
+          value={field.label}
+          onChange={(e) => set({ label: e.target.value })}
+        />
+      </label>
+
+      {!isSection && !isConsent ? (
+        <>
+          <label className="mhub-v3-label mhub-form-inspector__check">
+            <input type="checkbox" checked={Boolean(field.required)} onChange={(e) => set({ required: e.target.checked })} />
+            Required
+          </label>
+          <label className="mhub-v3-label">
+            Placeholder
             <input
-              value={field.label}
-              onChange={(e) => set({ label: e.target.value })}
-              className="mt-0.5 w-full text-xs border border-gray-200 rounded-lg px-2 py-1.5 bg-white"
+              className="mhub-v3-input"
+              value={field.placeholder || ''}
+              onChange={(e) => set({ placeholder: e.target.value })}
             />
           </label>
-        )}
-        {needsOptions && (
-          <label className="text-xs text-gray-500 sm:col-span-2">
-            Choices (one per line)
-            <textarea
-              value={(field.options || []).join('\n')}
-              onChange={(e) => set({ options: e.target.value.split('\n') })}
-              rows={3}
-              className="mt-0.5 w-full text-xs border border-gray-200 rounded-lg px-2 py-1.5 bg-white font-mono"
-            />
-          </label>
-        )}
-        <label className="text-xs text-gray-500 sm:col-span-2">
-          Help text (optional)
-          <input
-            value={field.helpText || ''}
-            onChange={(e) => set({ helpText: e.target.value })}
-            className="mt-0.5 w-full text-xs border border-gray-200 rounded-lg px-2 py-1.5 bg-white"
+        </>
+      ) : null}
+
+      {isConsent ? (
+        <label className="mhub-v3-label mhub-form-inspector__check">
+          <input type="checkbox" checked={field.required !== false} onChange={(e) => set({ required: e.target.checked })} />
+          Required to submit
+        </label>
+      ) : null}
+
+      <label className="mhub-v3-label">
+        Help text
+        <input
+          className="mhub-v3-input"
+          value={field.helpText || ''}
+          onChange={(e) => set({ helpText: e.target.value })}
+          placeholder={isConsent ? 'Shown above the consent checkbox' : 'Optional hint under the label'}
+        />
+      </label>
+
+      {needsOptions ? (
+        <label className="mhub-v3-label">
+          Choices (one per line)
+          <textarea
+            className="mhub-v3-input mhub-form-inspector__mono"
+            rows={4}
+            value={(field.options || []).join('\n')}
+            onChange={(e) => set({ options: e.target.value.split('\n') })}
           />
         </label>
-      </div>
+      ) : null}
     </div>
   )
 }
 
-export default function MarketingFormBuilder({ value, onChange }) {
-  const fields = normalizeFields(value.fields)
-  const theme = normalizeFormTheme(value.theme)
+export function MarketingFormFieldInspector({
+  form,
+  onChange,
+  selectedFieldId,
+  onSelectFieldId,
+}) {
+  const fields = normalizeFields(form.fields)
+  const setFields = (next) => onChange({ ...form, fields: next })
+  const selectedIndex = fields.findIndex((f) => f.id === selectedFieldId)
+  const selectedField = selectedIndex >= 0 ? fields[selectedIndex] : null
 
-  const setFields = (next) => onChange({ ...value, fields: next })
-  const setTheme = (patch) => onChange({ ...value, theme: { ...theme, ...patch } })
+  const updateSelected = (field) => {
+    if (selectedIndex < 0) return
+    const copy = [...fields]
+    copy[selectedIndex] = field
+    setFields(copy)
+  }
 
-  const moveField = (index, dir) => {
-    const next = index + dir
+  const moveSelected = (dir) => {
+    if (selectedIndex < 0) return
+    const next = selectedIndex + dir
     if (next < 0 || next >= fields.length) return
     const copy = [...fields]
-    const [item] = copy.splice(index, 1)
+    const [item] = copy.splice(selectedIndex, 1)
     copy.splice(next, 0, item)
     setFields(copy)
   }
 
-  const updateField = (index, field) => {
-    const copy = [...fields]
-    copy[index] = field
-    setFields(copy)
+  return (
+    <FieldInspector
+      field={selectedField}
+      index={selectedIndex}
+      total={fields.length}
+      onChange={updateSelected}
+      onRemove={() => {
+        if (selectedIndex < 0) return
+        setFields(fields.filter((_, i) => i !== selectedIndex))
+        onSelectFieldId?.(null)
+      }}
+      onMove={moveSelected}
+    />
+  )
+}
+
+export default function MarketingFormPalette({ form, onChange, onSelectFieldId }) {
+  const fields = normalizeFields(form.fields)
+
+  const setFields = (next) => onChange({ ...form, fields: next })
+
+  const addField = (type, preset = null) => {
+    if (type === 'consent' && fields.some((f) => f.type === 'consent')) return
+    const base = createEmptyField(type)
+    const next = preset
+      ? {
+          ...base,
+          ...preset,
+          id: fields.some((f) => f.id === preset.id) ? base.id : preset.id || base.id,
+        }
+      : base
+    const updated = [...fields, next]
+    setFields(updated)
+    onSelectFieldId?.(next.id)
   }
 
   return (
-    <div className="space-y-4">
-      <div className="grid sm:grid-cols-3 gap-2">
-        <label className="text-xs text-gray-500">
-          Accent color
-          <input
-            type="color"
-            value={theme.primaryColor}
-            onChange={(e) => setTheme({ primaryColor: e.target.value })}
-            className="mt-0.5 block h-8 w-full rounded border border-gray-200"
-          />
-        </label>
-        <label className="text-xs text-gray-500">
-          Page background
-          <input
-            type="color"
-            value={theme.pageBackground}
-            onChange={(e) => setTheme({ pageBackground: e.target.value })}
-            className="mt-0.5 block h-8 w-full rounded border border-gray-200"
-          />
-        </label>
-        <label className="text-xs text-gray-500">
-          Card background
-          <input
-            type="color"
-            value={theme.cardBackground}
-            onChange={(e) => setTheme({ cardBackground: e.target.value })}
-            className="mt-0.5 block h-8 w-full rounded border border-gray-200"
-          />
-        </label>
-      </div>
-
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <p className="text-xs font-semibold text-gray-900">Questions ({fields.length})</p>
-          <select
-            className="text-xs border border-gray-200 rounded-lg px-2 py-1"
-            defaultValue=""
-            onChange={(e) => {
-              if (!e.target.value) return
-              setFields([...fields, createEmptyField(e.target.value)])
-              e.target.value = ''
-            }}
-          >
-            <option value="">+ Add field</option>
-            {FIELD_TYPES.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.label}
-              </option>
-            ))}
-          </select>
+    <aside className="mhub-form-builder__palette">
+      <p className="mhub-v3-eyebrow">Add fields</p>
+      {FORM_FIELD_GROUPS.map((group) => (
+        <div key={group.id} className="mhub-form-builder__group">
+          <p className="mhub-form-builder__group-label">{group.label}</p>
+          {group.items.map((item) => {
+            const label = item.preset?.label || fieldTypeLabel(item.type)
+            const disabled = item.type === 'consent' && fields.some((f) => f.type === 'consent')
+            return (
+              <button
+                key={`${group.id}-${label}`}
+                type="button"
+                className="mhub-v3-palette-item"
+                disabled={disabled}
+                onClick={() => addField(item.type, item.preset)}
+                title={disabled ? 'Only one consent field per form' : undefined}
+              >
+                {label}
+              </button>
+            )
+          })}
         </div>
-        {fields.map((field, index) => (
-          <FieldRow
-            key={field.id}
-            field={field}
-            index={index}
-            total={fields.length}
-            onChange={(f) => updateField(index, f)}
-            onRemove={(i) => setFields(fields.filter((_, idx) => idx !== i))}
-            onMove={moveField}
-          />
-        ))}
-      </div>
-    </div>
+      ))}
+      <p className="mhub-form-builder__palette-foot">
+        Submissions create or update pipeline leads with a timeline event.
+      </p>
+    </aside>
   )
 }

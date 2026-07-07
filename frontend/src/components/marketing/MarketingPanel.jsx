@@ -3,7 +3,6 @@ import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { DEFAULT_THEME } from '../../lib/marketingEmailDesign'
 import MarketingTemplateBuilder, { FOLLOW_UP_STARTER } from './MarketingTemplateBuilder'
-import { DEFAULT_FORM_FIELDS, DEFAULT_FORM_THEME } from '../../../../lib/marketingFormSchema.js'
 import LoadingExperience from '../ui/LoadingExperience'
 import CampaignReportsView, { campaignToForm } from './CampaignReportsView'
 import MarketingReportsListPage from './MarketingReportsListPage'
@@ -63,15 +62,6 @@ const EMPTY_TEMPLATE = {
   design: { ...DEFAULT_THEME },
   previewText: '',
 }
-const EMPTY_FORM = {
-  name: '',
-  title: '',
-  description: '',
-  submitLabel: 'Submit',
-  fields: DEFAULT_FORM_FIELDS,
-  theme: { ...DEFAULT_FORM_THEME },
-}
-
 const EMPTY_CAMPAIGN = {
   name: '',
   channel: 'email',
@@ -170,7 +160,6 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
     gmailStatus.gmailConnectAvailable
 
   const [templateForm, setTemplateForm] = useState({ ...EMPTY_TEMPLATE })
-  const [formForm, setFormForm] = useState({ ...EMPTY_FORM })
   const [campaignForm, setCampaignForm] = useState({
     ...EMPTY_CAMPAIGN,
     design: { ...DEFAULT_THEME },
@@ -391,64 +380,6 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
       setError(e.message)
     } finally {
       setBusy(false)
-    }
-  }
-
-  const saveForm = async () => {
-    if (!formForm.name.trim()) return setError('Form name is required')
-    setBusy(true)
-    setError(null)
-    try {
-      const payload = {
-        name: formForm.name.trim(),
-        title: formForm.title.trim() || formForm.name.trim(),
-        description: formForm.description.trim(),
-        submitLabel: formForm.submitLabel.trim() || 'Submit',
-        fields: formForm.fields,
-        theme: formForm.theme,
-      }
-      const data = formForm.id
-        ? await api.updateMarketingForm({ id: formForm.id, ...payload })
-        : await api.createMarketingForm(payload)
-      setFormForm({ ...EMPTY_FORM })
-      setNotice(formForm.id ? 'Form updated' : 'Form created — copy the public link below')
-      await load()
-      setTab('forms')
-      if (!formForm.id && data.form?.publicUrl) {
-        try {
-          await navigator.clipboard.writeText(data.form.publicUrl)
-          setNotice('Form created — link copied to clipboard')
-        } catch {
-          // ignore clipboard errors
-        }
-      }
-    } catch (e) {
-      setError(e.message)
-    } finally {
-      setBusy(false)
-    }
-  }
-
-  const editForm = (f) => {
-    setFormForm({
-      id: f.id,
-      name: f.name,
-      title: f.title || '',
-      description: f.description || '',
-      submitLabel: f.submitLabel || 'Submit',
-      fields: f.fields?.length ? f.fields : DEFAULT_FORM_FIELDS,
-      theme: f.theme || { ...DEFAULT_FORM_THEME },
-    })
-  }
-
-  const copyFormLink = async (slug) => {
-    const base = window.location.origin
-    const url = `${base}/api/marketing/form?slug=${encodeURIComponent(slug)}`
-    try {
-      await navigator.clipboard.writeText(url)
-      setNotice('Form link copied')
-    } catch {
-      setNotice(url)
     }
   }
 
