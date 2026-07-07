@@ -9,7 +9,7 @@ import {
 } from './lib/api.js'
 
 const GMAIL_URL_PATTERN = 'https://mail.google.com/*'
-const LINKEDIN_URL_PATTERN = 'https://www.linkedin.com/in/*'
+const LINKEDIN_URL_PATTERN = 'https://*.linkedin.com/in/*'
 
 function isGmailTab(tab) {
   const url = String(tab?.url || tab?.pendingUrl || '')

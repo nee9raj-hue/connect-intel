@@ -59,7 +59,13 @@ async function loadPageCapture(tab) {
     const [{ result }] = await chrome.scripting.executeScript({
       target: { tabId: tab.id },
       files: ['lib/pageCapture.js'],
-      func: () => globalThis.__connectIntelExtractPage?.() || null,
+      func: async () => {
+        const ready = globalThis.__connectIntelExtractPageReady
+        const snap = globalThis.__connectIntelExtractPage
+        if (typeof ready === 'function') return ready()
+        if (typeof snap === 'function') return snap()
+        return null
+      },
     })
     return result || null
   } catch {

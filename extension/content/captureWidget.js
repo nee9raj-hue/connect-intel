@@ -56,8 +56,16 @@ class ConnectIntelCaptureWidget {
     this.els = {}
   }
 
-  readCapture() {
+  async readCaptureAsync() {
+    const extractReady = globalThis.__connectIntelExtractPageReady
     const extract = globalThis.__connectIntelExtractPage
+    if (typeof extractReady === 'function') {
+      try {
+        return await extractReady()
+      } catch {
+        /* fall through */
+      }
+    }
     if (typeof extract !== 'function') return null
     try {
       return extract()
@@ -233,7 +241,7 @@ class ConnectIntelCaptureWidget {
     this.renderLoading()
 
     try {
-      this.capture = this.readCapture()
+      this.capture = await this.readCaptureAsync()
       this.boot = await sendMessage('CI_BOOTSTRAP')
       await sendMessage('CI_LOG', {
         action: 'extension.capture_opened',
@@ -297,8 +305,13 @@ class ConnectIntelCaptureWidget {
     if (!this.capture) {
       this.els.preview.hidden = true
       this.els.capture.hidden = true
+      this.els.open.hidden = true
+      this.els.signin.hidden = true
       this.els.status.hidden = false
-      this.els.status.innerHTML = `${signedIn}<br/>Could not read this page. Try a LinkedIn profile or company site.`
+      const onProfile = /linkedin\.com\/in\//i.test(location.href)
+      this.els.status.innerHTML = onProfile
+        ? `${signedIn}<br/>Profile is still loading — close and reopen this panel, or refresh the tab.<br/><span style="color:#64748b">If this persists, reload the Connect Intel extension (v0.3.1+).</span>`
+        : `${signedIn}<br/>Could not read this page. Open a LinkedIn profile (<code>/in/…</code>) or company site.`
       return
     }
 

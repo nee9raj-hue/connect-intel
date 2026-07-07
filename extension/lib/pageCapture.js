@@ -1,13 +1,18 @@
 /**
  * Extract capture fields from LinkedIn profiles and generic web pages.
  * Constitution: visible page metadata only — no hidden DOM scraping beyond active tab.
+ * NOTE: Content scripts are classic scripts (no export/import).
  */
 
 function firstText(selectors, root = document) {
   for (const selector of selectors) {
-    const el = root.querySelector(selector)
-    const text = el?.textContent?.trim()
-    if (text) return text
+    try {
+      const el = root.querySelector(selector)
+      const text = el?.textContent?.trim()
+      if (text) return text
+    } catch {
+      /* invalid selector on some pages */
+    }
   }
   return ''
 }
@@ -44,32 +49,112 @@ function findEmailOnPage() {
   return match ? match[0].toLowerCase() : ''
 }
 
-export function extractLinkedInProfile() {
+function isLinkedInProfileUrl(url = '') {
+  return /linkedin\.com\/in\//i.test(String(url || location.href || ''))
+}
+
+function nameFromDocumentTitle() {
+  const raw = String(document.title || '')
+    .replace(/\s*\|\s*LinkedIn.*$/i, '')
+    .replace(/\s*-\s*LinkedIn.*$/i, '')
+    .trim()
+  if (!raw) return ''
+
+  const primary = raw.split(' - ')[0]?.split('|')[0]?.trim() || ''
+  if (primary.length < 2 || primary.length > 80) return ''
+  if (/^linkedin$/i.test(primary)) return ''
+  return primary
+}
+
+function findLinkedInProfileName() {
+  const fromTitle = nameFromDocumentTitle()
+  if (fromTitle) return fromTitle
+
+  const main = document.querySelector('main') || document
+  const fromH1 = firstText(
+    [
+      'h1.text-heading-xlarge',
+      'h1.inline.t-24',
+      'h1[class*="text-heading"]',
+      'main section:first-of-type h1',
+      'main h1',
+      '.pv-text-details__left-panel h1',
+      'h1',
+    ],
+    main
+  )
+  if (fromH1 && fromH1.length < 80) return fromH1
+
+  const ogTitle = document.querySelector('meta[property="og:title"]')?.getAttribute('content')
+  if (ogTitle) {
+    const cleaned = ogTitle.replace(/\s*\|\s*LinkedIn.*$/i, '').trim()
+    if (cleaned.length >= 2 && cleaned.length < 80) return cleaned
+  }
+
+  return ''
+}
+
+function findLinkedInHeadline() {
+  const main = document.querySelector('main') || document
+  const fromDom = firstText(
+    [
+      '.text-body-medium.break-words',
+      'div.text-body-medium',
+      '.text-body-medium',
+      '[data-generated-suggestion-target]',
+      '.pv-text-details__left-panel .text-body-medium',
+      'main section:first-of-type .text-body-medium',
+      'main .text-body-medium',
+    ],
+    main
+  )
+  if (fromDom) return fromDom
+
+  const rawTitle = String(document.title || '')
+  const dashIdx = rawTitle.indexOf(' - ')
+  if (dashIdx > 0) {
+    const segment = rawTitle
+      .slice(dashIdx + 3)
+      .replace(/\s*\|\s*LinkedIn.*$/i, '')
+      .trim()
+    if (segment.length >= 4 && segment.length < 240) return segment
+  }
+
+  return ''
+}
+
+function findLinkedInCurrentCompany() {
+  const buttonLabel = firstText([
+    'button[aria-label*="Current company"]',
+    'button[aria-label*="current company"]',
+  ])
+  if (buttonLabel) {
+    const cleaned = buttonLabel
+      .replace(/^current company:\s*/i, '')
+      .replace(/\.\s*click.*$/i, '')
+      .trim()
+    if (cleaned) return cleaned
+  }
+
+  return firstText([
+    '#experience ~ div li span[aria-hidden="true"]',
+    'section[data-section="experience"] li span[aria-hidden="true"]',
+    'section:has(#experience) li span[aria-hidden="true"]',
+  ])
+}
+
+function extractLinkedInProfile() {
   const url = String(location.href || '').split('?')[0]
-  if (!/\/in\//i.test(url)) return null
+  if (!isLinkedInProfileUrl(url)) return null
 
-  const name = firstText([
-    'h1.text-heading-xlarge',
-    'h1.inline.t-24',
-    'main h1',
-    'h1',
-  ])
-  const headline = firstText([
-    '.text-body-medium.break-words',
-    '.text-body-medium',
-    '[data-generated-suggestion-target]',
-    '.pv-text-details__left-panel .text-body-medium',
-  ])
-
+  const name = findLinkedInProfileName()
+  const headline = findLinkedInHeadline()
   const { title, company } = parseHeadline(headline)
   const { firstName, lastName } = splitPersonName(name)
 
   let resolvedCompany = company
   if (!resolvedCompany) {
-    const experienceCompany = firstText([
-      '#experience ~ div li span[aria-hidden="true"]',
-      'section[data-section="experience"] li span[aria-hidden="true"]',
-    ])
+    const experienceCompany = findLinkedInCurrentCompany()
     if (experienceCompany && experienceCompany.length < 120) {
       resolvedCompany = experienceCompany
     }
@@ -88,7 +173,7 @@ export function extractLinkedInProfile() {
   }
 }
 
-export function extractGenericPage() {
+function extractGenericPage() {
   const url = String(location.href || '').split('?')[0]
   const title = String(document.title || '').trim()
   const selection = String(window.getSelection?.()?.toString?.() || '').trim()
@@ -115,7 +200,7 @@ export function extractGenericPage() {
   }
 }
 
-export function extractPageCapture() {
+function extractPageCapture() {
   const host = String(location.hostname || '').toLowerCase()
   if (host.includes('linkedin.com')) {
     return extractLinkedInProfile() || extractGenericPage()
@@ -123,6 +208,29 @@ export function extractPageCapture() {
   return extractGenericPage()
 }
 
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+/** LinkedIn is a SPA — profile DOM may render after document_idle. */
+async function extractPageCaptureWhenReady(maxWaitMs = 2500) {
+  const started = Date.now()
+  let last = null
+
+  while (Date.now() - started < maxWaitMs) {
+    last = extractPageCapture()
+    const name = [last?.firstName, last?.lastName].filter(Boolean).join(' ')
+    const hasData = Boolean(
+      name || last?.company || last?.title || last?.linkedin || last?.email
+    )
+    if (hasData) return last
+    await sleep(400)
+  }
+
+  return last || extractPageCapture()
+}
+
 if (typeof globalThis !== 'undefined') {
   globalThis.__connectIntelExtractPage = extractPageCapture
+  globalThis.__connectIntelExtractPageReady = extractPageCaptureWhenReady
 }
