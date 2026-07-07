@@ -80,8 +80,9 @@ export function renderAssistantMarkdown(text) {
     const section = trimmed.match(/^\*\*([^*]+)\*\*:?\s*(.*)$/)
     if (section) {
       const [, title, rest] = section
+      const tone = sectionTone(title)
       nodes.push(
-        <div key={`sec-${idx}`} className="ci-ai-md__section">
+        <div key={`sec-${idx}`} className={`ci-ai-md__section${tone ? ` ci-ai-md__section--${tone}` : ''}`}>
           <p className="ci-ai-md__heading">{title}</p>
           {rest ? <p className="ci-ai-md__para">{renderInline(rest, `sec-${idx}`)}</p> : null}
         </div>
@@ -98,6 +99,15 @@ export function renderAssistantMarkdown(text) {
 
   flushList()
   return nodes
+}
+
+function sectionTone(title) {
+  const t = String(title || '').toLowerCase()
+  if (t.includes('crm')) return 'crm'
+  if (t.includes('web') || t.includes('internet') || t.includes('market')) return 'web'
+  if (t.includes('news')) return 'news'
+  if (t.includes('company') || t.includes('intelligence')) return 'intel'
+  return ''
 }
 
 export function sourceBadgesFromMessage(msg) {

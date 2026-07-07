@@ -3,7 +3,7 @@ import { useApp } from '../../context/AppContext'
 import useIsMobile from '../../hooks/useIsMobile'
 import { api } from '../../lib/api'
 import { applyAssistantAction } from '../../lib/assistantNavigation'
-import { getContextualSuggestions } from '../../lib/copilotSuggestions'
+import { getContextualSuggestions, COPILOT_TABS, PROGRESS_STEPS, pushRecentSearch, loadRecentSearches } from '../../lib/copilotSuggestions'
 import { CI_OPEN_AI_EVENT } from '../../lib/openConnectAI'
 import { CrmAiIcon } from './ConnectAIFab'
 import CopilotCompanyCard from './CopilotCompanyCard'
@@ -85,6 +85,9 @@ export default function ConnectAssistant({
   const [webResearchAvailable, setWebResearchAvailable] = useState(false)
   const [showRaiseForm, setShowRaiseForm] = useState(false)
   const [concernText, setConcernText] = useState('')
+  const [activeTab, setActiveTab] = useState('copilot')
+  const [progressStep, setProgressStep] = useState('')
+  const [recentSearches, setRecentSearches] = useState([])
   const bottomRef = useRef(null)
   const inputRef = useRef(null)
 
@@ -92,6 +95,7 @@ export default function ConnectAssistant({
     panel: activePanel || null,
     tab: panelOptions?.tab || null,
     leadId: pipelineLeadId || null,
+    copilotTab: activeTab,
   }
 
   const contextualPrompts = getContextualSuggestions(uiContext)
@@ -112,7 +116,30 @@ export default function ConnectAssistant({
     } catch {
       /* first visit */
     }
-  }, [uiContext.panel, uiContext.leadId])
+  }, [uiContext.panel, uiContext.leadId, uiContext.copilotTab])
+
+  useEffect(() => {
+    if (open) setRecentSearches(loadRecentSearches())
+  }, [open])
+
+  useEffect(() => {
+    if (!loading) {
+      setProgressStep('')
+      return undefined
+    }
+    const steps = PROGRESS_STEPS[activeTab] || PROGRESS_STEPS.copilot
+    let i = 0
+    setProgressStep(steps[0])
+    const id = setInterval(() => {
+      i = Math.min(i + 1, steps.length - 1)
+      setProgressStep(steps[i])
+    }, 1400)
+    return () => clearInterval(id)
+  }, [loading, activeTab])
+
+  useEffect(() => {
+    setSuggestions(getContextualSuggestions(uiContext))
+  }, [activeTab, uiContext.panel, uiContext.leadId])
 
   useEffect(() => {
     if (open && messages.length === 0) {
@@ -249,6 +276,8 @@ export default function ConnectAssistant({
       setStatus(null)
 
       try {
+        pushRecentSearch(trimmed)
+        setRecentSearches(loadRecentSearches())
         const data = await api.sendAssistantMessage(trimmed, uiContext)
         await loadHistory()
         if (data.suggestions?.length) setSuggestions(data.suggestions)
@@ -263,11 +292,17 @@ export default function ConnectAssistant({
     [loading, loadHistory, uiContext]
   )
 
+  const tabMeta = COPILOT_TABS.find((t) => t.id === activeTab) || COPILOT_TABS[0]
   const copilotSub = pipelineLeadId
     ? 'Lead context on · CRM + web research'
-    : webResearchAvailable
-      ? 'Auto-routes CRM data & live web research'
-      : 'CRM data & product knowledge · web when configured'
+    : `${tabMeta.hint}${webResearchAvailable ? ' · web live' : ''}`
+
+  const inputPlaceholder = {
+    copilot: 'Ask anything — CRM data, company research, emails, pipeline…',
+    market: 'Find exporters, research companies, market news…',
+    crm: 'Search pipeline, counts, follow-ups, stalled deals…',
+    actions: 'Draft email, schedule meeting, create task…',
+  }[activeTab]
 
   if (!user || user.isPlatformAdmin) return null
 
@@ -311,6 +346,20 @@ export default function ConnectAssistant({
           </button>
         </header>
 
+        <nav className="ci-ai-tabs" aria-label="Copilot modes">
+          {COPILOT_TABS.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              className={`ci-ai-tabs__btn${activeTab === tab.id ? ' is-active' : ''}`}
+              onClick={() => setActiveTab(tab.id)}
+              title={tab.hint}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </nav>
+
         <div className="ci-ai-panel__body">
           {activeTickets.length > 0 && (
             <div className="ci-ai-tickets">
@@ -334,8 +383,26 @@ export default function ConnectAssistant({
                 Hi{user.name ? `, ${user.name.split(' ')[0]}` : ''} — your sales copilot.
               </p>
               <p className="ci-ai-welcome__copy">
-                One question — I pick **CRM records**, **your workspace data**, or **live web research** automatically. Then suggest next actions.
+                {tabMeta.hint}. I check **CRM first**, then enrich from **web sources** — with one-click actions.
               </p>
+              {recentSearches.length > 0 ? (
+                <div className="ci-ai-recent">
+                  <p className="ci-ai-recent__label">Recent</p>
+                  <div className="ci-ai-capabilities">
+                    {recentSearches.slice(0, 3).map((prompt) => (
+                      <button
+                        key={prompt}
+                        type="button"
+                        className="ci-ai-capabilities__chip ci-ai-capabilities__chip--muted"
+                        disabled={loading}
+                        onClick={() => sendMessage(prompt)}
+                      >
+                        {prompt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
               <div className="ci-ai-capabilities">
                 {contextualPrompts.map((prompt) => (
                   <button
@@ -359,7 +426,10 @@ export default function ConnectAssistant({
           {loading && (
             <div className="ci-ai-thinking">
               <span className="ci-ai-thinking__dot" />
-              Routing CRM + web sources…
+              <span>{progressStep || 'Working…'}</span>
+              <div className="ci-ai-thinking__bar" aria-hidden>
+                <span className="ci-ai-thinking__bar-fill" />
+              </div>
             </div>
           )}
 
@@ -426,7 +496,7 @@ export default function ConnectAssistant({
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask anything — CRM data, company research, emails, pipeline…"
+              placeholder={inputPlaceholder}
               className="ci-ai-compose__input"
               disabled={loading}
               maxLength={2000}

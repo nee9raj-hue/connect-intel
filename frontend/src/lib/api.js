@@ -923,6 +923,7 @@ export const api = {
         panel: uiContext.panel,
         tab: uiContext.tab,
         leadId: uiContext.leadId,
+        copilotTab: uiContext.copilotTab,
       },
     }),
   escalateAssistantSupport: (payload) =>
