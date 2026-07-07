@@ -11,6 +11,7 @@ function tick() {
 
   const context = extract()
   const key = [
+    context.threadId || location.hash || '',
     context.subject || '',
     ...(context.emails || []).sort(),
     ...(context.recipientNames || []).sort(),
@@ -23,6 +24,10 @@ function tick() {
   })
 }
 
+window.addEventListener('hashchange', () => {
+  lastKey = ''
+  tick()
+})
 const observer = new MutationObserver(() => tick())
 observer.observe(document.documentElement, { childList: true, subtree: true })
 setInterval(tick, 4000)

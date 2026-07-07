@@ -1,8 +1,12 @@
 {
   "manifest_version": 3,
   "name": "Connect Intel for Gmail",
-  "version": "0.1.1",
+  "version": "0.2.1",
   "description": "Link Gmail threads to your Connect Intel pipeline — trail sync, activity log, no bulk inbox import.",
+  "icons": {
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-48.png"
+  },
   "permissions": ["storage", "cookies", "activeTab", "scripting"],
   "host_permissions": [
     "https://connectintel.net/*",
@@ -14,13 +18,22 @@
   },
   "action": {
     "default_title": "Connect Intel",
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": {
+      "48": "icons/icon-48.png"
+    }
   },
   "content_scripts": [
     {
       "matches": ["https://mail.google.com/*"],
-      "js": ["lib/gmailParticipants.js", "content/gmail.js"],
+      "js": ["lib/gmailParticipants.js", "content/gmail.js", "content/pageWidget.js"],
       "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/*"],
+      "matches": ["https://mail.google.com/*"]
     }
   ]
 }

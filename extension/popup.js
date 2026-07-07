@@ -85,6 +85,7 @@ async function init() {
       excludeEmails,
       subject: context.subject || '',
       recipientNames: context.recipientNames || [],
+      domainHints: context.domainHints || [],
     })
 
     if (!matches?.length) {

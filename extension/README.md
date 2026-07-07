@@ -23,7 +23,7 @@ Constitution-aligned browser companion for **Phase 22 Integrations**. Thin clien
 2. Sign in at [connectintel.net](https://connectintel.net) in Chrome (same profile).
 3. Open `chrome://extensions` → **Developer mode** → **Load unpacked**.
 4. Select this folder: `extension/`.
-5. Open Gmail → click the Connect Intel toolbar icon.
+5. Open Gmail → use the **floating Connect Intel button** (bottom-right) or the toolbar icon.
 
 ## API routes (server)
 
