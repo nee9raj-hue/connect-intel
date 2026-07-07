@@ -6,6 +6,8 @@ import {
   matchLeadsByEmails,
   syncEmailTrail,
   captureLead,
+  generateCrmEmail,
+  sendCrmEmail,
 } from './lib/api.js'
 
 const GMAIL_URL_PATTERN = 'https://mail.google.com/*'
@@ -117,6 +119,20 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     captureLead(message.fields || {})
       .then((result) => reply(sendResponse, { ok: true, result }))
       .catch((err) => reply(sendResponse, { ok: false, error: err.message }))
+    return true
+  }
+
+  if (message?.type === 'CI_GENERATE_EMAIL') {
+    generateCrmEmail(message.leadId, message.options || {})
+      .then((result) => reply(sendResponse, { ok: true, result }))
+      .catch((err) => reply(sendResponse, { ok: false, error: err.message, data: err.data }))
+    return true
+  }
+
+  if (message?.type === 'CI_SEND_EMAIL') {
+    sendCrmEmail(message.leadId, message.payload || {})
+      .then((result) => reply(sendResponse, { ok: true, result }))
+      .catch((err) => reply(sendResponse, { ok: false, error: err.message, data: err.data }))
     return true
   }
 

@@ -25,7 +25,9 @@ function sendMessage(type, payload = {}) {
 
   return rt.safeSendMessageAsync({ type, ...payload }).then((response) => {
     if (response?.ok === false) {
-      throw new Error(response.error || 'Request failed')
+      const err = new Error(response.error || 'Request failed')
+      err.data = response.data
+      throw err
     }
     return response?.result ?? response
   })
@@ -105,6 +107,18 @@ class ConnectIntelPageWidget {
             <button type="button" class="ci-btn ci-btn--secondary" data-action="open">Open in Connect Intel</button>
             <button type="button" class="ci-btn ci-btn--primary" data-action="sync">Sync email trail</button>
           </div>
+          <div class="ci-compose" hidden>
+            <div class="ci-compose__head">Send from CRM</div>
+            <label class="ci-label">Goal (for AI draft)</label>
+            <input type="text" class="ci-input" data-field="agenda" placeholder="Follow up on USA rates…" maxlength="500" />
+            <button type="button" class="ci-btn ci-btn--secondary" data-action="generate">Generate draft</button>
+            <label class="ci-label">Subject</label>
+            <input type="text" class="ci-input" data-field="subject" placeholder="Subject" maxlength="500" />
+            <label class="ci-label">Body</label>
+            <textarea class="ci-textarea" data-field="body" rows="5" placeholder="Email body"></textarea>
+            <button type="button" class="ci-btn ci-btn--primary" data-action="send">Send &amp; log in CRM</button>
+            <div class="ci-compose__hint">Sends from your connected work Gmail and logs to the lead trail.</div>
+          </div>
           <button type="button" class="ci-btn ci-btn--primary ci-signin" hidden data-action="signin">Sign in</button>
         </div>
       </div>
@@ -119,7 +133,11 @@ class ConnectIntelPageWidget {
       status: root.querySelector('.ci-status'),
       lead: root.querySelector('.ci-lead'),
       actions: root.querySelector('.ci-actions'),
+      compose: root.querySelector('.ci-compose'),
       signin: root.querySelector('.ci-signin'),
+      agenda: root.querySelector('[data-field="agenda"]'),
+      subject: root.querySelector('[data-field="subject"]'),
+      body: root.querySelector('[data-field="body"]'),
     }
 
     this.els.fab.addEventListener('click', () => this.togglePanel())
@@ -127,6 +145,8 @@ class ConnectIntelPageWidget {
     root.querySelector('[data-action="open"]')?.addEventListener('click', () => this.openInApp())
     root.querySelector('[data-action="sync"]')?.addEventListener('click', () => this.syncTrail())
     root.querySelector('[data-action="signin"]')?.addEventListener('click', () => this.signIn())
+    root.querySelector('[data-action="generate"]')?.addEventListener('click', () => this.generateDraft())
+    root.querySelector('[data-action="send"]')?.addEventListener('click', () => this.sendEmail())
 
     document.documentElement.appendChild(this.host)
 
@@ -191,7 +211,7 @@ class ConnectIntelPageWidget {
         right: 64px;
         bottom: 0;
         width: 320px;
-        max-height: min(70vh, 480px);
+        max-height: min(85vh, 620px);
         overflow: auto;
         background: #f8fafc;
         border: 1px solid #e2e8f0;
@@ -262,6 +282,51 @@ class ConnectIntelPageWidget {
       .ci-lead__name { font-weight: 700; font-size: 13px; color: #0f172a; }
       .ci-lead__meta { color: #64748b; margin-top: 4px; }
       .ci-actions { margin-top: 10px; }
+      .ci-compose {
+        margin-top: 10px;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 12px;
+      }
+      .ci-compose__head {
+        font-size: 12px;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 8px;
+      }
+      .ci-compose__hint {
+        font-size: 10px;
+        color: #64748b;
+        margin-top: 8px;
+        line-height: 1.4;
+      }
+      .ci-label {
+        display: block;
+        font-size: 10px;
+        font-weight: 600;
+        color: #64748b;
+        margin: 8px 0 4px;
+      }
+      .ci-label:first-of-type { margin-top: 0; }
+      .ci-input, .ci-textarea {
+        all: unset;
+        box-sizing: border-box;
+        display: block;
+        width: 100%;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        padding: 8px 10px;
+        font-size: 12px;
+        line-height: 1.4;
+        color: #0f172a;
+        background: #fff;
+      }
+      .ci-textarea { resize: vertical; min-height: 72px; }
+      .ci-input:focus, .ci-textarea:focus {
+        outline: 2px solid #93c5fd;
+        border-color: #3b82f6;
+      }
       .ci-btn {
         all: unset;
         box-sizing: border-box;
@@ -344,11 +409,24 @@ class ConnectIntelPageWidget {
     if (this.els?.badge) this.els.badge.hidden = true
   }
 
+  hideCompose() {
+    if (this.els?.compose) this.els.compose.hidden = true
+  }
+
+  showComposeIfEnabled() {
+    const enabled = Boolean(this.boot?.capabilities?.composeEmail && this.currentLead?.leadId)
+    if (this.els?.compose) this.els.compose.hidden = !enabled
+    if (enabled && this.els?.subject && !this.els.subject.value && this.context?.subject) {
+      this.els.subject.value = this.context.subject
+    }
+  }
+
   renderContextInvalidated() {
     if (!this.els?.status) return
     this.els.signin.hidden = true
     this.els.lead.hidden = true
     this.els.actions.hidden = true
+    this.hideCompose()
     this.els.status.hidden = false
     this.els.status.className = 'ci-status'
     this.els.status.innerHTML =
@@ -361,6 +439,7 @@ class ConnectIntelPageWidget {
     this.els.signin.hidden = true
     this.els.lead.hidden = true
     this.els.actions.hidden = true
+    this.hideCompose()
     this.els.status.hidden = false
     this.els.status.className = 'ci-status'
     this.els.status.textContent = 'Loading…'
@@ -369,6 +448,7 @@ class ConnectIntelPageWidget {
   renderSignIn() {
     this.els.lead.hidden = true
     this.els.actions.hidden = true
+    this.hideCompose()
     this.els.signin.hidden = false
     this.els.status.hidden = false
     this.els.status.className = 'ci-status'
@@ -379,6 +459,7 @@ class ConnectIntelPageWidget {
     this.els.signin.hidden = true
     this.els.lead.hidden = true
     this.els.actions.hidden = true
+    this.hideCompose()
     this.els.status.hidden = false
     this.els.status.className = 'ci-status ci-status--error'
     this.els.status.textContent = message
@@ -397,6 +478,7 @@ class ConnectIntelPageWidget {
       this.currentLead = null
       this.els.lead.hidden = true
       this.els.actions.hidden = true
+      this.hideCompose()
       this.els.status.hidden = false
       this.els.status.className = 'ci-status'
 
@@ -432,6 +514,114 @@ class ConnectIntelPageWidget {
       <div class="ci-lead__meta">Status: ${escapeHtml(lead.status || '—')}</div>
     `
     this.els.actions.hidden = false
+    this.showComposeIfEnabled()
+  }
+
+  async generateDraft() {
+    if (!this.currentLead?.leadId) return
+    const agenda = String(this.els.agenda?.value || '').trim()
+    if (agenda.length < 8) {
+      this.els.status.hidden = false
+      this.els.status.className = 'ci-status ci-status--error'
+      this.els.status.textContent = 'Describe your email goal in at least a few words before generating.'
+      return
+    }
+
+    this.els.status.hidden = false
+    this.els.status.className = 'ci-status'
+    this.els.status.textContent = 'Generating AI draft…'
+
+    try {
+      await sendMessage('CI_LOG', {
+        action: 'extension.email_draft_requested',
+        leadId: this.currentLead.leadId,
+        metadata: { agendaLength: agenda.length },
+      }).catch(() => {})
+
+      const result = await sendMessage('CI_GENERATE_EMAIL', {
+        leadId: this.currentLead.leadId,
+        options: { agenda, purpose: 'follow_up', tone: 'professional' },
+      })
+
+      const draft = result?.draft || result
+      if (draft?.subject && this.els.subject) this.els.subject.value = draft.subject
+      if (draft?.body && this.els.body) this.els.body.value = draft.body
+
+      await sendMessage('CI_LOG', {
+        action: 'extension.email_draft_generated',
+        leadId: this.currentLead.leadId,
+        metadata: { aiGenerated: true },
+      }).catch(() => {})
+
+      this.els.status.className = 'ci-status ci-status--ok'
+      this.els.status.textContent = 'Draft ready — review and send when ready.'
+      this.els.lead.hidden = false
+      this.els.actions.hidden = false
+      this.showComposeIfEnabled()
+    } catch (err) {
+      if (runtime()?.isContextInvalidatedError?.(err.message)) {
+        this.renderContextInvalidated()
+        return
+      }
+      this.renderError(err.message || 'Could not generate draft')
+      this.showComposeIfEnabled()
+    }
+  }
+
+  async sendEmail() {
+    if (!this.currentLead?.leadId) return
+    const subject = String(this.els.subject?.value || '').trim()
+    const body = String(this.els.body?.value || '').trim()
+    if (!subject || !body) {
+      this.els.status.hidden = false
+      this.els.status.className = 'ci-status ci-status--error'
+      this.els.status.textContent = 'Subject and body are required to send.'
+      return
+    }
+
+    this.els.status.hidden = false
+    this.els.status.className = 'ci-status'
+    this.els.status.textContent = 'Sending from your work Gmail…'
+
+    try {
+      await sendMessage('CI_LOG', {
+        action: 'extension.email_send_requested',
+        leadId: this.currentLead.leadId,
+      }).catch(() => {})
+
+      const result = await sendMessage('CI_SEND_EMAIL', {
+        leadId: this.currentLead.leadId,
+        payload: {
+          subject,
+          body,
+          aiGenerated: Boolean(this.els.agenda?.value?.trim()),
+        },
+      })
+
+      await sendMessage('CI_LOG', {
+        action: 'extension.email_sent',
+        leadId: this.currentLead.leadId,
+        metadata: { provider: result?.provider, mailbox: result?.mailbox },
+      }).catch(() => {})
+
+      this.els.status.className = 'ci-status ci-status--ok'
+      this.els.status.textContent = `Sent and logged${result?.mailbox ? ` from ${result.mailbox}` : ''}.`
+      this.els.lead.hidden = false
+      this.els.actions.hidden = false
+      this.showComposeIfEnabled()
+    } catch (err) {
+      if (runtime()?.isContextInvalidatedError?.(err.message)) {
+        this.renderContextInvalidated()
+        return
+      }
+      const hint = err.data?.needsGmailConnect
+        ? ' Connect work Gmail in Team → CRM email.'
+        : err.data?.needsEmailConsent
+          ? ' Lead needs email consent in CRM.'
+          : ''
+      this.renderError((err.message || 'Send failed') + hint)
+      this.showComposeIfEnabled()
+    }
   }
 
   async openInApp() {
@@ -463,6 +653,7 @@ class ConnectIntelPageWidget {
       this.els.status.textContent = `Trail sync done — ${result?.importedCount || 0} new message(s), ${result?.removedCount || 0} pruned`
       this.els.lead.hidden = false
       this.els.actions.hidden = false
+      this.showComposeIfEnabled()
     } catch (err) {
       if (runtime()?.isContextInvalidatedError?.(err.message)) {
         this.renderContextInvalidated()

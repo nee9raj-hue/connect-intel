@@ -8,6 +8,7 @@ Constitution-aligned browser companion for **Phase 22 Integrations**. Thin clien
 |---------|------------------------|
 | **Gmail lead match** | Matches visible participant emails to pipeline leads (workspace-scoped RBAC) |
 | **Trail sync** | Calls `POST /api/crm/sync-email-thread` — server-side trail-only import |
+| **Gmail compose** | AI draft (`crm-generate-email`) + **Send & log** (`crm-send-email`) from matched thread |
 | **LinkedIn / site capture** | `POST /api/extension/capture-lead` — add profile or page to pipeline (audited) |
 | **Activity log** | `POST /api/extension/log` → `audit_events` + workspace pulse |
 | **Open in app** | Deep link to pipeline lead in Connect Intel |
@@ -37,6 +38,8 @@ After reloading the extension, Gmail and LinkedIn tabs reload automatically (v0.
 | `/api/extension/capture-lead` | POST | Add LinkedIn / page capture to pipeline |
 | `/api/extension/log` | POST | Audited extension actions |
 | `/api/crm/sync-email-thread` | POST | Trail sync (existing) |
+| `/api/crm-generate-email` | POST | AI email draft for matched lead |
+| `/api/crm-send-email` | POST | Send from work Gmail + log to trail |
 
 ## Local API base
 

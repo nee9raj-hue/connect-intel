@@ -1,7 +1,7 @@
 # Chrome extension — constitution alignment
 
 **Phase:** 22 Integrations (partial → extension catalog)  
-**Status:** v0.2 shipped · v0.3 in progress (`extension/`)  
+**Status:** v0.3 shipped · v1.0 next (Chrome Web Store) (`extension/`)
 **Stack:** Manifest V3 · service worker · Gmail content script · existing Vercel APIs
 
 ---
@@ -28,7 +28,9 @@ Gmail (user browser)
                           ├─ extension/lead-match
                           ├─ extension/capture-lead
                           ├─ extension/log → audit_events
-                          └─ crm/sync-email-thread (Gmail API on server)
+                          ├─ crm/sync-email-thread (Gmail API on server)
+                          ├─ crm/generate-email (AI draft)
+                          └─ crm/send-email (send + trail log)
 ```
 
 ---
@@ -49,7 +51,7 @@ No extension-specific OAuth client in v0.1.
 |---------|-------------|
 | **v0.1** ✅ | Gmail lead match, trail sync trigger, audit log |
 | **v0.2** ✅ | LinkedIn / company site “Add to pipeline” (capture API + widget) |
-| v0.3 | Compose helper — log outbound sent via existing `crm-send-email` |
+| **v0.3** ✅ | Gmail compose helper — AI draft + send & log via `crm-send-email` |
 | v1.0 | Chrome Web Store listing + CASA disclosure update |
 
 ---

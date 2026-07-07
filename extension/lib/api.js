@@ -64,3 +64,17 @@ export async function syncEmailTrail(leadId) {
 export async function captureLead(fields) {
   return apiFetch('/api/extension/capture-lead', { method: 'POST', body: fields })
 }
+
+export async function generateCrmEmail(leadId, options = {}) {
+  return apiFetch('/api/crm-generate-email', {
+    method: 'POST',
+    body: { leadId, ...options },
+  })
+}
+
+export async function sendCrmEmail(leadId, payload = {}) {
+  return apiFetch('/api/crm-send-email', {
+    method: 'POST',
+    body: { leadId, ...payload },
+  })
+}
