@@ -1,0 +1,88 @@
+/**
+ * Safe chrome.runtime messaging — stops cleanly after extension reload.
+ * Content scripts survive tab reloads; the service worker context does not.
+ */
+let contextInvalid = false
+const teardownCallbacks = new Set()
+
+function isContextInvalidatedError(message) {
+  const msg = String(message || '')
+  return (
+    msg.includes('Extension context invalidated') ||
+    msg.includes('Receiving end does not exist') ||
+    msg.includes('Could not establish connection')
+  )
+}
+
+function isExtensionContextAlive() {
+  if (contextInvalid) return false
+  try {
+    return Boolean(chrome?.runtime?.id)
+  } catch {
+    return false
+  }
+}
+
+function invalidateExtensionContext() {
+  if (contextInvalid) return
+  contextInvalid = true
+  for (const cb of teardownCallbacks) {
+    try {
+      cb()
+    } catch {
+      /* ignore teardown errors */
+    }
+  }
+  teardownCallbacks.clear()
+}
+
+function onExtensionContextInvalidated(callback) {
+  if (contextInvalid) return
+  teardownCallbacks.add(callback)
+}
+
+function safeSendMessage(message, callback) {
+  if (!isExtensionContextAlive()) {
+    invalidateExtensionContext()
+    callback?.(null, new Error('extension_context_invalidated'))
+    return
+  }
+
+  try {
+    chrome.runtime.sendMessage(message, (response) => {
+      const err = chrome.runtime.lastError
+      if (err) {
+        if (isContextInvalidatedError(err.message)) invalidateExtensionContext()
+        callback?.(null, err)
+        return
+      }
+      callback?.(response, null)
+    })
+  } catch (err) {
+    invalidateExtensionContext()
+    callback?.(null, err)
+  }
+}
+
+function safeSendMessageAsync(message) {
+  return new Promise((resolve, reject) => {
+    safeSendMessage(message, (response, err) => {
+      if (err) {
+        reject(err instanceof Error ? err : new Error(String(err.message || err)))
+        return
+      }
+      resolve(response)
+    })
+  })
+}
+
+if (typeof globalThis !== 'undefined') {
+  globalThis.__connectIntelRuntime = {
+    isExtensionContextAlive,
+    invalidateExtensionContext,
+    onExtensionContextInvalidated,
+    safeSendMessage,
+    safeSendMessageAsync,
+    isContextInvalidatedError,
+  }
+}

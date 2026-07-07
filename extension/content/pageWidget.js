@@ -4,21 +4,30 @@
  */
 
 const WIDGET_HOST_ID = 'connect-intel-widget-host'
-const ICON_URL = chrome.runtime.getURL('icons/icon-48.png')
+
+function runtime() {
+  return globalThis.__connectIntelRuntime
+}
+
+function extensionIconUrl() {
+  try {
+    return chrome.runtime.getURL('icons/icon-48.png')
+  } catch {
+    return ''
+  }
+}
 
 function sendMessage(type, payload = {}) {
-  return new Promise((resolve, reject) => {
-    chrome.runtime.sendMessage({ type, ...payload }, (response) => {
-      if (chrome.runtime.lastError) {
-        reject(new Error(chrome.runtime.lastError.message))
-        return
-      }
-      if (response?.ok === false) {
-        reject(new Error(response.error || 'Request failed'))
-        return
-      }
-      resolve(response?.result ?? response)
-    })
+  const rt = runtime()
+  if (!rt?.isExtensionContextAlive()) {
+    return Promise.reject(new Error('extension_context_invalidated'))
+  }
+
+  return rt.safeSendMessageAsync({ type, ...payload }).then((response) => {
+    if (response?.ok === false) {
+      throw new Error(response.error || 'Request failed')
+    }
+    return response?.result ?? response
   })
 }
 
@@ -51,11 +60,26 @@ class ConnectIntelPageWidget {
     this.host = null
     this.shadow = null
     this.els = {}
+    this.pollTimer = null
+  }
+
+  teardown() {
+    if (this.pollTimer) {
+      clearInterval(this.pollTimer)
+      this.pollTimer = null
+    }
+    this.host?.remove()
+    this.host = null
+    this.shadow = null
+    this.els = {}
   }
 
   mount() {
     if (document.getElementById(WIDGET_HOST_ID)) return
 
+    runtime()?.onExtensionContextInvalidated(() => this.teardown())
+
+    const iconUrl = extensionIconUrl()
     this.host = document.createElement('div')
     this.host.id = WIDGET_HOST_ID
     this.shadow = this.host.attachShadow({ mode: 'closed' })
@@ -68,12 +92,12 @@ class ConnectIntelPageWidget {
     root.className = 'ci-root'
     root.innerHTML = `
       <button type="button" class="ci-fab" aria-label="Connect Intel" title="Connect Intel">
-        <img class="ci-fab__icon" src="${ICON_URL}" alt="" />
+        <img class="ci-fab__icon" src="${iconUrl}" alt="" />
         <span class="ci-fab__badge" hidden></span>
       </button>
       <div class="ci-panel" hidden>
         <header class="ci-panel__head">
-          <img class="ci-panel__logo" src="${ICON_URL}" alt="" />
+          <img class="ci-panel__logo" src="${iconUrl}" alt="" />
           <div>
             <div class="ci-panel__title">Connect Intel</div>
             <div class="ci-panel__tag">Trail-only · workspace-scoped</div>
@@ -111,8 +135,8 @@ class ConnectIntelPageWidget {
     root.querySelector('[data-action="signin"]')?.addEventListener('click', () => this.signIn())
 
     document.documentElement.appendChild(this.host)
+    this.pollTimer = setInterval(() => this.tick(), 5000)
     this.tick()
-    setInterval(() => this.tick(), 5000)
     window.addEventListener('hashchange', () => {
       this.lastThreadKey = ''
       this.tick()
@@ -282,6 +306,11 @@ class ConnectIntelPageWidget {
   }
 
   async tick() {
+    if (!runtime()?.isExtensionContextAlive()) {
+      this.renderContextInvalidated()
+      return
+    }
+
     const context = this.readContext()
     const key = threadKey(context)
     if (key === this.lastThreadKey) return
@@ -317,6 +346,10 @@ class ConnectIntelPageWidget {
       this.renderMatch()
       await this.refreshBadge()
     } catch (err) {
+      if (runtime()?.isContextInvalidatedError?.(err.message)) {
+        this.renderContextInvalidated()
+        return
+      }
       if (String(err.message).includes('not_signed_in')) {
         this.renderSignIn()
       } else {
@@ -325,6 +358,22 @@ class ConnectIntelPageWidget {
       this.els.badge.hidden = true
     } finally {
       this.loading = false
+    }
+  }
+
+  renderContextInvalidated() {
+    if (!this.els.status) return
+    this.els.signin.hidden = true
+    this.els.lead.hidden = true
+    this.els.actions.hidden = true
+    this.els.status.hidden = false
+    this.els.status.className = 'ci-status'
+    this.els.status.innerHTML =
+      'Extension was updated. <strong>Refresh this Gmail tab</strong> to reconnect.'
+    this.els.badge.hidden = true
+    if (this.pollTimer) {
+      clearInterval(this.pollTimer)
+      this.pollTimer = null
     }
   }
 
@@ -411,7 +460,7 @@ class ConnectIntelPageWidget {
       action: 'extension.open_in_app',
       leadId: this.currentLead.leadId,
     }).catch(() => {})
-    chrome.runtime.sendMessage({ type: 'OPEN_TAB', url: this.currentLead.pipelineUrl })
+    runtime()?.safeSendMessage({ type: 'OPEN_TAB', url: this.currentLead.pipelineUrl })
   }
 
   async syncTrail() {
@@ -435,12 +484,16 @@ class ConnectIntelPageWidget {
       this.els.lead.hidden = false
       this.els.actions.hidden = false
     } catch (err) {
+      if (runtime()?.isContextInvalidatedError?.(err.message)) {
+        this.renderContextInvalidated()
+        return
+      }
       this.renderError(err.message || 'Sync failed')
     }
   }
 
   signIn() {
-    chrome.runtime.sendMessage({ type: 'OPEN_SIGN_IN' })
+    runtime()?.safeSendMessage({ type: 'OPEN_SIGN_IN' })
   }
 }
 

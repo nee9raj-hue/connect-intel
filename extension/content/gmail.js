@@ -3,9 +3,26 @@
  * Constitution: header/metadata only for lead match; no bulk inbox upload.
  */
 
+const runtime = () => globalThis.__connectIntelRuntime
+
 let lastKey = ''
+let observer = null
+let pollTimer = null
+
+function teardown() {
+  observer?.disconnect()
+  observer = null
+  if (pollTimer) {
+    clearInterval(pollTimer)
+    pollTimer = null
+  }
+}
+
+runtime()?.onExtensionContextInvalidated(teardown)
 
 function tick() {
+  if (!runtime()?.isExtensionContextAlive()) return
+
   const extract = globalThis.__connectIntelExtractGmail
   if (typeof extract !== 'function') return
 
@@ -19,16 +36,19 @@ function tick() {
   if (!key || key === lastKey) return
   lastKey = key
 
-  chrome.runtime.sendMessage({ type: 'GMAIL_PARTICIPANTS', ...context }, () => {
-    void chrome.runtime.lastError
-  })
+  runtime()?.safeSendMessage({ type: 'GMAIL_PARTICIPANTS', ...context })
 }
 
-window.addEventListener('hashchange', () => {
-  lastKey = ''
+function start() {
+  window.addEventListener('hashchange', () => {
+    lastKey = ''
+    tick()
+  })
+
+  observer = new MutationObserver(() => tick())
+  observer.observe(document.documentElement, { childList: true, subtree: true })
+  pollTimer = setInterval(tick, 4000)
   tick()
-})
-const observer = new MutationObserver(() => tick())
-observer.observe(document.documentElement, { childList: true, subtree: true })
-setInterval(tick, 4000)
-tick()
+}
+
+start()
