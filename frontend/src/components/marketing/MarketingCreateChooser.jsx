@@ -2,35 +2,35 @@ import { mc } from '../../lib/marketingColors'
 import { ChevronLeftIcon } from '../ui/icons'
 
 const CREATE_TYPES = [
-  { id: 'email', section: 'Email', label: 'Regular', desc: 'Step-by-step email campaign', action: 'campaign' },
-  { id: 'plain', section: 'Email', label: 'Plain text', desc: 'Simple text-only email', action: 'campaign-plain' },
-  { id: 'template', section: 'Email', label: 'Template', desc: 'Start from a saved template', action: 'templates' },
+  { id: 'email', section: 'Email', label: 'Campaign', desc: 'Audience broadcast with checklist', action: 'campaign' },
+  { id: 'plain', section: 'Email', label: 'Plain text', desc: 'Simple text-only campaign', action: 'campaign-plain' },
+  { id: 'template', section: 'Email', label: 'From template', desc: 'Start from a saved design', action: 'templates' },
 ]
 
 const CREATE_CARDS = [
   {
     id: 'email',
-    title: 'Regular email',
-    body: 'Use our email builder to launch a campaign in minutes.',
-    cta: 'Design Email',
+    title: 'Email campaign',
+    body: 'Pick an audience, subject, and design — track opens and clicks.',
+    cta: 'Create campaign',
     tint: '#e8f5e9',
     action: 'campaign',
   },
   {
     id: 'automation',
     title: 'Automation',
-    body: 'Set up email automations that personalize your marketing and save you time.',
-    cta: 'Create Journey',
+    body: 'Trigger emails and actions from audience or pipeline events.',
+    cta: 'Create journey',
     tint: '#e8f0fb',
     action: 'automations',
   },
   {
-    id: 'landing',
-    title: 'Landing page',
-    body: 'Create a landing page that lets people sign up for promotions or discounts.',
-    cta: 'Build Landing Page',
+    id: 'forms',
+    title: 'Signup form',
+    body: 'Capture leads from a form linked to your pipeline.',
+    cta: 'Build form',
     tint: '#fef9e7',
-    action: 'landing',
+    action: 'forms',
   },
 ]
 
@@ -41,10 +41,7 @@ const SIDE_SECTIONS = [
     items: CREATE_TYPES,
   },
   { id: 'automations', label: 'Automations', action: 'automations' },
-  { id: 'landing', label: 'Landing Page', action: 'landing' },
-  { id: 'divider' },
-  { id: 'forms', label: 'Signup Form', action: 'forms' },
-  { id: 'bulk', label: 'Bulk email', action: 'bulk-email' },
+  { id: 'forms', label: 'Signup form', action: 'forms' },
 ]
 
 export default function MarketingCreateChooser({
@@ -61,14 +58,6 @@ export default function MarketingCreateChooser({
       onNavigate?.('marketing', { tab: 'templates' })
       return
     }
-    if (action === 'landing') {
-      onNavigate?.('marketing', { tab: 'landing' })
-      return
-    }
-    if (action === 'bulk-email') {
-      onNavigate?.('marketing', { tab: 'bulk-email' })
-      return
-    }
     onNavigate?.('marketing', { tab: action })
   }
 
@@ -81,9 +70,6 @@ export default function MarketingCreateChooser({
         </button>
         <nav className="mc-create-chooser__nav">
           {SIDE_SECTIONS.map((section) => {
-            if (section.id === 'divider') {
-              return <hr key="div" className="mc-create-chooser__divider" />
-            }
             if (section.items) {
               return (
                 <div key={section.id} className="mc-create-chooser__group">
@@ -113,28 +99,31 @@ export default function MarketingCreateChooser({
             )
           })}
         </nav>
+        <p className="mc-create-chooser__hint text-xs text-[#516f90] mt-6 px-3 leading-relaxed">
+          Pipeline bulk email to selected leads is in <strong>CRM → Pipeline</strong>.
+        </p>
       </aside>
 
       <main className="mc-create-chooser__main">
         <button type="button" className="mc-link mc-create-chooser__back-top" onClick={onBack}>
           ← Back
         </button>
-        <h1>Create something that gets noticed</h1>
-        <p className="mc-create-chooser__badge">Based on best practices</p>
-        <h2>Try building one of these</h2>
-
+        <h1 className="mc-create-chooser__title">What do you want to create?</h1>
         <div className="mc-create-chooser__cards">
           {CREATE_CARDS.map((card) => (
-            <article key={card.id} className="mc-create-chooser__card">
-              <div className="mc-create-chooser__card-art" style={{ background: card.tint }}>
-                <div className="mc-create-chooser__card-mock" />
-              </div>
-              <h3>{card.title}</h3>
+            <button
+              key={card.id}
+              type="button"
+              className="mc-create-chooser__card"
+              style={{ background: card.tint }}
+              onClick={() => run(card.action)}
+            >
+              <h2>{card.title}</h2>
               <p>{card.body}</p>
-              <button type="button" className="mc-create-chooser__card-cta" onClick={() => run(card.action)}>
-                {card.cta}
-              </button>
-            </article>
+              <span className="mc-create-chooser__card-cta" style={{ color: mc.primary }}>
+                {card.cta} →
+              </span>
+            </button>
           ))}
         </div>
       </main>

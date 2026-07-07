@@ -643,12 +643,10 @@ export default function MarketingAudiencesHub(props) {
         )
       case 'segments':
         return <SegmentsPage segments={segments} segmentPanelProps={segmentPanelProps} />
-      case 'surveys':
-        return <SurveysPage onNavigate={onNavigate} setNotice={setNotice} />
-      case 'preferences':
-        return <PreferencesPage onNavigate={onNavigate} setNotice={setNotice} />
       case 'inbox':
         return <InboxPage onNavigate={onNavigate} />
+      case 'surveys':
+      case 'preferences':
       case 'contacts':
       default:
         return (

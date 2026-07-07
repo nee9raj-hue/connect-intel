@@ -317,15 +317,13 @@ export function buildCustomerNavSections(
 
   const marketingChildren = [
     { id: 'marketing-overview', label: 'Overview', panel: 'marketing', tab: 'overview' },
-    { id: 'marketing-audiences', label: 'Audiences', panel: 'marketing', tab: 'audiences' },
     { id: 'marketing-campaigns', label: 'Campaigns', panel: 'marketing', tab: 'campaigns' },
+    { id: 'marketing-templates', label: 'Templates', panel: 'marketing', tab: 'templates' },
     { id: 'marketing-automations', label: 'Automations', panel: 'marketing', tab: 'automations' },
     { id: 'marketing-forms', label: 'Forms', panel: 'marketing', tab: 'forms' },
-    { id: 'marketing-landing', label: 'Landing Pages', panel: 'marketing', tab: 'landing' },
-    { id: 'marketing-templates', label: 'Templates', panel: 'marketing', tab: 'templates' },
+    { id: 'marketing-audiences', label: 'Audiences', panel: 'marketing', tab: 'audiences' },
     { id: 'marketing-analytics', label: 'Analytics', panel: 'marketing', tab: 'analytics' },
     { id: 'marketing-domains', label: 'Domains', panel: 'marketing', tab: 'domains' },
-    { id: 'marketing-assets', label: 'Assets', panel: 'marketing', tab: 'assets' },
   ]
 
   const calendarChildren = [
@@ -557,7 +555,7 @@ export const MOBILE_NAV_PILL_PRIMARY_ITEMS = [
 /** Secondary mobile nav shortcuts — horizontal scroll beside primary row. */
 export const MOBILE_NAV_PILL_MORE_ITEMS = [
   { id: 'marketing', label: 'Mail', panel: 'marketing', tab: 'overview', icon: 'mail' },
-  { id: 'whatsapp', label: 'WA', panel: 'marketing', tab: 'inbox', icon: 'whatsapp' },
+  { id: 'whatsapp', label: 'WA', panel: 'marketing', tab: 'audiences', audienceTab: 'inbox', icon: 'whatsapp' },
   { id: 'calendar', label: 'Meetings', panel: 'crm-calendar', upcomingOnly: true, icon: 'calendar' },
   { id: 'app-settings', label: 'Display', panel: 'app-settings', icon: 'settings' },
 ]

@@ -1,13 +1,13 @@
-import { MailIcon, BoltIcon, LayoutTemplateIcon } from '../ui/icons'
+import { MailIcon, BoltIcon, NoteIcon } from '../ui/icons'
 
 const CREATE_OPTIONS = [
   {
     id: 'email',
-    title: 'Regular email',
-    body: 'Use the step-by-step builder to launch a campaign in minutes.',
+    title: 'Email campaign',
+    body: 'Broadcast to an audience with the step-by-step checklist and email builder.',
     tint: '#e2f4e8',
     accent: '#007c89',
-    actionLabel: 'Design email',
+    actionLabel: 'Create campaign',
     tab: 'campaigns',
     Illustration: EmailIllustration,
     icon: MailIcon,
@@ -24,15 +24,15 @@ const CREATE_OPTIONS = [
     icon: BoltIcon,
   },
   {
-    id: 'landing',
-    title: 'Landing page',
-    body: 'Capture signups with a focused page linked to your pipeline.',
+    id: 'forms',
+    title: 'Signup form',
+    body: 'Capture leads from a form — submissions flow into your pipeline.',
     tint: '#fff4d6',
     accent: '#d97706',
-    actionLabel: 'Build page',
-    tab: 'landing',
-    Illustration: LandingIllustration,
-    icon: LayoutTemplateIcon,
+    actionLabel: 'Build form',
+    tab: 'forms',
+    Illustration: FormIllustration,
+    icon: NoteIcon,
   },
 ]
 
@@ -69,17 +69,13 @@ function AutomationIllustration() {
   )
 }
 
-function LandingIllustration() {
+function FormIllustration() {
   return (
     <svg className="mc-home-create__art" viewBox="0 0 200 140" fill="none" aria-hidden>
       <rect x="44" y="16" width="112" height="108" rx="8" fill="#fff" stroke="#241c15" strokeWidth="1.5" />
-      <rect x="44" y="16" width="112" height="18" rx="8" fill="#f3f4f6" />
-      <circle cx="56" cy="25" r="3" fill="#ef4444" />
-      <circle cx="66" cy="25" r="3" fill="#fbbf24" />
-      <circle cx="76" cy="25" r="3" fill="#22c55e" />
-      <rect x="60" y="48" width="80" height="8" rx="3" fill="#d97706" fillOpacity="0.35" />
-      <rect x="60" y="66" width="80" height="10" rx="4" fill="#fff" stroke="#d1d5db" />
-      <rect x="60" y="84" width="80" height="10" rx="4" fill="#fff" stroke="#d1d5db" />
+      <rect x="60" y="40" width="80" height="10" rx="4" fill="#fff" stroke="#d1d5db" />
+      <rect x="60" y="58" width="80" height="10" rx="4" fill="#fff" stroke="#d1d5db" />
+      <rect x="60" y="76" width="80" height="10" rx="4" fill="#fff" stroke="#d1d5db" />
       <rect x="60" y="102" width="48" height="12" rx="6" fill="#d97706" />
     </svg>
   )
@@ -97,9 +93,8 @@ export default function MarketingCreateHome({ onCreateCampaign, onNavigate }) {
   return (
     <section className="mc-home-create">
       <header className="mc-home-create__head">
-        <h1 className="mc-home-create__title">Create something that gets noticed</h1>
-        <span className="mc-home-create__badge">Based on best practices</span>
-        <h2 className="mc-home-create__subtitle">Try building one of these</h2>
+        <h1 className="mc-home-create__title">Marketing Hub</h1>
+        <h2 className="mc-home-create__subtitle">Campaigns, audiences, and analytics</h2>
       </header>
       <div className="mc-home-create__grid">
         {CREATE_OPTIONS.map((opt) => {

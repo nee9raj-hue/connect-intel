@@ -1616,7 +1616,7 @@ export default function LeadWorkspace({
                   Open WhatsApp & log
                 </LwBtn>
                 {onNavigate && (
-                  <LwBtn variant="secondary" className="lw-btn--block" onClick={() => onNavigate('marketing', { tab: 'inbox' })}>
+                  <LwBtn variant="secondary" className="lw-btn--block" onClick={() => onNavigate('marketing', { tab: 'audiences', audienceTab: 'inbox' })}>
                     Team WA Inbox
                   </LwBtn>
                 )}

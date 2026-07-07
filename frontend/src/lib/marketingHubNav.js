@@ -3,7 +3,7 @@
 export const MARKETING_HUB_TABS = [
   { id: 'overview', label: 'Home', short: 'Home' },
   { id: 'campaigns', label: 'Campaigns', short: 'Camp' },
-  { id: 'templates', label: 'Email templates', short: 'Tpl', badge: 'New' },
+  { id: 'templates', label: 'Email templates', short: 'Tpl' },
   { id: 'automations', label: 'Automations', short: 'Auto' },
   { id: 'forms', label: 'Forms', short: 'Form' },
   { id: 'audiences', label: 'Audience', short: 'Aud' },
@@ -17,8 +17,6 @@ export const AUDIENCE_SUB_NAV = [
   { id: 'contacts', label: 'Contacts' },
   { id: 'tags', label: 'Tags' },
   { id: 'segments', label: 'Segments' },
-  { id: 'surveys', label: 'Surveys' },
-  { id: 'preferences', label: 'Subscriber preferences' },
   { id: 'inbox', label: 'Inbox' },
 ]
 
@@ -41,10 +39,10 @@ const TAB_ALIASES = {
   assets: 'templates',
   content: 'templates',
   suppressions: 'domains',
-  inbox: 'campaigns',
+  inbox: 'audiences',
   'bulk email': 'bulk-email',
   'bulk-email': 'bulk-email',
-  landing: 'templates',
+  landing: 'forms',
 }
 
 export function normalizeMarketingTab(tab) {
@@ -55,7 +53,9 @@ export function normalizeMarketingTab(tab) {
 export function audienceTabFromPanelOptions(panelOptions) {
   const raw =
     panelOptions?.audienceTab ||
+    (panelOptions?.tab === 'inbox' ? 'inbox' : null) ||
     (panelOptions?.tab === 'lists' ? 'contacts' : panelOptions?.tab === 'segments' ? 'segments' : null)
   if (!raw) return 'contacts'
+  if (raw === 'surveys' || raw === 'preferences') return 'contacts'
   return AUDIENCE_TAB_ALIASES[raw] || raw
 }

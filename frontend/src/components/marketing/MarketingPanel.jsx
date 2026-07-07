@@ -23,7 +23,7 @@ import MarketingCampaignSetupFields from './MarketingCampaignSetupFields'
 import MarketingCampaignWizardModal from './MarketingCampaignWizardModal'
 import MarketingHubShell from './MarketingHubShell'
 import MarketingOverviewTab from './MarketingOverviewTab'
-import MarketingBulkEmailTab from './MarketingBulkEmailTab'
+import MarketingPipelineEmailRedirect from './MarketingPipelineEmailRedirect'
 import MarketingCampaigns from './MarketingCampaigns'
 import MarketingCreateChooser from './MarketingCreateChooser'
 import MarketingCampaignChecklistBuilder from './MarketingCampaignChecklistBuilder'
@@ -1421,7 +1421,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
           ) : tab === 'templates' ? (
             renderTemplatesTab()
           ) : tab === 'bulk-email' ? (
-            <MarketingBulkEmailTab lists={lists} onNavigate={onNavigate} />
+            <MarketingPipelineEmailRedirect onNavigate={onNavigate} />
           ) : tab === 'reports' ? (
             renderReportsTab()
           ) : tab === 'analytics' ? (
@@ -1497,7 +1497,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
               onCreateCampaign={openCreateFlow}
             />
           ) : tab === 'bulk-email' ? (
-            <MarketingBulkEmailTab lists={lists} onNavigate={onNavigate} />
+            <MarketingPipelineEmailRedirect onNavigate={onNavigate} />
           ) : tab === 'analytics' ? (
             <MarketingAnalyticsHub
               onNavigate={onNavigate}
