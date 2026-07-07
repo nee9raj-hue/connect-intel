@@ -46,8 +46,8 @@ export default function ConnectAIFab({
       className={`ci-ai-fab${open ? ' is-open' : ''}${shiftUp ? ' is-shifted' : ''}`}
       style={{ bottom, right }}
       aria-expanded={open}
-      aria-label={open ? 'Close CRM AI' : 'Open CRM AI assistant'}
-      title="CRM AI — help & web research"
+      aria-label={open ? 'Close Connect Copilot' : 'Open Connect Copilot'}
+      title="Connect Copilot — CRM & web research"
     >
       <span className="ci-ai-fab__glow" aria-hidden />
       <span className="ci-ai-fab__inner">
@@ -59,7 +59,7 @@ export default function ConnectAIFab({
           <CrmAiIcon className="w-7 h-7" />
         )}
       </span>
-      {!open ? <span className="ci-ai-fab__label">CRM AI</span> : null}
+      {!open ? <span className="ci-ai-fab__label">Copilot</span> : null}
     </button>
   )
 }

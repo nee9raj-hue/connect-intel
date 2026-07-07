@@ -3,38 +3,39 @@ import { useApp } from '../../context/AppContext'
 import useIsMobile from '../../hooks/useIsMobile'
 import { api } from '../../lib/api'
 import { applyAssistantAction } from '../../lib/assistantNavigation'
+import { getContextualSuggestions } from '../../lib/copilotSuggestions'
 import { CI_OPEN_AI_EVENT } from '../../lib/openConnectAI'
 import { CrmAiIcon } from './ConnectAIFab'
-import { renderAssistantMarkdown, sourceBadgeLabel } from './assistantMessageRender'
-
-const CRM_PROMPTS = [
-  'How many leads in my pipeline?',
-  'CRM vs Marketing email?',
-  'How do I connect work Gmail?',
-  'Bulk email limits from Pipeline',
-]
-
-const RESEARCH_PROMPTS = [
-  'Logistics managers at Innovist — names & LinkedIn',
-  'Latest funding news for [company name]',
-  'Amazon bestsellers in organic snacks India',
-  'Who is the CEO of [company] — profile link',
-]
-
-const CAPABILITY_AREAS = [
-  { id: 'crm', label: 'Pipeline & leads', prompt: 'How many leads in my pipeline and by stage?' },
-  { id: 'marketing', label: 'Marketing vs CRM', prompt: 'CRM bulk email vs Marketing campaigns — differences?' },
-  { id: 'setup', label: 'Gmail setup', prompt: 'How do I connect work Gmail step by step?' },
-]
+import CopilotCompanyCard from './CopilotCompanyCard'
+import {
+  renderAssistantMarkdown,
+  sourceBadgesFromMessage,
+  confidenceLabel,
+} from './assistantMessageRender'
 
 function MessageBubble({ msg, onAction }) {
   const isUser = msg.role === 'user'
-  const badge = !isUser ? sourceBadgeLabel(msg.source) : null
+  const badges = !isUser ? sourceBadgesFromMessage(msg) : []
+  const conf = !isUser ? confidenceLabel(msg.confidence) : null
 
   return (
     <div className={`ci-ai-msg ${isUser ? 'ci-ai-msg--user' : 'ci-ai-msg--bot'}`}>
-      {!isUser && badge ? (
-        <span className={`ci-ai-msg__badge ci-ai-msg__badge--${badge.tone}`}>{badge.label}</span>
+      {!isUser && (badges.length > 0 || conf) ? (
+        <div className="ci-ai-msg__meta">
+          {badges.map((b) => (
+            <span key={b.label} className={`ci-ai-msg__badge ci-ai-msg__badge--${b.tone}`}>
+              {b.label}
+            </span>
+          ))}
+          {conf ? (
+            <span className={`ci-ai-msg__confidence ci-ai-msg__confidence--${conf.tone}`}>
+              {conf.label}
+            </span>
+          ) : null}
+        </div>
+      ) : null}
+      {!isUser && msg.companyCard ? (
+        <CopilotCompanyCard card={msg.companyCard} onAction={onAction} />
       ) : null}
       <div className={`ci-ai-msg__bubble${isUser ? ' ci-ai-msg__bubble--user' : ''}`}>
         {isUser ? msg.content : <div className="ci-ai-md">{renderAssistantMarkdown(msg.content)}</div>}
@@ -69,6 +70,7 @@ export default function ConnectAssistant({
   onNavigate,
   activePanel,
   panelOptions,
+  pipelineLeadId,
 }) {
   const { user, openPipelineLead } = useApp()
   const isMobile = useIsMobile()
@@ -79,8 +81,7 @@ export default function ConnectAssistant({
   const [loading, setLoading] = useState(false)
   const [escalating, setEscalating] = useState(false)
   const [status, setStatus] = useState(null)
-  const [suggestions, setSuggestions] = useState(CRM_PROMPTS)
-  const [aiMode, setAiMode] = useState('crm')
+  const [suggestions, setSuggestions] = useState([])
   const [webResearchAvailable, setWebResearchAvailable] = useState(false)
   const [showRaiseForm, setShowRaiseForm] = useState(false)
   const [concernText, setConcernText] = useState('')
@@ -90,8 +91,10 @@ export default function ConnectAssistant({
   const uiContext = {
     panel: activePanel || null,
     tab: panelOptions?.tab || null,
-    mode: aiMode,
+    leadId: pipelineLeadId || null,
   }
+
+  const contextualPrompts = getContextualSuggestions(uiContext)
 
   const loadHistory = useCallback(async () => {
     try {
@@ -102,20 +105,20 @@ export default function ConnectAssistant({
       setWebResearchAvailable(Boolean(data.webResearchAvailable))
       const lastAssistant = [...(data.messages || [])].reverse().find((m) => m.role === 'assistant')
       if (lastAssistant?.suggestions?.length) {
-        const webish = lastAssistant.source === 'web' || lastAssistant.source === 'web_error'
-        if ((aiMode === 'research' && webish) || (aiMode === 'crm' && !webish)) {
-          setSuggestions(lastAssistant.suggestions)
-        }
+        setSuggestions(lastAssistant.suggestions)
+      } else {
+        setSuggestions(getContextualSuggestions(uiContext))
       }
     } catch {
       /* first visit */
     }
-  }, [aiMode])
+  }, [uiContext.panel, uiContext.leadId])
 
-  const switchMode = (mode) => {
-    setAiMode(mode)
-    setSuggestions(mode === 'research' ? RESEARCH_PROMPTS : CRM_PROMPTS)
-  }
+  useEffect(() => {
+    if (open && messages.length === 0) {
+      setSuggestions(contextualPrompts)
+    }
+  }, [open, contextualPrompts, messages.length])
 
   useEffect(() => {
     const onGlobalOpen = () => onOpenChange?.(true)
@@ -193,7 +196,22 @@ export default function ConnectAssistant({
   )
 
   const handleAction = useCallback(
-    (action) => {
+    async (action) => {
+      if (action.type === 'create_lead' && action.payload) {
+        try {
+          const data = await api.addManualLead(action.payload)
+          const leadId = data?.lead?.id || data?.entry?.lead?.id || data?.id
+          if (leadId && openPipelineLead) {
+            openPipelineLead(leadId, 'overview')
+            onOpenChange?.(false)
+            return
+          }
+        } catch (err) {
+          setStatus(err.message || 'Could not create lead')
+          return
+        }
+      }
+
       const ok = applyAssistantAction(action, {
         navigate: onNavigate,
         openPipelineLead,
@@ -231,26 +249,19 @@ export default function ConnectAssistant({
         if (data.myTickets?.length) setMyTickets(data.myTickets)
       } catch (err) {
         setMessages((prev) => prev.filter((m) => m.id !== optimistic.id))
-        setStatus(err.message || 'Could not reach CRM AI')
+        setStatus(err.message || 'Could not reach Connect Copilot')
       } finally {
         setLoading(false)
       }
     },
-    [loading, loadHistory, uiContext, aiMode]
+    [loading, loadHistory, uiContext]
   )
 
-  const onCapabilityClick = (cap) => {
-    setAiMode('crm')
-    setSuggestions(CRM_PROMPTS)
-    sendMessage(cap.prompt)
-  }
-
-  const modeHint =
-    aiMode === 'research'
-      ? webResearchAvailable
-        ? 'Live web search — names, companies, LinkedIn, Amazon, news'
-        : 'Web research needs server setup — CRM help still works'
-      : 'Your pipeline counts, Gmail status, and product how-to'
+  const copilotSub = pipelineLeadId
+    ? 'Lead context on · CRM + web research'
+    : webResearchAvailable
+      ? 'Auto-routes CRM data & live web research'
+      : 'CRM data & product knowledge · web when configured'
 
   if (!user || user.isPlatformAdmin) return null
 
@@ -263,7 +274,7 @@ export default function ConnectAssistant({
         <button
           type="button"
           className="ci-ai-backdrop"
-          aria-label="Close CRM AI"
+          aria-label="Close Connect Copilot"
           onClick={() => onOpenChange?.(false)}
         />
       )}
@@ -271,7 +282,7 @@ export default function ConnectAssistant({
       <aside
         className={`ci-ai-panel connect-assistant-panel${open ? ' is-open' : ''}${isMobile ? ' ci-ai-panel--mobile' : ''}`}
         role="dialog"
-        aria-label="CRM AI"
+        aria-label="Connect Copilot"
         aria-hidden={!open}
       >
         <header className="ci-ai-panel__head">
@@ -280,8 +291,8 @@ export default function ConnectAssistant({
               <CrmAiIcon className="w-5 h-5" />
             </span>
             <div className="min-w-0">
-              <p className="ci-ai-panel__title">CRM AI</p>
-              <p className="ci-ai-panel__sub">{modeHint}</p>
+              <p className="ci-ai-panel__title">Connect Copilot</p>
+              <p className="ci-ai-panel__sub">{copilotSub}</p>
             </div>
           </div>
           <button
@@ -293,33 +304,6 @@ export default function ConnectAssistant({
             ✕
           </button>
         </header>
-
-        <div className="ci-ai-mode-bar" role="tablist" aria-label="CRM AI mode">
-          <button
-            type="button"
-            role="tab"
-            aria-selected={aiMode === 'crm'}
-            className={`ci-ai-mode-bar__btn${aiMode === 'crm' ? ' is-active' : ''}`}
-            onClick={() => switchMode('crm')}
-          >
-            <span className="ci-ai-mode-bar__label">CRM help</span>
-            <span className="ci-ai-mode-bar__hint">Your data & product</span>
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={aiMode === 'research'}
-            className={`ci-ai-mode-bar__btn ci-ai-mode-bar__btn--research${aiMode === 'research' ? ' is-active' : ''}`}
-            onClick={() => switchMode('research')}
-            title={webResearchAvailable ? 'Search the web' : 'Web research requires server setup'}
-          >
-            <span className="ci-ai-mode-bar__label">
-              Web research
-              {!webResearchAvailable ? <span className="ci-ai-mode-bar__dot" /> : null}
-            </span>
-            <span className="ci-ai-mode-bar__hint">LinkedIn · Amazon · news</span>
-          </button>
-        </div>
 
         <div className="ci-ai-panel__body">
           {activeTickets.length > 0 && (
@@ -341,47 +325,24 @@ export default function ConnectAssistant({
           {showWelcome && (
             <div className="ci-ai-welcome">
               <p className="ci-ai-welcome__hi">
-                Hi{user.name ? `, ${user.name.split(' ')[0]}` : ''} — ask something specific.
+                Hi{user.name ? `, ${user.name.split(' ')[0]}` : ''} — your sales copilot.
               </p>
-              {aiMode === 'research' ? (
-                <>
-                  <p className="ci-ai-welcome__copy">
-                    Name the **company**, **role**, or **product**. I return facts and links — not search tutorials.
-                  </p>
-                  <div className="ci-ai-capabilities">
-                    {RESEARCH_PROMPTS.map((prompt) => (
-                      <button
-                        key={prompt}
-                        type="button"
-                        className="ci-ai-capabilities__chip ci-ai-capabilities__chip--research"
-                        disabled={loading}
-                        onClick={() => sendMessage(prompt)}
-                      >
-                        {prompt}
-                      </button>
-                    ))}
-                  </div>
-                </>
-              ) : (
-                <>
-                  <p className="ci-ai-welcome__copy">
-                    I use **your workspace numbers** and product rules — lead counts, Gmail, campaigns, consent.
-                  </p>
-                  <div className="ci-ai-capabilities">
-                    {CAPABILITY_AREAS.map((c) => (
-                      <button
-                        key={c.id}
-                        type="button"
-                        className="ci-ai-capabilities__chip"
-                        disabled={loading}
-                        onClick={() => onCapabilityClick(c)}
-                      >
-                        {c.label}
-                      </button>
-                    ))}
-                  </div>
-                </>
-              )}
+              <p className="ci-ai-welcome__copy">
+                One question — I pick **CRM records**, **your workspace data**, or **live web research** automatically. Then suggest next actions.
+              </p>
+              <div className="ci-ai-capabilities">
+                {contextualPrompts.map((prompt) => (
+                  <button
+                    key={prompt}
+                    type="button"
+                    className="ci-ai-capabilities__chip"
+                    disabled={loading}
+                    onClick={() => sendMessage(prompt)}
+                  >
+                    {prompt}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 
@@ -392,7 +353,7 @@ export default function ConnectAssistant({
           {loading && (
             <div className="ci-ai-thinking">
               <span className="ci-ai-thinking__dot" />
-              {aiMode === 'research' ? 'Searching the web…' : 'Checking your CRM…'}
+              Routing CRM + web sources…
             </div>
           )}
 
@@ -459,17 +420,13 @@ export default function ConnectAssistant({
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder={
-                aiMode === 'research'
-                  ? 'e.g. Supply chain managers at Innovist — names & LinkedIn URLs'
-                  : 'e.g. How many leads in my pipeline by stage?'
-              }
+              placeholder="Ask anything — CRM data, company research, emails, pipeline…"
               className="ci-ai-compose__input"
               disabled={loading}
               maxLength={2000}
             />
             <button type="submit" disabled={loading || !input.trim()} className="ci-ai-compose__send">
-              Send
+              {loading ? 'Working…' : 'Send'}
             </button>
           </form>
           <button
@@ -497,11 +454,11 @@ export function ConnectAIButton({ onClick, compact = false }) {
       type="button"
       onClick={onClick}
       className={`ci-ai-trigger${compact ? ' ci-ai-trigger--compact' : ''}`}
-      aria-label="Open CRM AI"
-      title="CRM AI (⌘/)"
+      aria-label="Open Connect Copilot"
+      title="Connect Copilot (⌘/)"
     >
       <CrmAiIcon className="w-4 h-4" />
-      {!compact && <span>CRM AI</span>}
+      {!compact && <span>Copilot</span>}
       {!compact && <kbd className="ci-ai-trigger__kbd">⌘/</kbd>}
     </button>
   )

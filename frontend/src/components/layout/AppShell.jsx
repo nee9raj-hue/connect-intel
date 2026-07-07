@@ -451,6 +451,7 @@ export default function AppShell() {
           onNavigate={navigate}
           activePanel={activePanel}
           panelOptions={panelOptions}
+          pipelineLeadId={pipelineLeadId}
         />
       )}
       {user && !needsOnboarding && !user.isPlatformAdmin && (

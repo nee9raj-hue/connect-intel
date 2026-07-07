@@ -922,7 +922,7 @@ export const api = {
         message,
         panel: uiContext.panel,
         tab: uiContext.tab,
-        mode: uiContext.mode,
+        leadId: uiContext.leadId,
       },
     }),
   escalateAssistantSupport: (payload) =>

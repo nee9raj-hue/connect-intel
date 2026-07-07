@@ -100,11 +100,37 @@ export function renderAssistantMarkdown(text) {
   return nodes
 }
 
+export function sourceBadgesFromMessage(msg) {
+  if (msg.sources?.length) {
+    return msg.sources.map((s) => ({
+      label: s.label || s.type,
+      tone: badgeTone(s.type || s.label),
+    }))
+  }
+  const single = sourceBadgeLabel(msg.source)
+  return single ? [single] : []
+}
+
+function badgeTone(type) {
+  if (type === 'web' || type === 'Web research') return 'web'
+  if (type === 'crm' || type === 'Your workspace' || type === 'CRM search') return 'crm'
+  if (type === 'guide' || type === 'Product guide') return 'guide'
+  if (type === 'news') return 'news'
+  return 'copilot'
+}
+
+export function confidenceLabel(level) {
+  if (level === 'high') return { label: 'High confidence', tone: 'high' }
+  if (level === 'medium') return { label: 'Medium confidence', tone: 'medium' }
+  if (level === 'low') return { label: 'Low confidence', tone: 'low' }
+  return null
+}
+
 export function sourceBadgeLabel(source) {
   if (source === 'web') return { label: 'Web research', tone: 'web' }
   if (source === 'grounded') return { label: 'Your workspace', tone: 'crm' }
   if (source === 'faq' || source === 'faq_confident') return { label: 'Product guide', tone: 'guide' }
-  if (source === 'ai') return { label: 'CRM AI', tone: 'crm' }
+  if (source === 'copilot') return { label: 'Connect Copilot', tone: 'copilot' }
   if (source === 'web_error') return { label: 'Web research', tone: 'muted' }
   return null
 }
