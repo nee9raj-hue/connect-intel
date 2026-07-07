@@ -928,6 +928,12 @@ export const api = {
     ),
   getCompanyDetail: (companyId) =>
     request(`/api/companies/hub?companyId=${encodeURIComponent(companyId)}`),
+  patchCompanyParent: (companyId, parentCompanyId) =>
+    request('/api/companies/hub', {
+      method: 'PATCH',
+      body: { companyId, parentCompanyId },
+    }),
+  getExtensionBootstrap: () => request('/api/extension/bootstrap'),
   getCrmLeadTimeline: (leadId) =>
     request(`/api/crm/lead-timeline?leadId=${encodeURIComponent(leadId)}`),
 }

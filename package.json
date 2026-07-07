@@ -50,6 +50,7 @@
     "grafana:verify": "node scripts/grafana-verify.mjs",
     "grafana:connect": "node scripts/grafana-connect.mjs",
     "companies:sync": "node scripts/companies-sync.mjs",
+    "companies:hierarchy-migrate": "node scripts/apply-companies-hierarchy-migration.mjs",
     "activities:backfill": "node scripts/backfill-pipeline-activities.mjs",
     "activities:indexes": "node scripts/apply-activities-indexes.mjs",
     "enterprise:backfill": "node scripts/backfill-enterprise-crm.mjs",

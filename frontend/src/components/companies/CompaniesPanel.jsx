@@ -8,11 +8,13 @@ export default function CompaniesPanel({ onNavigate }) {
   const { openPipelineLead } = useApp()
   const [companies, setCompanies] = useState([])
   const [total, setTotal] = useState(0)
+  const [hierarchyEnabled, setHierarchyEnabled] = useState(false)
   const [search, setSearch] = useState('')
   const [applied, setApplied] = useState('')
   const [loading, setLoading] = useState(true)
   const [detail, setDetail] = useState(null)
   const [detailLoading, setDetailLoading] = useState(false)
+  const [parentSaving, setParentSaving] = useState(false)
   const [error, setError] = useState(null)
 
   const load = useCallback(async () => {
@@ -22,6 +24,7 @@ export default function CompaniesPanel({ onNavigate }) {
       const res = await api.getCompaniesHub({ q: applied })
       setCompanies(res.companies || [])
       setTotal(res.total || 0)
+      setHierarchyEnabled(Boolean(res.hierarchyEnabled))
     } catch (e) {
       setError(e.message)
     } finally {
@@ -38,6 +41,7 @@ export default function CompaniesPanel({ onNavigate }) {
     try {
       const res = await api.getCompanyDetail(company.id)
       setDetail(res.company)
+      setHierarchyEnabled(Boolean(res.hierarchyEnabled ?? hierarchyEnabled))
     } catch (e) {
       setError(e.message)
     } finally {
@@ -50,12 +54,32 @@ export default function CompaniesPanel({ onNavigate }) {
     openPipelineLead(leadId, 'overview')
   }
 
+  const parentOptions = detail
+    ? companies.filter((c) => c.id !== detail.id)
+    : []
+
+  const saveParent = async (parentCompanyId) => {
+    if (!detail?.id || !hierarchyEnabled) return
+    setParentSaving(true)
+    setError(null)
+    try {
+      await api.patchCompanyParent(detail.id, parentCompanyId || null)
+      await load()
+      const res = await api.getCompanyDetail(detail.id)
+      setDetail(res.company)
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setParentSaving(false)
+    }
+  }
+
   return (
     <div className="panel-shell">
       <header className="shrink-0 bg-white border-b border-gray-200 px-5 py-4">
         <h1 className="text-lg font-semibold text-gray-900">Accounts</h1>
         <p className="text-xs text-gray-500 mt-0.5">
-          Company accounts aggregated from your pipeline — contacts, deals, and activity rolled up by name.
+          Company accounts aggregated from your pipeline — contacts, deals, parent/child hierarchy, and activity rolled up by name.
         </p>
       </header>
 
@@ -94,9 +118,10 @@ export default function CompaniesPanel({ onNavigate }) {
                       >
                         <p className="font-semibold text-sm text-gray-900">{c.name}</p>
                         <p className="text-xs text-gray-500 mt-0.5">
+                          {c.parentName && <span>Under {c.parentName} · </span>}
                           {c.leadCount} contact{c.leadCount === 1 ? '' : 's'}
+                          {c.childCount > 0 && ` · ${c.childCount} child account${c.childCount === 1 ? '' : 's'}`}
                           {c.openDeals > 0 && ` · ${c.openDeals} open deal${c.openDeals === 1 ? '' : 's'}`}
-                          {c.topScore > 0 && ` · top score ${c.topScore}`}
                         </p>
                       </button>
                     </li>
@@ -115,6 +140,21 @@ export default function CompaniesPanel({ onNavigate }) {
                   <div>
                     <h2 className="text-base font-semibold text-gray-900">{detail.name}</h2>
                     {detail.domain && <p className="text-xs text-gray-500">{detail.domain}</p>}
+                    {detail.parentName && (
+                      <p className="text-xs text-gray-600 mt-1">
+                        Parent account:{' '}
+                        <button
+                          type="button"
+                          className="text-orange-700 underline"
+                          onClick={() => {
+                            const parent = companies.find((c) => c.id === detail.parentCompanyId)
+                            if (parent) openCompany(parent)
+                          }}
+                        >
+                          {detail.parentName}
+                        </button>
+                      </p>
+                    )}
                     <div className="flex flex-wrap gap-3 mt-2 text-xs text-gray-600">
                       <span>{detail.leadCount} contacts</span>
                       <span>{detail.openDeals} open deals</span>
@@ -124,6 +164,51 @@ export default function CompaniesPanel({ onNavigate }) {
                       )}
                     </div>
                   </div>
+
+                  {hierarchyEnabled && (
+                    <div>
+                      <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Parent account</h3>
+                      <select
+                        className="ci-input w-full text-sm"
+                        disabled={parentSaving}
+                        value={detail.parentCompanyId || ''}
+                        onChange={(e) => saveParent(e.target.value || null)}
+                      >
+                        <option value="">None (top-level account)</option>
+                        {parentOptions.map((c) => (
+                          <option key={c.id} value={c.id}>
+                            {c.name}
+                          </option>
+                        ))}
+                      </select>
+                      <p className="text-[11px] text-gray-500 mt-1">
+                        Group subsidiaries under a parent account (constitution P1 hierarchy).
+                      </p>
+                    </div>
+                  )}
+
+                  {(detail.children || []).length > 0 && (
+                    <div>
+                      <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Child accounts</h3>
+                      <ul className="space-y-1">
+                        {detail.children.map((child) => (
+                          <li key={child.id}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const row = companies.find((c) => c.id === child.id) || child
+                                openCompany(row)
+                              }}
+                              className="text-sm text-orange-700 hover:underline"
+                            >
+                              {child.name}
+                              {child.leadCount != null && ` (${child.leadCount} contacts)`}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
 
                   <div>
                     <h3 className="text-xs font-semibold uppercase text-gray-400 mb-2">Contacts</h3>

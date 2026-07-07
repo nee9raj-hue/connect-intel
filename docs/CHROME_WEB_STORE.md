@@ -59,11 +59,13 @@ The zip contains `manifest.json` at the **root** (required by Google).
 5. **Regions** — all regions where Connect Intel sells, or Worldwide.  
 6. Submit for review (typically **1–3 business days**; Gmail-related extensions may take longer).
 
-After approval, copy the public URL (`https://chromewebstore.google.com/detail/...`) into:
+After approval, set in **Vercel Production**:
 
-- `extension/README.md`  
-- Team onboarding / `GO-LIVE-EVERYONE.md`  
-- Optional: in-app link in Team settings
+```
+CHROME_EXTENSION_STORE_URL=https://chromewebstore.google.com/detail/connect-intel/XXXXXXXX
+```
+
+Redeploy — Team → Integrations shows **Install from Chrome Web Store**.
 
 ---
 

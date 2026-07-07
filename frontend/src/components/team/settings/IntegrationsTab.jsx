@@ -36,9 +36,11 @@ function IntegrationIcon({ name }) {
 
 export default function IntegrationsTab({ onNavigate }) {
   const [status, setStatus] = useState(null)
+  const [extensionInfo, setExtensionInfo] = useState(null)
 
   useEffect(() => {
     api.getIntegrationStatus().then(setStatus).catch(() => setStatus(null))
+    api.getExtensionBootstrap().then(setExtensionInfo).catch(() => setExtensionInfo(null))
   }, [])
 
   const isConnected = (item) => {
@@ -49,8 +51,42 @@ export default function IntegrationsTab({ onNavigate }) {
     return false
   }
 
+  const storeUrl = extensionInfo?.distribution?.chromeWebStoreUrl
+  const extensionVersion = extensionInfo?.distribution?.extensionVersion || extensionInfo?.extensionVersion
+
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 16 }}>
+      <SettingsCard>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 12 }}>
+          <IntegrationIcon name="Chrome extension" />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 14, fontWeight: 500, color: C.text }}>Chrome extension</span>
+              <SettingsBadge bg="#eaf3de" color="#27500a">
+                v{extensionVersion || '1.0.0'}
+              </SettingsBadge>
+            </div>
+          </div>
+        </div>
+        <p style={{ fontSize: 12, color: C.textSecondary, margin: '0 0 16px', lineHeight: 1.5 }}>
+          Gmail lead match, trail sync, LinkedIn capture, and CRM compose for your team. Requires Connect Intel sign-in.
+        </p>
+        {storeUrl ? (
+          <PrimaryButton onClick={() => window.open(storeUrl, '_blank', 'noopener,noreferrer')}>
+            Install from Chrome Web Store
+          </PrimaryButton>
+        ) : (
+          <>
+            <p style={{ fontSize: 11, color: C.textMuted, margin: '0 0 12px' }}>
+              Store listing pending — use Load unpacked from the repo <code>extension/</code> folder, or complete Web Store upload.
+            </p>
+            <TextButton onClick={() => window.open('https://connectintel.net', '_blank', 'noopener,noreferrer')}>
+              Open Connect Intel
+            </TextButton>
+          </>
+        )}
+      </SettingsCard>
+
       {INTEGRATIONS.map((item) => {
         const connected = !item.roadmap && isConnected(item)
         const muted = item.roadmap
