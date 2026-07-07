@@ -435,7 +435,12 @@ export default function ConnectAssistant({
           {loading && (
             <div className="ci-ai-thinking">
               <span className="ci-ai-thinking__dot" />
-              <span>{progressStep || 'Working…'}</span>
+              <span>
+                {progressStep ||
+                  (activeTab === 'market'
+                    ? 'Searching companies — may take up to 60s…'
+                    : 'Working…')}
+              </span>
               <div className="ci-ai-thinking__bar" aria-hidden>
                 <span className="ci-ai-thinking__bar-fill" />
               </div>

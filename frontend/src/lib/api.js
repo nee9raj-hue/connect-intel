@@ -918,6 +918,7 @@ export const api = {
   sendAssistantMessage: (message, uiContext = {}) =>
     request('/api/assistant/chat', {
       method: 'POST',
+      timeoutMs: 120_000,
       body: {
         message,
         panel: uiContext.panel,
