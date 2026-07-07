@@ -72,7 +72,7 @@ export default function ConnectAssistant({
   panelOptions,
   pipelineLeadId,
 }) {
-  const { user, openPipelineLead } = useApp()
+  const { user, openPipelineLead, openPipelineEmailDraft } = useApp()
   const isMobile = useIsMobile()
   const [messages, setMessages] = useState([])
   const [myTickets, setMyTickets] = useState([])
@@ -197,6 +197,12 @@ export default function ConnectAssistant({
 
   const handleAction = useCallback(
     async (action) => {
+      if (action.type === 'open_email_draft' && action.leadId) {
+        openPipelineEmailDraft(action.leadId, action.payload || {})
+        onOpenChange?.(false)
+        return
+      }
+
       if (action.type === 'create_lead' && action.payload) {
         try {
           const data = await api.addManualLead(action.payload)
@@ -223,7 +229,7 @@ export default function ConnectAssistant({
       })
       if (ok && action.type !== 'escalate') onOpenChange?.(false)
     },
-    [onNavigate, openPipelineLead, messages, onOpenChange]
+    [onNavigate, openPipelineLead, openPipelineEmailDraft, messages, onOpenChange]
   )
 
   const sendMessage = useCallback(

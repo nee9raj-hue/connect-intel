@@ -116,6 +116,7 @@ export function AppProvider({ children }) {
   const panelNavigateRef = useRef(null)
   const closePipelineLeadRef = useRef(null)
   const pendingLeadOpenRef = useRef({ leadId: null, tab: null })
+  const pendingEmailDraftRef = useRef(null)
   const workspaceLoadedAtRef = useRef(0)
   const workspaceLoadInFlightRef = useRef(null)
   const teamFetchAtRef = useRef(0)
@@ -1064,6 +1065,32 @@ export function AppProvider({ children }) {
     return null
   }, [])
 
+  const openPipelineEmailDraft = useCallback((leadId, draft = {}) => {
+    if (!leadId) return
+    pendingEmailDraftRef.current = {
+      leadId,
+      subject: draft.subject || '',
+      body: draft.body || '',
+      agenda: draft.agenda || '',
+    }
+    pendingLeadOpenRef.current = { leadId, tab: 'email' }
+    setPipelineLeadId(leadId)
+    void api.postWorkspacePulse({ leadId, panel: 'pipeline' }, { silent: true })
+  }, [])
+
+  const consumePendingEmailDraft = useCallback((leadId) => {
+    const pending = pendingEmailDraftRef.current
+    if (pending?.leadId != null && String(pending.leadId) === String(leadId)) {
+      pendingEmailDraftRef.current = null
+      return {
+        subject: pending.subject || '',
+        body: pending.body || '',
+        agenda: pending.agenda || '',
+      }
+    }
+    return null
+  }, [])
+
   const openContact = useCallback((contactId) => {
     if (!contactId) return
     setContactsFocusId(contactId)
@@ -1173,8 +1200,10 @@ export function AppProvider({ children }) {
         updateMobile,
         saveEmailSignature,
         openPipelineLead,
+        openPipelineEmailDraft,
         closePipelineLead,
         consumePendingLeadTab,
+        consumePendingEmailDraft,
         openContact,
         contactsFocusId,
         clearContactsFocus,

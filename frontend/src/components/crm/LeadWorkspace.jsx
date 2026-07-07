@@ -139,6 +139,7 @@ export default function LeadWorkspace({
     generateWhatsAppDraft,
     refreshTeam,
     consumePendingLeadTab,
+    consumePendingEmailDraft,
     openContact,
     saveEmailSignature,
     orgLeadTags,
@@ -238,10 +239,18 @@ export default function LeadWorkspace({
     setError(null)
     setNotice(null)
     const pendingTab = consumePendingLeadTab(lead.id)
-    const validTab = TABS.some((t) => t.id === pendingTab) ? pendingTab : null
-    setTab(validTab || 'overview')
+    const emailDraft = consumePendingEmailDraft(lead.id)
+    if (emailDraft) {
+      setSubject(emailDraft.subject || '')
+      setBody(emailDraft.body || '')
+      if (emailDraft.agenda) setEmailAgenda(emailDraft.agenda)
+      setTab('email')
+    } else {
+      const validTab = TABS.some((t) => t.id === pendingTab) ? pendingTab : null
+      setTab(validTab || 'overview')
+    }
     setSenderCompany(user?.organizationName || user?.company || '')
-  }, [lead.id, user?.organizationName, user?.company, consumePendingLeadTab])
+  }, [lead.id, user?.organizationName, user?.company, consumePendingLeadTab, consumePendingEmailDraft])
 
   useEffect(() => {
     if (!notice) return

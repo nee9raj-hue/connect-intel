@@ -72,9 +72,20 @@ User question + uiContext (panel, tab, leadId)
 - Context suggestions from `getContextualSuggestions(panel, leadId)`.
 - `pipelineLeadId` passed from `AppShell` for lead-scoped answers.
 
-## Future (v2)
+## v2 — CRM action execution (shipped)
 
-- Tool execution: auto-create lead via `persistManualPipelineLead` on confirm.
-- Email/calendar tools wired to Gmail APIs.
-- Deal forecasting from dashboard snapshots.
-- Provider abstraction beyond Perplexity.
+| Action | Behavior |
+|--------|----------|
+| Draft email | Server generates AI draft; **Open in composer** prefills lead email tab |
+| Create task | Server creates task on lead with parsed due date |
+| Schedule meeting | Server books meeting on lead schedule |
+| Permissions | Same as Pipeline PATCH (schedule-only for own leads) |
+
+Modules: `copilot/crmTools.js`, `copilot/scheduleIntent.js`
+
+## Future (v2 continued)
+
+- Deal forecasting from dashboard snapshots
+- Meeting/email summarization
+- Dark mode for copilot panel
+- Conversation search history UI

@@ -6,10 +6,10 @@ export function getContextualSuggestions(uiContext = {}) {
 
   if (hasLead) {
     return [
-      'Research this company on the web',
+      'Draft a follow-up email for this lead',
+      'Remind me to follow up next Monday',
+      'Schedule a call tomorrow at 3pm',
       'Summarize this lead',
-      'Draft a follow-up email',
-      'Find public decision makers',
     ]
   }
   if (panel === 'pipeline' || panel === 'contacts' || panel === 'companies') {
