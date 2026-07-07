@@ -9,6 +9,7 @@ const TRIGGERS = [
   { id: 'form_submitted', label: 'Form submitted' },
   { id: 'tag_added', label: 'Tag added' },
   { id: 'deal_created', label: 'Deal created' },
+  { id: 'sequence_completed', label: 'CRM sequence completed' },
 ]
 
 const STEP_TYPES = [

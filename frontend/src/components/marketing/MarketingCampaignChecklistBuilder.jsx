@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { api } from '../../lib/api'
 import { renderEmailCanvasHtml, STARTER_TEMPLATES } from '../../lib/marketingEmailDesign'
 import {
   audienceCount,
@@ -6,6 +7,7 @@ import {
   canSendCampaign,
   checklistProgress,
   defaultFromFields,
+  formatAudienceEligibilityLine,
   isChecklistStepComplete,
   stepSummary,
   visibleChecklistSteps,
@@ -71,6 +73,8 @@ export default function MarketingCampaignChecklistBuilder({
   const [sendConfirmOpen, setSendConfirmOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [mobilePreview, setMobilePreview] = useState(false)
+  const [audiencePreview, setAudiencePreview] = useState(null)
+  const [audiencePreviewLoading, setAudiencePreviewLoading] = useState(false)
 
   const gmailConnected = Boolean(gmailStatus?.connected)
   const progress = useMemo(
@@ -105,6 +109,43 @@ export default function MarketingCampaignChecklistBuilder({
   const channelLists = lists.filter((l) => (l.channel || 'email') === campaignForm.channel)
   const channelSegments = segments.filter((s) => (s.channel || 'email') === campaignForm.channel)
   const audienceMode = campaignForm.audienceMode || (campaignForm.segmentId ? 'segment' : campaignForm.listId ? 'list' : 'all')
+
+  useEffect(() => {
+    const canPreview =
+      audienceMode === 'all' ||
+      (audienceMode === 'segment' && campaignForm.segmentId) ||
+      (audienceMode === 'list' && campaignForm.listId)
+    if (!canPreview) {
+      setAudiencePreview(null)
+      return undefined
+    }
+    let cancelled = false
+    const timer = setTimeout(async () => {
+      setAudiencePreviewLoading(true)
+      try {
+        const data = await api.previewMarketingAudience({
+          audienceMode,
+          listId: campaignForm.listId || undefined,
+          segmentId: campaignForm.segmentId || undefined,
+          channel: campaignForm.channel || 'email',
+        })
+        if (!cancelled) setAudiencePreview(data)
+      } catch {
+        if (!cancelled) setAudiencePreview(null)
+      } finally {
+        if (!cancelled) setAudiencePreviewLoading(false)
+      }
+    }, 400)
+    return () => {
+      cancelled = true
+      clearTimeout(timer)
+    }
+  }, [
+    audienceMode,
+    campaignForm.listId,
+    campaignForm.segmentId,
+    campaignForm.channel,
+  ])
 
   const applyStarter = (tpl) => {
     if (!tpl) return
@@ -214,6 +255,13 @@ export default function MarketingCampaignChecklistBuilder({
           </button>
         </p>
       )}
+      {audiencePreviewLoading ? (
+        <p className="mc-field-hint">Checking consent and suppressions…</p>
+      ) : formatAudienceEligibilityLine(audiencePreview) ? (
+        <p className="mc-field-hint text-[#33475b] font-medium">
+          {formatAudienceEligibilityLine(audiencePreview)}
+        </p>
+      ) : null}
       <div className="mc-accordion__actions">
         <button
           type="button"
@@ -492,6 +540,7 @@ export default function MarketingCampaignChecklistBuilder({
               const summary = stepSummary(step.id, campaignForm, lists, segments, {
                 gmailStatus,
                 totalContacts,
+                audiencePreview: step.id === 'to' ? audiencePreview : undefined,
               })
               const expanded = activeStep === step.id
               const contentDone = step.id === 'content' && done
@@ -640,6 +689,7 @@ export default function MarketingCampaignChecklistBuilder({
         lists={lists}
         segments={segments}
         gmailStatus={gmailStatus}
+        audiencePreview={audiencePreview}
         busy={busy}
       />
 

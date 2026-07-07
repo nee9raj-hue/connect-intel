@@ -135,10 +135,25 @@ export function defaultFromFields(user, gmailStatus, orgName) {
   return { fromName, fromEmail }
 }
 
-export function stepSummary(stepId, campaignForm, lists, segments, { gmailStatus, totalContacts = 0 } = {}) {
+export function formatAudienceEligibilityLine(preview) {
+  if (!preview || preview.eligible == null) return null
+  const { total = 0, eligible = 0, skipped = {} } = preview
+  const skips = []
+  if (skipped.no_consent) skips.push(`${skipped.no_consent} no consent`)
+  if (skipped.no_email) skips.push(`${skipped.no_email} no email`)
+  if (skipped.suppressed) skips.push(`${skipped.suppressed} suppressed`)
+  if (skipped.not_in_pipeline) skips.push(`${skipped.not_in_pipeline} not in pipeline`)
+  const skipPart = skips.length ? ` — ${skips.join(', ')}` : ''
+  if (eligible === total) return `${eligible.toLocaleString()} will receive this email`
+  return `${eligible.toLocaleString()} of ${total.toLocaleString()} eligible to receive${skipPart}`
+}
+
+export function stepSummary(stepId, campaignForm, lists, segments, { gmailStatus, totalContacts = 0, audiencePreview } = {}) {
   switch (stepId) {
     case 'to': {
       const label = audienceLabel(campaignForm, lists, segments)
+      const eligibility = formatAudienceEligibilityLine(audiencePreview)
+      if (eligibility) return `${label || 'Audience'} · ${eligibility}`
       const count = audienceCount(campaignForm, lists, segments, totalContacts)
       if (!label) return null
       return count ? `${label} · ${count.toLocaleString()} contacts` : label

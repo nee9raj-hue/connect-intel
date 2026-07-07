@@ -692,6 +692,12 @@ export const api = {
     request('/api/marketing/templates', { method: 'DELETE', body: { id } }),
   createMarketingCampaign: (payload) =>
     request('/api/marketing/campaigns', { method: 'POST', body: payload, timeoutMs: 120_000 }),
+  previewMarketingAudience: (payload) =>
+    request('/api/marketing/campaigns', {
+      method: 'POST',
+      body: { action: 'preview_audience', ...payload },
+      timeoutMs: 60_000,
+    }),
   updateMarketingCampaign: (payload) =>
     request('/api/marketing/campaigns', { method: 'PATCH', body: payload, timeoutMs: 120_000 }),
   startMarketingCampaign: (id, opts = {}) =>

@@ -12,7 +12,8 @@ export const TIMELINE_FILTERS = [
 function marketingEventTitle(ev) {
   if (ev.type === 'email_open' || ev.type === 'open') return 'Email opened'
   if (ev.type === 'link_click' || ev.type === 'click') return 'Link clicked'
-  if (ev.type === 'unsubscribe') return 'Unsubscribed'
+  if (ev.type === 'marketing_send' || ev.type === 'send') return 'Campaign email sent'
+  if (ev.type === 'unsubscribe') return 'Unsubscribed from marketing'
   return ev.type || 'Marketing event'
 }
 
@@ -91,10 +92,21 @@ export function buildUnifiedTimeline(crm = {}, { marketingEvents = [], indexedAc
       id: ev.id || `mkt-${ev.createdAt}`,
       kind: 'marketing',
       category: 'marketing',
-      type: ev.type === 'open' ? 'email_open' : ev.type === 'click' ? 'link_click' : ev.type,
+      type:
+        ev.type === 'open'
+          ? 'email_open'
+          : ev.type === 'click'
+            ? 'link_click'
+            : ev.type === 'send'
+              ? 'marketing_send'
+              : ev.type,
       at: ev.createdAt,
       title: marketingEventTitle(ev),
-      subtitle: ev.url ? String(ev.url).slice(0, 80) : 'Campaign activity',
+      subtitle: ev.campaignId
+        ? `Campaign · ${String(ev.campaignId).slice(0, 8)}`
+        : ev.url
+          ? String(ev.url).slice(0, 80)
+          : 'Campaign activity',
       meta: { campaignId: ev.campaignId },
     })
   }
