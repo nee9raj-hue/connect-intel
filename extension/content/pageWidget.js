@@ -3,7 +3,14 @@
  * Shadow DOM keeps Gmail styles from breaking the panel.
  */
 
-const WIDGET_HOST_ID = 'connect-intel-widget-host'
+void (function connectIntelGmailPageWidget() {
+  if (globalThis.__connectIntelGmailPageWidgetBooted) {
+    globalThis.__connectIntelGmailPageWidgetTryMount?.()
+    return
+  }
+  globalThis.__connectIntelGmailPageWidgetBooted = true
+
+  const WIDGET_HOST_ID = 'connect-intel-widget-host'
 
 function runtime() {
   return globalThis.__connectIntelRuntime
@@ -740,6 +747,8 @@ function tryMountWidget() {
   }
 }
 
+globalThis.__connectIntelGmailPageWidgetTryMount = tryMountWidget
+
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', tryMountWidget)
 } else {
@@ -749,3 +758,4 @@ if (document.readyState === 'loading') {
 setTimeout(tryMountWidget, 400)
 setTimeout(tryMountWidget, 2000)
 window.addEventListener('pageshow', tryMountWidget)
+})()
