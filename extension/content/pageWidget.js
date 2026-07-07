@@ -62,6 +62,10 @@ class ConnectIntelPageWidget {
       window.removeEventListener('hashchange', this.onHashChange)
       this.onHashChange = null
     }
+    if (this.onRemountCheck) {
+      clearInterval(this.onRemountCheck)
+      this.onRemountCheck = null
+    }
     this.host?.remove()
     this.host = null
     this.shadow = null
@@ -73,11 +77,21 @@ class ConnectIntelPageWidget {
     if (document.getElementById(WIDGET_HOST_ID)) return
 
     this.active = true
-    runtime()?.onExtensionContextInvalidated(() => this.teardown())
+    runtime()?.onExtensionContextInvalidated(() => {
+      if (!this.host) return
+      this.renderContextInvalidated()
+    })
 
     const iconUrl = extensionIconUrl()
     this.host = document.createElement('div')
     this.host.id = WIDGET_HOST_ID
+    Object.assign(this.host.style, {
+      position: 'fixed',
+      right: '56px',
+      bottom: '24px',
+      zIndex: '2147483647',
+      pointerEvents: 'none',
+    })
     this.shadow = this.host.attachShadow({ mode: 'closed' })
 
     const style = document.createElement('style')
@@ -142,20 +156,42 @@ class ConnectIntelPageWidget {
 
     this.els.fab.addEventListener('click', () => this.togglePanel())
     this.els.close.addEventListener('click', () => this.setOpen(false))
+    root.addEventListener('click', (event) => {
+      if (event.target?.closest?.('[data-action="reload-tab"]')) this.reloadTab()
+    })
     root.querySelector('[data-action="open"]')?.addEventListener('click', () => this.openInApp())
     root.querySelector('[data-action="sync"]')?.addEventListener('click', () => this.syncTrail())
     root.querySelector('[data-action="signin"]')?.addEventListener('click', () => this.signIn())
     root.querySelector('[data-action="generate"]')?.addEventListener('click', () => this.generateDraft())
     root.querySelector('[data-action="send"]')?.addEventListener('click', () => this.sendEmail())
+    root.querySelector('[data-action="reload-tab"]')?.addEventListener('click', () => this.reloadTab())
     this.bindComposeInteractionGuards(root)
 
-    document.documentElement.appendChild(this.host)
+    const mountTarget = document.body || document.documentElement
+    mountTarget.appendChild(this.host)
+    this.scheduleRemountChecks()
 
     this.onHashChange = () => {
       if (!this.active) return
       if (this.open) void this.refresh()
     }
     window.addEventListener('hashchange', this.onHashChange)
+  }
+
+  scheduleRemountChecks() {
+    if (this.onRemountCheck) return
+    this.onRemountCheck = setInterval(() => {
+      if (!document.getElementById(WIDGET_HOST_ID) && runtime()?.isExtensionContextAlive()) {
+        this.active = false
+        this.host = null
+        this.mount()
+      }
+    }, 2000)
+  }
+
+  reloadTab() {
+    runtime()?.safeSendMessage({ type: 'CI_RELOAD_GMAIL_TAB' })
+    window.location.reload()
   }
 
   bindComposeInteractionGuards(root) {
@@ -180,10 +216,8 @@ class ConnectIntelPageWidget {
     return `
       :host, .ci-root { all: initial; }
       .ci-root {
-        position: fixed;
-        right: 18px;
-        bottom: 88px;
-        z-index: 2147483646;
+        position: relative;
+        pointer-events: auto;
         font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       }
       .ci-fab {
@@ -367,6 +401,13 @@ class ConnectIntelPageWidget {
       .ci-btn--secondary { background: #e2e8f0; color: #0f172a; }
       .ci-btn--secondary:hover { background: #cbd5e1; }
       .ci-signin { margin-top: 10px; }
+      .ci-link {
+        all: unset;
+        color: #2563eb;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: underline;
+      }
     `
   }
 
@@ -452,9 +493,10 @@ class ConnectIntelPageWidget {
     this.els.status.hidden = false
     this.els.status.className = 'ci-status'
     this.els.status.innerHTML =
-      'Extension was updated. <strong>Refresh this Gmail tab</strong> to reconnect.'
+      'Extension was updated. <button type="button" class="ci-link" data-action="reload-tab">Refresh this Gmail tab</button> to reconnect.'
     this.hideBadge()
-    this.teardown()
+    if (this.els.panel) this.els.panel.hidden = false
+    this.open = true
   }
 
   renderLoading() {
@@ -691,8 +733,19 @@ class ConnectIntelPageWidget {
 }
 
 const widget = new ConnectIntelPageWidget()
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => widget.mount())
-} else {
-  widget.mount()
+
+function tryMountWidget() {
+  if (!document.getElementById(WIDGET_HOST_ID)) {
+    widget.mount()
+  }
 }
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', tryMountWidget)
+} else {
+  tryMountWidget()
+}
+
+setTimeout(tryMountWidget, 400)
+setTimeout(tryMountWidget, 2000)
+window.addEventListener('pageshow', tryMountWidget)
