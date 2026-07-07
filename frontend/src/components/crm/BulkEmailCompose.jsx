@@ -1,20 +1,13 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useApp } from '../../context/AppContext'
-import { EMAIL_PURPOSES } from '../../lib/crmConstants'
 import { leadDisplayName, leadHasSendableEmail } from '../../lib/emailUtils'
 import { bulkEmailChunkSize, INLINE_EMAIL_MAX_RECIPIENTS } from '../../lib/bulkEmailLimits.js'
-import { crmTemplateToComposeFields, loadCrmMarketingTemplates } from '../../lib/crmMarketingTemplates.js'
-import { MarketingTemplatePicker, RecipientEmailPreview } from './MarketingEmailComposeTools'
+import { RecipientEmailPreview } from './MarketingEmailComposeTools'
 import CampaignSendProgress from '../marketing/CampaignSendProgress.jsx'
 import { useCampaignSendProgress } from '../../hooks/useCampaignSendProgress.js'
 import { saveActivePipelineEmailCampaign } from '../../lib/pipelineEmailCampaign.js'
 
 const TERMINAL_CAMPAIGN = new Set(['completed', 'failed', 'cancelled', 'stopped', 'archived'])
-
-const COMPOSE_TABS = [
-  { id: 'ai', label: '✨ AI draft' },
-  { id: 'manual', label: 'Manual' },
-]
 
 export default function BulkEmailCompose({
   leadIds,
@@ -25,12 +18,8 @@ export default function BulkEmailCompose({
   skippedCount = 0,
 }) {
   const { user, sendBulkEmail, generateEmailDraft } = useApp()
-  const [composeTab, setComposeTab] = useState('ai')
   const [cc, setCc] = useState('')
   const [agenda, setAgenda] = useState('')
-  const [keyPoints, setKeyPoints] = useState('')
-  const [senderCompany, setSenderCompany] = useState(user?.organizationName || user?.company || '')
-  const [purpose, setPurpose] = useState('introduction')
   const [personalizeEach, setPersonalizeEach] = useState(true)
   const [subject, setSubject] = useState('')
   const [body, setBody] = useState('')
@@ -52,20 +41,9 @@ export default function BulkEmailCompose({
     !backgroundProgress.done &&
     !TERMINAL_CAMPAIGN.has(String(backgroundProgress.sendStatus || '').toLowerCase())
   const [previewIndex, setPreviewIndex] = useState(0)
-  const [templates, setTemplates] = useState([])
-  const [templateId, setTemplateId] = useState('')
-  const [aiPreview, setAiPreview] = useState(null)
-  const [aiPreviewLoading, setAiPreviewLoading] = useState(false)
+  const [showCc, setShowCc] = useState(false)
 
-  useEffect(() => {
-    let cancelled = false
-    loadCrmMarketingTemplates().then((rows) => {
-      if (!cancelled) setTemplates(rows)
-    })
-    return () => {
-      cancelled = true
-    }
-  }, [])
+  const senderCompany = user?.organizationName || user?.company || ''
 
   const withEmail = useMemo(
     () => leads.filter((l) => leadIds.includes(l.id) && leadHasSendableEmail(l)),
@@ -77,9 +55,9 @@ export default function BulkEmailCompose({
   const recipientSummary = useMemo(() => {
     const parts = [`${withEmail.length} recipient${withEmail.length === 1 ? '' : 's'}`]
     if (withEmail.length > INLINE_EMAIL_MAX_RECIPIENTS) {
-      parts.push('queue + worker (close tab OK)')
+      parts.push('queued send — you can close this tab')
     } else {
-      parts.push('immediate send')
+      parts.push('sends from your work Gmail')
     }
     if (skippedCount > 0) {
       parts.push(`${skippedCount} skipped`)
@@ -89,36 +67,13 @@ export default function BulkEmailCompose({
     return parts.join(' · ')
   }, [withEmail.length, skippedCount, missingEmail])
 
-  const selectedTemplate = useMemo(
-    () => templates.find((t) => t.id === templateId) || null,
-    [templates, templateId]
-  )
-
-  const applySelectedTemplate = (template = selectedTemplate) => {
-    if (!template) return
-    const { subject: subj, body: text } = crmTemplateToComposeFields(template)
-    if (!subj && !text) {
-      setError('This template has no subject or body content to apply.')
-      return
-    }
-    setComposeTab('manual')
-    setPersonalizeEach(false)
-    setSubject(subj)
-    setBody(text)
-    setDraftAi(false)
-    setError(null)
-    setPreviewIndex(0)
-    setNotice(`Applied “${template.name}”. Preview each recipient below — merge fields fill in per lead.`)
-    setAiPreview(null)
-  }
-
   const handleGenerate = async () => {
     if (!sampleLead) {
       setError('No selected leads have a valid email address')
       return
     }
     if (agenda.trim().length < 8) {
-      setError('Describe your email goal (agenda) in a few words before generating a draft')
+      setError('Describe your email goal in at least a few words')
       return
     }
     setGenerating(true)
@@ -126,59 +81,26 @@ export default function BulkEmailCompose({
     setNotice(null)
     try {
       const data = await generateEmailDraft(sampleLead.id, {
-        purpose,
+        purpose: 'introduction',
         tone: 'professional',
         agenda: agenda.trim(),
-        keyPoints: keyPoints.trim(),
         senderCompany: senderCompany.trim(),
         senderName: user?.name,
       })
       setSubject(data.draft.subject || '')
       setBody(data.draft.body || '')
       setDraftAi(Boolean(data.draft.aiGenerated))
-      const name = leadDisplayName(sampleLead)
-      const sampleFirst = sampleLead.firstName?.trim() || '(no first name on this lead)'
       setNotice(
-        data.draft.notice ||
-          `Sample draft for ${name} (first name: ${sampleFirst}) — review below. ${
-            personalizeEach
-              ? 'On send, AI writes a separate email per lead using each person’s first name when available.'
-              : 'Same text will go to everyone unless you edit it.'
-          }`
+        `Sample draft for ${leadDisplayName(sampleLead)} — review below.${
+          personalizeEach
+            ? ' Each recipient gets a personalized email at send time.'
+            : ' Same text goes to everyone unless you edit it.'
+        }`
       )
-      setAiPreview(null)
     } catch (e) {
       setError(e.message)
     } finally {
       setGenerating(false)
-    }
-  }
-
-  const handlePreviewAiDraft = async (lead) => {
-    if (agenda.trim().length < 8) {
-      setError('Add an agenda before previewing AI drafts')
-      return
-    }
-    setAiPreviewLoading(true)
-    setError(null)
-    try {
-      const data = await generateEmailDraft(lead.id, {
-        purpose,
-        tone: 'professional',
-        agenda: agenda.trim(),
-        keyPoints: keyPoints.trim(),
-        senderCompany: senderCompany.trim(),
-        senderName: user?.name,
-      })
-      setAiPreview({
-        leadId: lead.id,
-        subject: data.draft.subject || '',
-        body: data.draft.body || '',
-      })
-    } catch (e) {
-      setError(e.message)
-    } finally {
-      setAiPreviewLoading(false)
     }
   }
 
@@ -187,17 +109,17 @@ export default function BulkEmailCompose({
       setError('No selected leads have a valid email address')
       return
     }
-    const useAiPerLead = composeTab === 'ai' && personalizeEach
-    if (composeTab === 'ai' && useAiPerLead && agenda.trim().length < 8) {
-      setError('Add an agenda (at least a short sentence) for AI personalization')
+    const useAiPerLead = personalizeEach
+    if (useAiPerLead && agenda.trim().length < 8) {
+      setError('Add a goal (agenda) for AI personalization')
       return
     }
     if (!useAiPerLead && !subject.trim()) {
-      setError('Subject line is required before sending')
+      setError('Subject is required')
       return
     }
     if (!useAiPerLead && !body.trim()) {
-      setError('Message body is required before sending')
+      setError('Message body is required')
       return
     }
     setBusy(true)
@@ -220,9 +142,9 @@ export default function BulkEmailCompose({
           campaignId: resumeCampaignId || undefined,
           cc: cc.trim(),
           agenda: agenda.trim(),
-          keyPoints: keyPoints.trim(),
+          keyPoints: '',
           senderCompany: senderCompany.trim(),
-          purpose,
+          purpose: 'introduction',
           useAiPerLead,
           subject: subject.trim(),
           body: body.trim(),
@@ -233,10 +155,9 @@ export default function BulkEmailCompose({
       setResult(data)
       setResumeCampaignId(null)
       if (data.timedOut) {
-        setError(null)
         setNotice(
           data.workerHint ||
-            'The request timed out, but your send may still be processing. Check the Pipeline progress banner or try Send again in a minute.'
+            'Request timed out — send may still be processing. Check Pipeline progress or retry in a minute.'
         )
       }
       if (data.campaignId) {
@@ -248,15 +169,15 @@ export default function BulkEmailCompose({
         const isQueued = data.mode === 'queued'
         if (data.done || (sent > 0 && pending <= 0 && !isQueued)) {
           setNotice(
-            `Completed — ${sent} email${sent === 1 ? '' : 's'} sent${failed ? `, ${failed} failed` : ''}. Check each lead timeline; inbox may take a few minutes.`
+            `Done — ${sent} sent${failed ? `, ${failed} failed` : ''}. Check each lead timeline.`
           )
         } else if (isQueued) {
           setNotice(
             data.workerHint ||
-              `Queued — ${withEmail.length} recipients. Status: Preparing → Sending. You can close this tab; track progress below or on the Pipeline banner.`
+              `Queued ${withEmail.length} emails. Track progress below or on Pipeline.`
           )
         } else if (sent > 0 || pending > 0) {
-          setNotice(`${sent} sent — ${pending} remaining.`)
+          setNotice(`${sent} sent — ${pending} remaining`)
         } else if (data.firstError) {
           setError(data.firstError)
         } else {
@@ -273,12 +194,12 @@ export default function BulkEmailCompose({
         setResumeCampaignId(e.bulkEmailProgress.campaignId)
         const sent = e.bulkEmailProgress.sentCount || 0
         if (sent > 0) {
-          setNotice(`${sent} email${sent === 1 ? '' : 's'} already sent — click Send again to continue.`)
+          setNotice(`${sent} already sent — click Send again to continue`)
         }
       }
       setError(
         e.message?.includes('timed out')
-          ? `${e.message} Progress is saved — click Send again to continue from where it stopped.`
+          ? `${e.message} Progress saved — Send again to continue.`
           : e.message
       )
     } finally {
@@ -287,23 +208,19 @@ export default function BulkEmailCompose({
     }
   }
 
-  const useAiPerLead = composeTab === 'ai' && personalizeEach
-  const batchSize = bulkEmailChunkSize({ useAiPerLead })
-  const batchCount = Math.max(1, Math.ceil(withEmail.length / batchSize))
-
+  const batchSize = bulkEmailChunkSize({ useAiPerLead: personalizeEach })
   const sendDisabled =
     busy ||
     campaignSending ||
     !withEmail.length ||
-    (composeTab === 'ai' && personalizeEach && agenda.trim().length < 8) ||
-    (composeTab === 'manual' && (!subject.trim() || !body.trim())) ||
-    (composeTab === 'ai' && !personalizeEach && (!subject.trim() || !body.trim()))
+    (personalizeEach && agenda.trim().length < 8) ||
+    (!personalizeEach && (!subject.trim() || !body.trim()))
 
   return (
     <div className={`flex flex-col min-h-0 text-sm ${compact ? 'h-full' : 'h-full'}`}>
       {!compact && (
         <div className="shrink-0 px-4 py-3 border-b border-[#dfe3eb] bg-white">
-          <h2 className="text-sm font-semibold text-[#33475b]">Compose</h2>
+          <h2 className="text-sm font-semibold text-[#33475b]">Bulk email</h2>
           <p className="text-xs text-[#516f90] mt-0.5">{recipientSummary}</p>
         </div>
       )}
@@ -317,154 +234,94 @@ export default function BulkEmailCompose({
           compact ? 'px-5 pb-3' : 'p-4'
         }`}
       >
-        <div className="flex gap-1 p-0.5 bg-gray-100 rounded-lg">
-          {COMPOSE_TABS.map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              onClick={() => setComposeTab(t.id)}
-              className={`flex-1 py-1.5 text-xs font-semibold rounded-md ${
-                composeTab === t.id ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
-
-        <MarketingTemplatePicker
-          templates={templates}
-          value={templateId}
-          onChange={setTemplateId}
-          onApply={(template) => {
-            setTemplateId(template.id)
-            applySelectedTemplate(template)
-          }}
-          disabled={busy}
-        />
+        <p className="text-xs text-[#516f90] leading-relaxed">
+          CRM trail email from your connected work Gmail — logged on each lead. For marketing campaigns
+          and templates, use <strong>Marketing hub</strong>.
+        </p>
 
         <div>
-          <label className="text-xs font-semibold uppercase text-gray-400">Cc (optional)</label>
-          <input
-            value={cc}
-            onChange={(e) => setCc(e.target.value)}
-            placeholder="manager@company.com, colleague@company.com"
+          <label className="text-xs font-semibold uppercase text-gray-400">Goal</label>
+          <textarea
+            value={agenda}
+            onChange={(e) => setAgenda(e.target.value)}
+            rows={3}
+            placeholder="e.g. Follow up on USA commercial rates and request a 15-min call"
             className="w-full mt-1 border border-gray-200 rounded-lg px-3 py-2 text-sm"
           />
-          <p className="text-xs text-gray-400 mt-0.5">Same Cc on every email in this batch</p>
         </div>
 
-        {composeTab === 'ai' ? (
-          <>
-            <section className="space-y-2">
-              <h3 className="text-xs font-semibold uppercase text-gray-400">What should these emails say?</h3>
-              <input
-                value={senderCompany}
-                onChange={(e) => setSenderCompany(e.target.value)}
-                placeholder="Your company name"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
-              />
-              <textarea
-                value={agenda}
-                onChange={(e) => setAgenda(e.target.value)}
-                rows={3}
-                placeholder="Agenda (required): e.g. Introduce our organic snacks to boutique buyers; ask for a 15-min call"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
-              />
-              <textarea
-                value={keyPoints}
-                onChange={(e) => setKeyPoints(e.target.value)}
-                rows={2}
-                placeholder="Key points (optional): pricing, certifications, trade show, etc."
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
-              />
-            </section>
-
-            <div className="flex gap-2">
-              <select
-                value={purpose}
-                onChange={(e) => setPurpose(e.target.value)}
-                className="flex-1 border border-gray-200 rounded-lg px-2 py-1.5 text-xs"
-              >
-                {EMAIL_PURPOSES.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.label}
-                  </option>
-                ))}
-              </select>
-              <button
-                type="button"
-                onClick={handleGenerate}
-                disabled={generating || !sampleLead || agenda.trim().length < 8}
-                className="text-xs font-semibold px-3 py-1.5 bg-[#fff4ee] border border-[#ffd4b8] rounded-lg disabled:opacity-50 whitespace-nowrap"
-              >
-                {generating ? 'Drafting…' : '✨ Generate draft'}
-              </button>
-            </div>
-
-            <label className="flex items-start gap-2 text-xs text-gray-600 leading-snug">
-              <input
-                type="checkbox"
-                className="mt-0.5"
-                checked={personalizeEach}
-                onChange={(e) => {
-                  setPersonalizeEach(e.target.checked)
-                  setAiPreview(null)
-                }}
-              />
-              Personalize with AI for each recipient at send time (recommended)
-            </label>
-            {personalizeEach && withEmail.length > batchSize && (
-              <p className="text-xs text-[#516f90] bg-[#f5f8fa] rounded-lg px-2 py-1.5">
-                AI writes a unique email per lead, then sends from your mailbox — up to {batchSize} per step (
-                {batchCount} step{batchCount === 1 ? '' : 's'} for {withEmail.length} recipients). Progress is
-                saved; you can retry if a step is interrupted.
-              </p>
-            )}
-
-            {notice && (
-              <p className="text-xs text-green-800 bg-green-50 rounded-lg px-2 py-1.5">{notice}</p>
-            )}
-
+        <div className="flex flex-wrap gap-2 items-center">
+          <button
+            type="button"
+            onClick={handleGenerate}
+            disabled={generating || !sampleLead || agenda.trim().length < 8}
+            className="text-xs font-semibold px-3 py-2 bg-[#fff4ee] border border-[#ffd4b8] rounded-lg disabled:opacity-50"
+          >
+            {generating ? 'Generating…' : '✨ Generate sample draft'}
+          </button>
+          <label className="flex items-center gap-2 text-xs text-gray-600 ml-auto">
             <input
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              placeholder="Subject (preview / same for all if not personalizing)"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
+              type="checkbox"
+              checked={personalizeEach}
+              onChange={(e) => setPersonalizeEach(e.target.checked)}
             />
-            <textarea
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
-              rows={8}
-              placeholder={
-                personalizeEach
-                  ? 'Generate a sample draft above, or leave blank to let AI write each email at send'
-                  : 'Message body — Dear {{firstName}} or Dear [Name] is replaced per recipient'
-              }
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono text-xs"
-            />
-          </>
+            Personalize each recipient with AI
+          </label>
+        </div>
+
+        {personalizeEach && withEmail.length > batchSize && (
+          <p className="text-xs text-[#516f90] bg-[#f5f8fa] rounded-lg px-2 py-1.5">
+            {withEmail.length} leads — AI writes one email per person in batches of {batchSize}.
+          </p>
+        )}
+
+        {notice && (
+          <p className="text-xs text-green-800 bg-green-50 rounded-lg px-2 py-1.5">{notice}</p>
+        )}
+
+        <div>
+          <label className="text-xs font-semibold uppercase text-gray-400">Subject</label>
+          <input
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+            placeholder={personalizeEach ? 'Optional preview — AI sets per recipient' : 'Subject'}
+            className="w-full mt-1 border border-gray-200 rounded-lg px-3 py-2 text-sm"
+          />
+        </div>
+
+        <div>
+          <label className="text-xs font-semibold uppercase text-gray-400">Body</label>
+          <textarea
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            rows={8}
+            placeholder={
+              personalizeEach
+                ? 'Generate a sample above, or leave blank for AI at send time'
+                : 'Message — use {{firstName}} for each recipient’s name'
+            }
+            className="w-full mt-1 border border-gray-200 rounded-lg px-3 py-2 text-sm"
+          />
+        </div>
+
+        {!showCc ? (
+          <button
+            type="button"
+            className="text-xs text-[#ff7a59] font-medium hover:underline"
+            onClick={() => setShowCc(true)}
+          >
+            + Add Cc
+          </button>
         ) : (
-          <>
-            <p className="text-xs text-gray-500">
-              Same template for every lead — use <code className="text-[11px]">{'{{firstName}}'}</code> or{' '}
-              <code className="text-[11px]">[Name]</code> and each recipient gets their own first name (up to 200
-              with email). Sends via your connected work or company email.
-            </p>
+          <div>
+            <label className="text-xs font-semibold uppercase text-gray-400">Cc (optional)</label>
             <input
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              placeholder="Subject (same for all)"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
+              value={cc}
+              onChange={(e) => setCc(e.target.value)}
+              placeholder="colleague@company.com"
+              className="w-full mt-1 border border-gray-200 rounded-lg px-3 py-2 text-sm"
             />
-            <textarea
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
-              rows={10}
-              placeholder="Message body (same for all)"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono text-xs"
-            />
-          </>
+          </div>
         )}
 
         {withEmail.length > 0 && (
@@ -474,10 +331,7 @@ export default function BulkEmailCompose({
             onPreviewIndexChange={setPreviewIndex}
             subject={subject}
             body={body}
-            personalizeEach={composeTab === 'ai' && personalizeEach}
-            aiPreview={aiPreview}
-            aiPreviewLoading={aiPreviewLoading}
-            onPreviewAiDraft={composeTab === 'ai' && personalizeEach ? handlePreviewAiDraft : undefined}
+            personalizeEach={personalizeEach}
           />
         )}
 
@@ -489,10 +343,8 @@ export default function BulkEmailCompose({
           <div className="text-xs text-[#33475b] bg-[#eaf0f6] rounded-lg px-2 py-2 space-y-1.5">
             <p>
               {sendProgress.phase === 'queuing'
-                ? 'Queuing recipients…'
-                : `${sendProgress.sentSoFar ?? 0} of ${sendProgress.total} sent · ${
-                    sendProgress.remaining ?? sendProgress.pending ?? Math.max(0, sendProgress.total - (sendProgress.sentSoFar ?? 0))
-                  } remaining${sendProgress.failedSoFar > 0 ? ` · ${sendProgress.failedSoFar} failed` : ''}…`}
+                ? 'Queuing…'
+                : `${sendProgress.sentSoFar ?? 0} of ${sendProgress.total} sent…`}
             </p>
             <div className="h-1.5 rounded-full bg-[#cbd6e2] overflow-hidden">
               <div
@@ -503,7 +355,8 @@ export default function BulkEmailCompose({
                     sendProgress.phase === 'queuing'
                       ? 8
                       : Math.round(
-                          ((sendProgress.sentSoFar + (sendProgress.failedSoFar || 0)) / sendProgress.total) * 100
+                          ((sendProgress.sentSoFar + (sendProgress.failedSoFar || 0)) / sendProgress.total) *
+                            100
                         )
                   )}%`,
                 }}
@@ -513,16 +366,14 @@ export default function BulkEmailCompose({
         )}
         {result && result.background ? (
           <p className="text-xs text-green-800 bg-green-50 rounded-lg px-2 py-1.5">
-            Campaign queued — {result.pendingSends ?? withEmail.length} email
-            {(result.pendingSends ?? withEmail.length) === 1 ? '' : 's'} sending in the background.
+            Queued — {(result.pendingSends ?? withEmail.length) === 1 ? '1 email' : `${result.pendingSends ?? withEmail.length} emails`} sending in background.
           </p>
         ) : result ? (
           <p className="text-xs text-green-800 bg-green-50 rounded-lg px-2 py-1.5 tabular-nums">
             {result.sentCount ?? 0} of {withEmail.length} sent
             {(result.pendingSends ?? 0) > 0 ? ` · ${result.pendingSends} remaining` : ''}
             {(result.failedCount ?? 0) > 0 ? ` · ${result.failedCount} failed` : ''}
-            {(result.skippedCount ?? 0) > 0 ? ` · ${result.skippedCount} skipped` : ''}
-            {result.done ? ' · Completed' : ''}
+            {result.done ? ' · Done' : ''}
           </p>
         ) : null}
       </div>
@@ -538,7 +389,7 @@ export default function BulkEmailCompose({
             onClick={() => onRequestClose?.()}
             className="crm-btn crm-btn-secondary w-full py-2.5 mb-2"
           >
-            Close — track progress on Pipeline
+            Close — track on Pipeline
           </button>
         ) : null}
         <button
