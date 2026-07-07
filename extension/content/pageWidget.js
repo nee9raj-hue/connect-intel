@@ -31,15 +31,6 @@ function sendMessage(type, payload = {}) {
   })
 }
 
-function threadKey(context) {
-  return [
-    context?.threadId || '',
-    context?.subject || '',
-    ...(context?.emails || []).sort(),
-    ...(context?.recipientNames || []).sort(),
-  ].join('|')
-}
-
 function escapeHtml(value) {
   return String(value || '')
     .replace(/&/g, '&amp;')
@@ -52,21 +43,22 @@ class ConnectIntelPageWidget {
   constructor() {
     this.open = false
     this.loading = false
+    this.active = false
     this.boot = null
     this.context = { emails: [], subject: '', recipientNames: [] }
     this.matchResult = null
     this.currentLead = null
-    this.lastThreadKey = ''
     this.host = null
     this.shadow = null
     this.els = {}
-    this.pollTimer = null
+    this.onHashChange = null
   }
 
   teardown() {
-    if (this.pollTimer) {
-      clearInterval(this.pollTimer)
-      this.pollTimer = null
+    this.active = false
+    if (this.onHashChange) {
+      window.removeEventListener('hashchange', this.onHashChange)
+      this.onHashChange = null
     }
     this.host?.remove()
     this.host = null
@@ -75,8 +67,10 @@ class ConnectIntelPageWidget {
   }
 
   mount() {
+    if (!runtime()?.isExtensionContextAlive()) return
     if (document.getElementById(WIDGET_HOST_ID)) return
 
+    this.active = true
     runtime()?.onExtensionContextInvalidated(() => this.teardown())
 
     const iconUrl = extensionIconUrl()
@@ -135,12 +129,12 @@ class ConnectIntelPageWidget {
     root.querySelector('[data-action="signin"]')?.addEventListener('click', () => this.signIn())
 
     document.documentElement.appendChild(this.host)
-    this.pollTimer = setInterval(() => this.tick(), 5000)
-    this.tick()
-    window.addEventListener('hashchange', () => {
-      this.lastThreadKey = ''
-      this.tick()
-    })
+
+    this.onHashChange = () => {
+      if (!this.active) return
+      if (this.open) void this.refresh()
+    }
+    window.addEventListener('hashchange', this.onHashChange)
   }
 
   styles() {
@@ -291,8 +285,8 @@ class ConnectIntelPageWidget {
 
   setOpen(next) {
     this.open = next
-    this.els.panel.hidden = !next
-    if (next) this.refresh()
+    if (this.els.panel) this.els.panel.hidden = !next
+    if (next) void this.refresh()
   }
 
   togglePanel() {
@@ -311,61 +305,17 @@ class ConnectIntelPageWidget {
     }
   }
 
-  async tick() {
-    try {
-      if (!runtime()?.isExtensionContextAlive()) {
-        this.renderContextInvalidated()
-        return
-      }
-
-      const context = this.readContext()
-      const key = threadKey(context)
-      if (key === this.lastThreadKey) return
-      this.lastThreadKey = key
-      this.context = context
-
-      const hasSignal =
-        (context.emails?.length || 0) > 0 ||
-        String(context.subject || '').trim().length >= 2 ||
-        (context.recipientNames?.length || 0) > 0
-      if (!hasSignal) {
-        this.els.badge.hidden = true
-        return
-      }
-
-      if (this.open) {
-        await this.refresh()
-      } else {
-        await this.refreshBadge()
-      }
-    } catch (err) {
-      if (runtime()?.isContextInvalidatedError?.(err?.message)) {
-        this.renderContextInvalidated()
-      }
-    }
-  }
-
-  async refreshBadge() {
-    try {
-      const result = await sendMessage('CI_MATCH_THREAD', { context: this.context })
-      const matched = Boolean(result?.matches?.length)
-      this.els.badge.hidden = !matched && !result?.searchQuery
-      this.els.badge.classList.toggle('ci-fab__badge--warn', !matched && Boolean(result?.searchQuery))
-    } catch {
-      this.els.badge.hidden = true
-    }
-  }
-
   async refresh() {
-    if (this.loading) return
+    if (!this.active || this.loading) return
     this.loading = true
     this.renderLoading()
 
     try {
+      this.context = this.readContext()
       this.boot = await sendMessage('CI_BOOTSTRAP')
       this.matchResult = await sendMessage('CI_MATCH_THREAD', { context: this.context })
       this.renderMatch()
-      await this.refreshBadge()
+      this.updateBadge()
     } catch (err) {
       if (runtime()?.isContextInvalidatedError?.(err.message)) {
         this.renderContextInvalidated()
@@ -376,14 +326,26 @@ class ConnectIntelPageWidget {
       } else {
         this.renderError(err.message || 'Could not load Connect Intel')
       }
-      this.els.badge.hidden = true
+      this.hideBadge()
     } finally {
       this.loading = false
     }
   }
 
+  updateBadge() {
+    const badge = this.els?.badge
+    if (!badge) return
+    const matched = Boolean(this.matchResult?.matches?.length)
+    badge.hidden = !matched && !this.matchResult?.searchQuery
+    badge.classList.toggle('ci-fab__badge--warn', !matched && Boolean(this.matchResult?.searchQuery))
+  }
+
+  hideBadge() {
+    if (this.els?.badge) this.els.badge.hidden = true
+  }
+
   renderContextInvalidated() {
-    if (!this.els.status) return
+    if (!this.els?.status) return
     this.els.signin.hidden = true
     this.els.lead.hidden = true
     this.els.actions.hidden = true
@@ -391,11 +353,8 @@ class ConnectIntelPageWidget {
     this.els.status.className = 'ci-status'
     this.els.status.innerHTML =
       'Extension was updated. <strong>Refresh this Gmail tab</strong> to reconnect.'
-    this.els.badge.hidden = true
-    if (this.pollTimer) {
-      clearInterval(this.pollTimer)
-      this.pollTimer = null
-    }
+    this.hideBadge()
+    this.teardown()
   }
 
   renderLoading() {

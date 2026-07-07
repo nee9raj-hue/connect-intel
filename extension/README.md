@@ -25,7 +25,7 @@ Constitution-aligned browser companion for **Phase 22 Integrations**. Thin clien
 4. Select this folder: `extension/`.
 5. Open Gmail → use the **floating Connect Intel button** (bottom-right) or the toolbar icon.
 
-After reloading the extension in `chrome://extensions`, **refresh open Gmail tabs** so content scripts reconnect (avoids “Extension context invalidated” errors).
+After reloading the extension in `chrome://extensions`, Gmail tabs reload automatically. If the widget says to refresh, reload the Gmail tab once.
 
 ## API routes (server)
 

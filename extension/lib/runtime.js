@@ -1,6 +1,5 @@
 /**
  * Safe chrome.runtime messaging — stops cleanly after extension reload.
- * Content scripts survive tab reloads; the service worker context does not.
  */
 let contextInvalid = false
 const teardownCallbacks = new Set()
@@ -80,7 +79,28 @@ function safeSendMessageAsync(message) {
   })
 }
 
+function installGlobalErrorGuards() {
+  if (globalThis.__connectIntelRuntimeGuards) return
+  globalThis.__connectIntelRuntimeGuards = true
+
+  window.addEventListener('unhandledrejection', (event) => {
+    const message = event?.reason?.message || String(event?.reason || '')
+    if (isContextInvalidatedError(message)) {
+      event.preventDefault()
+      invalidateExtensionContext()
+    }
+  })
+
+  window.addEventListener('error', (event) => {
+    if (isContextInvalidatedError(event?.message || event?.error?.message)) {
+      event.preventDefault()
+      invalidateExtensionContext()
+    }
+  })
+}
+
 if (typeof globalThis !== 'undefined') {
+  installGlobalErrorGuards()
   globalThis.__connectIntelRuntime = {
     isExtensionContextAlive,
     invalidateExtensionContext,

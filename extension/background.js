@@ -7,8 +7,24 @@ import {
   syncEmailTrail,
 } from './lib/api.js'
 
-chrome.runtime.onInstalled.addListener(() => {
-  console.log('Connect Intel extension installed')
+const GMAIL_URL_PATTERN = 'https://mail.google.com/*'
+
+async function reloadGmailTabs() {
+  try {
+    const tabs = await chrome.tabs.query({ url: GMAIL_URL_PATTERN })
+    for (const tab of tabs) {
+      if (tab.id) chrome.tabs.reload(tab.id).catch(() => {})
+    }
+  } catch {
+    /* ignore tab reload failures */
+  }
+}
+
+chrome.runtime.onInstalled.addListener((details) => {
+  console.log('Connect Intel extension installed', details.reason)
+  if (details.reason === 'update' || details.reason === 'install') {
+    void reloadGmailTabs()
+  }
 })
 
 function excludeEmailsForBoot(boot) {
@@ -53,13 +69,6 @@ function reply(sendResponse, payload) {
 }
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (message?.type === 'GMAIL_PARTICIPANTS') {
-    matchThreadContext(message)
-      .then((result) => reply(sendResponse, { ok: true, result }))
-      .catch((err) => reply(sendResponse, { ok: false, error: err.message }))
-    return true
-  }
-
   if (message?.type === 'CI_BOOTSTRAP') {
     extensionBootstrap()
       .then((result) => reply(sendResponse, { ok: true, result }))
