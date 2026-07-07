@@ -26,8 +26,8 @@
   position: absolute;
   inset: -4px;
   border-radius: 999px;
-  background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.35), transparent 70%);
-  opacity: 0.85;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 203, 43, 0.38), rgba(139, 92, 246, 0.12) 55%, transparent 72%);
+  opacity: 0.9;
   pointer-events: none;
   animation: ci-ai-fab-pulse 2.8s ease-in-out infinite;
 }
@@ -227,8 +227,9 @@
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  background: #0f172a;
-  border: 1px solid rgba(148, 163, 184, 0.25);
+  background: linear-gradient(145deg, #0f172a 0%, #1e1b4b 100%);
+  border: 1px solid rgba(255, 203, 43, 0.22);
+  box-shadow: 0 0 12px rgba(255, 203, 43, 0.12);
   shrink: 0;
 }
 
