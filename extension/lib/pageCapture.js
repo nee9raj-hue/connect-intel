@@ -5,6 +5,14 @@
 
 const parseApi = () => globalThis.__connectIntelLinkedInParse || {}
 
+function safeQuerySelector(selector, root = document) {
+  try {
+    return root.querySelector(selector)
+  } catch {
+    return null
+  }
+}
+
 function firstText(selectors, root = document) {
   for (const selector of selectors) {
     try {
@@ -167,7 +175,7 @@ function findLinkedInTopExperience() {
   const section =
     document.querySelector('#experience')?.closest('section') ||
     document.querySelector('section[data-section="experience"]') ||
-    document.querySelector('section:has(#experience)')
+    safeQuerySelector('section:has(#experience)')
 
   if (!section) return { title: '', company: '' }
 
@@ -289,7 +297,7 @@ function extractLinkedInProfile() {
   )
 
   const locationRaw = findLinkedInLocation()
-  const { city, state, location } = parseLocFn(locationRaw)
+  const { city, state, location: parsedLocation } = parseLocFn(locationRaw)
   const industry = findLinkedInIndustry()
   const education = findLinkedInEducationNote()
   const { email, phone } = findMailtoTelAndVisibleContacts()
@@ -303,7 +311,7 @@ function extractLinkedInProfile() {
     company,
     city,
     state,
-    location: location || locationRaw,
+    location: parsedLocation || locationRaw,
     industry: industry || '',
     linkedin: url,
     email,

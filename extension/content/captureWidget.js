@@ -56,6 +56,10 @@ function renderCaptureFields(capture) {
   return rows.length ? rows.join('') : '<div class="ci-preview__row">No fields detected yet.</div>'
 }
 
+function isLinkedInProfilePage(url = '') {
+  return /linkedin\.com\/in\//i.test(String(url || location.href || ''))
+}
+
 class ConnectIntelCaptureWidget {
   constructor() {
     this.open = false
@@ -78,25 +82,44 @@ class ConnectIntelCaptureWidget {
   }
 
   async readCaptureAsync() {
-    const extractReady = globalThis.__connectIntelExtractPageReady
-    const extract = globalThis.__connectIntelExtractPage
-    if (typeof extractReady === 'function') {
+    const tryExtract = async () => {
+      const extractReady = globalThis.__connectIntelExtractPageReady
+      const extract = globalThis.__connectIntelExtractPage
+      if (typeof extractReady === 'function') {
+        try {
+          const ready = await extractReady()
+          if (ready) return ready
+        } catch {
+          /* fall through */
+        }
+      }
+      if (typeof extract !== 'function') return null
       try {
-        return await extractReady()
+        return extract()
       } catch {
-        /* fall through */
+        return null
       }
     }
-    if (typeof extract !== 'function') return null
-    try {
-      return extract()
-    } catch {
-      return null
+
+    let capture = await tryExtract()
+    if (!capture) {
+      try {
+        await sendMessage('CI_ENSURE_CAPTURE_SCRIPTS')
+        await new Promise((resolve) => setTimeout(resolve, 120))
+        capture = await tryExtract()
+      } catch {
+        /* ignore reinject errors */
+      }
     }
+    return capture
   }
 
   mount() {
     if (!runtime()?.isExtensionContextAlive()) return
+    if (!isLinkedInProfilePage()) {
+      this.watchForProfileNavigation()
+      return
+    }
     if (document.getElementById(WIDGET_HOST_ID)) return
 
     this.active = true
@@ -155,6 +178,32 @@ class ConnectIntelCaptureWidget {
     this.els.signin?.addEventListener('click', () => this.signIn())
 
     document.documentElement.appendChild(this.host)
+  }
+
+  watchForProfileNavigation() {
+    if (this._navWatch) return
+    this._navWatch = true
+    const check = () => {
+      if (!runtime()?.isExtensionContextAlive()) return
+      if (isLinkedInProfilePage() && !document.getElementById(WIDGET_HOST_ID)) {
+        this.mount()
+      }
+    }
+    window.addEventListener('popstate', check)
+    const origPush = history.pushState
+    const origReplace = history.replaceState
+    history.pushState = function (...args) {
+      const out = origPush.apply(this, args)
+      check()
+      return out
+    }
+    history.replaceState = function (...args) {
+      const out = origReplace.apply(this, args)
+      check()
+      return out
+    }
+    setInterval(check, 1500)
+    check()
   }
 
   styles() {
@@ -342,7 +391,7 @@ class ConnectIntelCaptureWidget {
       this.els.status.hidden = false
       const onProfile = /linkedin\.com\/in\//i.test(location.href)
       this.els.status.innerHTML = onProfile
-        ? `${signedIn}<br/>Profile is still loading — close and reopen this panel, or refresh the tab.<br/><span style="color:#64748b">If this persists, reload the Connect Intel extension (v0.3.1+).</span>`
+        ? `${signedIn}<br/>Profile is still loading — close and reopen this panel, or refresh the tab.<br/><span style="color:#64748b">If this persists, reload the Connect Intel extension (v1.1.1+).</span>`
         : `${signedIn}<br/>Could not read this page. Open a LinkedIn profile (<code>/in/…</code>) or company site.`
       return
     }

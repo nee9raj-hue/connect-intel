@@ -57,17 +57,17 @@
   width: 56px;
   height: 56px;
   border-radius: 999px;
-  background: #0a0a0a;
-  border: 1px solid rgba(148, 163, 184, 0.28);
-  box-shadow:
-    0 8px 24px rgba(15, 23, 42, 0.28),
-    0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+  background: transparent;
+  border: none;
+  box-shadow: none;
   color: #fff;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .ci-ai-fab.is-open .ci-ai-fab__inner {
-  background: #334155;
+  background: rgba(51, 65, 85, 0.92);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.2);
 }
 
 .ci-ai-fab__close {
@@ -228,9 +228,9 @@
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  background: #000;
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  overflow: hidden;
+  background: transparent;
+  border: none;
+  overflow: visible;
   shrink: 0;
 }
 
@@ -240,9 +240,10 @@
 }
 
 .ci-copilot-icon--fab {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+  width: 52px;
+  height: 52px;
+  border-radius: 0;
+  filter: drop-shadow(0 4px 10px rgba(15, 23, 42, 0.18));
 }
 
 .ci-copilot-icon--panel {

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Connect Intel",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "CRM companion for Gmail and LinkedIn — match pipeline leads, sync email trails, capture profiles, and send from Connect Intel.",
   "icons": {
     "48": "icons/icon-48.png",
@@ -37,7 +37,7 @@
       "run_at": "document_idle"
     },
     {
-      "matches": ["https://*.linkedin.com/in/*", "https://linkedin.com/in/*"],
+      "matches": ["https://*.linkedin.com/*", "https://linkedin.com/*"],
       "js": ["lib/runtime.js", "lib/linkedinCaptureParse.js", "lib/pageCapture.js", "content/captureWidget.js"],
       "run_at": "document_idle"
     }

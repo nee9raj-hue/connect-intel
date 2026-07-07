@@ -11,7 +11,7 @@ import {
 } from './lib/api.js'
 
 const GMAIL_URL_PATTERN = 'https://mail.google.com/*'
-const LINKEDIN_URL_PATTERN = 'https://*.linkedin.com/in/*'
+const LINKEDIN_URL_PATTERN = 'https://*.linkedin.com/*'
 
 function isGmailTab(tab) {
   const url = String(tab?.url || tab?.pendingUrl || '')
@@ -162,6 +162,22 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     chrome.tabs.reload(_sender.tab.id).catch(() => {})
     reply(sendResponse, { ok: true })
     return false
+  }
+
+  if (message?.type === 'CI_ENSURE_CAPTURE_SCRIPTS') {
+    const tabId = _sender?.tab?.id
+    if (!tabId) {
+      reply(sendResponse, { ok: false, error: 'no_tab' })
+      return false
+    }
+    chrome.scripting
+      .executeScript({
+        target: { tabId },
+        files: ['lib/linkedinCaptureParse.js', 'lib/pageCapture.js'],
+      })
+      .then(() => reply(sendResponse, { ok: true }))
+      .catch((err) => reply(sendResponse, { ok: false, error: err.message }))
+    return true
   }
 
   return false
