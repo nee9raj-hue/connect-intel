@@ -52,15 +52,19 @@ export default function CrmEmailThread({
           </p>
         </div>
         <div className="flex flex-wrap gap-1.5">
-          {gmailConnected && !inboundReplySync && (
+          {gmailConnected && (
             <button
               type="button"
               disabled={busy}
               onClick={() => onSync?.()}
               className="text-xs font-semibold px-2 py-1 rounded-md border border-gray-200 hover:bg-gray-50 disabled:opacity-50"
-              title="Sync trail mail for this lead (legacy Gmail read)"
+              title={
+                inboundReplySync
+                  ? 'Pull this thread from Gmail (use if an automatic reply did not appear)'
+                  : 'Sync trail mail for this lead'
+              }
             >
-              {busy ? 'Syncing…' : '↻ Sync trail'}
+              {busy ? 'Syncing…' : '↻ Sync from Gmail'}
             </button>
           )}
           <button
@@ -76,8 +80,8 @@ export default function CrmEmailThread({
 
       {inboundReplySync && gmailConnected && (
         <div className="text-xs text-emerald-900 bg-emerald-50 border-b border-emerald-100 px-3 py-2 leading-relaxed">
-          When {lead?.email || 'this lead'} replies, their mail app shows your work email — the reply is
-          logged here and copied to your Gmail inbox. No Gmail read permission needed.
+          Replies sent to your CRM routing address log automatically. If a reply is missing, use{' '}
+          <strong>Sync from Gmail</strong> or <strong>Log reply</strong>.
         </div>
       )}
 

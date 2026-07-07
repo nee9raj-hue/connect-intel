@@ -703,6 +703,7 @@ export default function LeadWorkspace({
     setError(null)
     try {
       const data = await syncEmailThread(lead.id)
+      await refreshPipelineLead?.(lead.id, { silent: true })
       setNotice(
         data.bounceDetected
           ? 'Delivery failure detected — lead email marked as bounced'
@@ -731,6 +732,7 @@ export default function LeadWorkspace({
     setError(null)
     try {
       await logEmailReply(lead.id, { subject: replySubj, body: replyBody })
+      await refreshPipelineLead?.(lead.id, { silent: true })
       setNotice('Reply logged — lead marked as replied')
     } catch (e) {
       setError(e.message)
