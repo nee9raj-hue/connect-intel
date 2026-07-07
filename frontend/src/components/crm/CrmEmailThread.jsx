@@ -12,11 +12,13 @@ export default function CrmEmailThread({
   lead,
   emails = [],
   gmailConnected,
+  gmailConnectAvailable = true,
   inboundReplySync = false,
   replySyncEnabled,
   busy,
   onSync,
   onLogReply,
+  onConnectGmail,
 }) {
   const [showReplyForm, setShowReplyForm] = useState(false)
   const [replySubject, setReplySubject] = useState('')
@@ -40,6 +42,20 @@ export default function CrmEmailThread({
     setShowReplyForm(false)
   }
 
+  const handleSyncClick = () => {
+    if (gmailConnected) {
+      onSync?.()
+      return
+    }
+    onConnectGmail?.()
+  }
+
+  const syncLabel = busy
+    ? 'Syncing…'
+    : gmailConnected
+      ? '↻ Sync from Gmail'
+      : '↻ Connect Gmail to sync'
+
   return (
     <section className="rounded-xl border border-gray-200 bg-white overflow-hidden">
       <div className="px-3 py-2.5 border-b border-gray-100 flex flex-wrap items-center justify-between gap-2">
@@ -52,21 +68,21 @@ export default function CrmEmailThread({
           </p>
         </div>
         <div className="flex flex-wrap gap-1.5">
-          {gmailConnected && (
-            <button
-              type="button"
-              disabled={busy}
-              onClick={() => onSync?.()}
-              className="text-xs font-semibold px-2 py-1 rounded-md border border-gray-200 hover:bg-gray-50 disabled:opacity-50"
-              title={
-                inboundReplySync
+          <button
+            type="button"
+            disabled={busy || (!gmailConnected && !gmailConnectAvailable)}
+            onClick={handleSyncClick}
+            className="text-xs font-semibold px-2 py-1 rounded-md border border-gray-200 hover:bg-gray-50 disabled:opacity-50"
+            title={
+              gmailConnected
+                ? inboundReplySync
                   ? 'Pull this thread from Gmail (use if an automatic reply did not appear)'
                   : 'Sync trail mail for this lead'
-              }
-            >
-              {busy ? 'Syncing…' : '↻ Sync from Gmail'}
-            </button>
-          )}
+                : 'Connect your work Gmail to pull sent mail and replies into CRM'
+            }
+          >
+            {syncLabel}
+          </button>
           <button
             type="button"
             disabled={busy}
@@ -78,10 +94,17 @@ export default function CrmEmailThread({
         </div>
       </div>
 
-      {inboundReplySync && gmailConnected && (
+      {inboundReplySync && (
         <div className="text-xs text-emerald-900 bg-emerald-50 border-b border-emerald-100 px-3 py-2 leading-relaxed">
-          Replies sent to your CRM routing address log automatically. If a reply is missing, use{' '}
-          <strong>Sync from Gmail</strong> or <strong>Log reply</strong>.
+          {gmailConnected
+            ? 'Replies to your CRM routing address log automatically. If a reply is missing, use Sync from Gmail or Log reply.'
+            : 'Connect work Gmail below to sync replies from your inbox, or use Log reply to paste a message.'}
+        </div>
+      )}
+
+      {!gmailConnected && !inboundReplySync && (
+        <div className="text-xs text-slate-700 bg-slate-50 border-b border-slate-100 px-3 py-2 leading-relaxed">
+          Connect work Gmail to pull sent mail and replies from your inbox into this thread.
         </div>
       )}
 

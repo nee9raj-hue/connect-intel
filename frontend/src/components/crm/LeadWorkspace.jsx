@@ -1402,6 +1402,21 @@ export default function LeadWorkspace({
               </LwAlert>
             )}
 
+            <LwDivider label="Thread" />
+
+            <CrmEmailThread
+              lead={lead}
+              emails={crm.emails || []}
+              gmailConnected={gmailStatus.connected}
+              gmailConnectAvailable={gmailStatus.gmailConnectAvailable}
+              inboundReplySync={gmailStatus.inboundReplySync}
+              replySyncEnabled={gmailStatus.replySyncEnabled}
+              busy={threadSyncing || sending}
+              onSync={handleSyncEmailThread}
+              onLogReply={handleLogReply}
+              onConnectGmail={connectWorkGmail}
+            />
+
             <LwSection
               icon={PencilIcon}
               title="Signature"
@@ -1510,19 +1525,6 @@ export default function LeadWorkspace({
                 </LwBtn>
               </div>
             </LwSection>
-
-            <LwDivider label="Thread" />
-
-            <CrmEmailThread
-              lead={lead}
-              emails={crm.emails || []}
-              gmailConnected={gmailStatus.connected}
-              inboundReplySync={gmailStatus.inboundReplySync}
-              replySyncEnabled={gmailStatus.replySyncEnabled}
-              busy={threadSyncing || sending}
-              onSync={handleSyncEmailThread}
-              onLogReply={handleLogReply}
-            />
           </>
         )}
 
