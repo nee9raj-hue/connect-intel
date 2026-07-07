@@ -179,7 +179,7 @@ export default function CopilotCompanyList({ companies, discoveryMeta, onAction 
         </p>
         {isKnowledge ? (
           <p className="ci-copilot-list__sub">
-            {linkedinCount > 0 ? `${linkedinCount} LinkedIn` : 'LinkedIn where public'}
+            {linkedinCount > 0 ? `${linkedinCount} verified LinkedIn` : 'Verified LinkedIn only'}
             {discoveryMeta?.inCrm != null
               ? ` · ${discoveryMeta.inCrm} in CRM · ${discoveryMeta.newLeads ?? total - discoveryMeta.inCrm} new`
               : null}
