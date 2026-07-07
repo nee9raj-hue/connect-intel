@@ -925,6 +925,7 @@ export const api = {
         tab: uiContext.tab,
         leadId: uiContext.leadId,
         copilotTab: uiContext.copilotTab,
+        editFromMessageId: uiContext.editFromMessageId || null,
       },
     }),
   escalateAssistantSupport: (payload) =>

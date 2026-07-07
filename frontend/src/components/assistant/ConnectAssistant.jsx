@@ -15,13 +15,13 @@ import {
   confidenceLabel,
 } from './assistantMessageRender'
 
-function MessageBubble({ msg, onAction }) {
+function MessageBubble({ msg, onAction, onEdit, editing }) {
   const isUser = msg.role === 'user'
   const badges = !isUser ? sourceBadgesFromMessage(msg) : []
   const conf = !isUser ? confidenceLabel(msg.confidence) : null
 
   return (
-    <div className={`ci-ai-msg ${isUser ? 'ci-ai-msg--user' : 'ci-ai-msg--bot'}`}>
+    <div className={`ci-ai-msg ${isUser ? 'ci-ai-msg--user' : 'ci-ai-msg--bot'}${editing ? ' ci-ai-msg--editing' : ''}`}>
       {!isUser && (badges.length > 0 || conf) ? (
         <div className="ci-ai-msg__meta">
           {badges.map((b) => (
@@ -38,6 +38,18 @@ function MessageBubble({ msg, onAction }) {
       ) : null}
       <div className={`ci-ai-msg__bubble${isUser ? ' ci-ai-msg__bubble--user' : ''}`}>
         {isUser ? msg.content : <div className="ci-ai-md">{renderAssistantMarkdown(msg.content)}</div>}
+        {isUser && onEdit ? (
+          <div className="ci-ai-msg__user-actions">
+            <button
+              type="button"
+              className="ci-ai-msg__edit"
+              onClick={() => onEdit(msg)}
+              title="Edit and rephrase this question"
+            >
+              {editing ? 'Editing…' : 'Edit'}
+            </button>
+          </div>
+        ) : null}
         {!isUser && msg.actions?.length > 0 && (
           <div className="ci-ai-msg__actions">
             {msg.actions.map((action, i) => (
@@ -101,6 +113,7 @@ export default function ConnectAssistant({
   const [activeTab, setActiveTab] = useState('copilot')
   const [progressStep, setProgressStep] = useState('')
   const [recentSearches, setRecentSearches] = useState([])
+  const [editingMessageId, setEditingMessageId] = useState(null)
   const bottomRef = useRef(null)
   const inputRef = useRef(null)
 
@@ -272,26 +285,54 @@ export default function ConnectAssistant({
     [onNavigate, openPipelineLead, openPipelineEmailDraft, messages, onOpenChange]
   )
 
+  const startEditMessage = useCallback((msg) => {
+    if (!msg?.content || loading) return
+    setEditingMessageId(msg.id)
+    setInput(msg.content)
+    setStatus(null)
+    setTimeout(() => inputRef.current?.focus(), 80)
+  }, [loading])
+
+  const cancelEditMessage = useCallback(() => {
+    setEditingMessageId(null)
+    setInput('')
+  }, [])
+
   const sendMessage = useCallback(
     async (text) => {
       const trimmed = String(text || '').trim()
       if (!trimmed || loading) return
 
+      const editFromMessageId = editingMessageId
       const optimistic = {
-        id: `local-${Date.now()}`,
+        id: editFromMessageId || `local-${Date.now()}`,
         role: 'user',
         content: trimmed,
         createdAt: new Date().toISOString(),
       }
-      setMessages((prev) => [...prev, optimistic])
+
+      if (editFromMessageId) {
+        const editIdx = messages.findIndex((m) => m.id === editFromMessageId)
+        setMessages((prev) => {
+          const base = editIdx >= 0 ? prev.slice(0, editIdx) : prev
+          return [...base, optimistic]
+        })
+      } else {
+        setMessages((prev) => [...prev, optimistic])
+      }
+
       setInput('')
+      setEditingMessageId(null)
       setLoading(true)
       setStatus(null)
 
       try {
         pushRecentSearch(trimmed)
         setRecentSearches(loadRecentSearches())
-        const data = await api.sendAssistantMessage(trimmed, uiContext)
+        const data = await api.sendAssistantMessage(trimmed, {
+          ...uiContext,
+          editFromMessageId: editFromMessageId || null,
+        })
         await loadHistory()
         if (data.suggestions?.length) setSuggestions(data.suggestions)
         if (data.myTickets?.length) setMyTickets(data.myTickets)
@@ -302,7 +343,7 @@ export default function ConnectAssistant({
         setLoading(false)
       }
     },
-    [loading, loadHistory, uiContext]
+    [loading, loadHistory, uiContext, editingMessageId, messages]
   )
 
   const tabMeta = COPILOT_TABS.find((t) => t.id === activeTab) || COPILOT_TABS[0]
@@ -433,7 +474,13 @@ export default function ConnectAssistant({
           )}
 
           {messages.map((msg) => (
-            <MessageBubble key={msg.id} msg={msg} onAction={handleAction} />
+            <MessageBubble
+              key={msg.id}
+              msg={msg}
+              onAction={handleAction}
+              onEdit={msg.role === 'user' ? startEditMessage : null}
+              editing={editingMessageId === msg.id}
+            />
           ))}
 
           {loading && (
@@ -502,6 +549,14 @@ export default function ConnectAssistant({
         {status && <p className="ci-ai-status">{status}</p>}
 
         <footer className="ci-ai-panel__foot">
+          {editingMessageId ? (
+            <p className="ci-ai-compose__edit-hint">
+              Rephrasing your question — edit below, then send. Earlier replies after this point will be replaced.
+              <button type="button" className="ci-ai-compose__edit-cancel" onClick={cancelEditMessage}>
+                Cancel
+              </button>
+            </p>
+          ) : null}
           <form
             onSubmit={(e) => {
               e.preventDefault()
