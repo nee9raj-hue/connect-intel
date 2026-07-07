@@ -99,7 +99,7 @@ function renderCapturePreview(fields) {
     <div class="muted">${fields.linkedin || ''}</div>
   `
   actionsEl.hidden = false
-  primaryActionEl.textContent = 'Add to pipeline'
+  primaryActionEl.textContent = 'Add / update pipeline'
 }
 
 async function initGmail(boot) {
@@ -158,7 +158,7 @@ async function initCapture(boot, pageMode) {
   mode = 'capture'
   subtitleEl.textContent =
     pageMode === 'linkedin' ? 'LinkedIn profile capture' : 'Add current page to pipeline'
-  primaryActionEl.textContent = 'Add to pipeline'
+  primaryActionEl.textContent = 'Add / update pipeline'
 
   const tab = await readActiveTab()
   const fields = await loadPageCapture(tab)
@@ -237,7 +237,7 @@ primaryActionEl.addEventListener('click', async () => {
   }
 
   if (!captureFields) return
-  setStatus('Adding to pipeline…', 'muted')
+  setStatus('Saving to pipeline…', 'muted')
   try {
     await logExtensionAction('extension.lead_capture_requested', {
       metadata: { pageType: captureFields.pageType },

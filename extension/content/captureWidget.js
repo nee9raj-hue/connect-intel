@@ -414,7 +414,7 @@ class ConnectIntelCaptureWidget {
     `
 
     this.els.capture.hidden = !hasMinimum
-    this.els.capture.textContent = 'Add to pipeline'
+    this.els.capture.textContent = 'Add / update pipeline'
     this.els.capture.disabled = false
   }
 
@@ -422,7 +422,7 @@ class ConnectIntelCaptureWidget {
     if (!this.capture) return
     this.els.capture.disabled = true
     this.els.status.className = 'ci-status'
-    this.els.status.textContent = 'Adding to pipeline…'
+    this.els.status.textContent = 'Saving to pipeline…'
 
     try {
       await sendMessage('CI_LOG', {
