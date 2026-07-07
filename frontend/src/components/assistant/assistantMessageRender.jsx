@@ -103,6 +103,8 @@ export function renderAssistantMarkdown(text) {
 
 function sectionTone(title) {
   const t = String(title || '').toLowerCase()
+  if (t.includes('understanding')) return 'understanding'
+  if (t.includes('recommended')) return 'nbsa'
   if (t.includes('crm')) return 'crm'
   if (t.includes('web') || t.includes('internet') || t.includes('market')) return 'web'
   if (t.includes('news')) return 'news'

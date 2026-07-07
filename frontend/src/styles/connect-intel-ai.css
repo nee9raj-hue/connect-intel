@@ -618,6 +618,24 @@
   }
 }
 
+.ci-ai-md__section--understanding {
+  padding-left: 8px;
+  border-left: 3px solid #ffcb2b;
+  background: #fffbeb;
+  border-radius: 0 8px 8px 0;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  margin-bottom: 4px;
+}
+
+.ci-ai-md__section--nbsa {
+  padding-left: 8px;
+  border-left: 3px solid #17191c;
+  background: #f8fafc;
+  border-radius: 0 8px 8px 0;
+  margin-top: 4px;
+}
+
 .ci-ai-md__section--crm {
   padding-left: 8px;
   border-left: 3px solid #8b5cf6;

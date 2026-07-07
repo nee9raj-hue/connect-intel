@@ -8,6 +8,7 @@ import { CI_OPEN_AI_EVENT } from '../../lib/openConnectAI'
 import { CrmAiIcon } from './ConnectAIFab'
 import CopilotCompanyCard from './CopilotCompanyCard'
 import CopilotCompanyList, { CopilotPlanSteps } from './CopilotCompanyList'
+import CopilotPeopleList from './CopilotPeopleList'
 import {
   renderAssistantMarkdown,
   sourceBadgesFromMessage,
@@ -53,6 +54,9 @@ function MessageBubble({ msg, onAction }) {
         )}
       </div>
       {!isUser && msg.planSteps?.length > 0 ? <CopilotPlanSteps steps={msg.planSteps} /> : null}
+      {!isUser && msg.people?.length > 0 ? (
+        <CopilotPeopleList people={msg.people} onAction={onAction} />
+      ) : null}
       {!isUser && msg.companies?.length > 0 ? (
         <CopilotCompanyList
           companies={msg.companies}
