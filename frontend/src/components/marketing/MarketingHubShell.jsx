@@ -8,10 +8,10 @@ import {
 import useIsMobile from '../../hooks/useIsMobile'
 import { BRAND_LOGO_MARK_LIGHT, BRAND_LOGO_MARK_CLASS } from '../../lib/brandAssets'
 import { openConnectAI } from '../../lib/openConnectAI'
+import { CrmAiIcon } from '../assistant/ConnectAIFab'
 import {
   HomeIcon,
   MailIcon,
-  BoltIcon,
   PeopleIcon,
   NoteIcon,
   ChartIcon,
@@ -166,7 +166,7 @@ export default function MarketingHubShell({
           {!collapsed ? <span>Back to CRM</span> : null}
         </button>
         <button type="button" className="mc-nav__exit" onClick={() => openConnectAI()}>
-          <BoltIcon className="mc-nav__icon" />
+          <CrmAiIcon className="mc-nav__icon ci-copilot-icon" />
           {!collapsed ? <span>Copilot</span> : null}
         </button>
       </div>

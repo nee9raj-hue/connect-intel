@@ -342,7 +342,7 @@ export default function ConnectAssistant({
         <header className="ci-ai-panel__head">
           <div className="ci-ai-panel__brand">
             <span className="ci-ai-panel__icon" aria-hidden>
-              <CrmAiIcon className="w-5 h-5" />
+              <CrmAiIcon className="ci-copilot-icon ci-copilot-icon--panel" />
             </span>
             <div className="min-w-0">
               <p className="ci-ai-panel__title">Connect Copilot</p>
@@ -551,7 +551,7 @@ export function ConnectAIButton({ onClick, compact = false }) {
       aria-label="Open Connect Copilot"
       title="Connect Copilot (⌘/)"
     >
-      <CrmAiIcon className="w-4 h-4" />
+      <CrmAiIcon className="ci-copilot-icon ci-copilot-icon--inline" />
       {!compact && <span>Copilot</span>}
       {!compact && <kbd className="ci-ai-trigger__kbd">⌘/</kbd>}
     </button>
