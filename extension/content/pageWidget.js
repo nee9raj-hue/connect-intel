@@ -205,14 +205,9 @@ class ConnectIntelPageWidget {
     const stop = (event) => {
       event.stopPropagation()
     }
-    const panel = root.querySelector('.ci-panel')
-    const compose = root.querySelector('.ci-compose')
-    for (const el of [panel, compose]) {
-      if (!el) continue
-      el.addEventListener('mousedown', stop, true)
-      el.addEventListener('click', stop, true)
-    }
+    // Only guard editable fields — panel-level capture click handlers block child buttons.
     for (const field of root.querySelectorAll('.ci-input, .ci-textarea')) {
+      field.addEventListener('mousedown', stop, true)
       field.addEventListener('keydown', stop)
       field.addEventListener('keyup', stop)
       field.addEventListener('keypress', stop)
@@ -407,6 +402,7 @@ class ConnectIntelPageWidget {
       .ci-btn--primary:hover { background: #1d4ed8; }
       .ci-btn--secondary { background: #e2e8f0; color: #0f172a; }
       .ci-btn--secondary:hover { background: #cbd5e1; }
+      .ci-btn:disabled { opacity: 0.6; cursor: wait; }
       .ci-signin { margin-top: 10px; }
       .ci-link {
         all: unset;
@@ -589,7 +585,10 @@ class ConnectIntelPageWidget {
   }
 
   async generateDraft() {
-    if (!this.currentLead?.leadId) return
+    if (!this.currentLead?.leadId) {
+      this.renderError('Open a matched Gmail thread first.')
+      return
+    }
     const agenda = String(this.els.agenda?.value || '').trim()
     if (agenda.length < 8) {
       this.els.status.hidden = false
@@ -598,9 +597,13 @@ class ConnectIntelPageWidget {
       return
     }
 
+    const generateBtn = this.shadow?.querySelector?.('[data-action="generate"]')
+    if (generateBtn) generateBtn.disabled = true
+
     this.els.status.hidden = false
     this.els.status.className = 'ci-status'
-    this.els.status.textContent = 'Generating AI draft…'
+    this.els.status.textContent = 'Generating AI draft… (may take 15–30s)'
+    this.els.status.scrollIntoView?.({ block: 'nearest' })
 
     try {
       await sendMessage('CI_LOG', {
@@ -636,6 +639,8 @@ class ConnectIntelPageWidget {
       }
       this.renderError(err.message || 'Could not generate draft')
       this.showComposeIfEnabled()
+    } finally {
+      if (generateBtn) generateBtn.disabled = false
     }
   }
 
