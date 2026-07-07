@@ -33,9 +33,7 @@ import MarketingBrandKit, { mergeBrandKit } from './MarketingBrandKit'
 import MarketingAnalyticsHub from './MarketingAnalyticsHub'
 import MarketingAudiencesHub from './MarketingAudiencesHub'
 import MarketingFormsHub from './MarketingFormsHub'
-import MarketingLandingHub from './MarketingLandingHub'
 import MarketingAutomationsHub from './MarketingAutomationsHub'
-import MarketingAssetsHub from './MarketingAssetsHub'
 import MarketingSegmentsPanel from './MarketingSegmentsPanel'
 import {
   MARKETING_HUB_TABS,
@@ -1516,7 +1514,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
           ) : tab === 'forms' ? (
             <MarketingFormsHub teamMembers={teamMembers} onReload={load} />
           ) : tab === 'domains' ? (
-            <MarketingDomainsPanel user={user} />
+            <MarketingDomainsPanel user={user} permissions={permissions} />
           ) : loading ? (
             <LoadingExperience message={LOADING_MESSAGES.marketing} />
           ) : tab === 'campaigns' ? (
@@ -1561,20 +1559,6 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
               setError={setError}
               setNotice={setNotice}
             />
-          ) : tab === 'assets' ? (
-            <MarketingAssetsHub
-              templates={templates}
-              onOpenTemplate={() => setTab('templates')}
-              onNavigate={onNavigate}
-              feedsPanelProps={{
-                lists,
-                segments,
-                templates,
-                onReload: load,
-              }}
-            />
-          ) : tab === 'landing' ? (
-            <MarketingLandingHub forms={forms} onReload={load} />
           ) : tab === 'automations' ? (
             <MarketingAutomationsHub
               campaigns={reportCampaigns}

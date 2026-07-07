@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '../../lib/api'
 import CrmGmailConnectCard from '../team/CrmGmailConnectCard'
+import MarketingSuppressionPanel from './MarketingSuppressionPanel'
 
 function DnsRecordBlock({ title, type, name, value }) {
   const copy = () => {
@@ -31,7 +32,7 @@ function DnsRecordBlock({ title, type, name, value }) {
   )
 }
 
-export default function MarketingDomainsPanel({ user }) {
+export default function MarketingDomainsPanel({ user, permissions }) {
   const isAdmin = Boolean(user?.isOrgAdmin)
   const [busy, setBusy] = useState(false)
   const [notice, setNotice] = useState(null)
@@ -100,8 +101,17 @@ export default function MarketingDomainsPanel({ user }) {
 
   if (user?.accountType !== 'company') {
     return (
-      <div className="mhub-v3-page">
-        <p className="mhub-v3-empty">Company email domains are available on team accounts.</p>
+      <div className="mhub-v3-page" style={{ maxWidth: 720 }}>
+        <section className="mhub-v3-card mhub-v3-domain-section">
+          <h3>Work email</h3>
+          <p>Connect your work Gmail to send CRM and campaign email from your mailbox.</p>
+          <div style={{ marginTop: 12 }}>
+            <CrmGmailConnectCard compact />
+          </div>
+        </section>
+        <section className="mhub-v3-card mhub-v3-domain-section">
+          <MarketingSuppressionPanel user={user} permissions={permissions} />
+        </section>
       </div>
     )
   }
@@ -231,6 +241,10 @@ export default function MarketingDomainsPanel({ user }) {
       {!isAdmin && !dnsVerified && !gmailConnected && (
         <p className="mhub-v3-empty">Ask your admin to connect work email or finish DNS domain setup.</p>
       )}
+
+      <section className="mhub-v3-card mhub-v3-domain-section">
+        <MarketingSuppressionPanel user={user} permissions={permissions} />
+      </section>
     </div>
   )
 }

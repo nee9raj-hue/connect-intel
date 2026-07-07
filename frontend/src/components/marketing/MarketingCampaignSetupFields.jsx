@@ -2,7 +2,8 @@ import { FOLLOW_UP_STARTER } from './MarketingTemplateBuilder'
 import { marketingOptionLabel } from './MarketingCreatorBadge'
 
 /**
- * Shared campaign setup fields (channel, name, list, template, optional sequence).
+ * Campaign setup — constitution P0: email audience broadcasts only.
+ * (Pipeline bulk email lives in CRM → Pipeline.)
  */
 export default function MarketingCampaignSetupFields({
   campaignForm,
@@ -14,42 +15,16 @@ export default function MarketingCampaignSetupFields({
   compact = false,
   showSequenceControls = true,
   showScheduleControls = true,
-  user,
   permissions,
-  onNavigate,
   onTestSend,
   testSendBusy,
 }) {
-  const channelLists = lists.filter((l) => (l.channel || 'email') === campaignForm.channel)
-  const channelSegments = segments.filter((s) => (s.channel || 'email') === campaignForm.channel)
+  const channelLists = lists.filter((l) => (l.channel || 'email') === 'email')
+  const channelSegments = segments.filter((s) => (s.channel || 'email') === 'email')
   const audienceMode = campaignForm.audienceMode || (campaignForm.segmentId ? 'segment' : 'list')
 
   return (
     <div className={`space-y-3 ${compact ? '' : 'pt-1'}`}>
-      <div className="flex flex-wrap gap-2">
-        {[
-          { id: 'email', label: 'Email' },
-          { id: 'whatsapp', label: 'WhatsApp' },
-        ].map((ch) => (
-          <button
-            key={ch.id}
-            type="button"
-            onClick={() =>
-              setCampaignForm((p) => ({
-                ...p,
-                channel: ch.id,
-                listId: '',
-              }))
-            }
-            className={`ci-btn !text-xs flex-1 min-w-[7rem] ${
-              campaignForm.channel === ch.id ? 'ci-btn-accent' : 'ci-btn-secondary'
-            }`}
-          >
-            {ch.label}
-          </button>
-        ))}
-      </div>
-
       <input
         value={campaignForm.name}
         onChange={(e) => setCampaignForm((p) => ({ ...p, name: e.target.value }))}
@@ -57,14 +32,12 @@ export default function MarketingCampaignSetupFields({
         className="ci-input w-full"
       />
 
-      {campaignForm.channel === 'email' && (
-        <input
-          value={campaignForm.subject}
-          onChange={(e) => setCampaignForm((p) => ({ ...p, subject: e.target.value }))}
-          placeholder="Email subject — {{firstName}}, quick update"
-          className="ci-input w-full"
-        />
-      )}
+      <input
+        value={campaignForm.subject}
+        onChange={(e) => setCampaignForm((p) => ({ ...p, subject: e.target.value }))}
+        placeholder="Email subject — {{firstName}}, quick update"
+        className="ci-input w-full"
+      />
 
       <div className="flex flex-wrap gap-2">
         {[
@@ -77,6 +50,7 @@ export default function MarketingCampaignSetupFields({
             onClick={() =>
               setCampaignForm((p) => ({
                 ...p,
+                channel: 'email',
                 audienceMode: m.id,
                 listId: m.id === 'list' ? p.listId : '',
                 segmentId: m.id === 'segment' ? p.segmentId : '',
@@ -125,17 +99,16 @@ export default function MarketingCampaignSetupFields({
 
       {audienceMode === 'list' && !channelLists.length && (
         <p className="text-xs text-amber-800 leading-relaxed">
-          No {campaignForm.channel === 'whatsapp' ? 'WhatsApp' : 'email'} lists yet — create one under
-          Lists.
+          No email lists yet — create one under Audience → Contacts.
         </p>
       )}
       {audienceMode === 'segment' && !channelSegments.length && (
         <p className="text-xs text-amber-800 leading-relaxed">
-          No segments yet — create one under Segments.
+          No segments yet — create one under Audience → Segments.
         </p>
       )}
 
-      {showScheduleControls && campaignForm.channel === 'email' && (
+      {showScheduleControls && (
         <div className="space-y-2 rounded-xl border border-gray-100 bg-gray-50/80 p-3">
           <label className="flex items-center gap-2 text-xs text-gray-700">
             <input
@@ -174,74 +147,6 @@ export default function MarketingCampaignSetupFields({
               Send test to my email
             </button>
           )}
-          <label className="block text-xs text-gray-600 mt-2">
-            Recurring send
-            <select
-              value={campaignForm.recurrence || ''}
-              onChange={(e) => setCampaignForm((p) => ({ ...p, recurrence: e.target.value }))}
-              className="ci-input w-full mt-1"
-            >
-              <option value="">One-time only</option>
-              <option value="daily">Daily</option>
-              <option value="weekly">Weekly</option>
-              <option value="monthly">Monthly</option>
-            </select>
-          </label>
-          <label className="flex items-center gap-2 text-xs text-gray-700 mt-2">
-            <input
-              type="checkbox"
-              checked={Boolean(campaignForm.abTest?.enabled)}
-              onChange={(e) =>
-                setCampaignForm((p) => ({
-                  ...p,
-                  abTest: e.target.checked
-                    ? {
-                        enabled: true,
-                        winnerMetric: 'open',
-                        variants: [
-                          { id: 'a', label: 'Variant A', weight: 50, subject: p.subject },
-                          { id: 'b', label: 'Variant B', weight: 50, subject: `${p.subject || ''} (B)`.trim() },
-                        ],
-                      }
-                    : null,
-                }))
-              }
-            />
-            A/B test subject lines
-          </label>
-          {campaignForm.abTest?.enabled && (
-            <input
-              className="ci-input w-full mt-1"
-              placeholder="Variant B subject"
-              value={campaignForm.abTest?.variants?.[1]?.subject || ''}
-              onChange={(e) =>
-                setCampaignForm((p) => ({
-                  ...p,
-                  abTest: {
-                    ...p.abTest,
-                    variants: [
-                      p.abTest.variants[0],
-                      { ...p.abTest.variants[1], subject: e.target.value },
-                    ],
-                  },
-                }))
-              }
-            />
-          )}
-          <label className="block text-xs text-gray-600 mt-2">
-            Email provider
-            <select
-              value={campaignForm.emailProvider || 'auto'}
-              onChange={(e) => setCampaignForm((p) => ({ ...p, emailProvider: e.target.value }))}
-              className="ci-input w-full mt-1"
-            >
-              <option value="auto">Auto (Resend → Gmail)</option>
-              <option value="resend">Resend</option>
-              <option value="gmail">Gmail</option>
-              <option value="ses">Amazon SES</option>
-              <option value="sendgrid">SendGrid</option>
-            </select>
-          </label>
         </div>
       )}
 
@@ -260,78 +165,47 @@ export default function MarketingCampaignSetupFields({
       </select>
 
       {showSequenceControls && (
-        <>
-          <div className="flex flex-wrap items-center gap-3">
-            {campaignForm.channel === 'email' && (
-              <label className="flex items-center gap-2 text-xs text-gray-700">
-                <input
-                  type="checkbox"
-                  checked={campaignForm.useSequence}
-                  onChange={(e) => {
-                    const checked = e.target.checked
-                    setCampaignForm((p) => ({
-                      ...p,
-                      useSequence: checked,
-                      step2Blocks:
-                        checked && !p.step2Blocks?.length
-                          ? FOLLOW_UP_STARTER.blocks.map((b) => ({
-                              ...b,
-                              id: `blk-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-                            }))
-                          : p.step2Blocks,
-                      step2Subject:
-                        checked && !p.step2Subject ? FOLLOW_UP_STARTER.subject : p.step2Subject,
-                    }))
-                  }}
-                />
-                Add follow-up email
-              </label>
-            )}
-            {campaignForm.channel === 'whatsapp' && (
-              <label className="flex items-center gap-2 text-xs text-gray-700">
-                <input
-                  type="checkbox"
-                  checked={campaignForm.useSequence}
-                  onChange={(e) =>
-                    setCampaignForm((p) => ({ ...p, useSequence: e.target.checked }))
-                  }
-                />
-                Add follow-up WhatsApp
-              </label>
-            )}
-            {campaignForm.useSequence && (
-              <label className="flex items-center gap-2 text-xs text-gray-600">
-                After
-                <input
-                  value={campaignForm.step2Delay}
-                  onChange={(e) =>
-                    setCampaignForm((p) => ({ ...p, step2Delay: e.target.value }))
-                  }
-                  type="number"
-                  min={1}
-                  max={30}
-                  className="w-14 text-sm border border-gray-200 rounded-lg px-2 py-1"
-                />
-                days
-              </label>
-            )}
-          </div>
-
-          {campaignForm.channel === 'whatsapp' &&
-            !user?.whatsappAutoSendReady &&
-            user?.isOrgAdmin && (
-              <p className="text-xs text-amber-950 leading-relaxed rounded-lg border border-amber-100 bg-amber-50/80 p-2.5">
-                Connect WhatsApp Business API for auto-send.{' '}
-                <button
-                  type="button"
-                  onClick={() => onNavigate?.('whatsapp-settings')}
-                  className="font-semibold underline text-[#FF773D]"
-                >
-                  WhatsApp settings
-                </button>
-              </p>
-            )}
-        </>
+        <div className="flex flex-wrap items-center gap-3">
+          <label className="flex items-center gap-2 text-xs text-gray-700">
+            <input
+              type="checkbox"
+              checked={campaignForm.useSequence}
+              onChange={(e) => {
+                const checked = e.target.checked
+                setCampaignForm((p) => ({
+                  ...p,
+                  useSequence: checked,
+                  step2Blocks:
+                    checked && !p.step2Blocks?.length
+                      ? FOLLOW_UP_STARTER.blocks.map((b) => ({
+                          ...b,
+                          id: `blk-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+                        }))
+                      : p.step2Blocks,
+                  step2Subject:
+                    checked && !p.step2Subject ? FOLLOW_UP_STARTER.subject : p.step2Subject,
+                }))
+              }}
+            />
+            Add follow-up email
+          </label>
+          {campaignForm.useSequence && (
+            <label className="flex items-center gap-2 text-xs text-gray-600">
+              After
+              <input
+                value={campaignForm.step2Delay}
+                onChange={(e) =>
+                  setCampaignForm((p) => ({ ...p, step2Delay: e.target.value }))
+                }
+                type="number"
+                min={1}
+                max={30}
+                className="w-14 text-sm border border-gray-200 rounded-lg px-2 py-1"
+              />
+              days
+            </label>
+          )}
+        </div>
       )}
     </div>
   )

@@ -5,8 +5,16 @@ import { SettingsCard } from './SettingsUi'
 
 const SOURCE_LABELS = {
   crm_1to1: 'CRM 1:1',
+  crm_bulk: 'CRM bulk (Pipeline)',
   marketing_campaign: 'Marketing campaign',
 }
+
+const SOURCE_FILTER_OPTIONS = [
+  { value: '', label: 'All sources' },
+  { value: 'crm_1to1', label: SOURCE_LABELS.crm_1to1 },
+  { value: 'crm_bulk', label: SOURCE_LABELS.crm_bulk },
+  { value: 'marketing_campaign', label: SOURCE_LABELS.marketing_campaign },
+]
 
 function formatWhen(iso) {
   if (!iso) return '—'
@@ -50,15 +58,16 @@ export default function EmailSendsTab() {
   }, [load])
 
   const sourceOptions = useMemo(() => {
-    const set = new Set(sends.map((s) => s.source).filter(Boolean))
-    return Array.from(set).sort()
+    const known = new Set(SOURCE_FILTER_OPTIONS.map((o) => o.value).filter(Boolean))
+    const fromData = sends.map((s) => s.source).filter((s) => s && !known.has(s))
+    return [...SOURCE_FILTER_OPTIONS, ...fromData.map((s) => ({ value: s, label: s }))]
   }, [sends])
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <SettingsCard
         title="Email send audit"
-        description="Immutable per-message log for CRM 1:1 and marketing campaign sends (constitution P1)."
+        description="Per-message log for CRM 1:1, Pipeline bulk, and Marketing campaign sends. Requires Supabase email_sends migration."
       >
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
           <select
@@ -72,10 +81,9 @@ export default function EmailSendsTab() {
               background: '#fff',
             }}
           >
-            <option value="">All sources</option>
-            {sourceOptions.map((source) => (
-              <option key={source} value={source}>
-                {SOURCE_LABELS[source] || source}
+            {sourceOptions.map((opt) => (
+              <option key={opt.value || 'all'} value={opt.value}>
+                {opt.label}
               </option>
             ))}
           </select>
@@ -98,10 +106,10 @@ export default function EmailSendsTab() {
         {loading ? <p style={{ fontSize: 13, color: C.textMuted }}>Loading…</p> : null}
         {error ? <p style={{ fontSize: 13, color: '#b91c1c' }}>{error}</p> : null}
 
-        {!loading && !sends.length ? (
-          <p style={{ fontSize: 13, color: C.textMuted }}>
-            No sends logged yet. CRM emails and marketing campaigns appear here after the email_sends
-            table is active.
+        {!loading && !sends.length && !error ? (
+          <p style={{ fontSize: 13, color: C.textMuted, lineHeight: 1.5 }}>
+            No sends logged yet. After migration, CRM and marketing sends appear here automatically.
+            Ops: run <code style={{ fontSize: 12 }}>npm run email:sends-migrate</code> on Supabase.
           </p>
         ) : null}
 
@@ -114,6 +122,7 @@ export default function EmailSendsTab() {
                   <th style={{ padding: '8px 6px', borderBottom: `1px solid ${C.border}` }}>Source</th>
                   <th style={{ padding: '8px 6px', borderBottom: `1px solid ${C.border}` }}>To</th>
                   <th style={{ padding: '8px 6px', borderBottom: `1px solid ${C.border}` }}>Subject</th>
+                  <th style={{ padding: '8px 6px', borderBottom: `1px solid ${C.border}` }}>Campaign</th>
                   <th style={{ padding: '8px 6px', borderBottom: `1px solid ${C.border}` }}>Status</th>
                 </tr>
               </thead>
@@ -133,13 +142,28 @@ export default function EmailSendsTab() {
                       style={{
                         padding: '8px 6px',
                         borderBottom: `1px solid ${C.border}`,
-                        maxWidth: 220,
+                        maxWidth: 200,
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                         whiteSpace: 'nowrap',
                       }}
+                      title={row.subject || ''}
                     >
                       {row.subject || '—'}
+                    </td>
+                    <td
+                      style={{
+                        padding: '8px 6px',
+                        borderBottom: `1px solid ${C.border}`,
+                        fontFamily: 'monospace',
+                        fontSize: 11,
+                        maxWidth: 100,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}
+                      title={row.campaignId || ''}
+                    >
+                      {row.campaignId ? String(row.campaignId).slice(0, 8) : '—'}
                     </td>
                     <td style={{ padding: '8px 6px', borderBottom: `1px solid ${C.border}` }}>
                       {row.status || '—'}
