@@ -1,6 +1,9 @@
 import { useMemo } from 'react'
 import { leadDisplayName } from '../../lib/emailUtils'
-import { mergeTemplateFields } from '../../../../lib/server/marketingTemplates.js'
+import {
+  localizeSampleDraftForLead,
+  mergeTemplateFields,
+} from '../../../../lib/server/marketingTemplates.js'
 import { MERGE_FIELDS } from '../../lib/marketingEmailDesign.js'
 
 export function RecipientEmailPreview({
@@ -10,6 +13,7 @@ export function RecipientEmailPreview({
   subject,
   body,
   personalizeEach,
+  sampleLead,
   aiPreview,
   aiPreviewLoading,
   onPreviewAiDraft,
@@ -27,8 +31,15 @@ export function RecipientEmailPreview({
     if (personalizeEach && !hasDraft) {
       return { subject: '', body: '' }
     }
+    if (personalizeEach && hasDraft && sampleLead) {
+      return localizeSampleDraftForLead(
+        { subject: subject || '', body: body || '' },
+        sampleLead,
+        lead
+      )
+    }
     return mergeTemplateFields({ subject: subject || '', body: body || '' }, lead)
-  }, [lead, subject, body, personalizeEach, aiPreview])
+  }, [lead, subject, body, personalizeEach, sampleLead, aiPreview])
 
   if (!total) return null
 

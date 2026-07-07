@@ -42,6 +42,7 @@ export default function BulkEmailCompose({
     !TERMINAL_CAMPAIGN.has(String(backgroundProgress.sendStatus || '').toLowerCase())
   const [previewIndex, setPreviewIndex] = useState(0)
   const [showCc, setShowCc] = useState(false)
+  const [draftSampleLeadId, setDraftSampleLeadId] = useState(null)
 
   const senderCompany = user?.organizationName || user?.company || ''
 
@@ -90,6 +91,8 @@ export default function BulkEmailCompose({
       setSubject(data.draft.subject || '')
       setBody(data.draft.body || '')
       setDraftAi(Boolean(data.draft.aiGenerated))
+      setDraftSampleLeadId(sampleLead.id)
+      setPreviewIndex(0)
       setNotice(
         `Sample draft for ${leadDisplayName(sampleLead)} — review below.${
           personalizeEach
@@ -332,6 +335,11 @@ export default function BulkEmailCompose({
             subject={subject}
             body={body}
             personalizeEach={personalizeEach}
+            sampleLead={
+              draftSampleLeadId
+                ? withEmail.find((l) => String(l.id) === String(draftSampleLeadId))
+                : null
+            }
           />
         )}
 
