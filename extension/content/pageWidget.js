@@ -147,6 +147,7 @@ class ConnectIntelPageWidget {
     root.querySelector('[data-action="signin"]')?.addEventListener('click', () => this.signIn())
     root.querySelector('[data-action="generate"]')?.addEventListener('click', () => this.generateDraft())
     root.querySelector('[data-action="send"]')?.addEventListener('click', () => this.sendEmail())
+    this.bindComposeInteractionGuards(root)
 
     document.documentElement.appendChild(this.host)
 
@@ -155,6 +156,24 @@ class ConnectIntelPageWidget {
       if (this.open) void this.refresh()
     }
     window.addEventListener('hashchange', this.onHashChange)
+  }
+
+  bindComposeInteractionGuards(root) {
+    const stop = (event) => {
+      event.stopPropagation()
+    }
+    const panel = root.querySelector('.ci-panel')
+    const compose = root.querySelector('.ci-compose')
+    for (const el of [panel, compose]) {
+      if (!el) continue
+      el.addEventListener('mousedown', stop, true)
+      el.addEventListener('click', stop, true)
+    }
+    for (const field of root.querySelectorAll('.ci-input, .ci-textarea')) {
+      field.addEventListener('keydown', stop)
+      field.addEventListener('keyup', stop)
+      field.addEventListener('keypress', stop)
+    }
   }
 
   styles() {
@@ -310,17 +329,20 @@ class ConnectIntelPageWidget {
       }
       .ci-label:first-of-type { margin-top: 0; }
       .ci-input, .ci-textarea {
-        all: unset;
         box-sizing: border-box;
         display: block;
         width: 100%;
+        margin: 0;
         border: 1px solid #cbd5e1;
         border-radius: 8px;
         padding: 8px 10px;
+        font-family: inherit;
         font-size: 12px;
         line-height: 1.4;
         color: #0f172a;
         background: #fff;
+        -webkit-user-select: text;
+        user-select: text;
       }
       .ci-textarea { resize: vertical; min-height: 72px; }
       .ci-input:focus, .ci-textarea:focus {
