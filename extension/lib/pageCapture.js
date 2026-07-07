@@ -119,6 +119,57 @@ function isNoiseLocationText(text = '') {
   return /connection|follower|contact info|^\d+\+?$/i.test(String(text || '').trim())
 }
 
+function looksLikeLocationText(text = '') {
+  const value = String(text || '').trim()
+  if (!value || value.length > 120) return false
+  if (isNoiseLocationText(value)) return false
+  if (/\b(founder|ceo|director|consultant|forbes)\b/i.test(value)) return false
+  if (value.includes(',')) return true
+  if (/\b(area|india|metropolitan|region|district|county|gujarat|maharashtra|karnataka)\b/i.test(value)) {
+    return true
+  }
+  if (/^greater\s+[a-z]/i.test(value)) return true
+  return false
+}
+
+function findLinkedInLocationFromTopCard() {
+  const main = document.querySelector('main')
+  if (!main) return ''
+
+  const sections = main.querySelectorAll('section')
+  const roots = sections.length ? [sections[0], main] : [main]
+
+  for (const root of roots) {
+    for (const el of root.querySelectorAll('span, div, li, p')) {
+      if (el.children?.length > 2) continue
+      const text = el.textContent?.trim()
+      if (looksLikeLocationText(text)) return text
+    }
+  }
+
+  return ''
+}
+
+function findLinkedInLocationFromProfileText() {
+  const main = document.querySelector('main')
+  if (!main) return ''
+
+  const block = main.innerText?.slice(0, 4000) || ''
+  const patterns = [
+    /\b(Greater\s+[A-Za-z][\w\s.'-]{1,40}\s+Area)\b/i,
+    /\b([A-Za-z][\w\s.'-]{2,40}\s+Metropolitan\s+Area)\b/i,
+    /\b([A-Za-z][\w\s.'-]{2,40},\s*[A-Za-z][\w\s.'-]{2,40}(?:,\s*India)?)\b/,
+  ]
+
+  for (const re of patterns) {
+    const match = block.match(re)
+    const candidate = match?.[1]?.trim()
+    if (candidate && looksLikeLocationText(candidate)) return candidate
+  }
+
+  return ''
+}
+
 function findLinkedInLocation() {
   const candidates = allText(
     [
@@ -128,17 +179,23 @@ function findLinkedInLocation() {
       '.text-body-small.inline.t-black--light',
       'div.pv-top-card--list-bullet span',
       'li.text-body-small span',
+      'main section:first-of-type span.t-black--light',
+      'main section:first-of-type span[class*="text-body-small"]',
+      'main section:first-of-type span[class*="t-black--light"]',
+      '[data-view-name="profile-top-card"] span',
+      'section.artdeco-card span.text-body-small',
     ],
     document.querySelector('main') || document
   )
 
   for (const text of candidates) {
-    if (!text || text.length > 120) continue
-    if (isNoiseLocationText(text)) continue
-    if (/\b(area|india|metropolitan|region)\b/i.test(text) || text.includes(',')) return text
+    if (looksLikeLocationText(text)) return text
   }
 
-  return ''
+  const fromTopCard = findLinkedInLocationFromTopCard()
+  if (fromTopCard) return fromTopCard
+
+  return findLinkedInLocationFromProfileText()
 }
 
 function findLinkedInCompanyFromLinks() {
@@ -363,17 +420,18 @@ function sleep(ms) {
 }
 
 /** LinkedIn is a SPA — profile DOM may render after document_idle. */
-async function extractPageCaptureWhenReady(maxWaitMs = 4000) {
+async function extractPageCaptureWhenReady(maxWaitMs = 6000) {
   const started = Date.now()
   let last = null
 
   while (Date.now() - started < maxWaitMs) {
     last = extractPageCapture()
     const name = [last?.firstName, last?.lastName].filter(Boolean).join(' ')
-    const hasData = Boolean(
-      name || last?.company || last?.title || last?.linkedin || last?.email || last?.city
-    )
-    if (hasData && (name || last?.company)) return last
+    const hasCore = Boolean(name || last?.company)
+    const hasLocation = Boolean(last?.city || last?.state || last?.location)
+    const isProfile = last?.pageType === 'linkedin_profile'
+
+    if (hasCore && (!isProfile || hasLocation)) return last
     await sleep(400)
   }
 
