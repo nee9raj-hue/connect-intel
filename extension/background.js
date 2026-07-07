@@ -9,22 +9,34 @@ import {
 
 const GMAIL_URL_PATTERN = 'https://mail.google.com/*'
 
+function isGmailTab(tab) {
+  const url = String(tab?.url || tab?.pendingUrl || '')
+  return url.includes('mail.google.com')
+}
+
 async function reloadGmailTabs() {
   try {
-    const tabs = await chrome.tabs.query({ url: GMAIL_URL_PATTERN })
-    for (const tab of tabs) {
-      if (tab.id) chrome.tabs.reload(tab.id).catch(() => {})
+    let tabs = await chrome.tabs.query({ url: GMAIL_URL_PATTERN })
+    if (!tabs.length) {
+      tabs = (await chrome.tabs.query({})).filter(isGmailTab)
     }
-  } catch {
-    /* ignore tab reload failures */
+    await Promise.all(
+      tabs.map((tab) => (tab.id ? chrome.tabs.reload(tab.id).catch(() => {}) : Promise.resolve()))
+    )
+  } catch (err) {
+    console.warn('Connect Intel: could not reload Gmail tabs', err?.message || err)
   }
 }
 
 chrome.runtime.onInstalled.addListener((details) => {
-  console.log('Connect Intel extension installed', details.reason)
+  console.log('Connect Intel extension', details.reason)
   if (details.reason === 'update' || details.reason === 'install') {
     void reloadGmailTabs()
   }
+})
+
+chrome.runtime.onStartup.addListener(() => {
+  void reloadGmailTabs()
 })
 
 function excludeEmailsForBoot(boot) {
@@ -108,6 +120,12 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
   if (message?.type === 'OPEN_TAB' && message.url) {
     chrome.tabs.create({ url: message.url })
+    reply(sendResponse, { ok: true })
+    return false
+  }
+
+  if (message?.type === 'CI_RELOAD_GMAIL_TAB' && _sender?.tab?.id) {
+    chrome.tabs.reload(_sender.tab.id).catch(() => {})
     reply(sendResponse, { ok: true })
     return false
   }

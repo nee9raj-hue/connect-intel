@@ -25,7 +25,7 @@ Constitution-aligned browser companion for **Phase 22 Integrations**. Thin clien
 4. Select this folder: `extension/`.
 5. Open Gmail → use the **floating Connect Intel button** (bottom-right) or the toolbar icon.
 
-After reloading the extension in `chrome://extensions`, Gmail tabs reload automatically. If the widget says to refresh, reload the Gmail tab once.
+After reloading the extension, Gmail tabs reload automatically (v0.2.5+). Click **Clear all** on the Errors page — old errors stay listed until cleared. If you still see `content/gmail.js` errors, that file was removed; close and reopen Gmail.
 
 ## API routes (server)
 

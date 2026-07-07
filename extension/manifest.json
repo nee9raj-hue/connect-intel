@@ -1,13 +1,13 @@
 {
   "manifest_version": 3,
   "name": "Connect Intel for Gmail",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Link Gmail threads to your Connect Intel pipeline — trail sync, activity log, no bulk inbox import.",
   "icons": {
     "48": "icons/icon-48.png",
     "128": "icons/icon-48.png"
   },
-  "permissions": ["storage", "cookies", "activeTab", "scripting"],
+  "permissions": ["storage", "cookies", "activeTab", "scripting", "tabs"],
   "host_permissions": [
     "https://connectintel.net/*",
     "https://mail.google.com/*"
