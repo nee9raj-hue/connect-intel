@@ -3,7 +3,7 @@ import { useApp } from '../../context/AppContext'
 import { leadDisplayName, leadHasSendableEmail } from '../../lib/emailUtils'
 import { bulkEmailChunkSize, INLINE_EMAIL_MAX_RECIPIENTS } from '../../lib/bulkEmailLimits.js'
 import { RecipientEmailPreview } from './MarketingEmailComposeTools'
-import CampaignSendProgress from '../marketing/CampaignSendProgress.jsx'
+import CampaignMonitor from '../messaging/CampaignMonitor.jsx'
 import { useCampaignSendProgress } from '../../hooks/useCampaignSendProgress.js'
 import { saveActivePipelineEmailCampaign } from '../../lib/pipelineEmailCampaign.js'
 
@@ -223,7 +223,7 @@ export default function BulkEmailCompose({
     <div className={`flex flex-col min-h-0 text-sm ${compact ? 'h-full' : 'h-full'}`}>
       {!compact && (
         <div className="shrink-0 px-4 py-3 border-b border-[#dfe3eb] bg-white">
-          <h2 className="text-sm font-semibold text-[#33475b]">Bulk email</h2>
+          <h2 className="text-sm font-semibold text-[#33475b]">Communications</h2>
           <p className="text-xs text-[#516f90] mt-0.5">{recipientSummary}</p>
         </div>
       )}
@@ -344,7 +344,13 @@ export default function BulkEmailCompose({
         )}
 
         {backgroundCampaignId ? (
-          <CampaignSendProgress campaignId={backgroundCampaignId} enabled className="mt-1" />
+          <CampaignMonitor
+            campaignId={backgroundCampaignId}
+            campaignName="Pipeline outreach"
+            enabled
+            className="mt-1"
+            onDone={() => onDone?.(result)}
+          />
         ) : null}
         {error && <p className="text-xs text-red-700 bg-red-50 rounded-lg px-2 py-1.5">{error}</p>}
         {busy && sendProgress && (

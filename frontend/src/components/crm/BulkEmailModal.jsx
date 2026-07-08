@@ -236,7 +236,7 @@ export default function BulkEmailModal({ open, leadIds, leads, onClose, onDone, 
         >
           <div className="crm-modal-dialog" onClick={(e) => e.stopPropagation()}>
             <header className="crm-modal-header">
-              <h2 id="bulk-email-title">Bulk email ({leadIds.length} selected)</h2>
+              <h2 id="bulk-email-title">Communications ({leadIds.length} selected)</h2>
               <button type="button" onClick={onClose} className="crm-modal-close" aria-label="Close">
                 ×
               </button>

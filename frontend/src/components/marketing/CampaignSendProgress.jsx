@@ -1,14 +1,18 @@
 import { useCampaignSendProgress } from '../../hooks/useCampaignSendProgress.js'
 
 const STATUS_LABELS = {
+  draft: 'Draft',
+  validating: 'Validating recipients…',
   queued: 'Queued',
-  preparing: 'Preparing',
-  sending: 'Sending',
+  preparing: 'Preparing campaign…',
+  personalizing: 'Personalizing emails…',
+  connecting: 'Connecting Gmail…',
+  sending: 'Sending…',
+  delivered: 'Delivered',
   completed: 'Completed',
   failed: 'Failed',
   cancelled: 'Cancelled',
   paused: 'Paused',
-  draft: 'Draft',
 }
 
 function formatEta(ms) {
