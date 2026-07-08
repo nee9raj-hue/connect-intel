@@ -157,6 +157,19 @@ export default function BulkEmailCompose({
       )
       setResult(data)
       setResumeCampaignId(null)
+      if (data.queued === false && (data.sendable ?? 0) === 0 && !data.campaignId) {
+        const reasons = Array.isArray(data.skipped) ? data.skipped : []
+        const noConsent = reasons.filter((s) => s.reason === 'no_consent').length
+        const noEmail = reasons.filter((s) => s.reason === 'no_email').length
+        setError(
+          noConsent > 0
+            ? `Nothing sent — ${noConsent} recipient${noConsent === 1 ? '' : 's'} without email consent. Record consent on the lead(s) and try again.`
+            : noEmail > 0
+              ? `Nothing sent — ${noEmail} recipient${noEmail === 1 ? '' : 's'} without a sendable email.`
+              : 'Nothing sent — no eligible recipients in this selection.'
+        )
+        return
+      }
       if (data.timedOut) {
         setNotice(
           data.workerHint ||
