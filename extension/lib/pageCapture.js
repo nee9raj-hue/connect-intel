@@ -115,24 +115,14 @@ function findLinkedInHeadline() {
   return ''
 }
 
-function isNoiseLocationText(text = '') {
-  return /connection|follower|contact info|^\d+\+?$/i.test(String(text || '').trim())
-}
-
-function looksLikeLocationText(text = '') {
+function looksLikeLocationText(text = '', exclude = []) {
+  const { isLikelyLocationText } = parseApi()
+  if (isLikelyLocationText) return isLikelyLocationText(text, exclude)
   const value = String(text || '').trim()
-  if (!value || value.length > 120) return false
-  if (isNoiseLocationText(value)) return false
-  if (/\b(founder|ceo|director|consultant|forbes)\b/i.test(value)) return false
-  if (value.includes(',')) return true
-  if (/\b(area|india|metropolitan|region|district|county|gujarat|maharashtra|karnataka)\b/i.test(value)) {
-    return true
-  }
-  if (/^greater\s+[a-z]/i.test(value)) return true
-  return false
+  return Boolean(value) && value.length <= 80 && value.includes(',')
 }
 
-function findLinkedInLocationFromTopCard() {
+function findLinkedInLocationFromTopCard(exclude = []) {
   const main = document.querySelector('main')
   if (!main) return ''
 
@@ -143,14 +133,14 @@ function findLinkedInLocationFromTopCard() {
     for (const el of root.querySelectorAll('span, div, li, p')) {
       if (el.children?.length > 2) continue
       const text = el.textContent?.trim()
-      if (looksLikeLocationText(text)) return text
+      if (looksLikeLocationText(text, exclude)) return text
     }
   }
 
   return ''
 }
 
-function findLinkedInLocationFromProfileText() {
+function findLinkedInLocationFromProfileText(exclude = []) {
   const main = document.querySelector('main')
   if (!main) return ''
 
@@ -164,13 +154,13 @@ function findLinkedInLocationFromProfileText() {
   for (const re of patterns) {
     const match = block.match(re)
     const candidate = match?.[1]?.trim()
-    if (candidate && looksLikeLocationText(candidate)) return candidate
+    if (candidate && looksLikeLocationText(candidate, exclude)) return candidate
   }
 
   return ''
 }
 
-function findLinkedInLocation() {
+function findLinkedInLocation(exclude = []) {
   const candidates = allText(
     [
       '.pv-text-details__left-panel span.text-body-small',
@@ -189,29 +179,53 @@ function findLinkedInLocation() {
   )
 
   for (const text of candidates) {
-    if (looksLikeLocationText(text)) return text
+    if (looksLikeLocationText(text, exclude)) return text
   }
 
-  const fromTopCard = findLinkedInLocationFromTopCard()
+  const fromTopCard = findLinkedInLocationFromTopCard(exclude)
   if (fromTopCard) return fromTopCard
 
-  return findLinkedInLocationFromProfileText()
+  return findLinkedInLocationFromProfileText(exclude)
 }
 
-function findLinkedInCompanyFromLinks() {
+function companyLabelFromLink(a) {
   const { cleanCompanyLabel } = parseApi()
   const clean = cleanCompanyLabel || ((v) => String(v || '').trim())
+  const label =
+    a.querySelector('span[aria-hidden="true"]')?.textContent?.trim() ||
+    a.getAttribute('aria-label') ||
+    a.textContent?.trim()
+  const company = clean(label)
+  if (company && company.length >= 2 && company.length <= 120 && !/logo|company page/i.test(company)) {
+    return company
+  }
+  return ''
+}
 
-  const links = document.querySelectorAll('a[href*="/company/"]')
-  for (const a of links) {
-    const label =
-      a.querySelector('span[aria-hidden="true"]')?.textContent?.trim() ||
-      a.getAttribute('aria-label') ||
-      a.textContent?.trim()
-    const company = clean(label)
-    if (company && company.length >= 2 && company.length <= 120 && !/logo|company page/i.test(company)) {
-      return company
-    }
+// The top card's company link is the person's *current* employer — this avoids
+// sidebar contamination ("People also viewed", "You might like", promoted pages).
+function findLinkedInTopCardCompany() {
+  const main = document.querySelector('main')
+  if (!main) return ''
+  const topCard =
+    main.querySelector('[data-view-name="profile-top-card"]') ||
+    main.querySelector('section') ||
+    main
+  for (const a of topCard.querySelectorAll('a[href*="/company/"]')) {
+    const company = companyLabelFromLink(a)
+    if (company) return company
+  }
+  return ''
+}
+
+// Fallback: scan links inside the profile <main> but never the <aside>/sidebar,
+// which is where recommended companies (the wrong ones) live.
+function findLinkedInCompanyFromLinks() {
+  const main = document.querySelector('main') || document
+  for (const a of main.querySelectorAll('a[href*="/company/"]')) {
+    if (a.closest('aside')) continue
+    const company = companyLabelFromLink(a)
+    if (company) return company
   }
   return ''
 }
@@ -306,14 +320,22 @@ function findMailtoTelAndVisibleContacts() {
   return { email, phone }
 }
 
-function resolveLinkedInCompany(headlineCompany, experience, linkCompany, buttonCompany) {
-  const { cleanCompanyLabel } = parseApi()
-  const clean = cleanCompanyLabel || ((v) => String(v || '').trim())
+function resolveLinkedInCompany(headlineCompany, experience, linkCompany, buttonCompany, topCardCompany) {
+  const { pickCompanyName, cleanCompanyLabel } = parseApi()
+  if (pickCompanyName) {
+    return pickCompanyName({
+      topCardCompany,
+      buttonCompany,
+      experienceCompany: experience?.company,
+      linkCompany,
+      headlineCompany,
+    })
+  }
 
-  const candidates = [linkCompany, experience?.company, buttonCompany, headlineCompany]
+  const clean = cleanCompanyLabel || ((v) => String(v || '').trim())
+  const candidates = [topCardCompany, buttonCompany, experience?.company, linkCompany, headlineCompany]
     .map((c) => clean(c))
     .filter((c) => c && c.length >= 2 && c.length <= 120)
-
   for (const c of candidates) {
     if (!/forbes|consultant|\d+u\d+/i.test(c)) return c
   }
@@ -341,6 +363,7 @@ function extractLinkedInProfile() {
   const headline = findLinkedInHeadline()
   const parsedHeadline = parseHeadlineFn(headline)
   const experience = findLinkedInTopExperience()
+  const topCardCompany = findLinkedInTopCardCompany()
   const linkCompany = findLinkedInCompanyFromLinks()
   const buttonCompany = findLinkedInCurrentCompanyButton()
   const { firstName, lastName } = splitNameFn(name)
@@ -350,10 +373,11 @@ function extractLinkedInProfile() {
     parsedHeadline.company,
     experience,
     linkCompany,
-    buttonCompany
+    buttonCompany,
+    topCardCompany
   )
 
-  const locationRaw = findLinkedInLocation()
+  const locationRaw = findLinkedInLocation([headline, name, company])
   const { city, state, location: parsedLocation } = parseLocFn(locationRaw)
   const industry = findLinkedInIndustry()
   const education = findLinkedInEducationNote()

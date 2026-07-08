@@ -177,6 +177,65 @@ function cleanCompanyLabel(label = '') {
     .slice(0, 160)
 }
 
+const NON_LOCATION_WORDS =
+  /\b(founder|co-?founder|ceo|cto|coo|cfo|cmo|director|manager|consultant|forbes|brand|toys?|crafting|montessori|building|helping|passionate|entrepreneur|president|owner|partner|advisor|coach|specialist|engineer|developer|designer|marketer|investor|mentor|head|lead|winner|award)\b/i
+
+const STATE_NAME_RE =
+  /\b(andhra pradesh|arunachal|assam|bihar|chhattisgarh|delhi|goa|gujarat|haryana|himachal|jharkhand|karnataka|kerala|madhya pradesh|maharashtra|manipur|meghalaya|mizoram|nagaland|odisha|punjab|rajasthan|sikkim|tamil nadu|telangana|tripura|uttar pradesh|uttarakhand|west bengal)\b/i
+
+function isNoiseLocationText(text = '') {
+  return /connection|follower|contact info|^\d+\+?$/i.test(String(text || '').trim())
+}
+
+/**
+ * Decide whether a snippet is an actual place vs a headline/tagline/job title.
+ * `exclude` holds already-known headline/name/company text to reject outright,
+ * which prevents a marketing headline like "India's No.1 … Brand" (which contains
+ * the word "India") from being captured as the location.
+ */
+function isLikelyLocationText(text = '', exclude = []) {
+  const value = String(text || '').trim()
+  if (!value || value.length > 80) return false
+  if (isNoiseLocationText(value)) return false
+
+  const key = normalizeLocationKey(value)
+  for (const other of exclude) {
+    const otherKey = normalizeLocationKey(other)
+    if (otherKey && (otherKey === key || otherKey.includes(key) || key.includes(otherKey))) {
+      return false
+    }
+  }
+
+  if (/['’]s\b/i.test(value)) return false
+  if (/\d/.test(value)) return false
+  if (/[|–—]/.test(value)) return false
+  if (/\s-\s/.test(value)) return false
+  if (NON_LOCATION_WORDS.test(value)) return false
+
+  if (value.includes(',')) return true
+  if (/\b(area|india|metropolitan|region|district|county)\b/i.test(value)) return true
+  if (/^greater\s+[a-z]/i.test(value)) return true
+  if (STATE_NAME_RE.test(value)) return true
+  return false
+}
+
+/**
+ * Resolve the person's company from the various sources, most trustworthy first.
+ * Top-card / current-company / Experience come before page-wide links (sidebars)
+ * and headline parsing (taglines), so recommended companies never win.
+ */
+function pickCompanyName(sources = {}) {
+  const { topCardCompany, buttonCompany, experienceCompany, linkCompany, headlineCompany } = sources
+  const candidates = [topCardCompany, buttonCompany, experienceCompany, linkCompany, headlineCompany]
+    .map((c) => cleanCompanyLabel(c))
+    .filter((c) => c && c.length >= 2 && c.length <= 120)
+
+  for (const c of candidates) {
+    if (!/forbes|consultant|\d+u\d+/i.test(c)) return c
+  }
+  return candidates[0] || ''
+}
+
 const api = {
   parseHeadline,
   splitPersonName,
@@ -186,6 +245,8 @@ const api = {
   findPhoneInText,
   cleanCompanyLabel,
   resolveIndianState,
+  isLikelyLocationText,
+  pickCompanyName,
 }
 
 if (typeof globalThis !== 'undefined') {
