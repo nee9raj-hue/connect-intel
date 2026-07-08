@@ -220,20 +220,63 @@ function isLikelyLocationText(text = '', exclude = []) {
 }
 
 /**
+ * Pull the employer from a LinkedIn Experience list item's text lines.
+ * Item lines look like: ["Founder", "Ariro toys · Full-time",
+ * "Jun 2020 - Present · 6 yrs", "Chennai, Tamil Nadu, India"]. The first line is
+ * the role; the company is the next line that is not a date range or duration.
+ */
+function companyFromExperienceLines(lines = []) {
+  const arr = (Array.isArray(lines) ? lines : [])
+    .map((l) => String(l || '').trim())
+    .filter(Boolean)
+  for (let i = 1; i < arr.length; i += 1) {
+    const line = arr[i]
+    if (/\b(present|yrs?|mos?|months?|years?)\b/i.test(line)) continue
+    if (/\b(19|20)\d{2}\b/.test(line)) continue
+    if (/^(full-?time|part-?time|self-?employed|freelance|internship|contract)$/i.test(line)) continue
+    const cleaned = line.split('·')[0].trim()
+    if (cleaned) return cleaned
+  }
+  return ''
+}
+
+// Headline/tagline text masquerading as a company: possessives ("India's"),
+// "No.1"/rankings, or overly long marketing phrases.
+function isHeadlineJunkCompany(value = '') {
+  const v = String(value || '').trim()
+  if (!v) return true
+  if (/['’]s\b/i.test(v)) return true
+  if (/\bno\.?\s*\d/i.test(v)) return true
+  if (/\b(india's|world's|no\.?\s*1|montessori|crafting)\b/i.test(v)) return true
+  if (v.split(/\s+/).length > 6) return true
+  return false
+}
+
+function basicCompanyLabel(value = '') {
+  const v = cleanCompanyLabel(value)
+  if (!v || v.length < 2 || v.length > 120) return ''
+  if (/forbes|consultant|\d+u\d+/i.test(v)) return ''
+  return v
+}
+
+/**
  * Resolve the person's company from the various sources, most trustworthy first.
- * Top-card / current-company / Experience come before page-wide links (sidebars)
- * and headline parsing (taglines), so recommended companies never win.
+ * Structural sources (top-card / current-company button / Experience) are trusted
+ * as-is; the headline is only used as a last resort and rejected when it looks
+ * like a tagline. Page-wide links are never used, so followed/recommended
+ * companies (e.g. a toy brand the person merely follows) can never win.
  */
 function pickCompanyName(sources = {}) {
-  const { topCardCompany, buttonCompany, experienceCompany, linkCompany, headlineCompany } = sources
-  const candidates = [topCardCompany, buttonCompany, experienceCompany, linkCompany, headlineCompany]
-    .map((c) => cleanCompanyLabel(c))
-    .filter((c) => c && c.length >= 2 && c.length <= 120)
+  const { topCardCompany, buttonCompany, experienceCompany, experienceLinkCompany, headlineCompany } =
+    sources
+  const reliable = [topCardCompany, buttonCompany, experienceCompany, experienceLinkCompany]
+    .map((c) => basicCompanyLabel(c))
+    .filter(Boolean)
+  if (reliable.length) return reliable[0]
 
-  for (const c of candidates) {
-    if (!/forbes|consultant|\d+u\d+/i.test(c)) return c
-  }
-  return candidates[0] || ''
+  const headline = basicCompanyLabel(headlineCompany)
+  if (headline && !isHeadlineJunkCompany(headline)) return headline
+  return ''
 }
 
 const api = {
@@ -247,6 +290,8 @@ const api = {
   resolveIndianState,
   isLikelyLocationText,
   pickCompanyName,
+  companyFromExperienceLines,
+  isHeadlineJunkCompany,
 }
 
 if (typeof globalThis !== 'undefined') {

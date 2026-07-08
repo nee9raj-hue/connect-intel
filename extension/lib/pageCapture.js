@@ -218,12 +218,20 @@ function findLinkedInTopCardCompany() {
   return ''
 }
 
-// Fallback: scan links inside the profile <main> but never the <aside>/sidebar,
-// which is where recommended companies (the wrong ones) live.
-function findLinkedInCompanyFromLinks() {
-  const main = document.querySelector('main') || document
-  for (const a of main.querySelectorAll('a[href*="/company/"]')) {
-    if (a.closest('aside')) continue
+function findLinkedInExperienceSection() {
+  return (
+    document.querySelector('#experience')?.closest('section') ||
+    document.querySelector('section[data-section="experience"]') ||
+    safeQuerySelector('section:has(#experience)')
+  )
+}
+
+// Company link, but only from within the Experience section — never a page-wide
+// scan, which would pick up companies the person merely follows (Interests).
+function findLinkedInExperienceLinkCompany() {
+  const section = findLinkedInExperienceSection()
+  if (!section) return ''
+  for (const a of section.querySelectorAll('a[href*="/company/"]')) {
     const company = companyLabelFromLink(a)
     if (company) return company
   }
@@ -243,11 +251,8 @@ function findLinkedInCurrentCompanyButton() {
 }
 
 function findLinkedInTopExperience() {
-  const section =
-    document.querySelector('#experience')?.closest('section') ||
-    document.querySelector('section[data-section="experience"]') ||
-    safeQuerySelector('section:has(#experience)')
-
+  const { companyFromExperienceLines } = parseApi()
+  const section = findLinkedInExperienceSection()
   if (!section) return { title: '', company: '' }
 
   const item = section.querySelector('li, .pvs-list__paged-list-item, .artdeco-list__item')
@@ -259,10 +264,13 @@ function findLinkedInTopExperience() {
 
   const companyLink = item.querySelector('a[href*="/company/"] span[aria-hidden="true"]')
   const companyFromLink = companyLink?.textContent?.trim() || ''
+  const companyFromLines = companyFromExperienceLines
+    ? companyFromExperienceLines(lines)
+    : lines[1] || ''
 
   return {
     title: lines[0] || '',
-    company: companyFromLink || lines[1] || '',
+    company: companyFromLink || companyFromLines,
   }
 }
 
@@ -320,20 +328,26 @@ function findMailtoTelAndVisibleContacts() {
   return { email, phone }
 }
 
-function resolveLinkedInCompany(headlineCompany, experience, linkCompany, buttonCompany, topCardCompany) {
+function resolveLinkedInCompany({
+  headlineCompany,
+  experience,
+  experienceLinkCompany,
+  buttonCompany,
+  topCardCompany,
+}) {
   const { pickCompanyName, cleanCompanyLabel } = parseApi()
   if (pickCompanyName) {
     return pickCompanyName({
       topCardCompany,
       buttonCompany,
       experienceCompany: experience?.company,
-      linkCompany,
+      experienceLinkCompany,
       headlineCompany,
     })
   }
 
   const clean = cleanCompanyLabel || ((v) => String(v || '').trim())
-  const candidates = [topCardCompany, buttonCompany, experience?.company, linkCompany, headlineCompany]
+  const candidates = [topCardCompany, buttonCompany, experience?.company, experienceLinkCompany, headlineCompany]
     .map((c) => clean(c))
     .filter((c) => c && c.length >= 2 && c.length <= 120)
   for (const c of candidates) {
@@ -364,18 +378,18 @@ function extractLinkedInProfile() {
   const parsedHeadline = parseHeadlineFn(headline)
   const experience = findLinkedInTopExperience()
   const topCardCompany = findLinkedInTopCardCompany()
-  const linkCompany = findLinkedInCompanyFromLinks()
+  const experienceLinkCompany = findLinkedInExperienceLinkCompany()
   const buttonCompany = findLinkedInCurrentCompanyButton()
   const { firstName, lastName } = splitNameFn(name)
 
   const title = experience.title || parsedHeadline.title || ''
-  const company = resolveLinkedInCompany(
-    parsedHeadline.company,
+  const company = resolveLinkedInCompany({
+    headlineCompany: parsedHeadline.company,
     experience,
-    linkCompany,
+    experienceLinkCompany,
     buttonCompany,
-    topCardCompany
-  )
+    topCardCompany,
+  })
 
   const locationRaw = findLinkedInLocation([headline, name, company])
   const { city, state, location: parsedLocation } = parseLocFn(locationRaw)
@@ -443,9 +457,13 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-/** LinkedIn is a SPA — profile DOM may render after document_idle. */
+/** LinkedIn is a SPA — profile DOM (esp. the Experience section) may render after
+ * document_idle, so give the company a chance to load before returning. */
 async function extractPageCaptureWhenReady(maxWaitMs = 6000) {
   const started = Date.now()
+  // Company from the Experience section is the reliable source and may lag, so
+  // wait a bit longer for it before falling back to whatever we have.
+  const companyGraceMs = 3000
   let last = null
 
   while (Date.now() - started < maxWaitMs) {
@@ -455,7 +473,12 @@ async function extractPageCaptureWhenReady(maxWaitMs = 6000) {
     const hasLocation = Boolean(last?.city || last?.state || last?.location)
     const isProfile = last?.pageType === 'linkedin_profile'
 
-    if (hasCore && (!isProfile || hasLocation)) return last
+    if (hasCore && (!isProfile || hasLocation)) {
+      // Ready on name+location; keep waiting briefly if company hasn't loaded yet.
+      if (!isProfile || last?.company || Date.now() - started >= companyGraceMs) {
+        return last
+      }
+    }
     await sleep(400)
   }
 
