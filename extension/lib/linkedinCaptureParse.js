@@ -267,9 +267,15 @@ function basicCompanyLabel(value = '') {
  * companies (e.g. a toy brand the person merely follows) can never win.
  */
 function pickCompanyName(sources = {}) {
-  const { topCardCompany, buttonCompany, experienceCompany, experienceLinkCompany, headlineCompany } =
-    sources
-  const reliable = [topCardCompany, buttonCompany, experienceCompany, experienceLinkCompany]
+  const {
+    jsonLdCompany,
+    topCardCompany,
+    buttonCompany,
+    experienceCompany,
+    experienceLinkCompany,
+    headlineCompany,
+  } = sources
+  const reliable = [jsonLdCompany, topCardCompany, buttonCompany, experienceCompany, experienceLinkCompany]
     .map((c) => basicCompanyLabel(c))
     .filter(Boolean)
   if (reliable.length) return reliable[0]
@@ -277,6 +283,72 @@ function pickCompanyName(sources = {}) {
   const headline = basicCompanyLabel(headlineCompany)
   if (headline && !isHeadlineJunkCompany(headline)) return headline
   return ''
+}
+
+function jsonLdTypeIncludes(node, type) {
+  const t = node?.['@type']
+  if (Array.isArray(t)) return t.includes(type)
+  return t === type
+}
+
+function firstOrgName(worksFor) {
+  if (!worksFor) return ''
+  if (Array.isArray(worksFor)) {
+    for (const w of worksFor) {
+      const name = typeof w === 'string' ? w : w?.name
+      if (name) return String(name).trim()
+    }
+    return ''
+  }
+  if (typeof worksFor === 'object') return String(worksFor.name || '').trim()
+  return String(worksFor || '').trim()
+}
+
+/**
+ * LinkedIn embeds an authoritative <script type="application/ld+json"> Person
+ * node (name, jobTitle, worksFor, address). Parse it out of the JSON-LD graph —
+ * this is far more reliable than scraping the rendered DOM, which mixes in
+ * followed/recommended companies.
+ */
+function parseLinkedInJsonLd(raw) {
+  let root = raw
+  if (typeof raw === 'string') {
+    try {
+      root = JSON.parse(raw)
+    } catch {
+      return null
+    }
+  }
+  if (!root || typeof root !== 'object') return null
+
+  const nodes = []
+  const walk = (x) => {
+    if (Array.isArray(x)) {
+      x.forEach(walk)
+    } else if (x && typeof x === 'object') {
+      nodes.push(x)
+      if (x['@graph']) walk(x['@graph'])
+    }
+  }
+  walk(root)
+
+  const person = nodes.find((n) => jsonLdTypeIncludes(n, 'Person'))
+  if (!person) return null
+
+  const jobTitle = Array.isArray(person.jobTitle) ? person.jobTitle[0] : person.jobTitle
+  const company = firstOrgName(person.worksFor)
+  const address = person.address || {}
+  const city = String(address.addressLocality || '').trim()
+  const state = String(address.addressRegion || '').trim()
+
+  return {
+    name: String(person.name || '').trim(),
+    title: String(jobTitle || '').trim(),
+    company,
+    city,
+    state,
+    location: [city, state].filter(Boolean).join(', '),
+  }
 }
 
 const api = {
@@ -292,6 +364,7 @@ const api = {
   pickCompanyName,
   companyFromExperienceLines,
   isHeadlineJunkCompany,
+  parseLinkedInJsonLd,
 }
 
 if (typeof globalThis !== 'undefined') {

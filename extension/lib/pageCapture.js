@@ -329,6 +329,7 @@ function findMailtoTelAndVisibleContacts() {
 }
 
 function resolveLinkedInCompany({
+  jsonLdCompany,
   headlineCompany,
   experience,
   experienceLinkCompany,
@@ -338,6 +339,7 @@ function resolveLinkedInCompany({
   const { pickCompanyName, cleanCompanyLabel } = parseApi()
   if (pickCompanyName) {
     return pickCompanyName({
+      jsonLdCompany,
       topCardCompany,
       buttonCompany,
       experienceCompany: experience?.company,
@@ -347,7 +349,7 @@ function resolveLinkedInCompany({
   }
 
   const clean = cleanCompanyLabel || ((v) => String(v || '').trim())
-  const candidates = [topCardCompany, buttonCompany, experience?.company, experienceLinkCompany, headlineCompany]
+  const candidates = [jsonLdCompany, topCardCompany, buttonCompany, experience?.company, experienceLinkCompany, headlineCompany]
     .map((c) => clean(c))
     .filter((c) => c && c.length >= 2 && c.length <= 120)
   for (const c of candidates) {
@@ -364,6 +366,19 @@ function buildLinkedInNotes({ headline, title, education, industry }) {
   return lines.join('\n').slice(0, 2000)
 }
 
+// LinkedIn ships an authoritative Person node in <script type="application/ld+json">.
+// This is the most reliable source for employer/location and is immune to the
+// DOM contamination (followed companies, recommendations) that misled scraping.
+function readLinkedInJsonLd() {
+  const { parseLinkedInJsonLd } = parseApi()
+  if (!parseLinkedInJsonLd) return null
+  for (const script of document.querySelectorAll('script[type="application/ld+json"]')) {
+    const parsed = parseLinkedInJsonLd(script.textContent || '')
+    if (parsed && (parsed.company || parsed.name)) return parsed
+  }
+  return null
+}
+
 function extractLinkedInProfile() {
   const url = String(location.href || '').split('?')[0]
   if (!isLinkedInProfileUrl(url)) return null
@@ -373,7 +388,9 @@ function extractLinkedInProfile() {
   const splitNameFn = splitPersonName || (() => ({ firstName: '', lastName: '' }))
   const parseLocFn = parseLocationToCityState || (() => ({ city: '', state: '', location: '' }))
 
-  const name = findLinkedInProfileName()
+  const jsonLd = readLinkedInJsonLd()
+
+  const name = jsonLd?.name || findLinkedInProfileName()
   const headline = findLinkedInHeadline()
   const parsedHeadline = parseHeadlineFn(headline)
   const experience = findLinkedInTopExperience()
@@ -382,8 +399,9 @@ function extractLinkedInProfile() {
   const buttonCompany = findLinkedInCurrentCompanyButton()
   const { firstName, lastName } = splitNameFn(name)
 
-  const title = experience.title || parsedHeadline.title || ''
+  const title = experience.title || parsedHeadline.title || jsonLd?.title || ''
   const company = resolveLinkedInCompany({
+    jsonLdCompany: jsonLd?.company,
     headlineCompany: parsedHeadline.company,
     experience,
     experienceLinkCompany,
@@ -391,8 +409,16 @@ function extractLinkedInProfile() {
     topCardCompany,
   })
 
-  const locationRaw = findLinkedInLocation([headline, name, company])
-  const { city, state, location: parsedLocation } = parseLocFn(locationRaw)
+  let city = jsonLd?.city || ''
+  let state = jsonLd?.state || ''
+  let parsedLocation = jsonLd?.location || ''
+  if (!city && !state) {
+    const locationRaw = findLinkedInLocation([headline, name, company])
+    const parsed = parseLocFn(locationRaw)
+    city = parsed.city
+    state = parsed.state
+    parsedLocation = parsed.location || locationRaw
+  }
   const industry = findLinkedInIndustry()
   const education = findLinkedInEducationNote()
   const { email, phone } = findMailtoTelAndVisibleContacts()
@@ -406,7 +432,7 @@ function extractLinkedInProfile() {
     company,
     city,
     state,
-    location: parsedLocation || locationRaw,
+    location: parsedLocation || [city, state].filter(Boolean).join(', '),
     industry: industry || '',
     linkedin: url,
     email,

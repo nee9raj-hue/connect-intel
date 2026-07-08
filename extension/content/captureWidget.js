@@ -16,6 +16,14 @@ function extensionIconUrl() {
   }
 }
 
+function extensionVersion() {
+  try {
+    return chrome.runtime.getManifest().version || ''
+  } catch {
+    return ''
+  }
+}
+
 function sendMessage(type, payload = {}) {
   const rt = runtime()
   if (!rt?.isExtensionContextAlive()) {
@@ -145,7 +153,7 @@ class ConnectIntelCaptureWidget {
           <img class="ci-panel__logo" src="${iconUrl}" alt="" />
           <div>
             <div class="ci-panel__title">Add to pipeline</div>
-            <div class="ci-panel__tag">Connect Intel · audited capture</div>
+            <div class="ci-panel__tag">Connect Intel · audited capture${extensionVersion() ? ` · v${extensionVersion()}` : ''}</div>
           </div>
           <button type="button" class="ci-panel__close" aria-label="Close">×</button>
         </header>
