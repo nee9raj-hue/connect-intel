@@ -415,7 +415,7 @@ Future `deals` SQL table (PLANNED)
 
 ### Acceptance criteria
 - [x] Open deals from Opportunities nav
-- [ ] First-class Deal record API
+- [x] First-class Deal record API (`GET/POST/PATCH/DELETE /api/crm/deals`)
 - [ ] Forecasting
 
 ---

@@ -50,7 +50,8 @@ Partial — not globally enforced (constitution gap). Marketing send paths have 
 
 | Path | Handler | Description |
 |------|---------|-------------|
-| `saved-leads` | `saved-leads.js` | Pipeline CRUD, summary, board, deals view |
+| `saved-leads` | `saved-leads.js` | Pipeline CRUD, summary, board |
+| `crm/deals` | `crm-deals.js` | First-class deals: list, create, patch, delete |
 | `pipeline/bootstrap` | `pipeline-bootstrap.js` | Fast pipeline boot (cached) |
 | `pipeline/lead-quick-summary` | `pipeline-lead-quick-summary.js` | Lead card summary |
 | `contacts` | `contacts.js` | Master contacts |

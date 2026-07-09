@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useApp } from '../../context/AppContext'
+import { api } from '../../lib/api'
 import {
   getDealStageMeta,
   getDealStagesForFreight,
@@ -267,7 +268,7 @@ function DealRow({
 
 /** Deals on a lead — compact cards, minimal copy. */
 export default function LeadDealsSection({ lead, patchLead, user, busy = false, onNotice, onError }) {
-  const { logCrmEmailSend, consumePendingFreightRfq } = useApp()
+  const { logCrmEmailSend, consumePendingFreightRfq, refreshSavedLeads } = useApp()
   const crm = lead.crm || {}
   const deals = crm.deals || []
   const freightOrg = isFreightDealOrg(user)
@@ -331,7 +332,21 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
     setSaving(true)
     onError?.(null)
     try {
-      await patchLead(lead.id, { deal: body })
+      const { action, dealId, lostReason, ...fields } = body
+      if (action === 'add') {
+        await api.createCrmDeal({ leadId: lead.id, ...fields })
+      } else if (action === 'duplicate') {
+        await api.duplicateCrmDeal({ dealId, ...fields })
+      } else if (action === 'delete') {
+        await api.deleteCrmDeal(dealId)
+      } else if (action === 'won' || action === 'lost') {
+        await api.patchCrmDeal({ dealId, action, lostReason })
+      } else if (action === 'update') {
+        await api.patchCrmDeal({ dealId, ...fields })
+      } else {
+        await patchLead(lead.id, { deal: body })
+      }
+      await refreshSavedLeads()
       if (okMsg) {
         onNotice?.(okMsg)
         setFeedback(okMsg)

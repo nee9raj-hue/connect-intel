@@ -32,7 +32,7 @@ export default function PipelineDealsView({
   onOpenLead,
   assigneeFilter = null,
 }) {
-  const { patchLead, user } = useApp()
+  const { refreshSavedLeads, user } = useApp()
   const [rows, setRows] = useState([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -70,11 +70,12 @@ export default function PipelineDealsView({
     setLoading(true)
     setError(null)
     try {
-      const data = await api.fetchPipelineDeals({ dealStage, limit: 200 })
-      let list = data.deals || []
-      if (assigneeFilter) {
-        list = list.filter((r) => String(r.assigneeUserId || '') === String(assigneeFilter))
-      }
+      const data = await api.fetchPipelineDeals({
+        dealStage,
+        limit: 200,
+        assigneeUserId: assigneeFilter || undefined,
+      })
+      const list = data.deals || []
       setRows(list)
       setTotal(data.total ?? list.length)
       setSelected((prev) => {
@@ -135,13 +136,15 @@ export default function PipelineDealsView({
     try {
       for (const { deal, leadId } of selectedRows) {
         try {
-          await patchLead(leadId, {
-            deal: {
-              action,
+          if (action === 'delete') {
+            await api.deleteCrmDeal(deal.id)
+          } else {
+            await api.patchCrmDeal({
               dealId: deal.id,
+              action,
               ...(action === 'lost' && lostReason ? { lostReason } : {}),
-            },
-          })
+            })
+          }
           okCount += 1
         } catch {
           failCount += 1
@@ -156,6 +159,7 @@ export default function PipelineDealsView({
       )
       setSelected(new Set())
       await load()
+      void refreshSavedLeads().catch(() => {})
     } catch (e) {
       setError(e.message || 'Bulk update failed')
     } finally {

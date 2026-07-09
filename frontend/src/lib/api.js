@@ -232,15 +232,20 @@ export const api = {
     )
   },
 
-  fetchPipelineDeals: ({ dealStage = 'all', offset = 0, limit = 100, silent = false } = {}) => {
+  fetchPipelineDeals: ({
+    dealStage = 'all',
+    offset = 0,
+    limit = 100,
+    assigneeUserId = null,
+    silent = false,
+  } = {}) => {
     const qs = new URLSearchParams({
-      view: 'deals',
+      dealStage,
       limit: String(limit),
       offset: String(offset),
-      light: '1',
     })
-    if (dealStage && dealStage !== 'all') qs.set('dealStage', dealStage)
-    return request(`/api/saved-leads?${qs}`, { timeoutMs: 60_000 }, { silent })
+    if (assigneeUserId) qs.set('assigneeUserId', assigneeUserId)
+    return request(`/api/crm/deals?${qs}`, { timeoutMs: 60_000 }, { silent })
   },
 
   fetchPipelineBoard: (params = {}) => {
@@ -565,7 +570,15 @@ export const api = {
     const q = params.toString()
     return request(`/api/org/email-sends${q ? `?${q}` : ''}`)
   },
-  getCrmDeals: ({ q = '', dealStage = 'all', limit = 50, offset = 0, dealId } = {}) => {
+  getCrmDeals: ({
+    q = '',
+    dealStage = 'all',
+    limit = 50,
+    offset = 0,
+    dealId,
+    leadId,
+    assigneeUserId,
+  } = {}) => {
     const params = new URLSearchParams({
       dealStage,
       limit: String(limit),
@@ -573,9 +586,17 @@ export const api = {
     })
     if (q) params.set('q', q)
     if (dealId) params.set('dealId', dealId)
+    if (leadId) params.set('leadId', leadId)
+    if (assigneeUserId) params.set('assigneeUserId', assigneeUserId)
     return request(`/api/crm/deals?${params}`, { timeoutMs: 45_000 })
   },
+  createCrmDeal: (payload) =>
+    request('/api/crm/deals', { method: 'POST', body: payload, timeoutMs: 30_000 }),
+  duplicateCrmDeal: (payload) =>
+    request('/api/crm/deals', { method: 'POST', body: { action: 'duplicate', ...payload }, timeoutMs: 30_000 }),
   patchCrmDeal: (body) => request('/api/crm/deals', { method: 'PATCH', body, timeoutMs: 30_000 }),
+  deleteCrmDeal: (dealId) =>
+    request('/api/crm/deals', { method: 'DELETE', body: { dealId }, timeoutMs: 30_000 }),
   getWorkflowRuns: ({ limit = 50, trigger, leadId } = {}) => {
     const params = new URLSearchParams()
     if (limit) params.set('limit', String(limit))
