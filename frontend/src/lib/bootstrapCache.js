@@ -52,3 +52,24 @@ export function clearBootstrapCache(key) {
     // ignore
   }
 }
+
+/** Clear all cached pipeline bootstrap payloads for this user (after CRM mutations). */
+export function clearPipelineBootstrapCachesForUser(user) {
+  if (!user?.id) return
+  const org = user.organizationId || 'solo'
+  const uid = user.id
+  const prefixes = [`ci-bootstrap-cache:pipeline:${org}:${uid}:`]
+  for (const key of [...memory.keys()]) {
+    if (prefixes.some((p) => key.includes(`pipeline:${org}:${uid}:`))) memory.delete(key)
+  }
+  try {
+    for (let i = sessionStorage.length - 1; i >= 0; i -= 1) {
+      const k = sessionStorage.key(i)
+      if (k && prefixes.some((p) => k.includes(`pipeline:${org}:${uid}:`))) {
+        sessionStorage.removeItem(k)
+      }
+    }
+  } catch {
+    // ignore
+  }
+}

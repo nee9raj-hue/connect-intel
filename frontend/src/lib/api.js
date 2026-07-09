@@ -202,6 +202,7 @@ export const api = {
     followUpDue,
     overdueFollowUp,
     silent = false,
+    fresh = false,
   } = {}) => {
     const qs = new URLSearchParams({ limit: String(limit), offset: String(offset) })
     if (cursor) qs.set('cursor', cursor)
@@ -219,8 +220,13 @@ export const api = {
     if (minLeadScore != null && minLeadScore !== '') qs.set('minLeadScore', String(minLeadScore))
     if (followUpDue) qs.set('followUpDue', '1')
     if (overdueFollowUp) qs.set('overdueFollowUp', '1')
+    if (fresh) qs.set('fresh', '1')
     const path = `/api/pipeline/bootstrap?${qs}`
-    return dedupeGet(`pipeline-bootstrap:${path}`, () =>
+    const dedupeKey = `pipeline-bootstrap:${path}`
+    if (fresh) {
+      return request(path, { timeoutMs: 60_000 }, { silent })
+    }
+    return dedupeGet(dedupeKey, () =>
       request(path, { timeoutMs: 60_000 }, { silent })
     )
   },

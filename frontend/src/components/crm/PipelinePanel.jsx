@@ -767,25 +767,6 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   }, [serverSidePipeline, serverFilters, loadPipelineList, hasActiveServerFilters])
 
   useEffect(() => {
-    if (!serverSidePipeline) return undefined
-    void refreshPipelineSummary({
-      assigneeUserId: serverFilters.assigneeUserId,
-      tagIds: serverFilters.tagIds,
-      q: serverFilters.q,
-      cities: serverFilters.cities,
-      states: serverFilters.states,
-    })
-  }, [
-    serverSidePipeline,
-    refreshPipelineSummary,
-    serverFilters.assigneeUserId,
-    serverFilters.tagIds,
-    serverFilters.q,
-    serverFilters.cities,
-    serverFilters.states,
-  ])
-
-  useEffect(() => {
     if (!serverSidePipeline || view !== 'board' || stageListMode) {
       setBoardLeadsByStatus(null)
       return undefined
@@ -1194,13 +1175,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       }
       if (serverSidePipeline && actions.assignToUserId !== undefined && hasActiveServerFilters) {
         void loadPipelineList(serverFilters, { append: false, silent: true }).catch(() => {})
-        void refreshPipelineSummary({
-          assigneeUserId: serverFilters.assigneeUserId,
-          tagIds: serverFilters.tagIds,
-          q: serverFilters.q,
-          cities: serverFilters.cities,
-          states: serverFilters.states,
-        })
+        void refreshPipelineSummary()
       }
       setSelectedIds(new Set())
       setBulkAssignOpen(false)
@@ -1609,13 +1584,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                   }
                   if (serverSidePipeline && hasActiveServerFilters) {
                     void loadPipelineList(serverFilters, { append: false, silent: true }).catch(() => {})
-                    void refreshPipelineSummary({
-                      assigneeUserId: serverFilters.assigneeUserId,
-                      tagIds: serverFilters.tagIds,
-                      q: serverFilters.q,
-                      cities: serverFilters.cities,
-                      states: serverFilters.states,
-                    })
+                    void refreshPipelineSummary()
                   } else {
                     await refreshSavedLeads()
                   }

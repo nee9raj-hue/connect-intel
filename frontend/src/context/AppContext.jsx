@@ -4,10 +4,11 @@ import { storeSessionToken, getSessionToken } from '../lib/sessionAuth'
 import { defaultCrm } from '../lib/crmConstants'
 import { loadReadNotificationIds, saveReadNotificationIds } from '../lib/notificationStorage'
 import { getNotificationTarget } from '../lib/notificationNavigation'
-import { navTargetToOptions, normalizePipelineSummary } from '../lib/navConfig'
+import { navTargetToOptions, normalizePipelineSummary, bumpPipelineSummaryStatus } from '../lib/navConfig'
 import { withTimeout } from '../lib/fetchWithTimeout'
 import { clearAppNavigationState, preparePostLoginNavigation } from '../lib/appHistory'
 import {
+  clearPipelineBootstrapCachesForUser,
   pipelineBootstrapCacheKey,
   readBootstrapCache,
   writeBootstrapCache,
@@ -338,17 +339,14 @@ export function AppProvider({ children }) {
     [pipelineAssigneeFilter]
   )
 
-  const refreshPipelineSummary = useCallback(async (filters = {}) => {
+  const refreshPipelineSummary = useCallback(async () => {
     try {
+      clearPipelineBootstrapCachesForUser(user)
       const data = await api.getPipelineBootstrap({
         summaryOnly: true,
         silent: true,
         status: 'all',
-        assigneeUserId: filters.assigneeUserId || undefined,
-        tagIds: filters.tagIds,
-        q: filters.q || undefined,
-        cities: filters.cities,
-        states: filters.states,
+        fresh: true,
       })
       if (data?.summary) {
         setPipelineSummary(normalizePipelineSummary(data.summary))
@@ -356,7 +354,7 @@ export function AppProvider({ children }) {
     } catch {
       // keep last summary
     }
-  }, [])
+  }, [user])
 
   const mergeNotificationItems = useCallback((newItems) => {
     if (!newItems?.length) return []
@@ -634,12 +632,13 @@ export function AppProvider({ children }) {
     }
   }, [user?.id, user?.organizationId, user?.accountType])
 
-  /** Sidebar counts only — no lead list reload (60s). */
+  /** Sidebar counts only — org-wide SQL summary, no lead list reload (60s). */
   useEffect(() => {
     if (!user?.id) return
     const refreshCounts = () => {
+      clearPipelineBootstrapCachesForUser(user)
       api
-        .getPipelineBootstrap({ summaryOnly: true, silent: true })
+        .getPipelineBootstrap({ summaryOnly: true, silent: true, status: 'all', fresh: true })
         .then((data) => {
           if (data?.summary) {
             setPipelineSummary(normalizePipelineSummary(data.summary))
@@ -649,7 +648,7 @@ export function AppProvider({ children }) {
     }
     const timer = setInterval(refreshCounts, 60_000)
     return () => clearInterval(timer)
-  }, [user?.id])
+  }, [user])
 
   useEffect(() => {
     if (!user?.id || !pipelineAssigneeFilter) return
@@ -788,8 +787,11 @@ export function AppProvider({ children }) {
 
   const patchLead = useCallback(async (leadId, body) => {
     let previous = []
+    let previousStatus = null
     setSavedLeads((current) => {
       previous = current
+      const hit = current.find((l) => l.id === leadId)
+      previousStatus = hit?.crm?.status || 'new'
       if (body?.crm && typeof body.crm === 'object') {
         return current.map((lead) =>
           lead.id === leadId ? { ...lead, crm: { ...(lead.crm || {}), ...body.crm } } : lead
@@ -811,6 +813,17 @@ export function AppProvider({ children }) {
       }
       return current
     })
+
+    const nextStatus = body?.crm?.status
+    const statusChanged =
+      nextStatus != null && String(nextStatus) !== String(previousStatus || 'new')
+    let previousSummary = null
+    if (statusChanged) {
+      setPipelineSummary((summary) => {
+        previousSummary = summary
+        return bumpPipelineSummaryStatus(summary, previousStatus, nextStatus)
+      })
+    }
 
     const CRM_PATCH_WITHOUT_RELOAD = new Set([
       'status',
@@ -847,12 +860,18 @@ export function AppProvider({ children }) {
           .then((summary) => setPipelineSummary(normalizePipelineSummary(summary)))
           .catch(() => {})
       }
+      if (statusChanged) {
+        void refreshPipelineSummary()
+      }
       return lead
     } catch (error) {
       setSavedLeads(previous)
+      if (statusChanged && previousSummary) {
+        setPipelineSummary(previousSummary)
+      }
       throw error
     }
-  }, [pipelineLeadId])
+  }, [pipelineLeadId, refreshPipelineSummary, user])
 
   const updateSavedLeadCrm = useCallback(
     async (leadId, crmPatch) => patchLead(leadId, { crm: crmPatch }),
