@@ -23,6 +23,12 @@ const REQUIRED = [
   'icons/icon-128.png',
   'lib/api.js',
   'lib/runtime.js',
+  'lib/gmailParticipants.js',
+  'lib/gmailKeyboardIsolate.js',
+  'lib/linkedinCaptureParse.js',
+  'lib/contactPageParse.js',
+  'lib/pageCapture.js',
+  'content/captureWidget.js',
   'content/pageWidget.js',
 ]
 

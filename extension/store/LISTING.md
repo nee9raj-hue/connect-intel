@@ -1,7 +1,7 @@
-# Chrome Web Store listing copy — Connect Intel v1.0
+# Chrome Web Store listing copy — Connect Intel v1.2
 
 Use this text in the [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole).  
-After the first upload, add the public URL to `extension/README.md` and team onboarding docs.
+After the first upload, set `CHROME_EXTENSION_STORE_URL` on Vercel (see `docs/CHROME_WEB_STORE.md`).
 
 ---
 
@@ -20,7 +20,7 @@ After the first upload, add the public URL to `extension/README.md` and team onb
 ### Short description (≤132 characters)
 
 ```
-CRM companion for Gmail & LinkedIn — match pipeline leads, sync trails, capture profiles, draft & send from CRM.
+CRM companion for Gmail, LinkedIn & contact pages — match leads, sync trails, capture contacts, send from CRM.
 ```
 
 ### Detailed description
@@ -28,7 +28,7 @@ CRM companion for Gmail & LinkedIn — match pipeline leads, sync trails, captur
 ```
 Connect Intel is the browser companion for customers of Connect Intel CRM (https://connectintel.net).
 
-Requires an active Connect Intel account. Sign in on connectintel.net in the same Chrome profile, then use this extension on Gmail and LinkedIn.
+Requires an active Connect Intel account. Sign in on connectintel.net in the same Chrome profile, then use this extension on Gmail, LinkedIn, and contact-rich websites.
 
 GMAIL
 • Match the open email thread to a pipeline lead in your workspace
@@ -36,8 +36,9 @@ GMAIL
 • Generate AI email drafts and send from your connected work Gmail
 • Log outbound mail to the lead record automatically
 
-LINKEDIN
-• Add a profile or company page to your pipeline with one click
+LINKEDIN & CONTACT PAGES
+• Add a LinkedIn profile or company page to your pipeline with one click
+• Capture contacts from team/about pages (schema.org, mailto, tel, headings)
 • Audited capture — all logic runs on Connect Intel servers
 
 PRIVACY & SECURITY

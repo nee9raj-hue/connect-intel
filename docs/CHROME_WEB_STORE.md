@@ -11,7 +11,8 @@
 
 | Item | State |
 |------|--------|
-| Extension v1.0 code | ✅ Ready (`manifest` version `1.0.0`) |
+| Extension v1.2 code | ✅ Ready (`manifest` version `1.2.0`) |
+| Store URL in app | ✅ `CHROME_EXTENSION_STORE_URL` → `/api/public-config` + Team → Integrations |
 | Store listing copy | ✅ `extension/store/LISTING.md` |
 | Privacy policy (extension section) | ✅ `frontend/public/privacy.html` |
 | Package script | ✅ `npm run extension:package` |
@@ -39,7 +40,7 @@ npm run extension:verify
 npm run extension:package
 ```
 
-Output: `dist/connect-intel-chrome-extension-1.0.0.zip`
+Output: `dist/connect-intel-chrome-extension-1.2.0.zip`
 
 The zip contains `manifest.json` at the **root** (required by Google).
 

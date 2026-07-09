@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { useApp } from '../../context/AppContext'
 import { pipelineCountsFromSummary } from '../../lib/navConfig'
 import { GMAIL_ONBOARDING_PROMPT_ENABLED } from '../../lib/crmProductFlags'
+import { loadChromeExtensionDistribution, openChromeWebStore } from '../../lib/chromeExtension'
 
 const DISMISS_PREFIX = 'ci_crm_setup_dismissed_'
 
@@ -20,6 +21,13 @@ export default function CrmGettingStarted({ onNavigate, pipelineSummary }) {
     if (!dismissKey || typeof window === 'undefined') return false
     return window.localStorage.getItem(dismissKey) === '1'
   })
+  const [extensionStoreUrl, setExtensionStoreUrl] = useState(null)
+
+  useEffect(() => {
+    loadChromeExtensionDistribution()
+      .then((dist) => setExtensionStoreUrl(dist.storeUrl))
+      .catch(() => {})
+  }, [])
 
   const leadCount = useMemo(() => {
     const counts = pipelineCountsFromSummary(pipelineSummary, [])
@@ -62,6 +70,18 @@ export default function CrmGettingStarted({ onNavigate, pipelineSummary }) {
         },
         ...(GMAIL_ONBOARDING_PROMPT_ENABLED ? [gmailStep(true)] : []),
         {
+          id: 'extension',
+          title: 'Install Chrome extension',
+          detail: extensionStoreUrl
+            ? 'Gmail match, LinkedIn capture, and trail sync from your browser.'
+            : 'Load unpacked from the repo extension/ folder, or install from Chrome Web Store when published.',
+          done: false,
+          optional: true,
+          externalUrl: extensionStoreUrl,
+          action: { panel: 'team', teamTab: 'integrations' },
+          cta: extensionStoreUrl ? 'Install' : 'Integrations',
+        },
+        {
           id: 'calendar',
           title: 'Plan follow-ups',
           detail: 'Tasks and meetings live on Calendar and each lead.',
@@ -83,6 +103,18 @@ export default function CrmGettingStarted({ onNavigate, pipelineSummary }) {
       },
       ...(GMAIL_ONBOARDING_PROMPT_ENABLED ? [gmailStep(false)] : []),
       {
+        id: 'extension',
+        title: 'Install Chrome extension',
+        detail: extensionStoreUrl
+          ? 'Match Gmail threads to leads and capture LinkedIn profiles faster.'
+          : 'Ask your admin for the Web Store link, or use Team → Integrations for setup.',
+        done: false,
+        optional: true,
+        externalUrl: extensionStoreUrl,
+        action: { panel: 'team', teamTab: 'integrations' },
+        cta: extensionStoreUrl ? 'Install' : 'Integrations',
+      },
+      {
         id: 'calendar',
         title: 'Check today’s calendar',
         detail: 'Meetings and tasks due today.',
@@ -92,7 +124,7 @@ export default function CrmGettingStarted({ onNavigate, pipelineSummary }) {
         cta: 'Calendar',
       },
     ]
-  }, [isAdmin, memberCount, leadCount])
+  }, [isAdmin, memberCount, leadCount, extensionStoreUrl])
 
   const requiredSteps = steps.filter((s) => !s.optional)
   const doneCount = requiredSteps.filter((s) => s.done).length
@@ -132,7 +164,13 @@ export default function CrmGettingStarted({ onNavigate, pipelineSummary }) {
             <button
               type="button"
               className="dash-home__link shrink-0"
-              onClick={() => onNavigate?.(step.action.panel, step.action)}
+              onClick={() => {
+                if (step.externalUrl) {
+                  openChromeWebStore(step.externalUrl)
+                  return
+                }
+                onNavigate?.(step.action.panel, step.action)
+              }}
             >
               {step.cta} →
             </button>

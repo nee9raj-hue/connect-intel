@@ -1,7 +1,7 @@
 # Chrome extension — constitution alignment
 
 **Phase:** 22 Integrations (partial → extension catalog)  
-**Status:** v1.0 ready for Chrome Web Store · see [CHROME_WEB_STORE.md](./CHROME_WEB_STORE.md)
+**Status:** v1.2 ready for Chrome Web Store · see [CHROME_WEB_STORE.md](./CHROME_WEB_STORE.md)
 **Stack:** Manifest V3 · service worker · Gmail content script · existing Vercel APIs
 
 ---
@@ -54,7 +54,7 @@ No extension-specific OAuth client in v0.1.
 | **v0.3** ✅ | Gmail compose helper — AI draft + send & log via `crm-send-email` |
 | **v1.0** ✅ | Chrome Web Store package, listing copy, privacy disclosure (`npm run extension:package`) |
 | **v1.2** ✅ | Smart contact capture on team/about/directory pages (schema.org, mailto/tel, headings) |
-| v1.1 | Post-launch: store URL in app (`CHROME_EXTENSION_STORE_URL`), account hierarchy UI |
+| **v1.1** ✅ | Store URL in app via `CHROME_EXTENSION_STORE_URL` (`/api/public-config` + Team → Integrations) |
 
 ---
 
