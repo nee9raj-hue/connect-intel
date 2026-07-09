@@ -97,7 +97,7 @@ Connect Intel has **two workflow systems** today. The engineering constitution r
 | Capability | Marketing graph | CRM rules | Sequences |
 |------------|-----------------|-----------|-----------|
 | Visual editor | ✅ | Partial | ❌ |
-| Versioning | ❌ | ❌ | ❌ |
+| Versioning | ✅ publish snapshots | ✅ publish snapshots | ✅ on active publish |
 | Audit trail | Partial runs | ❌ | Partial |
 | Delay steps | ✅ | ❌ | ✅ |
 | Branching | ✅ | Limited | ❌ |
