@@ -1011,10 +1011,15 @@ export const api = {
   processCrmSequences: () => request('/api/crm/sequences?process=1'),
   getCrmSettings: () => request('/api/crm/settings'),
   updateCrmSettings: (payload) => request('/api/crm/settings', { method: 'PATCH', body: payload }),
-  getCompaniesHub: ({ q = '', limit = 50, offset = 0 } = {}) =>
-    request(
-      `/api/companies/hub?q=${encodeURIComponent(q)}&limit=${limit}&offset=${offset}`
-    ),
+  getCompaniesHub: ({ q = '', limit = 50, offset = 0, rootsOnly = false } = {}) => {
+    const params = new URLSearchParams({
+      limit: String(limit),
+      offset: String(offset),
+    })
+    if (q) params.set('q', q)
+    if (rootsOnly) params.set('rootsOnly', '1')
+    return request(`/api/companies/hub?${params.toString()}`)
+  },
   getCompanyDetail: (companyId) =>
     request(`/api/companies/hub?companyId=${encodeURIComponent(companyId)}`),
   patchCompanyParent: (companyId, parentCompanyId) =>

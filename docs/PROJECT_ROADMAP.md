@@ -284,8 +284,8 @@ Hub aggregation tests (PLANNED)
 
 ### Acceptance criteria
 - [x] Search accounts by name
-- [ ] Domain-based account matching
-- [ ] Parent/child account hierarchy
+- [x] Domain-based account matching
+- [x] Parent/child account hierarchy (`PATCH /api/companies/hub`, rollup metrics, sync-safe parents)
 
 ---
 

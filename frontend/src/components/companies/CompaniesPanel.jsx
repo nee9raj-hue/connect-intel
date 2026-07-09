@@ -15,13 +15,14 @@ export default function CompaniesPanel({ onNavigate }) {
   const [detail, setDetail] = useState(null)
   const [detailLoading, setDetailLoading] = useState(false)
   const [parentSaving, setParentSaving] = useState(false)
+  const [rootsOnly, setRootsOnly] = useState(false)
   const [error, setError] = useState(null)
 
   const load = useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
-      const res = await api.getCompaniesHub({ q: applied })
+      const res = await api.getCompaniesHub({ q: applied, rootsOnly })
       setCompanies(res.companies || [])
       setTotal(res.total || 0)
       setHierarchyEnabled(Boolean(res.hierarchyEnabled))
@@ -30,7 +31,7 @@ export default function CompaniesPanel({ onNavigate }) {
     } finally {
       setLoading(false)
     }
-  }, [applied])
+  }, [applied, rootsOnly])
 
   useEffect(() => {
     load()
@@ -84,7 +85,7 @@ export default function CompaniesPanel({ onNavigate }) {
       </header>
 
       <div className="panel-body-scroll p-5 space-y-4">
-        <div className="flex flex-wrap gap-2 max-w-xl">
+        <div className="flex flex-wrap items-center gap-3 max-w-xl">
           <input
             className="ci-input flex-1 min-w-[12rem]"
             placeholder="Search companies…"
@@ -95,6 +96,16 @@ export default function CompaniesPanel({ onNavigate }) {
           <button type="button" className="ci-btn ci-btn-accent" onClick={() => setApplied(search.trim())}>
             Search
           </button>
+          {hierarchyEnabled ? (
+            <label className="flex items-center gap-2 text-xs text-gray-600 whitespace-nowrap">
+              <input
+                type="checkbox"
+                checked={rootsOnly}
+                onChange={(e) => setRootsOnly(e.target.checked)}
+              />
+              Top-level only
+            </label>
+          ) : null}
         </div>
 
         {error && <p className="text-sm text-red-700">{error}</p>}
@@ -119,9 +130,15 @@ export default function CompaniesPanel({ onNavigate }) {
                         <p className="font-semibold text-sm text-gray-900">{c.name}</p>
                         <p className="text-xs text-gray-500 mt-0.5">
                           {c.parentName && <span>Under {c.parentName} · </span>}
-                          {c.leadCount} contact{c.leadCount === 1 ? '' : 's'}
+                          {(c.rollupLeadCount ?? c.leadCount) || 0} contact
+                          {(c.rollupLeadCount ?? c.leadCount) === 1 ? '' : 's'}
+                          {c.rollupLeadCount > c.leadCount &&
+                            ` (${c.leadCount} direct · ${c.rollupLeadCount} incl. children)`}
                           {c.childCount > 0 && ` · ${c.childCount} child account${c.childCount === 1 ? '' : 's'}`}
-                          {c.openDeals > 0 && ` · ${c.openDeals} open deal${c.openDeals === 1 ? '' : 's'}`}
+                          {(c.rollupOpenDeals ?? c.openDeals) > 0 &&
+                            ` · ${c.rollupOpenDeals ?? c.openDeals} open deal${
+                              (c.rollupOpenDeals ?? c.openDeals) === 1 ? '' : 's'
+                            }`}
                         </p>
                       </button>
                     </li>
@@ -156,9 +173,15 @@ export default function CompaniesPanel({ onNavigate }) {
                       </p>
                     )}
                     <div className="flex flex-wrap gap-3 mt-2 text-xs text-gray-600">
-                      <span>{detail.leadCount} contacts</span>
-                      <span>{detail.openDeals} open deals</span>
-                      <span>{detail.wonDeals} won</span>
+                      <span>
+                        {detail.rollupLeadCount ?? detail.leadCount} contacts
+                        {detail.rollupLeadCount > detail.leadCount &&
+                          ` (${detail.leadCount} direct)`}
+                      </span>
+                      <span>
+                        {detail.rollupOpenDeals ?? detail.openDeals} open deals
+                      </span>
+                      <span>{detail.rollupWonDeals ?? detail.wonDeals} won</span>
                       {detail.lastActivityAt && (
                         <span>Last activity {formatDateTime(detail.lastActivityAt)}</span>
                       )}
