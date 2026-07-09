@@ -267,7 +267,7 @@ function DealRow({
 
 /** Deals on a lead — compact cards, minimal copy. */
 export default function LeadDealsSection({ lead, patchLead, user, busy = false, onNotice, onError }) {
-  const { logCrmEmailSend } = useApp()
+  const { logCrmEmailSend, consumePendingFreightRfq } = useApp()
   const crm = lead.crm || {}
   const deals = crm.deals || []
   const freightOrg = isFreightDealOrg(user)
@@ -316,6 +316,15 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
   useEffect(() => {
     if (!nameTouched) setName(suggestedDealName)
   }, [suggestedDealName, nameTouched])
+
+  useEffect(() => {
+    const prefill = consumePendingFreightRfq?.(lead.id)
+    if (!prefill || !freightOrg) return
+    setFreight({ ...emptyFreightRfq(), ...prefill })
+    setStage('rfq')
+    setShowCreate(true)
+    onNotice?.('RFQ fields prefilled from Copilot — review and save the deal.')
+  }, [lead.id, freightOrg, consumePendingFreightRfq, onNotice])
 
   const runDeal = async (body, okMsg) => {
     if (saving || busy) return false

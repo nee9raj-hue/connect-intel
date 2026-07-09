@@ -117,6 +117,7 @@ export function AppProvider({ children }) {
   const closePipelineLeadRef = useRef(null)
   const pendingLeadOpenRef = useRef({ leadId: null, tab: null })
   const pendingEmailDraftRef = useRef(null)
+  const pendingFreightRfqRef = useRef(null)
   const workspaceLoadedAtRef = useRef(0)
   const workspaceLoadInFlightRef = useRef(null)
   const teamFetchAtRef = useRef(0)
@@ -1091,6 +1092,23 @@ export function AppProvider({ children }) {
     return null
   }, [])
 
+  const openPipelineFreightRfq = useCallback((leadId, freight) => {
+    if (!leadId || !freight) return
+    pendingFreightRfqRef.current = { leadId, freight }
+    pendingLeadOpenRef.current = { leadId, tab: 'deals' }
+    setPipelineLeadId(leadId)
+    void api.postWorkspacePulse({ leadId, panel: 'pipeline' }, { silent: true })
+  }, [])
+
+  const consumePendingFreightRfq = useCallback((leadId) => {
+    const pending = pendingFreightRfqRef.current
+    if (pending?.leadId != null && String(pending.leadId) === String(leadId) && pending.freight) {
+      pendingFreightRfqRef.current = null
+      return pending.freight
+    }
+    return null
+  }, [])
+
   const openContact = useCallback((contactId) => {
     if (!contactId) return
     setContactsFocusId(contactId)
@@ -1201,9 +1219,11 @@ export function AppProvider({ children }) {
         saveEmailSignature,
         openPipelineLead,
         openPipelineEmailDraft,
+        openPipelineFreightRfq,
         closePipelineLead,
         consumePendingLeadTab,
         consumePendingEmailDraft,
+        consumePendingFreightRfq,
         openContact,
         contactsFocusId,
         clearContactsFocus,

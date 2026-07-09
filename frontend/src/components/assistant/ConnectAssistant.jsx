@@ -9,13 +9,14 @@ import { CrmAiIcon } from './ConnectAIFab'
 import CopilotCompanyCard from './CopilotCompanyCard'
 import CopilotCompanyList, { CopilotPlanSteps } from './CopilotCompanyList'
 import CopilotPeopleList from './CopilotPeopleList'
+import CopilotRfqCard from './CopilotRfqCard'
 import {
   renderAssistantMarkdown,
   sourceBadgesFromMessage,
   confidenceLabel,
 } from './assistantMessageRender'
 
-function MessageBubble({ msg, onAction, onEdit, editing }) {
+function MessageBubble({ msg, onAction, onEdit, editing, onApplyRfq }) {
   const isUser = msg.role === 'user'
   const badges = !isUser ? sourceBadgesFromMessage(msg) : []
   const conf = !isUser ? confidenceLabel(msg.confidence) : null
@@ -79,6 +80,22 @@ function MessageBubble({ msg, onAction, onEdit, editing }) {
       {!isUser && msg.companyCard && !msg.companies?.length ? (
         <CopilotCompanyCard card={msg.companyCard} onAction={onAction} />
       ) : null}
+      {!isUser && msg.rfqPrefill ? (
+        <CopilotRfqCard
+          freight={msg.rfqPrefill}
+          onApply={
+            onApplyRfq
+              ? () =>
+                  onApplyRfq(
+                    msg.actions?.find((a) => a.type === 'apply_rfq') || {
+                      type: 'apply_rfq',
+                      payload: { freight: msg.rfqPrefill },
+                    }
+                  )
+              : null
+          }
+        />
+      ) : null}
     </div>
   )
 }
@@ -97,7 +114,7 @@ export default function ConnectAssistant({
   panelOptions,
   pipelineLeadId,
 }) {
-  const { user, openPipelineLead, openPipelineEmailDraft } = useApp()
+  const { user, openPipelineLead, openPipelineEmailDraft, openPipelineFreightRfq } = useApp()
   const isMobile = useIsMobile()
   const [messages, setMessages] = useState([])
   const [myTickets, setMyTickets] = useState([])
@@ -256,6 +273,17 @@ export default function ConnectAssistant({
         return
       }
 
+      if (action.type === 'apply_rfq' && action.payload?.freight) {
+        const leadId = action.leadId || pipelineLeadId
+        if (!leadId) {
+          setStatus('Open a lead first, then apply the RFQ.')
+          return
+        }
+        openPipelineFreightRfq(leadId, action.payload.freight)
+        onOpenChange?.(false)
+        return
+      }
+
       if (action.type === 'create_lead' && action.payload) {
         try {
           const data = await api.addManualLead(action.payload)
@@ -282,7 +310,19 @@ export default function ConnectAssistant({
       })
       if (ok && action.type !== 'escalate') onOpenChange?.(false)
     },
-    [onNavigate, openPipelineLead, openPipelineEmailDraft, messages, onOpenChange]
+    [onNavigate, openPipelineLead, openPipelineEmailDraft, openPipelineFreightRfq, pipelineLeadId, messages, onOpenChange]
+  )
+
+  const handleApplyRfq = useCallback(
+    (action) => {
+      handleAction({
+        type: 'apply_rfq',
+        leadId: action.leadId || pipelineLeadId,
+        payload: action.payload,
+        label: action.label || 'Apply to deal RFQ',
+      })
+    },
+    [handleAction, pipelineLeadId]
   )
 
   const startEditMessage = useCallback((msg) => {
@@ -478,6 +518,7 @@ export default function ConnectAssistant({
               key={msg.id}
               msg={msg}
               onAction={handleAction}
+              onApplyRfq={handleApplyRfq}
               onEdit={msg.role === 'user' ? startEditMessage : null}
               editing={editingMessageId === msg.id}
             />
