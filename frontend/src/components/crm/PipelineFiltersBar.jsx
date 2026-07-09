@@ -59,6 +59,9 @@ export default function PipelineFiltersBar({
   onRemoveAppliedFilter,
   canSaveAsAudience = false,
   onSaveAsAudience,
+  canSaveReport = false,
+  onSaveReport,
+  onRunSavedReport,
   canShowOwnerFilter = false,
   ownerFilter = null,
   ownerOptions = [],
@@ -66,6 +69,7 @@ export default function PipelineFiltersBar({
   statusCounts = {},
 }) {
   const [savedViews, setSavedViews] = useState([])
+  const [savedReports, setSavedReports] = useState([])
   const [activeFilter, setActiveFilter] = useState(null)
   const useMobileFilterSheet = usePipelineFilterMobile()
 
@@ -78,9 +82,19 @@ export default function PipelineFiltersBar({
     }
   }, [])
 
+  const loadReports = useCallback(async () => {
+    try {
+      const data = await api.getReportDefinitions()
+      setSavedReports(data.reports || [])
+    } catch {
+      setSavedReports([])
+    }
+  }, [])
+
   useEffect(() => {
     loadViews()
-  }, [loadViews])
+    loadReports()
+  }, [loadViews, loadReports])
 
   const handleApply = () => onApplyFilters?.()
 
@@ -125,6 +139,7 @@ export default function PipelineFiltersBar({
     (activeSmartViewId ? 1 : 0)
 
   const openFilter = (type) => {
+    if (type === 'advanced') void loadReports()
     setActiveFilter({
       type,
       draft: {
@@ -297,6 +312,24 @@ export default function PipelineFiltersBar({
                   emptyLabel="None"
                   onChange={updateFilterDraftSmartView}
                 />
+              </section>
+            ) : null}
+            {savedReports.length > 0 ? (
+              <section className="pipeline-filter-popout-section">
+                <p className="hs-advanced-filter-label">Saved reports</p>
+                <ul className="pipeline-saved-reports-list">
+                  {savedReports.map((report) => (
+                    <li key={report.id}>
+                      <button
+                        type="button"
+                        className="crm-filter-link-btn text-left w-full"
+                        onClick={() => onRunSavedReport?.(report)}
+                      >
+                        Export {report.shared ? `${report.name} (Team)` : report.name}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
               </section>
             ) : null}
             {orgLeadTags.length > 0 ? (
@@ -617,6 +650,11 @@ export default function PipelineFiltersBar({
           {canSaveAsAudience ? (
             <button type="button" className="crm-filter-link-btn" onClick={onSaveAsAudience}>
               Save as audience
+            </button>
+          ) : null}
+          {canSaveReport ? (
+            <button type="button" className="crm-filter-link-btn" onClick={onSaveReport}>
+              Save as report
             </button>
           ) : null}
           {appliedSearch && (

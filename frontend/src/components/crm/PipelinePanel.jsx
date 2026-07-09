@@ -39,7 +39,7 @@ import { leadHasCallablePhone } from '../../lib/phoneUtils'
 import LeadPhoneCall from './LeadPhoneCall'
 import { leadHasSendableEmail, getLeadEmail } from '../../lib/emailUtils'
 import { getLeadCity, getLeadState } from '../../lib/pipelineFilters'
-import PipelineDealsView from './PipelineDealsView'
+import SaveReportModal from './SaveReportModal'
 import { isFreightDealOrg } from '../../lib/freightDeal'
 import { getDealStageMeta } from '../../lib/crmConstants'
 import {
@@ -166,6 +166,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const [emailGuide, setEmailGuide] = useState({ open: false, variant: 'guide_marketing' })
   const [createAudienceOpen, setCreateAudienceOpen] = useState(false)
   const [saveFilterAudienceOpen, setSaveFilterAudienceOpen] = useState(false)
+  const [saveReportOpen, setSaveReportOpen] = useState(false)
   const [batchListsOpen, setBatchListsOpen] = useState(false)
   const [batchListsCreated, setBatchListsCreated] = useState(null)
   const [audienceCreated, setAudienceCreated] = useState(null)
@@ -1272,6 +1273,12 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     [selectedIds.size, selectedLeads, policies, runBulk]
   )
 
+  const canExportLeads =
+    !user?.organizationId ||
+    user?.accountType !== 'company' ||
+    !user?.orgPermissions ||
+    Boolean(user.orgPermissions.export_leads)
+
   const downloadLeadsCsv = useCallback((rows) => {
     if (!rows.length) return
     const headers = ['Name', 'Email', 'Phone', 'Company', 'Status', 'City', 'State']
@@ -1301,46 +1308,81 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     URL.revokeObjectURL(url)
   }, [])
 
-  const canExportLeads =
-    !user?.organizationId ||
-    user?.accountType !== 'company' ||
-    !user?.orgPermissions ||
-    Boolean(user.orgPermissions.export_leads)
+  const exportRowCount = useMemo(
+    () => pipelineLoad.total || pipelineSummary.total || filtered.length,
+    [pipelineLoad.total, pipelineSummary.total, filtered.length]
+  )
 
-  const exportVisibleLeads = useCallback(() => {
-    const rows = filtered
-    if (!rows.length) return
+  const useServerPipelineExport =
+    serverSidePipeline || exportRowCount > filtered.length || hasActiveServerFilters
+
+  const performPipelineExport = useCallback(async () => {
     if (!canExportLeads) {
       setBulkNotice('Export is disabled for your role. Ask your admin in Team → Permissions.')
       return
     }
-    const mode = evaluateExport(rows.length, user, policies)
+    if (useServerPipelineExport) {
+      try {
+        await api.exportPipelineReport(serverFilters, { timeoutMs: 120_000 })
+      } catch (e) {
+        setBulkNotice(e.message || 'Export failed')
+      }
+      return
+    }
+    downloadLeadsCsv(filtered)
+  }, [canExportLeads, useServerPipelineExport, serverFilters, filtered, downloadLeadsCsv])
+
+  const runSavedReportExport = useCallback(
+    async (report) => {
+      if (!canExportLeads) {
+        setBulkNotice('Export is disabled for your role. Ask your admin in Team → Permissions.')
+        return
+      }
+      try {
+        await api.exportPipelineReport({}, { reportId: report.id, timeoutMs: 120_000 })
+        setBulkNotice(`Exported “${report.name}” — check your downloads.`)
+      } catch (e) {
+        setBulkNotice(e.message || 'Export failed')
+      }
+    },
+    [canExportLeads]
+  )
+
+  const exportVisibleLeads = useCallback(() => {
+    const count = exportRowCount
+    if (!count && !filtered.length) return
+    if (!canExportLeads) {
+      setBulkNotice('Export is disabled for your role. Ask your admin in Team → Permissions.')
+      return
+    }
+    const mode = evaluateExport(count || filtered.length, user, policies)
     if (mode === 'instant') {
-      downloadLeadsCsv(rows)
+      void performPipelineExport()
       return
     }
     setExportGuard({ open: true, mode, preparing: mode === 'background' })
-  }, [filtered, user, policies, downloadLeadsCsv, canExportLeads])
+  }, [exportRowCount, filtered.length, user, policies, performPipelineExport, canExportLeads])
 
   const runProtectedExport = useCallback(() => {
-    const rows = filtered
     const mode = exportGuard.mode
     if (mode === 'prepare') {
       setExportGuard((g) => ({ ...g, preparing: true }))
       window.setTimeout(() => {
-        downloadLeadsCsv(rows)
-        setExportGuard({ open: false, mode: 'instant', preparing: false })
+        void performPipelineExport().finally(() => {
+          setExportGuard({ open: false, mode: 'instant', preparing: false })
+        })
       }, 600)
       return
     }
     if (mode === 'background') {
       window.setTimeout(() => {
-        downloadLeadsCsv(rows)
-        setExportGuard({ open: false, mode: 'instant', preparing: false })
-        setBulkNotice('Your export is ready — check your downloads.')
+        void performPipelineExport().finally(() => {
+          setExportGuard({ open: false, mode: 'instant', preparing: false })
+          setBulkNotice('Your export is ready — check your downloads.')
+        })
       }, 1200)
     }
-  }, [filtered, exportGuard.mode, downloadLeadsCsv])
+  }, [exportGuard.mode, performPipelineExport])
 
   const listOrStageView = view === 'list' || stageListMode
   const useHubSpotList = listOrStageView
@@ -1510,6 +1552,9 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               onRemoveAppliedFilter={removeAppliedFilter}
               canSaveAsAudience={canSaveAsAudience}
               onSaveAsAudience={() => setSaveFilterAudienceOpen(true)}
+              canSaveReport={canSaveAsAudience}
+              onSaveReport={() => setSaveReportOpen(true)}
+              onRunSavedReport={runSavedReportExport}
               canShowOwnerFilter={canFilterByOwner}
               ownerFilter={effectiveAssigneeFilter}
               ownerOptions={ownerFilterOptions}
@@ -1812,6 +1857,18 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
         onCreated={(data) => {
           setSaveFilterAudienceOpen(false)
           setAudienceCreated(data)
+        }}
+      />
+      <SaveReportModal
+        open={saveReportOpen}
+        filterSummary={pipelineAudienceFilterSummary}
+        serverFilters={serverFilters}
+        advancedFilters={appliedAdvanced}
+        canShareOrg={isOrgAdmin}
+        onClose={() => setSaveReportOpen(false)}
+        onSaved={() => {
+          setSaveReportOpen(false)
+          setBulkNotice('Report saved — run it from More filters → Saved reports.')
         }}
       />
       <CreateBatchListsModal
