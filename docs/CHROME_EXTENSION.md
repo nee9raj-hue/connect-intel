@@ -54,6 +54,7 @@ No extension-specific OAuth client in v0.1.
 | **v0.3** ✅ | Gmail compose helper — AI draft + send & log via `crm-send-email` |
 | **v1.0** ✅ | Chrome Web Store package, listing copy, privacy disclosure (`npm run extension:package`) |
 | **v1.2** ✅ | Smart contact capture on team/about/directory pages (schema.org, mailto/tel, headings) |
+| **v1.3** ✅ | Multi-contact picker on team/directory pages — select and bulk-add to pipeline |
 | **v1.1** ✅ | Store URL in app via `CHROME_EXTENSION_STORE_URL` (`/api/public-config` + Team → Integrations) |
 
 ---

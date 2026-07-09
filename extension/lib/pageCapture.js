@@ -482,12 +482,26 @@ function extractGenericPage() {
   }
 }
 
-function extractPageCapture() {
+function extractPageCaptureCandidates() {
   const host = String(location.hostname || '').toLowerCase()
   if (host.includes('linkedin.com')) {
-    return extractLinkedInProfile() || extractGenericPage()
+    const profile = extractLinkedInProfile()
+    return profile ? [profile] : []
   }
-  return extractGenericPage()
+
+  const contactApi = globalThis.__connectIntelContactPageParse
+  if (contactApi?.extractContactCandidates) {
+    const list = contactApi.extractContactCandidates()
+    if (list.length) return list
+  }
+
+  const single = extractGenericPage()
+  return single ? [single] : []
+}
+
+function extractPageCapture() {
+  const candidates = extractPageCaptureCandidates()
+  return candidates[0] || null
 }
 
 function sleep(ms) {
@@ -497,29 +511,34 @@ function sleep(ms) {
 /** LinkedIn is a SPA — profile DOM (esp. the Experience section) may render after
  * document_idle, so give the company a chance to load before returning. */
 async function extractPageCaptureWhenReady(maxWaitMs = 6000) {
+  const list = await extractPageCaptureCandidatesWhenReady(maxWaitMs)
+  return list[0] || null
+}
+
+async function extractPageCaptureCandidatesWhenReady(maxWaitMs = 6000) {
   const started = Date.now()
-  // Company from the Experience section is the reliable source and may lag, so
-  // wait a bit longer for it before falling back to whatever we have.
   const companyGraceMs = 3000
-  let last = null
+  let last = []
 
   while (Date.now() - started < maxWaitMs) {
-    last = extractPageCapture()
-    const name = [last?.firstName, last?.lastName].filter(Boolean).join(' ')
-    const hasCore = Boolean(name || last?.company)
-    const hasLocation = Boolean(last?.city || last?.state || last?.location)
-    const isProfile = last?.pageType === 'linkedin_profile'
+    last = extractPageCaptureCandidates()
+    if (last.length > 1) return last
+
+    const capture = last[0]
+    const name = [capture?.firstName, capture?.lastName].filter(Boolean).join(' ')
+    const hasCore = Boolean(name || capture?.company)
+    const hasLocation = Boolean(capture?.city || capture?.state || capture?.location)
+    const isProfile = capture?.pageType === 'linkedin_profile'
 
     if (hasCore && (!isProfile || hasLocation)) {
-      // Ready on name+location; keep waiting briefly if company hasn't loaded yet.
-      if (!isProfile || last?.company || Date.now() - started >= companyGraceMs) {
+      if (!isProfile || capture?.company || Date.now() - started >= companyGraceMs) {
         return last
       }
     }
     await sleep(400)
   }
 
-  return last || extractPageCapture()
+  return last.length ? last : extractPageCaptureCandidates()
 }
 
 function isBlockedCaptureHost(hostname = '') {
@@ -542,5 +561,7 @@ function shouldShowCaptureWidget(url = location.href) {
 if (typeof globalThis !== 'undefined') {
   globalThis.__connectIntelExtractPage = extractPageCapture
   globalThis.__connectIntelExtractPageReady = extractPageCaptureWhenReady
+  globalThis.__connectIntelExtractPageCandidates = extractPageCaptureCandidates
+  globalThis.__connectIntelExtractPageCandidatesReady = extractPageCaptureCandidatesWhenReady
   globalThis.__connectIntelShouldShowCaptureWidget = shouldShowCaptureWidget
 }

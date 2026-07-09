@@ -48,6 +48,21 @@ function previewRow(label, value) {
   return `<div class="ci-preview__row"><span class="ci-preview__label">${escapeHtml(label)}</span><span>${escapeHtml(value)}</span></div>`
 }
 
+function candidateLabel(capture) {
+  const name = [capture.firstName, capture.lastName].filter(Boolean).join(' ')
+  return name || capture.company || capture.email || 'Contact'
+}
+
+function candidateMeta(capture) {
+  const parts = [
+    capture.title,
+    capture.company,
+    capture.email,
+    capture.phone,
+  ].filter(Boolean)
+  return parts.join(' · ')
+}
+
 function renderCaptureFields(capture) {
   const name = [capture.firstName, capture.lastName].filter(Boolean).join(' ')
   const rows = [
@@ -93,6 +108,8 @@ class ConnectIntelCaptureWidget {
     this.active = false
     this.boot = null
     this.capture = null
+    this.candidates = []
+    this.selected = new Set()
     this.resultLead = null
     this.host = null
     this.shadow = null
@@ -107,37 +124,53 @@ class ConnectIntelCaptureWidget {
     this.els = {}
   }
 
-  async readCaptureAsync() {
+  async readCandidatesAsync() {
     const tryExtract = async () => {
-      const extractReady = globalThis.__connectIntelExtractPageReady
-      const extract = globalThis.__connectIntelExtractPage
+      const extractReady = globalThis.__connectIntelExtractPageCandidatesReady
+      const extract = globalThis.__connectIntelExtractPageCandidates
       if (typeof extractReady === 'function') {
         try {
           const ready = await extractReady()
-          if (ready) return ready
+          if (Array.isArray(ready) && ready.length) return ready
         } catch {
           /* fall through */
         }
       }
-      if (typeof extract !== 'function') return null
-      try {
-        return extract()
-      } catch {
-        return null
+      if (typeof extract === 'function') {
+        try {
+          const list = extract()
+          if (Array.isArray(list) && list.length) return list
+        } catch {
+          /* fall through */
+        }
       }
+      const single = globalThis.__connectIntelExtractPage?.()
+      return single ? [single] : []
     }
 
-    let capture = await tryExtract()
-    if (!capture) {
+    let candidates = await tryExtract()
+    if (!candidates.length) {
       try {
         await sendMessage('CI_ENSURE_CAPTURE_SCRIPTS')
         await new Promise((resolve) => setTimeout(resolve, 120))
-        capture = await tryExtract()
+        candidates = await tryExtract()
       } catch {
         /* ignore reinject errors */
       }
     }
-    return capture
+    return candidates
+  }
+
+  async readCaptureAsync() {
+    const candidates = await this.readCandidatesAsync()
+    this.candidates = candidates
+    this.capture = candidates[0] || null
+    if (candidates.length > 1) {
+      this.selected = new Set(candidates.map((_, index) => index))
+    } else {
+      this.selected = new Set()
+    }
+    return this.capture
   }
 
   mount() {
@@ -177,6 +210,13 @@ class ConnectIntelCaptureWidget {
         </header>
         <div class="ci-panel__body">
           <div class="ci-status">Open a profile or company page to capture.</div>
+          <div class="ci-picker" hidden>
+            <div class="ci-picker__toolbar">
+              <button type="button" class="ci-picker__toggle-all">Select all</button>
+              <span class="ci-picker__count"></span>
+            </div>
+            <div class="ci-picker__list"></div>
+          </div>
           <div class="ci-preview" hidden></div>
           <button type="button" class="ci-btn ci-btn--primary ci-capture" hidden data-action="capture">Add to pipeline</button>
           <button type="button" class="ci-btn ci-btn--secondary ci-open" hidden data-action="open">Open in Connect Intel</button>
@@ -191,6 +231,10 @@ class ConnectIntelCaptureWidget {
       panel: root.querySelector('.ci-panel'),
       close: root.querySelector('.ci-panel__close'),
       status: root.querySelector('.ci-status'),
+      picker: root.querySelector('.ci-picker'),
+      pickerList: root.querySelector('.ci-picker__list'),
+      pickerCount: root.querySelector('.ci-picker__count'),
+      pickerToggleAll: root.querySelector('.ci-picker__toggle-all'),
       preview: root.querySelector('.ci-preview'),
       capture: root.querySelector('.ci-capture'),
       open: root.querySelector('.ci-open'),
@@ -199,7 +243,20 @@ class ConnectIntelCaptureWidget {
 
     this.els.fab.addEventListener('click', () => this.togglePanel())
     this.els.close.addEventListener('click', () => this.setOpen(false))
-    this.els.capture?.addEventListener('click', () => this.submitCapture())
+    this.els.capture?.addEventListener('click', () => {
+      if (this.candidates.length > 1) void this.submitSelectedCaptures()
+      else void this.submitCapture()
+    })
+    this.els.pickerToggleAll?.addEventListener('click', () => this.toggleSelectAll())
+    this.els.pickerList?.addEventListener('change', (event) => {
+      const input = event.target
+      if (!(input instanceof HTMLInputElement) || input.type !== 'checkbox') return
+      const index = Number(input.dataset.index)
+      if (!Number.isFinite(index)) return
+      if (input.checked) this.selected.add(index)
+      else this.selected.delete(index)
+      this.updatePickerCount()
+    })
     this.els.open?.addEventListener('click', () => this.openInApp())
     this.els.signin?.addEventListener('click', () => this.signIn())
 
@@ -300,6 +357,43 @@ class ConnectIntelCaptureWidget {
         color: #475569;
       }
       .ci-preview { margin-top: 10px; }
+      .ci-picker {
+        margin-top: 10px;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 10px;
+        max-height: 240px;
+        overflow: auto;
+      }
+      .ci-picker__toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 8px;
+        font-size: 11px;
+        color: #64748b;
+      }
+      .ci-picker__toggle-all {
+        all: unset;
+        cursor: pointer;
+        color: #2563eb;
+        font-weight: 600;
+        font-size: 11px;
+      }
+      .ci-picker__row {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 8px 0;
+        border-top: 1px solid #f1f5f9;
+        cursor: pointer;
+      }
+      .ci-picker__row:first-child { border-top: 0; }
+      .ci-picker__row input { margin-top: 2px; }
+      .ci-picker__name { font-size: 12px; font-weight: 700; color: #0f172a; }
+      .ci-picker__meta { font-size: 10px; color: #64748b; line-height: 1.35; margin-top: 2px; }
       .ci-preview__name { font-weight: 700; color: #0f172a; font-size: 13px; margin-bottom: 8px; }
       .ci-preview__row {
         display: grid;
@@ -373,6 +467,7 @@ class ConnectIntelCaptureWidget {
 
   renderLoading() {
     this.els.signin.hidden = true
+    this.els.picker.hidden = true
     this.els.preview.hidden = true
     this.els.capture.hidden = true
     this.els.open.hidden = true
@@ -382,6 +477,7 @@ class ConnectIntelCaptureWidget {
   }
 
   renderSignIn() {
+    this.els.picker.hidden = true
     this.els.preview.hidden = true
     this.els.capture.hidden = true
     this.els.open.hidden = true
@@ -392,12 +488,71 @@ class ConnectIntelCaptureWidget {
 
   renderError(message) {
     this.els.signin.hidden = true
+    this.els.picker.hidden = true
     this.els.preview.hidden = true
     this.els.capture.hidden = true
     this.els.open.hidden = true
     this.els.status.hidden = false
     this.els.status.className = 'ci-status ci-status--error'
     this.els.status.textContent = message
+  }
+
+  updatePickerCount() {
+    const count = this.selected.size
+    const total = this.candidates.length
+    if (this.els.pickerCount) {
+      this.els.pickerCount.textContent = `${count} of ${total} selected`
+    }
+    if (this.els.capture) {
+      this.els.capture.textContent =
+        count === 1 ? 'Add 1 contact to pipeline' : `Add ${count} contacts to pipeline`
+      this.els.capture.disabled = count === 0
+    }
+    if (this.els.pickerToggleAll) {
+      this.els.pickerToggleAll.textContent = count === total ? 'Clear all' : 'Select all'
+    }
+  }
+
+  toggleSelectAll() {
+    if (this.selected.size === this.candidates.length) {
+      this.selected = new Set()
+    } else {
+      this.selected = new Set(this.candidates.map((_, index) => index))
+    }
+    if (this.els.pickerList) {
+      for (const input of this.els.pickerList.querySelectorAll('input[type="checkbox"]')) {
+        const index = Number(input.dataset.index)
+        input.checked = this.selected.has(index)
+      }
+    }
+    this.updatePickerCount()
+  }
+
+  renderMultiPicker(candidates) {
+    this.els.preview.hidden = true
+    this.els.picker.hidden = false
+    this.els.open.hidden = true
+    this.els.capture.hidden = false
+    this.els.capture.disabled = false
+
+    if (this.els.pickerList) {
+      this.els.pickerList.innerHTML = candidates
+        .map((capture, index) => {
+          const checked = this.selected.has(index) ? 'checked' : ''
+          const meta = candidateMeta(capture)
+          return `
+            <label class="ci-picker__row">
+              <input type="checkbox" data-index="${index}" ${checked} />
+              <span>
+                <div class="ci-picker__name">${escapeHtml(candidateLabel(capture))}</div>
+                ${meta ? `<div class="ci-picker__meta">${escapeHtml(meta)}</div>` : ''}
+              </span>
+            </label>
+          `
+        })
+        .join('')
+    }
+    this.updatePickerCount()
   }
 
   renderPreview() {
@@ -410,6 +565,7 @@ class ConnectIntelCaptureWidget {
     this.resultLead = null
 
     if (!this.capture) {
+      this.els.picker.hidden = true
       this.els.preview.hidden = true
       this.els.capture.hidden = true
       this.els.open.hidden = true
@@ -425,6 +581,16 @@ class ConnectIntelCaptureWidget {
       return
     }
 
+    if (this.candidates.length > 1) {
+      this.els.status.hidden = false
+      this.els.status.className = 'ci-status'
+      this.els.status.innerHTML =
+        signedIn ||
+        `${this.candidates.length} contacts found — select who to add to your pipeline.`
+      this.renderMultiPicker(this.candidates)
+      return
+    }
+
     const name = [this.capture.firstName, this.capture.lastName].filter(Boolean).join(' ')
     const hasMinimum =
       name ||
@@ -437,6 +603,7 @@ class ConnectIntelCaptureWidget {
     this.els.status.className = 'ci-status'
     this.els.status.innerHTML = signedIn || 'Review details before adding to pipeline.'
 
+    this.els.picker.hidden = true
     this.els.preview.hidden = false
     this.els.preview.innerHTML = `
       <div class="ci-preview__name">${escapeHtml(name || this.capture.company || 'New lead')}</div>
@@ -446,6 +613,50 @@ class ConnectIntelCaptureWidget {
     this.els.capture.hidden = !hasMinimum
     this.els.capture.textContent = 'Add / update pipeline'
     this.els.capture.disabled = false
+  }
+
+  async submitSelectedCaptures() {
+    const indices = [...this.selected].sort((a, b) => a - b)
+    if (!indices.length) return
+
+    this.els.capture.disabled = true
+    this.els.status.className = 'ci-status'
+    this.els.status.textContent = `Saving ${indices.length} contact(s)…`
+
+    let added = 0
+    let updated = 0
+    let failed = 0
+
+    for (const index of indices) {
+      const fields = this.candidates[index]
+      if (!fields) continue
+      try {
+        await sendMessage('CI_LOG', {
+          action: 'extension.lead_capture_requested',
+          metadata: { pageType: fields.pageType, bulk: true },
+        }).catch(() => {})
+
+        const result = await sendMessage('CI_CAPTURE_LEAD', { fields })
+        added += 1
+        if (result?.duplicate && result?.updated) updated += 1
+        if (result?.lead) this.resultLead = result.lead
+      } catch {
+        failed += 1
+      }
+    }
+
+    this.els.picker.hidden = true
+    this.els.capture.hidden = true
+    this.els.status.className = 'ci-status ci-status--ok'
+    if (failed) {
+      this.els.status.className = 'ci-status ci-status--error'
+      this.els.status.textContent = `Saved ${added} contact(s); ${failed} failed.`
+    } else if (updated) {
+      this.els.status.textContent = `Added ${added} contact(s) — ${updated} updated existing leads.`
+    } else {
+      this.els.status.textContent = `Added ${added} contact(s) to pipeline.`
+    }
+    this.els.open.hidden = !this.resultLead?.pipelineUrl
   }
 
   async submitCapture() {
@@ -465,6 +676,7 @@ class ConnectIntelCaptureWidget {
 
       this.els.status.className = 'ci-status ci-status--ok'
       this.els.status.textContent = result?.message || 'Lead saved to pipeline'
+      this.els.picker.hidden = true
       this.els.capture.hidden = true
       this.els.open.hidden = !this.resultLead?.pipelineUrl
     } catch (err) {

@@ -307,6 +307,261 @@ function scoreContactCapture(fields = {}) {
   return score
 }
 
+function contactFingerprint(fields = {}) {
+  const email = String(fields.email || '')
+    .trim()
+    .toLowerCase()
+  if (email.includes('@')) return `email:${email}`
+  const linkedin = String(fields.linkedin || '')
+    .split('?')[0]
+    .toLowerCase()
+  if (/linkedin\.com\/in\//i.test(linkedin)) return `li:${linkedin}`
+  const name = [fields.firstName, fields.lastName].filter(Boolean).join(' ').trim().toLowerCase()
+  const company = String(fields.company || '')
+    .trim()
+    .toLowerCase()
+  if (name) return `name:${name}|${company}`
+  return ''
+}
+
+function isQualityCandidate(fields = {}) {
+  if (hasMinimumCaptureFields(fields)) return true
+  return scoreContactCapture(fields) >= 4
+}
+
+function dedupeCandidates(list = []) {
+  const seen = new Set()
+  const out = []
+  for (const item of list) {
+    const fp = contactFingerprint(item)
+    if (!fp || seen.has(fp)) continue
+    if (!isQualityCandidate(item)) continue
+    seen.add(fp)
+    out.push(item)
+  }
+  return out.sort((a, b) => scoreContactCapture(b) - scoreContactCapture(a))
+}
+
+function enrichCandidate(fields, url) {
+  const out = { pageType: 'contact_page', sourcePage: url, ...fields }
+  if (!out.location && (out.city || out.state)) {
+    out.location = [out.city, out.state].filter(Boolean).join(', ')
+  }
+  return out
+}
+
+const TEAM_CARD_SELECTORS = [
+  '[class*="team-member"]',
+  '[class*="team_member"]',
+  '[class*="staff-member"]',
+  '[class*="person-card"]',
+  '[class*="profile-card"]',
+  '.vcard',
+  '.h-card',
+  '[itemtype*="Person"]',
+]
+
+function nearestBlock(el) {
+  if (typeof el?.closest === 'function') {
+    return el.closest('article, li, tr, div, section') || el.parentElement
+  }
+  return el?.parentElement || null
+}
+
+function findTeamMemberCards() {
+  const cards = new Set()
+  for (const selector of TEAM_CARD_SELECTORS) {
+    try {
+      document.querySelectorAll(selector).forEach((el) => cards.add(el))
+    } catch {
+      /* invalid selector */
+    }
+  }
+  return [...cards]
+}
+
+function mailtoTelInRoot(root) {
+  const { normalizePhone } = linkedInParse()
+  let email = ''
+  let phone = ''
+  if (!root?.querySelectorAll) return { email, phone }
+  for (const a of root.querySelectorAll('a[href^="mailto:"], a[href^="tel:"]')) {
+    const href = a.getAttribute('href') || ''
+    if (!email && href.startsWith('mailto:')) {
+      email = href.replace(/^mailto:/i, '').split('?')[0].trim().toLowerCase()
+    }
+    if (!phone && href.startsWith('tel:')) {
+      phone = normalizePhone ? normalizePhone(href.replace(/^tel:/i, '')) : href.replace(/^tel:/i, '')
+    }
+  }
+  return { email, phone }
+}
+
+function linkedinInRoot(root) {
+  if (!root?.querySelectorAll) return ''
+  for (const a of root.querySelectorAll('a[href*="linkedin.com/in/"]')) {
+    const href = String(a.getAttribute('href') || '').split('?')[0]
+    if (/linkedin\.com\/in\//i.test(href)) return href
+  }
+  return ''
+}
+
+function parsePersonFromElement(el) {
+  const { splitPersonName, parseHeadline } = linkedInParse()
+  const splitName = splitPersonName || (() => ({ firstName: '', lastName: '' }))
+  const parseHeadlineFn = parseHeadline || (() => ({ title: '', company: '' }))
+
+  const nameEl = el.querySelector(
+    '[itemprop="name"], .fn, .p-name, h1, h2, h3, h4, [class*="name"]'
+  )
+  const name = nameEl?.textContent?.trim() || ''
+  if (!name || name.length > 80) return null
+  if (/\b(team|contact|about|leadership|our people)\b/i.test(name) && name.split(/\s+/).length <= 3) {
+    return null
+  }
+
+  const { firstName, lastName } = splitName(name)
+  if (!firstName) return null
+
+  const titleEl = el.querySelector(
+    '[itemprop="jobTitle"], .title, .role, [class*="title"], [class*="role"], [class*="position"]'
+  )
+  let title = titleEl?.textContent?.trim() || ''
+  if (title.length > 120) title = ''
+  const parsedRole = parseHeadlineFn(title)
+  const { email, phone } = mailtoTelInRoot(el)
+  const linkedin = linkedinInRoot(el)
+
+  return {
+    firstName,
+    lastName,
+    title: parsedRole.title || title,
+    company: parsedRole.company || '',
+    email,
+    phone,
+    linkedin,
+  }
+}
+
+function parseLinkedInAnchorContext(anchor) {
+  const { splitPersonName, parseHeadline } = linkedInParse()
+  const splitName = splitPersonName || (() => ({ firstName: '', lastName: '' }))
+  const parseHeadlineFn = parseHeadline || (() => ({ title: '', company: '' }))
+  const href = String(anchor.getAttribute('href') || '').split('?')[0]
+  if (!/linkedin\.com\/in\//i.test(href)) return null
+
+  const container =
+    (typeof anchor.closest === 'function'
+      ? anchor.closest('article, li, tr, [class*="member"], [class*="card"], [class*="person"], [class*="team"]')
+      : null) || anchor.parentElement
+  if (!container) return null
+
+  const name =
+    anchor.textContent?.trim() ||
+    container.querySelector('h1,h2,h3,h4,[class*="name"]')?.textContent?.trim() ||
+    ''
+  const { firstName, lastName } = splitName(name)
+  if (!firstName) return null
+
+  const roleText =
+    container.querySelector('[class*="title"],[class*="role"],[class*="position"],p')?.textContent?.trim() ||
+    ''
+  const { title, company } = parseHeadlineFn(roleText)
+  const { email, phone } = mailtoTelInRoot(container)
+
+  return { firstName, lastName, title, company, email, phone, linkedin: href }
+}
+
+/**
+ * Scan team/about/directory pages for multiple contact candidates.
+ * Returns deduped list sorted by capture quality (best first).
+ */
+function extractContactCandidates() {
+  const url = String(location.href || '').split('?')[0]
+  let companyDomain = ''
+  try {
+    companyDomain = new URL(url).hostname.replace(/^www\./, '')
+  } catch {
+    companyDomain = ''
+  }
+
+  const schema = extractSchemaOrgContact()
+  const og = parseOpenGraphContact()
+  const orgCompany = schema.organization?.company || og.siteName || ''
+  const raw = []
+
+  for (const node of readJsonLdNodes()) {
+    const person = parsePersonNode(node)
+    if (!person) continue
+    if (!person.company && orgCompany) person.company = orgCompany
+    if (!person.companyDomain && companyDomain) person.companyDomain = companyDomain
+    raw.push(enrichCandidate(person, url))
+  }
+
+  for (const card of findTeamMemberCards()) {
+    const person = parsePersonFromElement(card)
+    if (!person) continue
+    if (!person.company && orgCompany) person.company = orgCompany
+    if (!person.companyDomain) person.companyDomain = companyDomain
+    raw.push(enrichCandidate(person, url))
+  }
+
+  for (const anchor of document.querySelectorAll('a[href*="linkedin.com/in/"]')) {
+    const parsed = parseLinkedInAnchorContext(anchor)
+    if (!parsed) continue
+    if (!parsed.company && orgCompany) parsed.company = orgCompany
+    if (!parsed.companyDomain) parsed.companyDomain = companyDomain
+    raw.push(enrichCandidate(parsed, url))
+  }
+
+  for (const anchor of document.querySelectorAll('a[href^="mailto:"]')) {
+    const email = anchor
+      .getAttribute('href')
+      ?.replace(/^mailto:/i, '')
+      .split('?')[0]
+      .trim()
+      .toLowerCase()
+    if (!email) continue
+    const block = nearestBlock(anchor)
+    if (!block) continue
+    const nameEl = block.querySelector('h1,h2,h3,h4,strong,[class*="name"]')
+    const name = nameEl?.textContent?.trim() || ''
+    const { splitPersonName } = linkedInParse()
+    const splitName = splitPersonName || (() => ({ firstName: '', lastName: '' }))
+    const { firstName, lastName } = splitName(name)
+    if (!firstName && !lastName) continue
+    const { phone } = mailtoTelInRoot(block)
+    raw.push(
+      enrichCandidate(
+        {
+          firstName,
+          lastName,
+          email,
+          phone,
+          company: orgCompany,
+          companyDomain,
+          linkedin: linkedinInRoot(block),
+        },
+        url
+      )
+    )
+  }
+
+  const deduped = dedupeCandidates(raw)
+
+  if (deduped.length <= 1) {
+    const single = extractContactPage()
+    if (single?.email || single?.firstName || single?.company) {
+      const fp = contactFingerprint(single)
+      if (!fp || !deduped.some((item) => contactFingerprint(item) === fp)) {
+        deduped.push(enrichCandidate(single, url))
+      }
+    }
+  }
+
+  return deduped.slice(0, 30)
+}
+
 /**
  * Rich contact extraction for non-LinkedIn pages (team, about, directory, company contact).
  */
@@ -400,8 +655,11 @@ if (typeof globalThis !== 'undefined') {
   globalThis.__connectIntelContactPageParse = {
     extractSchemaOrgContact,
     extractContactPage,
+    extractContactCandidates,
     quickContactSignals,
     hasMinimumCaptureFields,
     scoreContactCapture,
+    contactFingerprint,
+    dedupeCandidates,
   }
 }
