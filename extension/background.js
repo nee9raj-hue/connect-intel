@@ -173,7 +173,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     chrome.scripting
       .executeScript({
         target: { tabId },
-        files: ['lib/linkedinCaptureParse.js', 'lib/pageCapture.js'],
+        files: ['lib/linkedinCaptureParse.js', 'lib/contactPageParse.js', 'lib/pageCapture.js'],
       })
       .then(() => reply(sendResponse, { ok: true }))
       .catch((err) => reply(sendResponse, { ok: false, error: err.message }))

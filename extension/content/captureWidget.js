@@ -1,5 +1,5 @@
 /**
- * Connect Intel capture widget — LinkedIn profiles and company sites (v0.2).
+ * Connect Intel capture widget — LinkedIn profiles, team pages, and contact-rich sites.
  */
 
 const WIDGET_HOST_ID = 'connect-intel-capture-host'
@@ -68,6 +68,24 @@ function isLinkedInProfilePage(url = '') {
   return /linkedin\.com\/in\//i.test(String(url || location.href || ''))
 }
 
+function isBlockedHost() {
+  const host = String(location.hostname || '').toLowerCase()
+  return (
+    host.includes('mail.google.com') ||
+    host.includes('connectintel.net') ||
+    host.includes('chrome.google.com')
+  )
+}
+
+function shouldMountWidget() {
+  if (isBlockedHost()) return false
+  if (isLinkedInProfilePage()) return true
+  const check = globalThis.__connectIntelShouldShowCaptureWidget
+  if (typeof check === 'function') return check()
+  const signals = globalThis.__connectIntelContactPageParse?.quickContactSignals
+  return typeof signals === 'function' ? signals() : false
+}
+
 class ConnectIntelCaptureWidget {
   constructor() {
     this.open = false
@@ -124,8 +142,8 @@ class ConnectIntelCaptureWidget {
 
   mount() {
     if (!runtime()?.isExtensionContextAlive()) return
-    if (!isLinkedInProfilePage()) {
-      this.watchForProfileNavigation()
+    if (!shouldMountWidget()) {
+      this.watchForCapturePage()
       return
     }
     if (document.getElementById(WIDGET_HOST_ID)) return
@@ -188,12 +206,12 @@ class ConnectIntelCaptureWidget {
     document.documentElement.appendChild(this.host)
   }
 
-  watchForProfileNavigation() {
+  watchForCapturePage() {
     if (this._navWatch) return
     this._navWatch = true
     const check = () => {
       if (!runtime()?.isExtensionContextAlive()) return
-      if (isLinkedInProfilePage() && !document.getElementById(WIDGET_HOST_ID)) {
+      if (shouldMountWidget() && !document.getElementById(WIDGET_HOST_ID)) {
         this.mount()
       }
     }
@@ -210,7 +228,7 @@ class ConnectIntelCaptureWidget {
       check()
       return out
     }
-    setInterval(check, 1500)
+    setInterval(check, 2000)
     check()
   }
 
@@ -398,9 +416,12 @@ class ConnectIntelCaptureWidget {
       this.els.signin.hidden = true
       this.els.status.hidden = false
       const onProfile = /linkedin\.com\/in\//i.test(location.href)
+      const onContact = this.capture?.pageType === 'contact_page'
       this.els.status.innerHTML = onProfile
-        ? `${signedIn}<br/>Profile is still loading — close and reopen this panel, or refresh the tab.<br/><span style="color:#64748b">If this persists, reload the Connect Intel extension (v1.1.1+).</span>`
-        : `${signedIn}<br/>Could not read this page. Open a LinkedIn profile (<code>/in/…</code>) or company site.`
+        ? `${signedIn}<br/>Profile is still loading — close and reopen this panel, or refresh the tab.<br/><span style="color:#64748b">If this persists, reload the Connect Intel extension.</span>`
+        : onContact
+          ? `${signedIn}<br/>Contact details are still loading — close and reopen this panel.`
+          : `${signedIn}<br/>No contact found on this page yet. Try a team/about page, directory, or LinkedIn profile.`
       return
     }
 
@@ -409,6 +430,7 @@ class ConnectIntelCaptureWidget {
       name ||
       this.capture.company ||
       this.capture.email ||
+      this.capture.phone ||
       this.capture.linkedin
 
     this.els.status.hidden = false

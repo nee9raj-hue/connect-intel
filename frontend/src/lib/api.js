@@ -916,6 +916,12 @@ export const api = {
     return request(`/api/contacts${qs ? `?${qs}` : ''}`)
   },
   getContact: (contactId) => request(`/api/contacts?contactId=${encodeURIComponent(contactId)}`),
+  listContactDuplicates: () => request('/api/contacts?duplicates=1'),
+  mergeContacts: ({ primaryContactId, mergeContactIds }) =>
+    request('/api/contacts', {
+      method: 'POST',
+      body: { action: 'merge', primaryContactId, mergeContactIds },
+    }),
   updateContact: (contactId, contact) =>
     request('/api/contacts', { method: 'PATCH', body: { contactId, contact } }),
   searchContactLinkedin: (contactId, contact) =>

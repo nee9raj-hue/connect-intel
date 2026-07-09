@@ -442,6 +442,17 @@ function extractLinkedInProfile() {
 }
 
 function extractGenericPage() {
+  const contactApi = globalThis.__connectIntelContactPageParse
+  if (contactApi?.extractContactPage) {
+    const rich = contactApi.extractContactPage()
+    if (contactApi.hasMinimumCaptureFields?.(rich) || contactApi.scoreContactCapture?.(rich) >= 3) {
+      return rich
+    }
+    if (rich?.email || rich?.phone || rich?.firstName || rich?.company) {
+      return rich
+    }
+  }
+
   const { findEmailInText, findPhoneInText } = parseApi()
   const url = String(location.href || '').split('?')[0]
   const title = String(document.title || '').trim()
@@ -511,7 +522,25 @@ async function extractPageCaptureWhenReady(maxWaitMs = 6000) {
   return last || extractPageCapture()
 }
 
+function isBlockedCaptureHost(hostname = '') {
+  const host = String(hostname || location.hostname || '').toLowerCase()
+  if (!host) return true
+  if (host.includes('mail.google.com')) return true
+  if (host.includes('connectintel.net')) return true
+  if (host.includes('chrome.google.com')) return true
+  if (host === 'localhost' || host === '127.0.0.1') return true
+  return false
+}
+
+function shouldShowCaptureWidget(url = location.href) {
+  if (isBlockedCaptureHost()) return false
+  if (isLinkedInProfileUrl(url)) return true
+  const contactApi = globalThis.__connectIntelContactPageParse
+  return Boolean(contactApi?.quickContactSignals?.())
+}
+
 if (typeof globalThis !== 'undefined') {
   globalThis.__connectIntelExtractPage = extractPageCapture
   globalThis.__connectIntelExtractPageReady = extractPageCaptureWhenReady
+  globalThis.__connectIntelShouldShowCaptureWidget = shouldShowCaptureWidget
 }

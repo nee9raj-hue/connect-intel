@@ -40,7 +40,7 @@
     "tasks:migrate": "node scripts/apply-tasks-meetings-migration.mjs",
     "campaigns:migrate": "node scripts/apply-campaigns-v3-migration.mjs",
     "email:sends-migrate": "node scripts/apply-email-sends-migration.mjs",
-    "extension:verify": "node --check extension/background.js && node --check extension/popup.js && node --check extension/lib/api.js && node --check extension/lib/runtime.js && node --check extension/lib/gmailParticipants.js && node --check extension/lib/gmailKeyboardIsolate.js && node --check extension/lib/pageCapture.js && node --check extension/content/pageWidget.js && node --check extension/content/captureWidget.js",
+    "extension:verify": "node --check extension/background.js && node --check extension/popup.js && node --check extension/lib/api.js && node --check extension/lib/runtime.js && node --check extension/lib/gmailParticipants.js && node --check extension/lib/gmailKeyboardIsolate.js && node --check extension/lib/linkedinCaptureParse.js && node --check extension/lib/contactPageParse.js && node --check extension/lib/pageCapture.js && node --check extension/content/pageWidget.js && node --check extension/content/captureWidget.js",
     "extension:package": "node scripts/package-chrome-extension.mjs",
     "campaigns:sql-ops": "node scripts/campaigns-v3-sql-ops.mjs",
     "step10:gate": "node scripts/step10-load-gate.mjs",

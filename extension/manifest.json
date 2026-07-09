@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Connect Intel",
-  "version": "1.1.6",
-  "description": "CRM companion for Gmail and LinkedIn — match pipeline leads, sync email trails, capture profiles, and send from Connect Intel.",
+  "version": "1.2.0",
+  "description": "CRM companion for Gmail, LinkedIn, and contact pages — match pipeline leads, sync email trails, capture contacts, and send from Connect Intel.",
   "icons": {
     "48": "icons/icon-48.png",
     "128": "icons/icon-128.png"
@@ -38,14 +38,37 @@
     },
     {
       "matches": ["https://*.linkedin.com/*", "https://linkedin.com/*"],
-      "js": ["lib/runtime.js", "lib/linkedinCaptureParse.js", "lib/pageCapture.js", "content/captureWidget.js"],
+      "js": [
+        "lib/runtime.js",
+        "lib/linkedinCaptureParse.js",
+        "lib/contactPageParse.js",
+        "lib/pageCapture.js",
+        "content/captureWidget.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "exclude_matches": [
+        "https://mail.google.com/*",
+        "https://connectintel.net/*",
+        "https://*.linkedin.com/*",
+        "https://linkedin.com/*"
+      ],
+      "js": [
+        "lib/runtime.js",
+        "lib/linkedinCaptureParse.js",
+        "lib/contactPageParse.js",
+        "lib/pageCapture.js",
+        "content/captureWidget.js"
+      ],
       "run_at": "document_idle"
     }
   ],
   "web_accessible_resources": [
     {
       "resources": ["icons/*"],
-      "matches": ["https://mail.google.com/*", "https://*.linkedin.com/*", "https://linkedin.com/*"]
+      "matches": ["http://*/*", "https://*/*"]
     }
   ]
 }

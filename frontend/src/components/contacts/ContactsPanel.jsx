@@ -54,6 +54,8 @@ export default function ContactsPanel({ onNavigate }) {
   const [bulkTagsOpen, setBulkTagsOpen] = useState(false)
   const [bulkBusy, setBulkBusy] = useState(false)
   const [bulkNotice, setBulkNotice] = useState(null)
+  const [duplicateGroups, setDuplicateGroups] = useState([])
+  const [mergeBusy, setMergeBusy] = useState(false)
   const isMobile = useIsMobile()
 
   const leadByContactId = useMemo(() => {
@@ -100,6 +102,19 @@ export default function ContactsPanel({ onNavigate }) {
   useEffect(() => {
     loadList()
   }, [loadList])
+
+  const loadDuplicates = useCallback(async () => {
+    try {
+      const data = await api.listContactDuplicates()
+      setDuplicateGroups(data.groups || [])
+    } catch {
+      setDuplicateGroups([])
+    }
+  }, [])
+
+  useEffect(() => {
+    loadDuplicates()
+  }, [loadDuplicates])
 
   useEffect(() => {
     if (!contactsFocusId) return
@@ -318,6 +333,36 @@ export default function ContactsPanel({ onNavigate }) {
     else setSelectedIds(new Set())
   }
 
+  const mergeDuplicateGroup = async (group) => {
+    if (!group?.primaryContactId || mergeBusy) return
+    const names = (group.contacts || [])
+      .map((c) => [c.firstName, c.lastName].filter(Boolean).join(' '))
+      .filter(Boolean)
+      .join(', ')
+    const ok = window.confirm(
+      `Merge ${group.mergeContactIds?.length || 0} duplicate contact(s) into one record?\n\n${names}`
+    )
+    if (!ok) return
+
+    setMergeBusy(true)
+    setError(null)
+    try {
+      const data = await api.mergeContacts({
+        primaryContactId: group.primaryContactId,
+        mergeContactIds: group.mergeContactIds || [],
+      })
+      setNotice(data.message || 'Duplicates merged')
+      await Promise.all([loadList(), loadDuplicates(), refreshSavedLeads?.()])
+      if (selectedId && group.mergeContactIds?.includes(selectedId)) {
+        setSelectedId(group.primaryContactId)
+      }
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setMergeBusy(false)
+    }
+  }
+
   const runBulkTags = async (actions) => {
     if (!selectedLeadIds.length) {
       window.alert('Selected contacts are not in your pipeline yet. Add them to pipeline first.')
@@ -437,6 +482,41 @@ export default function ContactsPanel({ onNavigate }) {
               role="status"
             >
               {bulkNotice}
+            </div>
+          )}
+          {duplicateGroups.length > 0 && (
+            <div className="shrink-0 mx-2 md:mx-4 mb-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5">
+              <div className="text-sm font-semibold text-amber-950">
+                {duplicateGroups.length} possible duplicate group
+                {duplicateGroups.length === 1 ? '' : 's'}
+              </div>
+              <p className="mt-1 text-xs text-amber-900/80">
+                Same email, phone, LinkedIn, or name at the same company — merge to keep one CRM contact.
+              </p>
+              <div className="mt-2 flex flex-col gap-2">
+                {duplicateGroups.slice(0, 3).map((group) => {
+                  const label = (group.contacts || [])
+                    .map((c) => [c.firstName, c.lastName].filter(Boolean).join(' ') || c.email || c.company)
+                    .filter(Boolean)
+                    .join(' · ')
+                  return (
+                    <div
+                      key={group.primaryContactId}
+                      className="flex flex-wrap items-center justify-between gap-2 rounded-md bg-white/80 px-2.5 py-2"
+                    >
+                      <span className="text-xs text-slate-700 min-w-0 truncate">{label}</span>
+                      <button
+                        type="button"
+                        className="crm-btn crm-btn-sm crm-btn-primary shrink-0"
+                        disabled={mergeBusy}
+                        onClick={() => mergeDuplicateGroup(group)}
+                      >
+                        Merge {group.mergeContactIds?.length || 0}
+                      </button>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
           )}
           <div className="crm-split-card flex-1 min-h-0">

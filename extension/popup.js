@@ -58,7 +58,7 @@ async function loadPageCapture(tab) {
   try {
     const [{ result }] = await chrome.scripting.executeScript({
       target: { tabId: tab.id },
-      files: ['lib/linkedinCaptureParse.js', 'lib/pageCapture.js'],
+      files: ['lib/linkedinCaptureParse.js', 'lib/contactPageParse.js', 'lib/pageCapture.js'],
       func: async () => {
         const ready = globalThis.__connectIntelExtractPageReady
         const snap = globalThis.__connectIntelExtractPage
@@ -156,18 +156,23 @@ async function initGmail(boot) {
 
 async function initCapture(boot, pageMode) {
   mode = 'capture'
-  subtitleEl.textContent =
-    pageMode === 'linkedin' ? 'LinkedIn profile capture' : 'Add current page to pipeline'
   primaryActionEl.textContent = 'Add / update pipeline'
 
   const tab = await readActiveTab()
   const fields = await loadPageCapture(tab)
 
+  subtitleEl.textContent =
+    pageMode === 'linkedin'
+      ? 'LinkedIn profile capture'
+      : fields?.pageType === 'contact_page'
+        ? 'Contact page capture'
+        : 'Add current page to pipeline'
+
   setStatus(`Signed in as <strong>${boot.user.name || boot.user.email}</strong>`, 'ok')
 
   if (!fields) {
     setStatus(
-      'Could not read this page.<br/><span class="muted">Try a LinkedIn profile (/in/…) or company website.</span>',
+      'Could not read this page.<br/><span class="muted">Open a contact/team page, company site, or LinkedIn profile.</span>',
       'muted'
     )
     return
