@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 91066a8
+npm run prod:rollback -- e0fc2d0
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 91066a8
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `86660c3` |
-| Log updated (IST) | 08/07/2026, 16:16:47 |
+| Commit | `50bc205` |
+| Log updated (IST) | 09/07/2026, 22:30:01 |
 
 ---
 
@@ -44,26 +44,25 @@ npm run prod:rollback -- 91066a8
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 08/07/2026, 16:15:57 | `86660c3` | Send small CRM bulk emails inline in-request so they no longer stall as "queued" | [preview](https://connect-intel-b2mmtgz2r-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 86660c3` | **← LIVE**
+| 09/07/2026, 22:21:51 | `50bc205` | Add extension v1.3 multi-contact picker for team and directory pages. | [preview](https://connect-intel-4ma2bk145-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 50bc205` | **← LIVE**
+| 09/07/2026, 21:46:16 | `e0fc2d0` | Shorten extension manifest description for Chrome Web Store limits. | [preview](https://connect-intel-oyujo0gba-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e0fc2d0` |
+| 09/07/2026, 21:42:35 | `c0cd323` | Wire Chrome Web Store URL through public-config and Team Integrations. | [preview](https://connect-intel-6bt4d5lok-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c0cd323` |
+| 09/07/2026, 20:53:26 | `29300d9` | Fix account hierarchy sync and add rollup metrics for parent/child accounts. | [preview](https://connect-intel-dema5jukq-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 29300d9` |
+| 09/07/2026, 20:39:55 | `25b6fb0` | Add first-class Deal API with full CRUD on /api/crm/deals. | [preview](https://connect-intel-j02kq9lhn-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 25b6fb0` |
+| 09/07/2026, 20:27:01 | `7337eaf` | Add server-side pipeline CSV export and saved report definitions. | [preview](https://connect-intel-ats0x3cu5-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7337eaf` |
+| 09/07/2026, 18:08:06 | `b696103` | Document workflow versioning snapshots as shipped for CRM and marketing. | [preview](https://connect-intel-lr9qcaibx-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b696103` |
+| 09/07/2026, 18:07:08 | `f09fda9` | Add versioned workflow publish snapshots and run history UI. | [preview](https://connect-intel-n2t7s1m7z-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f09fda9` |
+| 09/07/2026, 17:57:54 | `35d242f` | Ship extension v1.2 contact capture, contact dedup merge, and RBAC audit fix. | [preview](https://connect-intel-b4hoa2kh6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 35d242f` |
+| 09/07/2026, 13:07:20 | `32fd333` | Fix sidebar pipeline counts staying stale after CRM status changes. | [preview](https://connect-intel-hjf5k2kuu-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 32fd333` |
+| 09/07/2026, 12:51:24 | `de3c7e8` | Add freight RFQ parsing, logistics intel, and messaging stats to Connect Copilot. | [preview](https://connect-intel-i6ufoa09d-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- de3c7e8` |
+| 08/07/2026, 17:09:03 | `fc0da17` | Fix CRM bulk email silently dropping all recipients as "no_consent" | [preview](https://connect-intel-g8lj8bzlq-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- fc0da17` |
+| 08/07/2026, 16:52:09 | `ff130e5` | Unified Enterprise Messaging Engine: queue all sends via worker + shared engine | [preview](https://connect-intel-1tqcc6f1d-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ff130e5` |
+| 08/07/2026, 16:20:45 | `46335b7` | Update production deploy log for 86660c3 | [preview](https://connect-intel-q8xis78n4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 46335b7` |
+| 08/07/2026, 16:15:57 | `86660c3` | Send small CRM bulk emails inline in-request so they no longer stall as "queued" | [preview](https://connect-intel-b2mmtgz2r-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 86660c3` |
 | 08/07/2026, 16:05:52 | `91066a8` | Fix bulk emails stuck at "queued" by seeding recipients sync + self-healing drain | [preview](https://connect-intel-1bex98cjf-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 91066a8` |
 | 08/07/2026, 15:45:21 | `1ca4600` | Stop AI CRM emails fabricating sender claims from the recipient's city. | [preview](https://connect-intel-rkpfhr1b0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1ca4600` |
 | 08/07/2026, 14:37:28 | `0c93d77` | Use LinkedIn JSON-LD as authoritative employer/location source for capture. | [preview](https://connect-intel-h9ga0egom-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0c93d77` |
 | 08/07/2026, 13:12:54 | `7d4324b` | Stop LinkedIn capture picking a followed company; read employer from Experience. | [preview](https://connect-intel-ih49x9tql-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7d4324b` |
-| 08/07/2026, 13:03:09 | `d547877` | Fix LinkedIn capture grabbing wrong company and headline as location. | [preview](https://connect-intel-6e38d3vtu-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d547877` |
-| 08/07/2026, 12:51:39 | `1bf09d2` | Sync contact edits to pipeline table, not just the shard mirror. | [preview](https://connect-intel-2l1aij9nj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1bf09d2` |
-| 08/07/2026, 12:45:13 | `c6afbae` | Persist contact email/phone edits to linked pipeline leads. | [preview](https://connect-intel-nrph1ts2a-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c6afbae` |
-| 07/07/2026, 23:52:39 | `c44e2d0` | Disable Team intelligence and non-core CRM analytics from the product shell. | [preview](https://connect-intel-65qrrf2zf-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c44e2d0` |
-| 07/07/2026, 23:47:46 | `7726f86` | Allow reps to delete their own pipeline leads without org-wide delete permission. | [preview](https://connect-intel-om9dtcm1o-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7726f86` |
-| 07/07/2026, 23:43:51 | `4abe24f` | Prevent duplicate pipeline leads from extension capture and manual add. | [preview](https://connect-intel-9se2v8vo2-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4abe24f` |
-| 07/07/2026, 23:36:13 | `657c9b1` | Fix Copilot misrouting fresh FBA discovery queries to stale session memory. | [preview](https://connect-intel-57ac8arfe-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 657c9b1` |
-| 07/07/2026, 23:29:06 | `c789337` | Improve Copilot LinkedIn profile accuracy with verified web discovery. | [preview](https://connect-intel-l08eq7qqn-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c789337` |
-| 07/07/2026, 23:16:55 | `ee1db2c` | Fix extension capture persistence and LinkedIn location extraction. | [preview](https://connect-intel-9xt7e13qh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ee1db2c` |
-| 07/07/2026, 23:04:56 | `0ea7939` | Enrich existing pipeline leads when extension captures LinkedIn profiles. | [preview](https://connect-intel-e51usrnba-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0ea7939` |
-| 07/07/2026, 22:54:53 | `e528c72` | Fix Copilot transparent icon and extension LinkedIn profile capture. | [preview](https://connect-intel-ntu0g3nrc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e528c72` |
-| 07/07/2026, 22:46:57 | `7fe06b4` | Fix production white screen from missing BoltIcon import. | [preview](https://connect-intel-e6toi4qad-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7fe06b4` |
-| 07/07/2026, 22:42:41 | `674b77b` | Enrich Chrome extension LinkedIn capture for full CRM pipeline fields. | [preview](https://connect-intel-mtwpxuloa-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 674b77b` |
-| 07/07/2026, 22:32:04 | `b0fd1a5` | Replace Connect Copilot icon with new innovation brand mark. | [preview](https://connect-intel-2j1agxdfi-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b0fd1a5` |
-| 07/07/2026, 22:26:04 | `ce5bc5d` | Polish Copilot knowledge results: compact reply, dedupe, and LinkedIn. | [preview](https://connect-intel-bp3rgwnkd-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ce5bc5d` |
 
 ---
 
