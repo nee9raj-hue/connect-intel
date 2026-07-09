@@ -5,11 +5,15 @@ import LoadingExperience from '../ui/LoadingExperience'
 
 const TRIGGERS = [
   { id: 'contact_added', label: 'Contact added to pipeline' },
-  { id: 'lead_stage_changed', label: 'Lead stage changed' },
+  { id: 'lead_created', label: 'Lead created' },
+  { id: 'status_enter', label: 'Lead stage entered' },
+  { id: 'deal_won', label: 'Deal won' },
   { id: 'form_submitted', label: 'Form submitted' },
+  { id: 'email_opened', label: 'Email opened' },
+  { id: 'link_clicked', label: 'Link clicked' },
   { id: 'tag_added', label: 'Tag added' },
-  { id: 'deal_created', label: 'Deal created' },
   { id: 'sequence_completed', label: 'CRM sequence completed' },
+  { id: 'no_activity_days', label: 'No activity (inactivity)' },
 ]
 
 const STEP_TYPES = [

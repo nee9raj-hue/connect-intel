@@ -32,6 +32,8 @@ export default function CrmAutomationPanel() {
   const [section, setSection] = useState('workflows')
   const [editingWorkflow, setEditingWorkflow] = useState(null)
   const [showCanvas, setShowCanvas] = useState(false)
+  const [workflowRuns, setWorkflowRuns] = useState([])
+  const [runsLoading, setRunsLoading] = useState(false)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -48,6 +50,22 @@ export default function CrmAutomationPanel() {
   useEffect(() => {
     load()
   }, [load])
+
+  const loadRuns = useCallback(async () => {
+    setRunsLoading(true)
+    try {
+      const data = await api.getWorkflowRuns({ limit: 40 })
+      setWorkflowRuns(data.runs || [])
+    } catch {
+      setWorkflowRuns([])
+    } finally {
+      setRunsLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (section === 'runs') void loadRuns()
+  }, [section, loadRuns])
 
   const save = async (patch) => {
     setBusy(true)
@@ -140,6 +158,7 @@ export default function CrmAutomationPanel() {
             ['rules', 'Quick rules'],
             ['pipelines', 'Pipelines'],
             ['scoring', 'Lead scoring'],
+            ['runs', 'Run history'],
           ].map(([id, label]) => (
             <button
               key={id}
@@ -377,6 +396,62 @@ export default function CrmAutomationPanel() {
                     ))}
                   </tbody>
                 </table>
+              </div>
+            )}
+
+            {section === 'runs' && (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <h2 className="text-sm font-semibold">Workflow run history</h2>
+                  <button
+                    type="button"
+                    className="ci-btn ci-btn-secondary !text-xs"
+                    disabled={runsLoading}
+                    onClick={() => loadRuns()}
+                  >
+                    Refresh
+                  </button>
+                </div>
+                <p className="text-xs text-gray-500">
+                  Audited CRM rules, visual workflows, and marketing automations (when Supabase workflow tables are enabled).
+                </p>
+                {runsLoading ? (
+                  <LoadingExperience label="Loading runs…" />
+                ) : !workflowRuns.length ? (
+                  <p className="text-xs text-gray-500">No workflow runs logged yet.</p>
+                ) : (
+                  <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white">
+                    <table className="crm-table w-full text-xs">
+                      <thead>
+                        <tr>
+                          <th>When</th>
+                          <th>Trigger</th>
+                          <th>Workflow</th>
+                          <th>Lead</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {workflowRuns.map((run) => (
+                          <tr key={run.id}>
+                            <td className="whitespace-nowrap">
+                              {run.created_at
+                                ? new Date(run.created_at).toLocaleString()
+                                : '—'}
+                            </td>
+                            <td>{run.trigger_type || '—'}</td>
+                            <td>
+                              <span className="text-gray-500">{run.workflow_type}</span>
+                              {run.workflow_key ? ` · ${run.workflow_key}` : ''}
+                            </td>
+                            <td className="font-mono text-[11px]">{run.lead_id || '—'}</td>
+                            <td>{run.status || '—'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
             )}
           </>
