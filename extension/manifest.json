@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Connect Intel",
   "version": "1.2.0",
-  "description": "CRM companion for Gmail, LinkedIn, and contact pages — match pipeline leads, sync email trails, capture contacts, and send from Connect Intel.",
+  "description": "CRM companion for Gmail, LinkedIn & contact pages — match leads, sync trails, capture contacts, send from CRM.",
   "icons": {
     "48": "icons/icon-48.png",
     "128": "icons/icon-128.png"
