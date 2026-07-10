@@ -16,6 +16,7 @@ import EmailSendsTab from './settings/EmailSendsTab'
 import IntegrationsTab from './settings/IntegrationsTab'
 import ImportLeadsTab from './settings/ImportLeadsTab'
 import BillingTab from './settings/BillingTab'
+import TeamAccessPanel from './TeamAccessPanel'
 
 function buildTeamMap(departments) {
   const map = new Map()
@@ -125,22 +126,7 @@ export default function TeamPanel({ onNavigate, panelOptions = {} }) {
 
   if (!user?.isOrgAdmin || user?.accountType !== 'company') {
     return (
-      <div className="panel-shell flex items-center justify-center p-8">
-        <div className="max-w-md text-center bg-white rounded-2xl border border-gray-200 p-8">
-          <h2 className="text-lg font-medium text-gray-900">Work email</h2>
-          <p className="mt-2 text-sm text-gray-500">
-            Team administration is for company admins. Connect your Gmail to send from Pipeline.
-          </p>
-          <button
-            type="button"
-            onClick={() => onNavigate?.('my-email')}
-            className="mt-5 px-4 py-2.5 text-sm font-medium rounded-lg text-white"
-            style={{ background: C.accent }}
-          >
-            Open Work email
-          </button>
-        </div>
-      </div>
+      <TeamAccessPanel user={user} onNavigate={onNavigate} />
     )
   }
 
@@ -221,6 +207,7 @@ export default function TeamPanel({ onNavigate, panelOptions = {} }) {
               teamOptions={teamOptions}
               refreshTeam={refreshTeam}
               updateMemberPermissions={updateMemberPermissions}
+              inviteTeamMember={inviteTeamMember}
               onInviteClick={() => setInviteOpen(true)}
               onNavigateTab={setTab}
               onNotice={showToast}

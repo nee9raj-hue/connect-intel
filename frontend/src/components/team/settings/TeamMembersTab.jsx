@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { api } from '../../../lib/api'
 import {
   AVATAR_BY_ROLE,
@@ -130,6 +130,7 @@ export default function TeamMembersTab({
   teamOptions = [],
   refreshTeam,
   updateMemberPermissions,
+  inviteTeamMember,
   onInviteClick,
   onNavigateTab,
   onNotice,
@@ -141,6 +142,20 @@ export default function TeamMembersTab({
   const [busyId, setBusyId] = useState(null)
   const [roleModal, setRoleModal] = useState(null)
   const [teamModal, setTeamModal] = useState(null)
+  const [accessRequests, setAccessRequests] = useState([])
+
+  const loadAccessRequests = useCallback(async () => {
+    try {
+      const data = await api.getTeamMembers({ silent: true })
+      setAccessRequests(data.accessRequests || [])
+    } catch {
+      setAccessRequests([])
+    }
+  }, [])
+
+  useEffect(() => {
+    void loadAccessRequests()
+  }, [loadAccessRequests, teamMembers.length])
   const stats = useMemo(() => {
     let admins = 0
     let managers = 0
@@ -311,6 +326,72 @@ export default function TeamMembersTab({
           subtitle="Invite teammates by work email"
         />
       </div>
+
+      {accessRequests.length > 0 && (
+        <SettingsCard style={{ padding: 16 }}>
+          <h3 style={{ margin: '0 0 8px', fontSize: 14, fontWeight: 600, color: C.text }}>
+            Access requests
+          </h3>
+          <p style={{ margin: '0 0 12px', fontSize: 12, color: C.textMuted }}>
+            Teammates with your email domain asked to join this workspace.
+          </p>
+          <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {accessRequests.map((row) => (
+              <li
+                key={row.id}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 12,
+                  padding: '10px 12px',
+                  border: `0.5px solid ${C.border}`,
+                  borderRadius: 8,
+                  background: '#fffaf7',
+                }}
+              >
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: C.text }}>{row.name || row.email}</div>
+                  <div style={{ fontSize: 12, color: C.textMuted }}>{row.email}</div>
+                  {row.mobile ? (
+                    <div style={{ fontSize: 11, color: C.textMuted }}>Mobile: {row.mobile}</div>
+                  ) : null}
+                </div>
+                <button
+                  type="button"
+                  disabled={busyId === row.id}
+                  onClick={async () => {
+                    setBusyId(row.id)
+                    try {
+                      await inviteTeamMember({ email: row.email, pipelineRole: 'member' })
+                      await refreshTeam({ force: true })
+                      await loadAccessRequests()
+                      onNotice?.(`Invite sent to ${row.email}`)
+                    } catch (err) {
+                      onNotice?.(err.message || 'Invite failed', 'error')
+                    } finally {
+                      setBusyId(null)
+                    }
+                  }}
+                  style={{
+                    border: 'none',
+                    borderRadius: 8,
+                    padding: '8px 12px',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    background: C.accent,
+                    color: '#242424',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  Send invite
+                </button>
+              </li>
+            ))}
+          </ul>
+        </SettingsCard>
+      )}
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center' }}>
         <SettingsInput

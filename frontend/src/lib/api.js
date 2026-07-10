@@ -119,6 +119,9 @@ export const api = {
   destroySession: () => request('/api/auth/session', { method: 'DELETE' }),
   completeOnboarding: (payload) =>
     request('/api/onboarding/complete', { method: 'POST', body: payload }),
+  getOrgWorkspaceLookup: () => request('/api/org/workspace-lookup', { silent: true }),
+  requestOrgAccess: (payload) =>
+    request('/api/org/access-request', { method: 'POST', body: payload }),
   getTeamMembers: ({ silent = false } = {}) => request('/api/team/members', {}, { silent }),
   inviteTeamMember: (payload) =>
     request('/api/team/invite', { method: 'POST', body: payload, timeoutMs: 60_000 }),
