@@ -74,6 +74,7 @@ function renderCaptureFields(capture) {
     previewRow('Phone', capture.phone),
     previewRow('LinkedIn', capture.linkedin),
     previewRow('Industry', capture.industry),
+    previewRow('Notes', capture.notes),
   ].filter(Boolean)
 
   return rows.length ? rows.join('') : '<div class="ci-preview__row">No fields detected yet.</div>'

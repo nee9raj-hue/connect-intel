@@ -148,19 +148,291 @@ function parseOpenGraphContact() {
   return { ogTitle, ogDesc, siteName, metaAuthor }
 }
 
+const LABELED_FIELD_ALIASES = {
+  personName: [
+    'contact name',
+    'customer name',
+    'client name',
+    'full name',
+    'contact person',
+    'person name',
+    'name of contact',
+    'representative name',
+  ],
+  company: [
+    'trade name',
+    'company name',
+    'business name',
+    'firm name',
+    'legal name',
+    'organisation name',
+    'organization name',
+    'account name',
+    'customer company',
+    'company',
+  ],
+  email: ['contact email', 'email id', 'email address', 'e-mail', 'email'],
+  emailAlt: ['firm email id', 'firm email', 'company email', 'business email'],
+  phone: [
+    'contact no',
+    'contact number',
+    'contact phone',
+    'mobile no',
+    'mobile number',
+    'phone number',
+    'phone no',
+    'phone',
+    'mobile',
+  ],
+  phoneAlt: ['firm mobile no', 'firm mobile', 'firm phone', 'alternate phone'],
+  title: ['designation', 'job title', 'role', 'position'],
+  city: ['city'],
+  state: ['state'],
+  noteGst: ['gst number', 'gst no', 'gstin'],
+  noteIec: ['iec number', 'iec no', 'iec'],
+  notePan: ['pan number', 'pan no', 'pan'],
+  noteConstitution: ['constitution of business', 'business type'],
+  noteCategory: ['category of exporters', 'exporter category'],
+}
+
+const LABEL_ALIAS_TO_FIELD = Object.fromEntries(
+  Object.entries(LABELED_FIELD_ALIASES).flatMap(([field, labels]) =>
+    labels.map((label) => [label, field])
+  )
+)
+
+function normalizeLabelKey(raw = '') {
+  return String(raw || '')
+    .replace(/\s+/g, ' ')
+    .replace(/[:：*]+$/g, '')
+    .trim()
+    .toLowerCase()
+}
+
+function mapLabelToField(label = '') {
+  const key = normalizeLabelKey(label)
+  if (!key) return ''
+  if (LABEL_ALIAS_TO_FIELD[key]) return LABEL_ALIAS_TO_FIELD[key]
+  if (key.endsWith(' name') && !key.includes('company') && !key.includes('trade')) {
+    if (key.includes('contact') || key.includes('customer') || key.includes('client')) {
+      return 'personName'
+    }
+  }
+  return ''
+}
+
+function isProductPageTitle(title = '') {
+  const raw = String(title || '').trim()
+  if (!raw) return true
+  if (/^\s*xindus\s+erp\s*$/i.test(raw)) return true
+  if (/\berp\b/i.test(raw) && raw.split(/\s+/).length <= 4) return true
+  if (/\b(crm|dashboard|admin|portal)\b/i.test(raw) && raw.split(/\s+/).length <= 4) return true
+  return false
+}
+
+function isErpActionHeading(text = '') {
+  const raw = String(text || '').trim()
+  if (!raw) return true
+  if (/^(manage|edit|view|create|update|add|new)\s+/i.test(raw)) return true
+  if (/\b(inc|pvt|ltd|llp|llc)\b\.?$/i.test(raw) && raw.split(/\s+/).length >= 3) return true
+  return false
+}
+
+function looksLikeFieldLabel(text = '') {
+  const key = normalizeLabelKey(text)
+  if (!key || key.length > 48) return false
+  if (mapLabelToField(key)) return true
+  return /^[a-z][a-z0-9\s/&()-]{1,40}$/i.test(key) && key.split(/\s+/).length <= 6
+}
+
+function cleanLabeledValue(value = '') {
+  return String(value || '')
+    .replace(/\s+/g, ' ')
+    .replace(/^[:：\s-]+/, '')
+    .replace(/[:：\s-]+$/, '')
+    .trim()
+}
+
+function isUsableLabeledValue(value = '') {
+  const cleaned = cleanLabeledValue(value)
+  if (!cleaned || cleaned.length > 240) return false
+  if (mapLabelToField(cleaned)) return false
+  if (/^(company info|account details|contact info)$/i.test(cleaned)) return false
+  return true
+}
+
+function storeLabeledPair(store, field, value) {
+  if (!field || !isUsableLabeledValue(value)) return
+  const cleaned = cleanLabeledValue(value)
+  if (!store[field]) store[field] = cleaned
+}
+
+function parseInlineLabelValue(line = '', store = {}) {
+  const match = String(line || '').match(/^(.{2,48}?)\s*[:：]\s*(.+)$/)
+  if (!match) return false
+  const field = mapLabelToField(match[1])
+  if (!field) return false
+  storeLabeledPair(store, field, match[2])
+  return true
+}
+
+function collectLabelValuePairsFromText(text = '') {
+  const store = {}
+  const lines = String(text || '')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+
+  for (const line of lines) {
+    if (parseInlineLabelValue(line, store)) continue
+  }
+
+  for (let i = 0; i < lines.length - 1; i += 1) {
+    const field = mapLabelToField(lines[i])
+    if (!field) continue
+    const value = lines[i + 1]
+    if (!isUsableLabeledValue(value)) continue
+    storeLabeledPair(store, field, value)
+    i += 1
+  }
+
+  return store
+}
+
+function readInputValue(el) {
+  if (!el) return ''
+  const tag = String(el.tagName || '').toLowerCase()
+  if (tag === 'input' || tag === 'textarea' || tag === 'select') {
+    return cleanLabeledValue(el.value || el.getAttribute?.('value') || '')
+  }
+  return cleanLabeledValue(el.textContent || '')
+}
+
+function collectLabelValuePairsFromDom() {
+  const store = {}
+
+  for (const tr of document.querySelectorAll('tr')) {
+    const cells = [...tr.querySelectorAll('th, td')]
+      .map((cell) => cleanLabeledValue(cell.textContent || ''))
+      .filter(Boolean)
+    if (cells.length < 2) continue
+    const field = mapLabelToField(cells[0])
+    if (field) storeLabeledPair(store, field, cells.slice(1).join(' '))
+  }
+
+  for (const row of document.querySelectorAll('dl')) {
+    const labels = row.querySelectorAll('dt')
+    const values = row.querySelectorAll('dd')
+    for (let i = 0; i < Math.min(labels.length, values.length); i += 1) {
+      const field = mapLabelToField(labels[i].textContent || '')
+      if (field) storeLabeledPair(store, field, values[i].textContent || '')
+    }
+  }
+
+  const labelSelectors = [
+    'label',
+    'mat-label',
+    '.mat-form-field-label',
+    '[class*="form-label"]',
+    '[class*="field-label"]',
+    '[class*="label-text"]',
+  ]
+  for (const selector of labelSelectors) {
+    try {
+      for (const labelEl of document.querySelectorAll(selector)) {
+        const field = mapLabelToField(labelEl.textContent || '')
+        if (!field) continue
+        const block =
+          labelEl.closest(
+            '.mat-form-field, .form-group, .field, .row, tr, dl, [class*="form-field"], [class*="field-row"]'
+          ) || labelEl.parentElement
+        if (!block) continue
+        const valueEl = block.querySelector(
+          'input, textarea, select, .mat-input-element, [class*="value"], [class*="field-value"], span:not(label):not(mat-label)'
+        )
+        const value = readInputValue(valueEl)
+        if (value) storeLabeledPair(store, field, value)
+      }
+    } catch {
+      /* invalid selector */
+    }
+  }
+
+  return store
+}
+
+function collectLabelValuePairs() {
+  const fromDom = collectLabelValuePairsFromDom()
+  const pageText = document.body?.innerText?.slice(0, 120_000) || ''
+  const fromText = collectLabelValuePairsFromText(pageText)
+  const merged = { ...fromText, ...fromDom }
+  return merged
+}
+
+function labeledPairsToContactFields(pairs = {}) {
+  const { splitPersonName, normalizePhone } = linkedInParse()
+  const splitName = splitPersonName || (() => ({ firstName: '', lastName: '' }))
+  const normalizePhoneFn = normalizePhone || ((value) => String(value || '').trim())
+
+  const personRaw = pairs.personName || ''
+  const { firstName, lastName } = splitName(personRaw)
+  const company = pairs.company || ''
+  const email = String(pairs.email || pairs.emailAlt || '')
+    .trim()
+    .toLowerCase()
+  const phone = normalizePhoneFn(pairs.phone || pairs.phoneAlt || '')
+
+  const noteLines = []
+  if (pairs.noteGst) noteLines.push(`GST: ${pairs.noteGst}`)
+  if (pairs.noteIec) noteLines.push(`IEC: ${pairs.noteIec}`)
+  if (pairs.notePan) noteLines.push(`PAN: ${pairs.notePan}`)
+  if (pairs.noteConstitution) noteLines.push(`Business: ${pairs.noteConstitution}`)
+  if (pairs.noteCategory) noteLines.push(`Exporter category: ${pairs.noteCategory}`)
+  if (pairs.emailAlt && pairs.emailAlt !== pairs.email) {
+    noteLines.push(`Alt email: ${pairs.emailAlt}`)
+  }
+  if (pairs.phoneAlt && pairs.phoneAlt !== pairs.phone) {
+    noteLines.push(`Alt phone: ${pairs.phoneAlt}`)
+  }
+
+  const hasCore = Boolean((firstName && lastName) || company || email)
+  if (!hasCore) return null
+
+  return {
+    firstName,
+    lastName,
+    company,
+    email,
+    phone,
+    title: pairs.title || '',
+    city: pairs.city || '',
+    state: pairs.state || '',
+    notes: noteLines.join('\n').slice(0, 2000),
+    pageType: 'crm_form',
+  }
+}
+
+function extractLabeledFormContact() {
+  const pairs = collectLabelValuePairs()
+  return labeledPairsToContactFields(pairs)
+}
+
 function personNameFromTitle(title = '') {
   const { splitPersonName, parseHeadline } = linkedInParse()
   const splitName = splitPersonName || (() => ({ firstName: '', lastName: '' }))
   const parseHeadlineFn = parseHeadline || (() => ({ title: '', company: '' }))
 
   const raw = String(title || '').trim()
-  if (!raw) return { firstName: '', lastName: '', title: '', company: '' }
+  if (!raw || isProductPageTitle(raw)) return { firstName: '', lastName: '', title: '', company: '' }
 
   const parsed = parseHeadlineFn(raw)
   const primary = raw.split('|')[0]?.split('–')[0]?.trim() || raw
   const dashParts = primary.split(/\s+-\s+/)
   const nameCandidate =
     dashParts.length >= 2 && dashParts[0].length <= 40 ? dashParts[0].trim() : primary
+  if (isErpActionHeading(nameCandidate)) {
+    return { firstName: '', lastName: '', title: '', company: parsed.company || '' }
+  }
   const nameParts = splitName(nameCandidate)
 
   return {
@@ -187,6 +459,7 @@ function findPrimaryHeadingName() {
       const el = document.querySelector(selector)
       const text = el?.textContent?.trim() || ''
       if (!text || text.length > 80) continue
+      if (isErpActionHeading(text)) continue
       if (/\b(team|contact|about|leadership|our people)\b/i.test(text) && text.split(/\s+/).length <= 3) {
         continue
       }
@@ -283,6 +556,8 @@ function quickContactSignals() {
   const { findEmailInText, findPhoneInText } = linkedInParse()
   const sample = document.body?.innerText?.slice(0, 8000) || ''
   if (findEmailInText?.(sample) || findPhoneInText?.(sample)) return true
+  const pairs = collectLabelValuePairsFromText(sample)
+  if (pairs.personName || pairs.company || pairs.email || pairs.phone) return true
   return false
 }
 
@@ -584,6 +859,11 @@ function extractContactPage() {
 
   const schema = extractSchemaOrgContact()
   const og = parseOpenGraphContact()
+  const labeled = extractLabeledFormContact()
+  const useLabeledPrimary = Boolean(
+    labeled &&
+      ((labeled.firstName && labeled.lastName) || (labeled.company && (labeled.email || labeled.phone)))
+  )
   const titleName = personNameFromTitle(og.ogTitle || document.title || '')
   const headingName = findPrimaryHeadingName()
   const roleNearName = findRoleNearName()
@@ -607,26 +887,28 @@ function extractContactPage() {
   const metaName = og.metaAuthor ? personNameFromTitle(og.metaAuthor) : { firstName: '', lastName: '' }
 
   const merged = mergeContactFields(
+    labeled,
     schema.person,
     schema.organization,
-    headingName,
-    titleName,
-    metaName,
+    ...(useLabeledPrimary ? [] : [headingName, titleName, metaName]),
     {
-      title: roleNearName.title || titleParsed.title || schema.person?.title || '',
-      company:
-        roleNearName.company ||
-        titleParsed.company ||
-        titleName.company ||
-        schema.person?.company ||
-        schema.organization?.company ||
-        og.siteName ||
-        '',
-      email: schema.person?.email || schema.organization?.email || email,
-      phone: schema.person?.phone || schema.organization?.phone || phone,
-      city: schema.person?.city || schema.organization?.city || '',
-      state: schema.person?.state || schema.organization?.state || '',
-      location: schema.person?.location || schema.organization?.location || '',
+      title: useLabeledPrimary
+        ? labeled?.title || schema.person?.title || ''
+        : roleNearName.title || titleParsed.title || schema.person?.title || '',
+      company: useLabeledPrimary
+        ? labeled?.company || schema.person?.company || schema.organization?.company || ''
+        : roleNearName.company ||
+          titleParsed.company ||
+          titleName.company ||
+          schema.person?.company ||
+          schema.organization?.company ||
+          og.siteName ||
+          '',
+      email: labeled?.email || schema.person?.email || schema.organization?.email || email,
+      phone: labeled?.phone || schema.person?.phone || schema.organization?.phone || phone,
+      city: labeled?.city || schema.person?.city || schema.organization?.city || '',
+      state: labeled?.state || schema.person?.state || schema.organization?.state || '',
+      location: labeled?.location || schema.person?.location || schema.organization?.location || '',
       linkedin,
       industry: schema.person?.industry || schema.organization?.industry || '',
       companyDomain: schema.organization?.companyDomain || companyDomain,
@@ -638,10 +920,15 @@ function extractContactPage() {
   }
 
   const notesParts = []
+  if (labeled?.notes) notesParts.push(labeled.notes)
   if (og.ogDesc && og.ogDesc !== merged.title) notesParts.push(og.ogDesc.slice(0, 300))
   if (selection) notesParts.push(`Selected: ${selection.slice(0, 400)}`)
 
-  const pageType = schema.person || merged.firstName ? 'contact_page' : 'generic_page'
+  const pageType = labeled
+    ? 'crm_form'
+    : schema.person || merged.firstName
+      ? 'contact_page'
+      : 'generic_page'
 
   return {
     pageType,
@@ -656,6 +943,8 @@ if (typeof globalThis !== 'undefined') {
     extractSchemaOrgContact,
     extractContactPage,
     extractContactCandidates,
+    extractLabeledFormContact,
+    collectLabelValuePairs,
     quickContactSignals,
     hasMinimumCaptureFields,
     scoreContactCapture,

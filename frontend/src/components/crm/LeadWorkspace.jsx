@@ -1028,6 +1028,10 @@ export default function LeadWorkspace({
                     ))}
                   </LwSelect>
                 )}
+                <p className="lw-muted lw-muted--sm" style={{ marginTop: 8 }}>
+                  Reps only see leads assigned to them in Pipeline. Managers: pick a teammate here to
+                  share access, or schedule a task/meeting for them.
+                </p>
               </LwSection>
             )}
 

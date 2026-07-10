@@ -97,6 +97,7 @@ function renderCapturePreview(fields) {
     <div class="muted">${fields.email || ''}</div>
     <div class="muted">${fields.phone || ''}</div>
     <div class="muted">${fields.linkedin || ''}</div>
+    ${fields.notes ? `<div class="muted">${fields.notes.split('\n').slice(0, 3).join(' · ')}</div>` : ''}
   `
   actionsEl.hidden = false
   primaryActionEl.textContent = 'Add / update pipeline'
