@@ -11,6 +11,10 @@ const TYPE_LABELS = {
   company: 'Company',
   campaign: 'Campaign',
   deal: 'Deal',
+  task: 'Task',
+  note: 'Note',
+  message: 'Message',
+  template: 'Template',
 }
 
 function useDebounced(value, ms = 500) {
@@ -125,11 +129,18 @@ export default function CommandPalette({
           openPipelineLead?.(item.leadId)
           return
         }
-        onNavigate?.(item.panel || 'contacts', {})
+        onNavigate?.(item.panel || 'contacts', {
+          ...(item.tab ? { tab: item.tab } : {}),
+          ...(item.view ? { view: item.view } : {}),
+          ...(item.dealStage ? { dealStage: item.dealStage } : {}),
+        })
         return
       }
 
-      onNavigate?.(item.panel, item.options || {})
+      onNavigate?.(item.panel, {
+        ...(item.options || {}),
+        ...(item.tab ? { tab: item.tab } : {}),
+      })
     },
     [onClose, onNavigate, openPipelineLead]
   )
@@ -213,7 +224,7 @@ export default function CommandPalette({
           <input
             ref={inputRef}
             className="ci-cmd-input"
-            placeholder="Search leads, contacts, campaigns… or jump to a page"
+            placeholder="Search leads, tasks, templates… or jump to a page"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             autoComplete="off"
