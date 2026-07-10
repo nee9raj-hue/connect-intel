@@ -48,7 +48,7 @@ export default function InviteMemberDrawer({
       const data = await inviteTeamMember({
         email: email.trim(),
         name: name.trim() || undefined,
-        canSearch: false,
+        canSearch: role.pipelineRole !== 'org_admin',
         pipelineRole: role.pipelineRole,
         marketingRole: role.marketingRole,
       })
