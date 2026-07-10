@@ -7,6 +7,7 @@ export default function SaveReportModal({
   filterSummary,
   serverFilters,
   advancedFilters,
+  module = 'pipeline',
   canShareOrg = false,
   onClose,
   onSaved,
@@ -28,6 +29,7 @@ export default function SaveReportModal({
     try {
       const data = await api.saveReportDefinition({
         name: name.trim(),
+        module,
         scope: canShareOrg && scope === 'org' ? 'org' : 'personal',
         serverFilters,
         advancedFilters,
@@ -47,7 +49,11 @@ export default function SaveReportModal({
       <GuidanceCard
         icon="↓"
         title="Save as report"
-        message="Save your current pipeline filters as a reusable export. Run it anytime to download a full CSV from the server — not just loaded rows."
+        message={
+          module === 'deals'
+            ? 'Save your current deal filters as a reusable export. Run it anytime to download a full CSV from the server — not just loaded rows.'
+            : 'Save your current pipeline filters as a reusable export. Run it anytime to download a full CSV from the server — not just loaded rows.'
+        }
         hint={filterSummary || 'Pipeline filters applied'}
         primaryLabel={busy ? 'Saving…' : 'Save report'}
         onPrimary={busy ? undefined : submit}

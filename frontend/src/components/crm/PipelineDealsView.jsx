@@ -17,6 +17,7 @@ import {
   dealFilterDateInputValue,
 } from '../../lib/pipelineDealsFilter'
 import { DashboardSegmented } from '../dashboard/dashboardUi'
+import SaveReportModal from './SaveReportModal'
 
 function formatWeight(freight) {
   return formatFreightGross(freight)
@@ -40,6 +41,8 @@ export default function PipelineDealsView({
   const [selected, setSelected] = useState(() => new Set())
   const [bulkBusy, setBulkBusy] = useState(false)
   const [notice, setNotice] = useState(null)
+  const [exportBusy, setExportBusy] = useState(false)
+  const [saveReportOpen, setSaveReportOpen] = useState(false)
   const [dateFrom, setDateFrom] = useState(null)
   const [dateTo, setDateTo] = useState(null)
   const [transportMode, setTransportMode] = useState('all')
@@ -65,6 +68,48 @@ export default function PipelineDealsView({
     if (dealStage === 'all') return { label: 'All open deals' }
     return getDealStageMeta(dealStage, { freightOrg: true })
   }, [dealStage])
+
+  const canExportDeals =
+    !user?.organizationId ||
+    user?.accountType !== 'company' ||
+    !user?.orgPermissions ||
+    Boolean(user.orgPermissions.export_leads)
+
+  const serverFilters = useMemo(
+    () => ({
+      dealStage,
+      assigneeUserId: assigneeFilter || null,
+      transportMode,
+      dateFrom: dateFrom ? dealFilterDateInputValue(dateFrom, timeZone) : null,
+      dateTo: dateTo ? dealFilterDateInputValue(dateTo, timeZone) : null,
+    }),
+    [dealStage, assigneeFilter, transportMode, dateFrom, dateTo, timeZone]
+  )
+
+  const filterSummary = useMemo(() => {
+    const parts = [stageMeta.label]
+    if (rangeLabel) parts.push(rangeLabel)
+    if (transportMode !== 'all') {
+      const mode = DEAL_TRANSPORT_FILTERS.find((opt) => opt.id === transportMode)
+      if (mode) parts.push(mode.label)
+    }
+    if (assigneeFilter) parts.push('Assigned filter')
+    return parts.join(' · ')
+  }, [stageMeta.label, rangeLabel, transportMode, assigneeFilter])
+
+  const runExport = useCallback(async () => {
+    if (!canExportDeals || exportBusy) return
+    setExportBusy(true)
+    setError(null)
+    try {
+      const result = await api.exportDealsReport(serverFilters, { timeZone, timeoutMs: 120_000 })
+      setNotice(`Exported ${result.rowCount || 0} deal${result.rowCount === 1 ? '' : 's'}`)
+    } catch (e) {
+      setError(e.message || 'Export failed')
+    } finally {
+      setExportBusy(false)
+    }
+  }, [canExportDeals, exportBusy, serverFilters, timeZone])
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -182,11 +227,33 @@ export default function PipelineDealsView({
             Select deals for bulk actions, or click a row to open the lead.
           </p>
         </div>
-        <p className="text-xs text-gray-500 tabular-nums shrink-0">
-          {filteredRows.length}
-          {filtersActive && rows.length !== filteredRows.length ? ` of ${rows.length}` : ''} deal
-          {filteredRows.length === 1 ? '' : 's'}
-        </p>
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
+          {canExportDeals ? (
+            <>
+              <button
+                type="button"
+                className="crm-filter-link-btn"
+                disabled={exportBusy || loading}
+                onClick={() => void runExport()}
+              >
+                {exportBusy ? 'Exporting…' : 'Export CSV'}
+              </button>
+              <button
+                type="button"
+                className="crm-filter-link-btn"
+                disabled={exportBusy || loading}
+                onClick={() => setSaveReportOpen(true)}
+              >
+                Save report
+              </button>
+            </>
+          ) : null}
+          <p className="text-xs text-gray-500 tabular-nums">
+            {filteredRows.length}
+            {filtersActive && rows.length !== filteredRows.length ? ` of ${rows.length}` : ''} deal
+            {filteredRows.length === 1 ? '' : 's'}
+          </p>
+        </div>
       </div>
 
       <div className="pipeline-deals-filters" role="search" aria-label="Deal filters">
@@ -419,6 +486,18 @@ export default function PipelineDealsView({
           </table>
         </div>
       )}
+      <SaveReportModal
+        open={saveReportOpen}
+        module="deals"
+        filterSummary={filterSummary}
+        serverFilters={serverFilters}
+        canShareOrg={Boolean(user?.isOrgAdmin)}
+        onClose={() => setSaveReportOpen(false)}
+        onSaved={() => {
+          setSaveReportOpen(false)
+          setNotice('Report saved')
+        }}
+      />
     </div>
   )
 }

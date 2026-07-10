@@ -4,6 +4,7 @@ import { getSessionToken, storeSessionToken } from './sessionAuth'
 import { trackApiLoading } from './apiLoading'
 import { fetchWithTimeout } from './fetchWithTimeout'
 import { buildPipelineExportQuery, triggerCsvDownload } from './pipelineExportQuery.js'
+import { buildDealExportQuery } from './dealExportQuery.js'
 import {
   prepareWorkspaceUploadRows,
   WORKSPACE_UPLOAD_CHUNK_ROWS,
@@ -966,7 +967,10 @@ export const api = {
     request('/api/assistant/chat', { method: 'POST', body: { action: 'escalate', ...payload } }),
   getPipelineSavedViews: () => request('/api/crm/saved-views'),
   savePipelineView: (payload) => request('/api/crm/saved-views', { method: 'POST', body: payload }),
-  getReportDefinitions: () => request('/api/reports/definitions'),
+  getReportDefinitions: (module = null) => {
+    const params = module ? `?module=${encodeURIComponent(module)}` : ''
+    return request(`/api/reports/definitions${params}`)
+  },
   saveReportDefinition: (payload) =>
     request('/api/reports/definitions', { method: 'POST', body: payload }),
   deleteReportDefinition: (reportId) =>
@@ -1000,6 +1004,39 @@ export const api = {
     const disposition = response.headers.get('Content-Disposition') || ''
     const match = disposition.match(/filename="([^"]+)"/)
     const filename = match?.[1] || options.filename || 'pipeline-leads.csv'
+    triggerCsvDownload(blob, filename)
+    const rowCount = Number(response.headers.get('X-Export-Row-Count') || 0)
+    return { ok: true, rowCount }
+  },
+  exportDealsReport: async (serverFilters = {}, options = {}) => {
+    const params = buildDealExportQuery(serverFilters, options)
+    const token = getSessionToken()
+    const response = await fetchWithTimeout(
+      `/api/reports/deals-export?${params.toString()}`,
+      {
+        credentials: 'same-origin',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      },
+      options.timeoutMs ?? 120_000
+    )
+    if (!response.ok) {
+      const text = await response.text()
+      let data = {}
+      if (text) {
+        try {
+          data = JSON.parse(text)
+        } catch {
+          throw new Error(text.slice(0, 120) || 'Export failed')
+        }
+      }
+      const error = new Error(data.error || data.message || 'Export failed')
+      if (data.code) error.code = data.code
+      throw error
+    }
+    const blob = await response.blob()
+    const disposition = response.headers.get('Content-Disposition') || ''
+    const match = disposition.match(/filename="([^"]+)"/)
+    const filename = match?.[1] || options.filename || 'pipeline-deals.csv'
     triggerCsvDownload(blob, filename)
     const rowCount = Number(response.headers.get('X-Export-Row-Count') || 0)
     return { ok: true, rowCount }

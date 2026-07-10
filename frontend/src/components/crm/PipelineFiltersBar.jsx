@@ -84,7 +84,7 @@ export default function PipelineFiltersBar({
 
   const loadReports = useCallback(async () => {
     try {
-      const data = await api.getReportDefinitions()
+      const data = await api.getReportDefinitions('pipeline')
       setSavedReports(data.reports || [])
     } catch {
       setSavedReports([])
