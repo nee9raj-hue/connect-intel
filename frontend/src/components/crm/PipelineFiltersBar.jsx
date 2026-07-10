@@ -62,6 +62,8 @@ export default function PipelineFiltersBar({
   canSaveReport = false,
   onSaveReport,
   onRunSavedReport,
+  canExportFunnel = false,
+  onExportFunnel,
   canShowOwnerFilter = false,
   ownerFilter = null,
   ownerOptions = [],
@@ -655,6 +657,11 @@ export default function PipelineFiltersBar({
           {canSaveReport ? (
             <button type="button" className="crm-filter-link-btn" onClick={onSaveReport}>
               Save as report
+            </button>
+          ) : null}
+          {canExportFunnel ? (
+            <button type="button" className="crm-filter-link-btn" onClick={onExportFunnel}>
+              Export funnel CSV
             </button>
           ) : null}
           {appliedSearch && (

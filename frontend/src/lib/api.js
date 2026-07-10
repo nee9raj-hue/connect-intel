@@ -1008,6 +1008,39 @@ export const api = {
     const rowCount = Number(response.headers.get('X-Export-Row-Count') || 0)
     return { ok: true, rowCount }
   },
+  exportPipelineFunnelReport: async (serverFilters = {}, options = {}) => {
+    const params = buildPipelineExportQuery(serverFilters, options)
+    const token = getSessionToken()
+    const response = await fetchWithTimeout(
+      `/api/reports/pipeline-funnel-export?${params.toString()}`,
+      {
+        credentials: 'same-origin',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      },
+      options.timeoutMs ?? 120_000
+    )
+    if (!response.ok) {
+      const text = await response.text()
+      let data = {}
+      if (text) {
+        try {
+          data = JSON.parse(text)
+        } catch {
+          throw new Error(text.slice(0, 120) || 'Export failed')
+        }
+      }
+      const error = new Error(data.error || data.message || 'Export failed')
+      if (data.code) error.code = data.code
+      throw error
+    }
+    const blob = await response.blob()
+    const disposition = response.headers.get('Content-Disposition') || ''
+    const match = disposition.match(/filename="([^"]+)"/)
+    const filename = match?.[1] || options.filename || 'pipeline-funnel.csv'
+    triggerCsvDownload(blob, filename)
+    const rowCount = Number(response.headers.get('X-Export-Row-Count') || 0)
+    return { ok: true, rowCount }
+  },
   exportDealsReport: async (serverFilters = {}, options = {}) => {
     const params = buildDealExportQuery(serverFilters, options)
     const token = getSessionToken()

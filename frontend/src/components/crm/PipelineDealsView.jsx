@@ -43,6 +43,7 @@ export default function PipelineDealsView({
   const [notice, setNotice] = useState(null)
   const [exportBusy, setExportBusy] = useState(false)
   const [saveReportOpen, setSaveReportOpen] = useState(false)
+  const [savedReports, setSavedReports] = useState([])
   const [dateFrom, setDateFrom] = useState(null)
   const [dateTo, setDateTo] = useState(null)
   const [transportMode, setTransportMode] = useState('all')
@@ -110,6 +111,36 @@ export default function PipelineDealsView({
       setExportBusy(false)
     }
   }, [canExportDeals, exportBusy, serverFilters, timeZone])
+
+  const runSavedReportExport = useCallback(
+    async (report) => {
+      if (!canExportDeals || exportBusy) return
+      setExportBusy(true)
+      setError(null)
+      try {
+        const result = await api.exportDealsReport({}, { reportId: report.id, timeZone, timeoutMs: 120_000 })
+        setNotice(`Exported “${report.name}” (${result.rowCount || 0} deals)`)
+      } catch (e) {
+        setError(e.message || 'Export failed')
+      } finally {
+        setExportBusy(false)
+      }
+    },
+    [canExportDeals, exportBusy, timeZone]
+  )
+
+  const loadSavedReports = useCallback(async () => {
+    try {
+      const data = await api.getReportDefinitions('deals')
+      setSavedReports(data.reports || [])
+    } catch {
+      setSavedReports([])
+    }
+  }, [])
+
+  useEffect(() => {
+    if (canExportDeals) void loadSavedReports()
+  }, [canExportDeals, loadSavedReports])
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -246,6 +277,27 @@ export default function PipelineDealsView({
               >
                 Save report
               </button>
+              {savedReports.length > 0 ? (
+                <details className="pipeline-deals-saved-reports">
+                  <summary className="crm-filter-link-btn cursor-pointer list-none">
+                    Saved reports ({savedReports.length})
+                  </summary>
+                  <ul className="pipeline-saved-reports-list mt-1">
+                    {savedReports.map((report) => (
+                      <li key={report.id}>
+                        <button
+                          type="button"
+                          className="crm-filter-link-btn text-left w-full"
+                          disabled={exportBusy}
+                          onClick={() => void runSavedReportExport(report)}
+                        >
+                          {report.shared ? `${report.name} (Team)` : report.name}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              ) : null}
             </>
           ) : null}
           <p className="text-xs text-gray-500 tabular-nums">
@@ -496,6 +548,7 @@ export default function PipelineDealsView({
         onSaved={() => {
           setSaveReportOpen(false)
           setNotice('Report saved')
+          void loadSavedReports()
         }}
       />
     </div>

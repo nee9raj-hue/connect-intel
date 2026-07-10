@@ -1348,6 +1348,19 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     [canExportLeads]
   )
 
+  const runFunnelExport = useCallback(async () => {
+    if (!canExportLeads) {
+      setBulkNotice('Export is disabled for your role. Ask your admin in Team → Permissions.')
+      return
+    }
+    try {
+      const result = await api.exportPipelineFunnelReport(serverFilters, { timeoutMs: 120_000 })
+      setBulkNotice(`Funnel exported (${result.rowCount || 0} leads in scope).`)
+    } catch (e) {
+      setBulkNotice(e.message || 'Funnel export failed')
+    }
+  }, [canExportLeads, serverFilters])
+
   const exportVisibleLeads = useCallback(() => {
     const count = exportRowCount
     if (!count && !filtered.length) return
@@ -1555,6 +1568,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               canSaveReport={canSaveAsAudience}
               onSaveReport={() => setSaveReportOpen(true)}
               onRunSavedReport={runSavedReportExport}
+              canExportFunnel={canExportLeads}
+              onExportFunnel={() => void runFunnelExport()}
               canShowOwnerFilter={canFilterByOwner}
               ownerFilter={effectiveAssigneeFilter}
               ownerOptions={ownerFilterOptions}
