@@ -47,6 +47,8 @@ export default function PipelineDealsView({
   const [dateFrom, setDateFrom] = useState(null)
   const [dateTo, setDateTo] = useState(null)
   const [transportMode, setTransportMode] = useState('all')
+  const [forecast, setForecast] = useState(null)
+  const [forecastLoading, setForecastLoading] = useState(false)
 
   const timeZone = user?.timezone || undefined
 
@@ -173,6 +175,22 @@ export default function PipelineDealsView({
   useEffect(() => {
     load()
   }, [load])
+
+  const loadForecast = useCallback(async () => {
+    setForecastLoading(true)
+    try {
+      const data = await api.getDealsForecast(serverFilters, { timeZone })
+      setForecast(data.forecast || null)
+    } catch {
+      setForecast(null)
+    } finally {
+      setForecastLoading(false)
+    }
+  }, [serverFilters, timeZone])
+
+  useEffect(() => {
+    void loadForecast()
+  }, [loadForecast])
 
   const allSelected = filteredRows.length > 0 && filteredRows.every((row) => selected.has(dealRowKey(row)))
 
@@ -310,6 +328,46 @@ export default function PipelineDealsView({
           </p>
         </div>
       </div>
+
+      {forecastLoading ? (
+        <p className="pipeline-deals-forecast pipeline-deals-forecast--loading text-xs text-gray-500">
+          Loading forecast…
+        </p>
+      ) : forecast?.dealCount > 0 ? (
+        <div className="pipeline-deals-forecast" role="region" aria-label="Deal forecast">
+          <article className="pipeline-deals-forecast__card">
+            <span className="pipeline-deals-forecast__label">Open pipeline</span>
+            <strong className="pipeline-deals-forecast__value">{formatDealValue(forecast.openValue)}</strong>
+            <span className="pipeline-deals-forecast__hint">{forecast.openCount} open deals</span>
+          </article>
+          <article className="pipeline-deals-forecast__card">
+            <span className="pipeline-deals-forecast__label">Weighted forecast</span>
+            <strong className="pipeline-deals-forecast__value">
+              {formatDealValue(forecast.weightedPipeline)}
+            </strong>
+            <span className="pipeline-deals-forecast__hint">Stage-weighted</span>
+          </article>
+          <article className="pipeline-deals-forecast__card">
+            <span className="pipeline-deals-forecast__label">30-day outlook</span>
+            <strong className="pipeline-deals-forecast__value">
+              {formatDealValue(forecast.forecast30d)}
+            </strong>
+          </article>
+          <article className="pipeline-deals-forecast__card">
+            <span className="pipeline-deals-forecast__label">Won value</span>
+            <strong className="pipeline-deals-forecast__value">{formatDealValue(forecast.wonValue)}</strong>
+            <span className="pipeline-deals-forecast__hint">{forecast.winRate ?? 0}% win rate</span>
+          </article>
+          {forecast.atRiskValue > 0 ? (
+            <article className="pipeline-deals-forecast__card pipeline-deals-forecast__card--risk">
+              <span className="pipeline-deals-forecast__label">Stale (21d+)</span>
+              <strong className="pipeline-deals-forecast__value">
+                {formatDealValue(forecast.atRiskValue)}
+              </strong>
+            </article>
+          ) : null}
+        </div>
+      ) : null}
 
       <div className="pipeline-deals-filters" role="search" aria-label="Deal filters">
         <div className="pipeline-deals-filters__dates">

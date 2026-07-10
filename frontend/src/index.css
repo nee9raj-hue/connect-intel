@@ -2976,6 +2976,52 @@ button.ci-lead-tag:disabled {
 }
 
 /* Freight deals table — full width, fixed columns */
+.pipeline-deals-forecast {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+  gap: 0.5rem;
+}
+
+.pipeline-deals-forecast--loading {
+  padding: 0.25rem 0.15rem;
+}
+
+.pipeline-deals-forecast__card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.55rem 0.7rem;
+  background: #fff;
+  border: 1px solid #dfe3eb;
+  border-radius: 8px;
+  min-width: 0;
+}
+
+.pipeline-deals-forecast__card--risk {
+  border-color: #f5c4a8;
+  background: #fff8f4;
+}
+
+.pipeline-deals-forecast__label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #516f90;
+}
+
+.pipeline-deals-forecast__value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #33475b;
+  font-variant-numeric: tabular-nums;
+}
+
+.pipeline-deals-forecast__hint {
+  font-size: 0.68rem;
+  color: #7c98b6;
+}
+
 .pipeline-deals-filters {
   display: flex;
   flex-wrap: wrap;

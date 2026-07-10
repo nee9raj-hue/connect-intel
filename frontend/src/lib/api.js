@@ -1076,6 +1076,10 @@ export const api = {
     const rowCount = Number(response.headers.get('X-Export-Row-Count') || 0)
     return { ok: true, rowCount }
   },
+  getDealsForecast: (serverFilters = {}, options = {}) => {
+    const params = buildDealExportQuery(serverFilters, options)
+    return request(`/api/crm/deals-forecast?${params.toString()}`)
+  },
   listCrmSequences: () => request('/api/crm/sequences'),
   createCrmSequence: (payload) => request('/api/crm/sequences', { method: 'POST', body: payload }),
   enrollCrmSequence: (payload) =>

@@ -2,6 +2,7 @@ export {
   flattenDealsFromEntries,
   countDealsByStage,
   isClosedDealStage,
+  buildDealsForecast,
 } from '../../../lib/dealPipeline.js'
 
 import { getFreightCustomerTypeMeta } from '../../../lib/freightDeal.js'
