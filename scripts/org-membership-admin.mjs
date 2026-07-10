@@ -19,6 +19,8 @@ const { getOrganizationRoster, transferOrgAdmin } = await import(adminUrl)
 
 const args = process.argv.slice(2)
 const isRoster = args.includes('--roster') || process.env.npm_lifecycle_event === 'org:roster'
+const isInvite = args.includes('--invite') || process.env.npm_lifecycle_event === 'org:invite'
+const inviteEmail = args.find((a) => a.startsWith('--email='))?.split('=')[1]
 const execute = args.includes('--execute')
 const orgId = args.find((a) => a.startsWith('--org='))?.split('=')[1]
 const nameQuery = args.find((a) => a.startsWith('--name='))?.split('=')[1]
@@ -26,7 +28,7 @@ const fromEmail = args.find((a) => a.startsWith('--from='))?.split('=')[1]
 const toEmail = args.find((a) => a.startsWith('--to='))?.split('=')[1]
 const remoteBase = args.find((a) => a.startsWith('--url='))?.split('=')[1]?.replace(/\/$/, '')
 
-const action = isRoster ? 'org-roster' : 'org-transfer-admin'
+const action = isRoster ? 'org-roster' : isInvite ? 'org-invite-member' : 'org-transfer-admin'
 
 if (remoteBase) {
   const secret = process.env.CRON_SECRET || process.env.MARKETING_CRON_SECRET
@@ -37,6 +39,7 @@ if (remoteBase) {
   const qs = new URLSearchParams({ action, dryRun: execute ? '0' : '1' })
   if (orgId) qs.set('orgId', orgId)
   if (nameQuery) qs.set('nameQuery', nameQuery)
+  if (inviteEmail) qs.set('email', inviteEmail)
   const url = `${remoteBase}/api/infra/bootstrap?${qs}`
   const body = {
     action,
@@ -45,6 +48,7 @@ if (remoteBase) {
     nameQuery,
     fromEmail,
     toEmail,
+    email: inviteEmail,
   }
   console.log(`${execute ? 'POST (EXECUTE)' : 'POST'} ${url}\n`)
   const res = await fetch(url, {
@@ -61,6 +65,13 @@ if (remoteBase) {
 if (!orgId && !nameQuery) {
   console.error('Pass --org=ORG_ID or --name=xindus')
   process.exit(1)
+}
+
+if (isInvite) {
+  if (!inviteEmail) {
+    console.error('Invite requires --email=user@company.com')
+    process.exit(1)
+  }
 }
 
 if (isRoster) {
