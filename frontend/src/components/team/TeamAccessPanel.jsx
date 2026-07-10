@@ -53,7 +53,7 @@ export default function TeamAccessPanel({ user, onNavigate }) {
             Only company admins can invite teammates and change roles. You are a member of{' '}
             <strong>{user.organizationName || 'your workspace'}</strong>.
           </p>
-          {lookup?.adminContacts?.length > 0 && (
+          {lookup?.adminContacts?.length > 0 ? (
             <p className="text-xs text-gray-600">
               Ask{' '}
               {lookup.adminContacts
@@ -61,6 +61,11 @@ export default function TeamAccessPanel({ user, onNavigate }) {
                 .slice(0, 2)
                 .join(' or ')}{' '}
               to invite colleagues from Team → Members.
+            </p>
+          ) : (
+            <p className="text-xs text-gray-600">
+              No workspace admin is assigned yet. Contact your Connect Intel operator at invite@connectintel.net to
+              grant admin access.
             </p>
           )}
           <button

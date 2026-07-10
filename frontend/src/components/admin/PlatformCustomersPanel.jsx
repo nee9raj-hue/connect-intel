@@ -526,6 +526,20 @@ function CustomerDetail({ detail, busy, onAction }) {
           >
             Set 100 DB searches
           </ActionBtn>
+          {!u.isOrgAdmin && (detail.matchedOrganization || u.organizationId) && (
+            <ActionBtn
+              disabled={busy}
+              onClick={() =>
+                onAction({
+                  userId: u.id,
+                  action: 'grant_org_admin',
+                  organizationId: detail.matchedOrganization?.id || u.organizationId,
+                })
+              }
+            >
+              Grant company admin (Team → Invite)
+            </ActionBtn>
+          )}
           {u.organizationId && (
             <>
               <ActionBtn
@@ -688,6 +702,20 @@ function OrganizationDetail({ detail, busy, onAction }) {
                   <p className="text-xs text-gray-500">{m.email}</p>
                 </div>
                 <div className="flex gap-1">
+                  {!m.isOrgAdmin && (
+                    <ActionBtn
+                      disabled={busy}
+                      onClick={() =>
+                        onAction({
+                          organizationId: org.id,
+                          action: 'grant_org_admin',
+                          userId: m.id,
+                        })
+                      }
+                    >
+                      Make admin
+                    </ActionBtn>
+                  )}
                   <ActionBtn
                     disabled={busy}
                     onClick={() =>
