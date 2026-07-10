@@ -26,6 +26,7 @@ const orgId = args.find((a) => a.startsWith('--org='))?.split('=')[1]
 const nameQuery = args.find((a) => a.startsWith('--name='))?.split('=')[1]
 const fromEmail = args.find((a) => a.startsWith('--from='))?.split('=')[1]
 const toEmail = args.find((a) => a.startsWith('--to='))?.split('=')[1]
+const fromPipelineRole = args.find((a) => a.startsWith('--from-role='))?.split('=')[1]
 const remoteBase = args.find((a) => a.startsWith('--url='))?.split('=')[1]?.replace(/\/$/, '')
 
 const action = isRoster ? 'org-roster' : isInvite ? 'org-invite-member' : 'org-transfer-admin'
@@ -48,6 +49,7 @@ if (remoteBase) {
     nameQuery,
     fromEmail,
     toEmail,
+    fromPipelineRole,
     email: inviteEmail,
   }
   console.log(`${execute ? 'POST (EXECUTE)' : 'POST'} ${url}\n`)
@@ -85,6 +87,13 @@ if (!fromEmail && !toEmail) {
   process.exit(1)
 }
 
-const result = await transferOrgAdmin({ orgId, nameQuery, fromEmail, toEmail, dryRun: !execute })
+const result = await transferOrgAdmin({
+  orgId,
+  nameQuery,
+  fromEmail,
+  toEmail,
+  fromPipelineRole,
+  dryRun: !execute,
+})
 console.log(JSON.stringify(result, null, 2))
 process.exit(execute && !result.ok ? 2 : 0)
