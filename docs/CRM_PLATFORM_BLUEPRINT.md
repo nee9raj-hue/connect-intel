@@ -187,7 +187,7 @@ erDiagram
 | Meeting booked | +100 |
 | Unsubscribe | −25 |
 
-Store rules in `org.crmSettings.scoringRules[]`; recompute on `marketingEvents` + website tracking webhooks.
+Store rules in `org.crmSettings.scoringRules[]`; recompute on `marketingEvents` + website tracking webhooks. **Shipped:** CRM → Automation → Lead scoring; live refresh on email open/click/unsubscribe; bulk recompute API.
 
 ---
 

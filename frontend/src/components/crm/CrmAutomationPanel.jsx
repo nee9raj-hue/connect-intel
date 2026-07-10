@@ -34,12 +34,14 @@ export default function CrmAutomationPanel() {
   const [showCanvas, setShowCanvas] = useState(false)
   const [workflowRuns, setWorkflowRuns] = useState([])
   const [runsLoading, setRunsLoading] = useState(false)
+  const [scoringDefaults, setScoringDefaults] = useState(null)
 
   const load = useCallback(async () => {
     setLoading(true)
     try {
       const data = await api.getCrmSettings()
       setSettings(data.settings)
+      setScoringDefaults(data.scoringDefaults || null)
     } catch (e) {
       setError(e.message)
     } finally {
@@ -97,14 +99,24 @@ export default function CrmAutomationPanel() {
 
   const rules = settings?.workflowRules || []
   const visualWorkflows = settings?.visualWorkflows || []
-  const scoringRules = settings?.scoringRules?.length
-    ? settings.scoringRules
-    : [
-        { id: 'email_open', label: 'Email opened', event: 'email_open', points: 10, enabled: true },
-        { id: 'link_click', label: 'Link clicked', event: 'link_click', points: 25, enabled: true },
-        { id: 'meeting_booked', label: 'Meeting scheduled', event: 'meeting_booked', points: 100, enabled: true },
-        { id: 'unsubscribe', label: 'Unsubscribed', event: 'unsubscribe', points: -25, enabled: true },
-      ]
+  const scoringRules = settings?.scoringRules?.length ? settings.scoringRules : scoringDefaults || []
+
+  const resetScoringDefaults = async () => {
+    await save({ seedScoringDefaults: true })
+  }
+
+  const recomputeScores = async () => {
+    setBusy(true)
+    setError(null)
+    try {
+      const result = await api.recomputeCrmLeadScores()
+      setNotice(result.message || 'Lead scores recalculated')
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setBusy(false)
+    }
+  }
 
   const saveWorkflow = async () => {
     if (!editingWorkflow) return
@@ -363,8 +375,28 @@ export default function CrmAutomationPanel() {
             {section === 'scoring' && (
               <div className="space-y-3">
                 <p className="text-xs text-gray-500">
-                  Points apply when conditions match. Score is capped 0–100. Changes recalculate on next lead save.
+                  Points apply when conditions match. Score is capped 0–100. Opens, clicks, and
+                  unsubscribes recalculate immediately; other rules update on lead save or bulk
+                  recompute.
                 </p>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    className="ci-btn ci-btn-secondary !text-xs"
+                    disabled={busy}
+                    onClick={() => void resetScoringDefaults()}
+                  >
+                    Reset to defaults
+                  </button>
+                  <button
+                    type="button"
+                    className="ci-btn ci-btn-secondary !text-xs"
+                    disabled={busy}
+                    onClick={() => void recomputeScores()}
+                  >
+                    Recompute all scores
+                  </button>
+                </div>
                 <table className="crm-table w-full text-sm">
                   <thead>
                     <tr>

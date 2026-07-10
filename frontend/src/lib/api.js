@@ -1011,6 +1011,7 @@ export const api = {
   processCrmSequences: () => request('/api/crm/sequences?process=1'),
   getCrmSettings: () => request('/api/crm/settings'),
   updateCrmSettings: (payload) => request('/api/crm/settings', { method: 'PATCH', body: payload }),
+  recomputeCrmLeadScores: () => request('/api/crm/scoring/recompute', { method: 'POST', body: {} }),
   getCompaniesHub: ({ q = '', limit = 50, offset = 0, rootsOnly = false } = {}) => {
     const params = new URLSearchParams({
       limit: String(limit),
