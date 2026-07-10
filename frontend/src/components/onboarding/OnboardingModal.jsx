@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useApp } from '../../context/AppContext'
 
 export default function OnboardingModal() {
-  const { completeOnboarding } = useApp()
+  const { completeOnboarding, logout } = useApp()
   const [accountType, setAccountType] = useState('company')
   const [companyName, setCompanyName] = useState('')
   const [logoUrl, setLogoUrl] = useState('')
@@ -114,6 +114,14 @@ export default function OnboardingModal() {
           className="w-full py-2.5 bg-[#FF773D] hover:bg-[#e5652f] text-[#242424] font-semibold rounded-lg text-sm disabled:opacity-60"
         >
           {loading ? 'Setting up…' : 'Continue to workspace'}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => logout()}
+          className="w-full text-xs text-gray-500 underline"
+        >
+          Sign out — use a different account
         </button>
       </form>
     </div>
