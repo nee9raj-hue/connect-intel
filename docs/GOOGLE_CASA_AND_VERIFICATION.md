@@ -123,7 +123,8 @@ For pilots only:
 
 1. Google Cloud → **Audience** → add test user emails (max 100).
 2. Vercel → `GOOGLE_OAUTH_ALLOW_CONNECT=true` (do **not** set `GOOGLE_OAUTH_VERIFIED=true` yet).
-3. Pilots use **Advanced → Go to Connect Intel (unsafe)** if warned.
+3. Vercel → `GMAIL_ONBOARDING_PROMPT_ENABLED=true` to show the post-onboarding Gmail connect modal and getting-started step (only when connect is offered).
+4. Pilots use **Advanced → Go to Connect Intel (unsafe)** if warned.
 
 Alternative without Gmail OAuth: **Team → Company domain (DNS)** via Resend for outbound email.
 
@@ -134,6 +135,7 @@ Alternative without Gmail OAuth: **Team → Company domain (DNS)** via Resend fo
 1. Google email: verification **approved**.
 2. Vercel Production:
    - `GOOGLE_OAUTH_VERIFIED=true`
+   - `GMAIL_ONBOARDING_PROMPT_ENABLED=true` (enables onboarding modal for all verified users)
    - Remove `GOOGLE_OAUTH_ALLOW_CONNECT` (optional)
 3. Redeploy: `npm run prod:ship` → push → `npm run prod:log`
 4. Google Cloud → **Audience** → **Publish app** (Production, not Testing).

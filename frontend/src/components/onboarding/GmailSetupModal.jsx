@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
-import { GMAIL_ONBOARDING_PROMPT_ENABLED } from '../../lib/crmProductFlags'
+import { useGmailOnboardingConfig } from '../../lib/gmailOnboarding'
 
 const STORAGE_KEY = 'ci_gmail_setup_done'
 
@@ -14,11 +14,12 @@ export function markGmailSetupDone() {
 }
 
 export function useGmailSetupNeeded(user) {
+  const { promptEnabled } = useGmailOnboardingConfig()
   const [needed, setNeeded] = useState(false)
   const [status, setStatus] = useState(null)
 
   useEffect(() => {
-    if (!GMAIL_ONBOARDING_PROMPT_ENABLED || !user?.onboardingComplete || user?.isPlatformAdmin) {
+    if (!promptEnabled || !user?.onboardingComplete || user?.isPlatformAdmin) {
       setNeeded(false)
       return
     }
@@ -57,13 +58,14 @@ export function useGmailSetupNeeded(user) {
     return () => {
       cancelled = true
     }
-  }, [user?.id, user?.onboardingComplete, user?.isPlatformAdmin])
+  }, [user?.id, user?.onboardingComplete, user?.isPlatformAdmin, promptEnabled])
 
   return { needed, status, setNeeded }
 }
 
 export default function GmailSetupModal({ onDone }) {
   const { user } = useApp()
+  const { phase } = useGmailOnboardingConfig()
   const [connecting, setConnecting] = useState(false)
   const [error, setError] = useState(null)
   const [status, setStatus] = useState(null)
@@ -121,6 +123,16 @@ export default function GmailSetupModal({ onDone }) {
             inbox — only send permission is required (no Gmail read access).
           </p>
         </div>
+
+        {phase === 'testing' && (
+          <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-950 leading-relaxed">
+            <p className="font-semibold">Google verification in progress</p>
+            <p className="mt-1">
+              If Google blocks sign-in, your admin must add your work email as a test user in Google Cloud, or use
+              Advanced → Go to Connect Intel.
+            </p>
+          </div>
+        )}
 
         {!isAdmin && (
           <div className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-950 leading-relaxed">

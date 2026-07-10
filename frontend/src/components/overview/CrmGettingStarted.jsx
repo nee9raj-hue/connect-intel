@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from 'react'
 import { useApp } from '../../context/AppContext'
 import { pipelineCountsFromSummary } from '../../lib/navConfig'
-import { GMAIL_ONBOARDING_PROMPT_ENABLED } from '../../lib/crmProductFlags'
+import { useGmailOnboardingConfig } from '../../lib/gmailOnboarding'
 import { loadChromeExtensionDistribution, openChromeWebStore } from '../../lib/chromeExtension'
 
 const DISMISS_PREFIX = 'ci_crm_setup_dismissed_'
@@ -22,6 +22,7 @@ export default function CrmGettingStarted({ onNavigate, pipelineSummary }) {
     return window.localStorage.getItem(dismissKey) === '1'
   })
   const [extensionStoreUrl, setExtensionStoreUrl] = useState(null)
+  const { promptEnabled: gmailOnboardingEnabled } = useGmailOnboardingConfig()
 
   useEffect(() => {
     loadChromeExtensionDistribution()
@@ -68,7 +69,7 @@ export default function CrmGettingStarted({ onNavigate, pipelineSummary }) {
           action: { panel: 'pipeline', status: 'all' },
           cta: 'Open pipeline',
         },
-        ...(GMAIL_ONBOARDING_PROMPT_ENABLED ? [gmailStep(true)] : []),
+        ...(gmailOnboardingEnabled ? [gmailStep(true)] : []),
         {
           id: 'extension',
           title: 'Install Chrome extension',
@@ -101,7 +102,7 @@ export default function CrmGettingStarted({ onNavigate, pipelineSummary }) {
         action: { panel: 'pipeline', status: 'all', scopeOwner: 'me' },
         cta: 'My pipeline',
       },
-      ...(GMAIL_ONBOARDING_PROMPT_ENABLED ? [gmailStep(false)] : []),
+      ...(gmailOnboardingEnabled ? [gmailStep(false)] : []),
       {
         id: 'extension',
         title: 'Install Chrome extension',
@@ -124,7 +125,7 @@ export default function CrmGettingStarted({ onNavigate, pipelineSummary }) {
         cta: 'Calendar',
       },
     ]
-  }, [isAdmin, memberCount, leadCount, extensionStoreUrl])
+  }, [isAdmin, memberCount, leadCount, extensionStoreUrl, gmailOnboardingEnabled])
 
   const requiredSteps = steps.filter((s) => !s.optional)
   const doneCount = requiredSteps.filter((s) => s.done).length

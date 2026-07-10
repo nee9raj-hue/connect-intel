@@ -23,7 +23,7 @@ import { useWorkspaceSync } from '../../hooks/useWorkspaceSync'
 import { useWorkspacePulse } from '../../hooks/useWorkspacePulse'
 import SessionReconnectBanner from './SessionReconnectBanner'
 import GmailSetupModal, { markGmailSetupDone, useGmailSetupNeeded } from '../onboarding/GmailSetupModal'
-import { GMAIL_ONBOARDING_PROMPT_ENABLED } from '../../lib/crmProductFlags'
+import { useGmailOnboardingConfig } from '../../lib/gmailOnboarding'
 import ConnectAssistant, { ConnectAIButton } from '../assistant/ConnectAssistant'
 import ConnectAIFab from '../assistant/ConnectAIFab'
 import CommandPalette from '../platform/CommandPalette'
@@ -78,6 +78,7 @@ export default function AppShell() {
   const [commandOpen, setCommandOpen] = useState(false)
   const [aiOpen, setAiOpen] = useState(false)
   const needsOnboarding = user && !user.onboardingComplete && !user.isPlatformAdmin
+  const { promptEnabled: gmailOnboardingEnabled } = useGmailOnboardingConfig()
   const { needed: needsGmailSetup, setNeeded: setNeedsGmailSetup } = useGmailSetupNeeded(user)
   const chithiFocus = isChithiPanel(activePanel)
   const marketingFocus = activePanel === 'marketing' || activePanel === 'bulk-email'
@@ -433,7 +434,7 @@ export default function AppShell() {
         <EmailSendDock sidebarMode={sidebarMode} onNavigate={navigate} />
       )}
       {needsOnboarding && <OnboardingModal />}
-      {GMAIL_ONBOARDING_PROMPT_ENABLED && needsGmailSetup && !needsOnboarding && (
+      {gmailOnboardingEnabled && needsGmailSetup && !needsOnboarding && (
         <GmailSetupModal onDone={() => setNeedsGmailSetup(false)} />
       )}
       {user && !needsOnboarding && !user.isPlatformAdmin && (
