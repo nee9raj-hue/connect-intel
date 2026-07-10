@@ -328,6 +328,9 @@ export default function PipelineFiltersBar({
                         onClick={() => onRunSavedReport?.(report)}
                       >
                         Export {report.shared ? `${report.name} (Team)` : report.name}
+                        {report.schedule?.enabled
+                          ? ` · ${report.schedule.cadence === 'weekly' ? 'Weekly' : 'Daily'} email`
+                          : ''}
                       </button>
                     </li>
                   ))}

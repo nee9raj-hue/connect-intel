@@ -1880,6 +1880,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
         serverFilters={serverFilters}
         advancedFilters={appliedAdvanced}
         canShareOrg={isOrgAdmin}
+        userEmail={user?.email || ''}
         onClose={() => setSaveReportOpen(false)}
         onSaved={() => {
           setSaveReportOpen(false)

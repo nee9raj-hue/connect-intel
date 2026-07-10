@@ -973,6 +973,8 @@ export const api = {
   },
   saveReportDefinition: (payload) =>
     request('/api/reports/definitions', { method: 'POST', body: payload }),
+  updateReportSchedule: (reportId, schedule) =>
+    request('/api/reports/definitions', { method: 'PATCH', body: { reportId, schedule } }),
   deleteReportDefinition: (reportId) =>
     request('/api/reports/definitions', { method: 'DELETE', body: { reportId } }),
   exportPipelineReport: async (serverFilters = {}, options = {}) => {

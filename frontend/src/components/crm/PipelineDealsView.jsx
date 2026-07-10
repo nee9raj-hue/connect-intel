@@ -292,6 +292,9 @@ export default function PipelineDealsView({
                           onClick={() => void runSavedReportExport(report)}
                         >
                           {report.shared ? `${report.name} (Team)` : report.name}
+                          {report.schedule?.enabled
+                            ? ` · ${report.schedule.cadence === 'weekly' ? 'Weekly' : 'Daily'} email`
+                            : ''}
                         </button>
                       </li>
                     ))}
@@ -544,6 +547,7 @@ export default function PipelineDealsView({
         filterSummary={filterSummary}
         serverFilters={serverFilters}
         canShareOrg={Boolean(user?.isOrgAdmin)}
+        userEmail={user?.email || ''}
         onClose={() => setSaveReportOpen(false)}
         onSaved={() => {
           setSaveReportOpen(false)
