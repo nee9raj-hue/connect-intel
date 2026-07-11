@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- bd0b68f
+npm run prod:rollback -- d53458e
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- bd0b68f
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `d53458e` |
-| Log updated (IST) | 11/07/2026, 15:25:49 |
+| Commit | `e205253` |
+| Log updated (IST) | 11/07/2026, 15:29:33 |
 
 ---
 
@@ -44,7 +44,8 @@ npm run prod:rollback -- bd0b68f
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 11/07/2026, 15:25:13 | `d53458e` | Unify CRM workflow dispatch and pass Blueprint Phase 2+ gate. | [preview](https://connect-intel-g7oqzopxa-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d53458e` | **← LIVE**
+| 11/07/2026, 15:29:32 | `e205253` | Fix lead_created CRM workflow rules and expand trigger tests. | [preview](https://connect-intel-f8wo6rfsp-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e205253` | **← LIVE**
+| 11/07/2026, 15:25:13 | `d53458e` | Unify CRM workflow dispatch and pass Blueprint Phase 2+ gate. | [preview](https://connect-intel-g7oqzopxa-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d53458e` |
 | 11/07/2026, 14:25:03 | `bd0b68f` | Add Railway Meilisearch redeploy tooling and ops guide. | [preview](https://connect-intel-b9t54joox-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- bd0b68f` |
 | 11/07/2026, 14:11:51 | `e2c53de` | Add CWS publish helpers, PRD overview assets, and production log. | [preview](https://connect-intel-pp5ir8eow-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e2c53de` |
 | 11/07/2026, 14:09:46 | `5771b23` | Use Meilisearch-safe document IDs without colons. | [preview](https://connect-intel-dbe25ox7d-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5771b23` |
@@ -63,7 +64,6 @@ npm run prod:rollback -- bd0b68f
 | 10/07/2026, 13:06:37 | `2811f4b` | Enable Gmail onboarding prompt via runtime public-config flag. | [preview](https://connect-intel-rh4q04pa0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2811f4b` |
 | 10/07/2026, 12:52:39 | `8b923f9` | Wire Connect Copilot to grounded deal forecast answers. | [preview](https://connect-intel-zscf48p9a-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8b923f9` |
 | 10/07/2026, 12:44:24 | `bc23526` | Add stage-weighted deal forecasting to Pipeline Deals view. | [preview](https://connect-intel-gcwoetiqa-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- bc23526` |
-| 10/07/2026, 12:29:15 | `3133de9` | Link anonymous site visitors to leads for pricing-page scoring. | [preview](https://connect-intel-b659y0qrt-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3133de9` |
 
 ---
 
