@@ -33,7 +33,7 @@ function SectionHeader({ label, title, desc, align = 'left', dark = false, label
   return (
     <header className={centered ? 'text-center mx-auto max-w-3xl' : 'max-w-xl'}>
       {label ? <p className={`ci-v3-section-label mb-3 ${labelClassName}`.trim()}>{label}</p> : null}
-      <h2 className={`ci-v3-section-heading ${dark ? 'ci-v3-on-dark' : 'ci-v3-on-light'}`}>{title}</h2>
+      <h2 className={`ci-v3-section-heading ${dark ? 'ci-v3-on-dark text-white' : 'ci-v3-on-light'}`}>{title}</h2>
       {desc ? (
         <p className={`ci-v3-section-desc mt-4 ${dark ? 'ci-v3-desc-dark' : 'ci-v3-desc-light'} ${centered ? 'mx-auto' : ''}`}>
           {desc}
