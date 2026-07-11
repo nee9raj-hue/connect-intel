@@ -1,0 +1,41 @@
+---
+description: Platform operator vs customer access — never leak infra or block customers on internal panels
+alwaysApply: true
+---
+
+# Platform operator access (customer-safe)
+
+## Two audiences
+
+1. **Company customers** — org members using CRM (pipeline, team, marketing). Sidebar shows their company workspace.
+2. **Platform operators** — Connect Intel staff only (`isPlatformAdmin` / `ADMIN_EMAILS` / `invite@connectintel.net`).
+
+Never mix these surfaces. Customers must never land on operator panels or see operator-only errors.
+
+## Operator-only panels
+
+Guard at **three layers** (all required for new operator UI):
+
+1. **Routing** — `frontend/src/lib/platformOperator.js`: `PLATFORM_OPERATOR_PANELS`, `resolvePanelForUser`, `sanitizeAppLocation`. Use in `AppShell` navigate/applyLocation and `resolveInitialAppLocation`.
+2. **Component gate** — `PlatformOperatorGate.jsx` for operator panels (`admin-home`, `admin`, `admin-customers`, `integrations`). Redirect or “Go to your workspace”; never raw deny.
+3. **API** — `requireAdmin` in `lib/server/auth.js` for `/api/admin/*`.
+
+Adding a new operator panel → add to `PLATFORM_OPERATOR_PANELS` and gate the component.
+
+## Customer-facing copy (never)
+
+Do **not** show customers: `ADMIN_EMAILS`, Vercel, env var names, deployment steps, or “sign in with email listed in…”.
+
+Use neutral copy: “Connect Intel internal area”, “Your workspace account does not include access here”, CTA to **Home / Pipeline / Team**.
+
+## Session / ADMIN_EMAILS
+
+- `isPlatformAdmin` is computed server-side via `isPlatformOperatorUser` + `buildOrgUserResponse` (live `ADMIN_EMAILS`, not JWT-only).
+- `GET /api/auth/session` refreshes from DB (`refreshSessionFromDatabase`) and syncs `user.role` from `resolvePlatformRole`.
+- After changing `ADMIN_EMAILS` in production: user must **sign out and sign in** (or wait for session refresh).
+
+## Checklist before shipping operator or auth UI
+
+- [ ] Non-operators cannot open panel via URL, history, or persisted session location
+- [ ] No infra jargon in any user-visible error or empty state
+- [ ] Operator nav (`buildOperatorNavSections`) only when `user.isPlatformAdmin`
