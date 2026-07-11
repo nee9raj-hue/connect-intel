@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- e0fc2d0
+npm run prod:rollback -- ef70de8
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- e0fc2d0
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `50bc205` |
-| Log updated (IST) | 09/07/2026, 22:30:01 |
+| Commit | `5771b23` |
+| Log updated (IST) | 11/07/2026, 14:10:04 |
 
 ---
 
@@ -44,25 +44,26 @@ npm run prod:rollback -- e0fc2d0
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 09/07/2026, 22:21:51 | `50bc205` | Add extension v1.3 multi-contact picker for team and directory pages. | [preview](https://connect-intel-4ma2bk145-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 50bc205` | **← LIVE**
-| 09/07/2026, 21:46:16 | `e0fc2d0` | Shorten extension manifest description for Chrome Web Store limits. | [preview](https://connect-intel-oyujo0gba-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e0fc2d0` |
-| 09/07/2026, 21:42:35 | `c0cd323` | Wire Chrome Web Store URL through public-config and Team Integrations. | [preview](https://connect-intel-6bt4d5lok-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c0cd323` |
-| 09/07/2026, 20:53:26 | `29300d9` | Fix account hierarchy sync and add rollup metrics for parent/child accounts. | [preview](https://connect-intel-dema5jukq-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 29300d9` |
-| 09/07/2026, 20:39:55 | `25b6fb0` | Add first-class Deal API with full CRUD on /api/crm/deals. | [preview](https://connect-intel-j02kq9lhn-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 25b6fb0` |
-| 09/07/2026, 20:27:01 | `7337eaf` | Add server-side pipeline CSV export and saved report definitions. | [preview](https://connect-intel-ats0x3cu5-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7337eaf` |
-| 09/07/2026, 18:08:06 | `b696103` | Document workflow versioning snapshots as shipped for CRM and marketing. | [preview](https://connect-intel-lr9qcaibx-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b696103` |
-| 09/07/2026, 18:07:08 | `f09fda9` | Add versioned workflow publish snapshots and run history UI. | [preview](https://connect-intel-n2t7s1m7z-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f09fda9` |
-| 09/07/2026, 17:57:54 | `35d242f` | Ship extension v1.2 contact capture, contact dedup merge, and RBAC audit fix. | [preview](https://connect-intel-b4hoa2kh6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 35d242f` |
-| 09/07/2026, 13:07:20 | `32fd333` | Fix sidebar pipeline counts staying stale after CRM status changes. | [preview](https://connect-intel-hjf5k2kuu-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 32fd333` |
-| 09/07/2026, 12:51:24 | `de3c7e8` | Add freight RFQ parsing, logistics intel, and messaging stats to Connect Copilot. | [preview](https://connect-intel-i6ufoa09d-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- de3c7e8` |
-| 08/07/2026, 17:09:03 | `fc0da17` | Fix CRM bulk email silently dropping all recipients as "no_consent" | [preview](https://connect-intel-g8lj8bzlq-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- fc0da17` |
-| 08/07/2026, 16:52:09 | `ff130e5` | Unified Enterprise Messaging Engine: queue all sends via worker + shared engine | [preview](https://connect-intel-1tqcc6f1d-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ff130e5` |
-| 08/07/2026, 16:20:45 | `46335b7` | Update production deploy log for 86660c3 | [preview](https://connect-intel-q8xis78n4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 46335b7` |
-| 08/07/2026, 16:15:57 | `86660c3` | Send small CRM bulk emails inline in-request so they no longer stall as "queued" | [preview](https://connect-intel-b2mmtgz2r-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 86660c3` |
-| 08/07/2026, 16:05:52 | `91066a8` | Fix bulk emails stuck at "queued" by seeding recipients sync + self-healing drain | [preview](https://connect-intel-1bex98cjf-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 91066a8` |
-| 08/07/2026, 15:45:21 | `1ca4600` | Stop AI CRM emails fabricating sender claims from the recipient's city. | [preview](https://connect-intel-rkpfhr1b0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1ca4600` |
-| 08/07/2026, 14:37:28 | `0c93d77` | Use LinkedIn JSON-LD as authoritative employer/location source for capture. | [preview](https://connect-intel-h9ga0egom-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0c93d77` |
-| 08/07/2026, 13:12:54 | `7d4324b` | Stop LinkedIn capture picking a followed company; read employer from Experience. | [preview](https://connect-intel-ih49x9tql-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7d4324b` |
+| 11/07/2026, 14:09:46 | `5771b23` | Use Meilisearch-safe document IDs without colons. | [preview](https://connect-intel-dbe25ox7d-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5771b23` | **← LIVE**
+| 11/07/2026, 14:08:13 | `ef70de8` | Fix campaigns_v3 recipient upsert and Meilisearch task completion. | [preview](https://connect-intel-13y08tjid-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ef70de8` |
+| 11/07/2026, 14:02:37 | `8973ff0` | Speed up dashboard bootstrap and team metrics for Step 10 gate. | [preview](https://connect-intel-p9j916kng-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8973ff0` |
+| 10/07/2026, 17:24:29 | `51e8d05` | Add Google Search Console site verification meta tag. | [preview](https://connect-intel-m8uyqat48-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 51e8d05` |
+| 10/07/2026, 16:59:23 | `34f04f2` | Fix extension install config and default invite search access for reps. | [preview](https://connect-intel-nz2gdpreh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 34f04f2` |
+| 10/07/2026, 16:49:30 | `5d4eb41` | Bundle collaborator SQL migration for Vercel bootstrap ops. | [preview](https://connect-intel-i46kuzpt7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5d4eb41` |
+| 10/07/2026, 16:46:20 | `9758638` | Fix rep lead sharing visibility and surface Chrome extension install link. | [preview](https://connect-intel-m2pvmbaon-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9758638` |
+| 10/07/2026, 14:22:21 | `1ccdc3b` | Support manager role when demoting org admin during transfer. | [preview](https://connect-intel-gakxhlc4v-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1ccdc3b` |
+| 10/07/2026, 14:19:31 | `f290bba` | Add ops endpoint to invite org members via CRON bootstrap. | [preview](https://connect-intel-at5p4tl15-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f290bba` |
+| 10/07/2026, 14:08:08 | `9998c8f` | Skip customer onboarding for invite@ platform operator login. | [preview](https://connect-intel-3399nr58m-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9998c8f` |
+| 10/07/2026, 13:47:14 | `ac2e3b7` | Grant company admin via platform support for invite access. | [preview](https://connect-intel-fu4sgo2za-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ac2e3b7` |
+| 10/07/2026, 13:38:30 | `35fdaad` | Add invite-only company join flow with access requests. | [preview](https://connect-intel-mplzmfr1g-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 35fdaad` |
+| 10/07/2026, 13:19:36 | `8dc1d1a` | Add sign-out escape hatch on onboarding modal. | [preview](https://connect-intel-a55ad6wjs-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8dc1d1a` |
+| 10/07/2026, 13:06:37 | `2811f4b` | Enable Gmail onboarding prompt via runtime public-config flag. | [preview](https://connect-intel-rh4q04pa0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2811f4b` |
+| 10/07/2026, 12:52:39 | `8b923f9` | Wire Connect Copilot to grounded deal forecast answers. | [preview](https://connect-intel-zscf48p9a-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8b923f9` |
+| 10/07/2026, 12:44:24 | `bc23526` | Add stage-weighted deal forecasting to Pipeline Deals view. | [preview](https://connect-intel-gcwoetiqa-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- bc23526` |
+| 10/07/2026, 12:29:15 | `3133de9` | Link anonymous site visitors to leads for pricing-page scoring. | [preview](https://connect-intel-b659y0qrt-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3133de9` |
+| 10/07/2026, 12:22:31 | `7f6a4d4` | Add scheduled CSV email delivery for saved pipeline and deal reports. | [preview](https://connect-intel-a4ech2pke-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7f6a4d4` |
+| 10/07/2026, 12:13:03 | `0a700b9` | Extend platform search with team tasks, notes, and marketing templates. | [preview](https://connect-intel-7yzkuu8bp-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0a700b9` |
+| 10/07/2026, 12:05:43 | `8d87ce3` | Add pipeline funnel CSV export and saved deal report runner. | [preview](https://connect-intel-j7wxt63f6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8d87ce3` |
 
 ---
 

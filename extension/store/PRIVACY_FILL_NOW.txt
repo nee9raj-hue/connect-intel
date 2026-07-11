@@ -1,0 +1,32 @@
+=== CONNECT INTEL — PRIVACY TAB (paste each block into its box) ===
+
+SINGLE PURPOSE (required field at top of Privacy tab):
+This extension is a companion for Connect Intel CRM customers. It helps sales teams match Gmail threads to CRM leads, sync email activity, capture LinkedIn profiles into the pipeline, and compose CRM emails — only for users signed in to connectintel.net.
+
+--- PERMISSION JUSTIFICATIONS (one box per permission) ---
+
+activeTab:
+When the user opens the toolbar popup, read the current tab URL and title to offer Add to pipeline on contact-rich pages they are viewing.
+
+cookies:
+Read the connect_intel_session cookie from connectintel.net so the signed-in user can call Connect Intel APIs with the same session as the web app. No separate extension login.
+
+storage:
+Store minimal extension UI preferences only. CRM lead data is not saved in local storage; it stays on Connect Intel servers.
+
+scripting:
+Inject content scripts on Gmail, LinkedIn, and pages the user visits so the floating CRM widget and Gmail participant extraction run on those sites only.
+
+tabs:
+Reload Gmail tabs after an extension update so users get the latest content scripts without manually restarting Chrome.
+
+Host permission use:
+connectintel.net for CRM APIs (lead match, capture, email draft, audit log). mail.google.com for Gmail widget. linkedin.com for profile capture. Other https pages only when user clicks Add to pipeline.
+
+Remote code use:
+The extension does not download or execute remote JavaScript. It only calls HTTPS JSON APIs on connectintel.net using the users existing web-app session. All business logic runs on Connect Intel servers.
+
+--- ALSO ON PRIVACY TAB ---
+Privacy policy URL: https://connectintel.net/privacy.html
+Check the certification checkbox: data use complies with Developer Program Policy
+Click SAVE DRAFT at top right

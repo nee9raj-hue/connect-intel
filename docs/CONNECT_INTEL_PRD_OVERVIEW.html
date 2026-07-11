@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Connect Intel — Product & Architecture Overview</title>
+  <style>
+    @page { size: A4; margin: 14mm; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 10pt; line-height: 1.45; color: #1a1a1a; }
+    h1 { font-size: 18pt; border-bottom: 2px solid #2563eb; padding-bottom: 0.2em; }
+    h2 { font-size: 12pt; margin-top: 1.2em; color: #1e40af; page-break-after: avoid; }
+    h3 { font-size: 10.5pt; margin-top: 0.8em; }
+    table { font-size: 9pt; border-collapse: collapse; width: 100%; margin: 0.5em 0; }
+    th, td { border: 1px solid #d1d5db; padding: 4px 6px; text-align: left; vertical-align: top; }
+    th { background: #f3f4f6; }
+    pre { font-size: 8pt; background: #f9fafb; border: 1px solid #e5e7eb; padding: 8px; white-space: pre-wrap; }
+    .meta { color: #4b5563; font-size: 9pt; margin-bottom: 1em; }
+    .footer { margin-top: 2em; font-size: 8pt; color: #6b7280; border-top: 1px solid #e5e7eb; padding-top: 0.5em; }
+    ul { margin: 0.3em 0; padding-left: 1.2em; }
+    li { margin: 0.15em 0; }
+  </style>
+</head>
+<body>
+  <h1>Connect Intel — Product &amp; Architecture Overview</h1>
+  <p class="meta"><strong>Version:</strong> June 2026 · <strong>Live:</strong> https://connectintel.net<br>
+  <strong>Purpose:</strong> Share with reviewers. Goal: HubSpot-grade revenue platform (CRM + Marketing + Team ops).</p>
+
+  <h2>1. What Connect Intel Is</h2>
+  <p>B2B revenue workspace: prospect, qualify, and close leads in one app.</p>
+  <table>
+    <tr><th>Hub</th><th>What users do</th></tr>
+    <tr><td>CRM / Sales</td><td>Pipeline, lead records, deals, sequences, calendar, WhatsApp</td></tr>
+    <tr><td>Marketing</td><td>Campaigns, audiences, templates, automations, forms, analytics</td></tr>
+    <tr><td>Home / Analytics</td><td>Dashboard, team KPIs, activity log, my-day</td></tr>
+    <tr><td>Collaboration</td><td>Team chat (Chithi), notes, tasks</td></tr>
+    <tr><td>AI Prospecting</td><td>Search companies, save to pipeline</td></tr>
+    <tr><td>Workspace</td><td>Team invites, permissions, email domain, integrations</td></tr>
+  </table>
+  <p><strong>North star:</strong> HubSpot-style objects, timeline, permissions, reporting — fast SPA, no page reloads.</p>
+
+  <h2>2. Roles &amp; Data Scoping</h2>
+  <table>
+    <tr><th>Role</th><th>Pipeline access</th></tr>
+    <tr><td><strong>Rep</strong></td><td>Own leads only (<code>owner_id</code> = self) — cannot bypass</td></tr>
+    <tr><td><strong>Manager</strong></td><td>Team by default; “All Departments” → department scope</td></tr>
+    <tr><td><strong>Org Admin</strong></td><td>Full org pipeline + team settings, imports, permissions</td></tr>
+    <tr><td><strong>Marketing roles</strong></td><td>Manager / Executive / Read-only on marketing hub</td></tr>
+    <tr><td><strong>Platform Admin</strong></td><td>Connect Intel operator (customer admin, separate nav)</td></tr>
+  </table>
+  <p>Scoping enforced in <strong>Postgres</strong> (<code>pipeline_leads</code> + COUNT RPCs), not in-memory scans.</p>
+
+  <h2>3. Pages &amp; Navigation (SPA)</h2>
+  <p>Panel-based shell — URL drives panel state, not separate HTML pages.</p>
+  <pre>/home/dashboard              → Home overview
+?panel=pipeline&status=new    → CRM pipeline (filtered)
+?panel=marketing              → Marketing hub
+?panel=team                   → Team &amp; permissions
+?lead=&lt;id&gt;                   → Lead record workspace</pre>
+  <p><strong>Layout:</strong> Sidebar (nav + scoped lead counts) · Top bar (search, ⌘K) · Panel content · Lead workspace overlay.</p>
+  <p><strong>Key files:</strong> <code>navConfig.js</code>, <code>AppShell.jsx</code>, <code>PipelinePanel.jsx</code>, <code>MarketingPanel.jsx</code></p>
+
+  <h2>4. Code Structure</h2>
+  <pre>frontend/          React SPA (Vite) → site/
+api/index.js       Single Vercel function → all /api/*
+lib/server/        Auth, CRM, marketing, store, handlers/
+supabase/          Postgres migrations
+docs/              Blueprint, release, PRD</pre>
+  <p>Handlers: CORS → <code>requireUser()</code> → business logic → JSON. ~100 API routes.</p>
+
+  <h2>5. Data &amp; Deployment</h2>
+  <h3>Hybrid storage</h3>
+  <table>
+    <tr><th>Layer</th><th>Storage</th><th>Use</th></tr>
+    <tr><td>JSON store</td><td><code>store_collections</code></td><td>Users, orgs, lead blobs, marketing metadata</td></tr>
+    <tr><td>SQL (hot path)</td><td>Supabase Postgres</td><td>Pipeline queries, RBAC, email queue, activity snapshots</td></tr>
+  </table>
+  <p><strong>Key tables:</strong> <code>pipeline_leads</code>, <code>profiles</code>, <code>teams</code>, <code>departments</code>, <code>marketing_email_queue</code></p>
+
+  <h3>Deploy flow</h3>
+  <ol>
+    <li><code>npm run prod:ship</code> (build + checks)</li>
+    <li><code>git push origin main</code></li>
+    <li>GitHub CI + Vercel → https://connectintel.net</li>
+    <li><code>npm run prod:log</code> marks live commit</li>
+    <li>Supabase migrations run manually in SQL editor</li>
+  </ol>
+  <p><strong>Flags:</strong> <code>USE_PIPELINE_LEADS_TABLE</code>, <code>USE_PIPELINE_HIERARCHY_RBAC</code>, <code>USE_MARKETING_SQL_QUEUE</code></p>
+
+  <h2>6. Feature Status (PRD)</h2>
+  <table>
+    <tr><th>Module</th><th>Live</th><th>Roadmap</th></tr>
+    <tr><td>Pipeline kanban / table / deals</td><td>✅</td><td>Multi-pipeline</td></tr>
+    <tr><td>Lead workspace + timeline</td><td>✅</td><td>—</td></tr>
+    <tr><td>Sequences &amp; CRM rules</td><td>✅ partial</td><td>Unified automation engine</td></tr>
+    <tr><td>Marketing hub (campaigns, automations)</td><td>✅</td><td>CRM journey unification</td></tr>
+    <tr><td>Dashboard / team KPIs / my-day</td><td>✅</td><td>Custom report builder</td></tr>
+    <tr><td>Org admin (invites, permissions)</td><td>✅</td><td>Dept/team UI seeding</td></tr>
+    <tr><td>Team hierarchy RBAC</td><td>✅ SQL</td><td>—</td></tr>
+    <tr><td>Companies as parent object</td><td>partial</td><td>P0</td></tr>
+    <tr><td>Standalone deals + forecasting</td><td>partial</td><td>P0</td></tr>
+    <tr><td>Service tickets</td><td>partial</td><td>P2</td></tr>
+  </table>
+
+  <h2>7. HubSpot Gap — Review Priorities</h2>
+  <ul>
+    <li><strong>P0:</strong> Company-centric object model; standalone deal pipeline</li>
+    <li><strong>P1:</strong> One automation engine (CRM + Marketing); configurable reports</li>
+    <li><strong>P2:</strong> Service hub; multi-pipeline per product/team</li>
+    <li><strong>P3:</strong> Website tracking &amp; behavioral scoring</li>
+  </ul>
+  <p>Full blueprint: <code>docs/CRM_PLATFORM_BLUEPRINT.md</code></p>
+
+  <h2>8. Questions for Reviewers</h2>
+  <ol>
+    <li>Is rep / manager / org admin / marketing role split correct?</li>
+    <li>JSON + SQL hybrid until full Postgres cutover — acceptable?</li>
+    <li>Which P0/P1 gaps matter most for your workflow?</li>
+    <li>Panel-based SPA vs traditional routes — training concerns?</li>
+    <li>Priority: shared contact object + marketing/CRM journey view?</li>
+  </ol>
+
+  <p class="footer">Connect Intel — Confidential overview for internal and partner review. June 2026.</p>
+</body>
+</html>
