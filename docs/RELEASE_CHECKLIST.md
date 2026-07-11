@@ -68,7 +68,15 @@ Manual smoke (2–5 min) — on **local preview** (`5173` or `4173`), not only p
 - [ ] **Chithi** — opens without API errors; menu icon visible
 - [ ] **Marketing** — Lists tab filters work on mobile (Filters sheet → Apply)
 - [ ] **Auth** — sign-in still works
+- [ ] **Platform operator** — company user must **not** reach `?panel=admin-home` (redirects to Home); no Vercel/`ADMIN_EMAILS` text in UI
+- [ ] **Platform operator (staff)** — `ADMIN_EMAILS` user sees Platform backend nav after sign-in
 - [ ] **Scope** — Android/Capacitor not included unless explicitly shipping native
+
+Automated smoke (no login):
+
+```bash
+npm run prod:smoke
+```
 
 ---
 
@@ -91,6 +99,16 @@ npm run prod:log
 ```
 
 Confirm the new commit is **← LIVE** in [`PRODUCTION_LOG.md`](PRODUCTION_LOG.md).
+
+```bash
+npm run prod:smoke
+```
+
+Optional — search/index for one org after deploy:
+
+```bash
+npm run prod:ops -- --name=Xindus
+```
 
 Optional — mark a known-good release:
 

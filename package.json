@@ -29,6 +29,7 @@
     "prod:verify": "node scripts/verify-deploy.mjs",
     "prod:preview": "node scripts/verify-deploy.mjs && npm run preview --prefix frontend -- --host 127.0.0.1 --port 4173",
     "prod:ship": "node scripts/ship-production.mjs",
+    "prod:smoke": "node scripts/prod-smoke.mjs",
     "prod:ops": "node scripts/prod-ops.mjs",
     "workers": "node workers/index.mjs",
     "meili:backfill": "node scripts/backfill-meilisearch.mjs",
