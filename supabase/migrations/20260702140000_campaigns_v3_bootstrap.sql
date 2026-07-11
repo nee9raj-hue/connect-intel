@@ -57,6 +57,13 @@ ALTER TABLE public.campaign_recipients
   ADD COLUMN IF NOT EXISTS enrollment_ref TEXT,
   ADD COLUMN IF NOT EXISTS payload JSONB DEFAULT '{}'::jsonb;
 
+ALTER TABLE public.campaign_recipients
+  DROP CONSTRAINT IF EXISTS campaign_recipients_campaign_enrollment_key;
+
+ALTER TABLE public.campaign_recipients
+  ADD CONSTRAINT campaign_recipients_campaign_enrollment_key
+  UNIQUE (campaign_id, enrollment_ref);
+
 CREATE UNIQUE INDEX IF NOT EXISTS campaign_recipients_campaign_enrollment_unique
   ON public.campaign_recipients (campaign_id, enrollment_ref)
   WHERE enrollment_ref IS NOT NULL;
