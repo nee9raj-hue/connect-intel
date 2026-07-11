@@ -67,6 +67,14 @@ CREATE INDEX IF NOT EXISTS idx_campaign_recipients_due
 CREATE INDEX IF NOT EXISTS idx_campaigns_v3_org_status
   ON public.campaigns_v3 (organization_id, send_status);
 
+ALTER TABLE public.campaigns_v3
+  ADD COLUMN IF NOT EXISTS source TEXT,
+  ADD COLUMN IF NOT EXISTS scheduled_at TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS started_at TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS completed_at TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS total_recipients INT DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS correlation_id TEXT;
+
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.campaigns_v3 TO service_role;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.campaign_recipients TO service_role;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.campaign_events TO service_role;
