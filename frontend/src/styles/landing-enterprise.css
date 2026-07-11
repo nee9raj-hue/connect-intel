@@ -1,0 +1,82 @@
+/* Enterprise landing — minimal motion, generous whitespace */
+
+.ci-landing {
+  --ci-ink: #0a0a0b;
+  --ci-muted: #52525b;
+  --ci-border: #e4e4e7;
+  --ci-surface: #fafafa;
+  --ci-accent: #ff773d;
+  font-feature-settings: 'ss01' on, 'cv11' on;
+}
+
+.ci-landing-nav {
+  height: 64px;
+  border-bottom: 1px solid var(--ci-border);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+}
+
+.ci-landing-hero {
+  background: linear-gradient(180deg, #ffffff 0%, #f8f8f8 55%, #ffffff 100%);
+}
+
+.ci-landing-dark {
+  background: var(--ci-ink);
+  color: #fafafa;
+}
+
+.ci-landing-card {
+  border: 1px solid var(--ci-border);
+  border-radius: 1rem;
+  background: #fff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ci-landing-card:hover {
+  border-color: rgba(255, 119, 61, 0.35);
+  box-shadow: 0 12px 40px -20px rgba(0, 0, 0, 0.12);
+}
+
+.ci-btn-primary {
+  background: var(--ci-ink);
+  color: #fff;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  transition: background 0.15s ease;
+}
+
+.ci-btn-primary:hover {
+  background: #27272a;
+}
+
+.ci-btn-secondary {
+  background: #fff;
+  color: var(--ci-ink);
+  border: 1px solid var(--ci-border);
+  font-weight: 600;
+  border-radius: 0.5rem;
+}
+
+.ci-btn-secondary:hover {
+  background: var(--ci-surface);
+}
+
+.ci-btn-accent {
+  background: var(--ci-accent);
+  color: var(--ci-ink);
+  font-weight: 700;
+  border-radius: 0.5rem;
+}
+
+.ci-btn-accent:hover {
+  filter: brightness(0.96);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ci-landing-card,
+  .ci-btn-primary,
+  .ci-btn-secondary,
+  .ci-btn-accent {
+    transition: none;
+  }
+}

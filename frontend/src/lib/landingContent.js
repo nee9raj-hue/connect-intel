@@ -1,126 +1,210 @@
 import { CRM_ONBOARDING_STEPS, FREE_PLAN } from './crmPlanLimits'
 
+/** Enterprise landing copy — CRM core + AI intelligence platform (no Chithi / chat modules). */
+
 export const LANDING_HERO = {
-  badge: 'Free CRM for Indian B2B sales teams',
-  headline: 'Never lose a prospect in the follow-up gap',
+  badge: 'Enterprise AI Sales Intelligence',
+  headline: 'Enterprise AI CRM built for modern sales teams',
   subhead:
-    'Connect Intel is a workspace where your team imports leads, assigns owners, tracks every conversation, and gets reminded before every call—without forcing Gmail setup on day one.',
+    'One workspace for pipeline, deals, team intelligence, and AI-assisted follow-up—built for exporters, manufacturers, and B2B teams that need discipline at scale.',
   bullets: [
-    'Start with work email and password',
-    'Import CSV or add leads manually',
-    'Invite teammates with roles when ready',
-    'Connect work Gmail later for CRM email',
+    'Multi-tenant workspaces with role-based access',
+    'Pipeline, deals, and activity in one record',
+    'AI copilot for drafts, search, and coaching',
+    'Chrome extension for Gmail trail sync',
   ],
 }
+
+export const HERO_OUTCOMES = [
+  'Reduce manual follow-up work',
+  'Close more deals with full visibility',
+  'Automate stage-based workflows',
+  'Coach reps from real CRM activity',
+]
+
+export const PRODUCT_METRICS = [
+  { value: '<500ms', label: 'Dashboard load (production gate)' },
+  { value: 'RBAC', label: 'API-enforced workspace isolation' },
+  { value: '342+', label: 'Automated quality checks' },
+  { value: 'Free', label: 'Start with 5 seats · 500 leads' },
+]
+
+export const PRODUCT_SHOWCASE = [
+  {
+    id: 'pipeline',
+    title: 'Pipeline & lead workspace',
+    benefit: 'Every prospect has an owner, stage, and complete activity trail.',
+    visual: 'pipeline',
+  },
+  {
+    id: 'deals',
+    title: 'Deal management',
+    benefit: 'Track amount, stage, and won/lost triggers from the lead record or opportunities view.',
+    visual: 'deals',
+  },
+  {
+    id: 'dashboard',
+    title: 'Team intelligence',
+    benefit: 'Managers see rep activity, pipeline health, and last CRM touch—not login time alone.',
+    visual: 'dashboard',
+  },
+  {
+    id: 'copilot',
+    title: 'AI sales copilot',
+    benefit: 'Draft follow-ups, search workspace records, and get grounded answers inside CRM.',
+    visual: 'copilot',
+  },
+  {
+    id: 'automation',
+    title: 'Workflow automation',
+    benefit: 'Rules on lead created, stage entered, inactivity, and deal won—audited in SQL.',
+    visual: 'automation',
+  },
+  {
+    id: 'email',
+    title: 'Email & extension',
+    benefit: 'Gmail trail sync and send-and-log via Chrome extension; inbound reply routing to CRM.',
+    visual: 'email',
+  },
+]
+
+export const AI_COPILOT_CAPABILITIES = [
+  { title: 'CRM-aware answers', desc: 'Grounded on your pipeline, assignments, and workspace settings.' },
+  { title: 'Email drafting', desc: 'Generate follow-up copy on leads with consent and context.' },
+  { title: 'Command palette search', desc: 'Find leads, deals, and tasks across the workspace instantly.' },
+  { title: 'Pipeline insights', desc: 'Surface next steps, overdue tasks, and team activity patterns.' },
+  { title: 'Follow-up recommendations', desc: 'Coaching prompts tied to real CRM events—not generic scripts.' },
+  { title: 'Company context', desc: 'Lead and account data unified on one timeline per customer.' },
+]
+
+export const ENTERPRISE_FEATURES = [
+  { title: 'Multi-tenant architecture', desc: 'Isolated org workspaces with server-enforced scoping.' },
+  { title: 'Role-based access', desc: 'Org admin, manager, and rep views on pipeline data.' },
+  { title: 'Audit logs', desc: 'Sensitive actions recorded for compliance and coaching.' },
+  { title: 'Scalable infrastructure', desc: 'Vercel serverless API, Postgres pipeline reads, background workers.' },
+  { title: 'Data isolation', desc: 'Tenant filters on every mutation and list endpoint.' },
+  { title: 'Security-first auth', desc: 'Session JWT, HTTPS, rate-limited login, CSRF-safe cookies.' },
+  { title: 'Organization management', desc: 'Invites, hierarchy, departments, and team settings.' },
+  { title: 'API-ready platform', desc: 'Unified handler layer designed for ERP and integration expansion.' },
+]
+
+export const INDUSTRIES = [
+  'Exporters',
+  'Manufacturers',
+  'D2C brands',
+  'Amazon sellers',
+  'B2B distributors',
+  'Trading companies',
+  'Logistics & freight',
+  'Importers',
+  'Retail sales',
+  'Enterprise field sales',
+]
 
 export const WHO_ITS_FOR = [
   {
     id: 'exporters',
     title: 'Exporters & manufacturers',
-    desc: 'Run outbound from one pipeline instead of Excel tabs and personal WhatsApp threads.',
-    icon: '🏭',
-  },
-  {
-    id: 'founders',
-    title: 'Founders selling directly',
-    desc: 'Get a proper CRM on day one—free for your first seats and leads, no procurement cycle.',
-    icon: '🚀',
+    desc: 'Run international outbound from one pipeline with assignable owners and audit-ready activity.',
   },
   {
     id: 'managers',
-    title: 'Sales managers',
-    desc: 'See who contacted whom, which deals stalled, and who needs a nudge before the day ends.',
-    icon: '📊',
+    title: 'Sales leadership',
+    desc: 'Team review, rep metrics, and pipeline truth without weekly spreadsheet reconciliation.',
+  },
+  {
+    id: 'founders',
+    title: 'Founder-led sales',
+    desc: 'Enterprise-grade workspace on day one—free tier, no procurement cycle.',
   },
   {
     id: 'teams',
-    title: 'Small B2B teams (2–40)',
-    desc: 'One company workspace, shared pipeline, rep-level views—built for teams that outgrew spreadsheets.',
-    icon: '👥',
+    title: 'Growing B2B teams',
+    desc: '2–40 seats, shared pipeline, hierarchy RBAC, and scalable SQL-backed lists.',
   },
 ]
 
 export const PAIN_POINTS = [
-  'Callbacks missed because nobody owns the next step',
-  'Managers cannot see rep activity until weekly reviews',
-  'Customer history split across Gmail, WhatsApp, and notes',
-  'Pipeline numbers in sheets that nobody trusts',
+  'Revenue stalls when follow-ups live in personal inboxes',
+  'Managers lack per-rep CRM activity until manual reviews',
+  'Customer history fragmented across email, WhatsApp, and notes',
+  'Pipeline numbers in spreadsheets nobody trusts',
 ]
 
 export const CRM_WINS = [
-  'Every lead has an owner, stage, and activity trail',
-  'Reminders 30 minutes before meetings and calls',
-  'Team admins see the full org pipeline; reps see theirs',
-  'Import once—work from one record per customer',
+  'Unified timeline on every lead record',
+  'Sub-second dashboard paths for daily manager review',
+  'Workflow rules and sequences with versioned audit',
+  'Workspace isolation enforced at the API layer',
 ]
 
 export const WORKFLOW_STEPS = [
   {
-    title: 'Import your list',
-    desc: 'Upload a CSV from IndiaMART, trade fairs, or your existing sheet. Map columns once and land in pipeline.',
-    tag: 'Day 1',
+    title: 'Create organization',
+    desc: 'Work email and password—secure session, no forced Gmail OAuth at signup.',
+    tag: 'Step 1',
   },
   {
-    title: 'Assign & stage deals',
-    desc: 'Give each lead an owner and move through New → Contacted → Follow up → Won. Everyone sees the same truth.',
-    tag: 'Day 2',
+    title: 'Import pipeline',
+    desc: 'CSV or manual entry with duplicate detection and custom stages.',
+    tag: 'Step 2',
   },
   {
-    title: 'Follow up on time',
-    desc: 'Log calls, schedule tasks, and get browser alerts before meetings. WhatsApp opens with context on screen.',
-    tag: 'Ongoing',
+    title: 'Invite team',
+    desc: 'Roles, departments, and permission matrix for admins.',
+    tag: 'Step 3',
   },
   {
-    title: 'Connect email when ready',
-    desc: 'Optional work Gmail link—send and receive from the CRM when your team is ready. No OAuth during signup.',
-    tag: 'When you need it',
+    title: 'Scale with intelligence',
+    desc: 'AI copilot, automations, extension email sync, and team dashboards.',
+    tag: 'Step 4',
   },
 ]
 
 export const PILLARS = [
   {
     id: 'pipeline',
-    title: 'Pipeline & deal stages',
-    desc: 'Kanban-style stages, owner assignment, notes, tasks, and meetings on every lead record.',
+    title: 'Pipeline & kanban',
+    desc: 'Custom stages, bulk actions, saved views, and lead scoring.',
     tag: 'CRM',
   },
   {
+    id: 'deals',
+    title: 'Deals & opportunities',
+    desc: 'Nested deals per lead with won/lost automation hooks.',
+    tag: 'Sales',
+  },
+  {
     id: 'team',
-    title: 'Team invites & roles',
-    desc: 'Org admins see everything; reps see assigned leads. Invite colleagues with pipeline roles.',
-    tag: 'Team',
+    title: 'Team & permissions',
+    desc: 'Hierarchy RBAC, audit log, and rep-scoped visibility.',
+    tag: 'Enterprise',
   },
   {
     id: 'calendar',
-    title: 'Calendar & reminders',
-    desc: 'Upcoming calls and tasks surface in CRM calendar. Alerts fire 30 minutes before each meeting.',
-    tag: 'Calendar',
+    title: 'Calendar & tasks',
+    desc: 'Meetings, reminders, and optional Google Calendar sync.',
+    tag: 'Productivity',
   },
   {
-    id: 'import',
-    title: 'CSV import',
-    desc: 'Bring existing prospects from spreadsheets or export tools—no manual re-entry for hundreds of rows.',
-    tag: 'Import',
+    id: 'automation',
+    title: 'Workflow engine',
+    desc: 'CRM rules, sequences, and visual automation builder.',
+    tag: 'Automation',
   },
   {
-    id: 'email',
-    title: 'Work Gmail (optional)',
-    desc: 'Connect later with normal Google scopes. Outreach logs to the lead timeline when enabled.',
+    id: 'extension',
+    title: 'Chrome extension',
+    desc: 'Gmail lead match, trail sync, and send-and-log from the inbox.',
     tag: 'Email',
-  },
-  {
-    id: 'whatsapp',
-    title: 'WhatsApp follow-ups',
-    desc: 'Jump to WhatsApp from a lead with context visible—desktop or mobile. Log the touch in CRM.',
-    tag: 'WhatsApp',
   },
 ]
 
 export const MANAGER_BULLETS = [
   'Company-wide pipeline with role-based views',
-  'Per-rep activity and assignment visibility',
-  'CSV import and bulk pipeline updates',
-  'Workspace settings for team capacity and upgrades',
+  'Rep review with CRM last-active and period filters',
+  'SQL-backed list performance at scale',
+  'Audit trail for sensitive workspace actions',
 ]
 
 export const GETTING_STARTED = CRM_ONBOARDING_STEPS.map((s) => ({
@@ -131,34 +215,32 @@ export const GETTING_STARTED = CRM_ONBOARDING_STEPS.map((s) => ({
 
 export const FAQ_ITEMS = [
   {
-    q: 'Do I need Gmail or Google sign-in to start?',
-    a: 'No. Create your workspace with work email and password. Connect work Gmail later from settings when you want send/receive inside the CRM.',
+    q: 'Is Connect Intel only a CRM?',
+    a: 'CRM is the core: pipeline, deals, team intelligence, and automation. AI copilot and workspace search extend the same platform—without separate chat or prospecting modules in the product shell.',
   },
   {
-    q: 'Is Connect Intel really free?',
-    a: `Yes—for up to ${FREE_PLAN.maxSeats} team seats and ${FREE_PLAN.maxLeads} pipeline leads. No card at signup. Upgrade only when your admin confirms you need more capacity.`,
+    q: 'How do we sign in?',
+    a: 'Create a workspace with work email and password. Google Sign-In is available for identity on returning accounts. Active sessions persist securely—no repeated logins on the same device.',
   },
   {
-    q: 'How fast can we go live?',
-    a: 'Most teams sign up, import a CSV, and invite one colleague within the same day. Email integration is optional and can wait.',
+    q: 'How does email work?',
+    a: 'Install the Connect Intel Chrome extension for Gmail trail sync and send-and-log. Inbound reply routing logs responses to CRM without reading your entire inbox.',
   },
   {
-    q: 'Can multiple people from my company join?',
-    a: 'Yes. Company workspaces use your email domain. Admins invite teammates; duplicate company workspaces on the same domain are blocked to keep one source of truth.',
+    q: 'Is the platform enterprise-ready?',
+    a: 'Multi-tenant isolation, RBAC, audit events, Postgres pipeline reads, and production performance gates are live. SSO and org subdomains are on the roadmap.',
+  },
+  {
+    q: 'What does the free tier include?',
+    a: `Up to ${FREE_PLAN.maxSeats} seats and ${FREE_PLAN.maxLeads} pipeline leads. No card at signup. Upgrade when your admin confirms capacity needs.`,
   },
   {
     q: 'Who sees which leads?',
-    a: 'Org admins see the full company pipeline. Reps see leads assigned to them (and records they created). Managers coach from shared activity data.',
-  },
-  {
-    q: 'What happens when we outgrow the free tier?',
-    a: 'Your admin sees usage meters in Team → Workspace. When you are near limits, they can confirm a Team CRM upgrade and see the monthly amount before payment is collected.',
+    a: 'Org admins see the full company pipeline. Reps see assigned leads. Managers see their team subtree. Enforced server-side—not UI-only filters.',
   },
 ]
 
-export const TRUST_SIGNALS = [
-  { label: 'No card at signup', detail: 'Free tier to validate fit' },
-  { label: 'Work email first', detail: 'Gmail connect is optional' },
-  { label: 'One company workspace', detail: 'Per domain, admin-controlled' },
-  { label: 'Built for India B2B', detail: 'INR pricing when you upgrade' },
-]
+export const TRUST_SIGNALS = PRODUCT_METRICS
+
+export const DEMO_MAILTO =
+  'mailto:invite@connectintel.net?subject=Connect%20Intel%20demo%20request&body=Company%20name%3A%0ATeam%20size%3A%0AUse%20case%3A'

@@ -217,3 +217,94 @@ export function BeforeAfterCompare() {
     </div>
   )
 }
+
+export function AiCopilotPreview() {
+  return (
+    <div className="rounded-2xl border border-gray-200 bg-[#0f1117] text-white shadow-2xl overflow-hidden">
+      <div className="px-5 py-3 border-b border-white/10 flex items-center justify-between text-xs">
+        <span className="font-semibold text-white/90">AI Copilot</span>
+        <span className="px-2 py-0.5 rounded-full bg-[#FF773D]/20 text-[#ffb899] font-medium">Grounded on CRM</span>
+      </div>
+      <div className="p-5 space-y-4 text-sm">
+        <div className="rounded-lg bg-white/5 border border-white/10 p-3">
+          <p className="text-white/50 text-xs mb-1">You asked</p>
+          <p className="text-white/95">Draft a follow-up for Rajasthan Handicrafts — pricing sent last week.</p>
+        </div>
+        <div className="rounded-lg bg-[#FF773D]/10 border border-[#FF773D]/30 p-3">
+          <p className="text-amber-200/80 text-xs mb-1">Copilot</p>
+          <p className="text-white/90 leading-relaxed text-[13px]">
+            Subject: Quick check-in on export pricing · Body references last quote and proposes a 15-min call…
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2 text-[11px]">
+          {['Open lead', 'Log call', 'Schedule task'].map((a) => (
+            <span key={a} className="px-2.5 py-1 rounded-md bg-white/10 text-white/80 border border-white/10">
+              {a}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export function DealsPreview() {
+  return (
+    <div className="rounded-2xl border border-gray-200 bg-white shadow-lg p-5">
+      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Opportunities</p>
+      <div className="space-y-2">
+        {[
+          { deal: 'FOB Mumbai — Q3 container', amount: '₹18.4L', stage: 'Negotiation' },
+          { deal: 'EU distributor trial', amount: '₹6.2L', stage: 'Proposal' },
+          { deal: 'Repeat order — spices', amount: '₹2.1L', stage: 'Won' },
+        ].map((row) => (
+          <div key={row.deal} className="flex items-center justify-between gap-3 py-2 border-b border-gray-50 last:border-0 text-xs">
+            <span className="font-medium text-gray-900 truncate">{row.deal}</span>
+            <span className="text-gray-600 shrink-0">{row.amount}</span>
+            <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-semibold shrink-0">{row.stage}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export function AutomationPreview() {
+  return (
+    <div className="rounded-2xl border border-gray-200 bg-gradient-to-br from-slate-50 to-white p-5 shadow-sm">
+      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Workflow</p>
+      <div className="flex flex-col gap-2 text-xs">
+        {[
+          { node: 'Trigger: Stage → Follow up', color: 'bg-violet-100 text-violet-900' },
+          { node: 'Action: Create task — Call in 2 days', color: 'bg-blue-100 text-blue-900' },
+          { node: 'Log: workflow_runs · completed', color: 'bg-emerald-100 text-emerald-900' },
+        ].map((n, i) => (
+          <div key={n.node} className="flex items-center gap-2">
+            {i > 0 ? <span className="text-gray-300 ml-3">↓</span> : null}
+            <div className={`px-3 py-2 rounded-lg font-medium ${n.color}`}>{n.node}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export function ExtensionEmailFlow() {
+  return (
+    <div className="grid sm:grid-cols-3 gap-3">
+      {[
+        { title: 'Install extension', sub: 'Same Chrome profile as your workspace login' },
+        { title: 'Match in Gmail', sub: 'Participants mapped to pipeline leads (RBAC-scoped)' },
+        { title: 'Send & log', sub: 'Trail sync and inbound reply routing to CRM' },
+      ].map((step) => (
+        <div key={step.title} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+          <div className="w-8 h-8 rounded-lg bg-[#fff4ee] border border-[#ffd4b8] flex items-center justify-center mb-3">
+            <span className="text-[#FF773D] text-xs font-bold">CI</span>
+          </div>
+          <p className="text-sm font-semibold text-gray-900">{step.title}</p>
+          <p className="text-xs text-gray-600 mt-1 leading-relaxed">{step.sub}</p>
+        </div>
+      ))}
+    </div>
+  )
+}

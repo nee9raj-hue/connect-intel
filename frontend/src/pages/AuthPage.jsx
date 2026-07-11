@@ -47,13 +47,13 @@ export default function AuthPage({ inviteToken = null }) {
             />
           </button>
           <h2 className="text-3xl font-bold leading-tight mb-4 text-white">
-            Run your pipeline
+            Enterprise sales workspace
             <br />
-            without email setup first
+            without email setup on day one
           </h2>
-          <p className="text-gray-300 max-w-sm text-[15px] leading-relaxed">
-            Sign up with work email, set up your CRM, invite the team, and import leads. Connect work Gmail later
-            when you are ready to send and receive from the CRM.
+          <p className="text-zinc-300 max-w-sm text-[15px] leading-relaxed">
+            Multi-tenant CRM with role-based access, AI copilot, and team intelligence. Sign in once—your session
+            stays secure across visits.
           </p>
 
           <div className="mt-8 space-y-3">
@@ -97,12 +97,18 @@ export default function AuthPage({ inviteToken = null }) {
           </button>
 
           <h1 className="text-2xl font-bold text-ci-dark mb-1">
-            {mode === 'signup' ? 'Create your workspace' : 'Welcome back'}
+            {mode === 'signup' ? 'Create organization' : 'Sign in to workspace'}
           </h1>
-          <p className="text-sm text-gray-600 mb-6">
+          <p className="text-sm text-gray-600 mb-2">
             {mode === 'signup'
-              ? 'Use your work email and password — Gmail connect comes later in settings.'
-              : 'Work email + password, or Google if you originally signed up that way.'}
+              ? 'Work email and password. Chrome extension handles Gmail sync when you are ready.'
+              : 'Work email + password. Active sessions redirect you straight to your workspace.'}
+          </p>
+          <p className="text-xs text-zinc-500 mb-6 flex items-start gap-2">
+            <span className="text-emerald-600 font-bold" aria-hidden>
+              ●
+            </span>
+            HTTPS · encrypted session cookie · rate-limited login
           </p>
 
           {inviteToken && <InviteBanner token={inviteToken} />}
@@ -155,7 +161,17 @@ export default function AuthPage({ inviteToken = null }) {
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1.5">Password</label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-semibold text-gray-700">Password</label>
+                {mode === 'login' ? (
+                  <a
+                    href="mailto:invite@connectintel.net?subject=Password%20reset%20request"
+                    className="text-xs font-medium text-gray-600 hover:text-gray-900"
+                  >
+                    Forgot password?
+                  </a>
+                ) : null}
+              </div>
               <input
                 type="password"
                 required
@@ -192,7 +208,7 @@ export default function AuthPage({ inviteToken = null }) {
               disabled={loading || authBusy}
               className="w-full py-3 bg-ci-nav text-white font-semibold rounded-lg hover:bg-gray-800 disabled:opacity-60"
             >
-              {loading || authBusy ? 'Please wait…' : mode === 'signup' ? 'Create account →' : 'Sign in →'}
+              {loading || authBusy ? 'Please wait…' : mode === 'signup' ? 'Create workspace →' : 'Sign in →'}
             </button>
           </form>
 
