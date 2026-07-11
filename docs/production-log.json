@@ -1,10 +1,52 @@
 {
-  "updatedAt": "2026-07-11T08:40:04.984Z",
-  "updatedAtIst": "11/07/2026, 14:10:04",
+  "updatedAt": "2026-07-11T09:55:49.196Z",
+  "updatedAtIst": "11/07/2026, 15:25:49",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "5771b23",
+  "currentProductionCommit": "d53458e",
   "entries": [
+    {
+      "logId": "20260711-1525-d53458e",
+      "commit": "d53458e",
+      "commitFull": "d53458ed6af538526c6ec429abbebe6a1fe392c7",
+      "message": "Unify CRM workflow dispatch and pass Blueprint Phase 2+ gate.",
+      "deployedAt": "2026-07-11T09:55:13.383Z",
+      "deployedAtIst": "11/07/2026, 15:25:13",
+      "committedAtIst": "11/07/2026, 15:24:40",
+      "vercelPreviewUrl": "https://connect-intel-g7oqzopxa-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- d53458e"
+    },
+    {
+      "logId": "20260711-1425-bd0b68f",
+      "commit": "bd0b68f",
+      "commitFull": "bd0b68f00a30102366dbb474fd1861f9feb89491",
+      "message": "Add Railway Meilisearch redeploy tooling and ops guide.",
+      "deployedAt": "2026-07-11T08:55:03.350Z",
+      "deployedAtIst": "11/07/2026, 14:25:03",
+      "committedAtIst": "11/07/2026, 14:24:23",
+      "vercelPreviewUrl": "https://connect-intel-b9t54joox-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- bd0b68f"
+    },
+    {
+      "logId": "20260711-1411-e2c53de",
+      "commit": "e2c53de",
+      "commitFull": "e2c53dee8bc7244a006f5643ca3001bed090efe0",
+      "message": "Add CWS publish helpers, PRD overview assets, and production log.",
+      "deployedAt": "2026-07-11T08:41:51.949Z",
+      "deployedAtIst": "11/07/2026, 14:11:51",
+      "committedAtIst": "11/07/2026, 14:11:19",
+      "vercelPreviewUrl": "https://connect-intel-pp5ir8eow-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- e2c53de"
+    },
     {
       "logId": "20260711-1409-5771b23",
       "commit": "5771b23",
@@ -15,7 +57,7 @@
       "committedAtIst": "11/07/2026, 14:09:09",
       "vercelPreviewUrl": "https://connect-intel-dbe25ox7d-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 5771b23"
     },
@@ -242,48 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 3133de9"
-    },
-    {
-      "logId": "20260710-1222-7f6a4d4",
-      "commit": "7f6a4d4",
-      "commitFull": "7f6a4d4dac7783433cc909ec3c6e130c7b85c0a7",
-      "message": "Add scheduled CSV email delivery for saved pipeline and deal reports.",
-      "deployedAt": "2026-07-10T06:52:31.676Z",
-      "deployedAtIst": "10/07/2026, 12:22:31",
-      "committedAtIst": "10/07/2026, 12:21:52",
-      "vercelPreviewUrl": "https://connect-intel-a4ech2pke-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 7f6a4d4"
-    },
-    {
-      "logId": "20260710-1213-0a700b9",
-      "commit": "0a700b9",
-      "commitFull": "0a700b96d8f99910603926ef173d579fdf0a1c71",
-      "message": "Extend platform search with team tasks, notes, and marketing templates.",
-      "deployedAt": "2026-07-10T06:43:03.501Z",
-      "deployedAtIst": "10/07/2026, 12:13:03",
-      "committedAtIst": "10/07/2026, 12:12:21",
-      "vercelPreviewUrl": "https://connect-intel-7yzkuu8bp-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 0a700b9"
-    },
-    {
-      "logId": "20260710-1205-8d87ce3",
-      "commit": "8d87ce3",
-      "commitFull": "8d87ce3a2a6c441081fbd0273bd84900f3d24a89",
-      "message": "Add pipeline funnel CSV export and saved deal report runner.",
-      "deployedAt": "2026-07-10T06:35:43.509Z",
-      "deployedAtIst": "10/07/2026, 12:05:43",
-      "committedAtIst": "10/07/2026, 12:05:03",
-      "vercelPreviewUrl": "https://connect-intel-j7wxt63f6-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 8d87ce3"
     }
   ]
 }

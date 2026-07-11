@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- ef70de8
+npm run prod:rollback -- bd0b68f
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- ef70de8
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `5771b23` |
-| Log updated (IST) | 11/07/2026, 14:10:04 |
+| Commit | `d53458e` |
+| Log updated (IST) | 11/07/2026, 15:25:49 |
 
 ---
 
@@ -44,7 +44,10 @@ npm run prod:rollback -- ef70de8
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 11/07/2026, 14:09:46 | `5771b23` | Use Meilisearch-safe document IDs without colons. | [preview](https://connect-intel-dbe25ox7d-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5771b23` | **← LIVE**
+| 11/07/2026, 15:25:13 | `d53458e` | Unify CRM workflow dispatch and pass Blueprint Phase 2+ gate. | [preview](https://connect-intel-g7oqzopxa-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d53458e` | **← LIVE**
+| 11/07/2026, 14:25:03 | `bd0b68f` | Add Railway Meilisearch redeploy tooling and ops guide. | [preview](https://connect-intel-b9t54joox-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- bd0b68f` |
+| 11/07/2026, 14:11:51 | `e2c53de` | Add CWS publish helpers, PRD overview assets, and production log. | [preview](https://connect-intel-pp5ir8eow-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e2c53de` |
+| 11/07/2026, 14:09:46 | `5771b23` | Use Meilisearch-safe document IDs without colons. | [preview](https://connect-intel-dbe25ox7d-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5771b23` |
 | 11/07/2026, 14:08:13 | `ef70de8` | Fix campaigns_v3 recipient upsert and Meilisearch task completion. | [preview](https://connect-intel-13y08tjid-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ef70de8` |
 | 11/07/2026, 14:02:37 | `8973ff0` | Speed up dashboard bootstrap and team metrics for Step 10 gate. | [preview](https://connect-intel-p9j916kng-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8973ff0` |
 | 10/07/2026, 17:24:29 | `51e8d05` | Add Google Search Console site verification meta tag. | [preview](https://connect-intel-m8uyqat48-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 51e8d05` |
@@ -61,9 +64,6 @@ npm run prod:rollback -- ef70de8
 | 10/07/2026, 12:52:39 | `8b923f9` | Wire Connect Copilot to grounded deal forecast answers. | [preview](https://connect-intel-zscf48p9a-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8b923f9` |
 | 10/07/2026, 12:44:24 | `bc23526` | Add stage-weighted deal forecasting to Pipeline Deals view. | [preview](https://connect-intel-gcwoetiqa-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- bc23526` |
 | 10/07/2026, 12:29:15 | `3133de9` | Link anonymous site visitors to leads for pricing-page scoring. | [preview](https://connect-intel-b659y0qrt-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3133de9` |
-| 10/07/2026, 12:22:31 | `7f6a4d4` | Add scheduled CSV email delivery for saved pipeline and deal reports. | [preview](https://connect-intel-a4ech2pke-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7f6a4d4` |
-| 10/07/2026, 12:13:03 | `0a700b9` | Extend platform search with team tasks, notes, and marketing templates. | [preview](https://connect-intel-7yzkuu8bp-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0a700b9` |
-| 10/07/2026, 12:05:43 | `8d87ce3` | Add pipeline funnel CSV export and saved deal report runner. | [preview](https://connect-intel-j7wxt63f6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8d87ce3` |
 
 ---
 
