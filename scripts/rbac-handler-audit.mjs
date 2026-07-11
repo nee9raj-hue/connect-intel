@@ -49,6 +49,7 @@ const PUBLIC_OK = new Set([
   'crm-reminders-cron.js',
   'crm-dashboard-warm-cron.js',
   'crm-meili-sync-cron.js',
+  'crm-data-sync-cron.js',
   'reports-scheduled-cron.js',
   'marketing-cron.js',
   'grafana-metrics-cron.js',
