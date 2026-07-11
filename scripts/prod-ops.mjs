@@ -77,7 +77,10 @@ async function triggerViaHttp() {
 console.log(`Triggering production cron: ${cronPath}\n`)
 
 async function triggerViaVercelCron() {
-  execSync(`vercel crons run "${cronPath}"`, { cwd: ROOT, stdio: 'inherit' })
+  if (qs) {
+    console.warn(`vercel crons run does not pass query params — running ${path} for all orgs.\n`)
+  }
+  execSync(`vercel crons run "${path}"`, { cwd: ROOT, stdio: 'inherit' })
   console.log('\nCron triggered. Check Vercel → connect-intel → Logs for results.')
 }
 
