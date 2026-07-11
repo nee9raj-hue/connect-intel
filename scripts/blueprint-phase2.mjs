@@ -60,7 +60,7 @@ rbac.ok ? pass('RBAC handler audit (strict)') : fail('RBAC handler audit', rbac.
 
 let health = null
 try {
-  health = await fetch(`${PRODUCTION}/api/health`, { signal: AbortSignal.timeout(20_000) }).then(
+  health = await fetch(`${PRODUCTION}/api/health`, { signal: AbortSignal.timeout(45_000) }).then(
     (r) => r.json()
   )
   if (health.infra?.pipelineLeadsTable) pass('Production: USE_PIPELINE_LEADS_TABLE')
