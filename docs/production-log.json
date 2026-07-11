@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-07-11T09:59:33.802Z",
-  "updatedAtIst": "11/07/2026, 15:29:33",
+  "updatedAt": "2026-07-11T10:27:07.402Z",
+  "updatedAtIst": "11/07/2026, 15:57:07",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "e205253",
+  "currentProductionCommit": "9842ab4",
   "entries": [
+    {
+      "logId": "20260711-1557-9842ab4",
+      "commit": "9842ab4",
+      "commitFull": "9842ab4a1da64679b26e20aeb451cd19bc46fd75",
+      "message": "Degrade search gracefully when Meilisearch is down and fix pipeline sync probe.",
+      "deployedAt": "2026-07-11T10:27:00.144Z",
+      "deployedAtIst": "11/07/2026, 15:57:00",
+      "committedAtIst": "11/07/2026, 15:56:28",
+      "vercelPreviewUrl": "https://connect-intel-584mmymbf-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 9842ab4"
+    },
+    {
+      "logId": "20260711-1530-d9747d0",
+      "commit": "d9747d0",
+      "commitFull": "d9747d003e5a8f5ec6e93006746ab3ff694f666e",
+      "message": "Mark e205253 as live in production log.",
+      "deployedAt": "2026-07-11T10:00:38.406Z",
+      "deployedAtIst": "11/07/2026, 15:30:38",
+      "committedAtIst": "11/07/2026, 15:30:05",
+      "vercelPreviewUrl": "https://connect-intel-4l4zc7go2-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- d9747d0"
+    },
     {
       "logId": "20260711-1529-e205253",
       "commit": "e205253",
@@ -15,7 +43,7 @@
       "committedAtIst": "11/07/2026, 15:29:00",
       "vercelPreviewUrl": "https://connect-intel-f8wo6rfsp-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- e205253"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 2811f4b"
-    },
-    {
-      "logId": "20260710-1252-8b923f9",
-      "commit": "8b923f9",
-      "commitFull": "8b923f93d81070bb70823d05544c557e3c8dd795",
-      "message": "Wire Connect Copilot to grounded deal forecast answers.",
-      "deployedAt": "2026-07-10T07:22:39.338Z",
-      "deployedAtIst": "10/07/2026, 12:52:39",
-      "committedAtIst": "10/07/2026, 12:51:54",
-      "vercelPreviewUrl": "https://connect-intel-zscf48p9a-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 8b923f9"
-    },
-    {
-      "logId": "20260710-1244-bc23526",
-      "commit": "bc23526",
-      "commitFull": "bc23526c6896a3c97379b31addf0396ae6a4ea6d",
-      "message": "Add stage-weighted deal forecasting to Pipeline Deals view.",
-      "deployedAt": "2026-07-10T07:14:24.332Z",
-      "deployedAtIst": "10/07/2026, 12:44:24",
-      "committedAtIst": "10/07/2026, 12:43:43",
-      "vercelPreviewUrl": "https://connect-intel-gcwoetiqa-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- bc23526"
     }
   ]
 }
