@@ -28,11 +28,11 @@ function Reveal({ children, className = '', delay = 0 }) {
   )
 }
 
-function SectionHeader({ label, title, desc, align = 'left', dark = false }) {
+function SectionHeader({ label, title, desc, align = 'left', dark = false, labelClassName = '' }) {
   const centered = align === 'center'
   return (
     <header className={centered ? 'text-center mx-auto max-w-3xl' : 'max-w-xl'}>
-      {label ? <p className="ci-v3-section-label mb-3">{label}</p> : null}
+      {label ? <p className={`ci-v3-section-label mb-3 ${labelClassName}`.trim()}>{label}</p> : null}
       <h2 className={`ci-v3-section-heading ${dark ? 'ci-v3-on-dark' : 'ci-v3-on-light'}`}>{title}</h2>
       {desc ? (
         <p className={`ci-v3-section-desc mt-4 ${dark ? 'ci-v3-desc-dark' : 'ci-v3-desc-light'} ${centered ? 'mx-auto' : ''}`}>
@@ -206,13 +206,13 @@ export function CompanyIntelSection() {
 export function MarketIntelSection() {
   return (
     <section id="market" className="ci-v3-section px-4 sm:px-6">
-      <div className="max-w-[1100px] mx-auto">
-        <Reveal className="mb-10 text-center">
+      <div className="max-w-[1100px] mx-auto grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <Reveal>
           <SectionHeader
-            align="center"
-            label="Market Intelligence"
-            title="Global commerce — visualized"
-            desc="Hover trade hubs to see exporters, importers, and AI-ranked opportunities."
+            label="Chapter 05"
+            labelClassName="ci-v3-chapter-label"
+            title="Global business intelligence"
+            desc="Trade routes, importers, exporters, and opportunities — commerce without borders."
           />
         </Reveal>
         <Reveal delay={1}>
