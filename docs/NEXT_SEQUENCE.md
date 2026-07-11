@@ -21,9 +21,10 @@ Operational playbook after landing + operator-access work (July 2026). Run steps
 |------|------------------|-------|
 | 2.1 | `npm run rbac:audit -- --strict` | CI already runs this; 0 mutation gaps |
 | 2.2 | Confirm Supabase on Vercel | `USE_PIPELINE_LEADS_TABLE` + hierarchy RBAC auto-on when Supabase configured (`lib/server/infra/config.js`) |
-| 2.3 | `npm run prod:ops -- --name=Xindus` | Meilisearch sync after deploy (needs `CRON_SECRET`) |
-| 2.4 | `npm run pipeline:sync -- --name=Xindus` | SQL pipeline backfill if counts diverge |
-| 2.5 | `npm run companies:sync -- --name=Xindus` | `pipeline_companies` verify + backfill |
+| 2.3 | `npm run prod:ops -- --name=Xindus` | Meilisearch sync after deploy |
+| 2.4 | `npm run prod:ops -- --data-sync --name=Xindus` | Pipeline + companies SQL backfill |
+| 2.5 | `npm run pipeline:sync -- --name=Xindus` | SQL pipeline backfill if counts diverge |
+| 2.6 | `npm run companies:sync -- --name=Xindus` | `pipeline_companies` verify + backfill |
 | 2.6 | `npm run activities:backfill` | Activity log SQL (if hub enabled later) |
 | 2.7 | `npm run constitution:ops` | Load gate + worker health |
 

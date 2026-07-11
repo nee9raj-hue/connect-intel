@@ -26,6 +26,10 @@
       "schedule": "30 4 * * *"
     },
     {
+      "path": "/api/crm/data-sync-cron",
+      "schedule": "0 5 * * *"
+    },
+    {
       "path": "/api/reports/scheduled-cron",
       "schedule": "0 9 * * *"
     }
