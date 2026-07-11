@@ -288,6 +288,8 @@ function renderPipelineCell(colId, lead, ctx) {
     onDeleteLead,
     onChangeOwner,
     onChangeStatus,
+    onOpenCompany,
+    canOpenCompany = false,
   } = ctx
 
   switch (colId) {
@@ -379,9 +381,23 @@ function renderPipelineCell(colId, lead, ctx) {
       return (
         <td key={colId} className="pipeline-hs-td pipeline-hs-td--company">
           {lead.company ? (
-            <span className="pipeline-hs-cell-text" title={lead.company}>
-              {lead.company}
-            </span>
+            canOpenCompany && onOpenCompany ? (
+              <button
+                type="button"
+                className="pipeline-hs-company-link pipeline-hs-cell-text"
+                title={`Open account: ${lead.company}`}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onOpenCompany(lead)
+                }}
+              >
+                {lead.company}
+              </button>
+            ) : (
+              <span className="pipeline-hs-cell-text" title={lead.company}>
+                {lead.company}
+              </span>
+            )
           ) : (
             <span className="pipeline-hs-muted">—</span>
           )}
@@ -595,6 +611,8 @@ export default function PipelineLeadsTable({
   onDeleteLead,
   onChangeOwner,
   onChangeStatus,
+  onOpenCompany,
+  canOpenCompany = false,
 }) {
   const [sortKey, setSortKey] = useState('created')
   const [sortDir, setSortDir] = useState('desc')
@@ -702,6 +720,8 @@ export default function PipelineLeadsTable({
                     onDeleteLead,
                     onChangeOwner,
                     onChangeStatus,
+                    onOpenCompany,
+                    canOpenCompany,
                   })
                 )}
                 <td className="pipeline-hs-td pipeline-hs-td--actions">

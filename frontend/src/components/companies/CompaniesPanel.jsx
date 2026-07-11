@@ -2,9 +2,10 @@ import { useCallback, useEffect, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { formatDateTime } from '../../lib/crmUiConstants'
+import { formatDealValue } from '../../lib/crmTimeline'
 import LoadingExperience from '../ui/LoadingExperience'
 
-export default function CompaniesPanel({ onNavigate }) {
+export default function CompaniesPanel({ onNavigate, panelOptions }) {
   const { openPipelineLead } = useApp()
   const [companies, setCompanies] = useState([])
   const [total, setTotal] = useState(0)
@@ -36,6 +37,42 @@ export default function CompaniesPanel({ onNavigate }) {
   useEffect(() => {
     load()
   }, [load])
+
+  useEffect(() => {
+    const targetId = String(panelOptions?.companyId || '').trim()
+    const targetName = String(panelOptions?.companyName || '').trim()
+    if (!targetId && !targetName) return undefined
+
+    let cancelled = false
+    ;(async () => {
+      if (targetId) {
+        setDetailLoading(true)
+        try {
+          const res = await api.getCompanyDetail(targetId)
+          if (!cancelled && res.company) {
+            setDetail(res.company)
+            setHierarchyEnabled(Boolean(res.hierarchyEnabled))
+          }
+        } catch (e) {
+          if (!cancelled && targetName) {
+            setSearch(targetName)
+            setApplied(targetName)
+          } else if (!cancelled) {
+            setError(e.message)
+          }
+        } finally {
+          if (!cancelled) setDetailLoading(false)
+        }
+      } else if (targetName) {
+        setSearch(targetName)
+        setApplied(targetName)
+      }
+    })()
+
+    return () => {
+      cancelled = true
+    }
+  }, [panelOptions?.companyId, panelOptions?.companyName])
 
   const openCompany = async (company) => {
     setDetailLoading(true)
@@ -139,6 +176,8 @@ export default function CompaniesPanel({ onNavigate }) {
                             ` · ${c.rollupOpenDeals ?? c.openDeals} open deal${
                               (c.rollupOpenDeals ?? c.openDeals) === 1 ? '' : 's'
                             }`}
+                          {(c.rollupTotalDealValue ?? c.totalDealValue) > 0 &&
+                            ` · ${formatDealValue(c.rollupTotalDealValue ?? c.totalDealValue)}`}
                         </p>
                       </button>
                     </li>
@@ -182,6 +221,11 @@ export default function CompaniesPanel({ onNavigate }) {
                         {detail.rollupOpenDeals ?? detail.openDeals} open deals
                       </span>
                       <span>{detail.rollupWonDeals ?? detail.wonDeals} won</span>
+                      {(detail.rollupTotalDealValue ?? detail.totalDealValue) > 0 && (
+                        <span>
+                          {formatDealValue(detail.rollupTotalDealValue ?? detail.totalDealValue)} pipeline
+                        </span>
+                      )}
                       {detail.lastActivityAt && (
                         <span>Last activity {formatDateTime(detail.lastActivityAt)}</span>
                       )}

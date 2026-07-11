@@ -626,6 +626,23 @@
   text-decoration: none;
 }
 
+.pipeline-hs-company-link {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #c45c26;
+  font: inherit;
+  cursor: pointer;
+}
+
+.pipeline-hs-company-link:hover {
+  color: #9a4718;
+  text-decoration: underline;
+}
+
 .pipeline-hs-status {
   cursor: pointer;
 }

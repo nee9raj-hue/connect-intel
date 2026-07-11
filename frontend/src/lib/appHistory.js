@@ -92,6 +92,8 @@ export function parseAppLocation(search = '', pathname = '/') {
   if (params.get('tasks_due') === 'today') panelOptions.tasksDueToday = true
   if (params.get('unread') === '1') panelOptions.unreadOnly = true
   if (params.get('last_activity')) panelOptions.lastActivity = params.get('last_activity')
+  if (params.get('company')) panelOptions.companyId = params.get('company')
+  if (params.get('company_name')) panelOptions.companyName = params.get('company_name')
   const leadIds = params.getAll('leadId').filter(Boolean)
   if (leadIds.length) panelOptions.leadIds = leadIds
   if (params.get('campaign')) panelOptions.campaignId = params.get('campaign')
@@ -267,6 +269,8 @@ export function serializeAppLocation({ panel = 'overview', panelOptions = {}, le
   if (panelOptions.tasksDueToday) params.set('tasks_due', 'today')
   if (panelOptions.unreadOnly) params.set('unread', '1')
   if (panelOptions.lastActivity) params.set('last_activity', String(panelOptions.lastActivity))
+  if (panelOptions.companyId) params.set('company', String(panelOptions.companyId))
+  if (panelOptions.companyName) params.set('company_name', String(panelOptions.companyName))
   for (const id of panelOptions.leadIds || []) {
     if (id) params.append('leadId', String(id))
   }

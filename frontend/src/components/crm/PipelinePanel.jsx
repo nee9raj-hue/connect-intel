@@ -78,6 +78,7 @@ import {
   savePipelineHoverActionsPref,
 } from '../../lib/pipelineColumnPrefs'
 import { useDebouncedPipelineSearch } from '../../hooks/useDebouncedPipelineSearch'
+import { companyTargetFromLead } from '../../../lib/accountNavigation.js'
 
 export default function PipelinePanel({ onNavigate, panelOptions }) {
   const {
@@ -184,6 +185,19 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   )
   const isTeamManager = Boolean(
     user?.accountType === 'company' && !isOrgAdmin && user?.pipelineRole === 'manager'
+  )
+  const canOpenCompanyAccounts = user?.accountType === 'company'
+
+  const openCompanyFromLead = useCallback(
+    (lead) => {
+      const target = companyTargetFromLead(lead)
+      if (!target) return
+      onNavigate?.('companies', {
+        companyId: target.companyId,
+        companyName: target.companyName,
+      })
+    },
+    [onNavigate]
   )
 
   useEffect(() => {
@@ -1763,6 +1777,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                 setBulkEditOpen(true)
                 setSelectedIds(new Set([lead.id]))
               }}
+              onOpenCompany={openCompanyFromLead}
+              canOpenCompany={canOpenCompanyAccounts}
             />
           )}
           </div>
@@ -2189,9 +2205,22 @@ function KanbanColumn({
                       >
                         {lead.company[0]?.toUpperCase() || 'C'}
                       </span>
-                      <span className="text-sm text-[#33475b] font-medium truncate leading-snug">
-                        {lead.company}
-                      </span>
+                      {canOpenCompanyAccounts ? (
+                        <button
+                          type="button"
+                          className="text-sm text-orange-700 font-medium truncate leading-snug hover:underline text-left"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            openCompanyFromLead(lead)
+                          }}
+                        >
+                          {lead.company}
+                        </button>
+                      ) : (
+                        <span className="text-sm text-[#33475b] font-medium truncate leading-snug">
+                          {lead.company}
+                        </span>
+                      )}
                     </div>
                   ) : null}
                   <LeadTagDots lead={lead} tagById={tagById} />
