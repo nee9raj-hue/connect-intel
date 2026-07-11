@@ -88,7 +88,7 @@ try {
 }
 
 if (prod) {
-  for (const action of ['verify', 'deals-sync', 'companies-sync']) {
+  for (const action of ['pipeline-sync', 'deals-sync', 'companies-sync']) {
     const probe = await probeBootstrap(action)
     if (probe.skipped) {
       console.log(`  · ${action}: skipped (${probe.reason})`)
