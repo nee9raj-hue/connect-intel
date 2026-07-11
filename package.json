@@ -33,6 +33,7 @@
     "workers": "node workers/index.mjs",
     "meili:backfill": "node scripts/backfill-meilisearch.mjs",
     "meili:sync": "node scripts/meili-sync.mjs",
+    "meili:railway": "node scripts/meili-railway-connect.mjs",
     "pipeline:backfill": "node scripts/backfill-pipeline-leads.mjs",
     "pipeline:sync": "node scripts/pipeline-sync.mjs",
     "deals:sync": "node scripts/deals-sync.mjs",
