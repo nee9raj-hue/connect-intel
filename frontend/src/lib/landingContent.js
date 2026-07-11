@@ -245,12 +245,71 @@ export const TRUST_SIGNALS = PRODUCT_METRICS
 export const DEMO_MAILTO =
   'mailto:invite@connectintel.net?subject=Connect%20Intel%20demo%20request&body=Company%20name%3A%0ATeam%20size%3A%0AUse%20case%3A'
 
-/** Website 3.0 — story chapters */
+/** Website 3.0 — product story (no chapter labels) */
 export const STORY_HERO = {
-  line1: 'The Enterprise AI Platform',
-  line2: 'Built To Grow Sales.',
-  tagline: 'One workspace. Infinite intelligence.',
+  lines: [
+    'Search the world\'s businesses.',
+    'Find decision makers.',
+    'Build your pipeline.',
+    'Send outreach.',
+    'Close deals.',
+  ],
+  tagline: 'All from one AI workspace.',
 }
+
+export const PRODUCT_STORY = [
+  { title: 'Find exporters', desc: 'Search CRM and market sources for companies that match your ICP.' },
+  { title: 'AI researches company', desc: 'Website, products, export markets, and news — on the lead record.' },
+  { title: 'Finds LinkedIn context', desc: 'Decision makers surfaced with role and outreach angle.' },
+  { title: 'Finds decision makers', desc: 'Contacts ranked by relevance — not generic lists.' },
+  { title: 'Drafts email', desc: 'Personalized outreach grounded on CRM history and research.' },
+  { title: 'Tracks follow-up', desc: 'Tasks, reminders, and activity on one timeline.' },
+  { title: 'Win the deal', desc: 'Pipeline, deals, and manager visibility through close.' },
+]
+
+export const COPILOT_CONVERSATION = [
+  { role: 'user', text: 'Find textile exporters shipping to Germany.' },
+  { role: 'ai', text: 'Searching CRM…' },
+  { role: 'ai', text: '3 already exist in your workspace.' },
+  { role: 'ai', text: 'Searching web sources…' },
+  { role: 'ai', text: 'Found 42 matching exporters.' },
+  { role: 'ai', text: 'Ranking by export fit & engagement…' },
+  { role: 'ai', text: 'Checking LinkedIn for decision makers…' },
+  { role: 'ai', text: 'Drafting outreach for top 5 accounts…' },
+  { role: 'ai', text: 'Ready — review drafts or add to pipeline.' },
+]
+
+export const PIPELINE_SEQUENCE = [
+  'Lead enters pipeline',
+  'Owner assigned',
+  'Email sent & logged',
+  'Meeting booked',
+  'Stage → Negotiation',
+  'Deal won',
+]
+
+export const LIVE_DEMO_QUERY = 'Find textile exporters from Jaipur shipping to Amazon USA'
+
+export const LIVE_DEMO_STEPS = [
+  'Search CRM for existing matches',
+  'Search public trade & company sources',
+  'Find 38 companies · rank by fit',
+  'Enrich company profiles',
+  'Find decision makers on LinkedIn',
+  'Check duplicates in workspace',
+  'Generate personalized email',
+  'Add qualified leads to pipeline',
+]
+
+export const ANALYTICS_COUNTERS = [
+  { label: 'Open pipeline', end: 2.4, prefix: '₹', suffix: 'Cr', decimals: 1 },
+  { label: 'Forecast', end: 86, prefix: '₹', suffix: 'L', decimals: 0 },
+  { label: 'Win rate', end: 24, prefix: '', suffix: '%', decimals: 0 },
+  { label: 'Team touched', end: 89, prefix: '', suffix: '%', decimals: 0 },
+]
+
+export const AI_INSIGHT_COPY =
+  'AI noticed Mumbai region closed 18% more deals than last month — recommend doubling follow-up capacity.'
 
 export const CHAOS_TOOLS = [
   'Google',

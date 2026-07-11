@@ -1,17 +1,16 @@
 import { useState } from 'react'
 import { useApp } from '../context/AppContext'
+import LandingLiveDemo from '../components/landing/LandingLiveDemo'
 import {
   AnalyticsSection,
-  AutomationSection,
   CompanyIntelSection,
   CopilotSection,
-  DayWithCiSection,
   EnterpriseArchSection,
   FinalCtaSection,
   HeroSection,
   MarketIntelSection,
   PipelineSection,
-  RealitySection,
+  ProductStorySection,
   SecuritySection,
   SuccessMetricsSection,
 } from '../components/landing/LandingStory'
@@ -24,9 +23,10 @@ import { DEMO_MAILTO, FAQ_ITEMS, INDUSTRIES } from '../lib/landingContent'
 import '../styles/landing-v3.css'
 
 const NAV_LINKS = [
-  { href: '#story', label: 'Story' },
-  { href: '#copilot', label: 'Copilot' },
-  { href: '#pipeline', label: 'Pipeline' },
+  { href: '#platform', label: 'Platform' },
+  { href: '#copilot', label: 'AI Copilot' },
+  { href: '#crm', label: 'CRM' },
+  { href: '#market', label: 'Market Intelligence' },
   { href: '#enterprise', label: 'Enterprise' },
   { href: '#pricing', label: 'Pricing' },
 ]
@@ -41,7 +41,7 @@ export default function LandingPage() {
       <header className="ci-v3-nav fixed top-0 inset-x-0 z-50">
         <div className="max-w-[1200px] mx-auto h-full px-4 sm:px-6 flex items-center justify-between gap-3">
           <Logo />
-          <nav className="hidden lg:flex items-center gap-6 text-sm font-medium text-zinc-600" aria-label="Primary">
+          <nav className="hidden lg:flex items-center gap-5 text-sm font-medium text-zinc-600" aria-label="Primary">
             {NAV_LINKS.map((link) => (
               <a key={link.href} href={link.href} className="hover:text-zinc-900 transition-colors">
                 {link.label}
@@ -64,20 +64,20 @@ export default function LandingPage() {
 
       <main>
         <HeroSection onLaunch={launch} onSignIn={signIn} />
-        <RealitySection />
+        <ProductStorySection />
+        <LandingLiveDemo />
         <CopilotSection />
+        <MarketIntelSection />
         <PipelineSection />
         <CompanyIntelSection />
-        <MarketIntelSection />
-        <AutomationSection />
-        <EnterpriseArchSection />
         <AnalyticsSection />
-        <DayWithCiSection />
+        <EnterpriseArchSection />
+        <SecuritySection />
 
-        <section className="py-12 px-4 sm:px-6 border-y border-zinc-100 bg-zinc-50">
+        <section className="py-12 px-4 sm:px-6 ci-v3-surface border-y border-zinc-100">
           <div className="max-w-[1000px] mx-auto text-center">
-            <p className="text-xs font-bold uppercase tracking-wider text-[#FF773D] mb-3">Industries</p>
-            <h2 className="font-display text-2xl font-bold text-zinc-950 mb-6">Built for global B2B commerce</h2>
+            <p className="ci-v3-section-label mb-3">Industries</p>
+            <h2 className="ci-v3-section-heading ci-v3-on-light text-center mb-6">Built for global B2B commerce</h2>
             <div className="flex flex-wrap justify-center gap-2">
               {INDUSTRIES.map((name) => (
                 <span key={name} className="px-3 py-1.5 rounded-full border border-zinc-200 bg-white text-sm font-medium text-zinc-700">
@@ -89,12 +89,11 @@ export default function LandingPage() {
         </section>
 
         <SuccessMetricsSection />
-        <SecuritySection />
 
         <section id="pricing" className="py-16 px-4 sm:px-6">
           <div className="max-w-[900px] mx-auto text-center">
-            <h2 className="font-display text-2xl md:text-3xl font-bold text-zinc-900 mb-3">Start free. Scale when pipeline grows.</h2>
-            <p className="text-zinc-600 mb-10">No card at signup. Transparent upgrade when your admin confirms capacity.</p>
+            <h2 className="ci-v3-section-heading ci-v3-on-light mb-3">Start free. Scale when pipeline grows.</h2>
+            <p className="ci-v3-section-desc text-center mb-10">No card at signup. Transparent upgrade when your admin confirms capacity.</p>
             <div className="grid md:grid-cols-2 gap-6 text-left">
               <PricingCard
                 tier="Free workspace"
@@ -119,9 +118,9 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="faq" className="py-16 px-4 sm:px-6 bg-zinc-50">
+        <section id="faq" className="py-16 px-4 sm:px-6 ci-v3-surface">
           <div className="max-w-[720px] mx-auto">
-            <h2 className="font-display text-2xl font-bold text-center text-zinc-900 mb-8">Evaluation questions</h2>
+            <h2 className="ci-v3-section-heading ci-v3-on-light text-center mb-8">Evaluation questions</h2>
             <div className="space-y-3">
               {FAQ_ITEMS.map((item) => (
                 <FaqItem key={item.q} question={item.q} answer={item.a} />
@@ -138,7 +137,7 @@ export default function LandingPage() {
           <div>
             <Logo />
             <p className="text-sm text-zinc-500 mt-3 max-w-sm leading-relaxed">
-              Enterprise AI sales intelligence — not another CRM template.
+              Enterprise AI sales intelligence — CRM, copilot, and market intelligence in one workspace.
             </p>
           </div>
           <div className="flex flex-wrap gap-x-8 gap-y-4 text-sm text-zinc-600">
@@ -202,8 +201,14 @@ function FaqItem({ question, answer }) {
 
 function Logo() {
   return (
-    <a href="/" className="flex items-center shrink-0" aria-label="Connect Intel home">
-      <img src={BRAND_LOGO_HERO} alt="" width={48} height={48} className={`h-10 w-10 sm:h-11 sm:w-11 rounded-lg ${BRAND_LOGO_ICON_CLASS}`} />
+    <a href="/" className="flex items-center shrink-0 py-1" aria-label="Connect Intel home">
+      <img
+        src={BRAND_LOGO_HERO}
+        alt=""
+        width={56}
+        height={56}
+        className={`h-12 w-12 sm:h-14 sm:w-14 rounded-xl ${BRAND_LOGO_ICON_CLASS}`}
+      />
     </a>
   )
 }
