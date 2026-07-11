@@ -236,29 +236,29 @@
 
 .ci-v3-map-visual {
   width: 100%;
-  max-width: 36rem;
+  max-width: 100%;
   margin-inline: auto;
 }
 
 .ci-v3-map-canvas {
-  aspect-ratio: 16 / 10;
-  min-height: 260px;
+  min-height: 360px;
   border-radius: 1rem;
   overflow: hidden;
-  border: 1px solid #1e293b;
-  box-shadow: 0 24px 80px -32px rgba(0, 0, 0, 0.35);
-  background: linear-gradient(165deg, #0f172a 0%, #0c1222 100%);
+  border: 1px solid var(--ci-border);
+  box-shadow: 0 20px 60px -24px rgba(15, 23, 42, 0.18);
+  background: #ffffff;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   justify-content: space-between;
-  padding: 1rem 1.25rem 0.875rem;
+  padding: 0.5rem 0.75rem 0.875rem;
 }
 
 .ci-v3-map-image {
   flex: 1;
   width: 100%;
-  min-height: 0;
+  min-height: 280px;
+  max-height: 420px;
   object-fit: contain;
   object-position: center;
   display: block;
@@ -270,26 +270,26 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 0.65rem 1.1rem;
-  margin-top: 0.75rem;
-  padding-top: 0.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  gap: 0.75rem 1.25rem;
+  margin-top: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--ci-border);
   list-style: none;
 }
 
 .ci-v3-map-legend-item {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  font-size: 0.625rem;
+  gap: 0.45rem;
+  font-size: 0.6875rem;
   font-weight: 600;
-  color: #a1a1aa;
-  letter-spacing: 0.02em;
+  color: #3f3f46;
+  letter-spacing: 0.01em;
 }
 
 .ci-v3-map-legend-dot {
-  width: 0.5rem;
-  height: 0.5rem;
+  width: 0.55rem;
+  height: 0.55rem;
   border-radius: 9999px;
   flex-shrink: 0;
 }
@@ -297,6 +297,16 @@
 @media (min-width: 1024px) {
   .ci-v3-map-visual {
     margin-inline: 0 0 auto;
+  }
+
+  .ci-v3-map-canvas {
+    min-height: 400px;
+    padding: 0.625rem 1rem 1rem;
+  }
+
+  .ci-v3-map-image {
+    min-height: 320px;
+    max-height: 460px;
   }
 }
 
