@@ -3,6 +3,7 @@ import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { formatDateTime } from '../../lib/crmUiConstants'
 import LoadingExperience from '../ui/LoadingExperience'
+import PlatformOperatorGate from './PlatformOperatorGate'
 
 const QUICK_LINKS = [
   {
@@ -76,14 +77,7 @@ export default function PlatformAdminHome({ onNavigate }) {
   }, [user, load])
 
   if (!user?.isPlatformAdmin) {
-    return (
-      <div className="p-6">
-        <div className="bg-white rounded-2xl border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-900">Platform operator access required</h2>
-          <p className="mt-2 text-sm text-gray-500">Sign in with an email listed in ADMIN_EMAILS on Vercel.</p>
-        </div>
-      </div>
-    )
+    return <PlatformOperatorGate onNavigate={onNavigate} />
   }
 
   const metrics = overview?.metrics || {}

@@ -2,6 +2,7 @@
 
 import { CHITHI_IN_CRM_ENABLED } from './crmProductFlags'
 import { normalizeCrmPanel } from './chithiNav'
+import { sanitizeAppLocation } from './platformOperator'
 const OAUTH_QUERY_KEYS = ['email_oauth', 'crm_gmail', 'mailbox', 'invite']
 const LAST_LOCATION_KEY = 'ci_last_app_location'
 const POST_LOGIN_NAV_KEY = 'ci_post_login_nav'
@@ -205,22 +206,24 @@ export function clearAppNavigationState() {
 
 /** Prefer URL state; fall back to last session location when URL is bare (e.g. PWA reopen). */
 export function resolveInitialAppLocation(search = '', { isPlatformAdmin = false, pathname = '/' } = {}) {
+  let location
+
   if (urlHasAppNavigation(search, pathname)) {
-    return parseAppLocation(search, pathname)
+    location = parseAppLocation(search, pathname)
+  } else if (consumePostLoginNavigation()) {
+    location = defaultDashboardLocation()
+  } else {
+    const persisted = loadPersistedAppLocation()
+    if (persisted) {
+      location = persisted
+    } else if (isPlatformAdmin) {
+      location = { panel: 'admin-home', panelOptions: {}, leadId: null }
+    } else {
+      location = defaultDashboardLocation()
+    }
   }
 
-  if (consumePostLoginNavigation()) {
-    return defaultDashboardLocation()
-  }
-
-  const persisted = loadPersistedAppLocation()
-  if (persisted) return persisted
-
-  if (isPlatformAdmin) {
-    return { panel: 'admin-home', panelOptions: {}, leadId: null }
-  }
-
-  return defaultDashboardLocation()
+  return sanitizeAppLocation(location, { isPlatformAdmin })
 }
 
 export function serializeAppLocation({ panel = 'overview', panelOptions = {}, leadId = null } = {}) {

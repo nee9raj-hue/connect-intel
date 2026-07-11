@@ -5,6 +5,7 @@ import { formatDateTime } from '../../lib/crmUiConstants'
 import LoadingExperience from '../ui/LoadingExperience'
 import { LOADING_MESSAGES } from '../../lib/loadingQuotes'
 import PlatformSupportTickets from './PlatformSupportTickets'
+import PlatformOperatorGate from './PlatformOperatorGate'
 
 const TABS = [
   { id: 'overview', label: 'Overview' },
@@ -131,14 +132,7 @@ export default function PlatformCustomersPanel({ onNavigate, panelOptions = {} }
   }
 
   if (!user?.isPlatformAdmin) {
-    return (
-      <div className="p-6">
-        <div className="bg-white rounded-2xl border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-900">Platform operator access required</h2>
-          <p className="mt-2 text-sm text-gray-500">Sign in with an email listed in ADMIN_EMAILS on Vercel.</p>
-        </div>
-      </div>
-    )
+    return <PlatformOperatorGate onNavigate={onNavigate} />
   }
 
   const metrics = overview?.metrics || {}

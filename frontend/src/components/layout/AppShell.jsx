@@ -9,6 +9,7 @@ import {
   resolveInitialAppLocation,
   stripEphemeralQueryParams,
 } from '../../lib/appHistory'
+import { resolvePanelForUser, sanitizeAppLocation } from '../../lib/platformOperator'
 import { useApp } from '../../context/AppContext'
 import OnboardingModal from '../onboarding/OnboardingModal'
 import Sidebar from './Sidebar'
@@ -138,8 +139,10 @@ export default function AppShell() {
   const applyLocation = useCallback(
     (location) => {
       const { panel, panelOptions: opts = {}, leadId } = location || {}
-      const panelId = normalizeCrmPanel(panel || 'overview')
-      const resolved = resolvePanelOptions(panelId, opts)
+      const panelId = resolvePanelForUser(normalizeCrmPanel(panel || 'overview'), {
+        isPlatformAdmin: Boolean(user?.isPlatformAdmin),
+      })
+      const resolved = resolvePanelOptions(panelId, panelId === panel ? opts : {})
       setActivePanel(panelId)
       setPanelOptions(resolved)
       setMobileNavOpen(false)
@@ -149,7 +152,7 @@ export default function AppShell() {
       if (normalizedLeadId) openPipelineLead(normalizedLeadId)
       else setPipelineLeadId(null)
     },
-    [openPipelineLead, setPipelineLeadId, setPipelineAssigneeFilter, resolvePanelOptions]
+    [openPipelineLead, setPipelineLeadId, setPipelineAssigneeFilter, resolvePanelOptions, user?.isPlatformAdmin]
   )
 
   const commitHistory = useCallback((location, { replace = false } = {}) => {
@@ -197,7 +200,10 @@ export default function AppShell() {
   useEffect(() => {
     const onPopState = () => {
       applyingHistoryRef.current = true
-      const loc = parseAppLocation(window.location.search, window.location.pathname)
+      const loc = sanitizeAppLocation(
+        parseAppLocation(window.location.search, window.location.pathname),
+        { isPlatformAdmin: Boolean(user?.isPlatformAdmin) },
+      )
       applyLocation(loc)
       lastHistoryKeyRef.current = appLocationKey(loc)
       lastLeadIdRef.current = normalizeLeadId(loc.leadId)
@@ -205,7 +211,7 @@ export default function AppShell() {
     }
     window.addEventListener('popstate', onPopState)
     return () => window.removeEventListener('popstate', onPopState)
-  }, [applyLocation])
+  }, [applyLocation, user?.isPlatformAdmin])
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -230,7 +236,9 @@ export default function AppShell() {
   const navigate = useCallback(
     (id, options = {}, navOpts = {}) => {
       const replace = Boolean(navOpts.replace)
-      const panelId = normalizeCrmPanel(id)
+      const panelId = resolvePanelForUser(normalizeCrmPanel(id), {
+        isPlatformAdmin: Boolean(user?.isPlatformAdmin),
+      })
       const leavingChithi = isChithiPanel(activePanel) && !isChithiPanel(panelId)
       if (leavingChithi && sidebarMode === 'rail') {
         setSidebarMode('expanded')
@@ -252,7 +260,7 @@ export default function AppShell() {
         commitHistory(loc, { replace })
       }
     },
-    [activePanel, sidebarMode, pipelineLeadId, setPipelineLeadId, setPipelineAssigneeFilter, commitHistory, resolvePanelOptions]
+    [activePanel, sidebarMode, pipelineLeadId, setPipelineLeadId, setPipelineAssigneeFilter, commitHistory, resolvePanelOptions, user?.isPlatformAdmin]
   )
 
   useEffect(() => {

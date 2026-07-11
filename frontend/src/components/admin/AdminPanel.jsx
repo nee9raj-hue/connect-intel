@@ -10,6 +10,7 @@ import { useApp } from '../../context/AppContext'
 import InviteEmailSetup from '../team/InviteEmailSetup'
 import OrgWhatsAppCloudSetup from '../team/OrgWhatsAppCloudSetup'
 import { IMPORT_UPLOAD_CHUNK_ROWS, prepareImportUploadRows } from '../../lib/importUploadPrep'
+import PlatformOperatorGate from './PlatformOperatorGate'
 
 const DATASET_OPTIONS = [
   { id: 'exporters', label: 'Exporters' },
@@ -17,7 +18,7 @@ const DATASET_OPTIONS = [
   { id: 'general', label: 'General companies' },
 ]
 
-export default function AdminPanel() {
+export default function AdminPanel({ onNavigate }) {
   const { user } = useApp()
   const [datasetType, setDatasetType] = useState('exporters')
   const [overview, setOverview] = useState(null)
@@ -196,22 +197,7 @@ export default function AdminPanel() {
   }
 
   if (!user?.isPlatformAdmin) {
-    return (
-      <div className="p-6">
-        <div className="bg-white rounded-2xl border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-900">Platform operator access required</h2>
-          <p className="mt-2 text-sm text-gray-500">
-            This area is for Connect Intel backend staff only. Add your Google email to{' '}
-            <code className="text-xs bg-gray-100 px-1 rounded">ADMIN_EMAILS</code> on Vercel, then sign out and
-            sign in again.
-          </p>
-          <p className="mt-3 text-sm text-gray-600">
-            Company customers use <strong>Team → Import your pipeline</strong> for their own CRM data, not this
-            screen.
-          </p>
-        </div>
-      </div>
-    )
+    return <PlatformOperatorGate onNavigate={onNavigate} />
   }
 
   return (
