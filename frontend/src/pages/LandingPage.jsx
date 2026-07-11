@@ -77,7 +77,10 @@ export default function LandingPage() {
         <section className="py-12 px-4 sm:px-6 ci-v3-surface border-y border-zinc-100">
           <div className="max-w-[1000px] mx-auto text-center">
             <p className="ci-v3-section-label mb-3">Industries</p>
-            <h2 className="ci-v3-section-heading ci-v3-on-light text-center mb-6">Built for global B2B commerce</h2>
+            <h2 className="ci-v3-section-heading ci-v3-on-light text-center mb-3">Built for global B2B commerce</h2>
+            <p className="ci-v3-section-desc ci-v3-desc-light text-center mx-auto mb-6 max-w-lg">
+              Exporters, manufacturers, distributors, and trading teams selling across borders.
+            </p>
             <div className="flex flex-wrap justify-center gap-2">
               {INDUSTRIES.map((name) => (
                 <span key={name} className="px-3 py-1.5 rounded-full border border-zinc-200 bg-white text-sm font-medium text-zinc-700">

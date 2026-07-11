@@ -3,7 +3,7 @@
  */
 
 import { useLandingReveal } from '../../hooks/useLandingReveal'
-import { useCountUp, useStepCycle } from '../../hooks/useLandingMotion'
+import { useCountUp, useStepIndex, useTypewriter } from '../../hooks/useLandingMotion'
 import {
   AI_INSIGHT_COPY,
   ANALYTICS_COUNTERS,
@@ -28,13 +28,17 @@ function Reveal({ children, className = '', delay = 0 }) {
   )
 }
 
-function SectionHeader({ label, title, desc, align = 'left', light = false }) {
+function SectionHeader({ label, title, desc, align = 'left', dark = false }) {
   const centered = align === 'center'
   return (
     <header className={centered ? 'text-center mx-auto max-w-3xl' : 'max-w-xl'}>
       {label ? <p className="ci-v3-section-label mb-3">{label}</p> : null}
-      <h2 className={`ci-v3-section-heading ${light ? 'ci-v3-on-light' : ''}`}>{title}</h2>
-      {desc ? <p className={`ci-v3-section-desc mt-4 ${centered ? 'mx-auto' : ''}`}>{desc}</p> : null}
+      <h2 className={`ci-v3-section-heading ${dark ? 'ci-v3-on-dark' : 'ci-v3-on-light'}`}>{title}</h2>
+      {desc ? (
+        <p className={`ci-v3-section-desc mt-4 ${dark ? 'ci-v3-desc-dark' : 'ci-v3-desc-light'} ${centered ? 'mx-auto' : ''}`}>
+          {desc}
+        </p>
+      ) : null}
     </header>
   )
 }
@@ -108,33 +112,36 @@ export function ProductStorySection() {
 }
 
 export function CopilotSection() {
-  const [ref, visible] = useLandingReveal({ threshold: 0.2 })
-  const { visibleSteps } = useStepCycle(COPILOT_CONVERSATION, { active: visible, interval: 1300 })
+  const [ref, visible] = useLandingReveal({ threshold: 0.25, rootMargin: '0px 0px -10% 0px' })
+  const stepIndex = useStepIndex(COPILOT_CONVERSATION, { active: visible, interval: 1200 })
 
   return (
     <section id="copilot" className="ci-v3-section ci-v3-panel-dark px-4 sm:px-6" aria-labelledby="copilot-title">
       <div className="max-w-[1100px] mx-auto grid lg:grid-cols-2 gap-12 items-start">
         <Reveal>
           <SectionHeader
+            dark
             label="AI Copilot"
             title="Your AI sales partner — not a chatbot"
             desc="Watch Copilot search CRM, research companies, find decision makers, and draft outreach in one thread."
           />
         </Reveal>
 
-        <div ref={ref} className="ci-v3-conversation rounded-2xl border border-white/10 bg-white/[0.04] p-5 sm:p-6 min-h-[360px]">
-          <div className="space-y-3" id="copilot-title">
-            {visibleSteps.map((msg, i) => (
-              <div
-                key={`${msg.role}-${i}`}
-                className={`ci-v3-bubble ${msg.role === 'user' ? 'ci-v3-bubble-user' : 'ci-v3-bubble-ai'}`}
-              >
-                <p className="text-[10px] font-semibold uppercase tracking-wide mb-1 opacity-70">
-                  {msg.role === 'user' ? 'You' : 'Connect Copilot'}
-                </p>
-                <p className="text-sm leading-relaxed">{msg.text}</p>
-              </div>
-            ))}
+        <div ref={ref} className="ci-v3-conversation rounded-2xl border border-white/10 bg-white/[0.04] p-5 sm:p-6 h-[420px] overflow-hidden">
+          <div className="space-y-3 h-full overflow-y-auto overflow-x-hidden ci-v3-stable-scroll" id="copilot-title">
+            {COPILOT_CONVERSATION.map((msg, i) =>
+              i <= stepIndex ? (
+                <div
+                  key={`${msg.role}-${msg.text}`}
+                  className={`ci-v3-bubble ${msg.role === 'user' ? 'ci-v3-bubble-user' : 'ci-v3-bubble-ai'}`}
+                >
+                  <p className="text-[10px] font-semibold uppercase tracking-wide mb-1 text-zinc-300">
+                    {msg.role === 'user' ? 'You' : 'Connect Copilot'}
+                  </p>
+                  <p className="text-sm leading-relaxed text-zinc-100">{msg.text}</p>
+                </div>
+              ) : null,
+            )}
           </div>
         </div>
       </div>
@@ -143,8 +150,8 @@ export function CopilotSection() {
 }
 
 export function PipelineSection() {
-  const [ref, visible] = useLandingReveal()
-  const { index } = useStepCycle(PIPELINE_SEQUENCE, { active: visible, interval: 1500 })
+  const [ref, visible] = useLandingReveal({ threshold: 0.25 })
+  const stepIndex = useStepIndex(PIPELINE_SEQUENCE, { active: visible, interval: 1500 })
 
   return (
     <section id="crm" className="ci-v3-section px-4 sm:px-6">
@@ -162,10 +169,10 @@ export function PipelineSection() {
             {PIPELINE_SEQUENCE.map((step, i) => (
               <li
                 key={step}
-                className={`ci-v3-pipe-step text-sm flex items-center gap-3 ${i <= index ? 'is-done' : ''}`}
+                className={`ci-v3-pipe-step text-sm flex items-center gap-3 ${i <= stepIndex ? 'is-done' : ''}`}
               >
                 <span className="w-5 h-5 rounded-full border flex items-center justify-center text-[10px] font-bold shrink-0">
-                  {i <= index ? '✓' : i + 1}
+                  {i <= stepIndex ? '✓' : i + 1}
                 </span>
                 {step}
               </li>
@@ -226,7 +233,6 @@ export function AnalyticsSection() {
         <div>
           <Reveal className="mb-8">
             <SectionHeader
-              light
               label="Sales Analytics"
               title="Dashboards that feel alive"
               desc="Counters climb, bars grow, and AI surfaces what changed — not static marketing numbers."
@@ -266,9 +272,9 @@ function AnalyticsCounter({ metric, active }) {
   const val = useCountUp(metric.end, { active, duration: 2000, decimals: metric.decimals })
   const display = `${metric.prefix}${metric.decimals ? Number(val).toFixed(metric.decimals) : val}${metric.suffix}`
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-4 text-center shadow-sm">
-      <p className="text-2xl font-bold text-zinc-900 tabular-nums">{display}</p>
-      <p className="text-xs text-zinc-500 mt-1">{metric.label}</p>
+    <div className="rounded-xl border border-zinc-200 bg-white p-4 text-center shadow-sm min-w-[7rem]">
+      <p className="text-2xl font-bold text-zinc-900 tabular-nums min-h-[2rem]">{display}</p>
+      <p className="text-xs text-zinc-600 mt-1">{metric.label}</p>
     </div>
   )
 }
@@ -309,7 +315,6 @@ export function SecuritySection() {
         <Reveal className="mb-10 text-center">
           <SectionHeader
             align="center"
-            light
             label="Enterprise Security"
             title="Clarity — not just darkness"
             desc="Encryption, isolation, permissions, and audit — presented for evaluation teams."
@@ -338,7 +343,6 @@ export function SuccessMetricsSection() {
         <Reveal className="mb-10">
           <SectionHeader
             align="center"
-            light
             label="Production proof"
             title="Real metrics — not marketing claims"
             desc="Gates and architecture signals from the live platform."
@@ -365,7 +369,7 @@ export function FinalCtaSection({ onLaunch, demoHref }) {
       <div className="max-w-xl mx-auto text-center">
         <Reveal>
           <h2 className="ci-v3-section-heading ci-v3-on-light text-center mb-4">Start your AI sales platform</h2>
-          <p className="ci-v3-section-desc text-center mb-8">
+          <p className="ci-v3-section-desc ci-v3-desc-light text-center mb-8">
             Launch a secure workspace in minutes — or book an enterprise demo for your evaluation team.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
