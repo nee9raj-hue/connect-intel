@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
+import { openChromeWebStore, useChromeExtensionDistribution } from '../../lib/chromeExtension'
 
 export default function CrmGmailConnectCard({ compact = false }) {
   const { refreshSession } = useApp()
+  const extension = useChromeExtensionDistribution()
   const [status, setStatus] = useState(null)
   const [loading, setLoading] = useState(true)
   const [connecting, setConnecting] = useState(false)
@@ -93,10 +95,29 @@ export default function CrmGmailConnectCard({ compact = false }) {
   }
 
   if (!status.gmailConnectAvailable) {
+    const strategy = status.emailStrategy
     return (
-      <div className={`rounded-lg border border-gray-200 bg-gray-50 text-gray-700 ${pad}`}>
-        <p className="font-semibold text-xs text-gray-900">Work email connect is unavailable</p>
-        <p className="mt-1 text-xs leading-relaxed">Try again later or contact Connect Intel support.</p>
+      <div className={`rounded-lg border border-[#FF773D]/30 bg-[#FFF7F2] text-gray-800 ${pad}`}>
+        <p className="font-semibold text-xs text-gray-900">Gmail in the CRM app — coming later</p>
+        <p className="mt-1 text-xs leading-relaxed">
+          {strategy?.recommendedPath ||
+            'Use the Connect Intel Chrome extension in Gmail for trail sync and send-and-log. Web Gmail OAuth is deferred until Google security review.'}
+        </p>
+        {extension.storeUrl ? (
+          <button
+            type="button"
+            onClick={() => openChromeWebStore(extension.storeUrl)}
+            className="mt-2 w-full py-2 text-xs font-semibold bg-[#FF773D] text-[#242424] rounded-lg"
+          >
+            Install Chrome extension
+          </button>
+        ) : (
+          <p className="mt-2 text-xs text-gray-600">See Team → Integrations for extension setup.</p>
+        )}
+        <p className="mt-2 text-xs text-gray-500">
+          Replies still log via inbound routing when you send from CRM or extension. Manual{' '}
+          <strong>Log reply</strong> works on any lead.
+        </p>
       </div>
     )
   }

@@ -3,6 +3,7 @@ import { useApp } from '../../context/AppContext'
 import { useUsagePolicies } from '../../hooks/useUsagePolicies.js'
 import { isPipelineAssignManager } from '../../lib/pipelineAssignAccess'
 import { api } from '../../lib/api'
+import { loadChromeExtensionDistribution } from '../../lib/chromeExtension'
 import {
   leadHasCommercialEmailConsent,
   COMMERCIAL_EMAIL_CONSENT_MESSAGE,
@@ -169,7 +170,9 @@ export default function LeadWorkspace({
     inboundReplySync: false,
     gmailConnectAvailable: false,
     googleVerificationPending: true,
+    emailStrategyMode: 'extension_first',
   })
+  const [extensionStoreUrl, setExtensionStoreUrl] = useState(null)
   const [threadSyncing, setThreadSyncing] = useState(false)
   const [connectingGmail, setConnectingGmail] = useState(false)
   const [emailAgenda, setEmailAgenda] = useState('')
@@ -316,6 +319,12 @@ export default function LeadWorkspace({
   }, [tab, lead.id, gmailStatus.inboundReplySync, refreshPipelineLead])
 
   useEffect(() => {
+    loadChromeExtensionDistribution()
+      .then((dist) => setExtensionStoreUrl(dist.storeUrl))
+      .catch(() => {})
+  }, [])
+
+  useEffect(() => {
     if (tab !== 'email') return
     api
       .getOrgEmailDomain()
@@ -331,6 +340,7 @@ export default function LeadWorkspace({
           inboundReplySync: Boolean(data.inboundReplySync),
           gmailConnectAvailable: Boolean(data.gmailConnectAvailable),
           googleVerificationPending: Boolean(data.googleVerificationPending),
+          emailStrategyMode: data.emailStrategy?.mode || 'extension_first',
         })
       )
       .catch(() =>
@@ -341,6 +351,7 @@ export default function LeadWorkspace({
           inboundReplySync: false,
           gmailConnectAvailable: false,
           googleVerificationPending: true,
+          emailStrategyMode: 'extension_first',
         })
       )
   }, [tab, lead.id, user?.orgOutboundEmailReady])
@@ -364,6 +375,7 @@ export default function LeadWorkspace({
           inboundReplySync: Boolean(data.inboundReplySync),
           gmailConnectAvailable: Boolean(data.gmailConnectAvailable),
           googleVerificationPending: Boolean(data.googleVerificationPending),
+          emailStrategyMode: data.emailStrategy?.mode || 'extension_first',
         })
       )
       .catch(() => {})
@@ -1422,6 +1434,8 @@ export default function LeadWorkspace({
               gmailConnectAvailable={gmailStatus.gmailConnectAvailable}
               inboundReplySync={gmailStatus.inboundReplySync}
               replySyncEnabled={gmailStatus.replySyncEnabled}
+              extensionStoreUrl={extensionStoreUrl}
+              emailStrategyMode={gmailStatus.emailStrategyMode}
               busy={threadSyncing || sending}
               onSync={handleSyncEmailThread}
               onLogReply={handleLogReply}

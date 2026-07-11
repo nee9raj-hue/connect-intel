@@ -69,19 +69,19 @@ export default function CrmGettingStarted({ onNavigate, pipelineSummary }) {
           action: { panel: 'pipeline', status: 'all' },
           cta: 'Open pipeline',
         },
-        ...(gmailOnboardingEnabled ? [gmailStep(true)] : []),
         {
           id: 'extension',
           title: 'Install Chrome extension',
           detail: extensionStoreUrl
-            ? 'Gmail match, LinkedIn capture, and trail sync from your browser.'
+            ? 'Primary path for Gmail trail sync, send-and-log, and LinkedIn capture while web Gmail OAuth is deferred.'
             : 'Load unpacked from the repo extension/ folder, or install from Chrome Web Store when published.',
           done: false,
-          optional: true,
+          optional: false,
           externalUrl: extensionStoreUrl,
           action: { panel: 'team', teamTab: 'integrations' },
           cta: extensionStoreUrl ? 'Install' : 'Integrations',
         },
+        ...(gmailOnboardingEnabled ? [gmailStep(true)] : []),
         {
           id: 'calendar',
           title: 'Plan follow-ups',
@@ -102,19 +102,19 @@ export default function CrmGettingStarted({ onNavigate, pipelineSummary }) {
         action: { panel: 'pipeline', status: 'all', scopeOwner: 'me' },
         cta: 'My pipeline',
       },
-      ...(gmailOnboardingEnabled ? [gmailStep(false)] : []),
       {
         id: 'extension',
         title: 'Install Chrome extension',
         detail: extensionStoreUrl
-          ? 'Match Gmail threads to leads and capture LinkedIn profiles faster.'
+          ? 'Use Gmail trail sync and send-and-log from your browser — recommended until in-app Gmail connect returns.'
           : 'Ask your admin for the Web Store link, or use Team → Integrations for setup.',
         done: false,
-        optional: true,
+        optional: false,
         externalUrl: extensionStoreUrl,
         action: { panel: 'team', teamTab: 'integrations' },
         cta: extensionStoreUrl ? 'Install' : 'Integrations',
       },
+      ...(gmailOnboardingEnabled ? [gmailStep(false)] : []),
       {
         id: 'calendar',
         title: 'Check today’s calendar',

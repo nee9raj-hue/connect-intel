@@ -26,6 +26,8 @@ export default function CrmEmailThread({
   gmailConnectAvailable = true,
   inboundReplySync = false,
   replySyncEnabled,
+  extensionStoreUrl = null,
+  emailStrategyMode = null,
   busy,
   onSync,
   onLogReply,
@@ -58,14 +60,22 @@ export default function CrmEmailThread({
       onSync?.()
       return
     }
+    if (extensionFirst && extensionStoreUrl) {
+      window.open(extensionStoreUrl, '_blank', 'noopener,noreferrer')
+      return
+    }
     onConnectGmail?.()
   }
+
+  const extensionFirst = emailStrategyMode === 'extension_first' || (!gmailConnectAvailable && !gmailConnected)
 
   const syncLabel = busy
     ? 'Syncing…'
     : gmailConnected
       ? 'Sync from Gmail'
-      : 'Connect Gmail to sync'
+      : extensionFirst
+        ? 'Use Chrome extension'
+        : 'Connect Gmail to sync'
 
   const syncTitle = gmailConnected
     ? inboundReplySync
@@ -81,7 +91,7 @@ export default function CrmEmailThread({
         <div className="lw-btn-row lw-email-thread__actions">
           <LwBtn
             variant={gmailConnected ? 'secondary' : 'brand'}
-            disabled={busy || (!gmailConnected && !gmailConnectAvailable)}
+            disabled={busy || (!gmailConnected && !gmailConnectAvailable && !extensionFirst)}
             onClick={handleSyncClick}
             title={syncTitle}
           >
@@ -113,7 +123,15 @@ export default function CrmEmailThread({
         </LwNotice>
       )}
 
-      {!gmailConnected && !inboundReplySync && (
+      {extensionFirst && !gmailConnected && (
+        <LwNotice type="info">
+          Install the Connect Intel Chrome extension and open this thread in Gmail to sync trail mail or use{' '}
+          <strong>Send &amp; log</strong>. Replies can still log automatically via inbound routing when you send from
+          the extension.
+        </LwNotice>
+      )}
+
+      {!gmailConnected && !inboundReplySync && !extensionFirst && (
         <LwNotice type="info">
           Connect work Gmail to pull sent mail and replies from your inbox into this thread.
         </LwNotice>

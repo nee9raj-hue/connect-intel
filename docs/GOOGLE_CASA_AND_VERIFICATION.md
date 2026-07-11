@@ -1,5 +1,7 @@
 # Google OAuth verification & CASA Tier 2 (Connect Intel)
 
+> **Status: DEFERRED (July 2026)** — CASA fees are not in budget at this stage. Restricted Gmail scopes (`gmail.send`, `gmail.readonly`) are **removed from the web OAuth app**. CRM email sync uses the **Chrome extension** + **inbound reply routing**. See **`docs/EMAIL_STRATEGY_EARLY_STAGE.md`**.
+
 **Project:** connect-intel (ID `968000502951`)  
 **Production:** https://connectintel.net  
 **Support:** invite@connectintel.net
