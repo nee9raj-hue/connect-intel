@@ -244,3 +244,105 @@ export const TRUST_SIGNALS = PRODUCT_METRICS
 
 export const DEMO_MAILTO =
   'mailto:invite@connectintel.net?subject=Connect%20Intel%20demo%20request&body=Company%20name%3A%0ATeam%20size%3A%0AUse%20case%3A'
+
+/** Website 3.0 — story chapters */
+export const STORY_HERO = {
+  line1: 'The Enterprise AI Platform',
+  line2: 'Built To Grow Sales.',
+  tagline: 'One workspace. Infinite intelligence.',
+}
+
+export const CHAOS_TOOLS = [
+  'Google',
+  'LinkedIn',
+  'Excel',
+  'Legacy CRM',
+  'Email',
+  'WhatsApp',
+  'Notes',
+  'Browser tabs',
+  'Copy-paste',
+  'Manual research',
+]
+
+export const COPILOT_THINKING = [
+  'Understanding request: EU buyer for textiles',
+  'Searching CRM — 3 matching leads',
+  'Researching company website & export markets',
+  'Finding decision makers on LinkedIn',
+  'Drafting personalized follow-up email',
+  'Recommending: schedule call + update stage',
+]
+
+export const MARKET_ROUTES = [
+  { from: 'IN', to: 'EU', label: 'Exporters → EU buyers' },
+  { from: 'IN', to: 'US', label: 'Manufacturers → US distributors' },
+  { from: 'AE', to: 'IN', label: 'Importers → Indian suppliers' },
+]
+
+export const AUTOMATION_FLOW = [
+  'Lead enters pipeline',
+  'AI qualifies fit',
+  'Owner assigned',
+  'Email drafted',
+  'Task created',
+  'Reminder scheduled',
+  'Meeting booked',
+  'Deal won',
+]
+
+export const ENTERPRISE_ARCH = [
+  { title: 'Multi-tenant', desc: 'Org isolation at API layer' },
+  { title: 'RBAC', desc: 'Admin · manager · rep views' },
+  { title: 'Teams', desc: 'Departments & hierarchy' },
+  { title: 'Audit logs', desc: 'Sensitive actions recorded' },
+  { title: 'Secure auth', desc: 'JWT sessions · rate limits' },
+  { title: 'Cloud infra', desc: 'Vercel serverless scale path' },
+  { title: 'SQL pipeline', desc: 'Keyset lists at volume' },
+  { title: 'AI layer', desc: 'Copilot grounded on CRM data' },
+]
+
+export const DAY_WITH_CI = [
+  {
+    period: 'Morning',
+    title: 'AI briefing',
+    items: ['Hot leads surfaced', 'Tasks due today', 'Meetings on calendar'],
+  },
+  {
+    period: 'Midday',
+    title: 'Discovery & outreach',
+    items: ['Company research', 'Decision maker context', 'Email from extension'],
+  },
+  {
+    period: 'Afternoon',
+    title: 'Pipeline & coaching',
+    items: ['Deals progressing', 'Manager dashboard', 'Rep activity truth'],
+  },
+  {
+    period: 'Evening',
+    title: 'Revenue clarity',
+    items: ['Pipeline health', 'Forecast snapshot', 'Next-day recommendations'],
+  },
+]
+
+export const SUCCESS_METRICS = [
+  { value: '<500ms', label: 'Dashboard p50 (production gate)' },
+  { value: '342+', label: 'Automated quality checks' },
+  { value: 'RBAC', label: 'Enforced on every API handler' },
+  { value: 'Multi-tenant', label: 'Organizations in production' },
+]
+
+export const SECURITY_PILLARS = [
+  { title: 'Encryption', desc: 'HTTPS everywhere · secure cookies' },
+  { title: 'Isolation', desc: 'Organization boundaries on every query' },
+  { title: 'Permissions', desc: 'Role matrix — not UI-only filters' },
+  { title: 'Audit trail', desc: 'Coaching & compliance ready' },
+  { title: 'Google Workspace', desc: 'Optional identity & calendar' },
+  { title: 'Backups', desc: 'Durable store with export paths' },
+]
+
+export const CTA_V3 = {
+  primary: 'Launch your workspace',
+  demo: 'Book enterprise demo',
+  platform: 'Start your AI sales platform',
+}

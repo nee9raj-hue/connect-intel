@@ -4,12 +4,14 @@ import GoogleSignIn from '../components/auth/GoogleSignIn'
 import InviteBanner from '../components/auth/InviteBanner'
 import { GOOGLE_SIGNIN_ON_LOGIN_ENABLED } from '../lib/crmProductFlags'
 import { BRAND_LOGO_MARK_TRANSPARENT, BRAND_LOGO_MARK_CLASS } from '../lib/brandAssets'
-import { CRM_ONBOARDING_STEPS, FREE_PLAN, FREE_TIER_HIGHLIGHTS } from '../lib/crmPlanLimits'
+import { FREE_PLAN } from '../lib/crmPlanLimits'
+import '../styles/landing-v3.css'
 
 export default function AuthPage({ inviteToken = null }) {
   const { login, setScreen, authBusy } = useApp()
   const [mode, setMode] = useState('signup')
   const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '' })
+  const [remember, setRemember] = useState(true)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
 
@@ -36,97 +38,79 @@ export default function AuthPage({ inviteToken = null }) {
   }
 
   return (
-    <div className="min-h-screen flex bg-white">
-      <div className="hidden lg:flex lg:w-[44%] bg-[#1f1d1c] text-white flex-col justify-between p-12">
-        <div>
-          <button onClick={() => setScreen('landing')} className="flex items-center gap-2 mb-12">
-            <img
-              src={BRAND_LOGO_MARK_TRANSPARENT}
-              alt="Connect Intel"
-              className={`h-11 w-auto max-w-[240px] ${BRAND_LOGO_MARK_CLASS}`}
-            />
+    <div className="ci-v3 min-h-screen flex flex-col lg:flex-row bg-[#fafafa]">
+      <aside className="hidden lg:flex lg:w-[46%] relative overflow-hidden bg-zinc-950 text-white flex-col justify-between p-12">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_20%_0%,rgba(255,119,61,0.15),transparent_55%)]" aria-hidden />
+        <div className="relative z-10">
+          <button onClick={() => setScreen('landing')} className="flex items-center gap-2 mb-14">
+            <img src={BRAND_LOGO_MARK_TRANSPARENT} alt="Connect Intel" className={`h-10 w-auto max-w-[220px] ${BRAND_LOGO_MARK_CLASS}`} />
           </button>
-          <h2 className="text-3xl font-bold leading-tight mb-4 text-white">
-            Enterprise sales workspace
+          <p className="ci-v3-eyebrow text-amber-300/90 mb-4">Secure workspace access</p>
+          <h2 className="font-display text-[2rem] font-bold leading-tight mb-4">
+            Enterprise AI sales
             <br />
-            without email setup on day one
+            intelligence platform
           </h2>
-          <p className="text-zinc-300 max-w-sm text-[15px] leading-relaxed">
-            Multi-tenant CRM with role-based access, AI copilot, and team intelligence. Sign in once—your session
-            stays secure across visits.
+          <p className="text-zinc-400 max-w-md text-[15px] leading-relaxed">
+            Multi-tenant CRM with role-based access, AI copilot, and persistent secure sessions. Active logins redirect
+            straight to your workspace.
           </p>
-
-          <div className="mt-8 space-y-3">
-            {FREE_TIER_HIGHLIGHTS.map((item) => (
-              <div
-                key={item.title}
-                className="rounded-lg border border-white/10 bg-white/5 px-4 py-3"
-              >
-                <p className="text-sm font-semibold text-white">{item.title}</p>
-                <p className="text-xs text-gray-300 mt-0.5">{item.detail}</p>
-              </div>
-            ))}
-          </div>
-
-          <p className="mt-6 text-xs text-gray-400 leading-relaxed max-w-sm">
-            Free includes up to {FREE_PLAN.maxSeats} seats and {FREE_PLAN.maxLeads} leads. When you outgrow that,
-            your admin can confirm a Team CRM upgrade and see the monthly amount before payment is collected.
-          </p>
+          <ul className="mt-8 space-y-3 text-sm text-zinc-300">
+            {['Organization isolation at API layer', 'Rate-limited authentication', 'Google Workspace sign-in available', 'SSO architecture on roadmap'].map(
+              (line) => (
+                <li key={line} className="flex gap-2">
+                  <span className="text-[#FF773D]" aria-hidden>
+                    ✓
+                  </span>
+                  {line}
+                </li>
+              ),
+            )}
+          </ul>
         </div>
+        <p className="relative z-10 text-xs text-zinc-500">
+          Free tier: {FREE_PLAN.maxSeats} seats · {FREE_PLAN.maxLeads} leads · No card required
+        </p>
+      </aside>
 
-        <div className="grid grid-cols-2 gap-3 mt-10">
-          {CRM_ONBOARDING_STEPS.map((s) => (
-            <div key={s.step} className="rounded-lg border border-white/10 bg-white/5 p-3 text-left">
-              <div className="text-[10px] font-bold uppercase tracking-wide text-ci-yellow mb-1">
-                Step {s.step}
-              </div>
-              <div className="text-sm font-semibold text-white">{s.title}</div>
-              <div className="text-xs text-gray-300 mt-0.5">{s.detail}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="flex-1 flex items-center justify-center p-8 bg-ci-surface">
-        <div className="w-full max-w-[400px]">
-          <button
-            onClick={() => setScreen('landing')}
-            className="text-sm text-gray-600 hover:text-gray-900 mb-8"
-          >
-            ← Back
+      <div className="flex-1 flex items-center justify-center p-6 sm:p-10">
+        <div className="w-full max-w-[420px] ci-v3-glass rounded-2xl p-6 sm:p-8 border border-zinc-200/80 bg-white/90 shadow-xl">
+          <button type="button" onClick={() => setScreen('landing')} className="text-sm text-zinc-500 hover:text-zinc-900 mb-6 font-medium">
+            ← Back to experience
           </button>
 
-          <h1 className="text-2xl font-bold text-ci-dark mb-1">
+          <h1 className="font-display text-2xl font-bold text-zinc-950 mb-1">
             {mode === 'signup' ? 'Create organization' : 'Sign in to workspace'}
           </h1>
-          <p className="text-sm text-gray-600 mb-2">
-            {mode === 'signup'
-              ? 'Work email and password. Chrome extension handles Gmail sync when you are ready.'
-              : 'Work email + password. Active sessions redirect you straight to your workspace.'}
+          <p className="text-sm text-zinc-600 mb-4">
+            {mode === 'signup' ? 'Work email and password to launch your CRM.' : 'Welcome back — your session persists securely.'}
           </p>
-          <p className="text-xs text-zinc-500 mb-6 flex items-start gap-2">
-            <span className="text-emerald-600 font-bold" aria-hidden>
+
+          <div className="flex items-center gap-2 text-xs text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-lg px-3 py-2 mb-6">
+            <span className="font-bold" aria-hidden>
               ●
             </span>
-            HTTPS · encrypted session cookie · rate-limited login
-          </p>
+            HTTPS · encrypted cookies · brute-force protection
+          </div>
 
-          {inviteToken && <InviteBanner token={inviteToken} />}
+          {inviteToken ? <InviteBanner token={inviteToken} /> : null}
 
-          <div className="grid grid-cols-2 gap-2 mb-6 p-1 bg-gray-100 rounded-lg">
+          <div className="grid grid-cols-2 gap-1 mb-6 p-1 bg-zinc-100 rounded-xl" role="tablist">
             {[
-              { id: 'signup', label: 'Sign up' },
+              { id: 'signup', label: 'Create workspace' },
               { id: 'login', label: 'Sign in' },
             ].map((tab) => (
               <button
                 key={tab.id}
                 type="button"
+                role="tab"
+                aria-selected={mode === tab.id}
                 onClick={() => {
                   setMode(tab.id)
                   setError(null)
                 }}
-                className={`py-2 text-sm font-semibold rounded-md transition-colors ${
-                  mode === tab.id ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                className={`py-2.5 text-sm font-semibold rounded-lg transition-colors ${
+                  mode === tab.id ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'
                 }`}
               >
                 {tab.label}
@@ -136,8 +120,7 @@ export default function AuthPage({ inviteToken = null }) {
 
           <form onSubmit={handleEmailAuth} className="space-y-4">
             {mode === 'signup' ? (
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1.5">Your name</label>
+              <Field label="Your name">
                 <input
                   type="text"
                   required
@@ -146,10 +129,9 @@ export default function AuthPage({ inviteToken = null }) {
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                 />
-              </div>
+              </Field>
             ) : null}
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1.5">Work email</label>
+            <Field label="Work email">
               <input
                 type="email"
                 required
@@ -159,19 +141,17 @@ export default function AuthPage({ inviteToken = null }) {
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
               />
-            </div>
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-xs font-semibold text-gray-700">Password</label>
-                {mode === 'login' ? (
-                  <a
-                    href="mailto:invite@connectintel.net?subject=Password%20reset%20request"
-                    className="text-xs font-medium text-gray-600 hover:text-gray-900"
-                  >
+            </Field>
+            <Field
+              label="Password"
+              action={
+                mode === 'login' ? (
+                  <a href="mailto:invite@connectintel.net?subject=Password%20reset%20request" className="text-xs font-medium text-zinc-500 hover:text-zinc-900">
                     Forgot password?
                   </a>
-                ) : null}
-              </div>
+                ) : null
+              }
+            >
               <input
                 type="password"
                 required
@@ -182,10 +162,9 @@ export default function AuthPage({ inviteToken = null }) {
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
               />
-            </div>
+            </Field>
             {mode === 'signup' ? (
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1.5">Confirm password</label>
+              <Field label="Confirm password">
                 <input
                   type="password"
                   required
@@ -196,47 +175,41 @@ export default function AuthPage({ inviteToken = null }) {
                   value={form.confirm}
                   onChange={(e) => setForm({ ...form, confirm: e.target.value })}
                 />
-              </div>
+              </Field>
             ) : null}
 
-            {error ? (
-              <p className="text-xs text-red-700 bg-red-50 border border-red-100 rounded px-2 py-1.5">{error}</p>
+            {mode === 'login' ? (
+              <label className="flex items-center gap-2 text-sm text-zinc-600 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={remember}
+                  onChange={(e) => setRemember(e.target.checked)}
+                  className="rounded border-zinc-300 text-zinc-900 focus:ring-[#FF773D]/40"
+                />
+                Remember me on this device
+              </label>
             ) : null}
 
-            <button
-              type="submit"
-              disabled={loading || authBusy}
-              className="w-full py-3 bg-ci-nav text-white font-semibold rounded-lg hover:bg-gray-800 disabled:opacity-60"
-            >
-              {loading || authBusy ? 'Please wait…' : mode === 'signup' ? 'Create workspace →' : 'Sign in →'}
+            {error ? <p className="text-xs text-red-700 bg-red-50 border border-red-100 rounded-lg px-3 py-2">{error}</p> : null}
+
+            <button type="submit" disabled={loading || authBusy} className="ci-btn-primary w-full py-3 text-sm disabled:opacity-60">
+              {loading || authBusy ? 'Please wait…' : mode === 'signup' ? 'Launch workspace →' : 'Sign in →'}
             </button>
           </form>
 
           {mode === 'login' && GOOGLE_SIGNIN_ON_LOGIN_ENABLED ? (
             <>
               <div className="flex items-center gap-3 my-6">
-                <div className="flex-1 h-px bg-gray-200" />
-                <span className="text-xs text-gray-500 font-medium">or</span>
-                <div className="flex-1 h-px bg-gray-200" />
+                <div className="flex-1 h-px bg-zinc-200" />
+                <span className="text-xs text-zinc-500 font-medium">or</span>
+                <div className="flex-1 h-px bg-zinc-200" />
               </div>
-
               <GoogleSignIn text="signin_with" layout="block" enabled />
-
-              <p className="mt-4 text-xs text-gray-600 text-center leading-relaxed">
-                For teams already on Connect Intel (e.g. registered with Google). Uses profile only — work Gmail
-                for send/receive connects separately in settings.
-              </p>
+              <p className="mt-3 text-xs text-zinc-500 text-center">Google Workspace · profile only at sign-in</p>
             </>
           ) : null}
 
-          {mode === 'signup' ? (
-            <p className="mt-6 text-xs text-gray-500 text-center leading-relaxed">
-              After signup you will confirm company details and mobile in setup. Work Gmail uses normal Google scopes
-              only when you choose to connect it.
-            </p>
-          ) : null}
-
-          <p className="mt-4 text-sm text-gray-500 text-center leading-relaxed">
+          <p className="mt-6 text-xs text-zinc-500 text-center leading-relaxed">
             By continuing, you agree to our Terms of Service and Privacy Policy.
           </p>
         </div>
@@ -245,5 +218,17 @@ export default function AuthPage({ inviteToken = null }) {
   )
 }
 
+function Field({ label, children, action }) {
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-1.5">
+        <label className="block text-xs font-semibold text-zinc-700">{label}</label>
+        {action}
+      </div>
+      {children}
+    </div>
+  )
+}
+
 const inputCls =
-  'w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-ci-yellow/40 focus:border-ci-yellow bg-white'
+  'w-full px-3.5 py-2.5 border border-zinc-200 rounded-xl text-sm text-zinc-900 focus:outline-none focus:ring-2 focus:ring-[#FF773D]/30 focus:border-[#FF773D] bg-white transition-shadow'
