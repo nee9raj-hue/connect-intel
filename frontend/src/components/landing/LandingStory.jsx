@@ -15,6 +15,7 @@ import {
   SUCCESS_METRICS,
 } from '../../lib/landingContent'
 import { BRAND_LOGO_ICON, BRAND_LOGO_ICON_CLASS } from '../../lib/brandAssets'
+import WorldTradeMap from './WorldTradeMap'
 
 function Reveal({ children, className = '', delay = 0 }) {
   const [ref, visible] = useLandingReveal()
@@ -30,16 +31,20 @@ function ChapterHeader({ eyebrow, title, desc, dark = false, align = 'left' }) {
   const centered = align === 'center'
   return (
     <header className={centered ? 'text-center mx-auto max-w-3xl' : 'max-w-xl'}>
-      {eyebrow ? <p className={`ci-v3-eyebrow mb-3 ${dark ? 'text-amber-300' : ''}`}>{eyebrow}</p> : null}
+      {eyebrow ? (
+        <p className={`ci-v3-eyebrow mb-3 ${dark ? 'text-amber-300' : ''}`}>{eyebrow}</p>
+      ) : null}
       <h2
-        className={`font-display text-[clamp(1.75rem,4vw,2.75rem)] font-bold tracking-[-0.03em] leading-tight mb-4 ${
-          dark ? 'text-white' : 'text-zinc-950'
+        className={`ci-v3-chapter-heading font-display text-[clamp(1.75rem,4vw,2.75rem)] font-bold tracking-[-0.03em] leading-tight mb-4 ${
+          dark ? '' : 'text-zinc-950'
         }`}
       >
         {title}
       </h2>
       {desc ? (
-        <p className={`text-base leading-relaxed ${dark ? 'text-zinc-400' : 'text-zinc-600'} ${centered ? 'mx-auto' : ''}`}>
+        <p
+          className={`ci-v3-chapter-desc text-base leading-relaxed ${dark ? '' : 'text-zinc-600'} ${centered ? 'mx-auto' : ''}`}
+        >
           {desc}
         </p>
       ) : null}
@@ -253,21 +258,21 @@ export function CopilotSection() {
           />
         </Reveal>
 
-        <div ref={ref} className={`ci-v3-copilot rounded-2xl border border-white/10 bg-white/5 p-5 sm:p-6 ${visible ? 'is-visible' : ''}`}>
-          <p className="text-xs text-amber-200/90 font-semibold mb-4">Reasoning trace</p>
+        <div ref={ref} className={`ci-v3-copilot rounded-2xl border border-white/15 bg-white/[0.07] p-5 sm:p-6 ${visible ? 'is-visible' : ''}`}>
+          <p className="ci-v3-accent-label text-xs font-semibold mb-4">Reasoning trace</p>
           <ol className="space-y-3" aria-label="AI reasoning steps">
             {COPILOT_THINKING.map((step) => (
-              <li key={step} className="ci-v3-think-step flex gap-3 text-sm text-zinc-300">
-                <span className="w-5 h-5 rounded-full bg-[#FF773D]/20 text-[#ffb899] text-[10px] font-bold flex items-center justify-center shrink-0">
+              <li key={step} className="ci-v3-think-step flex gap-3 text-sm text-zinc-200">
+                <span className="w-5 h-5 rounded-full bg-[#FF773D]/25 text-[#fdba74] text-[10px] font-bold flex items-center justify-center shrink-0">
                   →
                 </span>
                 {step}
               </li>
             ))}
           </ol>
-          <div className="mt-6 rounded-xl bg-zinc-950/80 border border-white/10 p-4">
-            <p className="text-[10px] text-zinc-500 mb-1">Draft ready</p>
-            <p className="text-sm text-white/90 leading-relaxed" id="copilot-title">
+          <div className="mt-6 rounded-xl bg-black/40 border border-white/15 p-4">
+            <p className="ci-v3-muted-label text-[10px] font-semibold uppercase tracking-wide mb-1">Draft ready</p>
+            <p className="text-sm text-zinc-100 leading-relaxed" id="copilot-title">
               Personalized email referencing last quote, export MOQ, and proposed call slot — grounded on lead record.
             </p>
           </div>
@@ -366,11 +371,9 @@ export function CompanyIntelSection() {
 }
 
 export function MarketIntelSection() {
-  const [ref, visible] = useLandingReveal()
-
   return (
     <section className="ci-v3-chapter px-4 sm:px-6" aria-labelledby="market-title">
-      <div className="max-w-[1000px] mx-auto grid lg:grid-cols-2 gap-10 items-center">
+      <div className="max-w-[1100px] mx-auto grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
         <Reveal>
           <ChapterHeader
             eyebrow="Chapter 05"
@@ -379,27 +382,8 @@ export function MarketIntelSection() {
           />
         </Reveal>
 
-        <div ref={ref} className={`ci-v3-market rounded-2xl bg-zinc-950 p-6 ${visible ? 'is-visible' : ''}`}>
-          <svg viewBox="0 0 400 220" className="w-full h-auto" role="img" aria-labelledby="market-title">
-            <title id="market-title">Global trade routes map</title>
-            <rect width="400" height="220" fill="#0f1117" rx="12" />
-            <circle cx="120" cy="110" r="6" fill="#FF773D" />
-            <circle cx="280" cy="80" r="5" fill="#60a5fa" />
-            <circle cx="300" cy="150" r="5" fill="#34d399" />
-            <text x="120" y="130" fill="#a1a1aa" fontSize="10" textAnchor="middle">
-              India
-            </text>
-            <text x="280" y="68" fill="#a1a1aa" fontSize="10" textAnchor="middle">
-              EU
-            </text>
-            <text x="300" y="168" fill="#a1a1aa" fontSize="10" textAnchor="middle">
-              US
-            </text>
-            <path className="ci-v3-route" d="M126 108 Q200 60 274 82" stroke="#FF773D" strokeWidth="2" fill="none" opacity="0.8" />
-            <path className="ci-v3-route" d="M126 112 Q210 140 294 148" stroke="#60a5fa" strokeWidth="2" fill="none" opacity="0.7" />
-            <path className="ci-v3-route" d="M290 145 Q200 100 126 108" stroke="#34d399" strokeWidth="1.5" fill="none" opacity="0.5" strokeDasharray="4 4" />
-          </svg>
-          <p className="text-xs text-zinc-400 mt-3 text-center">Exporters · Importers · Distributors · Opportunities</p>
+        <div id="market-title">
+          <WorldTradeMap />
         </div>
       </div>
     </section>
@@ -486,16 +470,16 @@ export function AnalyticsSection() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {metrics.map((m) => (
             <Reveal key={m.label}>
-              <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-center">
-                <p className="text-2xl font-bold text-white">{m.value}</p>
-                <p className="text-xs text-zinc-400 mt-1">{m.label}</p>
+              <div className="rounded-xl border border-white/15 bg-white/[0.07] p-4 text-center">
+                <p className="ci-v3-stat-value text-2xl font-bold">{m.value}</p>
+                <p className="ci-v3-stat-label text-xs mt-1">{m.label}</p>
               </div>
             </Reveal>
           ))}
         </div>
 
-        <div ref={ref} className={`ci-v3-analytics rounded-2xl border border-white/10 bg-white/5 p-6 ${visible ? 'is-visible' : ''}`}>
-          <p className="text-xs text-zinc-400 mb-4" id="analytics-title">
+        <div ref={ref} className={`ci-v3-analytics rounded-2xl border border-white/15 bg-white/[0.07] p-6 ${visible ? 'is-visible' : ''}`}>
+          <p className="ci-v3-muted-label text-xs mb-4" id="analytics-title">
             Pipeline trend · last 30 days
           </p>
           <div className="flex items-end gap-3 h-32">
@@ -505,7 +489,7 @@ export function AnalyticsSection() {
               </div>
             ))}
           </div>
-          <p className="text-xs text-amber-200/80 mt-4">AI: 3 deals at risk — recommend manager review on Follow up stage.</p>
+          <p className="ci-v3-ai-insight text-xs mt-4 font-medium">AI: 3 deals at risk — recommend manager review on Follow up stage.</p>
         </div>
       </div>
     </section>
@@ -598,9 +582,9 @@ export function SecuritySection() {
 
         <div ref={ref} className={`ci-v3-security grid sm:grid-cols-2 lg:grid-cols-3 gap-4 ${visible ? 'is-visible' : ''}`} id="security-title">
           {SECURITY_PILLARS.map((item) => (
-            <div key={item.title} className="ci-v3-shield rounded-xl border border-white/10 bg-white/5 p-5">
-              <h3 className="font-semibold text-white text-sm mb-1">{item.title}</h3>
-              <p className="text-xs text-zinc-400 leading-relaxed">{item.desc}</p>
+            <div key={item.title} className="ci-v3-shield rounded-xl border border-white/15 bg-white/[0.08] p-5">
+              <h3 className="ci-v3-card-title font-semibold text-sm mb-1.5">{item.title}</h3>
+              <p className="ci-v3-card-desc text-xs leading-relaxed">{item.desc}</p>
             </div>
           ))}
         </div>

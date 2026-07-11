@@ -67,6 +67,43 @@
   color: #fafafa;
 }
 
+/* High-contrast typography on dark chapters (overrides inherited body color) */
+.ci-v3-dark .ci-v3-chapter-heading {
+  color: #ffffff;
+}
+
+.ci-v3-dark .ci-v3-chapter-desc {
+  color: #d4d4d8;
+}
+
+.ci-v3-dark .ci-v3-card-title {
+  color: #ffffff;
+}
+
+.ci-v3-dark .ci-v3-card-desc {
+  color: #c8c8d0;
+}
+
+.ci-v3-dark .ci-v3-muted-label {
+  color: #a8a8b3;
+}
+
+.ci-v3-dark .ci-v3-accent-label {
+  color: #fdba74;
+}
+
+.ci-v3-dark .ci-v3-stat-value {
+  color: #ffffff;
+}
+
+.ci-v3-dark .ci-v3-stat-label {
+  color: #d4d4d8;
+}
+
+.ci-v3-dark .ci-v3-ai-insight {
+  color: #fed7aa;
+}
+
 /* Scroll reveal */
 .ci-v3-reveal {
   opacity: 0;
@@ -325,6 +362,98 @@
   }
 }
 
+/* World trade map */
+.ci-v3-worldmap {
+  background: #0b1220;
+}
+
+.ci-v3-worldmap-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem 1rem;
+  padding: 0.85rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #e4e4e7;
+  background: rgba(15, 23, 42, 0.92);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ci-v3-legend-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+
+.ci-v3-world-route {
+  stroke-dasharray: 520;
+  stroke-dashoffset: 520;
+}
+
+.ci-v3-worldmap.is-visible .ci-v3-world-route {
+  animation: ci-v3-world-draw 2.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.ci-v3-worldmap.is-visible .ci-v3-world-route:nth-child(2) {
+  animation-delay: 0.3s;
+}
+.ci-v3-worldmap.is-visible .ci-v3-world-route:nth-child(3) {
+  animation-delay: 0.6s;
+}
+.ci-v3-worldmap.is-visible .ci-v3-world-route:nth-child(4) {
+  animation-delay: 0.9s;
+}
+
+@keyframes ci-v3-world-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.ci-v3-hub-ring {
+  animation: ci-v3-hub-pulse 2.8s ease-in-out infinite;
+}
+
+.ci-v3-worldmap.is-visible .ci-v3-world-hub:nth-child(2) .ci-v3-hub-ring {
+  animation-delay: 0.4s;
+}
+.ci-v3-worldmap.is-visible .ci-v3-world-hub:nth-child(3) .ci-v3-hub-ring {
+  animation-delay: 0.8s;
+}
+.ci-v3-worldmap.is-visible .ci-v3-world-hub:nth-child(4) .ci-v3-hub-ring {
+  animation-delay: 1.2s;
+}
+
+@keyframes ci-v3-hub-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.15);
+  }
+}
+
+.ci-v3-continents {
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+.ci-v3-worldmap.is-visible .ci-v3-continents {
+  opacity: 1;
+}
+
+.ci-v3-map-label {
+  paint-order: stroke fill;
+  stroke: rgba(11, 18, 32, 0.85);
+  stroke-width: 3px;
+}
+
 /* Workflow automation */
 .ci-v3-flow-node {
   opacity: 0;
@@ -551,5 +680,15 @@
   .ci-v3-route {
     stroke-dashoffset: 0 !important;
     animation: none !important;
+  }
+
+  .ci-v3-world-route,
+  .ci-v3-hub-ring {
+    animation: none !important;
+    stroke-dashoffset: 0 !important;
+  }
+
+  .ci-v3-continents {
+    opacity: 1 !important;
   }
 }

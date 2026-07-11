@@ -46,7 +46,7 @@ export default function AuthPage({ inviteToken = null }) {
             <img src={BRAND_LOGO_MARK_TRANSPARENT} alt="Connect Intel" className={`h-10 w-auto max-w-[220px] ${BRAND_LOGO_MARK_CLASS}`} />
           </button>
           <p className="ci-v3-eyebrow text-amber-300/90 mb-4">Secure workspace access</p>
-          <h2 className="font-display text-[2rem] font-bold leading-tight mb-4">
+          <h2 className="font-display text-[2rem] font-bold leading-tight mb-4 text-white">
             Enterprise AI sales
             <br />
             intelligence platform
