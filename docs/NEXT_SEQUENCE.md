@@ -19,6 +19,7 @@ Operational playbook after landing + operator-access work (July 2026). Run steps
 
 | Step | Command / action | Notes |
 |------|------------------|-------|
+| 2.0 | Infrastructure V2 P1 complete | `companies-hub` + `saved-leads` GET → `getPlatform().repositories.*` |
 | 2.1 | `npm run rbac:audit -- --strict` | CI already runs this; 0 mutation gaps |
 | 2.2 | Confirm Supabase on Vercel | `USE_PIPELINE_LEADS_TABLE` + hierarchy RBAC auto-on when Supabase configured (`lib/server/infra/config.js`) |
 | 2.3 | `npm run prod:ops -- --name=Xindus` | Meilisearch sync after deploy |

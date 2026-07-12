@@ -85,7 +85,7 @@ await platform.jobs.runNow('data-sync', { orgId })
 | `organizations` | `findById`, `listForUser`, `listMembers` | Org isolation |
 | `leads` | `findById`, `listForOrg`, `countForOrg` | Pipeline entries |
 | `companies` | `listHub`, `getDetail`, `updateParent`, `listForOrg`, `findById` | Accounts hub (SQL + in-memory) |
-| `pipeline` | `readShardEntries`, `loadListPage`, `summaryForOrg`, `verifySqlBackfill` | SQL verify + list read port |
+| `pipeline` | `loadListPage`, `loadLeadsByIds`, `loadSummaryOnly`, `loadBoardView`, `loadDealsPage`, `loadSummaryWithDeals`, `resolveListSource`, `readShardEntries`, `summaryForOrg`, `verifySqlBackfill` | All pipeline GET reads |
 
 **Rule:** New features use repositories. Legacy handlers keep working via `store.js` until migrated.
 
@@ -126,7 +126,17 @@ npm run server
 | **Cloudflare Pages** | Static only — **needs** separate API host | $0 static |
 | **Vercel Hobby** | Current production path | $0 (limits apply) |
 
-**Production today (connectintel.net):** Vercel + Supabase — unchanged. Adapters wrap existing code.
+**Production today (connectintel.net):** Vercel + Supabase + Railway workers — unchanged. Adapters wrap existing code.
+
+### Hosting decision tree
+
+| Question | Answer |
+|----------|--------|
+| **Where is production now?** | Vercel (web + API) + Supabase + Railway (workers, Meilisearch) |
+| **Need Cloudflare today?** | **No** — not required for current blueprint path |
+| **$0 MVP / dev escape hatch?** | `npm run docker:up` locally, or Oracle Cloud Free VM + same Docker image |
+| **When to add Cloudflare?** | Only when splitting static (Pages) from API, or adopting R2 (`STORAGE_PROVIDER=r2`) in P4 |
+| **When to leave Vercel?** | Hobby limits, cost, or enterprise self-host — migrate via `HOST_PROVIDER=docker` + Postgres, not a rewrite |
 
 ---
 
@@ -161,7 +171,7 @@ Providers (Gemini, Perplexity, future OpenAI/Anthropic/local LLM) live inside `a
 | Phase | Work | Status |
 |-------|------|--------|
 | **P0** | Platform kernel + Docker + docs | **Done** |
-| **P1** | Migrate handlers → repositories (pipeline, companies) | **In progress** — `companies-hub` on `platform.repositories.companies`; pipeline `loadListPage` port ready |
+| **P1** | Migrate handlers → repositories (pipeline, companies) | **Done** — `companies-hub` + all `saved-leads` GET reads |
 | **P2** | `DATABASE_PROVIDER=postgres` on self-hosted; deprecate supabase-rest | Planned |
 | **P3** | Auth abstraction (SAML/Azure AD) behind `AUTH_PROVIDER` | Planned |
 | **P4** | Storage S3/R2 adapter | Planned |
