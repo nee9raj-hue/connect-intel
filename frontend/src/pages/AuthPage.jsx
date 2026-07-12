@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useApp } from '../context/AppContext'
 import GoogleSignIn from '../components/auth/GoogleSignIn'
+import EnterpriseSsoSignIn from '../components/auth/EnterpriseSsoSignIn'
 import InviteBanner from '../components/auth/InviteBanner'
 import { GOOGLE_SIGNIN_ON_LOGIN_ENABLED } from '../lib/crmProductFlags'
+import { isEnterprisePrimary, resolvePublicAuthConfig } from '../lib/enterpriseAuthConfig'
 import { BRAND_LOGO_MARK_TRANSPARENT, BRAND_LOGO_MARK_CLASS } from '../lib/brandAssets'
 import { FREE_PLAN } from '../lib/crmPlanLimits'
 import '../styles/landing-v3.css'
@@ -14,6 +16,16 @@ export default function AuthPage({ inviteToken = null }) {
   const [remember, setRemember] = useState(true)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [authConfig, setAuthConfig] = useState(null)
+
+  useEffect(() => {
+    resolvePublicAuthConfig().then(setAuthConfig)
+  }, [])
+
+  const enterprisePrimary = isEnterprisePrimary(authConfig)
+  const showEmailPassword = mode === 'signup' || authConfig?.emailPassword?.enabled !== false
+  const showGoogle =
+    mode === 'login' && GOOGLE_SIGNIN_ON_LOGIN_ENABLED && authConfig?.google?.enabled !== false
 
   const handleEmailAuth = async (e) => {
     e.preventDefault()
@@ -37,6 +49,8 @@ export default function AuthPage({ inviteToken = null }) {
     }
   }
 
+  const showLoginAlternatives = mode === 'login' && (showEmailPassword || showGoogle)
+
   return (
     <div className="ci-v3 min-h-screen flex flex-col lg:flex-row bg-[#fafafa]">
       <aside className="hidden lg:flex lg:w-[46%] relative overflow-hidden bg-zinc-950 text-white flex-col justify-between p-12">
@@ -56,16 +70,19 @@ export default function AuthPage({ inviteToken = null }) {
             straight to your workspace.
           </p>
           <ul className="mt-8 space-y-3 text-sm text-zinc-300">
-            {['Organization isolation at API layer', 'Rate-limited authentication', 'Google Workspace sign-in available', 'SSO architecture on roadmap'].map(
-              (line) => (
-                <li key={line} className="flex gap-2">
-                  <span className="text-[#FF773D]" aria-hidden>
-                    ✓
-                  </span>
-                  {line}
-                </li>
-              ),
-            )}
+            {[
+              'Organization isolation at API layer',
+              'Rate-limited authentication',
+              'Google Workspace sign-in available',
+              'Enterprise SSO (Azure AD, Okta) when enabled',
+            ].map((line) => (
+              <li key={line} className="flex gap-2">
+                <span className="text-[#FF773D]" aria-hidden>
+                  ✓
+                </span>
+                {line}
+              </li>
+            ))}
           </ul>
         </div>
         <p className="relative z-10 text-xs text-zinc-500">
@@ -118,95 +135,117 @@ export default function AuthPage({ inviteToken = null }) {
             ))}
           </div>
 
-          <form onSubmit={handleEmailAuth} className="space-y-4">
-            {mode === 'signup' ? (
-              <Field label="Your name">
+          {mode === 'login' && enterprisePrimary ? <EnterpriseSsoSignIn layout="block" /> : null}
+
+          {mode === 'login' && enterprisePrimary && showLoginAlternatives ? (
+            <div className="flex items-center gap-3 my-6">
+              <div className="flex-1 h-px bg-zinc-200" />
+              <span className="text-xs text-zinc-500 font-medium">or</span>
+              <div className="flex-1 h-px bg-zinc-200" />
+            </div>
+          ) : null}
+
+          {showEmailPassword ? (
+            <form onSubmit={handleEmailAuth} className="space-y-4">
+              {mode === 'signup' ? (
+                <Field label="Your name">
+                  <input
+                    type="text"
+                    required
+                    className={inputCls}
+                    placeholder="Neeraj Kumar"
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  />
+                </Field>
+              ) : null}
+              <Field label="Work email">
                 <input
-                  type="text"
+                  type="email"
                   required
+                  autoComplete="email"
                   className={inputCls}
-                  placeholder="Neeraj Kumar"
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  placeholder="you@company.com"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
                 />
               </Field>
-            ) : null}
-            <Field label="Work email">
-              <input
-                type="email"
-                required
-                autoComplete="email"
-                className={inputCls}
-                placeholder="you@company.com"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-              />
-            </Field>
-            <Field
-              label="Password"
-              action={
-                mode === 'login' ? (
-                  <a href="mailto:invite@connectintel.net?subject=Password%20reset%20request" className="text-xs font-medium text-zinc-500 hover:text-zinc-900">
-                    Forgot password?
-                  </a>
-                ) : null
-              }
-            >
-              <input
-                type="password"
-                required
-                minLength={8}
-                autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
-                className={inputCls}
-                placeholder="At least 8 characters"
-                value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-              />
-            </Field>
-            {mode === 'signup' ? (
-              <Field label="Confirm password">
+              <Field
+                label="Password"
+                action={
+                  mode === 'login' ? (
+                    <a href="mailto:invite@connectintel.net?subject=Password%20reset%20request" className="text-xs font-medium text-zinc-500 hover:text-zinc-900">
+                      Forgot password?
+                    </a>
+                  ) : null
+                }
+              >
                 <input
                   type="password"
                   required
                   minLength={8}
-                  autoComplete="new-password"
+                  autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
                   className={inputCls}
-                  placeholder="Repeat password"
-                  value={form.confirm}
-                  onChange={(e) => setForm({ ...form, confirm: e.target.value })}
+                  placeholder="At least 8 characters"
+                  value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
                 />
               </Field>
-            ) : null}
+              {mode === 'signup' ? (
+                <Field label="Confirm password">
+                  <input
+                    type="password"
+                    required
+                    minLength={8}
+                    autoComplete="new-password"
+                    className={inputCls}
+                    placeholder="Repeat password"
+                    value={form.confirm}
+                    onChange={(e) => setForm({ ...form, confirm: e.target.value })}
+                  />
+                </Field>
+              ) : null}
 
-            {mode === 'login' ? (
-              <label className="flex items-center gap-2 text-sm text-zinc-600 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={remember}
-                  onChange={(e) => setRemember(e.target.checked)}
-                  className="rounded border-zinc-300 text-zinc-900 focus:ring-[#FF773D]/40"
-                />
-                Remember me on this device
-              </label>
-            ) : null}
+              {mode === 'login' ? (
+                <label className="flex items-center gap-2 text-sm text-zinc-600 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={remember}
+                    onChange={(e) => setRemember(e.target.checked)}
+                    className="rounded border-zinc-300 text-zinc-900 focus:ring-[#FF773D]/40"
+                  />
+                  Remember me on this device
+                </label>
+              ) : null}
 
-            {error ? <p className="text-xs text-red-700 bg-red-50 border border-red-100 rounded-lg px-3 py-2">{error}</p> : null}
+              {error ? <p className="text-xs text-red-700 bg-red-50 border border-red-100 rounded-lg px-3 py-2">{error}</p> : null}
 
-            <button type="submit" disabled={loading || authBusy} className="ci-btn-primary w-full py-3 text-sm disabled:opacity-60">
-              {loading || authBusy ? 'Please wait…' : mode === 'signup' ? 'Launch workspace →' : 'Sign in →'}
-            </button>
-          </form>
+              <button type="submit" disabled={loading || authBusy} className="ci-btn-primary w-full py-3 text-sm disabled:opacity-60">
+                {loading || authBusy ? 'Please wait…' : mode === 'signup' ? 'Launch workspace →' : 'Sign in →'}
+              </button>
+            </form>
+          ) : null}
 
-          {mode === 'login' && GOOGLE_SIGNIN_ON_LOGIN_ENABLED ? (
+          {mode === 'login' && !enterprisePrimary ? (
+            <EnterpriseSsoSignIn layout="block" dividerBefore={showLoginAlternatives} />
+          ) : null}
+
+          {showGoogle ? (
             <>
-              <div className="flex items-center gap-3 my-6">
-                <div className="flex-1 h-px bg-zinc-200" />
-                <span className="text-xs text-zinc-500 font-medium">or</span>
-                <div className="flex-1 h-px bg-zinc-200" />
-              </div>
+              {showEmailPassword ? (
+                <div className="flex items-center gap-3 my-6">
+                  <div className="flex-1 h-px bg-zinc-200" />
+                  <span className="text-xs text-zinc-500 font-medium">or</span>
+                  <div className="flex-1 h-px bg-zinc-200" />
+                </div>
+              ) : null}
               <GoogleSignIn text="signin_with" layout="block" enabled />
               <p className="mt-3 text-xs text-zinc-500 text-center">Google Workspace · profile only at sign-in</p>
             </>
+          ) : null}
+
+          {mode === 'login' && !showEmailPassword && !showGoogle && !enterprisePrimary ? (
+            <p className="text-sm text-zinc-600 text-center py-4">Contact your administrator for workspace access.</p>
           ) : null}
 
           <p className="mt-6 text-xs text-zinc-500 text-center leading-relaxed">

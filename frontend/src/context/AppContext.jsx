@@ -518,6 +518,15 @@ export function AppProvider({ children }) {
   }, [])
 
   useEffect(() => {
+    const url = new URL(window.location.href)
+    if (url.searchParams.get('sso') !== '1') return
+    url.searchParams.delete('sso')
+    const next = `${url.pathname}${url.search}${url.hash}`
+    window.history.replaceState({}, '', next)
+    void refreshSession()
+  }, [refreshSession])
+
+  useEffect(() => {
     let cancelled = false
 
     const loadWorkspace = async () => {
