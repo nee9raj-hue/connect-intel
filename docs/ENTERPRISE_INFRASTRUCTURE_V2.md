@@ -84,8 +84,8 @@ await platform.jobs.runNow('data-sync', { orgId })
 |------------|---------|-------|
 | `organizations` | `findById`, `listForUser`, `listMembers` | Org isolation |
 | `leads` | `findById`, `listForOrg`, `countForOrg` | Pipeline entries |
-| `companies` | `listForOrg`, `findById` | Accounts hub |
-| `pipeline` | `readShardEntries`, `summaryForOrg`, `verifySqlBackfill` | SQL verify path |
+| `companies` | `listHub`, `getDetail`, `updateParent`, `listForOrg`, `findById` | Accounts hub (SQL + in-memory) |
+| `pipeline` | `readShardEntries`, `loadListPage`, `summaryForOrg`, `verifySqlBackfill` | SQL verify + list read port |
 
 **Rule:** New features use repositories. Legacy handlers keep working via `store.js` until migrated.
 
@@ -161,7 +161,7 @@ Providers (Gemini, Perplexity, future OpenAI/Anthropic/local LLM) live inside `a
 | Phase | Work | Status |
 |-------|------|--------|
 | **P0** | Platform kernel + Docker + docs | **Done** |
-| **P1** | Migrate handlers → repositories (pipeline, companies) | Next |
+| **P1** | Migrate handlers → repositories (pipeline, companies) | **In progress** — `companies-hub` on `platform.repositories.companies`; pipeline `loadListPage` port ready |
 | **P2** | `DATABASE_PROVIDER=postgres` on self-hosted; deprecate supabase-rest | Planned |
 | **P3** | Auth abstraction (SAML/Azure AD) behind `AUTH_PROVIDER` | Planned |
 | **P4** | Storage S3/R2 adapter | Planned |

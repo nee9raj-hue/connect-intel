@@ -146,13 +146,13 @@ Developer laptop / Oracle Free VM
 
 ## Recommended next steps (priority order)
 
-1. **Migrate `companies-hub` handler** to `platform.repositories.companies` (Phase 3 product)
-2. **Migrate pipeline list load** to `platform.repositories.leads` + search port
+1. ~~**Migrate `companies-hub` handler** to `platform.repositories.companies`~~ **Done (Jul 2026)**
+2. **Migrate `saved-leads` GET list** to `platform.repositories.pipeline.loadListPage`
 3. **Hobby-safe `vercel.json`** if downgrading Vercel plan (see prior analysis)
 4. **Postgres document store migration** — move `store_collections` off Supabase REST
 5. **Auth provider** — SAML stub behind `AUTH_PROVIDER=azure-ad`
 6. **S3 storage adapter** for workspace uploads
-7. **CI gate:** `npm run platform:verify` in GitHub Actions
+7. ~~**CI gate:** `npm run platform:verify` in GitHub Actions~~ **Done (Jul 2026)**
 
 ---
 

@@ -39,6 +39,12 @@ jobs:
           NODE_ENV: development
         run: npm test
 
+      - name: Platform verify (Infrastructure V2)
+        env:
+          SESSION_SECRET: ci-test-session-secret-connect-intel
+          NODE_ENV: development
+        run: npm run platform:verify
+
       - name: RBAC handler audit
         run: npm run rbac:audit -- --strict
 
