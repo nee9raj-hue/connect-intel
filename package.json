@@ -36,6 +36,7 @@
     "docker:up": "docker compose up --build",
     "docker:postgres": "docker compose -f docker-compose.yml -f docker-compose.postgres.yml --profile postgres up --build",
     "docker:down": "docker compose down",
+    "sso:connect": "node scripts/enterprise-sso-connect.mjs",
     "workers": "node workers/index.mjs",
     "meili:backfill": "node scripts/backfill-meilisearch.mjs",
     "meili:sync": "node scripts/meili-sync.mjs",
