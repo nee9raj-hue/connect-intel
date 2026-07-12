@@ -1,0 +1,19 @@
+# Connect Intel — Postgres document store overlay
+#   docker compose -f docker-compose.yml -f docker-compose.postgres.yml --profile postgres up --build
+
+services:
+  api:
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_PROVIDER: postgres
+      STORE_BACKEND: postgres
+      DATABASE_URL: postgresql://connectintel:connectintel@postgres:5432/connectintel
+
+  postgres:
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U connectintel -d connectintel']
+      interval: 5s
+      timeout: 5s
+      retries: 10

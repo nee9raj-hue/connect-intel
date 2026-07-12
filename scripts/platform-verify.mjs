@@ -25,5 +25,6 @@ if (!health.ok) {
 }
 
 console.log('\nRepositories: organizations, leads, companies, pipeline — OK')
+console.log('Store backend:', health.storeBackend || '(unknown)')
 console.log('Contract version:', health.contract)
 console.log('\nPlatform verify PASSED')

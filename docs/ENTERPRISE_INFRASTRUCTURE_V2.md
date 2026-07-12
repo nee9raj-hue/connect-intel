@@ -75,6 +75,7 @@ await platform.jobs.runNow('data-sync', { orgId })
 | `CACHE_PROVIDER` | `memory`, `memory-redis`, `redis` | memory-redis if Redis | `memory` |
 | `JOBS_PROVIDER` | `inline`, `bullmq`, `manual` | bullmq if Redis | `inline` |
 | `HOST_PROVIDER` | `vercel`, `docker`, `railway`, `node` | auto-detect | `docker` |
+| `STORE_BACKEND` | `postgres`, `supabase-rest`, `sqlite` | follows `DATABASE_PROVIDER` / Supabase env | `sqlite` |
 
 ---
 
@@ -107,12 +108,19 @@ open http://localhost:3000
 
 Data persists in Docker volume `appdata` (`CONNECT_INTEL_DATA_DIR=/app/data`).
 
-### Standalone (no Docker)
+### Postgres document store (P2)
 
 ```bash
-npm run build
-npm run server
+# Docker with Postgres document store (no Supabase REST for JSON collections)
+npm run docker:postgres
+
+# Or set on any host with Postgres:
+#   DATABASE_PROVIDER=postgres
+#   STORE_BACKEND=postgres
+#   DATABASE_URL=postgresql://...
 ```
+
+Production **connectintel.net** stays on `supabase-rest` until you explicitly set `STORE_BACKEND=postgres` on Vercel (same `store_collections` table, direct `pg` pool).
 
 ---
 
@@ -171,8 +179,8 @@ Providers (Gemini, Perplexity, future OpenAI/Anthropic/local LLM) live inside `a
 | Phase | Work | Status |
 |-------|------|--------|
 | **P0** | Platform kernel + Docker + docs | **Done** |
-| **P1** | Migrate handlers → repositories (pipeline, companies) | **Done** — `companies-hub` + all `saved-leads` GET reads |
-| **P2** | `DATABASE_PROVIDER=postgres` on self-hosted; deprecate supabase-rest | Planned |
+| **P1** | Migrate handlers → repositories (pipeline, companies) | **Done** |
+| **P2** | Postgres document store (`store_collections` via `pg`, not PostgREST) | **Done (opt-in)** — set `DATABASE_PROVIDER=postgres` + `STORE_BACKEND=postgres` |
 | **P3** | Auth abstraction (SAML/Azure AD) behind `AUTH_PROVIDER` | Planned |
 | **P4** | Storage S3/R2 adapter | Planned |
 | **P5** | Full OpenAPI `/api/v1` | Planned |
