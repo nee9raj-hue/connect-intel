@@ -151,10 +151,11 @@ Developer laptop / Oracle Free VM
 3. ~~**Migrate board/deals/summary GET** in `saved-leads` to pipeline repository~~ **Done (Jul 2026)**
 4. ~~**Postgres document store migration** — move `store_collections` off Supabase REST (P2)~~ **Done (opt-in Jul 2026)**
 5. **Flip production to `STORE_BACKEND=postgres`** on Vercel when ready (same Supabase Postgres, no PostgREST for JSON)
-6. **Hobby-safe `vercel.json`** if downgrading Vercel plan (see prior analysis)
-7. **Auth provider** — SAML stub behind `AUTH_PROVIDER=azure-ad`
-8. **S3 storage adapter** for workspace uploads
+6. **Enable enterprise SSO** — set `AUTH_PROVIDER=azure-ad` or `okta` + IdP secrets on Vercel
+7. **Hobby-safe `vercel.json`** if downgrading Vercel plan (see prior analysis)
+8. **S3 storage adapter** for workspace uploads (P4)
 9. ~~**CI gate:** `npm run platform:verify` in GitHub Actions~~ **Done (Jul 2026)**
+10. ~~**Auth provider** — SAML/Azure AD behind `AUTH_PROVIDER`~~ **Done (OIDC opt-in Jul 2026)**
 
 ---
 

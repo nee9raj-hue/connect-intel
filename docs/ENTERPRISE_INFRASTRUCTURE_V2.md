@@ -67,7 +67,7 @@ await platform.jobs.runNow('data-sync', { orgId })
 | Env var | Values | Default (auto) | MVP $0 |
 |---------|--------|----------------|--------|
 | `DATABASE_PROVIDER` | `postgres`, `supabase-rest`, `sqlite` | supabase-rest if Supabase env; else sqlite | `sqlite` |
-| `AUTH_PROVIDER` | `session-jwt`, `google-oauth` | `session-jwt` | same |
+| `AUTH_PROVIDER` | `session-jwt`, `google-oauth`, `azure-ad`, `okta`, `saml` | `session-jwt` | same |
 | `EMAIL_PROVIDER` | `composite`, `smtp`, `resend`, `gmail`, `ses` | `composite` | same |
 | `SEARCH_PROVIDER` | `postgres`, `meilisearch`, `none` | meili if configured | `postgres` |
 | `STORAGE_PROVIDER` | `local`, `s3`, `r2`, `minio` | `local` | `local` |
@@ -174,20 +174,39 @@ Providers (Gemini, Perplexity, future OpenAI/Anthropic/local LLM) live inside `a
 
 ---
 
-## 9. Migration strategy (non-breaking)
+## 9. Enterprise auth (P3)
+
+All providers issue the same **session JWT** after login — handlers keep using `requireUser` / cookies.
+
+| Provider | Env | Login path |
+|----------|-----|------------|
+| `session-jwt` | default | Google credential + email/password (`/api/auth/session`) |
+| `azure-ad` | `AZURE_AD_TENANT_ID`, `AZURE_AD_CLIENT_ID`, `AZURE_AD_CLIENT_SECRET` | `/api/auth/sso/start?provider=azure-ad` |
+| `okta` | `OKTA_DOMAIN`, `OKTA_CLIENT_ID`, `OKTA_CLIENT_SECRET` | `/api/auth/sso/start?provider=okta` |
+| `saml` | `SAML_SP_ENTITY_ID`, `SAML_IDP_SSO_URL`, `SAML_IDP_CERT_PEM` | Stub — full assertion parsing in follow-up |
+
+Redirect URI for OIDC (register in IdP): `https://<your-domain>/api/auth/sso/callback`
+
+`/api/public-config` includes `auth.enterprise[]` with `configured` + `startUrl` for the frontend.
+
+Production **unchanged** until `AUTH_PROVIDER=azure-ad` (or Okta) and IdP env vars are set.
+
+---
+
+## 10. Migration strategy (non-breaking)
 
 | Phase | Work | Status |
 |-------|------|--------|
 | **P0** | Platform kernel + Docker + docs | **Done** |
 | **P1** | Migrate handlers → repositories (pipeline, companies) | **Done** |
 | **P2** | Postgres document store (`store_collections` via `pg`, not PostgREST) | **Done (opt-in)** — set `DATABASE_PROVIDER=postgres` + `STORE_BACKEND=postgres` |
-| **P3** | Auth abstraction (SAML/Azure AD) behind `AUTH_PROVIDER` | Planned |
+| **P3** | Auth abstraction (SAML/Azure AD/Okta) behind `AUTH_PROVIDER` | **Done (opt-in)** — OIDC SSO + session JWT; SAML env stub |
 | **P4** | Storage S3/R2 adapter | Planned |
 | **P5** | Full OpenAPI `/api/v1` | Planned |
 
 ---
 
-## 10. Verify
+## 11. Verify
 
 ```bash
 npm run platform:verify

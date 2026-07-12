@@ -33,6 +33,8 @@ const SELF_SERVICE_OK = new Set([
 ])
 const PUBLIC_OK = new Set([
   'auth-session.js',
+  'auth-sso-start.js',
+  'auth-sso-callback.js',
   'health.js',
   'invite-accept.js',
   'invite-preview.js',
