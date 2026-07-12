@@ -1,0 +1,70 @@
+# Connect Intel — Enterprise Infrastructure V2 (MVP zero-cost)
+#   docker compose up --build
+#   open http://localhost:3000
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    environment:
+      HOST_PROVIDER: docker
+      DATABASE_PROVIDER: sqlite
+      CONNECT_INTEL_DATA_DIR: /app/data
+      AUTH_PROVIDER: session-jwt
+      EMAIL_PROVIDER: composite
+      SEARCH_PROVIDER: postgres
+      STORAGE_PROVIDER: local
+      AI_PROVIDER: gateway
+      CACHE_PROVIDER: memory
+      JOBS_PROVIDER: inline
+      MVP_ZERO_COST: 'true'
+      PORT: '3000'
+      SESSION_SECRET: ${SESSION_SECRET:-dev-change-me-in-production}
+      APP_URL: http://localhost:3000
+      API_BASE_URL: http://localhost:3000
+      STORAGE_LOCAL_PATH: /app/data/uploads
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+    volumes:
+      - appdata:/app/data
+
+  # Optional PostgreSQL for SQL table migrations / enterprise path
+  postgres:
+    profiles: ['postgres']
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: connectintel
+      POSTGRES_PASSWORD: connectintel
+      POSTGRES_DB: connectintel
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/init-db.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    ports:
+      - '5432:5432'
+
+  worker:
+    profiles: ['worker']
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    restart: unless-stopped
+    depends_on:
+      - api
+    command: ['npm', 'run', 'workers']
+    environment:
+      HOST_PROVIDER: docker
+      DATABASE_PROVIDER: sqlite
+      CONNECT_INTEL_DATA_DIR: /app/data
+      JOBS_PROVIDER: bullmq
+      REDIS_URL: ${REDIS_URL:-}
+    volumes:
+      - appdata:/app/data
+
+volumes:
+  appdata:
+  pgdata:

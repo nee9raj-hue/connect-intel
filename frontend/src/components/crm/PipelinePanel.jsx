@@ -78,7 +78,7 @@ import {
   savePipelineHoverActionsPref,
 } from '../../lib/pipelineColumnPrefs'
 import { useDebouncedPipelineSearch } from '../../hooks/useDebouncedPipelineSearch'
-import { companyTargetFromLead } from '../../../lib/accountNavigation.js'
+import { companyTargetFromLead } from '../../../../lib/accountNavigation.js'
 
 export default function PipelinePanel({ onNavigate, panelOptions }) {
   const {

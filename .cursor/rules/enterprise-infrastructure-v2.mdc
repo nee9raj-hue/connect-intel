@@ -1,0 +1,39 @@
+---
+description: Enterprise Infrastructure V2 — platform kernel, provider abstractions, Docker, zero-lock-in
+alwaysApply: true
+---
+
+# Enterprise Infrastructure V2
+
+Read `docs/ENTERPRISE_INFRASTRUCTURE_V2.md` and `docs/INFRASTRUCTURE_MIGRATION_REPORT.md` before infrastructure changes.
+
+## Constitution overrides
+
+- Optimize for **enterprise, scalability, reliability, modularity, cloud independence** — not "free forever" hacks.
+- MVP may run at **$0** using Docker + SQLite or free tiers; production customers (Xindus) must not break.
+
+## Layering (mandatory for new code)
+
+```
+Presentation → API handlers → Business services → Platform repositories → Provider adapters → Infrastructure
+```
+
+## Rules
+
+1. **No vendor SDKs in business logic** — use `getPlatform()` ports (`database`, `auth`, `email`, `search`, `storage`, `jobs`, `ai`).
+2. **Repositories** for data access — `lib/platform/repositories/*`. Never add new `supabaseRest()` calls in handlers; wrap in repository or adapter.
+3. **Provider env vars** — `DATABASE_PROVIDER`, `AUTH_PROVIDER`, `EMAIL_PROVIDER`, `SEARCH_PROVIDER`, `STORAGE_PROVIDER`, `AI_PROVIDER`, `CACHE_PROVIDER`, `JOBS_PROVIDER`, `HOST_PROVIDER`.
+4. **Multi-tenancy** — every repository query scopes by `organizationId`; never leak cross-org data.
+5. **Jobs** — do not add Vercel-only cron dependencies; use `platform.jobs` (inline MVP, BullMQ when Redis present).
+6. **AI** — Copilot calls `platform.ai` gateway only; no direct OpenAI/Anthropic/Perplexity in new features.
+7. **Frontend** — relative `/api` or `API_BASE_URL`; no hardcoded Vercel/Supabase URLs.
+8. **Docker** — `docker compose up` must remain a valid local/MVP path (`npm run docker:up`).
+9. **Gradual migration** — existing handlers may call `store.js` until migrated; new features use platform layer.
+10. **No breaking changes** — production connectintel.net keeps working; adapters wrap current implementations.
+
+## Verify before ship
+
+```bash
+npm run platform:verify
+npm run prod:ship
+```
