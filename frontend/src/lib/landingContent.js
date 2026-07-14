@@ -26,7 +26,7 @@ export const PRODUCT_METRICS = [
   { value: '<500ms', label: 'Dashboard load (production gate)' },
   { value: 'RBAC', label: 'API-enforced workspace isolation' },
   { value: '342+', label: 'Automated quality checks' },
-  { value: 'Free', label: 'Start with 5 seats · 500 leads' },
+  { value: 'Free', label: `Start with ${FREE_PLAN.maxSeats} seat · ${FREE_PLAN.maxLeads} leads` },
 ]
 
 export const PRODUCT_SHOWCASE = [
@@ -120,7 +120,7 @@ export const WHO_ITS_FOR = [
   {
     id: 'teams',
     title: 'Growing B2B teams',
-    desc: '2–40 seats, shared pipeline, hierarchy RBAC, and scalable SQL-backed lists.',
+    desc: '1–40 seats, shared pipeline, hierarchy RBAC, and scalable SQL-backed lists.',
   },
 ]
 
@@ -232,7 +232,7 @@ export const FAQ_ITEMS = [
   },
   {
     q: 'What does the free tier include?',
-    a: `Up to ${FREE_PLAN.maxSeats} seats and ${FREE_PLAN.maxLeads} pipeline leads. No card at signup. Upgrade when your admin confirms capacity needs.`,
+    a: `Up to ${FREE_PLAN.maxSeats} seat and ${FREE_PLAN.maxLeads} pipeline leads. No card at signup. Upgrade to Starter, Growth, or Business when your admin confirms capacity — flat workspace pricing below typical Zoho, HubSpot, and Salesforce per-seat bills.`,
   },
   {
     q: 'Who sees which leads?',

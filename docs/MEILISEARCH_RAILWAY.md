@@ -2,7 +2,7 @@
 
 Platform search (`⌘K`, pipeline search) uses **Meilisearch** when `MEILI_HOST` + `MEILI_API_KEY` are set on Vercel.
 
-**Current production host (if deployed):** `https://meilisearch-production-00f3.up.railway.app`
+**Current production host:** removed (Jul 2026) — solo-free production no longer uses Meilisearch. Railway projects `connect-intel-meili` and `connect-intel-workers` were deleted.
 
 If `/api/health` shows `meilisearch.ok: false` or Railway returns **502**, the Meilisearch service is stopped — redeploy it.
 

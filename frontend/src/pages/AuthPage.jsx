@@ -86,7 +86,7 @@ export default function AuthPage({ inviteToken = null }) {
           </ul>
         </div>
         <p className="relative z-10 text-xs text-zinc-500">
-          Free tier: {FREE_PLAN.maxSeats} seats · {FREE_PLAN.maxLeads} leads · No card required
+          Free tier: {FREE_PLAN.maxSeats} seat · {FREE_PLAN.maxLeads} leads · No card required
         </p>
       </aside>
 

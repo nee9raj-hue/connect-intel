@@ -23,7 +23,7 @@ export default function HeroAuthCta({ id }) {
         </a>
       </div>
       <p className="text-xs text-zinc-500 text-center leading-relaxed">
-        Free for up to {FREE_PLAN.maxSeats} seats and {FREE_PLAN.maxLeads} leads · Secure sign-in · No card required
+        Free for {FREE_PLAN.maxSeats} seat and {FREE_PLAN.maxLeads} leads · Secure sign-in · No card required
       </p>
     </div>
   )

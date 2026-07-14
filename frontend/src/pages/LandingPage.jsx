@@ -18,7 +18,7 @@ import {
   BRAND_LOGO_HERO,
   BRAND_LOGO_ICON_CLASS,
 } from '../lib/brandAssets'
-import { FREE_PLAN, GROWTH_PLAN } from '../lib/crmPlanLimits'
+import { BUSINESS_PLAN, FREE_PLAN, GROWTH_PLAN, STARTER_PLAN } from '../lib/crmPlanLimits'
 import { DEMO_MAILTO, FAQ_ITEMS, INDUSTRIES } from '../lib/landingContent'
 import '../styles/landing-v3.css'
 
@@ -94,27 +94,63 @@ export default function LandingPage() {
         <SuccessMetricsSection />
 
         <section id="pricing" className="py-16 px-4 sm:px-6">
-          <div className="max-w-[900px] mx-auto text-center">
+          <div className="max-w-[1100px] mx-auto text-center">
             <h2 className="ci-v3-section-heading ci-v3-on-light mb-3">Start free. Scale when pipeline grows.</h2>
-            <p className="ci-v3-section-desc text-center mb-10">No card at signup. Transparent upgrade when your admin confirms capacity.</p>
-            <div className="grid md:grid-cols-2 gap-6 text-left">
+            <p className="ci-v3-section-desc text-center mb-3">
+              No card at signup. Flat workspace pricing — not billed per seat.
+            </p>
+            <p className="text-sm text-zinc-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+              Priced below typical Zoho, HubSpot, and Salesforce per-user plans for the same team size.
+              Confirm any upgrade in Workspace; payment is collected separately.
+            </p>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 text-left">
               <PricingCard
-                tier="Free workspace"
+                tier="Free"
                 price={FREE_PLAN.priceDisplay}
-                sub="for early teams"
-                features={[`Up to ${FREE_PLAN.maxSeats} seats`, `Up to ${FREE_PLAN.maxLeads} pipeline leads`, 'Full CRM + AI copilot', 'Chrome extension email sync']}
+                sub="1 user · try the CRM"
+                features={[
+                  `${FREE_PLAN.maxSeats} seat`,
+                  `${FREE_PLAN.maxLeads} pipeline leads`,
+                  'Full CRM workspace',
+                  'CSV import & Chrome extension',
+                ]}
               />
               <PricingCard
-                tier="Team CRM"
+                tier={STARTER_PLAN.label}
+                price={STARTER_PLAN.priceDisplay}
+                sub="small sales pod"
+                period="/month"
+                features={[
+                  `Up to ${STARTER_PLAN.maxSeats} seats`,
+                  `Up to ${STARTER_PLAN.maxLeads.toLocaleString('en-IN')} leads`,
+                  'Team invites & roles',
+                  'Admin-confirmed upgrade',
+                ]}
+              />
+              <PricingCard
+                tier={GROWTH_PLAN.label}
                 price={GROWTH_PLAN.priceDisplay}
-                sub="when you need more capacity"
+                sub="most teams"
                 period="/month"
                 highlight
+                badge="Popular"
                 features={[
                   `Up to ${GROWTH_PLAN.maxSeats} seats`,
                   `Up to ${GROWTH_PLAN.maxLeads.toLocaleString('en-IN')} leads`,
-                  'Admin-confirmed upgrade',
+                  'Pipeline + team intelligence',
                   'Amount shown before payment',
+                ]}
+              />
+              <PricingCard
+                tier={BUSINESS_PLAN.label}
+                price={BUSINESS_PLAN.priceDisplay}
+                sub="larger orgs"
+                period="/month"
+                features={[
+                  `Up to ${BUSINESS_PLAN.maxSeats} seats`,
+                  `Up to ${BUSINESS_PLAN.maxLeads.toLocaleString('en-IN')} leads`,
+                  'Highest published capacity',
+                  'Same CRM features, more room',
                 ]}
               />
             </div>
@@ -161,9 +197,14 @@ export default function LandingPage() {
   )
 }
 
-function PricingCard({ tier, price, sub, period, features, highlight }) {
+function PricingCard({ tier, price, sub, period, features, highlight, badge }) {
   return (
-    <div className={`rounded-2xl p-6 ${highlight ? 'border-2 border-[#FF773D]/40 bg-white shadow-sm' : 'border border-zinc-200 bg-white'}`}>
+    <div className={`rounded-2xl p-6 relative ${highlight ? 'border-2 border-[#FF773D]/40 bg-white shadow-sm' : 'border border-zinc-200 bg-white'}`}>
+      {badge ? (
+        <span className="absolute -top-2.5 right-4 px-2 py-0.5 rounded-full bg-[#FF773D] text-white text-[10px] font-bold uppercase tracking-wide">
+          {badge}
+        </span>
+      ) : null}
       <p className={`text-xs font-bold uppercase tracking-wide mb-2 ${highlight ? 'text-[#FF773D]' : 'text-zinc-500'}`}>{tier}</p>
       <p className="text-3xl font-bold text-zinc-900 mb-1">
         {price}
