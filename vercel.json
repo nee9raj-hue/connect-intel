@@ -14,23 +14,7 @@
   },
   "crons": [
     {
-      "path": "/api/grafana/metrics-cron",
-      "schedule": "*/5 * * * *"
-    },
-    {
-      "path": "/api/crm/dashboard-warm-cron",
-      "schedule": "0 4 * * *"
-    },
-    {
-      "path": "/api/crm/meili-sync-cron",
-      "schedule": "30 4 * * *"
-    },
-    {
-      "path": "/api/crm/data-sync-cron",
-      "schedule": "0 5 * * *"
-    },
-    {
-      "path": "/api/reports/scheduled-cron",
+      "path": "/api/marketing/cron",
       "schedule": "0 9 * * *"
     }
   ],
