@@ -8,6 +8,7 @@ frontend/dist/
 !.env.railway.secrets.example
 !.env.grafana.secrets.example
 !.env.enterprise-sso.example
+!.env.storage.example
 *.log
 
 # Built output (Vercel builds these on deploy)

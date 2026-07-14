@@ -22,6 +22,7 @@ Operational playbook after landing + operator-access work (July 2026). Run steps
 | 2.0 | Infrastructure V2 P1 complete | `companies-hub` + `saved-leads` GET → `getPlatform().repositories.*` |
 | 2.0b | Infrastructure V2 P2 (opt-in) | `STORE_BACKEND=postgres` for direct `store_collections` via `pg` |
 | 2.0c | Infrastructure V2 P3 (opt-in) | `AUTH_PROVIDER=azure-ad` / `okta` + `/api/auth/sso/*` |
+| 2.0d | Infrastructure V2 P4 (opt-in) | `STORAGE_PROVIDER=r2` / `s3` / `minio` + `STORAGE_BUCKET` credentials |
 | 2.1 | `npm run rbac:audit -- --strict` | CI already runs this; 0 mutation gaps |
 | 2.2 | Confirm Supabase on Vercel | `USE_PIPELINE_LEADS_TABLE` + hierarchy RBAC auto-on when Supabase configured (`lib/server/infra/config.js`) |
 | 2.3 | `npm run prod:ops -- --name=Xindus` | Meilisearch sync after deploy |

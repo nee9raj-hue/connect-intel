@@ -55,17 +55,19 @@ function loadLocalEnv() {
   return env
 }
 
-function vercelEnvAdd(key, value) {
-  const escaped = String(value).replace(/'/g, "'\\''")
-  const res = spawnSync('sh', ['-c', `printf '%s' '${escaped}' | vercel env add ${key} production`], {
-    cwd: ROOT,
-    encoding: 'utf8',
-  })
+function vercelEnvRm(key) {
+  spawnSync('vercel', ['env', 'rm', key, 'production', '--yes'], { cwd: ROOT, stdio: 'pipe' })
+}
+
+function vercelEnvAdd(key, value, { sensitive = false } = {}) {
+  const args = ['env', 'add', key, 'production', '--value', String(value), '--yes']
+  if (sensitive) args.push('--sensitive')
+  const res = spawnSync('vercel', args, { cwd: ROOT, encoding: 'utf8' })
   if (res.status !== 0) {
     const err = (res.stderr || res.stdout || '').trim()
     if (/already exists/i.test(err)) {
-      spawnSync('sh', ['-c', `printf '%s' '${escaped}' | vercel env rm ${key} production -y`], { cwd: ROOT, stdio: 'inherit' })
-      return vercelEnvAdd(key, value)
+      vercelEnvRm(key)
+      return vercelEnvAdd(key, value, { sensitive })
     }
     throw new Error(`vercel env add ${key} failed: ${err}`)
   }
@@ -111,8 +113,11 @@ async function main() {
 
   if (provider === 'azure-ad' && (!tenantId || !clientId || !clientSecret)) {
     printAzurePortalSteps()
+    console.error('\n⛔ BLOCKED: Azure credentials required before Vercel can be wired.')
     console.error('Missing AZURE_AD_TENANT_ID, AZURE_AD_CLIENT_ID, or AZURE_AD_CLIENT_SECRET.')
     console.error('Pass flags or create .env.enterprise-sso.local (see .env.enterprise-sso.example).')
+    console.error('\nAfter you click Register in Azure, paste the three values in chat or run:')
+    console.error('  npm run sso:connect -- --tenant-id <tenant> --client-id <id> --client-secret <secret>')
     process.exit(1)
   }
 
@@ -146,7 +151,7 @@ async function main() {
 
   console.log('\nSetting Vercel production env…')
   for (const [key, value] of Object.entries(envPairs)) {
-    vercelEnvAdd(key, value)
+    vercelEnvAdd(key, value, { sensitive: /SECRET/i.test(key) })
     console.log(`  ✓ ${key}`)
   }
 

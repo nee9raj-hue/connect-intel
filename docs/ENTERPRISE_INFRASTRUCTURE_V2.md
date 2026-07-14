@@ -70,7 +70,7 @@ await platform.jobs.runNow('data-sync', { orgId })
 | `AUTH_PROVIDER` | `session-jwt`, `google-oauth`, `azure-ad`, `okta`, `saml` | `session-jwt` | same |
 | `EMAIL_PROVIDER` | `composite`, `smtp`, `resend`, `gmail`, `ses` | `composite` | same |
 | `SEARCH_PROVIDER` | `postgres`, `meilisearch`, `none` | meili if configured | `postgres` |
-| `STORAGE_PROVIDER` | `local`, `s3`, `r2`, `minio` | `local` | `local` |
+| `STORAGE_PROVIDER` | `local`, `s3`, `r2`, `minio`, `supabase-storage` | `local` | `local` |
 | `AI_PROVIDER` | `gateway`, `gemini`, … | `gateway` | `gateway` |
 | `CACHE_PROVIDER` | `memory`, `memory-redis`, `redis` | memory-redis if Redis | `memory` |
 | `JOBS_PROVIDER` | `inline`, `bullmq`, `manual` | bullmq if Redis | `inline` |
@@ -143,7 +143,7 @@ Production **connectintel.net** stays on `supabase-rest` until you explicitly se
 | **Where is production now?** | Vercel (web + API) + Supabase + Railway (workers, Meilisearch) |
 | **Need Cloudflare today?** | **No** — not required for current blueprint path |
 | **$0 MVP / dev escape hatch?** | `npm run docker:up` locally, or Oracle Cloud Free VM + same Docker image |
-| **When to add Cloudflare?** | Only when splitting static (Pages) from API, or adopting R2 (`STORAGE_PROVIDER=r2`) in P4 |
+| **When to add Cloudflare?** | Only when splitting static (Pages) from API, or adopting R2 (`STORAGE_PROVIDER=r2`) in P4 — storage adapter is ready; flip when durable uploads matter |
 | **When to leave Vercel?** | Hobby limits, cost, or enterprise self-host — migrate via `HOST_PROVIDER=docker` + Postgres, not a rewrite |
 
 ---
@@ -178,22 +178,41 @@ Providers (Gemini, Perplexity, future OpenAI/Anthropic/local LLM) live inside `a
 
 All providers issue the same **session JWT** after login — handlers keep using `requireUser` / cookies.
 
-| Provider | Env | Login path |
-|----------|-----|------------|
-| `session-jwt` | default | Google credential + email/password (`/api/auth/session`) |
-| `azure-ad` | `AZURE_AD_TENANT_ID`, `AZURE_AD_CLIENT_ID`, `AZURE_AD_CLIENT_SECRET` | `/api/auth/sso/start?provider=azure-ad` |
-| `okta` | `OKTA_DOMAIN`, `OKTA_CLIENT_ID`, `OKTA_CLIENT_SECRET` | `/api/auth/sso/start?provider=okta` |
-| `saml` | `SAML_SP_ENTITY_ID`, `SAML_IDP_SSO_URL`, `SAML_IDP_CERT_PEM` | Stub — full assertion parsing in follow-up |
+| `AUTH_PROVIDER` | Login | Notes |
+|-----------------|-------|--------|
+| `session-jwt` | Google + email/password | Production default |
+| `azure-ad` / `okta` | OIDC SSO → `/api/auth/sso/*` | Opt-in via env |
+| `saml` | Env stub | Full assertion parsing deferred |
 
-Redirect URI for OIDC (register in IdP): `https://<your-domain>/api/auth/sso/callback`
-
-`/api/public-config` includes `auth.enterprise[]` with `configured` + `startUrl` for the frontend.
-
-Production **unchanged** until `AUTH_PROVIDER=azure-ad` (or Okta) and IdP env vars are set.
+See `docs/ENTERPRISE_SSO_SETUP.md`.
 
 ---
 
-## 10. Migration strategy (non-breaking)
+## 10. Object storage (P4)
+
+Workspace file blobs go through `platform.storage` — never vendor SDKs in handlers.
+
+| `STORAGE_PROVIDER` | Backend | Env |
+|--------------------|---------|-----|
+| `local` (default) | Filesystem (`STORAGE_LOCAL_PATH` / `data/uploads`) | Docker MVP |
+| `s3` | AWS S3 (SigV4) | `STORAGE_BUCKET` + `STORAGE_ACCESS_KEY_ID` + `STORAGE_SECRET_ACCESS_KEY` + optional `STORAGE_REGION` |
+| `r2` | Cloudflare R2 (S3 API) | same + `R2_ACCOUNT_ID` or `STORAGE_ENDPOINT` |
+| `minio` | MinIO | same + `STORAGE_ENDPOINT` (path-style) |
+| `supabase-storage` | Supabase S3 gateway | credentials + optional `SUPABASE_URL` → `/storage/v1/s3` |
+
+Optional: `STORAGE_PUBLIC_BASE_URL` for CDN URLs returned from `put()`.
+
+```javascript
+const { url } = await getPlatform().storage.put(`orgs/${orgId}/imports/${id}.csv`, buf, {
+  contentType: 'text/csv',
+})
+```
+
+Production **connectintel.net** stays on `local` until you set `STORAGE_PROVIDER=r2` (or `s3`) on Vercel — opt-in, non-breaking.
+
+---
+
+## 11. Migration strategy (non-breaking)
 
 | Phase | Work | Status |
 |-------|------|--------|
@@ -201,12 +220,12 @@ Production **unchanged** until `AUTH_PROVIDER=azure-ad` (or Okta) and IdP env va
 | **P1** | Migrate handlers → repositories (pipeline, companies) | **Done** |
 | **P2** | Postgres document store (`store_collections` via `pg`, not PostgREST) | **Done (opt-in)** — set `DATABASE_PROVIDER=postgres` + `STORE_BACKEND=postgres` |
 | **P3** | Auth abstraction (SAML/Azure AD/Okta) behind `AUTH_PROVIDER` | **Done (opt-in)** — OIDC SSO + session JWT; SAML env stub |
-| **P4** | Storage S3/R2 adapter | Planned |
+| **P4** | Storage S3/R2/MinIO adapter | **Done (opt-in)** — `STORAGE_PROVIDER=s3\|r2\|minio` |
 | **P5** | Full OpenAPI `/api/v1` | Planned |
 
 ---
 
-## 11. Verify
+## 12. Verify
 
 ```bash
 npm run platform:verify

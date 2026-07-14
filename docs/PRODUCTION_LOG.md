@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- d9747d0
+npm run prod:rollback -- 1161bea
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- d9747d0
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `9842ab4` |
-| Log updated (IST) | 11/07/2026, 15:57:07 |
+| Commit | `5f98b52` |
+| Log updated (IST) | 12/07/2026, 12:16:50 |
 
 ---
 
@@ -44,26 +44,24 @@ npm run prod:rollback -- d9747d0
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 11/07/2026, 15:57:00 | `9842ab4` | Degrade search gracefully when Meilisearch is down and fix pipeline sync probe. | [preview](https://connect-intel-584mmymbf-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9842ab4` | **← LIVE**
-| 11/07/2026, 15:30:38 | `d9747d0` | Mark e205253 as live in production log. | [preview](https://connect-intel-4l4zc7go2-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d9747d0` |
-| 11/07/2026, 15:29:32 | `e205253` | Fix lead_created CRM workflow rules and expand trigger tests. | [preview](https://connect-intel-f8wo6rfsp-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e205253` |
-| 11/07/2026, 15:25:13 | `d53458e` | Unify CRM workflow dispatch and pass Blueprint Phase 2+ gate. | [preview](https://connect-intel-g7oqzopxa-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d53458e` |
-| 11/07/2026, 14:25:03 | `bd0b68f` | Add Railway Meilisearch redeploy tooling and ops guide. | [preview](https://connect-intel-b9t54joox-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- bd0b68f` |
-| 11/07/2026, 14:11:51 | `e2c53de` | Add CWS publish helpers, PRD overview assets, and production log. | [preview](https://connect-intel-pp5ir8eow-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e2c53de` |
-| 11/07/2026, 14:09:46 | `5771b23` | Use Meilisearch-safe document IDs without colons. | [preview](https://connect-intel-dbe25ox7d-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5771b23` |
-| 11/07/2026, 14:08:13 | `ef70de8` | Fix campaigns_v3 recipient upsert and Meilisearch task completion. | [preview](https://connect-intel-13y08tjid-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ef70de8` |
-| 11/07/2026, 14:02:37 | `8973ff0` | Speed up dashboard bootstrap and team metrics for Step 10 gate. | [preview](https://connect-intel-p9j916kng-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8973ff0` |
-| 10/07/2026, 17:24:29 | `51e8d05` | Add Google Search Console site verification meta tag. | [preview](https://connect-intel-m8uyqat48-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 51e8d05` |
-| 10/07/2026, 16:59:23 | `34f04f2` | Fix extension install config and default invite search access for reps. | [preview](https://connect-intel-nz2gdpreh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 34f04f2` |
-| 10/07/2026, 16:49:30 | `5d4eb41` | Bundle collaborator SQL migration for Vercel bootstrap ops. | [preview](https://connect-intel-i46kuzpt7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5d4eb41` |
-| 10/07/2026, 16:46:20 | `9758638` | Fix rep lead sharing visibility and surface Chrome extension install link. | [preview](https://connect-intel-m2pvmbaon-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9758638` |
-| 10/07/2026, 14:22:21 | `1ccdc3b` | Support manager role when demoting org admin during transfer. | [preview](https://connect-intel-gakxhlc4v-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1ccdc3b` |
-| 10/07/2026, 14:19:31 | `f290bba` | Add ops endpoint to invite org members via CRON bootstrap. | [preview](https://connect-intel-at5p4tl15-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f290bba` |
-| 10/07/2026, 14:08:08 | `9998c8f` | Skip customer onboarding for invite@ platform operator login. | [preview](https://connect-intel-3399nr58m-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9998c8f` |
-| 10/07/2026, 13:47:14 | `ac2e3b7` | Grant company admin via platform support for invite access. | [preview](https://connect-intel-fu4sgo2za-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ac2e3b7` |
-| 10/07/2026, 13:38:30 | `35fdaad` | Add invite-only company join flow with access requests. | [preview](https://connect-intel-mplzmfr1g-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 35fdaad` |
-| 10/07/2026, 13:19:36 | `8dc1d1a` | Add sign-out escape hatch on onboarding modal. | [preview](https://connect-intel-a55ad6wjs-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8dc1d1a` |
-| 10/07/2026, 13:06:37 | `2811f4b` | Enable Gmail onboarding prompt via runtime public-config flag. | [preview](https://connect-intel-rh4q04pa0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2811f4b` |
+| 12/07/2026, 12:16:31 | `5f98b52` | Add enterprise SSO Vercel connect script and setup guide. | [preview](https://connect-intel-dys6ghpbd-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5f98b52` | **← LIVE**
+| 12/07/2026, 10:42:49 | `1161bea` | Wire enterprise SSO buttons on login from public-config auth block. | [preview](https://connect-intel-3b2fa5sjd-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1161bea` |
+| 12/07/2026, 10:39:31 | `b55e909` | Add enterprise auth abstraction with Azure AD and Okta OIDC (Infrastructure V2 P3). | [preview](https://connect-intel-85nu9x8ys-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b55e909` |
+| 12/07/2026, 10:35:14 | `a2e6e63` | Add Postgres document store backend for Infrastructure V2 P2. | [preview](https://connect-intel-4an4dzqtu-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a2e6e63` |
+| 12/07/2026, 10:31:26 | `ec4aff0` | Complete Infrastructure V2 P1 pipeline GET migration per blueprint. | [preview](https://connect-intel-dif65ur29-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ec4aff0` |
+| 12/07/2026, 10:22:34 | `30c9ce8` | Migrate companies hub to platform repository layer (Infrastructure V2 P1). | [preview](https://connect-intel-8pctlhli8-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 30c9ce8` |
+| 12/07/2026, 10:00:36 | `d2b08f0` | Add Enterprise Infrastructure V2 platform kernel and Docker support. | [preview](https://connect-intel-2xcii1pf5-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d2b08f0` |
+| 11/07/2026, 21:40:16 | `f7e6207` | Exempt data-sync cron from RBAC mutation audit. | [preview](https://connect-intel-nwrwya9es-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f7e6207` |
+| 11/07/2026, 21:40:01 | `954461a` | Fix prod:ops vercel cron trigger when query params are set. | [preview](https://connect-intel-lv3qn4aji-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 954461a` |
+| 11/07/2026, 21:37:05 | `5bee522` | Add production data-sync cron for pipeline and companies backfill. | [preview](https://connect-intel-6l8sb8jdb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5bee522` |
+| 11/07/2026, 19:20:06 | `6591d52` | Add prod smoke checks and phased rollout playbook. | [preview](https://connect-intel-hqn3wmifk-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6591d52` |
+| 11/07/2026, 19:03:19 | `191ff22` | Add CRM technical PRD document and platform operator access rule. | [preview](https://connect-intel-a6y6hyeix-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 191ff22` |
+| 11/07/2026, 18:08:48 | `7585344` | Keep platform operator panels internal and refresh admin access on session. | [preview](https://connect-intel-af14c77jy-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7585344` |
+| 11/07/2026, 17:46:16 | `be093aa` | Fix Copilot section heading color on dark landing panel. | [preview](https://connect-intel-pkder04bz-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- be093aa` |
+| 11/07/2026, 17:43:50 | `ea40447` | Improve global commerce map contrast and scale on landing. | [preview](https://connect-intel-56nnuo13w-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ea40447` |
+| 11/07/2026, 17:36:56 | `48f1b19` | Replace landing SVG globe with global commerce map asset. | [preview](https://connect-intel-6cdxsayb6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 48f1b19` |
+| 11/07/2026, 17:21:58 | `473d470` | Stabilize landing layout and improve global commerce map polish. | [preview](https://connect-intel-rksbnmtm3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 473d470` |
+| 11/07/2026, 17:12:29 | `3642369` | Evolve landing into product-story experience with live UI demos. | [preview](https://connect-intel-fx557qgj5-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3642369` |
 
 ---
 

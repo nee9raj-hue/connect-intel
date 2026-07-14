@@ -39,7 +39,7 @@ The Constitution requirement to avoid vendor lock-in is addressed by **ports and
 | Cache | `memory-redis` | `infra/cache.js` |
 | Email | `composite` | `emailProviders/index.js` |
 | Search | `postgres` / `meilisearch` | `pipelineListLoad.js`, `meiliWarm.js` |
-| Storage | `local` | Filesystem under `data/uploads/` |
+| Storage | `local` / `s3` / `r2` / `minio` / `supabase-storage` | Filesystem or S3-compatible (SigV4, no AWS SDK) |
 | Jobs | `inline` / `bullmq` | `triggerDrain.js`, worker queues |
 | AI | `gateway` | `gemini.js`, `perplexity.js` |
 
@@ -153,9 +153,10 @@ Developer laptop / Oracle Free VM
 5. **Flip production to `STORE_BACKEND=postgres`** on Vercel when ready (same Supabase Postgres, no PostgREST for JSON)
 6. **Enable enterprise SSO** — set `AUTH_PROVIDER=azure-ad` or `okta` + IdP secrets on Vercel
 7. **Hobby-safe `vercel.json`** if downgrading Vercel plan (see prior analysis)
-8. **S3 storage adapter** for workspace uploads (P4)
+8. ~~**S3 storage adapter** for workspace uploads (P4)~~ **Done (opt-in Jul 2026)** — set `STORAGE_PROVIDER=r2|s3|minio` + bucket credentials
 9. ~~**CI gate:** `npm run platform:verify` in GitHub Actions~~ **Done (Jul 2026)**
 10. ~~**Auth provider** — SAML/Azure AD behind `AUTH_PROVIDER`~~ **Done (OIDC opt-in Jul 2026)**
+11. **Wire handlers** (workspace CSV blobs, brand assets) to `getPlatform().storage` when durable object storage is enabled
 
 ---
 
