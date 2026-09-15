@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- e1ba15e
+npm run prod:rollback -- 1901df4
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- e1ba15e
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `d5cf838` |
-| Log updated (IST) | 15/09/2026, 21:23:42 |
+| Commit | `bc4ccd6` |
+| Log updated (IST) | 15/09/2026, 21:34:10 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- e1ba15e
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 15/09/2026, 21:23:20 | `d5cf838` | Show the same Lost deals in the list as in the sidebar count. | [preview](https://connect-intel-nbgmun7tm-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d5cf838` | **← LIVE**
+| 15/09/2026, 21:33:49 | `bc4ccd6` | Replace All Deals stage pills with a multi-select dropdown. | [preview](https://connect-intel-g4ykah2i0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- bc4ccd6` | **← LIVE**
+| 15/09/2026, 21:24:28 | `1901df4` | Record production deploy d5cf838 as LIVE. | [preview](https://connect-intel-q5wgk6kvt-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1901df4` |
+| 15/09/2026, 21:23:20 | `d5cf838` | Show the same Lost deals in the list as in the sidebar count. | [preview](https://connect-intel-nbgmun7tm-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d5cf838` |
 | 15/09/2026, 21:14:47 | `e1ba15e` | Record production deploy 7a435e1 as LIVE. | [preview](https://connect-intel-g3xw2ovrg-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e1ba15e` |
 | 15/09/2026, 21:13:33 | `7a435e1` | Show All Deals with estimated freight revenue and stage filters. | [preview](https://connect-intel-8yok9odd1-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7a435e1` |
 | 15/09/2026, 11:04:15 | `49b5248` | Record production deploy e08802c as LIVE. | [preview](https://connect-intel-h0wcafse4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 49b5248` |
@@ -56,8 +58,6 @@ npm run prod:rollback -- e1ba15e
 | 14/07/2026, 10:31:13 | `28c3c92` | Make Vercel crons Hobby-safe for free-tier production. | [preview](https://connect-intel-eojwznqfy-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 28c3c92` |
 | 14/07/2026, 10:15:49 | `aa2acb7` | Add Infrastructure V2 P4 storage adapters and harden Azure SSO. | [preview](https://connect-intel-buzpup2lm-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- aa2acb7` |
 | 12/07/2026, 13:29:37 | `5f98b52` | Add enterprise SSO Vercel connect script and setup guide. | [preview](https://connect-intel-g1rp3795y-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5f98b52` |
-| 12/07/2026, 10:42:49 | `1161bea` | Wire enterprise SSO buttons on login from public-config auth block. | [preview](https://connect-intel-3b2fa5sjd-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1161bea` |
-| 12/07/2026, 10:39:31 | `b55e909` | Add enterprise auth abstraction with Azure AD and Okta OIDC (Infrastructure V2 P3). | [preview](https://connect-intel-85nu9x8ys-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b55e909` |
 
 ---
 
