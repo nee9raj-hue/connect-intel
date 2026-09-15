@@ -3040,6 +3040,43 @@ button.ci-lead-tag:disabled {
   gap: 0.5rem 0.75rem;
 }
 
+.pipeline-deals-filters__stages {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.pipeline-deals-filters__stage-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.pipeline-deals-filters__stage {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #516f90;
+  background: #fff;
+  border: 1px solid #cbd6e2;
+  border-radius: 999px;
+  padding: 0.28rem 0.65rem;
+  cursor: pointer;
+  line-height: 1.2;
+}
+
+.pipeline-deals-filters__stage:hover {
+  border-color: #7c98b6;
+  color: #33475b;
+}
+
+.pipeline-deals-filters__stage.is-on {
+  background: #fff4ee;
+  border-color: #ffd4b8;
+  color: #c2410c;
+}
+
 .pipeline-deals-filters__field {
   display: flex;
   flex-direction: column;
@@ -3128,7 +3165,7 @@ button.ci-lead-tag:disabled {
 }
 
 .pipeline-deals-col-route {
-  width: 26%;
+  width: 20%;
 }
 
 .pipeline-deals-col-weight {
@@ -3137,6 +3174,10 @@ button.ci-lead-tag:disabled {
 
 .pipeline-deals-col-freight {
   width: 7%;
+}
+
+.pipeline-deals-col-revenue {
+  width: 8%;
 }
 
 .pipeline-deals-col-invoice {

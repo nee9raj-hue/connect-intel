@@ -9,6 +9,7 @@ import {
   transportModeLabel,
   freightCustomerTypeLabel,
 } from '../../lib/freightDeals'
+import { estimatedFreightRevenue, sumEstimatedFreightRevenue, FREIGHT_DEAL_STAGES } from '../../lib/freightDeal'
 import {
   DEAL_TRANSPORT_FILTERS,
   filterPipelineDealRows,
@@ -47,10 +48,13 @@ export default function PipelineDealsView({
   const [dateFrom, setDateFrom] = useState(null)
   const [dateTo, setDateTo] = useState(null)
   const [transportMode, setTransportMode] = useState('all')
+  const [selectedStages, setSelectedStages] = useState([])
   const [forecast, setForecast] = useState(null)
   const [forecastLoading, setForecastLoading] = useState(false)
 
   const timeZone = user?.timezone || undefined
+
+  const isAllDealsView = dealStage === 'all'
 
   const filteredRows = useMemo(
     () =>
@@ -58,17 +62,26 @@ export default function PipelineDealsView({
         dateFrom,
         dateTo,
         transportMode,
+        stages: isAllDealsView ? selectedStages : [],
         timeZone,
       }),
-    [rows, dateFrom, dateTo, transportMode, timeZone]
+    [rows, dateFrom, dateTo, transportMode, selectedStages, isAllDealsView, timeZone]
   )
 
-  const filtersActive = Boolean(dateFrom || dateTo) || transportMode !== 'all'
+  const estimatedRevenueTotal = useMemo(
+    () => Math.round(sumEstimatedFreightRevenue(filteredRows)),
+    [filteredRows]
+  )
+
+  const filtersActive =
+    Boolean(dateFrom || dateTo) ||
+    transportMode !== 'all' ||
+    (isAllDealsView && selectedStages.length > 0)
   const rangeLabel =
     dateFrom || dateTo ? formatLocalDateRangeLabel(dateFrom, dateTo, timeZone) : ''
 
   const stageMeta = useMemo(() => {
-    if (dealStage === 'all') return { label: 'All open deals' }
+    if (dealStage === 'all') return { label: 'All Deals' }
     return getDealStageMeta(dealStage, { freightOrg: true })
   }, [dealStage])
 
@@ -96,9 +109,13 @@ export default function PipelineDealsView({
       const mode = DEAL_TRANSPORT_FILTERS.find((opt) => opt.id === transportMode)
       if (mode) parts.push(mode.label)
     }
+    if (isAllDealsView && selectedStages.length > 0) {
+      const labels = FREIGHT_DEAL_STAGES.filter((s) => selectedStages.includes(s.id)).map((s) => s.label)
+      if (labels.length) parts.push(labels.join(', '))
+    }
     if (assigneeFilter) parts.push('Assigned filter')
     return parts.join(' · ')
-  }, [stageMeta.label, rangeLabel, transportMode, assigneeFilter])
+  }, [stageMeta.label, rangeLabel, transportMode, assigneeFilter, isAllDealsView, selectedStages])
 
   const runExport = useCallback(async () => {
     if (!canExportDeals || exportBusy) return
@@ -150,7 +167,7 @@ export default function PipelineDealsView({
     try {
       const data = await api.fetchPipelineDeals({
         dealStage,
-        limit: 200,
+        limit: isAllDealsView ? 500 : 200,
         assigneeUserId: assigneeFilter || undefined,
       })
       const list = data.deals || []
@@ -171,11 +188,15 @@ export default function PipelineDealsView({
     } finally {
       setLoading(false)
     }
-  }, [dealStage, assigneeFilter, refreshPipelineSummary])
+  }, [dealStage, assigneeFilter, refreshPipelineSummary, isAllDealsView])
 
   useEffect(() => {
     load()
   }, [load])
+
+  useEffect(() => {
+    if (!isAllDealsView) setSelectedStages([])
+  }, [isAllDealsView])
 
   const loadForecast = useCallback(async () => {
     setForecastLoading(true)
@@ -262,6 +283,14 @@ export default function PipelineDealsView({
     }
   }
 
+  const toggleStageFilter = (stageId) => {
+    setSelectedStages((prev) => {
+      const id = String(stageId)
+      return prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
+    })
+    setSelected(new Set())
+  }
+
   const markBulkLost = () => {
     const reason = window.prompt('Lost reason (optional — applies to all selected):', '') ?? null
     if (reason === null) return
@@ -334,32 +363,39 @@ export default function PipelineDealsView({
         <p className="pipeline-deals-forecast pipeline-deals-forecast--loading text-xs text-gray-500">
           Loading forecast…
         </p>
-      ) : forecast?.dealCount > 0 ? (
+      ) : filteredRows.length > 0 || forecast?.dealCount > 0 ? (
         <div className="pipeline-deals-forecast" role="region" aria-label="Deal forecast">
           <article className="pipeline-deals-forecast__card">
             <span className="pipeline-deals-forecast__label">Open pipeline</span>
-            <strong className="pipeline-deals-forecast__value">{formatDealValue(forecast.openValue)}</strong>
-            <span className="pipeline-deals-forecast__hint">{forecast.openCount} open deals</span>
+            <strong className="pipeline-deals-forecast__value">{formatDealValue(forecast?.openValue)}</strong>
+            <span className="pipeline-deals-forecast__hint">{forecast?.openCount || 0} open deals</span>
+          </article>
+          <article className="pipeline-deals-forecast__card">
+            <span className="pipeline-deals-forecast__label">Revenue</span>
+            <strong className="pipeline-deals-forecast__value">
+              {formatDealValue(estimatedRevenueTotal)}
+            </strong>
+            <span className="pipeline-deals-forecast__hint">Chargeable wt × freight rate</span>
           </article>
           <article className="pipeline-deals-forecast__card">
             <span className="pipeline-deals-forecast__label">Weighted forecast</span>
             <strong className="pipeline-deals-forecast__value">
-              {formatDealValue(forecast.weightedPipeline)}
+              {formatDealValue(forecast?.weightedPipeline)}
             </strong>
             <span className="pipeline-deals-forecast__hint">Stage-weighted</span>
           </article>
           <article className="pipeline-deals-forecast__card">
             <span className="pipeline-deals-forecast__label">30-day outlook</span>
             <strong className="pipeline-deals-forecast__value">
-              {formatDealValue(forecast.forecast30d)}
+              {formatDealValue(forecast?.forecast30d)}
             </strong>
           </article>
           <article className="pipeline-deals-forecast__card">
             <span className="pipeline-deals-forecast__label">Won value</span>
-            <strong className="pipeline-deals-forecast__value">{formatDealValue(forecast.wonValue)}</strong>
-            <span className="pipeline-deals-forecast__hint">{forecast.winRate ?? 0}% win rate</span>
+            <strong className="pipeline-deals-forecast__value">{formatDealValue(forecast?.wonValue)}</strong>
+            <span className="pipeline-deals-forecast__hint">{forecast?.winRate ?? 0}% win rate</span>
           </article>
-          {forecast.atRiskValue > 0 ? (
+          {forecast?.atRiskValue > 0 ? (
             <article className="pipeline-deals-forecast__card pipeline-deals-forecast__card--risk">
               <span className="pipeline-deals-forecast__label">Stale (21d+)</span>
               <strong className="pipeline-deals-forecast__value">
@@ -401,6 +437,34 @@ export default function PipelineDealsView({
             />
           </label>
         </div>
+        {isAllDealsView ? (
+          <div className="pipeline-deals-filters__stages" role="group" aria-label="Deal stages">
+            <span className="pipeline-deals-filters__label">Stages</span>
+            <div className="pipeline-deals-filters__stage-list">
+              {FREIGHT_DEAL_STAGES.map((stage) => {
+                const pressed = selectedStages.includes(stage.id)
+                return (
+                  <button
+                    key={stage.id}
+                    type="button"
+                    className={`pipeline-deals-filters__stage ${pressed ? 'is-on' : ''}`}
+                    aria-pressed={pressed}
+                    onClick={() => toggleStageFilter(stage.id)}
+                    title={
+                      selectedStages.length === 0
+                        ? 'All stages. Click to filter to this stage.'
+                        : pressed
+                          ? 'Remove this stage'
+                          : 'Add this stage'
+                    }
+                  >
+                    {stage.label}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        ) : null}
         {rangeLabel ? (
           <p className="pipeline-deals-filters__week-hint">{rangeLabel}</p>
         ) : (
@@ -422,6 +486,7 @@ export default function PipelineDealsView({
               setDateFrom(null)
               setDateTo(null)
               setTransportMode('all')
+              setSelectedStages([])
               setSelected(new Set())
             }}
           >
@@ -504,6 +569,7 @@ export default function PipelineDealsView({
               <col className="pipeline-deals-col-route" />
               <col className="pipeline-deals-col-weight" />
               <col className="pipeline-deals-col-freight" />
+              <col className="pipeline-deals-col-revenue" />
               <col className="pipeline-deals-col-invoice" />
             </colgroup>
             <thead>
@@ -525,6 +591,7 @@ export default function PipelineDealsView({
                 <th className="pipeline-deals-th">Route / lanes</th>
                 <th className="pipeline-deals-th pipeline-deals-th-num">Gross</th>
                 <th className="pipeline-deals-th pipeline-deals-th-num">Freight</th>
+                <th className="pipeline-deals-th pipeline-deals-th-num">Revenue</th>
                 <th className="pipeline-deals-th pipeline-deals-th-num">Invoice</th>
               </tr>
             </thead>
@@ -589,6 +656,9 @@ export default function PipelineDealsView({
                     </td>
                     <td className="pipeline-deals-td pipeline-deals-td-num tabular-nums font-medium">
                       {formatDealValue(deal.amount, deal.currency)}
+                    </td>
+                    <td className="pipeline-deals-td pipeline-deals-td-num tabular-nums font-semibold">
+                      {formatDealValue(estimatedFreightRevenue(deal), deal.currency)}
                     </td>
                     <td className="pipeline-deals-td pipeline-deals-td-num tabular-nums text-gray-600">
                       {formatDealValue(freight?.invoiceAmount, deal.currency)}

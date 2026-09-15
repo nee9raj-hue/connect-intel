@@ -187,11 +187,11 @@ function buildFreightPipelineChildren(columns, pipelineCounts, openDealCounts = 
       children: [
         {
           id: 'pipeline-all-deals',
-          label: 'All open',
+          label: 'All Deals',
           panel: 'pipeline',
           view: 'deals',
           dealStage: 'all',
-          badge: open.all || null,
+          badge: all.all || open.all || null,
         },
         ...FREIGHT_DEAL_STAGES.filter((s) => s.id !== 'won' && s.id !== 'lost').map((stage) => ({
           id: `pipeline-deal-${stage.id}`,
@@ -262,11 +262,11 @@ function buildStandardPipelineChildren(
       children: [
         {
           id: 'pipeline-all-deals',
-          label: 'All open',
+          label: 'All Deals',
           panel: 'pipeline',
           view: 'deals',
           dealStage: 'all',
-          badge: open.all || null,
+          badge: all.all || open.all || null,
         },
         {
           id: 'pipeline-won-deals',

@@ -42,7 +42,6 @@ import { leadHasSendableEmail, getLeadEmail } from '../../lib/emailUtils'
 import { getLeadCity, getLeadState } from '../../lib/pipelineFilters'
 import SaveReportModal from './SaveReportModal'
 import { isFreightDealOrg } from '../../lib/freightDeal'
-import { getDealStageMeta } from '../../lib/crmConstants'
 import {
   evaluateBulkAssign,
   evaluateBulkEdit,
@@ -470,11 +469,6 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     panelOptions?.clickedCampaignId,
     panelOptions?.campaignRecipientFilter,
   ])
-
-  const dealsStageLabel = useMemo(() => {
-    if (dealsStage === 'all') return 'All open deals'
-    return getDealStageMeta(dealsStage, { freightOrg: true }).label
-  }, [dealsStage])
 
   const openDealFromPipeline = useCallback(
     (leadId, tab = 'deals') => {

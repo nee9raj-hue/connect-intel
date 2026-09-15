@@ -17,6 +17,8 @@ export {
   emptyDestinationClearance,
   freightChargeableWeightKg,
   freightChargeableMeasure,
+  estimatedFreightRevenue,
+  sumEstimatedFreightRevenue,
   freightGrossFieldLabel,
   freightRateUnitLabel,
   formatFreightMeasure,
