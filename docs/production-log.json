@@ -1,10 +1,66 @@
 {
-  "updatedAt": "2026-07-14T07:58:49.038Z",
-  "updatedAtIst": "14/07/2026, 13:28:49",
+  "updatedAt": "2026-09-15T05:33:25.106Z",
+  "updatedAtIst": "15/09/2026, 11:03:25",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "f22177a",
+  "currentProductionCommit": "e08802c",
   "entries": [
+    {
+      "logId": "20260915-1101-e08802c",
+      "commit": "e08802c",
+      "commitFull": "e08802cf959b28407af4b51b96ff2521349f8aa6",
+      "message": "Fix sidebar Deals counts from pipeline_deals, matching Lost list.",
+      "deployedAt": "2026-09-15T05:31:47.743Z",
+      "deployedAtIst": "15/09/2026, 11:01:47",
+      "committedAtIst": "15/09/2026, 11:01:07",
+      "vercelPreviewUrl": "https://connect-intel-2hztsi2nz-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- e08802c"
+    },
+    {
+      "logId": "20260915-0955-517d130",
+      "commit": "517d130",
+      "commitFull": "517d13064e5c7dcbd047358ab1c486a3bc040f94",
+      "message": "Clear stale PWA cache when PipelineDealsView is missing.",
+      "deployedAt": "2026-09-15T04:25:11.114Z",
+      "deployedAtIst": "15/09/2026, 09:55:11",
+      "committedAtIst": "15/09/2026, 09:54:40",
+      "vercelPreviewUrl": "https://connect-intel-dr7z7wkl4-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 517d130"
+    },
+    {
+      "logId": "20260915-0939-4cb761a",
+      "commit": "4cb761a",
+      "commitFull": "4cb761a730847646980a5b334bc82a1f8a440445",
+      "message": "Fix pipeline deals crash from missing PipelineDealsView import.",
+      "deployedAt": "2026-09-15T04:09:04.064Z",
+      "deployedAtIst": "15/09/2026, 09:39:04",
+      "committedAtIst": "15/09/2026, 09:38:20",
+      "vercelPreviewUrl": "https://connect-intel-6ivfe60d8-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 4cb761a"
+    },
+    {
+      "logId": "20260714-1329-3b47342",
+      "commit": "3b47342",
+      "commitFull": "3b473429aacefe527dc6611e9d3fedfe4511fea0",
+      "message": "Record production deploy f22177a as LIVE.",
+      "deployedAt": "2026-07-14T07:59:42.096Z",
+      "deployedAtIst": "14/07/2026, 13:29:42",
+      "committedAtIst": "14/07/2026, 13:29:04",
+      "vercelPreviewUrl": "https://connect-intel-8np5lw2gs-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 3b47342"
+    },
     {
       "logId": "20260714-1328-f22177a",
       "commit": "f22177a",
@@ -15,7 +71,7 @@
       "committedAtIst": "14/07/2026, 13:27:50",
       "vercelPreviewUrl": "https://connect-intel-ptsieevr7-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- f22177a"
     },
@@ -144,48 +200,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- d2b08f0"
-    },
-    {
-      "logId": "20260711-2140-f7e6207",
-      "commit": "f7e6207",
-      "commitFull": "f7e62071fd495174b0500dbc77ebe184432e0943",
-      "message": "Exempt data-sync cron from RBAC mutation audit.",
-      "deployedAt": "2026-07-11T16:10:16.349Z",
-      "deployedAtIst": "11/07/2026, 21:40:16",
-      "committedAtIst": "11/07/2026, 21:39:44",
-      "vercelPreviewUrl": "https://connect-intel-nwrwya9es-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- f7e6207"
-    },
-    {
-      "logId": "20260711-2140-954461a",
-      "commit": "954461a",
-      "commitFull": "954461a4b8f4730445b6f532e1550f8bc117866c",
-      "message": "Fix prod:ops vercel cron trigger when query params are set.",
-      "deployedAt": "2026-07-11T16:10:01.874Z",
-      "deployedAtIst": "11/07/2026, 21:40:01",
-      "committedAtIst": "11/07/2026, 21:39:30",
-      "vercelPreviewUrl": "https://connect-intel-lv3qn4aji-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 954461a"
-    },
-    {
-      "logId": "20260711-2137-5bee522",
-      "commit": "5bee522",
-      "commitFull": "5bee522f4f8289576c5afb2e051953c00ec30aaa",
-      "message": "Add production data-sync cron for pipeline and companies backfill.",
-      "deployedAt": "2026-07-11T16:07:05.935Z",
-      "deployedAtIst": "11/07/2026, 21:37:05",
-      "committedAtIst": "11/07/2026, 21:36:27",
-      "vercelPreviewUrl": "https://connect-intel-6l8sb8jdb-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 5bee522"
     }
   ]
 }

@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 28c3c92
+npm run prod:rollback -- 517d130
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 28c3c92
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `f22177a` |
-| Log updated (IST) | 14/07/2026, 13:28:49 |
+| Commit | `e08802c` |
+| Log updated (IST) | 15/09/2026, 11:03:25 |
 
 ---
 
@@ -44,7 +44,11 @@ npm run prod:rollback -- 28c3c92
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 14/07/2026, 13:28:42 | `f22177a` | Ship competitive CRM plans with Free 1/100 and Xindus override. | [preview](https://connect-intel-ptsieevr7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f22177a` | **← LIVE**
+| 15/09/2026, 11:01:47 | `e08802c` | Fix sidebar Deals counts from pipeline_deals, matching Lost list. | [preview](https://connect-intel-2hztsi2nz-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e08802c` | **← LIVE**
+| 15/09/2026, 09:55:11 | `517d130` | Clear stale PWA cache when PipelineDealsView is missing. | [preview](https://connect-intel-dr7z7wkl4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 517d130` |
+| 15/09/2026, 09:39:04 | `4cb761a` | Fix pipeline deals crash from missing PipelineDealsView import. | [preview](https://connect-intel-6ivfe60d8-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4cb761a` |
+| 14/07/2026, 13:29:42 | `3b47342` | Record production deploy f22177a as LIVE. | [preview](https://connect-intel-8np5lw2gs-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3b47342` |
+| 14/07/2026, 13:28:42 | `f22177a` | Ship competitive CRM plans with Free 1/100 and Xindus override. | [preview](https://connect-intel-ptsieevr7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f22177a` |
 | 14/07/2026, 10:31:13 | `28c3c92` | Make Vercel crons Hobby-safe for free-tier production. | [preview](https://connect-intel-eojwznqfy-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 28c3c92` |
 | 14/07/2026, 10:15:49 | `aa2acb7` | Add Infrastructure V2 P4 storage adapters and harden Azure SSO. | [preview](https://connect-intel-buzpup2lm-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- aa2acb7` |
 | 12/07/2026, 13:29:37 | `5f98b52` | Add enterprise SSO Vercel connect script and setup guide. | [preview](https://connect-intel-g1rp3795y-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5f98b52` |
@@ -54,9 +58,6 @@ npm run prod:rollback -- 28c3c92
 | 12/07/2026, 10:31:26 | `ec4aff0` | Complete Infrastructure V2 P1 pipeline GET migration per blueprint. | [preview](https://connect-intel-dif65ur29-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ec4aff0` |
 | 12/07/2026, 10:22:34 | `30c9ce8` | Migrate companies hub to platform repository layer (Infrastructure V2 P1). | [preview](https://connect-intel-8pctlhli8-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 30c9ce8` |
 | 12/07/2026, 10:00:36 | `d2b08f0` | Add Enterprise Infrastructure V2 platform kernel and Docker support. | [preview](https://connect-intel-2xcii1pf5-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d2b08f0` |
-| 11/07/2026, 21:40:16 | `f7e6207` | Exempt data-sync cron from RBAC mutation audit. | [preview](https://connect-intel-nwrwya9es-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f7e6207` |
-| 11/07/2026, 21:40:01 | `954461a` | Fix prod:ops vercel cron trigger when query params are set. | [preview](https://connect-intel-lv3qn4aji-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 954461a` |
-| 11/07/2026, 21:37:05 | `5bee522` | Add production data-sync cron for pipeline and companies backfill. | [preview](https://connect-intel-6l8sb8jdb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5bee522` |
 
 ---
 
