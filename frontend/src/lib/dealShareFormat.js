@@ -173,6 +173,19 @@ export function formatDealSharePlainText({ deal, lead, user, freightOrg = false 
       line('Expected close', new Date(deal.expectedCloseDate).toLocaleDateString('en-IN'))
     )
   }
+  const milestoneRows = [
+    ['Query received', deal.queryReceivedOn],
+    ['Rates quoted', deal.ratesQuotedOn],
+    ['Booked', deal.bookedOn],
+    ['Won', deal.wonOn],
+    ['Lost', deal.lostOn],
+  ]
+  for (const [label, value] of milestoneRows) {
+    if (!value) continue
+    commercial.push(
+      line(label, new Date(value).toLocaleDateString('en-IN', { timeZone: 'UTC' }))
+    )
+  }
 
   const blocks = [
     `${header} — ${deal.name}`,

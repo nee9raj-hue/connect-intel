@@ -13,6 +13,8 @@ import { emptyFreightRfq, isFreightDealOrg, freightRateUnitLabel, isOceanTranspo
 import FreightDealFields, { formatFreightSummary, freightDealCreateLabel } from './FreightDealFields'
 import { getFreightCustomerTypeMeta } from '../../lib/freightDeal'
 import DealShareActions from './DealShareActions'
+import DealMilestoneDates from './DealMilestoneDates'
+import { emptyDealMilestones, pickDealMilestones, DEAL_MILESTONE_IDS } from '../../lib/dealMilestones'
 import {
   LwField,
   LwFormStack,
@@ -75,6 +77,7 @@ function DealRow({
   const [freightDraft, setFreightDraft] = useState(deal.freight || emptyFreightRfq())
   const [amountDraft, setAmountDraft] = useState(deal.amount ?? '')
   const [nameDraft, setNameDraft] = useState(deal.name || '')
+  const [datesDraft, setDatesDraft] = useState(() => pickDealMilestones(deal))
   const closed = isClosedDealStage(deal.stage)
   const stageOptions = freightOrg ? FREIGHT_DEAL_STAGES : DEAL_STAGES
   const typeMeta = getFreightCustomerTypeMeta(deal.freight?.customerType)
@@ -95,6 +98,7 @@ function DealRow({
   useEffect(() => {
     setFreightDraft(deal.freight || emptyFreightRfq())
     setAmountDraft(deal.amount ?? '')
+    setDatesDraft(pickDealMilestones(deal))
   }, [deal.id, deal.updatedAt, deal.amount])
 
   const saveFreight = () => {
@@ -109,6 +113,14 @@ function DealRow({
     const next = nameDraft.trim()
     if (!next || next === deal.name) return
     onUpdate(deal.id, { name: next })
+  }
+
+  const saveDates = (next) => {
+    const patch = pickDealMilestones(next)
+    setDatesDraft(patch)
+    const prev = pickDealMilestones(deal)
+    if (DEAL_MILESTONE_IDS.every((id) => prev[id] === patch[id])) return
+    onUpdate(deal.id, patch)
   }
 
   return (
@@ -194,6 +206,14 @@ function DealRow({
           />
         </LwField>
       </div>
+
+      <DealMilestoneDates
+        compact
+        values={datesDraft}
+        onChange={saveDates}
+        disabled={busy}
+        loggedAt={deal.createdAt}
+      />
 
       <div className="lw-deal-card__actions">
         {!closed ? (
@@ -327,6 +347,7 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
   const [amount, setAmount] = useState('')
   const [stage, setStage] = useState(freightOrg ? 'rfq' : 'new')
   const [expectedCloseDate, setExpectedCloseDate] = useState('')
+  const [milestones, setMilestones] = useState(() => emptyDealMilestones())
   const [freight, setFreight] = useState(emptyFreightRfq())
   const [saving, setSaving] = useState(false)
   const [feedback, setFeedback] = useState(null)
@@ -437,6 +458,7 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
       amount: amount === '' ? null : Number(amount),
       currency: resolveFreightDealCurrency({ freight }),
       expectedCloseDate: expectedCloseDate || null,
+      ...pickDealMilestones(milestones),
     }
     if (freightOrg) payload.freight = freight
     const ok = await runDeal(
@@ -448,6 +470,7 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
       setAmount('')
       setStage(freightOrg ? 'rfq' : 'new')
       setExpectedCloseDate('')
+      setMilestones(emptyDealMilestones())
       setFreight(emptyFreightRfq())
       setShowCreate(false)
       setListFilter('open')
@@ -565,9 +588,11 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
               </LwField>
             </div>
 
-            <LwField label="Close date" icon={CalendarIcon}>
+            <LwField label="Expected close" icon={CalendarIcon}>
               <LwInput type="date" value={expectedCloseDate} onChange={(e) => setExpectedCloseDate(e.target.value)} />
             </LwField>
+
+            <DealMilestoneDates values={milestones} onChange={setMilestones} disabled={dealBusy} />
 
             <div className="lw-btn-row">
               <LwSubmitBtn variant="brand" icon={PlusIcon} disabled={dealBusy}>

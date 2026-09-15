@@ -10,6 +10,7 @@ import {
   freightCustomerTypeLabel,
 } from '../../lib/freightDeals'
 import { estimatedFreightRevenueInr, sumEstimatedFreightRevenue, FREIGHT_DEAL_STAGES, resolveFreightDealCurrency, FALLBACK_USD_INR } from '../../lib/freightDeal'
+import { filledDealMilestones } from '../../lib/dealMilestones'
 import {
   DEAL_TRANSPORT_FILTERS,
   filterPipelineDealRows,
@@ -609,6 +610,7 @@ export default function PipelineDealsView({
                 const key = dealRowKey(row)
                 const meta = getDealStageMeta(deal.stage, { freightOrg: true })
                 const freight = deal.freight
+                const dates = filledDealMilestones(deal)
                 const isChecked = selected.has(key)
                 return (
                   <tr
@@ -632,6 +634,11 @@ export default function PipelineDealsView({
                       <span className="pipeline-deals-primary" title={deal.name}>
                         {deal.name}
                       </span>
+                      {dates.length > 0 ? (
+                        <span className="pipeline-deals-dates">
+                          {dates.map((field) => `${field.label} ${field.display}`).join(' · ')}
+                        </span>
+                      ) : null}
                     </td>
                     <td className="pipeline-deals-td">
                       <p className="truncate" title={leadName}>

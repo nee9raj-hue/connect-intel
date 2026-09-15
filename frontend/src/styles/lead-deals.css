@@ -602,3 +602,111 @@
   font-size: 0.75rem;
   margin-bottom: 8px;
 }
+
+.lw-deal-dates {
+  margin: 0 12px 10px;
+  padding: 10px 12px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: linear-gradient(180deg, #fafbfc 0%, #fff 100%);
+}
+
+.lw-deals-create-form .lw-deal-dates {
+  margin: 0;
+}
+
+.lw-deal-dates__head {
+  margin-bottom: 10px;
+}
+
+.lw-deal-dates__head h4 {
+  margin: 0;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #33475b;
+}
+
+.lw-deal-dates__head p {
+  margin: 3px 0 0;
+  font-size: 0.6875rem;
+  line-height: 1.4;
+  color: #7c98b6;
+}
+
+.lw-deal-dates__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 10px;
+}
+
+.lw-deal-dates__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.lw-deal-dates__label {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.lw-deal-dates__input {
+  width: 100%;
+  min-height: 34px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  background: #fff;
+  color: #0f172a;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.lw-deal-dates__input:focus {
+  outline: none;
+  border-color: #ff773d;
+  box-shadow: 0 0 0 3px rgba(255, 119, 61, 0.14);
+}
+
+.lw-deal-dates__input:disabled {
+  opacity: 0.6;
+  background: #f8fafc;
+}
+
+.lw-deal-dates__crm {
+  margin: 8px 0 0;
+  font-size: 0.6875rem;
+  color: #94a3b8;
+}
+
+.lw-deal-date-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+}
+
+.lw-deal-date-chips li {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 0.625rem;
+  font-weight: 600;
+}
+
+.lw-deal-date-chips time {
+  font-variant-numeric: tabular-nums;
+  color: #0f172a;
+}

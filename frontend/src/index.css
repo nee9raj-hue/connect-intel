@@ -3228,6 +3228,16 @@ button.ci-lead-tag:disabled {
   white-space: nowrap;
 }
 
+.pipeline-deals-dates {
+  display: block;
+  margin-top: 3px;
+  font-size: 10px;
+  line-height: 1.35;
+  font-weight: 500;
+  color: #7c98b6;
+  white-space: normal;
+}
+
 .pipeline-deals-td-route {
   white-space: nowrap;
   overflow: hidden;
