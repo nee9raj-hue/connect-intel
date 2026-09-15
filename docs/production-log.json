@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-15T16:46:38.444Z",
-  "updatedAtIst": "15/09/2026, 22:16:38",
+  "updatedAt": "2026-09-15T17:08:23.948Z",
+  "updatedAtIst": "15/09/2026, 22:38:23",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "efd7f1a",
+  "currentProductionCommit": "7a2220c",
   "entries": [
+    {
+      "logId": "20260915-2237-7a2220c",
+      "commit": "7a2220c",
+      "commitFull": "7a2220c71355fdcb98595ba2175e4c25f479d89a",
+      "message": "Use customer dates in deal range filters and a single Won/Booked/Lost outcome.",
+      "deployedAt": "2026-09-15T17:07:56.327Z",
+      "deployedAtIst": "15/09/2026, 22:37:56",
+      "committedAtIst": "15/09/2026, 22:37:20",
+      "vercelPreviewUrl": "https://connect-intel-3tc86vzg9-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 7a2220c"
+    },
+    {
+      "logId": "20260915-2217-57e7320",
+      "commit": "57e7320",
+      "commitFull": "57e7320f245ad9ebdd820a4e2baf83d29397567e",
+      "message": "Record production deploy efd7f1a as LIVE.",
+      "deployedAt": "2026-09-15T16:47:33.619Z",
+      "deployedAtIst": "15/09/2026, 22:17:33",
+      "committedAtIst": "15/09/2026, 22:16:53",
+      "vercelPreviewUrl": "https://connect-intel-rejobcu8b-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 57e7320"
+    },
     {
       "logId": "20260915-2216-efd7f1a",
       "commit": "efd7f1a",
@@ -15,7 +43,7 @@
       "committedAtIst": "15/09/2026, 22:15:26",
       "vercelPreviewUrl": "https://connect-intel-oqrhodnvp-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- efd7f1a"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 3b47342"
-    },
-    {
-      "logId": "20260714-1328-f22177a",
-      "commit": "f22177a",
-      "commitFull": "f22177a3da6c702d2425e856ae8d3d048fb57f02",
-      "message": "Ship competitive CRM plans with Free 1/100 and Xindus override.",
-      "deployedAt": "2026-07-14T07:58:42.001Z",
-      "deployedAtIst": "14/07/2026, 13:28:42",
-      "committedAtIst": "14/07/2026, 13:27:50",
-      "vercelPreviewUrl": "https://connect-intel-ptsieevr7-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- f22177a"
-    },
-    {
-      "logId": "20260714-1031-28c3c92",
-      "commit": "28c3c92",
-      "commitFull": "28c3c920523fa74b1239314dfb55ef3aab8bdacc",
-      "message": "Make Vercel crons Hobby-safe for free-tier production.",
-      "deployedAt": "2026-07-14T05:01:13.347Z",
-      "deployedAtIst": "14/07/2026, 10:31:13",
-      "committedAtIst": "14/07/2026, 10:30:32",
-      "vercelPreviewUrl": "https://connect-intel-eojwznqfy-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 28c3c92"
     }
   ]
 }

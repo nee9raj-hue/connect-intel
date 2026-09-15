@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- c3d00e3
+npm run prod:rollback -- 57e7320
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- c3d00e3
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `efd7f1a` |
-| Log updated (IST) | 15/09/2026, 22:16:38 |
+| Commit | `7a2220c` |
+| Log updated (IST) | 15/09/2026, 22:38:23 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- c3d00e3
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 15/09/2026, 22:16:13 | `efd7f1a` | Let reps record actual RFQ, quote, booked, won, and lost dates on deals. | [preview](https://connect-intel-oqrhodnvp-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- efd7f1a` | **← LIVE**
+| 15/09/2026, 22:37:56 | `7a2220c` | Use customer dates in deal range filters and a single Won/Booked/Lost outcome. | [preview](https://connect-intel-3tc86vzg9-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7a2220c` | **← LIVE**
+| 15/09/2026, 22:17:33 | `57e7320` | Record production deploy efd7f1a as LIVE. | [preview](https://connect-intel-rejobcu8b-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 57e7320` |
+| 15/09/2026, 22:16:13 | `efd7f1a` | Let reps record actual RFQ, quote, booked, won, and lost dates on deals. | [preview](https://connect-intel-oqrhodnvp-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- efd7f1a` |
 | 15/09/2026, 22:00:59 | `c3d00e3` | Record production deploy d874acd as LIVE. | [preview](https://connect-intel-oex9p0yv1-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c3d00e3` |
 | 15/09/2026, 21:59:53 | `d874acd` | Allow freight edits on every deal stage, including Won and Lost. | [preview](https://connect-intel-e9hr0f24c-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d874acd` |
 | 15/09/2026, 21:55:47 | `ec57021` | Record production deploy f30b3e6 as LIVE. | [preview](https://connect-intel-pdlhd9qgl-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ec57021` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- c3d00e3
 | 15/09/2026, 09:55:11 | `517d130` | Clear stale PWA cache when PipelineDealsView is missing. | [preview](https://connect-intel-dr7z7wkl4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 517d130` |
 | 15/09/2026, 09:39:04 | `4cb761a` | Fix pipeline deals crash from missing PipelineDealsView import. | [preview](https://connect-intel-6ivfe60d8-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4cb761a` |
 | 14/07/2026, 13:29:42 | `3b47342` | Record production deploy f22177a as LIVE. | [preview](https://connect-intel-8np5lw2gs-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3b47342` |
-| 14/07/2026, 13:28:42 | `f22177a` | Ship competitive CRM plans with Free 1/100 and Xindus override. | [preview](https://connect-intel-ptsieevr7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f22177a` |
-| 14/07/2026, 10:31:13 | `28c3c92` | Make Vercel crons Hobby-safe for free-tier production. | [preview](https://connect-intel-eojwznqfy-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 28c3c92` |
 
 ---
 
