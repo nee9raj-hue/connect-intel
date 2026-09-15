@@ -121,7 +121,14 @@ export default function Sidebar({
       dealCounts: pipelineSummary?.openDealCounts,
       allDealCounts: pipelineSummary?.dealCounts,
     })
-  }, [isOperator, user, pipelineCounts, upcomingCount])
+  }, [
+    isOperator,
+    user,
+    pipelineCounts,
+    upcomingCount,
+    pipelineSummary?.openDealCounts,
+    pipelineSummary?.dealCounts,
+  ])
 
   const [expanded, setExpanded] = useState(() => loadExpanded())
   const navScrollRef = useRef(null)

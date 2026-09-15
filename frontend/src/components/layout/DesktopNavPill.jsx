@@ -244,8 +244,20 @@ export default function DesktopNavPill({ activePanel, panelOptions, onNavigate }
   )
   const upcomingCount = useMemo(() => countUpcomingFromLeads(savedLeads), [savedLeads])
   const sections = useMemo(
-    () => buildCustomerNavSections(user, { pipelineCounts, upcomingCount }),
-    [user, pipelineCounts, upcomingCount]
+    () =>
+      buildCustomerNavSections(user, {
+        pipelineCounts,
+        upcomingCount,
+        dealCounts: pipelineSummary?.openDealCounts,
+        allDealCounts: pipelineSummary?.dealCounts,
+      }),
+    [
+      user,
+      pipelineCounts,
+      upcomingCount,
+      pipelineSummary?.openDealCounts,
+      pipelineSummary?.dealCounts,
+    ]
   )
 
   const items = MOBILE_NAV_PILL_ITEMS

@@ -33,7 +33,7 @@ export default function PipelineDealsView({
   onOpenLead,
   assigneeFilter = null,
 }) {
-  const { refreshSavedLeads, user } = useApp()
+  const { refreshSavedLeads, refreshPipelineSummary, user } = useApp()
   const [rows, setRows] = useState([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -164,13 +164,14 @@ export default function PipelineDealsView({
         }
         return next
       })
+      void refreshPipelineSummary?.()
     } catch (e) {
       setError(e.message || 'Could not load deals')
       setRows([])
     } finally {
       setLoading(false)
     }
-  }, [dealStage, assigneeFilter])
+  }, [dealStage, assigneeFilter, refreshPipelineSummary])
 
   useEffect(() => {
     load()
