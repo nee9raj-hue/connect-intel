@@ -1,9 +1,16 @@
 export {
   DEAL_MILESTONE_FIELDS,
   DEAL_MILESTONE_IDS,
+  DEAL_QUERY_FIELDS,
+  DEAL_OUTCOME_OPTIONS,
   emptyDealMilestones,
   normalizeDealCalendarDate,
   pickDealMilestones,
   formatDealCalendarDate,
   filledDealMilestones,
+  resolveDealOutcome,
+  applyDealOutcome,
+  dealOutcomeDateField,
+  dealOutcomeOptions,
+  dealDatesForRangeFilter,
 } from '../../../lib/dealMilestones.js'

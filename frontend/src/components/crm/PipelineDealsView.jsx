@@ -66,6 +66,7 @@ export default function PipelineDealsView({
         dateTo,
         transportMode,
         stages: isAllDealsView ? selectedStages : [],
+        dateStages: isAllDealsView ? selectedStages : [dealStage],
         timeZone,
       }),
     [rows, dateFrom, dateTo, transportMode, selectedStages, isAllDealsView, timeZone]

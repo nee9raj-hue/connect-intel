@@ -641,6 +641,24 @@
   gap: 8px 10px;
 }
 
+.lw-deal-dates__outcome {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 8px 10px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.lw-deal-dates__outcome-hint {
+  margin: 0;
+  align-self: end;
+  padding-bottom: 6px;
+  font-size: 0.6875rem;
+  line-height: 1.35;
+  color: #7c98b6;
+}
+
 .lw-deal-dates__field {
   display: flex;
   flex-direction: column;
@@ -666,6 +684,11 @@
   color: #0f172a;
   font-size: 0.75rem;
   font-variant-numeric: tabular-nums;
+}
+
+select.lw-deal-dates__input {
+  font-variant-numeric: normal;
+  cursor: pointer;
 }
 
 .lw-deal-dates__input:focus {

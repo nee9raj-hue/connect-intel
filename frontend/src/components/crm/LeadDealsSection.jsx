@@ -14,7 +14,7 @@ import FreightDealFields, { formatFreightSummary, freightDealCreateLabel } from 
 import { getFreightCustomerTypeMeta } from '../../lib/freightDeal'
 import DealShareActions from './DealShareActions'
 import DealMilestoneDates from './DealMilestoneDates'
-import { emptyDealMilestones, pickDealMilestones, DEAL_MILESTONE_IDS } from '../../lib/dealMilestones'
+import { emptyDealMilestones, pickDealMilestones, DEAL_MILESTONE_IDS, resolveDealOutcome } from '../../lib/dealMilestones'
 import {
   LwField,
   LwFormStack,
@@ -115,12 +115,24 @@ function DealRow({
     onUpdate(deal.id, { name: next })
   }
 
-  const saveDates = (next) => {
+  const saveDates = (next, meta = {}) => {
     const patch = pickDealMilestones(next)
     setDatesDraft(patch)
     const prev = pickDealMilestones(deal)
-    if (DEAL_MILESTONE_IDS.every((id) => prev[id] === patch[id])) return
-    onUpdate(deal.id, patch)
+    const datesChanged = DEAL_MILESTONE_IDS.some((id) => prev[id] !== patch[id])
+    const nextOutcome = meta.outcome
+    let stagePatch = {}
+    if (nextOutcome && nextOutcome !== deal.stage) {
+      stagePatch = { stage: nextOutcome }
+    } else if (
+      nextOutcome === '' &&
+      ['won', 'lost', 'booked'].includes(deal.stage) &&
+      resolveDealOutcome({ ...deal, ...patch, stage: '' }) === ''
+    ) {
+      stagePatch = { stage: freightOrg ? 'quoted' : 'contacted' }
+    }
+    if (!datesChanged && !stagePatch.stage) return
+    onUpdate(deal.id, { ...patch, ...stagePatch })
   }
 
   return (
@@ -210,6 +222,8 @@ function DealRow({
       <DealMilestoneDates
         compact
         values={datesDraft}
+        stage={deal.stage}
+        includeBooked={freightOrg}
         onChange={saveDates}
         disabled={busy}
         loggedAt={deal.createdAt}
@@ -558,15 +572,23 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
             {freightOrg && <FreightDealFields freight={freight} onChange={setFreight} disabled={dealBusy} compact />}
 
             <div className="lw-deal-card__controls">
-              <LwField label="Stage">
-                <LwSelect value={stage} onChange={(e) => setStage(e.target.value)}>
-                  {stageOptions.filter((s) => !isClosedDealStage(s.id)).map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.label}
-                    </option>
-                  ))}
-                </LwSelect>
-              </LwField>
+              {!['won', 'lost', 'booked'].includes(stage) ? (
+                <LwField label="Stage">
+                  <LwSelect value={stage} onChange={(e) => setStage(e.target.value)}>
+                    {stageOptions
+                      .filter((s) => !isClosedDealStage(s.id) && s.id !== 'booked')
+                      .map((s) => (
+                        <option key={s.id} value={s.id}>
+                          {s.label}
+                        </option>
+                      ))}
+                  </LwSelect>
+                </LwField>
+              ) : (
+                <LwField label="Stage">
+                  <LwInput value={getDealStageMeta(stage, { freightOrg }).label} disabled />
+                </LwField>
+              )}
               <LwField label={freightOrg ? `Freight ${freightRateUnitLabel(freight.transportMode)}` : 'Amount ₹'}>
                 <FreightAmountInput
                   freightOrg={freightOrg}
@@ -592,7 +614,21 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
               <LwInput type="date" value={expectedCloseDate} onChange={(e) => setExpectedCloseDate(e.target.value)} />
             </LwField>
 
-            <DealMilestoneDates values={milestones} onChange={setMilestones} disabled={dealBusy} />
+            <DealMilestoneDates
+              values={milestones}
+              stage={stage}
+              includeBooked={freightOrg}
+              disabled={dealBusy}
+              onChange={(next, meta) => {
+                setMilestones(next)
+                if (meta?.outcome) setStage(meta.outcome)
+                else if (meta?.outcome === '') {
+                  setStage((current) =>
+                    ['won', 'lost', 'booked'].includes(current) ? (freightOrg ? 'rfq' : 'new') : current
+                  )
+                }
+              }}
+            />
 
             <div className="lw-btn-row">
               <LwSubmitBtn variant="brand" icon={PlusIcon} disabled={dealBusy}>
