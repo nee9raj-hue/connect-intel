@@ -396,8 +396,19 @@
   height: 14px;
 }
 
-.lw-deal-rfq-panel {
-  padding: 0 12px 12px;
+.lw-deal-card__controls .lw-field {
+  min-width: 0;
+}
+
+.lw-deal-card__controls .lw-field__label {
+  margin-bottom: 4px;
+}
+
+.lw-deal-rfq-hint {
+  margin: 0 0 10px;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: #516f90;
 }
 
 .lw-deals-empty {

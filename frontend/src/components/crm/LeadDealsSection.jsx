@@ -23,7 +23,6 @@ import {
 import {
   CalendarIcon,
   CheckIcon,
-  ChevronRightIcon,
   CloseIcon,
   CopyIcon,
   PipelineIcon,
@@ -71,21 +70,31 @@ function DealRow({
   const [lostReason, setLostReason] = useState('')
   const [showLost, setShowLost] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
-  const [showFreight, setShowFreight] = useState(false)
+  const [showFreight, setShowFreight] = useState(() => Boolean(freightOrg) && !isClosedDealStage(deal.stage))
   const [freightDraft, setFreightDraft] = useState(deal.freight || emptyFreightRfq())
+  const [amountDraft, setAmountDraft] = useState(deal.amount ?? '')
   const [nameDraft, setNameDraft] = useState(deal.name || '')
   const closed = isClosedDealStage(deal.stage)
   const stageOptions = getDealStagesForFreight(freightOrg)
   const typeMeta = getFreightCustomerTypeMeta(deal.freight?.customerType)
   const freightSummary = formatFreightSummary(deal.freight)
+  const ocean = freightOrg && isOceanTransportMode((showFreight ? freightDraft : deal.freight)?.transportMode)
 
   useEffect(() => {
     setNameDraft(deal.name || '')
   }, [deal.name])
 
+  useEffect(() => {
+    setFreightDraft(deal.freight || emptyFreightRfq())
+    setAmountDraft(deal.amount ?? '')
+  }, [deal.id, deal.updatedAt, deal.amount])
+
   const saveFreight = () => {
-    onUpdate(deal.id, { freight: freightDraft })
-    setShowFreight(false)
+    const amount = amountDraft === '' ? null : Number(amountDraft)
+    onUpdate(deal.id, {
+      freight: freightDraft,
+      amount: Number.isFinite(amount) ? amount : null,
+    })
   }
 
   const saveName = () => {
@@ -146,37 +155,40 @@ function DealRow({
       {!closed && (
         <>
           <div className="lw-deal-card__controls">
-            <LwSelect
-              value={deal.stage}
-              disabled={busy}
-              onChange={(e) => onUpdate(deal.id, { stage: e.target.value })}
-              aria-label="Stage"
-            >
-              {stageOptions.filter((s) => !isClosedDealStage(s.id)).map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.label}
-                </option>
-              ))}
-            </LwSelect>
-            <FreightAmountInput
-              freightOrg={freightOrg}
-              transportMode={deal.freight?.transportMode}
-              type="number"
-              min={0}
-              step="0.01"
-              defaultValue={deal.amount ?? ''}
-              disabled={busy}
-              placeholder={freightOrg ? freightRateUnitLabel(deal.freight?.transportMode) : 'Amount ₹'}
-              aria-label={
-                freightOrg && isOceanTransportMode(deal.freight?.transportMode)
-                  ? 'Freight in US dollars per CBM'
-                  : 'Amount'
-              }
-              onBlur={(e) => {
-                const val = e.target.value === '' ? null : Number(e.target.value)
-                if (val !== deal.amount) onUpdate(deal.id, { amount: val })
-              }}
-            />
+            <LwField label="Stage">
+              <LwSelect
+                value={deal.stage}
+                disabled={busy}
+                onChange={(e) => onUpdate(deal.id, { stage: e.target.value })}
+                aria-label="Stage"
+              >
+                {stageOptions.filter((s) => !isClosedDealStage(s.id)).map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.label}
+                  </option>
+                ))}
+              </LwSelect>
+            </LwField>
+            <LwField label={freightOrg ? `Freight ${freightRateUnitLabel((showFreight ? freightDraft : deal.freight)?.transportMode)}` : 'Amount ₹'}>
+              <FreightAmountInput
+                freightOrg={freightOrg}
+                transportMode={(showFreight ? freightDraft : deal.freight)?.transportMode}
+                type="number"
+                min={0}
+                step="0.01"
+                value={amountDraft}
+                disabled={busy}
+                placeholder={freightOrg ? freightRateUnitLabel((showFreight ? freightDraft : deal.freight)?.transportMode) : 'Amount ₹'}
+                aria-label={
+                  ocean ? 'Freight in US dollars per CBM' : freightOrg ? 'Freight amount' : 'Amount'
+                }
+                onChange={(e) => setAmountDraft(e.target.value)}
+                onBlur={(e) => {
+                  const val = e.target.value === '' ? null : Number(e.target.value)
+                  if (val !== deal.amount) onUpdate(deal.id, { amount: val })
+                }}
+              />
+            </LwField>
           </div>
 
           <div className="lw-deal-card__actions">
@@ -192,6 +204,18 @@ function DealRow({
             >
               <CloseIcon aria-hidden />
               Lost
+            </button>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => {
+                setFreightDraft(deal.freight || emptyFreightRfq())
+                setAmountDraft(deal.amount ?? '')
+                setShowFreight((v) => !v)
+              }}
+              className="lw-deal-action"
+            >
+              {showFreight ? 'Hide freight' : 'Edit freight'}
             </button>
             <button type="button" disabled={busy} onClick={() => onDuplicate(deal.id)} className="lw-deal-action lw-deal-action--icon" title="Duplicate">
               <CopyIcon aria-hidden />
@@ -247,37 +271,58 @@ function DealRow({
             <CopyIcon aria-hidden />
             Duplicate
           </button>
+          {freightOrg ? (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => {
+                setFreightDraft(deal.freight || emptyFreightRfq())
+                setAmountDraft(deal.amount ?? '')
+                setShowFreight((v) => !v)
+              }}
+              className="lw-deal-action"
+            >
+              {showFreight ? 'Hide freight' : 'View freight'}
+            </button>
+          ) : null}
         </div>
       )}
 
-      {freightOrg && (
-        <>
-          <button
-            type="button"
-            disabled={busy}
-            onClick={() => {
-              setFreightDraft(deal.freight || emptyFreightRfq())
-              setShowFreight((v) => !v)
-            }}
-            className="lw-deal-rfq-toggle"
-          >
-            <ChevronRightIcon
-              aria-hidden
-              style={{ transform: showFreight ? 'rotate(90deg)' : undefined, transition: 'transform 0.15s' }}
+      {freightOrg && showFreight && (
+        <div className="lw-deal-rfq-panel lw-freight-fields">
+          <p className="lw-deal-rfq-hint">
+            Update lanes, weight, and the quoted freight rate after negotiation. Ocean rates are USD per CBM.
+          </p>
+          <LwField label={`Quoted freight ${freightRateUnitLabel(freightDraft.transportMode)}`}>
+            <FreightAmountInput
+              freightOrg
+              transportMode={freightDraft.transportMode}
+              type="number"
+              min={0}
+              step="0.01"
+              value={amountDraft}
+              disabled={busy || closed}
+              placeholder={freightRateUnitLabel(freightDraft.transportMode)}
+              aria-label={
+                isOceanTransportMode(freightDraft.transportMode)
+                  ? 'Freight in US dollars per CBM'
+                  : 'Freight amount'
+              }
+              onChange={(e) => setAmountDraft(e.target.value)}
             />
-            {showFreight ? 'Hide RFQ' : deal.freight ? 'Edit RFQ' : 'Add RFQ'}
-          </button>
-          {showFreight && (
-            <div className="lw-deal-rfq-panel lw-freight-fields">
-              <FreightDealFields freight={freightDraft} onChange={setFreightDraft} disabled={busy} compact />
-              {!closed && (
-                <button type="button" disabled={busy} onClick={saveFreight} className="lw-deal-action lw-deal-action--won mt-2">
-                  Save RFQ
-                </button>
-              )}
-            </div>
+          </LwField>
+          <FreightDealFields
+            freight={freightDraft}
+            onChange={setFreightDraft}
+            disabled={busy || closed}
+            compact
+          />
+          {!closed && (
+            <button type="button" disabled={busy} onClick={saveFreight} className="lw-deal-action lw-deal-action--won mt-2">
+              Save freight
+            </button>
           )}
-        </>
+        </div>
       )}
 
       <DealShareActions
