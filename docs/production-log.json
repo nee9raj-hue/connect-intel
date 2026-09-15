@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-15T16:25:07.399Z",
-  "updatedAtIst": "15/09/2026, 21:55:07",
+  "updatedAt": "2026-09-15T16:30:15.605Z",
+  "updatedAtIst": "15/09/2026, 22:00:15",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "f30b3e6",
+  "currentProductionCommit": "d874acd",
   "entries": [
+    {
+      "logId": "20260915-2159-d874acd",
+      "commit": "d874acd",
+      "commitFull": "d874acd34e98e105e53f6bd2861e8b89e07dd592",
+      "message": "Allow freight edits on every deal stage, including Won and Lost.",
+      "deployedAt": "2026-09-15T16:29:53.226Z",
+      "deployedAtIst": "15/09/2026, 21:59:53",
+      "committedAtIst": "15/09/2026, 21:59:11",
+      "vercelPreviewUrl": "https://connect-intel-e9hr0f24c-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- d874acd"
+    },
+    {
+      "logId": "20260915-2155-ec57021",
+      "commit": "ec57021",
+      "commitFull": "ec5702157a5e8db479519ae189dcf4a9f2edf831",
+      "message": "Record production deploy f30b3e6 as LIVE.",
+      "deployedAt": "2026-09-15T16:25:47.725Z",
+      "deployedAtIst": "15/09/2026, 21:55:47",
+      "committedAtIst": "15/09/2026, 21:55:12",
+      "vercelPreviewUrl": "https://connect-intel-pdlhd9qgl-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- ec57021"
+    },
     {
       "logId": "20260915-2154-f30b3e6",
       "commit": "f30b3e6",
@@ -15,7 +43,7 @@
       "committedAtIst": "15/09/2026, 21:54:07",
       "vercelPreviewUrl": "https://connect-intel-orlb9dgld-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- f30b3e6"
     },
@@ -242,20 +270,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- aa2acb7"
-    },
-    {
-      "logId": "20260712-1216-5f98b52",
-      "commit": "5f98b52",
-      "commitFull": "5f98b52de6cbaa2d826570e48e1ffa6b73efb03d",
-      "message": "Add enterprise SSO Vercel connect script and setup guide.",
-      "deployedAt": "2026-07-12T07:59:37.899Z",
-      "deployedAtIst": "12/07/2026, 13:29:37",
-      "committedAtIst": "12/07/2026, 10:45:33",
-      "vercelPreviewUrl": "https://connect-intel-g1rp3795y-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 5f98b52"
     }
   ]
 }
