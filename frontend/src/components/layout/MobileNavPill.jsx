@@ -3,11 +3,11 @@ import { useApp } from '../../context/AppContext'
 import useIsMobile from '../../hooks/useIsMobile'
 import {
   isNavTargetActive,
-  MOBILE_NAV_PILL_ITEMS,
   MOBILE_NAV_PILL_MORE_ITEMS,
   MOBILE_NAV_PILL_PRIMARY_ITEMS,
   navTargetToOptions,
 } from '../../lib/navConfig'
+import { isFreightDealOrg } from '../../lib/freightDeal'
 import ChithiMenuIcon from '../ui/ChithiMenuIcon'
 import {
   CalendarIcon,
@@ -34,15 +34,21 @@ const ICONS = {
   task: TaskIcon,
   settings: SettingsGearIcon,
   more: MoreHorizontalIcon,
+  deals: PipelineIcon,
 }
 
 function pillItemActive(activePanel, panelOptions, item) {
-  if (item.matchPanelOnly) return activePanel === item.panel
+  if (item.matchPanelOnly) {
+    if (activePanel !== item.panel) return false
+    // Pipeline "Leads" shortcut should not stay active on Deals view
+    if (item.panel === 'pipeline' && panelOptions?.view === 'deals') return false
+    return true
+  }
   return isNavTargetActive(activePanel, panelOptions, item)
 }
 
-function isMoreSectionActive(activePanel, panelOptions) {
-  return !MOBILE_NAV_PILL_ITEMS.some((item) => pillItemActive(activePanel, panelOptions, item))
+function isMoreSectionActive(activePanel, panelOptions, primaryItems) {
+  return !primaryItems.some((item) => pillItemActive(activePanel, panelOptions, item))
 }
 
 function NavPillButton({ item, active, badge, onClick }) {
@@ -72,10 +78,28 @@ function NavPillButton({ item, active, badge, onClick }) {
 export default function MobileNavPill({ activePanel, panelOptions, onNavigate, onOpenMenu, visible = true }) {
   const { user, pipelineLeadId, chithiUnread } = useApp()
   const isMobile = useIsMobile()
+  const freightOrg = isFreightDealOrg(user)
+
+  const primaryItems = useMemo(() => {
+    if (!freightOrg) return MOBILE_NAV_PILL_PRIMARY_ITEMS
+    const items = [...MOBILE_NAV_PILL_PRIMARY_ITEMS]
+    const leadsIdx = items.findIndex((item) => item.id === 'pipeline')
+    const dealsItem = {
+      id: 'deals',
+      label: 'Deals',
+      panel: 'pipeline',
+      view: 'deals',
+      dealStage: 'all',
+      icon: 'deals',
+    }
+    if (leadsIdx >= 0) items.splice(leadsIdx + 1, 0, dealsItem)
+    else items.push(dealsItem)
+    return items
+  }, [freightOrg])
 
   const moreActive = useMemo(
-    () => isMoreSectionActive(activePanel, panelOptions),
-    [activePanel, panelOptions]
+    () => isMoreSectionActive(activePanel, panelOptions, primaryItems),
+    [activePanel, panelOptions, primaryItems]
   )
 
   if (!isMobile || !user || user.isPlatformAdmin || pipelineLeadId) return null
@@ -95,7 +119,7 @@ export default function MobileNavPill({ activePanel, panelOptions, onNavigate, o
       <div className="mobile-nav-pill__track">
         <div className="mobile-nav-pill__inner">
           <div className="mobile-nav-pill__primary" aria-label="Primary shortcuts">
-            {MOBILE_NAV_PILL_PRIMARY_ITEMS.map((item) => (
+            {primaryItems.map((item) => (
               <NavPillButton
                 key={item.id}
                 item={item}

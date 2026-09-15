@@ -9,7 +9,7 @@ import {
   transportModeLabel,
   freightCustomerTypeLabel,
 } from '../../lib/freightDeals'
-import { estimatedFreightRevenueInr, sumEstimatedFreightRevenue, FREIGHT_DEAL_STAGES, resolveFreightDealCurrency, FALLBACK_USD_INR } from '../../lib/freightDeal'
+import { estimatedFreightRevenueInr, sumEstimatedFreightRevenue, FREIGHT_DEAL_STAGES, resolveFreightDealCurrency, FALLBACK_USD_INR, isFreightDealOrg } from '../../lib/freightDeal'
 import { filledDealMilestones } from '../../lib/dealMilestones'
 import {
   DEAL_TRANSPORT_FILTERS,
@@ -37,6 +37,7 @@ export default function PipelineDealsView({
   assigneeFilter = null,
 }) {
   const { refreshSavedLeads, refreshPipelineSummary, user } = useApp()
+  const freightOrg = isFreightDealOrg(user)
   const [rows, setRows] = useState([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -567,62 +568,19 @@ export default function PipelineDealsView({
       )}
 
       {!loading && filteredRows.length > 0 && (
-        <div className="pipeline-deals-table-wrap">
-          <table className="pipeline-deals-table">
-            <colgroup>
-              <col className="pipeline-deals-col-check" />
-              <col className="pipeline-deals-col-deal" />
-              <col className="pipeline-deals-col-lead" />
-              <col className="pipeline-deals-col-type" />
-              <col className="pipeline-deals-col-stage" />
-              <col className="pipeline-deals-col-mode" />
-              <col className="pipeline-deals-col-route" />
-              <col className="pipeline-deals-col-weight" />
-              <col className="pipeline-deals-col-freight" />
-              <col className="pipeline-deals-col-revenue" />
-              <col className="pipeline-deals-col-invoice" />
-            </colgroup>
-            <thead>
-              <tr>
-                <th className="pipeline-deals-th pipeline-deals-th-check">
-                  <input
-                    type="checkbox"
-                    className="pipeline-hs-checkbox"
-                    checked={allSelected}
-                    aria-label="Select all deals"
-                    onChange={(e) => toggleAll(e.target.checked)}
-                  />
-                </th>
-                <th className="pipeline-deals-th">Deal</th>
-                <th className="pipeline-deals-th">Lead / company</th>
-                <th className="pipeline-deals-th">Type</th>
-                <th className="pipeline-deals-th">Stage</th>
-                <th className="pipeline-deals-th">Mode</th>
-                <th className="pipeline-deals-th">Route / lanes</th>
-                <th className="pipeline-deals-th pipeline-deals-th-num">Gross</th>
-                <th className="pipeline-deals-th pipeline-deals-th-num">Freight</th>
-                <th className="pipeline-deals-th pipeline-deals-th-num">Revenue</th>
-                <th className="pipeline-deals-th pipeline-deals-th-num">Invoice</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredRows.map((row) => {
-                const { deal, leadId, leadName, company } = row
-                const key = dealRowKey(row)
-                const meta = getDealStageMeta(deal.stage, { freightOrg: true })
-                const freight = deal.freight
-                const dates = filledDealMilestones(deal)
-                const isChecked = selected.has(key)
-                return (
-                  <tr
-                    key={key}
-                    className={`pipeline-deals-row ${isChecked ? 'is-checked' : ''}`}
-                    onClick={() => onOpenLead?.(leadId, 'deals')}
-                  >
-                    <td
-                      className="pipeline-deals-td pipeline-deals-td-check"
-                      onClick={(e) => e.stopPropagation()}
-                    >
+        <>
+          <ul className="pipeline-deals-mobile-list" aria-label="Deals">
+            {filteredRows.map((row) => {
+              const { deal, leadId, leadName, company } = row
+              const key = dealRowKey(row)
+              const meta = getDealStageMeta(deal.stage, { freightOrg: true })
+              const freight = deal.freight
+              const dates = filledDealMilestones(deal)
+              const isChecked = selected.has(key)
+              return (
+                <li key={`m-${key}`} className={`pipeline-deals-mobile-card ${isChecked ? 'is-checked' : ''}`}>
+                  <div className="pipeline-deals-mobile-card__top">
+                    <label className="pipeline-deals-mobile-card__check" onClick={(e) => e.stopPropagation()}>
                       <input
                         type="checkbox"
                         className="pipeline-hs-checkbox"
@@ -630,61 +588,166 @@ export default function PipelineDealsView({
                         aria-label={`Select ${deal.name}`}
                         onChange={(e) => toggleRow(row, e.target.checked)}
                       />
-                    </td>
-                    <td className="pipeline-deals-td pipeline-deals-td-deal">
-                      <span className="pipeline-deals-primary" title={deal.name}>
-                        {deal.name}
+                    </label>
+                    <button
+                      type="button"
+                      className="pipeline-deals-mobile-card__open"
+                      onClick={() => onOpenLead?.(leadId, 'deals')}
+                    >
+                      <span className="pipeline-deals-mobile-card__name">{deal.name}</span>
+                      <span className="pipeline-deals-mobile-card__lead">
+                        {leadName}
+                        {company && company !== leadName ? ` · ${company}` : ''}
                       </span>
+                      {freightOrg && freightRouteLabel(freight) !== '—' ? (
+                        <span className="pipeline-deals-mobile-card__route">{freightRouteLabel(freight)}</span>
+                      ) : null}
                       {dates.length > 0 ? (
-                        <span className="pipeline-deals-dates">
+                        <span className="pipeline-deals-mobile-card__dates">
                           {dates.map((field) => `${field.label} ${field.display}`).join(' · ')}
                         </span>
                       ) : null}
-                    </td>
-                    <td className="pipeline-deals-td">
-                      <p className="truncate" title={leadName}>
-                        {leadName}
-                      </p>
-                      {company && company !== leadName && (
-                        <p className="truncate text-[10px] text-gray-400" title={company}>
-                          {company}
-                        </p>
-                      )}
-                    </td>
-                    <td className="pipeline-deals-td whitespace-nowrap">
-                      {freightCustomerTypeLabel(freight?.customerType)}
-                    </td>
-                    <td className="pipeline-deals-td">
-                      <span
-                        className={`inline-block px-1.5 py-0.5 rounded border text-[10px] font-semibold uppercase ${meta.color}`}
-                      >
-                        {meta.label}
-                      </span>
-                    </td>
-                    <td className="pipeline-deals-td whitespace-nowrap">
+                    </button>
+                  </div>
+                  <div className="pipeline-deals-mobile-card__meta">
+                    <span
+                      className={`inline-block px-1.5 py-0.5 rounded border text-[10px] font-semibold uppercase ${meta.color}`}
+                    >
+                      {meta.label}
+                    </span>
+                    <span className="pipeline-deals-mobile-card__mode">
                       {transportModeLabel(freight?.transportMode)}
-                    </td>
-                    <td className="pipeline-deals-td pipeline-deals-td-route" title={freightRouteLabel(freight)}>
-                      {freightRouteLabel(freight)}
-                    </td>
-                    <td className="pipeline-deals-td pipeline-deals-td-num tabular-nums">
-                      {formatWeight(freight)}
-                    </td>
-                    <td className="pipeline-deals-td pipeline-deals-td-num tabular-nums font-medium">
+                    </span>
+                    <span className="pipeline-deals-mobile-card__amount tabular-nums font-semibold">
                       {formatDealValue(deal.amount, resolveFreightDealCurrency(deal))}
-                    </td>
-                    <td className="pipeline-deals-td pipeline-deals-td-num tabular-nums font-semibold">
-                      {formatDealValue(estimatedFreightRevenueInr(deal, usdInrRate), 'INR')}
-                    </td>
-                    <td className="pipeline-deals-td pipeline-deals-td-num tabular-nums text-gray-600">
-                      {formatDealValue(freight?.invoiceAmount, 'INR')}
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
+                    </span>
+                    <span className="pipeline-deals-mobile-card__rev tabular-nums">
+                      Rev {formatDealValue(estimatedFreightRevenueInr(deal, usdInrRate), 'INR')}
+                    </span>
+                  </div>
+                </li>
+              )
+            })}
+          </ul>
+          <div className="pipeline-deals-table-wrap">
+            <table className="pipeline-deals-table">
+              <colgroup>
+                <col className="pipeline-deals-col-check" />
+                <col className="pipeline-deals-col-deal" />
+                <col className="pipeline-deals-col-lead" />
+                <col className="pipeline-deals-col-type" />
+                <col className="pipeline-deals-col-stage" />
+                <col className="pipeline-deals-col-mode" />
+                <col className="pipeline-deals-col-route" />
+                <col className="pipeline-deals-col-weight" />
+                <col className="pipeline-deals-col-freight" />
+                <col className="pipeline-deals-col-revenue" />
+                <col className="pipeline-deals-col-invoice" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th className="pipeline-deals-th pipeline-deals-th-check">
+                    <input
+                      type="checkbox"
+                      className="pipeline-hs-checkbox"
+                      checked={allSelected}
+                      aria-label="Select all deals"
+                      onChange={(e) => toggleAll(e.target.checked)}
+                    />
+                  </th>
+                  <th className="pipeline-deals-th">Deal</th>
+                  <th className="pipeline-deals-th">Lead / company</th>
+                  <th className="pipeline-deals-th">Type</th>
+                  <th className="pipeline-deals-th">Stage</th>
+                  <th className="pipeline-deals-th">Mode</th>
+                  <th className="pipeline-deals-th">Route / lanes</th>
+                  <th className="pipeline-deals-th pipeline-deals-th-num">Gross</th>
+                  <th className="pipeline-deals-th pipeline-deals-th-num">Freight</th>
+                  <th className="pipeline-deals-th pipeline-deals-th-num">Revenue</th>
+                  <th className="pipeline-deals-th pipeline-deals-th-num">Invoice</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredRows.map((row) => {
+                  const { deal, leadId, leadName, company } = row
+                  const key = dealRowKey(row)
+                  const meta = getDealStageMeta(deal.stage, { freightOrg: true })
+                  const freight = deal.freight
+                  const dates = filledDealMilestones(deal)
+                  const isChecked = selected.has(key)
+                  return (
+                    <tr
+                      key={key}
+                      className={`pipeline-deals-row ${isChecked ? 'is-checked' : ''}`}
+                      onClick={() => onOpenLead?.(leadId, 'deals')}
+                    >
+                      <td
+                        className="pipeline-deals-td pipeline-deals-td-check"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <input
+                          type="checkbox"
+                          className="pipeline-hs-checkbox"
+                          checked={isChecked}
+                          aria-label={`Select ${deal.name}`}
+                          onChange={(e) => toggleRow(row, e.target.checked)}
+                        />
+                      </td>
+                      <td className="pipeline-deals-td pipeline-deals-td-deal">
+                        <span className="pipeline-deals-primary" title={deal.name}>
+                          {deal.name}
+                        </span>
+                        {dates.length > 0 ? (
+                          <span className="pipeline-deals-dates">
+                            {dates.map((field) => `${field.label} ${field.display}`).join(' · ')}
+                          </span>
+                        ) : null}
+                      </td>
+                      <td className="pipeline-deals-td">
+                        <p className="truncate" title={leadName}>
+                          {leadName}
+                        </p>
+                        {company && company !== leadName && (
+                          <p className="truncate text-[10px] text-gray-400" title={company}>
+                            {company}
+                          </p>
+                        )}
+                      </td>
+                      <td className="pipeline-deals-td whitespace-nowrap">
+                        {freightCustomerTypeLabel(freight?.customerType)}
+                      </td>
+                      <td className="pipeline-deals-td">
+                        <span
+                          className={`inline-block px-1.5 py-0.5 rounded border text-[10px] font-semibold uppercase ${meta.color}`}
+                        >
+                          {meta.label}
+                        </span>
+                      </td>
+                      <td className="pipeline-deals-td whitespace-nowrap">
+                        {transportModeLabel(freight?.transportMode)}
+                      </td>
+                      <td className="pipeline-deals-td pipeline-deals-td-route" title={freightRouteLabel(freight)}>
+                        {freightRouteLabel(freight)}
+                      </td>
+                      <td className="pipeline-deals-td pipeline-deals-td-num tabular-nums">
+                        {formatWeight(freight)}
+                      </td>
+                      <td className="pipeline-deals-td pipeline-deals-td-num tabular-nums font-medium">
+                        {formatDealValue(deal.amount, resolveFreightDealCurrency(deal))}
+                      </td>
+                      <td className="pipeline-deals-td pipeline-deals-td-num tabular-nums font-semibold">
+                        {formatDealValue(estimatedFreightRevenueInr(deal, usdInrRate), 'INR')}
+                      </td>
+                      <td className="pipeline-deals-td pipeline-deals-td-num tabular-nums text-gray-600">
+                        {formatDealValue(freight?.invoiceAmount, 'INR')}
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
       <SaveReportModal
         open={saveReportOpen}

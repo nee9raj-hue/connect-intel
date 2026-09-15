@@ -507,8 +507,26 @@ export function getDesktopPillSubmenuTargets(pillItem, sections = []) {
     return []
   }
 
+  /** Nested Leads/Deals stage groups → flat navigable leaf targets. */
+  const flattenLeaves = (nodes = []) => {
+    const leaves = []
+    for (const node of nodes) {
+      if (node.children?.length) {
+        for (const nested of node.children) {
+          leaves.push({
+            ...nested,
+            label: node.label ? `${node.label} · ${nested.label}` : nested.label,
+          })
+        }
+      } else if (node.panel) {
+        leaves.push(node)
+      }
+    }
+    return leaves
+  }
+
   if (pillItem.panel === 'pipeline') {
-    return groupChildren((g) => g.id === 'pipeline')
+    return flattenLeaves(groupChildren((g) => g.id === 'pipeline'))
   }
   if (pillItem.panel === 'marketing') {
     const kids = groupChildren((g) => g.id === 'marketing')

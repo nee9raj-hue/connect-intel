@@ -47,7 +47,11 @@ const ICONS = {
 }
 
 function pillItemActive(activePanel, panelOptions, item) {
-  if (item.matchPanelOnly) return activePanel === item.panel
+  if (item.matchPanelOnly) {
+    if (activePanel !== item.panel) return false
+    if (item.panel === 'pipeline' && panelOptions?.view === 'deals') return false
+    return true
+  }
   return isNavTargetActive(activePanel, panelOptions, item)
 }
 
