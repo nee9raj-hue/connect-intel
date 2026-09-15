@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-15T16:30:15.605Z",
-  "updatedAtIst": "15/09/2026, 22:00:15",
+  "updatedAt": "2026-09-15T16:46:38.444Z",
+  "updatedAtIst": "15/09/2026, 22:16:38",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "d874acd",
+  "currentProductionCommit": "efd7f1a",
   "entries": [
+    {
+      "logId": "20260915-2216-efd7f1a",
+      "commit": "efd7f1a",
+      "commitFull": "efd7f1a79289d9ad85b2cb98c70046926474ee58",
+      "message": "Let reps record actual RFQ, quote, booked, won, and lost dates on deals.",
+      "deployedAt": "2026-09-15T16:46:13.037Z",
+      "deployedAtIst": "15/09/2026, 22:16:13",
+      "committedAtIst": "15/09/2026, 22:15:26",
+      "vercelPreviewUrl": "https://connect-intel-oqrhodnvp-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- efd7f1a"
+    },
+    {
+      "logId": "20260915-2200-c3d00e3",
+      "commit": "c3d00e3",
+      "commitFull": "c3d00e3eced9d77d2064b16550254665c35bea12",
+      "message": "Record production deploy d874acd as LIVE.",
+      "deployedAt": "2026-09-15T16:30:59.085Z",
+      "deployedAtIst": "15/09/2026, 22:00:59",
+      "committedAtIst": "15/09/2026, 22:00:20",
+      "vercelPreviewUrl": "https://connect-intel-oex9p0yv1-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- c3d00e3"
+    },
     {
       "logId": "20260915-2159-d874acd",
       "commit": "d874acd",
@@ -15,7 +43,7 @@
       "committedAtIst": "15/09/2026, 21:59:11",
       "vercelPreviewUrl": "https://connect-intel-e9hr0f24c-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- d874acd"
     },
@@ -256,20 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 28c3c92"
-    },
-    {
-      "logId": "20260714-1015-aa2acb7",
-      "commit": "aa2acb7",
-      "commitFull": "aa2acb72572a36248e4419d2673456c52bb1e834",
-      "message": "Add Infrastructure V2 P4 storage adapters and harden Azure SSO.",
-      "deployedAt": "2026-07-14T04:45:49.907Z",
-      "deployedAtIst": "14/07/2026, 10:15:49",
-      "committedAtIst": "14/07/2026, 10:15:17",
-      "vercelPreviewUrl": "https://connect-intel-buzpup2lm-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- aa2acb7"
     }
   ]
 }
