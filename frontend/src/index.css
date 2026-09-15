@@ -3041,37 +3041,24 @@ button.ci-lead-tag:disabled {
 }
 
 .pipeline-deals-filters__stages {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  min-width: 0;
+  position: relative;
+  z-index: 6;
+  min-width: 9.5rem;
 }
 
-.pipeline-deals-filters__stage-list {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.35rem;
-}
-
-.pipeline-deals-filters__stage {
-  font-size: 0.6875rem;
-  font-weight: 600;
-  color: #516f90;
+.pipeline-deals-filters__stages .crm-filter-btn {
+  width: 100%;
+  justify-content: space-between;
+  min-height: 2.05rem;
   background: #fff;
   border: 1px solid #cbd6e2;
-  border-radius: 999px;
-  padding: 0.28rem 0.65rem;
-  cursor: pointer;
-  line-height: 1.2;
-}
-
-.pipeline-deals-filters__stage:hover {
-  border-color: #7c98b6;
+  border-radius: 6px;
   color: #33475b;
+  font-size: 0.75rem;
+  padding: 0.35rem 0.5rem;
 }
 
-.pipeline-deals-filters__stage.is-on {
+.pipeline-deals-filters__stages .crm-filter-btn-active {
   background: #fff4ee;
   border-color: #ffd4b8;
   color: #c2410c;

@@ -18,6 +18,7 @@ import {
   dealFilterDateInputValue,
 } from '../../lib/pipelineDealsFilter'
 import { DashboardSegmented } from '../dashboard/dashboardUi'
+import FilterDropdown from './FilterDropdown'
 import SaveReportModal from './SaveReportModal'
 
 function formatWeight(freight) {
@@ -283,13 +284,13 @@ export default function PipelineDealsView({
     }
   }
 
-  const toggleStageFilter = (stageId) => {
-    setSelectedStages((prev) => {
-      const id = String(stageId)
-      return prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
-    })
-    setSelected(new Set())
-  }
+  const stageFilterDisplay = useMemo(() => {
+    if (!selectedStages.length) return null
+    const labels = FREIGHT_DEAL_STAGES.filter((s) => selectedStages.includes(s.id)).map((s) => s.label)
+    if (!labels.length) return null
+    if (labels.length === 1) return labels[0]
+    return `${labels[0]} +${labels.length - 1}`
+  }, [selectedStages])
 
   const markBulkLost = () => {
     const reason = window.prompt('Lost reason (optional — applies to all selected):', '') ?? null
@@ -436,35 +437,27 @@ export default function PipelineDealsView({
               aria-label="Filter to date"
             />
           </label>
-        </div>
-        {isAllDealsView ? (
-          <div className="pipeline-deals-filters__stages" role="group" aria-label="Deal stages">
-            <span className="pipeline-deals-filters__label">Stages</span>
-            <div className="pipeline-deals-filters__stage-list">
-              {FREIGHT_DEAL_STAGES.map((stage) => {
-                const pressed = selectedStages.includes(stage.id)
-                return (
-                  <button
-                    key={stage.id}
-                    type="button"
-                    className={`pipeline-deals-filters__stage ${pressed ? 'is-on' : ''}`}
-                    aria-pressed={pressed}
-                    onClick={() => toggleStageFilter(stage.id)}
-                    title={
-                      selectedStages.length === 0
-                        ? 'All stages. Click to filter to this stage.'
-                        : pressed
-                          ? 'Remove this stage'
-                          : 'Add this stage'
-                    }
-                  >
-                    {stage.label}
-                  </button>
-                )
-              })}
+          {isAllDealsView ? (
+            <div className="pipeline-deals-filters__stages">
+              <FilterDropdown
+                label="Stages"
+                multiSelect
+                values={selectedStages}
+                displayValue={stageFilterDisplay}
+                options={FREIGHT_DEAL_STAGES.map((stage) => ({
+                  id: stage.id,
+                  value: stage.id,
+                  label: stage.label,
+                }))}
+                emptyLabel="All stages"
+                onMultiChange={(next) => {
+                  setSelectedStages((next || []).map(String))
+                  setSelected(new Set())
+                }}
+              />
             </div>
-          </div>
-        ) : null}
+          ) : null}
+        </div>
         {rangeLabel ? (
           <p className="pipeline-deals-filters__week-hint">{rangeLabel}</p>
         ) : (
