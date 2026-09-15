@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 83b8beb
+npm run prod:rollback -- d1f1474
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 83b8beb
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `2f8de67` |
-| Log updated (IST) | 15/09/2026, 21:48:44 |
+| Commit | `f30b3e6` |
+| Log updated (IST) | 15/09/2026, 21:55:07 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 83b8beb
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 15/09/2026, 21:48:23 | `2f8de67` | Treat ocean freight as USD and convert revenue to INR. | [preview](https://connect-intel-fzkw3fjnq-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2f8de67` | **← LIVE**
+| 15/09/2026, 21:54:46 | `f30b3e6` | Show freight fields on open deals so reps can update quoted rates. | [preview](https://connect-intel-orlb9dgld-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f30b3e6` | **← LIVE**
+| 15/09/2026, 21:49:27 | `d1f1474` | Record production deploy 2f8de67 as LIVE. | [preview](https://connect-intel-exhj1cl31-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d1f1474` |
+| 15/09/2026, 21:48:23 | `2f8de67` | Treat ocean freight as USD and convert revenue to INR. | [preview](https://connect-intel-fzkw3fjnq-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2f8de67` |
 | 15/09/2026, 21:35:31 | `83b8beb` | Record production deploy bc4ccd6 as LIVE. | [preview](https://connect-intel-in15dktzu-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 83b8beb` |
 | 15/09/2026, 21:33:49 | `bc4ccd6` | Replace All Deals stage pills with a multi-select dropdown. | [preview](https://connect-intel-g4ykah2i0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- bc4ccd6` |
 | 15/09/2026, 21:24:28 | `1901df4` | Record production deploy d5cf838 as LIVE. | [preview](https://connect-intel-q5wgk6kvt-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1901df4` |

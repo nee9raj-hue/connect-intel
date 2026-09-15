@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-15T16:18:44.478Z",
-  "updatedAtIst": "15/09/2026, 21:48:44",
+  "updatedAt": "2026-09-15T16:25:07.399Z",
+  "updatedAtIst": "15/09/2026, 21:55:07",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "2f8de67",
+  "currentProductionCommit": "f30b3e6",
   "entries": [
+    {
+      "logId": "20260915-2154-f30b3e6",
+      "commit": "f30b3e6",
+      "commitFull": "f30b3e65ce44b3c890d5bbd88ad5039c5afddcd0",
+      "message": "Show freight fields on open deals so reps can update quoted rates.",
+      "deployedAt": "2026-09-15T16:24:46.445Z",
+      "deployedAtIst": "15/09/2026, 21:54:46",
+      "committedAtIst": "15/09/2026, 21:54:07",
+      "vercelPreviewUrl": "https://connect-intel-orlb9dgld-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- f30b3e6"
+    },
+    {
+      "logId": "20260915-2149-d1f1474",
+      "commit": "d1f1474",
+      "commitFull": "d1f1474c37965f8fb703019acfeb613066eea929",
+      "message": "Record production deploy 2f8de67 as LIVE.",
+      "deployedAt": "2026-09-15T16:19:27.508Z",
+      "deployedAtIst": "15/09/2026, 21:49:27",
+      "committedAtIst": "15/09/2026, 21:48:49",
+      "vercelPreviewUrl": "https://connect-intel-exhj1cl31-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- d1f1474"
+    },
     {
       "logId": "20260915-2148-2f8de67",
       "commit": "2f8de67",
@@ -15,7 +43,7 @@
       "committedAtIst": "15/09/2026, 21:47:44",
       "vercelPreviewUrl": "https://connect-intel-fzkw3fjnq-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 2f8de67"
     },
