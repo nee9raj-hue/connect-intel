@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
-import { CRM_STATUSES, formatCrmDate, getStatusMeta, getVisiblePipelineColumns } from '../../lib/crmConstants'
+import { CRM_STATUSES, formatCrmDate, getDealStageMeta, getStatusMeta, getVisiblePipelineColumns } from '../../lib/crmConstants'
 import { canAssignPipelineLeads } from '../../lib/pipelineAssignAccess'
 import {
   getDefaultPipelineId,
@@ -268,7 +268,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   ])
 
   const freightOrg = isFreightDealOrg(user)
-  const isDealsView = freightOrg && panelOptions?.view === 'deals'
+  const isDealsView = panelOptions?.view === 'deals'
   const dealsStage = panelOptions?.dealStage || 'all'
 
   const teamMemberIdsForFilter = useMemo(() => {
@@ -1016,6 +1016,11 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       (pipelineLoad.total > pipelineLoad.loaded && pipelineLoad.loaded > 0))
 
   const mobileHeaderStats = useMemo(() => {
+    if (isDealsView) {
+      const stageLabel =
+        dealsStage === 'all' ? 'All deals' : getDealStageMeta(dealsStage, { freightOrg }).label
+      return stageLabel
+    }
     if (assigneeName) return `Viewing ${assigneeName}`
     if (pipelineSummary.total === 0) return null
     const parts = []
@@ -1028,6 +1033,9 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     if (hasMoreLeads) parts.push(`${pipelineLoad.loaded.toLocaleString()} loaded`)
     return parts.join(' · ')
   }, [
+    isDealsView,
+    dealsStage,
+    freightOrg,
     assigneeName,
     pipelineSummary.total,
     savedLeads.length,
@@ -1427,6 +1435,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
             <PipelineMobileHeaderChrome
               statsText={mobileHeaderStats}
               stageListMode={stageListMode}
+              dealsMode={isDealsView}
               view={view}
               onViewChange={setView}
             />,
@@ -1441,7 +1450,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       <div
         className={`crm-workspace flex-1 min-w-0 min-h-0 flex flex-col ${
           selectedLead ? 'hidden md:flex' : 'flex'
-        } ${useHubSpotList ? 'pipeline-list-workspace pipeline-page-premium' : ''}`}
+        } ${useHubSpotList || isDealsView ? 'pipeline-list-workspace pipeline-page-premium' : ''}`}
       >
         <MyDayReturnBar panelOptions={panelOptions} onNavigate={onNavigate} />
         <header className="crm-page-header pipeline-page-header pipeline-v2-header">
@@ -1591,7 +1600,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
         <div className="crm-page-body flex-1 min-h-0">
           <div
             className={`crm-content-card flex-1 min-h-0 ${
-              useHubSpotList
+              useHubSpotList || isDealsView
                 ? 'crm-content-card--pipeline-table'
                 : view === 'board' && !stageListMode
                   ? 'crm-content-card--pipeline-board'
@@ -1677,7 +1686,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
 
           <div
             className={`crm-content-scroll pipeline-scroll-area ${
-              view === 'board' && !stageListMode ? 'crm-content-scroll-board' : ''
+              view === 'board' && !stageListMode && !isDealsView ? 'crm-content-scroll-board' : ''
             }`}
           >
           {isDealsView ? (

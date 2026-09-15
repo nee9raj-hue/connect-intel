@@ -3247,6 +3247,113 @@ button.ci-lead-tag:disabled {
 
 @media (max-width: 767px) {
   .pipeline-deals-table-wrap {
+    display: none;
+  }
+
+  .pipeline-deals-mobile-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pipeline-deals-mobile-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    padding: 0.75rem 0.85rem;
+    background: #fff;
+    border: 1px solid #dfe3eb;
+    border-radius: 10px;
+  }
+
+  .pipeline-deals-mobile-card.is-checked {
+    background: #f0f9fc;
+    border-color: #b7e0ea;
+  }
+
+  .pipeline-deals-mobile-card__top {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.55rem;
+  }
+
+  .pipeline-deals-mobile-card__check {
+    display: flex;
+    align-items: center;
+    padding-top: 0.15rem;
+  }
+
+  .pipeline-deals-mobile-card__open {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.15rem;
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .pipeline-deals-mobile-card__name {
+    font-size: 0.8125rem;
+    font-weight: 650;
+    color: #1f2d3d;
+    letter-spacing: -0.015em;
+  }
+
+  .pipeline-deals-mobile-card__lead,
+  .pipeline-deals-mobile-card__route,
+  .pipeline-deals-mobile-card__dates {
+    font-size: 0.6875rem;
+    color: #516f90;
+    line-height: 1.35;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+  }
+
+  .pipeline-deals-mobile-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.65rem;
+    padding-left: 1.65rem;
+  }
+
+  .pipeline-deals-mobile-card__mode {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: #516f90;
+  }
+
+  .pipeline-deals-mobile-card__amount {
+    font-size: 0.75rem;
+    color: #33475b;
+    margin-left: auto;
+  }
+
+  .pipeline-deals-mobile-card__rev {
+    font-size: 0.6875rem;
+    color: #7c98b6;
+  }
+}
+
+@media (min-width: 768px) {
+  .pipeline-deals-mobile-list {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .pipeline-deals-table-wrap {
     border-radius: 6px;
   }
 

@@ -2,9 +2,12 @@
 export default function PipelineMobileHeaderChrome({
   statsText,
   stageListMode = false,
+  dealsMode = false,
   view,
   onViewChange,
 }) {
+  const hideViewToggle = stageListMode || dealsMode
+
   return (
     <div className="ci-pipeline-mobile-header" role="group" aria-label="Pipeline summary">
       {statsText ? (
@@ -12,7 +15,7 @@ export default function PipelineMobileHeaderChrome({
           {statsText}
         </p>
       ) : null}
-      {!stageListMode ? (
+      {!hideViewToggle ? (
         <div className="crm-view-tabs crm-view-tabs--compact">
           {[
             { id: 'board', label: 'Board' },
