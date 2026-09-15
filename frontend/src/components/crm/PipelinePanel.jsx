@@ -19,6 +19,7 @@ import { PipelineBulkAssignModal, PipelineBulkEditModal } from './PipelineBulkMo
 import BulkLeadTagsModal from './BulkLeadTagsModal'
 import PipelineViewSettings from './PipelineViewSettings'
 import PipelineLeadsTable from './PipelineLeadsTable'
+import PipelineDealsView from './PipelineDealsView'
 import LeadTagDots from './LeadTagDots'
 import PipelineFiltersBar, { DEFAULT_PIPELINE_FILTERS } from './PipelineFiltersBar'
 import PipelineMobileHeaderChrome from './PipelineMobileHeaderChrome'
