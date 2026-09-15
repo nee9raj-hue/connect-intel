@@ -7,7 +7,9 @@ export function isStaleAssetError(message) {
     m.includes('failed to fetch dynamically imported module') ||
     m.includes('error loading dynamically imported module') ||
     m.includes('unable to preload css') ||
-    m.includes('dynamically imported module')
+    m.includes('dynamically imported module') ||
+    m.includes('pipelinedealsview is not defined') ||
+    (m.includes(' is not defined') && m.includes('pipeline'))
   )
 }
 
@@ -39,7 +41,7 @@ export async function clearPwaCachesAndReload() {
   window.location.reload()
 }
 
-function tryAutoRecover(message) {
+export function tryAutoRecover(message) {
   if (!isStaleAssetError(message)) return false
   if (sessionStorage.getItem(RECOVERY_KEY)) return false
   try {

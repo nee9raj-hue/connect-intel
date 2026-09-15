@@ -1,5 +1,5 @@
 import { Component } from 'react'
-import { clearPwaCachesAndReload, isStaleAssetError } from '../../lib/deployRecovery.js'
+import { clearPwaCachesAndReload, isStaleAssetError, tryAutoRecover } from '../../lib/deployRecovery.js'
 
 export default class ErrorBoundary extends Component {
   constructor(props) {
@@ -12,6 +12,7 @@ export default class ErrorBoundary extends Component {
   }
 
   componentDidCatch(error, info) {
+    if (tryAutoRecover(error?.message || '')) return
     const payload = {
       message: error?.message || 'React error',
       stack: [error?.stack, info?.componentStack].filter(Boolean).join('\n'),
@@ -39,8 +40,7 @@ export default class ErrorBoundary extends Component {
           <button
             type="button"
             onClick={() => {
-              if (staleAssets) void clearPwaCachesAndReload()
-              else window.location.reload()
+              void clearPwaCachesAndReload()
             }}
             className="mt-5 rounded-xl bg-[#17191c] px-4 py-2.5 text-sm font-semibold text-white"
           >
