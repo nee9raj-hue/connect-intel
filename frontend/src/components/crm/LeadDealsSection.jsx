@@ -5,10 +5,11 @@ import {
   getDealStageMeta,
   getDealStagesForFreight,
   isClosedDealStage,
+  DEAL_STAGES,
 } from '../../lib/crmConstants'
 import { formatDealValue } from '../../lib/crmTimeline'
 import { buildAutoDealName } from '../../lib/dealNaming'
-import { emptyFreightRfq, isFreightDealOrg, freightRateUnitLabel, isOceanTransportMode, resolveFreightDealCurrency, estimatedFreightRevenueInr, FALLBACK_USD_INR } from '../../lib/freightDeal'
+import { emptyFreightRfq, isFreightDealOrg, freightRateUnitLabel, isOceanTransportMode, resolveFreightDealCurrency, estimatedFreightRevenueInr, FALLBACK_USD_INR, FREIGHT_DEAL_STAGES } from '../../lib/freightDeal'
 import FreightDealFields, { formatFreightSummary, freightDealCreateLabel } from './FreightDealFields'
 import { getFreightCustomerTypeMeta } from '../../lib/freightDeal'
 import DealShareActions from './DealShareActions'
@@ -70,15 +71,22 @@ function DealRow({
   const [lostReason, setLostReason] = useState('')
   const [showLost, setShowLost] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
-  const [showFreight, setShowFreight] = useState(() => Boolean(freightOrg) && !isClosedDealStage(deal.stage))
+  const [showFreight, setShowFreight] = useState(() => Boolean(freightOrg))
   const [freightDraft, setFreightDraft] = useState(deal.freight || emptyFreightRfq())
   const [amountDraft, setAmountDraft] = useState(deal.amount ?? '')
   const [nameDraft, setNameDraft] = useState(deal.name || '')
   const closed = isClosedDealStage(deal.stage)
-  const stageOptions = getDealStagesForFreight(freightOrg)
+  const stageOptions = freightOrg ? FREIGHT_DEAL_STAGES : DEAL_STAGES
   const typeMeta = getFreightCustomerTypeMeta(deal.freight?.customerType)
   const freightSummary = formatFreightSummary(deal.freight)
-  const ocean = freightOrg && isOceanTransportMode((showFreight ? freightDraft : deal.freight)?.transportMode)
+  const rateMode = (showFreight ? freightDraft : deal.freight)?.transportMode
+  const ocean = freightOrg && isOceanTransportMode(rateMode)
+
+  const toggleFreightEditor = () => {
+    setFreightDraft(deal.freight || emptyFreightRfq())
+    setAmountDraft(deal.amount ?? '')
+    setShowFreight((v) => !v)
+  }
 
   useEffect(() => {
     setNameDraft(deal.name || '')
@@ -152,46 +160,44 @@ function DealRow({
         </div>
       )}
 
-      {!closed && (
-        <>
-          <div className="lw-deal-card__controls">
-            <LwField label="Stage">
-              <LwSelect
-                value={deal.stage}
-                disabled={busy}
-                onChange={(e) => onUpdate(deal.id, { stage: e.target.value })}
-                aria-label="Stage"
-              >
-                {stageOptions.filter((s) => !isClosedDealStage(s.id)).map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.label}
-                  </option>
-                ))}
-              </LwSelect>
-            </LwField>
-            <LwField label={freightOrg ? `Freight ${freightRateUnitLabel((showFreight ? freightDraft : deal.freight)?.transportMode)}` : 'Amount ₹'}>
-              <FreightAmountInput
-                freightOrg={freightOrg}
-                transportMode={(showFreight ? freightDraft : deal.freight)?.transportMode}
-                type="number"
-                min={0}
-                step="0.01"
-                value={amountDraft}
-                disabled={busy}
-                placeholder={freightOrg ? freightRateUnitLabel((showFreight ? freightDraft : deal.freight)?.transportMode) : 'Amount ₹'}
-                aria-label={
-                  ocean ? 'Freight in US dollars per CBM' : freightOrg ? 'Freight amount' : 'Amount'
-                }
-                onChange={(e) => setAmountDraft(e.target.value)}
-                onBlur={(e) => {
-                  const val = e.target.value === '' ? null : Number(e.target.value)
-                  if (val !== deal.amount) onUpdate(deal.id, { amount: val })
-                }}
-              />
-            </LwField>
-          </div>
+      <div className="lw-deal-card__controls">
+        <LwField label="Stage">
+          <LwSelect
+            value={deal.stage}
+            disabled={busy}
+            onChange={(e) => onUpdate(deal.id, { stage: e.target.value })}
+            aria-label="Stage"
+          >
+            {stageOptions.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.label}
+              </option>
+            ))}
+          </LwSelect>
+        </LwField>
+        <LwField label={freightOrg ? `Freight ${freightRateUnitLabel(rateMode)}` : 'Amount ₹'}>
+          <FreightAmountInput
+            freightOrg={freightOrg}
+            transportMode={rateMode}
+            type="number"
+            min={0}
+            step="0.01"
+            value={amountDraft}
+            disabled={busy}
+            placeholder={freightOrg ? freightRateUnitLabel(rateMode) : 'Amount ₹'}
+            aria-label={ocean ? 'Freight in US dollars per CBM' : freightOrg ? 'Freight amount' : 'Amount'}
+            onChange={(e) => setAmountDraft(e.target.value)}
+            onBlur={(e) => {
+              const val = e.target.value === '' ? null : Number(e.target.value)
+              if (val !== deal.amount) onUpdate(deal.id, { amount: val })
+            }}
+          />
+        </LwField>
+      </div>
 
-          <div className="lw-deal-card__actions">
+      <div className="lw-deal-card__actions">
+        {!closed ? (
+          <>
             <button type="button" disabled={busy} onClick={() => onWon(deal.id)} className="lw-deal-action lw-deal-action--won">
               <CheckIcon aria-hidden />
               Won
@@ -205,86 +211,56 @@ function DealRow({
               <CloseIcon aria-hidden />
               Lost
             </button>
-            <button
-              type="button"
-              disabled={busy}
-              onClick={() => {
-                setFreightDraft(deal.freight || emptyFreightRfq())
-                setAmountDraft(deal.amount ?? '')
-                setShowFreight((v) => !v)
-              }}
-              className="lw-deal-action"
-            >
-              {showFreight ? 'Hide freight' : 'Edit freight'}
-            </button>
-            <button type="button" disabled={busy} onClick={() => onDuplicate(deal.id)} className="lw-deal-action lw-deal-action--icon" title="Duplicate">
-              <CopyIcon aria-hidden />
-            </button>
-            {!confirmDelete ? (
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => setConfirmDelete(true)}
-                className="lw-deal-action lw-deal-action--danger lw-deal-action--icon"
-                title="Delete"
-              >
-                <TrashIcon aria-hidden />
-              </button>
-            ) : (
-              <>
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={() => {
-                    onDelete(deal.id)
-                    setConfirmDelete(false)
-                  }}
-                  className="lw-deal-action lw-deal-action--danger"
-                >
-                  Confirm delete
-                </button>
-                <button type="button" disabled={busy} onClick={() => setConfirmDelete(false)} className="lw-deal-action">
-                  Cancel
-                </button>
-              </>
-            )}
-          </div>
-
-          {showLost && (
-            <div className="lw-deal-lost-form">
-              <LwInput
-                value={lostReason}
-                onChange={(e) => setLostReason(e.target.value)}
-                placeholder="Reason (optional)"
-              />
-              <button type="button" disabled={busy} onClick={() => onLost(deal.id, lostReason)} className="lw-deal-action lw-deal-action--lost">
-                Save
-              </button>
-            </div>
-          )}
-        </>
-      )}
-
-      {closed && (
-        <div className="lw-deal-card__actions">
-          <button type="button" disabled={busy} onClick={() => onDuplicate(deal.id)} className="lw-deal-action">
-            <CopyIcon aria-hidden />
-            Duplicate
+          </>
+        ) : null}
+        {freightOrg ? (
+          <button type="button" disabled={busy} onClick={toggleFreightEditor} className="lw-deal-action">
+            {showFreight ? 'Hide freight' : 'Edit freight'}
           </button>
-          {freightOrg ? (
+        ) : null}
+        <button type="button" disabled={busy} onClick={() => onDuplicate(deal.id)} className="lw-deal-action lw-deal-action--icon" title="Duplicate">
+          <CopyIcon aria-hidden />
+        </button>
+        {!confirmDelete ? (
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => setConfirmDelete(true)}
+            className="lw-deal-action lw-deal-action--danger lw-deal-action--icon"
+            title="Delete"
+          >
+            <TrashIcon aria-hidden />
+          </button>
+        ) : (
+          <>
             <button
               type="button"
               disabled={busy}
               onClick={() => {
-                setFreightDraft(deal.freight || emptyFreightRfq())
-                setAmountDraft(deal.amount ?? '')
-                setShowFreight((v) => !v)
+                onDelete(deal.id)
+                setConfirmDelete(false)
               }}
-              className="lw-deal-action"
+              className="lw-deal-action lw-deal-action--danger"
             >
-              {showFreight ? 'Hide freight' : 'View freight'}
+              Confirm delete
             </button>
-          ) : null}
+            <button type="button" disabled={busy} onClick={() => setConfirmDelete(false)} className="lw-deal-action">
+              Cancel
+            </button>
+          </>
+        )}
+      </div>
+
+      {showLost && (
+        <div className="lw-deal-lost-form">
+          <LwInput
+            value={lostReason}
+            onChange={(e) => setLostReason(e.target.value)}
+            placeholder="Reason (optional)"
+          />
+          <button type="button" disabled={busy} onClick={() => onLost(deal.id, lostReason)} className="lw-deal-action lw-deal-action--lost">
+            Save
+          </button>
         </div>
       )}
 
@@ -301,7 +277,7 @@ function DealRow({
               min={0}
               step="0.01"
               value={amountDraft}
-              disabled={busy || closed}
+              disabled={busy}
               placeholder={freightRateUnitLabel(freightDraft.transportMode)}
               aria-label={
                 isOceanTransportMode(freightDraft.transportMode)
@@ -314,14 +290,12 @@ function DealRow({
           <FreightDealFields
             freight={freightDraft}
             onChange={setFreightDraft}
-            disabled={busy || closed}
+            disabled={busy}
             compact
           />
-          {!closed && (
-            <button type="button" disabled={busy} onClick={saveFreight} className="lw-deal-action lw-deal-action--won mt-2">
-              Save freight
-            </button>
-          )}
+          <button type="button" disabled={busy} onClick={saveFreight} className="lw-deal-action lw-deal-action--won mt-2">
+            Save freight
+          </button>
         </div>
       )}
 
