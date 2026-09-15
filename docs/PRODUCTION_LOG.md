@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 517d130
+npm run prod:rollback -- 49b5248
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 517d130
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `e08802c` |
-| Log updated (IST) | 15/09/2026, 11:03:25 |
+| Commit | `7a435e1` |
+| Log updated (IST) | 15/09/2026, 21:13:58 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 517d130
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 15/09/2026, 11:01:47 | `e08802c` | Fix sidebar Deals counts from pipeline_deals, matching Lost list. | [preview](https://connect-intel-2hztsi2nz-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e08802c` | **← LIVE**
+| 15/09/2026, 21:13:33 | `7a435e1` | Show All Deals with estimated freight revenue and stage filters. | [preview](https://connect-intel-8yok9odd1-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7a435e1` | **← LIVE**
+| 15/09/2026, 11:04:15 | `49b5248` | Record production deploy e08802c as LIVE. | [preview](https://connect-intel-h0wcafse4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 49b5248` |
+| 15/09/2026, 11:01:47 | `e08802c` | Fix sidebar Deals counts from pipeline_deals, matching Lost list. | [preview](https://connect-intel-2hztsi2nz-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e08802c` |
 | 15/09/2026, 09:55:11 | `517d130` | Clear stale PWA cache when PipelineDealsView is missing. | [preview](https://connect-intel-dr7z7wkl4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 517d130` |
 | 15/09/2026, 09:39:04 | `4cb761a` | Fix pipeline deals crash from missing PipelineDealsView import. | [preview](https://connect-intel-6ivfe60d8-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4cb761a` |
 | 14/07/2026, 13:29:42 | `3b47342` | Record production deploy f22177a as LIVE. | [preview](https://connect-intel-8np5lw2gs-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3b47342` |
@@ -56,8 +58,6 @@ npm run prod:rollback -- 517d130
 | 12/07/2026, 10:39:31 | `b55e909` | Add enterprise auth abstraction with Azure AD and Okta OIDC (Infrastructure V2 P3). | [preview](https://connect-intel-85nu9x8ys-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b55e909` |
 | 12/07/2026, 10:35:14 | `a2e6e63` | Add Postgres document store backend for Infrastructure V2 P2. | [preview](https://connect-intel-4an4dzqtu-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a2e6e63` |
 | 12/07/2026, 10:31:26 | `ec4aff0` | Complete Infrastructure V2 P1 pipeline GET migration per blueprint. | [preview](https://connect-intel-dif65ur29-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ec4aff0` |
-| 12/07/2026, 10:22:34 | `30c9ce8` | Migrate companies hub to platform repository layer (Infrastructure V2 P1). | [preview](https://connect-intel-8pctlhli8-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 30c9ce8` |
-| 12/07/2026, 10:00:36 | `d2b08f0` | Add Enterprise Infrastructure V2 platform kernel and Docker support. | [preview](https://connect-intel-2xcii1pf5-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d2b08f0` |
 
 ---
 

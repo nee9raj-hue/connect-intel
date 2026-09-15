@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-15T05:33:25.106Z",
-  "updatedAtIst": "15/09/2026, 11:03:25",
+  "updatedAt": "2026-09-15T15:43:58.028Z",
+  "updatedAtIst": "15/09/2026, 21:13:58",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "e08802c",
+  "currentProductionCommit": "7a435e1",
   "entries": [
+    {
+      "logId": "20260915-2113-7a435e1",
+      "commit": "7a435e1",
+      "commitFull": "7a435e1180e77b37770420842788d8241e09a841",
+      "message": "Show All Deals with estimated freight revenue and stage filters.",
+      "deployedAt": "2026-09-15T15:43:33.200Z",
+      "deployedAtIst": "15/09/2026, 21:13:33",
+      "committedAtIst": "15/09/2026, 21:12:48",
+      "vercelPreviewUrl": "https://connect-intel-8yok9odd1-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 7a435e1"
+    },
+    {
+      "logId": "20260915-1104-49b5248",
+      "commit": "49b5248",
+      "commitFull": "49b524856a0238f13acf2a4ce8f3e0b657fc2366",
+      "message": "Record production deploy e08802c as LIVE.",
+      "deployedAt": "2026-09-15T05:34:15.199Z",
+      "deployedAtIst": "15/09/2026, 11:04:15",
+      "committedAtIst": "15/09/2026, 11:03:35",
+      "vercelPreviewUrl": "https://connect-intel-h0wcafse4-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 49b5248"
+    },
     {
       "logId": "20260915-1101-e08802c",
       "commit": "e08802c",
@@ -15,7 +43,7 @@
       "committedAtIst": "15/09/2026, 11:01:07",
       "vercelPreviewUrl": "https://connect-intel-2hztsi2nz-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- e08802c"
     },
@@ -172,34 +200,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- ec4aff0"
-    },
-    {
-      "logId": "20260712-1022-30c9ce8",
-      "commit": "30c9ce8",
-      "commitFull": "30c9ce8f11db1f1635c1cce03b16ca7d3b82635c",
-      "message": "Migrate companies hub to platform repository layer (Infrastructure V2 P1).",
-      "deployedAt": "2026-07-12T04:52:34.837Z",
-      "deployedAtIst": "12/07/2026, 10:22:34",
-      "committedAtIst": "12/07/2026, 10:22:01",
-      "vercelPreviewUrl": "https://connect-intel-8pctlhli8-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 30c9ce8"
-    },
-    {
-      "logId": "20260712-1000-d2b08f0",
-      "commit": "d2b08f0",
-      "commitFull": "d2b08f0c4c4dc20cb9845e880272880cd28383c0",
-      "message": "Add Enterprise Infrastructure V2 platform kernel and Docker support.",
-      "deployedAt": "2026-07-12T04:30:36.514Z",
-      "deployedAtIst": "12/07/2026, 10:00:36",
-      "committedAtIst": "12/07/2026, 10:00:02",
-      "vercelPreviewUrl": "https://connect-intel-2xcii1pf5-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- d2b08f0"
     }
   ]
 }
