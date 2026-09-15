@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-15T15:43:58.028Z",
-  "updatedAtIst": "15/09/2026, 21:13:58",
+  "updatedAt": "2026-09-15T15:53:42.181Z",
+  "updatedAtIst": "15/09/2026, 21:23:42",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "7a435e1",
+  "currentProductionCommit": "d5cf838",
   "entries": [
+    {
+      "logId": "20260915-2123-d5cf838",
+      "commit": "d5cf838",
+      "commitFull": "d5cf8380645ed3738a8fc7184bba9708204a11df",
+      "message": "Show the same Lost deals in the list as in the sidebar count.",
+      "deployedAt": "2026-09-15T15:53:20.292Z",
+      "deployedAtIst": "15/09/2026, 21:23:20",
+      "committedAtIst": "15/09/2026, 21:22:41",
+      "vercelPreviewUrl": "https://connect-intel-nbgmun7tm-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- d5cf838"
+    },
+    {
+      "logId": "20260915-2114-e1ba15e",
+      "commit": "e1ba15e",
+      "commitFull": "e1ba15edf89ec00647d620e73098ff723b52ae6e",
+      "message": "Record production deploy 7a435e1 as LIVE.",
+      "deployedAt": "2026-09-15T15:44:47.398Z",
+      "deployedAtIst": "15/09/2026, 21:14:47",
+      "committedAtIst": "15/09/2026, 21:14:07",
+      "vercelPreviewUrl": "https://connect-intel-g3xw2ovrg-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- e1ba15e"
+    },
     {
       "logId": "20260915-2113-7a435e1",
       "commit": "7a435e1",
@@ -15,7 +43,7 @@
       "committedAtIst": "15/09/2026, 21:12:48",
       "vercelPreviewUrl": "https://connect-intel-8yok9odd1-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 7a435e1"
     },
@@ -172,34 +200,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- b55e909"
-    },
-    {
-      "logId": "20260712-1035-a2e6e63",
-      "commit": "a2e6e63",
-      "commitFull": "a2e6e63b41fe9225c56b671cbdd44fa7fa8a54d5",
-      "message": "Add Postgres document store backend for Infrastructure V2 P2.",
-      "deployedAt": "2026-07-12T05:05:14.525Z",
-      "deployedAtIst": "12/07/2026, 10:35:14",
-      "committedAtIst": "12/07/2026, 10:34:42",
-      "vercelPreviewUrl": "https://connect-intel-4an4dzqtu-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- a2e6e63"
-    },
-    {
-      "logId": "20260712-1031-ec4aff0",
-      "commit": "ec4aff0",
-      "commitFull": "ec4aff0166cabcea34ea07666ff1006f8c73e423",
-      "message": "Complete Infrastructure V2 P1 pipeline GET migration per blueprint.",
-      "deployedAt": "2026-07-12T05:01:26.466Z",
-      "deployedAtIst": "12/07/2026, 10:31:26",
-      "committedAtIst": "12/07/2026, 10:30:53",
-      "vercelPreviewUrl": "https://connect-intel-dif65ur29-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- ec4aff0"
     }
   ]
 }
