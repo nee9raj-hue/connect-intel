@@ -9,7 +9,6 @@ import {
   FREIGHT_CUSTOMER_TYPES,
   freightChargeableMeasure,
   freightGrossFieldLabel,
-  freightRateUnitLabel,
   formatFreightMeasure,
   getFreightCustomerTypeMeta,
   INCOTERM_OPTIONS,
@@ -208,7 +207,9 @@ function FreightMeasureSummary({ freight, boxes }) {
         </div>
       </div>
       {ocean ? (
-        <p className="text-[10px] text-gray-600 m-0">Ocean freight is quoted per CBM — enter rate as {freightRateUnitLabel('ocean')}.</p>
+        <p className="text-[10px] text-gray-600 m-0">
+          Ocean freight is quoted in USD per CBM — enter the dollar rate. Revenue converts to INR at the current USD rate.
+        </p>
       ) : null}
     </div>
   )

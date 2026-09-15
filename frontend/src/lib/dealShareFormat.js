@@ -7,6 +7,7 @@ import {
   formatFreightMeasure,
   freightGrossFieldLabel,
   getFreightCustomerTypeMeta,
+  resolveFreightDealCurrency,
   showsCourierFields,
   showsSpotRfqFields,
   TRANSPORT_MODE_OPTIONS,
@@ -144,7 +145,7 @@ function contactName(lead) {
 export function formatDealSharePlainText({ deal, lead, user, freightOrg = false }) {
   const stageMeta = getDealStageMeta(deal.stage, { freightOrg })
   const freight = deal.freight
-  const currency = deal.currency || 'INR'
+  const currency = resolveFreightDealCurrency(deal)
   const header = freightOrg ? 'FREIGHT DEAL' : 'DEAL SUMMARY'
   const divider = '─'.repeat(40)
 
@@ -161,11 +162,11 @@ export function formatDealSharePlainText({ deal, lead, user, freightOrg = false 
   const commercial = []
   if (deal.amount != null && deal.amount > 0) {
     const amountLabel =
-      freightOrg && freight?.transportMode === 'ocean' ? 'Freight rate (₹/CBM)' : freightOrg ? 'Freight charges' : 'Deal value'
+      freightOrg && freight?.transportMode === 'ocean' ? 'Freight rate ($/CBM)' : freightOrg ? 'Freight charges' : 'Deal value'
     commercial.push(line(amountLabel, formatDealValue(deal.amount, currency)))
   }
   if (freightOrg && freight?.invoiceAmount != null && freight.invoiceAmount > 0) {
-    commercial.push(line('Invoice amount', formatDealValue(freight.invoiceAmount, currency)))
+    commercial.push(line('Invoice amount', formatDealValue(freight.invoiceAmount, 'INR')))
   }
   if (deal.expectedCloseDate) {
     commercial.push(

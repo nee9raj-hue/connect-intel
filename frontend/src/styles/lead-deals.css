@@ -263,6 +263,41 @@
   padding: 7px 10px;
 }
 
+.lw-deal-amount-wrap {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.lw-deal-amount-wrap .lw-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.lw-deal-amount-wrap.is-usd .lw-input,
+.lw-deal-amount-wrap.is-inr .lw-input {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.lw-deal-amount-affix {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 0.55rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #33475b;
+  background: #f5f8fa;
+  border: 1px solid #cbd6e2;
+  border-right: none;
+  border-radius: 8px 0 0 8px;
+}
+
+.lw-deal-amount-wrap.is-usd .lw-deal-amount-affix {
+  color: #0f766e;
+  background: #f0fdfa;
+}
+
 .lw-deal-card__actions {
   display: flex;
   flex-wrap: wrap;

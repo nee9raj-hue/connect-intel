@@ -651,6 +651,7 @@ export const api = {
       timeoutMs: opts.timeoutMs ?? 30_000,
     }),
   getPublicConfig: () => request('/api/public-config', { silent: true }),
+  getUsdInrRate: () => request('/api/fx/usd-inr', { timeoutMs: 12_000 }, { silent: true }),
   drainBulkCrmEmail: (campaignId, opts = {}) =>
     request('/api/crm/bulk-email', {
       method: 'POST',

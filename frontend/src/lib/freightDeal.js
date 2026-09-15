@@ -18,12 +18,17 @@ export {
   freightChargeableWeightKg,
   freightChargeableMeasure,
   estimatedFreightRevenue,
+  estimatedFreightRevenueInr,
   sumEstimatedFreightRevenue,
   freightGrossFieldLabel,
   freightRateUnitLabel,
   formatFreightMeasure,
   totalVolumetricWeightKg,
   isOceanTransportMode,
+  resolveFreightDealCurrency,
+  hydrateFreightDealCurrency,
   isFreightDealOrg,
   getFreightDealStageMeta,
 } from '../../../lib/freightDeal.js'
+
+export { FALLBACK_USD_INR } from '../../../lib/usdInr.js'

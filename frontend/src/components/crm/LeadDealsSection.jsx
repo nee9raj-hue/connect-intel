@@ -8,7 +8,7 @@ import {
 } from '../../lib/crmConstants'
 import { formatDealValue } from '../../lib/crmTimeline'
 import { buildAutoDealName } from '../../lib/dealNaming'
-import { emptyFreightRfq, isFreightDealOrg, freightRateUnitLabel } from '../../lib/freightDeal'
+import { emptyFreightRfq, isFreightDealOrg, freightRateUnitLabel, isOceanTransportMode, resolveFreightDealCurrency, estimatedFreightRevenueInr, FALLBACK_USD_INR } from '../../lib/freightDeal'
 import FreightDealFields, { formatFreightSummary, freightDealCreateLabel } from './FreightDealFields'
 import { getFreightCustomerTypeMeta } from '../../lib/freightDeal'
 import DealShareActions from './DealShareActions'
@@ -37,6 +37,20 @@ function stageBadgeClass(stage, freightOrg) {
   return meta.color || 'bg-gray-50 text-gray-700 border-gray-200'
 }
 
+function FreightAmountInput({ transportMode, freightOrg, className = '', ...inputProps }) {
+  const ocean = Boolean(freightOrg && isOceanTransportMode(transportMode))
+  return (
+    <div className={`lw-deal-amount-wrap ${ocean ? 'is-usd' : freightOrg ? 'is-inr' : ''}`}>
+      {freightOrg ? (
+        <span className="lw-deal-amount-affix" aria-hidden>
+          {ocean ? '$' : '₹'}
+        </span>
+      ) : null}
+      <LwInput className={className} {...inputProps} />
+    </div>
+  )
+}
+
 function DealRow({
   deal,
   busy,
@@ -52,6 +66,7 @@ function DealRow({
   logCrmEmailSend,
   onNotice,
   onError,
+  usdInrRate = FALLBACK_USD_INR,
 }) {
   const [lostReason, setLostReason] = useState('')
   const [showLost, setShowLost] = useState(false)
@@ -102,13 +117,20 @@ function DealRow({
         </div>
         <div className="lw-deal-card__amount">
           {deal.amount != null && deal.amount > 0 ? (
-            <div className="lw-deal-card__amount-value">{formatDealValue(deal.amount, deal.currency)}</div>
+            <div className="lw-deal-card__amount-value">
+              {formatDealValue(deal.amount, resolveFreightDealCurrency(deal))}
+            </div>
           ) : (
             <div className="lw-deal-card__amount-sub">No amount</div>
           )}
+          {freightOrg && isOceanTransportMode(deal.freight?.transportMode) ? (
+            <div className="lw-deal-card__amount-sub">
+              Rev {formatDealValue(estimatedFreightRevenueInr(deal, usdInrRate), 'INR')}
+            </div>
+          ) : null}
           {freightOrg && deal.freight?.invoiceAmount > 0 && (
             <div className="lw-deal-card__amount-sub">
-              Inv {formatDealValue(deal.freight.invoiceAmount, deal.currency)}
+              Inv {formatDealValue(deal.freight.invoiceAmount, 'INR')}
             </div>
           )}
         </div>
@@ -136,13 +158,20 @@ function DealRow({
                 </option>
               ))}
             </LwSelect>
-            <LwInput
+            <FreightAmountInput
+              freightOrg={freightOrg}
+              transportMode={deal.freight?.transportMode}
               type="number"
               min={0}
+              step="0.01"
               defaultValue={deal.amount ?? ''}
               disabled={busy}
-              placeholder={freightOrg ? `Freight ${freightRateUnitLabel(deal.freight?.transportMode)}` : 'Amount ₹'}
-              aria-label="Amount"
+              placeholder={freightOrg ? freightRateUnitLabel(deal.freight?.transportMode) : 'Amount ₹'}
+              aria-label={
+                freightOrg && isOceanTransportMode(deal.freight?.transportMode)
+                  ? 'Freight in US dollars per CBM'
+                  : 'Amount'
+              }
               onBlur={(e) => {
                 const val = e.target.value === '' ? null : Number(e.target.value)
                 if (val !== deal.amount) onUpdate(deal.id, { amount: val })
@@ -284,6 +313,7 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
   const [feedback, setFeedback] = useState(null)
   const [showCreate, setShowCreate] = useState(deals.length === 0)
   const [listFilter, setListFilter] = useState('open')
+  const [usdInrRate, setUsdInrRate] = useState(FALLBACK_USD_INR)
 
   const { open, won, lost } = useMemo(() => {
     const o = []
@@ -326,6 +356,21 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
     setShowCreate(true)
     onNotice?.('RFQ fields prefilled from Copilot — review and save the deal.')
   }, [lead.id, freightOrg, consumePendingFreightRfq, onNotice])
+
+  useEffect(() => {
+    if (!freightOrg) return undefined
+    let cancelled = false
+    api
+      .getUsdInrRate()
+      .then((data) => {
+        const rate = Number(data?.rate)
+        if (!cancelled && Number.isFinite(rate) && rate > 0) setUsdInrRate(rate)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [freightOrg])
 
   const runDeal = async (body, okMsg) => {
     if (saving || busy) return false
@@ -371,6 +416,7 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
       company: lead.company || '',
       stage,
       amount: amount === '' ? null : Number(amount),
+      currency: resolveFreightDealCurrency({ freight }),
       expectedCloseDate: expectedCloseDate || null,
     }
     if (freightOrg) payload.freight = freight
@@ -480,12 +526,22 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
                 </LwSelect>
               </LwField>
               <LwField label={freightOrg ? `Freight ${freightRateUnitLabel(freight.transportMode)}` : 'Amount ₹'}>
-                <LwInput
+                <FreightAmountInput
+                  freightOrg={freightOrg}
+                  transportMode={freight.transportMode}
                   type="number"
                   min={0}
+                  step="0.01"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   placeholder="0"
+                  aria-label={
+                    freightOrg && isOceanTransportMode(freight.transportMode)
+                      ? 'Freight in US dollars per CBM'
+                      : freightOrg
+                        ? 'Freight amount'
+                        : 'Amount'
+                  }
                 />
               </LwField>
             </div>
@@ -528,6 +584,7 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
               logCrmEmailSend={logCrmEmailSend}
               onNotice={onNotice}
               onError={onError}
+              usdInrRate={usdInrRate}
             />
           ))}
         </ul>

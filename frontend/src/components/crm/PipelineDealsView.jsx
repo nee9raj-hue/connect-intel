@@ -9,7 +9,7 @@ import {
   transportModeLabel,
   freightCustomerTypeLabel,
 } from '../../lib/freightDeals'
-import { estimatedFreightRevenue, sumEstimatedFreightRevenue, FREIGHT_DEAL_STAGES } from '../../lib/freightDeal'
+import { estimatedFreightRevenueInr, sumEstimatedFreightRevenue, FREIGHT_DEAL_STAGES, resolveFreightDealCurrency, FALLBACK_USD_INR } from '../../lib/freightDeal'
 import {
   DEAL_TRANSPORT_FILTERS,
   filterPipelineDealRows,
@@ -52,6 +52,7 @@ export default function PipelineDealsView({
   const [selectedStages, setSelectedStages] = useState([])
   const [forecast, setForecast] = useState(null)
   const [forecastLoading, setForecastLoading] = useState(false)
+  const [usdInrRate, setUsdInrRate] = useState(FALLBACK_USD_INR)
 
   const timeZone = user?.timezone || undefined
 
@@ -70,8 +71,8 @@ export default function PipelineDealsView({
   )
 
   const estimatedRevenueTotal = useMemo(
-    () => Math.round(sumEstimatedFreightRevenue(filteredRows)),
-    [filteredRows]
+    () => Math.round(sumEstimatedFreightRevenue(filteredRows, usdInrRate)),
+    [filteredRows, usdInrRate]
   )
 
   const filtersActive =
@@ -161,6 +162,20 @@ export default function PipelineDealsView({
   useEffect(() => {
     if (canExportDeals) void loadSavedReports()
   }, [canExportDeals, loadSavedReports])
+
+  useEffect(() => {
+    let cancelled = false
+    api
+      .getUsdInrRate()
+      .then((data) => {
+        const rate = Number(data?.rate)
+        if (!cancelled && Number.isFinite(rate) && rate > 0) setUsdInrRate(rate)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -376,7 +391,7 @@ export default function PipelineDealsView({
             <strong className="pipeline-deals-forecast__value">
               {formatDealValue(estimatedRevenueTotal)}
             </strong>
-            <span className="pipeline-deals-forecast__hint">Chargeable wt × freight rate</span>
+            <span className="pipeline-deals-forecast__hint">Chargeable × freight (ocean USD→INR)</span>
           </article>
           <article className="pipeline-deals-forecast__card">
             <span className="pipeline-deals-forecast__label">Weighted forecast</span>
@@ -648,13 +663,13 @@ export default function PipelineDealsView({
                       {formatWeight(freight)}
                     </td>
                     <td className="pipeline-deals-td pipeline-deals-td-num tabular-nums font-medium">
-                      {formatDealValue(deal.amount, deal.currency)}
+                      {formatDealValue(deal.amount, resolveFreightDealCurrency(deal))}
                     </td>
                     <td className="pipeline-deals-td pipeline-deals-td-num tabular-nums font-semibold">
-                      {formatDealValue(estimatedFreightRevenue(deal), deal.currency)}
+                      {formatDealValue(estimatedFreightRevenueInr(deal, usdInrRate), 'INR')}
                     </td>
                     <td className="pipeline-deals-td pipeline-deals-td-num tabular-nums text-gray-600">
-                      {formatDealValue(freight?.invoiceAmount, deal.currency)}
+                      {formatDealValue(freight?.invoiceAmount, 'INR')}
                     </td>
                   </tr>
                 )
