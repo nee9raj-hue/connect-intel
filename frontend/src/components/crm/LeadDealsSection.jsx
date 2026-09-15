@@ -14,7 +14,7 @@ import FreightDealFields, { formatFreightSummary, freightDealCreateLabel } from 
 import { getFreightCustomerTypeMeta } from '../../lib/freightDeal'
 import DealShareActions from './DealShareActions'
 import DealMilestoneDates from './DealMilestoneDates'
-import { emptyDealMilestones, pickDealMilestones, DEAL_MILESTONE_IDS, resolveDealOutcome } from '../../lib/dealMilestones'
+import { emptyDealMilestones, pickDealMilestones, DEAL_MILESTONE_IDS, resolveDealOutcome, formatDealCalendarDate } from '../../lib/dealMilestones'
 import {
   LwField,
   LwFormStack,
@@ -26,6 +26,7 @@ import {
 import {
   CalendarIcon,
   CheckIcon,
+  ChevronDownIcon,
   CloseIcon,
   CopyIcon,
   PipelineIcon,
@@ -33,6 +34,24 @@ import {
   RouteIcon,
   TrashIcon,
 } from '../ui/icons'
+
+function dealListSortMs(deal) {
+  const calendar = [deal.bookedOn, deal.wonOn, deal.lostOn, deal.ratesQuotedOn, deal.queryReceivedOn]
+    .filter(Boolean)
+    .map((iso) => new Date(`${String(iso).slice(0, 10)}T12:00:00`).getTime())
+  const log = [deal.updatedAt, deal.createdAt]
+    .filter(Boolean)
+    .map((iso) => new Date(iso).getTime())
+  return Math.max(0, ...calendar, ...log)
+}
+
+function dealSummaryDate(deal) {
+  const calendar = [deal.bookedOn, deal.wonOn, deal.lostOn, deal.ratesQuotedOn, deal.queryReceivedOn]
+    .filter(Boolean)
+    .sort()
+    .at(-1)
+  return formatDealCalendarDate(calendar || deal.createdAt)
+}
 
 function stageBadgeClass(stage, freightOrg) {
   const meta = getDealStageMeta(stage, { freightOrg })
@@ -59,6 +78,8 @@ function DealRow({
   freightOrg,
   lead,
   user,
+  expanded = false,
+  onToggleExpand,
   onUpdate,
   onWon,
   onLost,
@@ -73,7 +94,7 @@ function DealRow({
   const [lostReason, setLostReason] = useState('')
   const [showLost, setShowLost] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
-  const [showFreight, setShowFreight] = useState(() => Boolean(freightOrg))
+  const [showFreight, setShowFreight] = useState(false)
   const [freightDraft, setFreightDraft] = useState(deal.freight || emptyFreightRfq())
   const [amountDraft, setAmountDraft] = useState(deal.amount ?? '')
   const [nameDraft, setNameDraft] = useState(deal.name || '')
@@ -136,17 +157,15 @@ function DealRow({
   }
 
   return (
-    <li className={`lw-deal-card ${closed ? 'is-closed' : ''}`}>
-      <div className="lw-deal-card__head">
+    <li className={`lw-deal-card ${closed ? 'is-closed' : ''} ${expanded ? 'is-expanded' : 'is-collapsed'}`}>
+      <button
+        type="button"
+        className="lw-deal-card__summary"
+        aria-expanded={expanded}
+        onClick={onToggleExpand}
+      >
         <div className="lw-deal-card__main">
-          <input
-            value={nameDraft}
-            disabled={busy}
-            onChange={(e) => setNameDraft(e.target.value)}
-            onBlur={saveName}
-            className="lw-deal-card__name"
-            aria-label="Deal name"
-          />
+          <span className="lw-deal-card__title">{deal.name}</span>
           <div className="lw-deal-card__meta">
             <span className={`lw-deal-card__stage ${stageBadgeClass(deal.stage, freightOrg)}`}>
               {getDealStageMeta(deal.stage, { freightOrg }).label}
@@ -154,7 +173,13 @@ function DealRow({
             {freightOrg && deal.freight?.customerType && deal.freight.customerType !== 'spot_rfq' && (
               <span className="lw-deal-card__type">{typeMeta.shortLabel}</span>
             )}
+            {dealSummaryDate(deal) ? (
+              <span className="lw-deal-card__when">{dealSummaryDate(deal)}</span>
+            ) : null}
           </div>
+          {freightOrg && freightSummary && !expanded ? (
+            <p className="lw-deal-card__route-line">{freightSummary}</p>
+          ) : null}
         </div>
         <div className="lw-deal-card__amount">
           {deal.amount != null && deal.amount > 0 ? (
@@ -169,12 +194,25 @@ function DealRow({
               Rev {formatDealValue(estimatedFreightRevenueInr(deal, usdInrRate), 'INR')}
             </div>
           ) : null}
-          {freightOrg && deal.freight?.invoiceAmount > 0 && (
-            <div className="lw-deal-card__amount-sub">
-              Inv {formatDealValue(deal.freight.invoiceAmount, 'INR')}
-            </div>
-          )}
         </div>
+        <span className="lw-deal-card__more">
+          {expanded ? 'Show less' : 'See more'}
+          <ChevronDownIcon aria-hidden />
+        </span>
+      </button>
+
+      {expanded ? (
+        <>
+      <div className="lw-deal-card__head">
+        <LwField label="Name">
+          <LwInput
+            value={nameDraft}
+            disabled={busy}
+            onChange={(e) => setNameDraft(e.target.value)}
+            onBlur={saveName}
+            aria-label="Deal name"
+          />
+        </LwField>
       </div>
 
       {freightOrg && freightSummary && (
@@ -344,6 +382,8 @@ function DealRow({
         patchLead={patchLead}
         logCrmEmailSend={logCrmEmailSend}
       />
+        </>
+      ) : null}
     </li>
   )
 }
@@ -368,6 +408,7 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
   const [showCreate, setShowCreate] = useState(deals.length === 0)
   const [listFilter, setListFilter] = useState('open')
   const [usdInrRate, setUsdInrRate] = useState(FALLBACK_USD_INR)
+  const [expandedDealId, setExpandedDealId] = useState(null)
 
   const { open, won, lost } = useMemo(() => {
     const o = []
@@ -388,10 +429,13 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
   }, [open, won])
 
   const visibleDeals = useMemo(() => {
-    if (listFilter === 'won') return won
-    if (listFilter === 'lost') return lost
-    return open
+    const list = listFilter === 'won' ? won : listFilter === 'lost' ? lost : open
+    return [...list].sort((a, b) => dealListSortMs(b) - dealListSortMs(a))
   }, [listFilter, open, won, lost])
+
+  useEffect(() => {
+    if (visibleDeals.length > 1) setExpandedDealId(null)
+  }, [visibleDeals.length, listFilter])
 
   const suggestedDealName = useMemo(
     () => buildAutoDealName({ company: lead.company, existingDeals: deals }),
@@ -655,6 +699,17 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
               user={user}
               busy={dealBusy}
               freightOrg={freightOrg}
+              expanded={
+                visibleDeals.length <= 1
+                  ? expandedDealId !== 'none'
+                  : expandedDealId === d.id
+              }
+              onToggleExpand={() =>
+                setExpandedDealId((current) => {
+                  if (visibleDeals.length <= 1) return current === 'none' ? d.id : 'none'
+                  return current === d.id ? null : d.id
+                })
+              }
               onUpdate={updateDeal}
               onWon={markWon}
               onLost={markLost}
