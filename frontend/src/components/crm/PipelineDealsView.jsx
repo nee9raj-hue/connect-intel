@@ -38,7 +38,7 @@ export default function PipelineDealsView({
   onDealStageChange,
   assigneeFilter = null,
 }) {
-  const { refreshSavedLeads, refreshPipelineSummary, user, pipelineSummary } = useApp()
+  const { refreshSavedLeads, refreshPipelineSummary, user } = useApp()
   const freightOrg = isFreightDealOrg(user)
   const [rows, setRows] = useState([])
   const [total, setTotal] = useState(0)
@@ -82,15 +82,6 @@ export default function PipelineDealsView({
     () => summarizePipelineDealRows(filteredRows, { usdInrRate }),
     [filteredRows, usdInrRate]
   )
-
-  const stageTabCounts = useMemo(() => {
-    const all = pipelineSummary?.dealCounts || {}
-    const counts = { all: Number(all.all) || rows.length }
-    for (const stage of FREIGHT_DEAL_STAGES) {
-      counts[stage.id] = Number(all[stage.id]) || 0
-    }
-    return counts
-  }, [pipelineSummary, rows.length])
 
   const filtersActive =
     Boolean(dateFrom || dateTo) ||
@@ -376,24 +367,6 @@ export default function PipelineDealsView({
         </div>
       </div>
 
-      {onDealStageChange ? (
-        <div className="pipeline-deals-stage-tabs" role="tablist" aria-label="Deal stages">
-          {[{ id: 'all', label: 'All' }, ...FREIGHT_DEAL_STAGES].map((stage) => (
-            <button
-              key={stage.id}
-              type="button"
-              role="tab"
-              aria-selected={dealStage === stage.id}
-              className={`pipeline-deals-stage-tabs__btn ${dealStage === stage.id ? 'is-active' : ''}`}
-              onClick={() => onDealStageChange(stage.id)}
-            >
-              {stage.label}
-              <span className="pipeline-deals-stage-tabs__count">{stageTabCounts[stage.id] || 0}</span>
-            </button>
-          ))}
-        </div>
-      ) : null}
-
       {filteredRows.length > 0 || rows.length > 0 ? (
         <div className="pipeline-deals-forecast" role="region" aria-label="Deal totals for this view">
           <article className="pipeline-deals-forecast__card">
@@ -466,26 +439,32 @@ export default function PipelineDealsView({
               aria-label="Filter to date"
             />
           </label>
-          {isAllDealsView ? (
-            <div className="pipeline-deals-filters__stages">
-              <FilterDropdown
-                label="Stages"
-                multiSelect
-                values={selectedStages}
-                displayValue={stageFilterDisplay}
-                options={FREIGHT_DEAL_STAGES.map((stage) => ({
-                  id: stage.id,
-                  value: stage.id,
-                  label: stage.label,
-                }))}
-                emptyLabel="All stages"
-                onMultiChange={(next) => {
-                  setSelectedStages((next || []).map(String))
-                  setSelected(new Set())
-                }}
-              />
-            </div>
-          ) : null}
+          <div className="pipeline-deals-filters__stages">
+            <FilterDropdown
+              label="Stages"
+              multiSelect
+              values={isAllDealsView ? selectedStages : dealStage !== 'all' ? [dealStage] : selectedStages}
+              displayValue={
+                isAllDealsView
+                  ? stageFilterDisplay
+                  : getDealStageMeta(dealStage, { freightOrg: true })?.label || null
+              }
+              options={FREIGHT_DEAL_STAGES.map((stage) => ({
+                id: stage.id,
+                value: stage.id,
+                label: stage.label,
+              }))}
+              emptyLabel="All stages"
+              onMultiChange={(next) => {
+                const ids = (next || []).map(String)
+                setSelectedStages(ids)
+                setSelected(new Set())
+                if (!onDealStageChange) return
+                if (ids.length === 1) onDealStageChange(ids[0])
+                else onDealStageChange('all')
+              }}
+            />
+          </div>
         </div>
         {rangeLabel ? (
           <p className="pipeline-deals-filters__week-hint">{rangeLabel}</p>
@@ -510,6 +489,7 @@ export default function PipelineDealsView({
               setTransportMode('all')
               setSelectedStages([])
               setSelected(new Set())
+              onDealStageChange?.('all')
             }}
           >
             Clear filters
