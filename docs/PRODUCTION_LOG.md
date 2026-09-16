@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- e9d4223
+npm run prod:rollback -- 471a346
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- e9d4223
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `5b84a41` |
-| Log updated (IST) | 16/09/2026, 10:17:06 |
+| Commit | `b1d8427` |
+| Log updated (IST) | 16/09/2026, 11:17:22 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- e9d4223
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 16/09/2026, 10:16:35 | `5b84a41` | Replace deal forecast pills with filter-aware customers, booked, and lost totals. | [preview](https://connect-intel-5fmbfzl9t-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5b84a41` | **← LIVE**
+| 16/09/2026, 11:16:23 | `b1d8427` | Replace generic CRM lead stages with a freight account lifecycle. | [preview](https://connect-intel-h4140ezpn-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b1d8427` | **← LIVE**
+| 16/09/2026, 10:17:47 | `471a346` | Record production deploy 5b84a41 as LIVE. | [preview](https://connect-intel-j3ozoomt4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 471a346` |
+| 16/09/2026, 10:16:35 | `5b84a41` | Replace deal forecast pills with filter-aware customers, booked, and lost totals. | [preview](https://connect-intel-5fmbfzl9t-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5b84a41` |
 | 16/09/2026, 00:55:20 | `e9d4223` | Merge branch 'cursor/fix-deals-mobile-view-802f' | [preview](https://connect-intel-6no09lt5d-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e9d4223` |
 | 15/09/2026, 22:51:43 | `330496d` | Record production deploy 5f39971 as LIVE. | [preview](https://connect-intel-2j0mrvxwx-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 330496d` |
 | 15/09/2026, 22:50:31 | `5f39971` | Collapse lead deal cards by default so multiple deals scan as a latest-first list. | [preview](https://connect-intel-fz2gyjq0j-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5f39971` |
@@ -61,8 +63,6 @@ npm run prod:rollback -- e9d4223
 | 15/09/2026, 21:35:31 | `83b8beb` | Record production deploy bc4ccd6 as LIVE. | [preview](https://connect-intel-in15dktzu-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 83b8beb` |
 | 15/09/2026, 21:33:49 | `bc4ccd6` | Replace All Deals stage pills with a multi-select dropdown. | [preview](https://connect-intel-g4ykah2i0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- bc4ccd6` |
 | 15/09/2026, 21:24:28 | `1901df4` | Record production deploy d5cf838 as LIVE. | [preview](https://connect-intel-q5wgk6kvt-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1901df4` |
-| 15/09/2026, 21:23:20 | `d5cf838` | Show the same Lost deals in the list as in the sidebar count. | [preview](https://connect-intel-nbgmun7tm-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d5cf838` |
-| 15/09/2026, 21:14:47 | `e1ba15e` | Record production deploy 7a435e1 as LIVE. | [preview](https://connect-intel-g3xw2ovrg-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e1ba15e` |
 
 ---
 

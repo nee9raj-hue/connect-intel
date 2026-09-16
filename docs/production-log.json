@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-16T04:47:06.413Z",
-  "updatedAtIst": "16/09/2026, 10:17:06",
+  "updatedAt": "2026-09-16T05:47:22.319Z",
+  "updatedAtIst": "16/09/2026, 11:17:22",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "5b84a41",
+  "currentProductionCommit": "b1d8427",
   "entries": [
+    {
+      "logId": "20260916-1116-b1d8427",
+      "commit": "b1d8427",
+      "commitFull": "b1d8427de1c219a502237d4f405fd272e6808c38",
+      "message": "Replace generic CRM lead stages with a freight account lifecycle.",
+      "deployedAt": "2026-09-16T05:46:23.262Z",
+      "deployedAtIst": "16/09/2026, 11:16:23",
+      "committedAtIst": "16/09/2026, 11:15:39",
+      "vercelPreviewUrl": "https://connect-intel-h4140ezpn-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- b1d8427"
+    },
+    {
+      "logId": "20260916-1017-471a346",
+      "commit": "471a346",
+      "commitFull": "471a346a19ace636df7830761cac3c4f9932e403",
+      "message": "Record production deploy 5b84a41 as LIVE.",
+      "deployedAt": "2026-09-16T04:47:47.061Z",
+      "deployedAtIst": "16/09/2026, 10:17:47",
+      "committedAtIst": "16/09/2026, 10:17:13",
+      "vercelPreviewUrl": "https://connect-intel-j3ozoomt4-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 471a346"
+    },
     {
       "logId": "20260916-1016-5b84a41",
       "commit": "5b84a41",
@@ -15,7 +43,7 @@
       "committedAtIst": "16/09/2026, 10:16:00",
       "vercelPreviewUrl": "https://connect-intel-5fmbfzl9t-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 5b84a41"
     },
@@ -242,34 +270,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 1901df4"
-    },
-    {
-      "logId": "20260915-2123-d5cf838",
-      "commit": "d5cf838",
-      "commitFull": "d5cf8380645ed3738a8fc7184bba9708204a11df",
-      "message": "Show the same Lost deals in the list as in the sidebar count.",
-      "deployedAt": "2026-09-15T15:53:20.292Z",
-      "deployedAtIst": "15/09/2026, 21:23:20",
-      "committedAtIst": "15/09/2026, 21:22:41",
-      "vercelPreviewUrl": "https://connect-intel-nbgmun7tm-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- d5cf838"
-    },
-    {
-      "logId": "20260915-2114-e1ba15e",
-      "commit": "e1ba15e",
-      "commitFull": "e1ba15edf89ec00647d620e73098ff723b52ae6e",
-      "message": "Record production deploy 7a435e1 as LIVE.",
-      "deployedAt": "2026-09-15T15:44:47.398Z",
-      "deployedAtIst": "15/09/2026, 21:14:47",
-      "committedAtIst": "15/09/2026, 21:14:07",
-      "vercelPreviewUrl": "https://connect-intel-g3xw2ovrg-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- e1ba15e"
     }
   ]
 }
