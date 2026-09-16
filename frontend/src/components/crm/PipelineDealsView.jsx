@@ -8,6 +8,7 @@ import {
   formatFreightGross,
   transportModeLabel,
   freightCustomerTypeLabel,
+  summarizePipelineDealRows,
 } from '../../lib/freightDeals'
 import { estimatedFreightRevenueInr, sumEstimatedFreightRevenue, FREIGHT_DEAL_STAGES, resolveFreightDealCurrency, FALLBACK_USD_INR, isFreightDealOrg } from '../../lib/freightDeal'
 import { filledDealMilestones } from '../../lib/dealMilestones'
@@ -52,8 +53,6 @@ export default function PipelineDealsView({
   const [dateTo, setDateTo] = useState(null)
   const [transportMode, setTransportMode] = useState('all')
   const [selectedStages, setSelectedStages] = useState([])
-  const [forecast, setForecast] = useState(null)
-  const [forecastLoading, setForecastLoading] = useState(false)
   const [usdInrRate, setUsdInrRate] = useState(FALLBACK_USD_INR)
 
   const timeZone = user?.timezone || undefined
@@ -75,6 +74,11 @@ export default function PipelineDealsView({
 
   const estimatedRevenueTotal = useMemo(
     () => Math.round(sumEstimatedFreightRevenue(filteredRows, usdInrRate)),
+    [filteredRows, usdInrRate]
+  )
+
+  const summary = useMemo(
+    () => summarizePipelineDealRows(filteredRows, { usdInrRate }),
     [filteredRows, usdInrRate]
   )
 
@@ -216,22 +220,6 @@ export default function PipelineDealsView({
   useEffect(() => {
     if (!isAllDealsView) setSelectedStages([])
   }, [isAllDealsView])
-
-  const loadForecast = useCallback(async () => {
-    setForecastLoading(true)
-    try {
-      const data = await api.getDealsForecast(serverFilters, { timeZone })
-      setForecast(data.forecast || null)
-    } catch {
-      setForecast(null)
-    } finally {
-      setForecastLoading(false)
-    }
-  }, [serverFilters, timeZone])
-
-  useEffect(() => {
-    void loadForecast()
-  }, [loadForecast])
 
   const allSelected = filteredRows.length > 0 && filteredRows.every((row) => selected.has(dealRowKey(row)))
 
@@ -378,50 +366,45 @@ export default function PipelineDealsView({
         </div>
       </div>
 
-      {forecastLoading ? (
-        <p className="pipeline-deals-forecast pipeline-deals-forecast--loading text-xs text-gray-500">
-          Loading forecast…
-        </p>
-      ) : filteredRows.length > 0 || forecast?.dealCount > 0 ? (
-        <div className="pipeline-deals-forecast" role="region" aria-label="Deal forecast">
+      {filteredRows.length > 0 || rows.length > 0 ? (
+        <div className="pipeline-deals-forecast" role="region" aria-label="Deal totals for this view">
           <article className="pipeline-deals-forecast__card">
             <span className="pipeline-deals-forecast__label">Open pipeline</span>
-            <strong className="pipeline-deals-forecast__value">{formatDealValue(forecast?.openValue)}</strong>
-            <span className="pipeline-deals-forecast__hint">{forecast?.openCount || 0} open deals</span>
+            <strong className="pipeline-deals-forecast__value">{formatDealValue(summary.openRevenue)}</strong>
+            <span className="pipeline-deals-forecast__hint">
+              {summary.openCount} open deal{summary.openCount === 1 ? '' : 's'}
+            </span>
           </article>
           <article className="pipeline-deals-forecast__card">
             <span className="pipeline-deals-forecast__label">Revenue</span>
             <strong className="pipeline-deals-forecast__value">
-              {formatDealValue(estimatedRevenueTotal)}
+              {formatDealValue(summary.totalRevenue || estimatedRevenueTotal)}
             </strong>
             <span className="pipeline-deals-forecast__hint">Chargeable × freight (ocean USD→INR)</span>
           </article>
           <article className="pipeline-deals-forecast__card">
-            <span className="pipeline-deals-forecast__label">Weighted forecast</span>
-            <strong className="pipeline-deals-forecast__value">
-              {formatDealValue(forecast?.weightedPipeline)}
-            </strong>
-            <span className="pipeline-deals-forecast__hint">Stage-weighted</span>
+            <span className="pipeline-deals-forecast__label">Customers</span>
+            <strong className="pipeline-deals-forecast__value">{summary.customerCount}</strong>
+            <span className="pipeline-deals-forecast__hint">
+              {summary.dealCount} deal{summary.dealCount === 1 ? '' : 's'} in this view
+            </span>
           </article>
           <article className="pipeline-deals-forecast__card">
-            <span className="pipeline-deals-forecast__label">30-day outlook</span>
-            <strong className="pipeline-deals-forecast__value">
-              {formatDealValue(forecast?.forecast30d)}
-            </strong>
+            <span className="pipeline-deals-forecast__label">Booked</span>
+            <strong className="pipeline-deals-forecast__value">{formatDealValue(summary.bookedRevenue)}</strong>
+            <span className="pipeline-deals-forecast__hint">
+              {summary.bookedCount} booked
+              {summary.wonCount ? ` · ${summary.wonCount} won` : ''}
+              {summary.bookRate != null ? ` · ${summary.bookRate}% of closed` : ''}
+            </span>
           </article>
           <article className="pipeline-deals-forecast__card">
-            <span className="pipeline-deals-forecast__label">Won value</span>
-            <strong className="pipeline-deals-forecast__value">{formatDealValue(forecast?.wonValue)}</strong>
-            <span className="pipeline-deals-forecast__hint">{forecast?.winRate ?? 0}% win rate</span>
+            <span className="pipeline-deals-forecast__label">Lost</span>
+            <strong className="pipeline-deals-forecast__value">{formatDealValue(summary.lostRevenue)}</strong>
+            <span className="pipeline-deals-forecast__hint">
+              {summary.lostCount} lost deal{summary.lostCount === 1 ? '' : 's'}
+            </span>
           </article>
-          {forecast?.atRiskValue > 0 ? (
-            <article className="pipeline-deals-forecast__card pipeline-deals-forecast__card--risk">
-              <span className="pipeline-deals-forecast__label">Stale (21d+)</span>
-              <strong className="pipeline-deals-forecast__value">
-                {formatDealValue(forecast.atRiskValue)}
-              </strong>
-            </article>
-          ) : null}
         </div>
       ) : null}
 

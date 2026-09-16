@@ -3,6 +3,7 @@ export {
   countDealsByStage,
   isClosedDealStage,
   buildDealsForecast,
+  summarizePipelineDealRows,
 } from '../../../lib/dealPipeline.js'
 
 import { getFreightCustomerTypeMeta } from '../../../lib/freightDeal.js'
