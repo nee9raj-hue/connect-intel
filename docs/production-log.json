@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-16T07:00:38.818Z",
-  "updatedAtIst": "16/09/2026, 12:30:38",
+  "updatedAt": "2026-09-16T07:35:25.725Z",
+  "updatedAtIst": "16/09/2026, 13:05:25",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "3e01162",
+  "currentProductionCommit": "796697d",
   "entries": [
+    {
+      "logId": "20260916-1302-796697d",
+      "commit": "796697d",
+      "commitFull": "796697d7cf85e3b8ba73c5d82ad5bda8bb28a360",
+      "message": "Fix Copilot crashing with Unexpected identifier pipeline_leads.",
+      "deployedAt": "2026-09-16T07:32:28.682Z",
+      "deployedAtIst": "16/09/2026, 13:02:28",
+      "committedAtIst": "16/09/2026, 13:01:42",
+      "vercelPreviewUrl": "https://connect-intel-mr56j4wiq-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 796697d"
+    },
+    {
+      "logId": "20260916-1231-bbbc423",
+      "commit": "bbbc423",
+      "commitFull": "bbbc4234d464d443b9d31dddd09c1357b5b06d5c",
+      "message": "Record production deploy 3e01162 as LIVE.",
+      "deployedAt": "2026-09-16T07:01:48.271Z",
+      "deployedAtIst": "16/09/2026, 12:31:48",
+      "committedAtIst": "16/09/2026, 12:31:00",
+      "vercelPreviewUrl": "https://connect-intel-54202nnf5-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- bbbc423"
+    },
     {
       "logId": "20260916-1229-3e01162",
       "commit": "3e01162",
@@ -15,7 +43,7 @@
       "committedAtIst": "16/09/2026, 12:28:27",
       "vercelPreviewUrl": "https://connect-intel-q7lg52doc-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 3e01162"
     },
@@ -242,34 +270,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- c3d00e3"
-    },
-    {
-      "logId": "20260915-2159-d874acd",
-      "commit": "d874acd",
-      "commitFull": "d874acd34e98e105e53f6bd2861e8b89e07dd592",
-      "message": "Allow freight edits on every deal stage, including Won and Lost.",
-      "deployedAt": "2026-09-15T16:29:53.226Z",
-      "deployedAtIst": "15/09/2026, 21:59:53",
-      "committedAtIst": "15/09/2026, 21:59:11",
-      "vercelPreviewUrl": "https://connect-intel-e9hr0f24c-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- d874acd"
-    },
-    {
-      "logId": "20260915-2155-ec57021",
-      "commit": "ec57021",
-      "commitFull": "ec5702157a5e8db479519ae189dcf4a9f2edf831",
-      "message": "Record production deploy f30b3e6 as LIVE.",
-      "deployedAt": "2026-09-15T16:25:47.725Z",
-      "deployedAtIst": "15/09/2026, 21:55:47",
-      "committedAtIst": "15/09/2026, 21:55:12",
-      "vercelPreviewUrl": "https://connect-intel-pdlhd9qgl-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- ec57021"
     }
   ]
 }
