@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-16T16:44:09.049Z",
-  "updatedAtIst": "16/09/2026, 22:14:09",
+  "updatedAt": "2026-09-16T17:02:21.664Z",
+  "updatedAtIst": "16/09/2026, 22:32:21",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "ac9b2dd",
+  "currentProductionCommit": "b7aa208",
   "entries": [
+    {
+      "logId": "20260916-2232-b7aa208",
+      "commit": "b7aa208",
+      "commitFull": "b7aa20860ba277a45295e6e4f6a2aa1167d63e89",
+      "message": "Populate lead ERP Revenue and Finance tabs from shipments, trading, and deals.",
+      "deployedAt": "2026-09-16T17:02:13.157Z",
+      "deployedAtIst": "16/09/2026, 22:32:13",
+      "committedAtIst": "16/09/2026, 22:31:16",
+      "vercelPreviewUrl": "https://connect-intel-p4ybnue4n-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- b7aa208"
+    },
+    {
+      "logId": "20260916-2215-e0ef88f",
+      "commit": "e0ef88f",
+      "commitFull": "e0ef88fdf8db70a3f55f949ffc460912623389fe",
+      "message": "Record production LIVE snapshot for pipeline board crash fix.",
+      "deployedAt": "2026-09-16T16:45:02.609Z",
+      "deployedAtIst": "16/09/2026, 22:15:02",
+      "committedAtIst": "16/09/2026, 22:14:14",
+      "vercelPreviewUrl": "https://connect-intel-icw1ayv4k-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- e0ef88f"
+    },
     {
       "logId": "20260916-2214-ac9b2dd",
       "commit": "ac9b2dd",
@@ -15,7 +43,7 @@
       "committedAtIst": "16/09/2026, 22:13:14",
       "vercelPreviewUrl": "https://connect-intel-8qc0c657o-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- ac9b2dd"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- ca41c41"
-    },
-    {
-      "logId": "20260916-1306-0c6ebce",
-      "commit": "0c6ebce",
-      "commitFull": "0c6ebce35c8990c9a75dcb89f2e6bbd5ab616595",
-      "message": "Record production deploy 796697d as LIVE.",
-      "deployedAt": "2026-09-16T07:36:38.284Z",
-      "deployedAtIst": "16/09/2026, 13:06:38",
-      "committedAtIst": "16/09/2026, 13:05:55",
-      "vercelPreviewUrl": "https://connect-intel-41bhsp2bw-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 0c6ebce"
-    },
-    {
-      "logId": "20260916-1302-796697d",
-      "commit": "796697d",
-      "commitFull": "796697d7cf85e3b8ba73c5d82ad5bda8bb28a360",
-      "message": "Fix Copilot crashing with Unexpected identifier pipeline_leads.",
-      "deployedAt": "2026-09-16T07:32:28.682Z",
-      "deployedAtIst": "16/09/2026, 13:02:28",
-      "committedAtIst": "16/09/2026, 13:01:42",
-      "vercelPreviewUrl": "https://connect-intel-mr56j4wiq-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 796697d"
     }
   ]
 }
