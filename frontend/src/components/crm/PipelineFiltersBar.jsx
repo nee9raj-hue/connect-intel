@@ -15,6 +15,7 @@ import {
   MapPinIcon,
   PeopleIcon,
   SearchIcon,
+  TeamIcon,
 } from '../ui/icons'
 
 const SMART_TAG_OPTIONS = [
@@ -25,6 +26,7 @@ const SMART_TAG_OPTIONS = [
 const MOBILE_FILTER_TITLES = {
   owner: 'Lead owner',
   status: 'Lead status',
+  team: 'Team',
   city: 'City',
   state: 'State',
   contact: 'Contact',
@@ -73,6 +75,7 @@ export default function PipelineFiltersBar({
   const [savedViews, setSavedViews] = useState([])
   const [savedReports, setSavedReports] = useState([])
   const [activeFilter, setActiveFilter] = useState(null)
+  const [orgTeams, setOrgTeams] = useState([])
   const useMobileFilterSheet = usePipelineFilterMobile()
 
   const loadViews = useCallback(async () => {
@@ -97,6 +100,29 @@ export default function PipelineFiltersBar({
     loadViews()
     loadReports()
   }, [loadViews, loadReports])
+
+  useEffect(() => {
+    let cancelled = false
+    api
+      .getOrgHierarchy({ skipLeadCounts: true, silent: true })
+      .then((data) => {
+        if (cancelled) return
+        const teams = (data?.departments || []).flatMap((dept) =>
+          (dept.teams || []).map((team) => ({
+            id: String(team.id),
+            label: dept.name ? `${team.name} (${dept.name})` : team.name,
+            name: team.name,
+          }))
+        )
+        setOrgTeams(teams)
+      })
+      .catch(() => {
+        if (!cancelled) setOrgTeams([])
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const handleApply = () => onApplyFilters?.()
 
@@ -126,6 +152,7 @@ export default function PipelineFiltersBar({
     value: o.id,
   }))
   const tagOptions = orgLeadTags.map((t) => ({ label: t.name, value: t.id }))
+  const teamOptions = orgTeams.map((t) => ({ label: t.label, value: t.id }))
   const smartOptions = SMART_TAG_OPTIONS.map((o) => ({ label: o.label, value: o.id }))
   const savedViewOptions = savedViews.map((v) => ({
     label: v.shared ? `${v.name} (Team)` : v.name,
@@ -235,6 +262,9 @@ export default function PipelineFiltersBar({
       case 'contact':
         commitFilters({ ...filters, contact: draft.filters.contact || 'any' })
         break
+      case 'team':
+        commitFilters({ ...filters, teamIds: draft.filters.teamIds || [] })
+        break
       case 'advanced': {
         commitFilters({ ...draft.filters })
         const view = savedViews.find((v) => v.id === draft.smartViewId)
@@ -300,6 +330,16 @@ export default function PipelineFiltersBar({
             value={filterDraft.filters.contact !== 'any' ? filterDraft.filters.contact : ''}
             emptyLabel="All contacts"
             onChange={(v) => updateFilterDraft({ contact: v || 'any' })}
+          />
+        )
+      case 'team':
+        return (
+          <SearchableMultiList
+            options={teamOptions}
+            values={filterDraft.filters.teamIds || []}
+            onChange={(v) => updateFilterDraft({ teamIds: v })}
+            placeholder="Search teams…"
+            emptyLabel="All teams"
           />
         )
       case 'advanced':
@@ -480,6 +520,7 @@ export default function PipelineFiltersBar({
     appliedStates.length ||
     (appliedFilters.tagIds?.length || 0) > 0 ||
     (appliedFilters.smartTags?.length || 0) > 0 ||
+    (appliedFilters.teamIds?.length || 0) > 0 ||
     (!stageListMode && statusFilter !== 'all') ||
     (appliedFilters.contact && appliedFilters.contact !== 'any')
 
@@ -495,6 +536,25 @@ export default function PipelineFiltersBar({
           active={Boolean(ownerFilter)}
           aria-expanded={activeFilter?.type === 'owner'}
           onClick={() => openFilter('owner')}
+        />
+      ) : null}
+
+      {teamOptions.length > 0 ? (
+        <PipelineFilterToolbarButton
+          icon={TeamIcon}
+          iconTone="owner"
+          label="Team"
+          compact={useMobileFilterSheet}
+          displayValue={
+            (appliedFilters.teamIds || []).length === 1
+              ? orgTeams.find((t) => t.id === appliedFilters.teamIds[0])?.name
+              : (appliedFilters.teamIds || []).length > 1
+                ? `${appliedFilters.teamIds.length} teams`
+                : undefined
+          }
+          active={(appliedFilters.teamIds || []).length > 0}
+          aria-expanded={activeFilter?.type === 'team'}
+          onClick={() => openFilter('team')}
         />
       ) : null}
 
@@ -704,6 +764,20 @@ export default function PipelineFiltersBar({
               onRemove={() => onRemoveAppliedFilter?.({ contact: 'any' })}
             />
           )}
+          {(appliedFilters.teamIds || []).map((teamId) => {
+            const team = orgTeams.find((t) => t.id === teamId)
+            return (
+              <FilterChipButton
+                key={`team-${teamId}`}
+                label={`Team: ${team?.name || teamId}`}
+                onRemove={() =>
+                  onRemoveAppliedFilter?.({
+                    teamIds: (appliedFilters.teamIds || []).filter((id) => id !== teamId),
+                  })
+                }
+              />
+            )
+          })}
           {(appliedFilters.tagIds || []).map((tagId) => {
             const tag = orgLeadTags.find((t) => t.id === tagId)
             if (!tag) return null

@@ -656,6 +656,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     getFilterStates(advancedFilters).join('|') !== getFilterStates(appliedAdvanced).join('|') ||
     advancedFilters.contact !== appliedAdvanced.contact ||
     (advancedFilters.tagIds || []).join(',') !== (appliedAdvanced.tagIds || []).join(',') ||
+    (advancedFilters.teamIds || []).join(',') !== (appliedAdvanced.teamIds || []).join(',') ||
     (advancedFilters.smartTags || []).join(',') !== (appliedAdvanced.smartTags || []).join(',') ||
     advancedFilters.minLeadScore !== appliedAdvanced.minLeadScore ||
     advancedFilters.maxLeadScore !== appliedAdvanced.maxLeadScore ||
@@ -675,6 +676,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       states: getFilterStates(adv).length ? getFilterStates(adv) : undefined,
       assigneeUserId: effectiveAssigneeFilter || undefined,
       teamId: panelOptions?.teamId || undefined,
+      teamIds: adv.teamIds?.length ? adv.teamIds : undefined,
       tagIds: adv.tagIds?.length ? adv.tagIds : undefined,
       tagMode: adv.tagMode || 'any',
       ...pipelineServerFilterExtras(adv, smartViewFilters),
@@ -692,6 +694,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       Boolean(
         serverFilters.assigneeUserId ||
           serverFilters.teamId ||
+          serverFilters.teamIds?.length ||
           serverFilters.status ||
           serverFilters.q ||
           serverFilters.cities?.length ||
@@ -838,6 +841,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       ),
       leadIds: dashboardLeadIds,
       teamMemberIds: teamMemberIdsForFilter,
+      teamIds: serverSidePipeline ? [] : appliedAdvanced.teamIds,
       ...smartViewFilters,
     })
   }, [
@@ -1446,12 +1450,12 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
         : null}
     <div
       className={`flex h-full min-h-0 w-full overflow-hidden relative bg-[var(--color-hs-canvas)] ${
-        selectedLead && useHubSpotList ? 'pipeline-split-record' : ''
+        selectedLead ? 'pipeline-split-record pipeline-lead-fullpage' : ''
       }`}
     >
       <div
         className={`crm-workspace flex-1 min-w-0 min-h-0 flex flex-col ${
-          selectedLead ? 'hidden md:flex' : 'flex'
+          selectedLead ? 'hidden' : 'flex'
         } ${useHubSpotList || isDealsView ? 'pipeline-list-workspace pipeline-page-premium' : ''}`}
       >
         <MyDayReturnBar panelOptions={panelOptions} onNavigate={onNavigate} />
@@ -1816,8 +1820,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
         </div>
       </div>
 
-      {pipelineLeadId && !selectedLead && useHubSpotList && (
-        <div className="crm-record-panel crm-record-panel--loading hidden md:flex">
+      {pipelineLeadId && !selectedLead && (
+        <div className="crm-record-panel crm-record-panel--page crm-record-panel--loading flex">
           Loading lead…
         </div>
       )}
@@ -1828,7 +1832,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
           statusOptions={columns}
           onClose={() => closePipelineLead()}
           onNavigate={onNavigate}
-          recordPanel={useHubSpotList}
+          recordPanel
         />
       )}
 

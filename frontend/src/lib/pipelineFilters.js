@@ -57,6 +57,7 @@ export const DEFAULT_PIPELINE_FILTERS = {
   states: [],
   contact: 'any',
   tagIds: [],
+  teamIds: [],
   tagMode: 'any',
   smartTags: [],
   overdueFollowUp: false,
@@ -284,6 +285,7 @@ export function applyPipelineFilters(
     tasksDueToday = false,
     leadIds = null,
     teamMemberIds = null,
+    teamIds = [],
   } = {}
 ) {
   let list = leads || []
@@ -428,13 +430,19 @@ export function applyPipelineFilters(
     list = list.filter((l) => allowed.has(String(l.id)))
   }
 
-  const teamIds = Array.isArray(teamMemberIds) ? teamMemberIds.map(String).filter(Boolean) : []
-  if (teamIds.length) {
-    const allowed = new Set(teamIds)
+  const ownerTeamIds = Array.isArray(teamMemberIds) ? teamMemberIds.map(String).filter(Boolean) : []
+  if (ownerTeamIds.length) {
+    const allowed = new Set(ownerTeamIds)
     list = list.filter((l) => {
       const owner = l.assignedToUserId || l.savedByUserId || l.userId
       return owner != null && allowed.has(String(owner))
     })
+  }
+
+  const departmentTeamIds = Array.isArray(teamIds) ? teamIds.map(String).filter(Boolean) : []
+  if (departmentTeamIds.length) {
+    const allowed = new Set(departmentTeamIds)
+    list = list.filter((l) => l.teamId && allowed.has(String(l.teamId)))
   }
 
   if (staleDays != null && staleDays !== '') {
@@ -498,6 +506,7 @@ export function countActiveFilters(filters, search) {
   if (getFilterStates(filters).length) n += 1
   if (filters.contact && filters.contact !== 'any') n += 1
   if (filters.tagIds?.length) n += 1
+  if (filters.teamIds?.length) n += 1
   if (filters.smartTags?.length) n += 1
   if (filters.overdueFollowUp) n += 1
   if (filters.followUpDue) n += 1

@@ -3686,6 +3686,13 @@ button.ci-lead-tag:disabled {
     max-height: none;
     box-shadow: -4px 0 24px rgba(0, 0, 0, 0.08);
   }
+
+  .crm-record-panel--page {
+    width: 100%;
+    max-width: none;
+    border-left: none;
+    box-shadow: none;
+  }
 }
 
 .crm-record-panel--loading {

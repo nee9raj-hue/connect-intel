@@ -207,6 +207,8 @@ export const api = {
     states,
     assigneeUserId,
     tagIds,
+    teamId,
+    teamIds,
     minLeadScore,
     followUpDue,
     overdueFollowUp,
@@ -226,6 +228,7 @@ export const api = {
     }
     if (assigneeUserId) qs.set('assigneeUserId', assigneeUserId)
     for (const id of tagIds || []) qs.append('tagId', id)
+    for (const id of [...(teamIds || []), teamId].filter(Boolean)) qs.append('teamId', String(id))
     if (minLeadScore != null && minLeadScore !== '') qs.set('minLeadScore', String(minLeadScore))
     if (followUpDue) qs.set('followUpDue', '1')
     if (overdueFollowUp) qs.set('overdueFollowUp', '1')
@@ -268,6 +271,9 @@ export const api = {
     }
     if (params.assigneeUserId) qs.set('assigneeUserId', params.assigneeUserId)
     for (const id of params.tagIds || []) qs.append('tagId', id)
+    for (const id of [...(params.teamIds || []), params.teamId].filter(Boolean)) {
+      qs.append('teamId', String(id))
+    }
     if (params.minLeadScore != null && params.minLeadScore !== '') {
       qs.set('minLeadScore', String(params.minLeadScore))
     }
@@ -296,6 +302,7 @@ export const api = {
     followUpDue,
     overdueFollowUp,
     teamId,
+    teamIds,
     leadIds,
     silent = false,
   } = {}) => {
@@ -326,6 +333,7 @@ export const api = {
     if (followUpDue) qs.set('followUpDue', '1')
     if (overdueFollowUp) qs.set('overdueFollowUp', '1')
     if (teamId) qs.set('teamId', String(teamId))
+    for (const id of teamIds || []) qs.append('teamId', String(id))
     return request(`/api/saved-leads?${qs}`, { timeoutMs: 45_000 }, { silent })
   },
 

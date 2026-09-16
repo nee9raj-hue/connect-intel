@@ -130,6 +130,38 @@
   height: 18px;
 }
 
+.lw-header__back {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-right: 4px;
+  padding: 6px 10px 6px 4px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--lw-text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.lw-header__back:hover {
+  background: var(--lw-bg);
+  color: var(--lw-text);
+}
+
+.lw-header__back svg {
+  width: 18px;
+  height: 18px;
+}
+
+.lw-stat-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+  gap: 10px;
+}
+
 /* Tab bar */
 .lw-tabs {
   display: flex;

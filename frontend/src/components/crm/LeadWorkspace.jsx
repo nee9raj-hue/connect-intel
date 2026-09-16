@@ -39,6 +39,7 @@ import {
 import { hasWorkspaceFeature } from '../../lib/workspaceFeatures'
 import FieldVisitRecordForm from './FieldVisitRecordForm'
 import LeadDealsSection from './LeadDealsSection'
+import LeadErpPanels from './LeadErpPanels'
 import TeamIntelReturnBanner from './TeamIntelReturnBanner'
 import { DEFAULT_FIELD_VISIT_EXPENSE_SETTINGS } from '../../lib/fieldVisitExpenses'
 import {
@@ -65,6 +66,7 @@ import {
 } from './leadWorkspaceUi'
 import {
   CalendarIcon,
+  ChevronLeftIcon,
   ChevronRightIcon,
   CloseIcon,
   HomeIcon,
@@ -105,6 +107,8 @@ function formatAttachmentSize(bytes) {
 
 const TABS = [
   { id: 'overview', label: 'Overview', shortLabel: 'Overview', Icon: HomeIcon },
+  { id: 'erp-revenue', label: 'ERP Revenue', shortLabel: 'Revenue', Icon: PipelineIcon },
+  { id: 'erp-finance', label: 'ERP Finance', shortLabel: 'Finance', Icon: SparkIcon },
   { id: 'deals', label: 'Deals', shortLabel: 'Deals', Icon: PipelineIcon },
   { id: 'notes', label: 'Timeline', shortLabel: 'Timeline', Icon: LogIcon },
   { id: 'schedule', label: 'Tasks & meetings', shortLabel: 'Tasks', Icon: CalendarIcon },
@@ -831,13 +835,19 @@ export default function LeadWorkspace({
     <aside
       className={
         recordPanel
-          ? 'crm-record-panel lw-root fixed inset-0 z-[75] md:static md:inset-auto shrink-0'
+          ? 'crm-record-panel crm-record-panel--page lw-root fixed inset-0 z-[75] md:static md:inset-auto flex-1 min-w-0'
           : 'crm-drawer lw-root fixed inset-0 z-[75] md:static md:inset-auto md:w-full md:max-w-[420px] shrink-0'
       }
     >
       <TeamIntelReturnBanner onNavigate={onNavigate} onCloseLead={onClose} />
       <header className="lw-header">
         <div className="lw-header__top">
+          {recordPanel ? (
+            <button type="button" onClick={onClose} className="lw-header__back" aria-label="Back">
+              <ChevronLeftIcon />
+              <span>Back</span>
+            </button>
+          ) : null}
           <div className="lw-header__avatar" aria-hidden>
             {leadInitials(lead)}
           </div>
@@ -850,9 +860,11 @@ export default function LeadWorkspace({
             </p>
             <span className={`lw-header__status ${statusMeta.color || ''}`}>{statusMeta.label}</span>
           </div>
-          <button type="button" onClick={onClose} className="lw-header__close" aria-label="Close">
-            <CloseIcon />
-          </button>
+          {recordPanel ? null : (
+            <button type="button" onClick={onClose} className="lw-header__close" aria-label="Close">
+              <CloseIcon />
+            </button>
+          )}
         </div>
         <nav className="lw-tabs" role="tablist" aria-label="Lead sections">
           {TABS.map((t) => (
@@ -1104,6 +1116,10 @@ export default function LeadWorkspace({
               ) : null}
             </LwSection>
           </>
+        )}
+
+        {(tab === 'erp-revenue' || tab === 'erp-finance') && (
+          <LeadErpPanels lead={lead} tab={tab} />
         )}
 
         {tab === 'deals' && (
