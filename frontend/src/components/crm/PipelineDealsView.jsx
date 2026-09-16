@@ -11,6 +11,7 @@ import {
   summarizePipelineDealRows,
 } from '../../lib/freightDeals'
 import { estimatedFreightRevenueInr, sumEstimatedFreightRevenue, FREIGHT_DEAL_STAGES, resolveFreightDealCurrency, FALLBACK_USD_INR, isFreightDealOrg } from '../../lib/freightDeal'
+import { filledDealMilestones } from '../../lib/dealMilestones'
 import { userCanDeleteCrmRecords } from '../../lib/orgActionAccess'
 import {
   DEAL_MONTH_OPTIONS,
