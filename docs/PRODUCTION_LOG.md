@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 2ad137f
+npm run prod:rollback -- e9d4223
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 2ad137f
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `5f39971` |
-| Log updated (IST) | 15/09/2026, 22:50:51 |
+| Commit | `5b84a41` |
+| Log updated (IST) | 16/09/2026, 10:17:06 |
 
 ---
 
@@ -44,7 +44,10 @@ npm run prod:rollback -- 2ad137f
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 15/09/2026, 22:50:31 | `5f39971` | Collapse lead deal cards by default so multiple deals scan as a latest-first list. | [preview](https://connect-intel-fz2gyjq0j-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5f39971` | **← LIVE**
+| 16/09/2026, 10:16:35 | `5b84a41` | Replace deal forecast pills with filter-aware customers, booked, and lost totals. | [preview](https://connect-intel-5fmbfzl9t-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5b84a41` | **← LIVE**
+| 16/09/2026, 00:55:20 | `e9d4223` | Merge branch 'cursor/fix-deals-mobile-view-802f' | [preview](https://connect-intel-6no09lt5d-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e9d4223` |
+| 15/09/2026, 22:51:43 | `330496d` | Record production deploy 5f39971 as LIVE. | [preview](https://connect-intel-2j0mrvxwx-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 330496d` |
+| 15/09/2026, 22:50:31 | `5f39971` | Collapse lead deal cards by default so multiple deals scan as a latest-first list. | [preview](https://connect-intel-fz2gyjq0j-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5f39971` |
 | 15/09/2026, 22:39:26 | `2ad137f` | Record production deploy 7a2220c as LIVE. | [preview](https://connect-intel-iyoi2shpo-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2ad137f` |
 | 15/09/2026, 22:37:56 | `7a2220c` | Use customer dates in deal range filters and a single Won/Booked/Lost outcome. | [preview](https://connect-intel-3tc86vzg9-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7a2220c` |
 | 15/09/2026, 22:17:33 | `57e7320` | Record production deploy efd7f1a as LIVE. | [preview](https://connect-intel-rejobcu8b-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 57e7320` |
@@ -60,10 +63,6 @@ npm run prod:rollback -- 2ad137f
 | 15/09/2026, 21:24:28 | `1901df4` | Record production deploy d5cf838 as LIVE. | [preview](https://connect-intel-q5wgk6kvt-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1901df4` |
 | 15/09/2026, 21:23:20 | `d5cf838` | Show the same Lost deals in the list as in the sidebar count. | [preview](https://connect-intel-nbgmun7tm-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d5cf838` |
 | 15/09/2026, 21:14:47 | `e1ba15e` | Record production deploy 7a435e1 as LIVE. | [preview](https://connect-intel-g3xw2ovrg-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e1ba15e` |
-| 15/09/2026, 21:13:33 | `7a435e1` | Show All Deals with estimated freight revenue and stage filters. | [preview](https://connect-intel-8yok9odd1-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7a435e1` |
-| 15/09/2026, 11:04:15 | `49b5248` | Record production deploy e08802c as LIVE. | [preview](https://connect-intel-h0wcafse4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 49b5248` |
-| 15/09/2026, 11:01:47 | `e08802c` | Fix sidebar Deals counts from pipeline_deals, matching Lost list. | [preview](https://connect-intel-2hztsi2nz-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e08802c` |
-| 15/09/2026, 09:55:11 | `517d130` | Clear stale PWA cache when PipelineDealsView is missing. | [preview](https://connect-intel-dr7z7wkl4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 517d130` |
 
 ---
 

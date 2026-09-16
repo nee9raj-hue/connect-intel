@@ -1,10 +1,52 @@
 {
-  "updatedAt": "2026-09-15T17:20:51.284Z",
-  "updatedAtIst": "15/09/2026, 22:50:51",
+  "updatedAt": "2026-09-16T04:47:06.413Z",
+  "updatedAtIst": "16/09/2026, 10:17:06",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "5f39971",
+  "currentProductionCommit": "5b84a41",
   "entries": [
+    {
+      "logId": "20260916-1016-5b84a41",
+      "commit": "5b84a41",
+      "commitFull": "5b84a4175a35cf0b166f13cb44209646dd486258",
+      "message": "Replace deal forecast pills with filter-aware customers, booked, and lost totals.",
+      "deployedAt": "2026-09-16T04:46:35.929Z",
+      "deployedAtIst": "16/09/2026, 10:16:35",
+      "committedAtIst": "16/09/2026, 10:16:00",
+      "vercelPreviewUrl": "https://connect-intel-5fmbfzl9t-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 5b84a41"
+    },
+    {
+      "logId": "20260916-0055-e9d4223",
+      "commit": "e9d4223",
+      "commitFull": "e9d4223121f542eac6045a567ee9b735ec493f4d",
+      "message": "Merge branch 'cursor/fix-deals-mobile-view-802f'",
+      "deployedAt": "2026-09-15T19:25:20.661Z",
+      "deployedAtIst": "16/09/2026, 00:55:20",
+      "committedAtIst": "16/09/2026, 00:54:41",
+      "vercelPreviewUrl": "https://connect-intel-6no09lt5d-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- e9d4223"
+    },
+    {
+      "logId": "20260915-2251-330496d",
+      "commit": "330496d",
+      "commitFull": "330496db5769f33d43d333c6881a2a11d7d10cd9",
+      "message": "Record production deploy 5f39971 as LIVE.",
+      "deployedAt": "2026-09-15T17:21:43.854Z",
+      "deployedAtIst": "15/09/2026, 22:51:43",
+      "committedAtIst": "15/09/2026, 22:51:04",
+      "vercelPreviewUrl": "https://connect-intel-2j0mrvxwx-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 330496d"
+    },
     {
       "logId": "20260915-2250-5f39971",
       "commit": "5f39971",
@@ -15,7 +57,7 @@
       "committedAtIst": "15/09/2026, 22:49:51",
       "vercelPreviewUrl": "https://connect-intel-fz2gyjq0j-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 5f39971"
     },
@@ -228,62 +270,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- e1ba15e"
-    },
-    {
-      "logId": "20260915-2113-7a435e1",
-      "commit": "7a435e1",
-      "commitFull": "7a435e1180e77b37770420842788d8241e09a841",
-      "message": "Show All Deals with estimated freight revenue and stage filters.",
-      "deployedAt": "2026-09-15T15:43:33.200Z",
-      "deployedAtIst": "15/09/2026, 21:13:33",
-      "committedAtIst": "15/09/2026, 21:12:48",
-      "vercelPreviewUrl": "https://connect-intel-8yok9odd1-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 7a435e1"
-    },
-    {
-      "logId": "20260915-1104-49b5248",
-      "commit": "49b5248",
-      "commitFull": "49b524856a0238f13acf2a4ce8f3e0b657fc2366",
-      "message": "Record production deploy e08802c as LIVE.",
-      "deployedAt": "2026-09-15T05:34:15.199Z",
-      "deployedAtIst": "15/09/2026, 11:04:15",
-      "committedAtIst": "15/09/2026, 11:03:35",
-      "vercelPreviewUrl": "https://connect-intel-h0wcafse4-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 49b5248"
-    },
-    {
-      "logId": "20260915-1101-e08802c",
-      "commit": "e08802c",
-      "commitFull": "e08802cf959b28407af4b51b96ff2521349f8aa6",
-      "message": "Fix sidebar Deals counts from pipeline_deals, matching Lost list.",
-      "deployedAt": "2026-09-15T05:31:47.743Z",
-      "deployedAtIst": "15/09/2026, 11:01:47",
-      "committedAtIst": "15/09/2026, 11:01:07",
-      "vercelPreviewUrl": "https://connect-intel-2hztsi2nz-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- e08802c"
-    },
-    {
-      "logId": "20260915-0955-517d130",
-      "commit": "517d130",
-      "commitFull": "517d13064e5c7dcbd047358ab1c486a3bc040f94",
-      "message": "Clear stale PWA cache when PipelineDealsView is missing.",
-      "deployedAt": "2026-09-15T04:25:11.114Z",
-      "deployedAtIst": "15/09/2026, 09:55:11",
-      "committedAtIst": "15/09/2026, 09:54:40",
-      "vercelPreviewUrl": "https://connect-intel-dr7z7wkl4-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 517d130"
     }
   ]
 }
