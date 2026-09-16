@@ -252,7 +252,7 @@ export default function TeamIntelligencePanel({ onNavigate, panelOptions = {}, i
   const handleLeak = useCallback(
     (leakId) => {
       const map = {
-        not_contacted: { panel: 'pipeline', status: 'new' },
+        not_contacted: { panel: 'pipeline', status: 'unqualified' },
         inactive_deals: { panel: 'pipeline', view: 'deals' },
         missing_step: { panel: 'pipeline', status: 'follow_up' },
         overdue_tasks: { panel: 'crm-log' },

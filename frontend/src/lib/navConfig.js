@@ -1,4 +1,5 @@
 import { CRM_STATUSES, getVisiblePipelineColumns } from './crmConstants'
+import { foldCrmStatusCounts, normalizeCrmLeadStatus } from '../../../lib/crmLeadStatuses.js'
 import {
   AI_PROSPECTING_IN_CRM_ENABLED,
   CHITHI_IN_CRM_ENABLED,
@@ -17,7 +18,7 @@ export function countPipelineByStatus(leads = []) {
   const counts = { all: leads.length }
   for (const s of CRM_STATUSES) counts[s.id] = 0
   for (const lead of leads) {
-    const st = lead.crm?.status || 'new'
+    const st = normalizeCrmLeadStatus(lead.crm?.status)
     if (counts[st] !== undefined) counts[st] += 1
   }
   return counts
@@ -27,8 +28,8 @@ export function countPipelineByStatus(leads = []) {
 export function pipelineCountsFromSummary(pipelineSummary, savedLeads = []) {
   if (Array.isArray(pipelineSummary?.byStatus) && pipelineSummary.byStatus.length) {
     const counts = { all: Number(pipelineSummary.total) || 0 }
-    for (const row of pipelineSummary.byStatus) {
-      if (row?.status) counts[row.status] = Number(row.count) || 0
+    for (const row of foldCrmStatusCounts(pipelineSummary.byStatus)) {
+      counts[row.status] = Number(row.count) || 0
     }
     return counts
   }

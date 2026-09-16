@@ -10,7 +10,7 @@ import {
   pipelineOwnerUserId,
   repPipelineEntryVisible,
 } from '../../../lib/pipelineOwner.js'
-import { leadHasSendableEmail, leadDisplayName, leadEmailBounced } from './emailUtils'
+import { crmStatusMatchesFilter } from '../../../lib/crmLeadStatuses.js'
 
 export const CONTACT_FILTER_OPTIONS = [
   { id: 'any', label: 'All contacts' },
@@ -232,7 +232,7 @@ function matchesDateRange(iso, from, to) {
 
 function matchesWonThisMonth(lead) {
   const crm = lead.crm || {}
-  if (crm.status !== 'won') return false
+  if (crm.status !== 'onboarding' && crm.status !== 'won') return false
   const monthStart = new Date()
   monthStart.setDate(1)
   monthStart.setHours(0, 0, 0, 0)
@@ -312,7 +312,7 @@ export function applyPipelineFilters(
   }
 
   if (status && status !== 'all') {
-    list = list.filter((l) => (l.crm?.status || 'new') === status)
+    list = list.filter((l) => crmStatusMatchesFilter(l.crm?.status, status))
   }
 
   if (minLeadScore != null && minLeadScore !== '') {
@@ -376,9 +376,7 @@ export function applyPipelineFilters(
     const endToday = new Date()
     endToday.setHours(23, 59, 59, 999)
     list = list.filter((l) => {
-      const crm = l.crm || {}
-      if (crm.status !== 'follow_up') return false
-      const at = crm.nextFollowUpAt
+      const at = l.crm?.nextFollowUpAt
       if (!at) return true
       return new Date(at).getTime() <= endToday.getTime()
     })

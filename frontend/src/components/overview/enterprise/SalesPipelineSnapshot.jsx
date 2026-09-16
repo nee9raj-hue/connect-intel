@@ -1,20 +1,12 @@
-const STAGE_ORDER = ['new', 'contacted', 'follow_up', 'replied', 'won', 'active_trading', 'lost']
+import { CRM_STATUS_IDS, crmLeadStatusLabel } from '../../../lib/crmConstants'
 
-const STAGE_LABELS = {
-  new: 'New',
-  contacted: 'Contacted',
-  follow_up: 'Follow up',
-  replied: 'Replied',
-  won: 'Won',
-  active_trading: 'Active',
-  lost: 'Lost',
-}
+const STAGE_ORDER = CRM_STATUS_IDS
 
 export default function SalesPipelineSnapshot({ stages = [], role = 'rep', total = 0, onStageClick }) {
   const rows = STAGE_ORDER.map((id) => {
     const hit = (stages || []).find((s) => s.id === id)
     return { id, count: hit?.count || 0, pct: hit?.pct || 0 }
-  }).filter((r) => r.count > 0 || r.id === 'new' || r.id === 'follow_up')
+  }).filter((r) => r.count > 0 || r.id === 'unqualified' || r.id === 'opportunity')
 
   const pipelineTotal = total || rows.reduce((n, r) => n + r.count, 0)
 
@@ -51,7 +43,7 @@ export default function SalesPipelineSnapshot({ stages = [], role = 'rep', total
             key={row.id}
             type="button"
             className="dash-ent__pipeline-stage"
-            aria-label={`${STAGE_LABELS[row.id] || row.id}: ${row.count} leads`}
+            aria-label={`${crmLeadStatusLabel(row.id)}: ${row.count} leads`}
             onClick={() =>
               onStageClick({
                 panel: 'pipeline',
@@ -65,7 +57,7 @@ export default function SalesPipelineSnapshot({ stages = [], role = 'rep', total
               })
             }
           >
-            <span className="dash-ent__pipeline-stage-label">{STAGE_LABELS[row.id] || row.id}</span>
+            <span className="dash-ent__pipeline-stage-label">{crmLeadStatusLabel(row.id)}</span>
             <span className="dash-ent__pipeline-stage-bar" style={{ '--w': `${Math.max(row.pct || 8, 8)}%` }} />
             <span className="dash-ent__pipeline-stage-count">{row.count}</span>
           </button>

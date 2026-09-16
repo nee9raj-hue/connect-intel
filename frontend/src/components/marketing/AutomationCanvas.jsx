@@ -196,7 +196,7 @@ export default function AutomationCanvas({
                   {node.config?.action === 'set_status' && (
                     <select
                       className="automation-canvas-node-select"
-                      value={node.config?.status || 'follow_up'}
+                      value={node.config?.status || 'opportunity'}
                       onChange={(e) => {
                         sync({
                           ...localGraph,

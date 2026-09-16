@@ -4,16 +4,10 @@ import * as XLSX from 'xlsx'
  * Canonical column names for Connect Intel imports.
  * Keep this sheet as the first row header; do not rename columns.
  */
-/** Mirrors server `CRM_STATUSES` — use these values for pipeline_stage / pipeline_status. */
-export const CRM_PIPELINE_STAGE_OPTIONS = [
-  'new',
-  'contacted',
-  'follow_up',
-  'replied',
-  'won',
-  'active_trading',
-  'lost',
-]
+import { CRM_STATUS_IDS } from '../../../lib/crmLeadStatuses.js'
+
+/** Mirrors server account pipeline stages — use these values for pipeline_stage / pipeline_status. */
+export const CRM_PIPELINE_STAGE_OPTIONS = [...CRM_STATUS_IDS]
 
 export const IMPORT_TEMPLATE_COLUMNS = [
   'company',
@@ -66,7 +60,7 @@ export const IMPORT_TEMPLATE_SAMPLE_ROWS = [
     linkedin: 'linkedin.com/in/priya-sharma-export',
     seniority: 'Manager',
     source_confidence: 'verified',
-    pipeline_status: 'contacted',
+    pipeline_status: 'qualified',
     notes: 'Met at trade fair — follow up on samples',
     assignee_email: '',
     team_leader: '',
@@ -93,7 +87,7 @@ export const IMPORT_TEMPLATE_SAMPLE_ROWS = [
     linkedin: 'linkedin.com/in/vikram-meena-marble',
     seniority: 'Director',
     source_confidence: 'verified',
-    pipeline_status: 'new',
+    pipeline_status: 'unqualified',
     notes: '',
     assignee_email: '',
     team_leader: '',
@@ -120,7 +114,7 @@ export const IMPORT_TEMPLATE_SAMPLE_ROWS = [
     linkedin: 'linkedin.com/in/anita-desai-pharma',
     seniority: 'Director',
     source_confidence: 'imported',
-    pipeline_status: 'new',
+    pipeline_status: 'unqualified',
     notes: '',
     assignee_email: '',
     team_leader: '',
@@ -147,7 +141,7 @@ export const IMPORT_TEMPLATE_SAMPLE_ROWS = [
     linkedin: 'linkedin.com/in/karthik-rajan-logistics',
     seniority: 'Manager',
     source_confidence: 'imported',
-    pipeline_status: 'new',
+    pipeline_status: 'unqualified',
     notes: '',
     assignee_email: '',
     team_leader: '',
@@ -174,7 +168,7 @@ export const IMPORT_TEMPLATE_SAMPLE_ROWS = [
     linkedin: '',
     seniority: 'Owner',
     source_confidence: 'verified',
-    pipeline_status: 'new',
+    pipeline_status: 'unqualified',
     notes: '',
     assignee_email: '',
     team_leader: '',
@@ -201,7 +195,7 @@ export const IMPORT_TEMPLATE_SAMPLE_ROWS = [
     linkedin: 'linkedin.com/in/sourav-banerjee-agro',
     seniority: 'Manager',
     source_confidence: 'imported',
-    pipeline_status: 'new',
+    pipeline_status: 'unqualified',
     notes: '',
     assignee_email: '',
     team_leader: '',

@@ -4,7 +4,7 @@ import { CRM_STATUSES } from '../../lib/crmConstants'
 const EDIT_PROPERTIES = [
   { id: 'status', label: 'Lead status', group: 'Sales properties' },
   { id: 'owner', label: 'Lead owner', group: 'Sales properties' },
-  { id: 'replied', label: 'Mark as replied', group: 'Sales properties' },
+  { id: 'replied', label: 'Mark reply received', group: 'Sales properties' },
 ]
 
 function ModalShell({ open, title, onClose, children, footer }) {

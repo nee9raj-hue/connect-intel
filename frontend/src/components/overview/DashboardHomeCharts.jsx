@@ -1,34 +1,17 @@
-const STAGE_LABELS = {
-  new: 'New',
-  contacted: 'Contacted',
-  follow_up: 'Follow up',
-  replied: 'Replied',
-  won: 'Won',
-  active_trading: 'Active trading',
-  lost: 'Lost',
-}
+import { CRM_STATUS_IDS, crmLeadStatusLabel } from '../../lib/crmConstants'
 
 const STAGE_COLORS = {
-  new: '#475569',
-  contacted: '#3b82f6',
-  follow_up: '#007c89',
-  replied: '#6366f1',
-  won: '#059669',
+  unqualified: '#475569',
+  qualified: '#3b82f6',
+  opportunity: '#d97706',
+  onboarding: '#7c3aed',
   active_trading: '#0d9488',
+  at_risk: '#ea580c',
+  churned: '#78716c',
   lost: '#94a3b8',
 }
 
-const STAGE_ORDER = ['new', 'contacted', 'follow_up', 'replied', 'won', 'active_trading', 'lost']
-
-const STAGE_SHORT = {
-  new: 'New',
-  contacted: 'Contacted',
-  follow_up: 'Follow up',
-  replied: 'Replied',
-  won: 'Won',
-  active_trading: 'Trading',
-  lost: 'Lost',
-}
+const STAGE_ORDER = CRM_STATUS_IDS
 
 function formatShortDate(value) {
   if (!value) return ''
@@ -71,7 +54,7 @@ export function PipelineHealthChart({ stages = [], onStageClick, role = 'rep' })
   const rows = STAGE_ORDER.map((id) => {
     const hit = (stages || []).find((s) => s.id === id)
     return { id, count: hit?.count || 0 }
-  }).filter((s) => s.count > 0 || s.id === 'follow_up' || s.id === 'new')
+  }).filter((s) => s.count > 0 || s.id === 'opportunity' || s.id === 'unqualified')
 
   const total = rows.reduce((n, s) => n + (s.count || 0), 0)
   const max = niceMax(Math.max(1, ...rows.map((s) => s.count || 0)))
@@ -109,7 +92,7 @@ export function PipelineHealthChart({ stages = [], onStageClick, role = 'rep' })
           {bottleneck?.count ? (
             <>
               {' '}
-              · <span className="dash-home__pipeline-bottleneck">{STAGE_LABELS[bottleneck.id]}</span> holds{' '}
+              · <span className="dash-home__pipeline-bottleneck">{crmLeadStatusLabel(bottleneck.id)}</span> holds{' '}
               {pct(bottleneck.count, total)}%
             </>
           ) : null}
@@ -128,7 +111,7 @@ export function PipelineHealthChart({ stages = [], onStageClick, role = 'rep' })
               type="button"
               className="dash-home__pipeline-stack-seg"
               style={{ width: `${widthPct}%`, background: color }}
-              title={`${STAGE_LABELS[row.id]}: ${row.count.toLocaleString()} (${pct(row.count, total)}%)`}
+              title={`${crmLeadStatusLabel(row.id)}: ${row.count.toLocaleString()} (${pct(row.count, total)}%)`}
               onClick={() => onStageClick?.(stageNavAction(row, role))}
             />
           )
@@ -177,7 +160,7 @@ export function PipelineHealthChart({ stages = [], onStageClick, role = 'rep' })
           const y = padT + innerH - barH
           const isBottleneck = row.id === bottleneck?.id
           const color = STAGE_COLORS[row.id] || '#64748b'
-          const label = STAGE_LABELS[row.id] || row.id
+          const label = crmLeadStatusLabel(row.id)
 
           return (
             <g key={row.id}>
@@ -215,7 +198,7 @@ export function PipelineHealthChart({ stages = [], onStageClick, role = 'rep' })
                 {count >= 1000 ? formatAxis(count) : count}
               </text>
               <text x={x + barW / 2} y={h - 10} textAnchor="middle" fontSize="9" fill="#64748b">
-                {STAGE_SHORT[row.id] || label}
+                {label}
               </text>
             </g>
           )
@@ -234,7 +217,7 @@ export function PipelineHealthChart({ stages = [], onStageClick, role = 'rep' })
               onClick={() => onStageClick?.(stageNavAction(row, role))}
             >
               <span className="dash-home__pipeline-chip-dot" style={{ background: color }} />
-              <span className="dash-home__pipeline-chip-label">{STAGE_LABELS[row.id]}</span>
+              <span className="dash-home__pipeline-chip-label">{crmLeadStatusLabel(row.id)}</span>
               <span className="dash-home__pipeline-chip-val">{row.count.toLocaleString()}</span>
               <span className="dash-home__pipeline-chip-pct">{pct(row.count, total)}%</span>
             </button>

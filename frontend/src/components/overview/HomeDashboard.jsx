@@ -141,7 +141,7 @@ function WeekProgressCard({ thisWeek, label = 'CRM actions this week' }) {
 
 function LeadFocusGrid({ leadFocus, leadFocusActions, onAction }) {
   const cells = [
-    { label: 'New leads', value: leadFocus?.newLeads, action: leadFocusActions?.newLeads || { panel: 'pipeline', status: 'new', scopeOwner: 'me', returnTo: 'overview' } },
+    { label: 'New leads', value: leadFocus?.newLeads, action: leadFocusActions?.newLeads || { panel: 'pipeline', status: 'unqualified', scopeOwner: 'me', returnTo: 'overview' } },
     { label: 'Hot leads', value: leadFocus?.hotLeads, action: { panel: 'pipeline', scoreMin: 70, scopeOwner: 'me', returnTo: 'overview' } },
     { label: 'Uncontacted', value: leadFocus?.uncontacted, action: leadFocusActions?.uncontacted },
     { label: 'Follow-up due', value: leadFocus?.followUpDue, action: leadFocusActions?.followUp },

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useApp } from '../../context/AppContext'
-import { CRM_STATUSES } from '../../lib/crmConstants'
+import { CRM_STATUSES, DEFAULT_CRM_LEAD_STATUS } from '../../lib/crmConstants'
 import { brand } from '../../lib/brandTokens'
 
 const EMPTY = {
@@ -16,7 +16,7 @@ const EMPTY = {
   industry: '',
   website: '',
   notes: '',
-  status: 'new',
+  status: DEFAULT_CRM_LEAD_STATUS,
   source: 'manual',
   assignedToUserId: '',
   commercialEmailOptIn: false,

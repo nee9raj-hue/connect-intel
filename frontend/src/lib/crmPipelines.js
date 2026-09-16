@@ -1,12 +1,14 @@
 import { CRM_STATUSES } from './crmConstants'
+import { defaultPipelineStages, migrateOrgPipelineStages } from '../../../lib/crmLeadStatuses.js'
 
 const COLOR_MAP = {
   slate: 'bg-slate-100 text-slate-700 border-slate-200',
   blue: 'bg-blue-50 text-blue-700 border-blue-200',
   amber: 'bg-amber-50 text-amber-800 border-amber-200',
   violet: 'bg-violet-50 text-violet-700 border-violet-200',
-  orange: 'bg-[#fff4ee] text-[#FF773D] border-[#ffd4b8]',
+  orange: 'bg-orange-50 text-orange-800 border-orange-200',
   teal: 'bg-teal-50 text-teal-800 border-teal-200',
+  stone: 'bg-stone-100 text-stone-700 border-stone-200',
   gray: 'bg-gray-100 text-gray-500 border-gray-200',
 }
 
@@ -20,13 +22,18 @@ export function stageToColumn(stage) {
 }
 
 export function pipelinesFromSettings(settings) {
-  if (settings?.pipelines?.length) return settings.pipelines
+  if (settings?.pipelines?.length) {
+    return settings.pipelines.map((p) => ({
+      ...p,
+      stages: migrateOrgPipelineStages(p.stages),
+    }))
+  }
   return [
     {
       id: 'default',
       name: 'Sales pipeline',
       isDefault: true,
-      stages: CRM_STATUSES.map((s) => ({ id: s.id, label: s.label, color: 'slate' })),
+      stages: defaultPipelineStages(),
     },
   ]
 }

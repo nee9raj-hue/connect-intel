@@ -12,7 +12,6 @@ export function mergeRepPerformanceRows(repPerformance = [], teamMembers = [], i
       open: { panel: 'pipeline', userId, assigneeUserId: userId, returnTo: 'overview' },
       followups: {
         panel: 'pipeline',
-        status: 'follow_up',
         followUpDue: true,
         userId,
         assigneeUserId: userId,
@@ -20,7 +19,7 @@ export function mergeRepPerformanceRows(repPerformance = [], teamMembers = [], i
       },
       won: {
         panel: 'pipeline',
-        status: 'won',
+        status: 'onboarding',
         wonThisMonth: true,
         userId,
         assigneeUserId: userId,

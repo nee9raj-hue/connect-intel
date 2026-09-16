@@ -189,10 +189,10 @@ export function RevenueProgressBar({ revenue }) {
 export function LeadFocusCards({ focus, onCardClick, onNavigate }) {
   if (!focus) return null
   const cards = [
-    { id: 'new', label: 'New leads', count: focus.newLeads, status: 'new' },
+    { id: 'new', label: 'New leads', count: focus.newLeads, status: 'unqualified' },
     { id: 'hot', label: 'Hot leads', count: focus.hotLeads, smartTags: ['hot_score'] },
-    { id: 'uncontacted', label: 'Uncontacted', count: focus.uncontacted, status: 'new' },
-    { id: 'followup', label: 'Follow-up due', count: focus.followUpDue, status: 'follow_up', followUpDue: true },
+    { id: 'uncontacted', label: 'Uncontacted', count: focus.uncontacted, status: 'unqualified' },
+    { id: 'followup', label: 'Follow-up due', count: focus.followUpDue, followUpDue: true },
   ]
   return (
     <div className="myday-lead-focus">

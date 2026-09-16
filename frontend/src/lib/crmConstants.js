@@ -3,24 +3,40 @@ import {
   getFreightDealStageMeta,
   isFreightDealStageClosed,
 } from '../../../lib/freightDeal.js'
+import { CRM_LEAD_STATUS_DEFS, DEFAULT_CRM_LEAD_STATUS, normalizeCrmLeadStatus, crmLeadStatusLabel } from '../../../lib/crmLeadStatuses.js'
 import { formatDate } from './dateLocale.js'
 
-export const CRM_STATUSES = [
-  { id: 'new', label: 'New', color: 'bg-slate-100 text-slate-700 border-slate-200' },
-  { id: 'contacted', label: 'Contacted', color: 'bg-blue-50 text-blue-700 border-blue-200' },
-  { id: 'follow_up', label: 'Follow up', color: 'bg-amber-50 text-amber-800 border-amber-200' },
-  { id: 'replied', label: 'Replied', color: 'bg-violet-50 text-violet-700 border-violet-200' },
-  { id: 'won', label: 'Won', color: 'bg-[#fff4ee] text-[#FF773D] border-[#ffd4b8]' },
-  {
-    id: 'active_trading',
-    label: 'Active trading',
-    color: 'bg-teal-50 text-teal-800 border-teal-200',
-  },
-  { id: 'lost', label: 'Lost', color: 'bg-gray-100 text-gray-500 border-gray-200' },
-]
+const STAGE_TW = {
+  slate: 'bg-slate-100 text-slate-700 border-slate-200',
+  blue: 'bg-blue-50 text-blue-700 border-blue-200',
+  amber: 'bg-amber-50 text-amber-800 border-amber-200',
+  violet: 'bg-violet-50 text-violet-700 border-violet-200',
+  teal: 'bg-teal-50 text-teal-800 border-teal-200',
+  orange: 'bg-orange-50 text-orange-800 border-orange-200',
+  stone: 'bg-stone-100 text-stone-700 border-stone-200',
+  gray: 'bg-gray-100 text-gray-500 border-gray-200',
+}
 
-/** HubSpot-style deal stages for standard (non-freight) orgs. */
-export const DEAL_STAGES = CRM_STATUSES.filter((col) => col.id !== 'active_trading')
+export const CRM_STATUSES = CRM_LEAD_STATUS_DEFS.map((row) => ({
+  id: row.id,
+  label: row.label,
+  hint: row.hint,
+  color: STAGE_TW[row.color] || STAGE_TW.slate,
+}))
+
+export const CRM_STATUS_IDS = CRM_STATUSES.map((row) => row.id)
+
+export { crmLeadStatusLabel, DEFAULT_CRM_LEAD_STATUS, normalizeCrmLeadStatus }
+
+/** HubSpot-style deal stages for standard (non-freight) orgs — not account pipeline. */
+export const DEAL_STAGES = [
+  { id: 'new', label: 'New', color: STAGE_TW.slate },
+  { id: 'contacted', label: 'Contacted', color: STAGE_TW.blue },
+  { id: 'follow_up', label: 'Follow up', color: STAGE_TW.amber },
+  { id: 'replied', label: 'Replied', color: STAGE_TW.violet },
+  { id: 'won', label: 'Won', color: 'bg-[#fff4ee] text-[#FF773D] border-[#ffd4b8]' },
+  { id: 'lost', label: 'Lost', color: STAGE_TW.gray },
+]
 
 export { FREIGHT_DEAL_STAGES, getFreightDealStageMeta }
 
@@ -69,7 +85,7 @@ export const EMAIL_PURPOSES = [
 
 export function defaultCrm() {
   return {
-    status: 'new',
+    status: DEFAULT_CRM_LEAD_STATUS,
     notes: '',
     lastEmailSentAt: null,
     lastResponseAt: null,
@@ -86,7 +102,8 @@ export function defaultCrm() {
 }
 
 export function getStatusMeta(statusId) {
-  return CRM_STATUSES.find((s) => s.id === statusId) || CRM_STATUSES[0]
+  const id = normalizeCrmLeadStatus(statusId)
+  return CRM_STATUSES.find((s) => s.id === id) || CRM_STATUSES[0]
 }
 
 export function formatCrmDate(iso) {
