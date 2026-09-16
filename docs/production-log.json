@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-16T14:22:34.727Z",
-  "updatedAtIst": "16/09/2026, 19:52:34",
+  "updatedAt": "2026-09-16T14:36:24.503Z",
+  "updatedAtIst": "16/09/2026, 20:06:24",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "d2e9536",
+  "currentProductionCommit": "02ad742",
   "entries": [
+    {
+      "logId": "20260916-2006-02ad742",
+      "commit": "02ad742",
+      "commitFull": "02ad74287abe3bec22144aaf4865214fe1da0ee5",
+      "message": "Fix deal click crash and keep CRM deals off ERP re-import.",
+      "deployedAt": "2026-09-16T14:36:08.103Z",
+      "deployedAtIst": "16/09/2026, 20:06:08",
+      "committedAtIst": "16/09/2026, 20:05:22",
+      "vercelPreviewUrl": "https://connect-intel-dll3n6pum-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 02ad742"
+    },
+    {
+      "logId": "20260916-1953-7d9f607",
+      "commit": "7d9f607",
+      "commitFull": "7d9f607ef74ec2ec3ddb82781d5620cb976da982",
+      "message": "Record production deploy d2e9536 as LIVE.",
+      "deployedAt": "2026-09-16T14:23:32.115Z",
+      "deployedAtIst": "16/09/2026, 19:53:32",
+      "committedAtIst": "16/09/2026, 19:52:42",
+      "vercelPreviewUrl": "https://connect-intel-giuwbm6ui-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 7d9f607"
+    },
     {
       "logId": "20260916-1952-d2e9536",
       "commit": "d2e9536",
@@ -15,7 +43,7 @@
       "committedAtIst": "16/09/2026, 19:51:29",
       "vercelPreviewUrl": "https://connect-intel-cxgr80b5r-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- d2e9536"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 471a346"
-    },
-    {
-      "logId": "20260916-1016-5b84a41",
-      "commit": "5b84a41",
-      "commitFull": "5b84a4175a35cf0b166f13cb44209646dd486258",
-      "message": "Replace deal forecast pills with filter-aware customers, booked, and lost totals.",
-      "deployedAt": "2026-09-16T04:46:35.929Z",
-      "deployedAtIst": "16/09/2026, 10:16:35",
-      "committedAtIst": "16/09/2026, 10:16:00",
-      "vercelPreviewUrl": "https://connect-intel-5fmbfzl9t-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 5b84a41"
-    },
-    {
-      "logId": "20260916-0055-e9d4223",
-      "commit": "e9d4223",
-      "commitFull": "e9d4223121f542eac6045a567ee9b735ec493f4d",
-      "message": "Merge branch 'cursor/fix-deals-mobile-view-802f'",
-      "deployedAt": "2026-09-15T19:25:20.661Z",
-      "deployedAtIst": "16/09/2026, 00:55:20",
-      "committedAtIst": "16/09/2026, 00:54:41",
-      "vercelPreviewUrl": "https://connect-intel-6no09lt5d-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- e9d4223"
     }
   ]
 }
