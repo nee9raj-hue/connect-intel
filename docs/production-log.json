@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-16T08:07:40.689Z",
-  "updatedAtIst": "16/09/2026, 13:37:40",
+  "updatedAt": "2026-09-16T11:04:05.619Z",
+  "updatedAtIst": "16/09/2026, 16:34:05",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "040421e",
+  "currentProductionCommit": "bf5f67d",
   "entries": [
+    {
+      "logId": "20260916-1633-bf5f67d",
+      "commit": "bf5f67d",
+      "commitFull": "bf5f67d3cf39333acef469f7cd90143881b6e484",
+      "message": "Restrict pipeline and deal delete to Org Admin.",
+      "deployedAt": "2026-09-16T11:03:41.227Z",
+      "deployedAtIst": "16/09/2026, 16:33:41",
+      "committedAtIst": "16/09/2026, 16:32:56",
+      "vercelPreviewUrl": "https://connect-intel-fgdohfv1i-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- bf5f67d"
+    },
+    {
+      "logId": "20260916-1339-bc47465",
+      "commit": "bc47465",
+      "commitFull": "bc474659f5fbc7ecd352547695e4056a2b37523d",
+      "message": "Record production deploy 040421e as LIVE.",
+      "deployedAt": "2026-09-16T08:09:03.075Z",
+      "deployedAtIst": "16/09/2026, 13:39:03",
+      "committedAtIst": "16/09/2026, 13:37:55",
+      "vercelPreviewUrl": "https://connect-intel-9ljchbdwh-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- bc47465"
+    },
     {
       "logId": "20260916-1336-040421e",
       "commit": "040421e",
@@ -15,7 +43,7 @@
       "committedAtIst": "16/09/2026, 13:35:43",
       "vercelPreviewUrl": "https://connect-intel-e0c22a7r5-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 040421e"
     },
@@ -242,34 +270,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 330496d"
-    },
-    {
-      "logId": "20260915-2250-5f39971",
-      "commit": "5f39971",
-      "commitFull": "5f399714d23d5d5eb60c1cdf3ab404790e89a9a1",
-      "message": "Collapse lead deal cards by default so multiple deals scan as a latest-first list.",
-      "deployedAt": "2026-09-15T17:20:31.594Z",
-      "deployedAtIst": "15/09/2026, 22:50:31",
-      "committedAtIst": "15/09/2026, 22:49:51",
-      "vercelPreviewUrl": "https://connect-intel-fz2gyjq0j-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 5f39971"
-    },
-    {
-      "logId": "20260915-2239-2ad137f",
-      "commit": "2ad137f",
-      "commitFull": "2ad137f5b296b9d3968a305791be5e5898161584",
-      "message": "Record production deploy 7a2220c as LIVE.",
-      "deployedAt": "2026-09-15T17:09:26.167Z",
-      "deployedAtIst": "15/09/2026, 22:39:26",
-      "committedAtIst": "15/09/2026, 22:38:45",
-      "vercelPreviewUrl": "https://connect-intel-iyoi2shpo-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 2ad137f"
     }
   ]
 }
