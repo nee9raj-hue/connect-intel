@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- bbbc423
+npm run prod:rollback -- 0c6ebce
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- bbbc423
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `796697d` |
-| Log updated (IST) | 16/09/2026, 13:05:25 |
+| Commit | `ca41c41` |
+| Log updated (IST) | 16/09/2026, 13:20:37 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- bbbc423
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 16/09/2026, 13:02:28 | `796697d` | Fix Copilot crashing with Unexpected identifier pipeline_leads. | [preview](https://connect-intel-mr56j4wiq-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 796697d` | **← LIVE**
+| 16/09/2026, 13:19:41 | `ca41c41` | Remove duplicate deal-stage pills from the Pipeline Deals header. | [preview](https://connect-intel-3mucw1fpr-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ca41c41` | **← LIVE**
+| 16/09/2026, 13:06:38 | `0c6ebce` | Record production deploy 796697d as LIVE. | [preview](https://connect-intel-41bhsp2bw-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0c6ebce` |
+| 16/09/2026, 13:02:28 | `796697d` | Fix Copilot crashing with Unexpected identifier pipeline_leads. | [preview](https://connect-intel-mr56j4wiq-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 796697d` |
 | 16/09/2026, 12:31:48 | `bbbc423` | Record production deploy 3e01162 as LIVE. | [preview](https://connect-intel-54202nnf5-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- bbbc423` |
 | 16/09/2026, 12:29:22 | `3e01162` | Keep Copilot as a single header CRM assistant without web theater. | [preview](https://connect-intel-q7lg52doc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3e01162` |
 | 16/09/2026, 12:09:40 | `b6fd53c` | Record production deploy b6dd140 as LIVE. | [preview](https://connect-intel-mk8g4ojkw-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b6fd53c` |
@@ -61,8 +63,6 @@ npm run prod:rollback -- bbbc423
 | 15/09/2026, 22:39:26 | `2ad137f` | Record production deploy 7a2220c as LIVE. | [preview](https://connect-intel-iyoi2shpo-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2ad137f` |
 | 15/09/2026, 22:37:56 | `7a2220c` | Use customer dates in deal range filters and a single Won/Booked/Lost outcome. | [preview](https://connect-intel-3tc86vzg9-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7a2220c` |
 | 15/09/2026, 22:17:33 | `57e7320` | Record production deploy efd7f1a as LIVE. | [preview](https://connect-intel-rejobcu8b-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 57e7320` |
-| 15/09/2026, 22:16:13 | `efd7f1a` | Let reps record actual RFQ, quote, booked, won, and lost dates on deals. | [preview](https://connect-intel-oqrhodnvp-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- efd7f1a` |
-| 15/09/2026, 22:00:59 | `c3d00e3` | Record production deploy d874acd as LIVE. | [preview](https://connect-intel-oex9p0yv1-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c3d00e3` |
 
 ---
 

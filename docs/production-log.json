@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-16T07:35:25.725Z",
-  "updatedAtIst": "16/09/2026, 13:05:25",
+  "updatedAt": "2026-09-16T07:50:37.707Z",
+  "updatedAtIst": "16/09/2026, 13:20:37",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "796697d",
+  "currentProductionCommit": "ca41c41",
   "entries": [
+    {
+      "logId": "20260916-1319-ca41c41",
+      "commit": "ca41c41",
+      "commitFull": "ca41c41ef259b2b8b4efb8e9bf340b34778282e0",
+      "message": "Remove duplicate deal-stage pills from the Pipeline Deals header.",
+      "deployedAt": "2026-09-16T07:49:41.956Z",
+      "deployedAtIst": "16/09/2026, 13:19:41",
+      "committedAtIst": "16/09/2026, 13:19:02",
+      "vercelPreviewUrl": "https://connect-intel-3mucw1fpr-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- ca41c41"
+    },
+    {
+      "logId": "20260916-1306-0c6ebce",
+      "commit": "0c6ebce",
+      "commitFull": "0c6ebce35c8990c9a75dcb89f2e6bbd5ab616595",
+      "message": "Record production deploy 796697d as LIVE.",
+      "deployedAt": "2026-09-16T07:36:38.284Z",
+      "deployedAtIst": "16/09/2026, 13:06:38",
+      "committedAtIst": "16/09/2026, 13:05:55",
+      "vercelPreviewUrl": "https://connect-intel-41bhsp2bw-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 0c6ebce"
+    },
     {
       "logId": "20260916-1302-796697d",
       "commit": "796697d",
@@ -15,7 +43,7 @@
       "committedAtIst": "16/09/2026, 13:01:42",
       "vercelPreviewUrl": "https://connect-intel-mr56j4wiq-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 796697d"
     },
@@ -242,34 +270,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 57e7320"
-    },
-    {
-      "logId": "20260915-2216-efd7f1a",
-      "commit": "efd7f1a",
-      "commitFull": "efd7f1a79289d9ad85b2cb98c70046926474ee58",
-      "message": "Let reps record actual RFQ, quote, booked, won, and lost dates on deals.",
-      "deployedAt": "2026-09-15T16:46:13.037Z",
-      "deployedAtIst": "15/09/2026, 22:16:13",
-      "committedAtIst": "15/09/2026, 22:15:26",
-      "vercelPreviewUrl": "https://connect-intel-oqrhodnvp-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- efd7f1a"
-    },
-    {
-      "logId": "20260915-2200-c3d00e3",
-      "commit": "c3d00e3",
-      "commitFull": "c3d00e3eced9d77d2064b16550254665c35bea12",
-      "message": "Record production deploy d874acd as LIVE.",
-      "deployedAt": "2026-09-15T16:30:59.085Z",
-      "deployedAtIst": "15/09/2026, 22:00:59",
-      "committedAtIst": "15/09/2026, 22:00:20",
-      "vercelPreviewUrl": "https://connect-intel-oex9p0yv1-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- c3d00e3"
     }
   ]
 }
