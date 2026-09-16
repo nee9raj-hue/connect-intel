@@ -41,6 +41,7 @@ export default function FilterDropdown({
   icon: Icon = null,
   showLabel = false,
   menuVariant = 'default',
+  disabled = false,
 }) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
@@ -57,11 +58,12 @@ export default function FilterDropdown({
   }, [])
 
   const toggleOpen = useCallback(() => {
+    if (disabled) return
     setOpen((wasOpen) => {
       if (!wasOpen) openedAtRef.current = Date.now()
       return !wasOpen
     })
-  }, [])
+  }, [disabled])
 
   const iconButton = iconOnly && (iconSrc || Icon)
   const hubspotStatusMenu = menuVariant === 'hubspot-status' && !multiSelect
@@ -114,6 +116,10 @@ export default function FilterDropdown({
   useEffect(() => {
     if (open && multiSelect) setDraftMulti([...(values || [])])
   }, [open, multiSelect, values])
+
+  useEffect(() => {
+    if (disabled && open) close()
+  }, [disabled, open, close])
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -301,10 +307,11 @@ export default function FilterDropdown({
           type="button"
           onClick={toggleOpen}
           onPointerDown={(e) => e.stopPropagation()}
+          disabled={disabled}
           className={
             iconButton
               ? `hs-filter-icon-btn ${showLabel ? 'hs-filter-icon-btn--labeled' : ''} ${active ? 'is-active' : ''}`
-              : `crm-filter-btn ${compact ? 'crm-filter-btn--compact' : ''} ${active ? 'crm-filter-btn-active' : ''}`
+              : `crm-filter-btn ${compact ? 'crm-filter-btn--compact' : ''} ${active ? 'crm-filter-btn-active' : ''} ${disabled ? 'crm-filter-btn--disabled' : ''}`
           }
           aria-expanded={open}
           aria-label={iconButton ? (active && shown ? `${label}: ${shown}` : label) : undefined}

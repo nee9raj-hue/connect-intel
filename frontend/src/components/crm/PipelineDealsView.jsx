@@ -13,11 +13,13 @@ import {
 import { estimatedFreightRevenueInr, sumEstimatedFreightRevenue, FREIGHT_DEAL_STAGES, resolveFreightDealCurrency, FALLBACK_USD_INR, isFreightDealOrg } from '../../lib/freightDeal'
 import { filledDealMilestones } from '../../lib/dealMilestones'
 import {
+  DEAL_MONTH_OPTIONS,
   DEAL_TRANSPORT_FILTERS,
+  dealYearOptions,
+  dealYearsFromRows,
   filterPipelineDealRows,
-  formatLocalDateRangeLabel,
-  parseDealFilterDate,
-  dealFilterDateInputValue,
+  formatDealPeriodLabel,
+  isoWeeksOverlappingMonth,
 } from '../../lib/pipelineDealsFilter'
 import { DashboardSegmented } from '../dashboard/dashboardUi'
 import FilterDropdown from './FilterDropdown'
@@ -50,8 +52,9 @@ export default function PipelineDealsView({
   const [exportBusy, setExportBusy] = useState(false)
   const [saveReportOpen, setSaveReportOpen] = useState(false)
   const [savedReports, setSavedReports] = useState([])
-  const [dateFrom, setDateFrom] = useState(null)
-  const [dateTo, setDateTo] = useState(null)
+  const [periodYear, setPeriodYear] = useState('')
+  const [periodMonth, setPeriodMonth] = useState('')
+  const [selectedWeeks, setSelectedWeeks] = useState([])
   const [transportMode, setTransportMode] = useState('all')
   const [selectedStages, setSelectedStages] = useState([])
   const [usdInrRate, setUsdInrRate] = useState(FALLBACK_USD_INR)
@@ -63,14 +66,15 @@ export default function PipelineDealsView({
   const filteredRows = useMemo(
     () =>
       filterPipelineDealRows(rows, {
-        dateFrom,
-        dateTo,
+        year: periodYear,
+        month: periodMonth,
+        weeks: selectedWeeks,
         transportMode,
         stages: isAllDealsView ? selectedStages : [],
         dateStages: isAllDealsView ? selectedStages : [dealStage],
         timeZone,
       }),
-    [rows, dateFrom, dateTo, transportMode, selectedStages, isAllDealsView, timeZone]
+    [rows, periodYear, periodMonth, selectedWeeks, transportMode, selectedStages, isAllDealsView, timeZone]
   )
 
   const estimatedRevenueTotal = useMemo(
@@ -84,11 +88,14 @@ export default function PipelineDealsView({
   )
 
   const filtersActive =
-    Boolean(dateFrom || dateTo) ||
+    Boolean(periodYear) ||
     transportMode !== 'all' ||
     (isAllDealsView && selectedStages.length > 0)
-  const rangeLabel =
-    dateFrom || dateTo ? formatLocalDateRangeLabel(dateFrom, dateTo, timeZone) : ''
+  const rangeLabel = formatDealPeriodLabel({
+    year: periodYear,
+    month: periodMonth,
+    weeks: selectedWeeks,
+  })
 
   const stageMeta = useMemo(() => {
     if (dealStage === 'all') return { label: 'All Deals' }
@@ -106,10 +113,11 @@ export default function PipelineDealsView({
       dealStage,
       assigneeUserId: assigneeFilter || null,
       transportMode,
-      dateFrom: dateFrom ? dealFilterDateInputValue(dateFrom, timeZone) : null,
-      dateTo: dateTo ? dealFilterDateInputValue(dateTo, timeZone) : null,
+      year: periodYear || null,
+      month: periodMonth || null,
+      weeks: selectedWeeks.length ? selectedWeeks : null,
     }),
-    [dealStage, assigneeFilter, transportMode, dateFrom, dateTo, timeZone]
+    [dealStage, assigneeFilter, transportMode, periodYear, periodMonth, selectedWeeks]
   )
 
   const filterSummary = useMemo(() => {
@@ -299,6 +307,29 @@ export default function PipelineDealsView({
     return `${labels[0]} +${labels.length - 1}`
   }, [selectedStages])
 
+  const yearOptions = useMemo(
+    () => dealYearOptions(new Date(), dealYearsFromRows(rows, timeZone), timeZone),
+    [rows, timeZone]
+  )
+
+  const weekOptions = useMemo(() => {
+    if (!periodYear || !periodMonth) return []
+    return isoWeeksOverlappingMonth(periodYear, periodMonth, timeZone)
+  }, [periodYear, periodMonth, timeZone])
+
+  const weekFilterDisplay = useMemo(() => {
+    if (!selectedWeeks.length) return null
+    const labels = weekOptions.filter((opt) => selectedWeeks.includes(opt.value)).map((opt) => opt.label)
+    if (!labels.length) return selectedWeeks.map((w) => `week${w}`).join(', ')
+    if (labels.length === 1) return labels[0]
+    return `${labels[0]} +${labels.length - 1}`
+  }, [selectedWeeks, weekOptions])
+
+  const monthFilterDisplay = useMemo(() => {
+    if (!periodMonth) return null
+    return DEAL_MONTH_OPTIONS.find((opt) => opt.value === String(periodMonth))?.label || null
+  }, [periodMonth])
+
   const markBulkLost = () => {
     const reason = window.prompt('Lost reason (optional — applies to all selected):', '') ?? null
     if (reason === null) return
@@ -411,34 +442,51 @@ export default function PipelineDealsView({
 
       <div className="pipeline-deals-filters" role="search" aria-label="Deal filters">
         <div className="pipeline-deals-filters__dates">
-          <label className="pipeline-deals-filters__field">
-            <span className="pipeline-deals-filters__label">From</span>
-            <input
-              type="date"
-              className="pipeline-deals-filters__date"
-              value={dateFrom ? dealFilterDateInputValue(dateFrom, timeZone) : ''}
-              max={dateTo ? dealFilterDateInputValue(dateTo, timeZone) : undefined}
-              onChange={(e) => {
-                setDateFrom(parseDealFilterDate(e.target.value, timeZone))
+          <div className="pipeline-deals-filters__dropdown">
+            <FilterDropdown
+              label="Year"
+              value={periodYear}
+              displayValue={periodYear || null}
+              options={yearOptions}
+              emptyLabel="All years"
+              onChange={(next) => {
+                setPeriodYear(String(next || ''))
+                setPeriodMonth('')
+                setSelectedWeeks([])
                 setSelected(new Set())
               }}
-              aria-label="Filter from date"
             />
-          </label>
-          <label className="pipeline-deals-filters__field">
-            <span className="pipeline-deals-filters__label">To</span>
-            <input
-              type="date"
-              className="pipeline-deals-filters__date"
-              value={dateTo ? dealFilterDateInputValue(dateTo, timeZone) : ''}
-              min={dateFrom ? dealFilterDateInputValue(dateFrom, timeZone) : undefined}
-              onChange={(e) => {
-                setDateTo(parseDealFilterDate(e.target.value, timeZone))
+          </div>
+          <div className="pipeline-deals-filters__dropdown">
+            <FilterDropdown
+              label="Month"
+              value={periodMonth}
+              displayValue={monthFilterDisplay}
+              options={DEAL_MONTH_OPTIONS}
+              emptyLabel="All months"
+              disabled={!periodYear}
+              onChange={(next) => {
+                setPeriodMonth(String(next || ''))
+                setSelectedWeeks([])
                 setSelected(new Set())
               }}
-              aria-label="Filter to date"
             />
-          </label>
+          </div>
+          <div className="pipeline-deals-filters__dropdown">
+            <FilterDropdown
+              label="Week Number"
+              multiSelect
+              values={selectedWeeks}
+              displayValue={weekFilterDisplay}
+              options={weekOptions}
+              emptyLabel="All weeks"
+              disabled={!periodYear || !periodMonth}
+              onMultiChange={(next) => {
+                setSelectedWeeks((next || []).map(String))
+                setSelected(new Set())
+              }}
+            />
+          </div>
           <div className="pipeline-deals-filters__stages">
             <FilterDropdown
               label="Stages"
@@ -469,7 +517,9 @@ export default function PipelineDealsView({
         {rangeLabel ? (
           <p className="pipeline-deals-filters__week-hint">{rangeLabel}</p>
         ) : (
-          <p className="pipeline-deals-filters__week-hint">Filter by deal activity date (created or updated)</p>
+          <p className="pipeline-deals-filters__week-hint">
+            Choose a year, then month, then week numbers. Stages stay independent.
+          </p>
         )}
         <DashboardSegmented
           value={transportMode}
@@ -553,7 +603,7 @@ export default function PipelineDealsView({
       {!loading && !error && filteredRows.length === 0 && (
         <p className="text-xs text-gray-500 py-10 text-center border rounded-xl bg-gray-50">
           {rows.length > 0 && filtersActive
-            ? 'No deals match these filters. Try another date range or transport mode.'
+            ? 'No deals match these filters. Try another period or transport mode.'
             : "No deals in this stage yet. Create one from a lead's Deals tab."}
         </p>
       )}

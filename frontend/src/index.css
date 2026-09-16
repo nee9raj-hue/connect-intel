@@ -3040,12 +3040,14 @@ button.ci-lead-tag:disabled {
   gap: 0.5rem 0.75rem;
 }
 
+.pipeline-deals-filters__dropdown,
 .pipeline-deals-filters__stages {
   position: relative;
   z-index: 6;
   min-width: 9.5rem;
 }
 
+.pipeline-deals-filters__dropdown .crm-filter-btn,
 .pipeline-deals-filters__stages .crm-filter-btn {
   width: 100%;
   justify-content: space-between;
@@ -3058,6 +3060,7 @@ button.ci-lead-tag:disabled {
   padding: 0.35rem 0.5rem;
 }
 
+.pipeline-deals-filters__dropdown .crm-filter-btn-active,
 .pipeline-deals-filters__stages .crm-filter-btn-active {
   background: #fff4ee;
   border-color: #ffd4b8;
@@ -7764,6 +7767,19 @@ button.dashboard-mini-stat--clickable:hover {
 
 .crm-filter-btn:hover {
   border-color: #99acc2;
+  background: #f5f8fa;
+}
+
+.crm-filter-btn:disabled,
+.crm-filter-btn--disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: #f5f8fa;
+}
+
+.crm-filter-btn:disabled:hover,
+.crm-filter-btn--disabled:hover {
+  border-color: #cbd6e2;
   background: #f5f8fa;
 }
 

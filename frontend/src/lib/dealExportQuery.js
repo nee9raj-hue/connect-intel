@@ -12,6 +12,15 @@ export function buildDealExportQuery(serverFilters = {}, { reportId, timeZone } 
   }
   if (serverFilters.dateFrom) params.set('dateFrom', serverFilters.dateFrom)
   if (serverFilters.dateTo) params.set('dateTo', serverFilters.dateTo)
+  if (serverFilters.year) params.set('year', String(serverFilters.year))
+  if (serverFilters.month) params.set('month', String(serverFilters.month))
+  const weeks = Array.isArray(serverFilters.weeks)
+    ? serverFilters.weeks
+    : String(serverFilters.weeks || '')
+        .split(',')
+        .map((w) => w.trim())
+        .filter(Boolean)
+  if (weeks.length) params.set('weeks', weeks.join(','))
   if (timeZone) params.set('timeZone', timeZone)
   if (reportId) params.set('reportId', reportId)
   return params
