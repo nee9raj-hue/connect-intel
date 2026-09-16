@@ -102,8 +102,9 @@ export default function LeadErpPanels({ lead, tab }) {
           </div>
           {!hasData ? (
             <LwEmpty>
-              No ERP revenue yet. Open this lead after a workspace shipment upload or trading import
-              that matches this company or customer code.
+              No revenue in Connect Intel for this lead. Xindus ERP and Metabase are not connected
+              yet — this tab fills from a workspace shipment upload, an Active customers trading
+              import, or deal amounts on the record.
             </LwEmpty>
           ) : (
             <>
@@ -145,8 +146,8 @@ export default function LeadErpPanels({ lead, tab }) {
     <LwSection icon={SparkIcon} title="ERP Finance">
       {!hasFinance ? (
         <LwEmpty>
-          No ERP finance yet. Invoice status, payments, and ledger fill from matched shipments and
-          open or won deals.
+          No finance in Connect Intel for this lead. Invoice status, payments, and ledger fill from
+          matched shipments and open or won deals — not from Xindus ERP until that API is connected.
         </LwEmpty>
       ) : (
         <>

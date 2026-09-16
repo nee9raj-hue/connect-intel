@@ -609,6 +609,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
           ...base,
           ...listLead,
           erp: listLead.erp || base.erp,
+          tradingProfile: listLead.tradingProfile || base.tradingProfile,
           commercialEmailOptIn:
             listLead.commercialEmailOptIn ??
             (listLead.commercialEmailConsentAt ? true : base.commercialEmailOptIn),
