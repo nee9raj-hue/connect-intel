@@ -735,7 +735,7 @@ export default function PipelineLeadsTable({
                     onAddTask={() => onQuickTask?.(lead)}
                     onChangeStatus={() => onChangeStatus?.(lead)}
                     onChangeOwner={() => onChangeOwner?.(lead)}
-                    onDelete={() => onDeleteLead?.(lead)}
+                    onDelete={onDeleteLead ? () => onDeleteLead(lead) : undefined}
                   />
                 </td>
               </tr>

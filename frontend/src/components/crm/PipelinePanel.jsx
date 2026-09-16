@@ -4,6 +4,7 @@ import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
 import { CRM_STATUSES, formatCrmDate, getDealStageMeta, getStatusMeta, getVisiblePipelineColumns } from '../../lib/crmConstants'
 import { canAssignPipelineLeads } from '../../lib/pipelineAssignAccess'
+import { userCanDeleteCrmRecords } from '../../lib/orgActionAccess'
 import {
   getDefaultPipelineId,
   getVisiblePipelineColumnsForSettings,
@@ -1295,6 +1296,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     user?.accountType !== 'company' ||
     !user?.orgPermissions ||
     Boolean(user.orgPermissions.export_leads)
+  const canDeleteLeads = userCanDeleteCrmRecords(user)
 
   const downloadLeadsCsv = useCallback((rows) => {
     if (!rows.length) return
@@ -1636,7 +1638,9 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                 }
                 downloadLeadsCsv(selectedLeads)
               }}
-              onDelete={async () => {
+              onDelete={
+                canDeleteLeads
+                  ? async () => {
                 const n = selectedIds.size
                 if (
                   !window.confirm(
@@ -1671,7 +1675,9 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                 } finally {
                   setBulkBusy(false)
                 }
-              }}
+              }
+                  : undefined
+              }
             />
           )}
 
@@ -1769,13 +1775,17 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               onQuickTask={(lead) => openPipelineLeadRow(lead, 'schedule')}
               onQuickWhatsApp={(lead) => openPipelineLeadRow(lead, 'whatsapp')}
               canAssign={canAssign}
-              onDeleteLead={async (lead) => {
+              onDeleteLead={
+                canDeleteLeads
+                  ? async (lead) => {
                 if (!window.confirm(`Remove ${lead.firstName || lead.company || 'this lead'} from pipeline?`)) {
                   return
                 }
                 await toggleSaveLead(lead)
                 await refreshSavedLeads()
-              }}
+              }
+                  : undefined
+              }
               onChangeOwner={(lead) => {
                 setBulkAssignOpen(true)
                 setSelectedIds(new Set([lead.id]))

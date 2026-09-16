@@ -11,7 +11,7 @@ import {
   summarizePipelineDealRows,
 } from '../../lib/freightDeals'
 import { estimatedFreightRevenueInr, sumEstimatedFreightRevenue, FREIGHT_DEAL_STAGES, resolveFreightDealCurrency, FALLBACK_USD_INR, isFreightDealOrg } from '../../lib/freightDeal'
-import { filledDealMilestones } from '../../lib/dealMilestones'
+import { userCanDeleteCrmRecords } from '../../lib/orgActionAccess'
 import {
   DEAL_MONTH_OPTIONS,
   DEAL_TRANSPORT_FILTERS,
@@ -107,6 +107,7 @@ export default function PipelineDealsView({
     user?.accountType !== 'company' ||
     !user?.orgPermissions ||
     Boolean(user.orgPermissions.export_leads)
+  const canDeleteDeals = userCanDeleteCrmRecords(user)
 
   const serverFilters = useMemo(
     () => ({
@@ -254,6 +255,7 @@ export default function PipelineDealsView({
 
   const runBulk = async (action, { confirmDelete = false, lostReason = '' } = {}) => {
     if (!selectedRows.length || bulkBusy) return
+    if (action === 'delete' && !canDeleteDeals) return
     if (confirmDelete) {
       const ok = window.confirm(
         `Delete ${selectedRows.length} deal${selectedRows.length === 1 ? '' : 's'}? This cannot be undone.`
@@ -534,8 +536,9 @@ export default function PipelineDealsView({
             type="button"
             className="pipeline-deals-filters__clear"
             onClick={() => {
-              setDateFrom(null)
-              setDateTo(null)
+              setPeriodYear('')
+              setPeriodMonth('')
+              setSelectedWeeks([])
               setTransportMode('all')
               setSelectedStages([])
               setSelected(new Set())
@@ -569,6 +572,7 @@ export default function PipelineDealsView({
             >
               Mark lost
             </button>
+            {canDeleteDeals ? (
             <button
               type="button"
               className="pipeline-bulk-hs-bar__btn"
@@ -577,6 +581,7 @@ export default function PipelineDealsView({
             >
               Delete
             </button>
+            ) : null}
           </div>
           <span className="pipeline-bulk-hs-bar__spacer" />
           <button

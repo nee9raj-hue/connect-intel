@@ -81,7 +81,11 @@ export default function PipelineRowActionsMenu({
         }
       : undefined
 
-  const visibleItems = MENU_ITEMS.filter((item) => !item.requiresAssign || canAssign)
+  const visibleItems = MENU_ITEMS.filter((item) => {
+    if (item.requiresAssign && !canAssign) return false
+    if (item.id === 'delete' && !onDelete) return false
+    return true
+  })
 
   return (
     <>

@@ -14,7 +14,7 @@ const ROLE_LABELS = {
 const TOOLTIPS = {
   view_all_leads: 'Reps see only their assigned leads unless enabled',
   edit_leads: 'Edit lead records and CRM fields',
-  delete_leads: 'Permanently delete leads',
+  delete_leads: 'Permanently delete leads and deals — Org Admin only',
   export_leads: 'Export pipeline data to CSV',
   manage_team: 'Invite members and change roles',
   access_marketing: 'Open Marketing Hub',
@@ -55,6 +55,7 @@ export default function PermissionsTab({ teamMembers }) {
 
   const toggle = async (role, action, allowed) => {
     if (role === 'admin') return
+    if (action === 'delete_leads') return
     const next = !allowed
     const affected = countAffectedReps(role, action, next)
     if (affected > 0) {
@@ -123,14 +124,18 @@ export default function PermissionsTab({ teamMembers }) {
                 </td>
                 {data.actions.map((action) => {
                   const allowed = Boolean(data.matrix[role]?.[action.id])
-                  const locked = role === 'admin'
+                  const locked = role === 'admin' || action.id === 'delete_leads'
                   const key = `${role}:${action.id}`
                   return (
                     <td key={key} style={{ padding: '11px 8px', textAlign: 'center' }}>
                       <button
                         type="button"
                         disabled={locked || saving === key}
-                        title={TOOLTIPS[action.id]}
+                        title={
+                          action.id === 'delete_leads' && role !== 'admin'
+                            ? 'Only Org Admin can delete leads and deals'
+                            : TOOLTIPS[action.id]
+                        }
                         onClick={() => toggle(role, action.id, allowed)}
                         style={{
                           width: 28,

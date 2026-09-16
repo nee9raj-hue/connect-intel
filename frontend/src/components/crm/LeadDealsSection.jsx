@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useApp } from '../../context/AppContext'
+import { userCanDeleteCrmRecords } from '../../lib/orgActionAccess'
 import { api } from '../../lib/api'
 import {
   getDealStageMeta,
@@ -85,6 +85,7 @@ function DealRow({
   onLost,
   onDuplicate,
   onDelete,
+  canDelete = false,
   patchLead,
   logCrmEmailSend,
   onNotice,
@@ -293,7 +294,8 @@ function DealRow({
         <button type="button" disabled={busy} onClick={() => onDuplicate(deal.id)} className="lw-deal-action lw-deal-action--icon" title="Duplicate">
           <CopyIcon aria-hidden />
         </button>
-        {!confirmDelete ? (
+        {canDelete ? (
+        !confirmDelete ? (
           <button
             type="button"
             disabled={busy}
@@ -320,7 +322,8 @@ function DealRow({
               Cancel
             </button>
           </>
-        )}
+        )
+        ) : null}
       </div>
 
       {showLost && (
@@ -394,6 +397,7 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
   const crm = lead.crm || {}
   const deals = crm.deals || []
   const freightOrg = isFreightDealOrg(user)
+  const canDeleteDeals = userCanDeleteCrmRecords(user)
   const stageOptions = getDealStagesForFreight(freightOrg)
 
   const [name, setName] = useState('')
@@ -731,7 +735,8 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
               onWon={markWon}
               onLost={markLost}
               onDuplicate={duplicateDeal}
-              onDelete={removeDeal}
+              onDelete={canDeleteDeals ? removeDeal : undefined}
+              canDelete={canDeleteDeals}
               patchLead={patchLead}
               logCrmEmailSend={logCrmEmailSend}
               onNotice={onNotice}
