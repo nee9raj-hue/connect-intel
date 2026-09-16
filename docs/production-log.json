@@ -1,10 +1,52 @@
 {
-  "updatedAt": "2026-09-16T17:15:53.272Z",
-  "updatedAtIst": "16/09/2026, 22:45:53",
+  "updatedAt": "2026-09-16T17:38:36.263Z",
+  "updatedAtIst": "16/09/2026, 23:08:36",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "1d308ed",
+  "currentProductionCommit": "458f6fb",
   "entries": [
+    {
+      "logId": "20260916-2308-458f6fb",
+      "commit": "458f6fb",
+      "commitFull": "458f6fb903436c2dd7e9556ff01695f9caea7f94",
+      "message": "Apply Xindus Excel ERP columns when a pipeline import updates a lead.",
+      "deployedAt": "2026-09-16T17:38:21.343Z",
+      "deployedAtIst": "16/09/2026, 23:08:21",
+      "committedAtIst": "16/09/2026, 23:07:32",
+      "vercelPreviewUrl": "https://connect-intel-2i1pd86n9-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 458f6fb"
+    },
+    {
+      "logId": "20260916-2305-dbdf964",
+      "commit": "dbdf964",
+      "commitFull": "dbdf964f1ca3797f7e5846efdb3f8ab86f74a112",
+      "message": "Show Xindus customer Excel fields in structured ERP Revenue and Finance tabs.",
+      "deployedAt": "2026-09-16T17:35:23.579Z",
+      "deployedAtIst": "16/09/2026, 23:05:23",
+      "committedAtIst": "16/09/2026, 23:04:35",
+      "vercelPreviewUrl": "https://connect-intel-dz4n0x7yy-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- dbdf964"
+    },
+    {
+      "logId": "20260916-2246-36a751f",
+      "commit": "36a751f",
+      "commitFull": "36a751f11d1e9e6d87bfd25d4f4a51d74fdb0adf",
+      "message": "Record production LIVE snapshot for ERP empty-state fallback.",
+      "deployedAt": "2026-09-16T17:16:55.290Z",
+      "deployedAtIst": "16/09/2026, 22:46:55",
+      "committedAtIst": "16/09/2026, 22:45:56",
+      "vercelPreviewUrl": "https://connect-intel-j6iyrh0re-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 36a751f"
+    },
     {
       "logId": "20260916-2245-1d308ed",
       "commit": "1d308ed",
@@ -15,7 +57,7 @@
       "committedAtIst": "16/09/2026, 22:44:21",
       "vercelPreviewUrl": "https://connect-intel-a7wf7n1kb-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 1d308ed"
     },
@@ -242,48 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 42ea1c3"
-    },
-    {
-      "logId": "20260916-1633-bf5f67d",
-      "commit": "bf5f67d",
-      "commitFull": "bf5f67d3cf39333acef469f7cd90143881b6e484",
-      "message": "Restrict pipeline and deal delete to Org Admin.",
-      "deployedAt": "2026-09-16T11:03:41.227Z",
-      "deployedAtIst": "16/09/2026, 16:33:41",
-      "committedAtIst": "16/09/2026, 16:32:56",
-      "vercelPreviewUrl": "https://connect-intel-fgdohfv1i-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- bf5f67d"
-    },
-    {
-      "logId": "20260916-1339-bc47465",
-      "commit": "bc47465",
-      "commitFull": "bc474659f5fbc7ecd352547695e4056a2b37523d",
-      "message": "Record production deploy 040421e as LIVE.",
-      "deployedAt": "2026-09-16T08:09:03.075Z",
-      "deployedAtIst": "16/09/2026, 13:39:03",
-      "committedAtIst": "16/09/2026, 13:37:55",
-      "vercelPreviewUrl": "https://connect-intel-9ljchbdwh-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- bc47465"
-    },
-    {
-      "logId": "20260916-1336-040421e",
-      "commit": "040421e",
-      "commitFull": "040421ead5a3828f0232533c6604f014ff0a7910",
-      "message": "Replace Pipeline Deals date range with cascaded Year, Month, and Week Number filters.",
-      "deployedAt": "2026-09-16T08:06:45.604Z",
-      "deployedAtIst": "16/09/2026, 13:36:45",
-      "committedAtIst": "16/09/2026, 13:35:43",
-      "vercelPreviewUrl": "https://connect-intel-e0c22a7r5-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 040421e"
     }
   ]
 }
