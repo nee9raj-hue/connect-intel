@@ -71,11 +71,18 @@
 
 .lw-deals-filter {
   display: flex;
+  flex-wrap: wrap;
   gap: 4px;
-  padding: 3px;
+  padding: 4px;
   border-radius: 10px;
   background: var(--lw-bg, #fafbfc);
   border: 1px solid var(--lw-border, rgba(15, 23, 42, 0.08));
+}
+
+.lw-deals-filter__count {
+  margin-left: 4px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.72;
 }
 
 .lw-deals-filter__btn {

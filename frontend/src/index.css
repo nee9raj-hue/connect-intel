@@ -2982,6 +2982,37 @@ button.ci-lead-tag:disabled {
   gap: 0.5rem;
 }
 
+.pipeline-deals-stage-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.pipeline-deals-stage-tabs__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  color: #475569;
+  border-radius: 999px;
+  padding: 0.28rem 0.7rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.pipeline-deals-stage-tabs__btn.is-active {
+  background: #007c89;
+  border-color: #007c89;
+  color: #fff;
+}
+
+.pipeline-deals-stage-tabs__count {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.8;
+}
+
 .pipeline-deals-forecast--loading {
   padding: 0.25rem 0.15rem;
 }

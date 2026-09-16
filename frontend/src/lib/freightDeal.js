@@ -29,6 +29,7 @@ export {
   hydrateFreightDealCurrency,
   isFreightDealOrg,
   getFreightDealStageMeta,
+  normalizeFreightDealStage,
 } from '../../../lib/freightDeal.js'
 
 export { FALLBACK_USD_INR } from '../../../lib/usdInr.js'

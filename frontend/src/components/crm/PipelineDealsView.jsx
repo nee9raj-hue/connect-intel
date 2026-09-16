@@ -35,9 +35,10 @@ function dealRowKey({ leadId, deal }) {
 export default function PipelineDealsView({
   dealStage = 'all',
   onOpenLead,
+  onDealStageChange,
   assigneeFilter = null,
 }) {
-  const { refreshSavedLeads, refreshPipelineSummary, user } = useApp()
+  const { refreshSavedLeads, refreshPipelineSummary, user, pipelineSummary } = useApp()
   const freightOrg = isFreightDealOrg(user)
   const [rows, setRows] = useState([])
   const [total, setTotal] = useState(0)
@@ -81,6 +82,15 @@ export default function PipelineDealsView({
     () => summarizePipelineDealRows(filteredRows, { usdInrRate }),
     [filteredRows, usdInrRate]
   )
+
+  const stageTabCounts = useMemo(() => {
+    const all = pipelineSummary?.dealCounts || {}
+    const counts = { all: Number(all.all) || rows.length }
+    for (const stage of FREIGHT_DEAL_STAGES) {
+      counts[stage.id] = Number(all[stage.id]) || 0
+    }
+    return counts
+  }, [pipelineSummary, rows.length])
 
   const filtersActive =
     Boolean(dateFrom || dateTo) ||
@@ -365,6 +375,24 @@ export default function PipelineDealsView({
           </p>
         </div>
       </div>
+
+      {onDealStageChange ? (
+        <div className="pipeline-deals-stage-tabs" role="tablist" aria-label="Deal stages">
+          {[{ id: 'all', label: 'All' }, ...FREIGHT_DEAL_STAGES].map((stage) => (
+            <button
+              key={stage.id}
+              type="button"
+              role="tab"
+              aria-selected={dealStage === stage.id}
+              className={`pipeline-deals-stage-tabs__btn ${dealStage === stage.id ? 'is-active' : ''}`}
+              onClick={() => onDealStageChange(stage.id)}
+            >
+              {stage.label}
+              <span className="pipeline-deals-stage-tabs__count">{stageTabCounts[stage.id] || 0}</span>
+            </button>
+          ))}
+        </div>
+      ) : null}
 
       {filteredRows.length > 0 || rows.length > 0 ? (
         <div className="pipeline-deals-forecast" role="region" aria-label="Deal totals for this view">

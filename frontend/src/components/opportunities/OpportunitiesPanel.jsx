@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
-import { getDealStageMeta, getDealStagesForFreight } from '../../lib/crmConstants'
+import { getDealStageMeta, DEAL_STAGES } from '../../lib/crmConstants'
+import { FREIGHT_DEAL_STAGES } from '../../lib/freightDeal'
 import { formatDealValue } from '../../lib/crmTimeline'
 import LoadingExperience from '../ui/LoadingExperience'
 
@@ -17,13 +18,8 @@ export default function OpportunitiesPanel({ onNavigate }) {
   const [error, setError] = useState(null)
 
   const stageOptions = useMemo(() => {
-    const stages = getDealStagesForFreight(freightOrg)
-    return [
-      { id: 'all', label: 'All open' },
-      ...stages.map((s) => ({ id: s.id, label: s.label })),
-      { id: 'won', label: 'Won' },
-      { id: 'lost', label: 'Lost' },
-    ]
+    const stages = freightOrg ? FREIGHT_DEAL_STAGES : DEAL_STAGES
+    return [{ id: 'all', label: 'All' }, ...stages.map((s) => ({ id: s.id, label: s.label }))]
   }, [freightOrg])
 
   const load = useCallback(async () => {

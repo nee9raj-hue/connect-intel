@@ -9,7 +9,7 @@ import {
 } from '../../lib/crmConstants'
 import { formatDealValue } from '../../lib/crmTimeline'
 import { buildAutoDealName } from '../../lib/dealNaming'
-import { emptyFreightRfq, isFreightDealOrg, freightRateUnitLabel, isOceanTransportMode, resolveFreightDealCurrency, estimatedFreightRevenueInr, FALLBACK_USD_INR, FREIGHT_DEAL_STAGES } from '../../lib/freightDeal'
+import { emptyFreightRfq, isFreightDealOrg, freightRateUnitLabel, isOceanTransportMode, resolveFreightDealCurrency, estimatedFreightRevenueInr, FALLBACK_USD_INR, FREIGHT_DEAL_STAGES, normalizeFreightDealStage } from '../../lib/freightDeal'
 import FreightDealFields, { formatFreightSummary, freightDealCreateLabel } from './FreightDealFields'
 import { getFreightCustomerTypeMeta } from '../../lib/freightDeal'
 import DealShareActions from './DealShareActions'
@@ -406,21 +406,35 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
   const [saving, setSaving] = useState(false)
   const [feedback, setFeedback] = useState(null)
   const [showCreate, setShowCreate] = useState(deals.length === 0)
-  const [listFilter, setListFilter] = useState('open')
+  const [listFilter, setListFilter] = useState('all')
   const [usdInrRate, setUsdInrRate] = useState(FALLBACK_USD_INR)
   const [expandedDealId, setExpandedDealId] = useState(null)
 
+  const stageTabs = useMemo(() => {
+    const catalog = freightOrg ? FREIGHT_DEAL_STAGES : DEAL_STAGES
+    const counts = Object.fromEntries(catalog.map((s) => [s.id, 0]))
+    for (const d of deals) {
+      const id = freightOrg ? normalizeFreightDealStage(d.stage) : d.stage
+      if (counts[id] != null) counts[id] += 1
+      else if (counts.rfq != null) counts.rfq += 1
+    }
+    return [
+      { id: 'all', label: 'All', count: deals.length },
+      ...catalog.map((s) => ({ id: s.id, label: s.label, count: counts[s.id] || 0 })),
+    ]
+  }, [deals, freightOrg])
   const { open, won, lost } = useMemo(() => {
     const o = []
     const w = []
     const l = []
     for (const d of deals) {
-      if (d.stage === 'won') w.push(d)
-      else if (d.stage === 'lost') l.push(d)
+      const stage = freightOrg ? normalizeFreightDealStage(d.stage) : d.stage
+      if (stage === 'won') w.push(d)
+      else if (stage === 'lost') l.push(d)
       else o.push(d)
     }
     return { open: o, won: w, lost: l }
-  }, [deals])
+  }, [deals, freightOrg])
 
   const totals = useMemo(() => {
     const openValue = open.reduce((sum, d) => sum + (Number(d.amount) || 0), 0)
@@ -429,9 +443,15 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
   }, [open, won])
 
   const visibleDeals = useMemo(() => {
-    const list = listFilter === 'won' ? won : listFilter === 'lost' ? lost : open
+    const list =
+      listFilter === 'all'
+        ? deals
+        : deals.filter((d) => {
+            const stage = freightOrg ? normalizeFreightDealStage(d.stage) : d.stage
+            return stage === listFilter
+          })
     return [...list].sort((a, b) => dealListSortMs(b) - dealListSortMs(a))
-  }, [listFilter, open, won, lost])
+  }, [listFilter, deals, freightOrg])
 
   useEffect(() => {
     if (visibleDeals.length > 1) setExpandedDealId(null)
@@ -531,7 +551,7 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
       setMilestones(emptyDealMilestones())
       setFreight(emptyFreightRfq())
       setShowCreate(false)
-      setListFilter('open')
+      setListFilter('all')
     }
   }
 
@@ -545,11 +565,7 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
 
   const dealBusy = saving || busy
 
-  const filterOptions = [
-    { id: 'open', label: 'Open', count: open.length },
-    { id: 'won', label: 'Won', count: won.length },
-    { id: 'lost', label: 'Lost', count: lost.length },
-  ].filter((f) => f.count > 0 || f.id === 'open')
+  const activeTab = stageTabs.find((f) => f.id === listFilter) || stageTabs[0]
 
   return (
     <div className="lw-deals">
@@ -577,8 +593,8 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
       </div>
 
       {deals.length > 0 && (
-        <div className="lw-deals-filter" role="tablist" aria-label="Deal status">
-          {filterOptions.map((f) => (
+        <div className="lw-deals-filter" role="tablist" aria-label="Deal stages">
+          {stageTabs.map((f) => (
             <button
               key={f.id}
               type="button"
@@ -587,7 +603,8 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
               onClick={() => setListFilter(f.id)}
               className={`lw-deals-filter__btn ${listFilter === f.id ? 'is-active' : ''}`}
             >
-              {f.label} ({f.count})
+              {f.label}
+              <span className="lw-deals-filter__count">{f.count}</span>
             </button>
           ))}
         </div>
@@ -730,7 +747,7 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
         </div>
       ) : visibleDeals.length === 0 ? (
         <div className="lw-deals-empty">
-          <p>No {listFilter} deals</p>
+          <p>No {activeTab?.label || listFilter} deals</p>
         </div>
       ) : null}
     </div>

@@ -1695,6 +1695,9 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                 dealStage={dealsStage}
                 assigneeFilter={effectiveAssigneeFilter}
                 onOpenLead={openDealFromPipeline}
+                onDealStageChange={(stage) =>
+                  onNavigate?.('pipeline', { view: 'deals', dealStage: stage })
+                }
               />
             </div>
           ) : showPipelineOnboarding ? (
