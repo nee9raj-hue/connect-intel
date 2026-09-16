@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- e0ef88f
+npm run prod:rollback -- 53359a6
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- e0ef88f
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `b7aa208` |
-| Log updated (IST) | 16/09/2026, 22:32:21 |
+| Commit | `1d308ed` |
+| Log updated (IST) | 16/09/2026, 22:45:53 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- e0ef88f
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 16/09/2026, 22:32:13 | `b7aa208` | Populate lead ERP Revenue and Finance tabs from shipments, trading, and deals. | [preview](https://connect-intel-p4ybnue4n-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b7aa208` | **← LIVE**
+| 16/09/2026, 22:45:09 | `1d308ed` | Fill ERP tabs from trading history on the lead and clarify empty state. | [preview](https://connect-intel-a7wf7n1kb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1d308ed` | **← LIVE**
+| 16/09/2026, 22:33:13 | `53359a6` | Record production LIVE snapshot for ERP tab populate. | [preview](https://connect-intel-1akhban7x-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 53359a6` |
+| 16/09/2026, 22:32:13 | `b7aa208` | Populate lead ERP Revenue and Finance tabs from shipments, trading, and deals. | [preview](https://connect-intel-p4ybnue4n-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b7aa208` |
 | 16/09/2026, 22:15:02 | `e0ef88f` | Record production LIVE snapshot for pipeline board crash fix. | [preview](https://connect-intel-icw1ayv4k-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e0ef88f` |
 | 16/09/2026, 22:14:03 | `ac9b2dd` | Pass company-open props into kanban so board view does not crash. | [preview](https://connect-intel-8qc0c657o-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ac9b2dd` |
 | 16/09/2026, 22:07:29 | `0913764` | Record production LIVE snapshot for findPipelineEntry restore. | [preview](https://connect-intel-erqtmrhqm-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0913764` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- e0ef88f
 | 16/09/2026, 16:33:41 | `bf5f67d` | Restrict pipeline and deal delete to Org Admin. | [preview](https://connect-intel-fgdohfv1i-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- bf5f67d` |
 | 16/09/2026, 13:39:03 | `bc47465` | Record production deploy 040421e as LIVE. | [preview](https://connect-intel-9ljchbdwh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- bc47465` |
 | 16/09/2026, 13:36:45 | `040421e` | Replace Pipeline Deals date range with cascaded Year, Month, and Week Number filters. | [preview](https://connect-intel-e0c22a7r5-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 040421e` |
-| 16/09/2026, 13:21:38 | `7dd1fca` | Record production deploy ca41c41 as LIVE. | [preview](https://connect-intel-iq5tbtbkh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7dd1fca` |
-| 16/09/2026, 13:19:41 | `ca41c41` | Remove duplicate deal-stage pills from the Pipeline Deals header. | [preview](https://connect-intel-3mucw1fpr-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ca41c41` |
 
 ---
 
