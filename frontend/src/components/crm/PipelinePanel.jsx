@@ -106,6 +106,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     patchLead,
     orgLeadTags,
     notifications,
+    refreshOrgLeadTags,
   } = useApp()
 
   const [tableColumns, setTableColumns] = useState(() => loadPipelineColumnPrefs())
@@ -602,6 +603,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       let cancelled = false
       setWorkspaceLead((prev) => {
         const base = prev?.id === listLead.id ? prev : listLead
+        const baseCrm = base?.crm || {}
+        const listCrm = listLead.crm || {}
         return {
           ...base,
           ...listLead,
@@ -612,6 +615,16 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
             listLead.commercialEmailConsentAt ?? base.commercialEmailConsentAt ?? null,
           commercialEmailConsentSource:
             listLead.commercialEmailConsentSource ?? base.commercialEmailConsentSource ?? null,
+          crm: {
+            ...baseCrm,
+            ...listCrm,
+            tagIds: Array.isArray(listCrm.tagIds) ? listCrm.tagIds : baseCrm.tagIds || [],
+            deals: Array.isArray(listCrm.deals) && listCrm.deals.length ? listCrm.deals : baseCrm.deals,
+            tasks: listCrm.tasks?.length ? listCrm.tasks : baseCrm.tasks,
+            meetings: listCrm.meetings?.length ? listCrm.meetings : baseCrm.meetings,
+            activities: listCrm.activities?.length ? listCrm.activities : baseCrm.activities,
+            emails: baseCrm.emails,
+          },
         }
       })
       api
@@ -1585,6 +1598,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               onApplySmartView={applySmartView}
               activeSmartViewId={smartViewId}
               orgLeadTags={orgLeadTags}
+              refreshOrgLeadTags={refreshOrgLeadTags}
               stageListMode={stageListMode}
               onRemoveAppliedFilter={removeAppliedFilter}
               canSaveAsAudience={canSaveAsAudience}

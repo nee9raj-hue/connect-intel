@@ -57,6 +57,7 @@ export default function PipelineFiltersBar({
   onApplySmartView,
   activeSmartViewId,
   orgLeadTags = [],
+  refreshOrgLeadTags,
   stageListMode = false,
   onRemoveAppliedFilter,
   canSaveAsAudience = false,
@@ -115,6 +116,7 @@ export default function PipelineFiltersBar({
           }))
         )
         setOrgTeams(teams)
+        void refreshOrgLeadTags?.()
       })
       .catch(() => {
         if (!cancelled) setOrgTeams([])
@@ -122,7 +124,7 @@ export default function PipelineFiltersBar({
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [refreshOrgLeadTags])
 
   const handleApply = () => onApplyFilters?.()
 

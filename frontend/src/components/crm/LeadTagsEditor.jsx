@@ -1,14 +1,28 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toggleTagId } from '../../lib/orgLeadTags'
 import LeadTag from '../ui/LeadTag'
 
 export default function LeadTagsEditor({ lead, orgLeadTags, onSave, readOnly = false }) {
   const [saving, setSaving] = useState(false)
   const [open, setOpen] = useState(false)
-  const selected = useMemo(() => new Set(lead?.crm?.tagIds || []), [lead?.crm?.tagIds])
+  const [error, setError] = useState(null)
+  const [pendingIds, setPendingIds] = useState(null)
+  const leadId = lead?.id
+  const serverIds = (lead?.crm?.tagIds || []).map(String)
+
+  useEffect(() => {
+    setPendingIds(null)
+    setError(null)
+    setOpen(false)
+  }, [leadId])
+  const serverKey = serverIds.join(',')
+  const selected = useMemo(
+    () => new Set(pendingIds || serverIds),
+    [pendingIds, serverKey, serverIds]
+  )
 
   const selectedTags = useMemo(
-    () => (orgLeadTags || []).filter((t) => selected.has(t.id)),
+    () => (orgLeadTags || []).filter((t) => selected.has(String(t.id))),
     [orgLeadTags, selected]
   )
 
@@ -22,21 +36,27 @@ export default function LeadTagsEditor({ lead, orgLeadTags, onSave, readOnly = f
 
   const apply = async (nextIds) => {
     setSaving(true)
+    setError(null)
+    setPendingIds(nextIds.map(String))
     try {
-      await onSave(nextIds)
+      await onSave(nextIds.map(String))
       setOpen(false)
+    } catch (err) {
+      setPendingIds(null)
+      setError(err?.message || 'Could not update tags')
     } finally {
       setSaving(false)
     }
   }
 
   const toggle = (tagId) => {
-    const next = toggleTagId([...selected], tagId)
+    const next = toggleTagId([...selected], String(tagId))
     void apply(next)
   }
 
   return (
     <div className="space-y-2">
+      {error ? <p className="text-xs text-red-700">{error}</p> : null}
       <div className="ci-lead-tags">
         {selectedTags.length === 0 ? (
           <span className="text-xs text-gray-400">No tags</span>
@@ -76,7 +96,7 @@ export default function LeadTagsEditor({ lead, orgLeadTags, onSave, readOnly = f
               as="button"
               type="button"
               name={tag.name}
-              active={selected.has(tag.id)}
+              active={selected.has(String(tag.id))}
               disabled={saving}
               onClick={() => toggle(tag.id)}
             />
