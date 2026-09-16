@@ -1288,6 +1288,53 @@
   color: var(--lw-text);
 }
 
+.lw-profile-tags {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lw-profile-tags__selected {
+  min-height: 0;
+}
+
+.lw-profile-tag-x {
+  margin-left: 6px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 0.9em;
+  line-height: 1;
+  padding: 0;
+}
+
+.lw-profile-cadence {
+  margin-top: 12px;
+}
+
+.lw-profile-cadence-edit {
+  list-style: none;
+  margin: 0 0 10px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lw-profile-cadence-edit__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 7.5rem auto;
+  gap: 8px;
+  align-items: center;
+}
+
+@media (max-width: 767px) {
+  .lw-profile-cadence-edit__row {
+    grid-template-columns: 1fr 6.5rem auto;
+  }
+}
+
 @media (max-width: 767px) {
   .lw-tab__label--long {
     display: none;

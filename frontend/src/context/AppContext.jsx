@@ -69,6 +69,7 @@ function mergeLightLeadPatch(prev, incoming) {
       incoming.commercialEmailConsentAt ?? prev.commercialEmailConsentAt ?? null,
     commercialEmailConsentSource:
       incoming.commercialEmailConsentSource ?? prev.commercialEmailConsentSource ?? null,
+    tradeProfile: incoming.tradeProfile ?? prev.tradeProfile ?? null,
     crm: {
       ...prevCrm,
       ...incCrm,
@@ -804,6 +805,11 @@ export function AppProvider({ children }) {
       if (body?.crm && typeof body.crm === 'object') {
         return current.map((lead) =>
           lead.id === leadId ? { ...lead, crm: { ...(lead.crm || {}), ...body.crm } } : lead
+        )
+      }
+      if (body?.tradeProfile && typeof body.tradeProfile === 'object') {
+        return current.map((lead) =>
+          lead.id === leadId ? { ...lead, tradeProfile: { ...(lead.tradeProfile || {}), ...body.tradeProfile } } : lead
         )
       }
       if (body?.emailConsent !== undefined) {

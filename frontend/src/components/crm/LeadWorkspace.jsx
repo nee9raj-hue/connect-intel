@@ -40,6 +40,7 @@ import { hasWorkspaceFeature } from '../../lib/workspaceFeatures'
 import FieldVisitRecordForm from './FieldVisitRecordForm'
 import LeadDealsSection from './LeadDealsSection'
 import LeadErpPanels from './LeadErpPanels'
+import LeadTradeProfilePanel from './LeadTradeProfilePanel'
 import TeamIntelReturnBanner from './TeamIntelReturnBanner'
 import { DEFAULT_FIELD_VISIT_EXPENSE_SETTINGS } from '../../lib/fieldVisitExpenses'
 import {
@@ -78,6 +79,7 @@ import {
   PeopleIcon,
   PlusIcon,
   PipelineIcon,
+  RouteIcon,
   SparkIcon,
   TaskIcon,
   TeamIcon,
@@ -109,6 +111,7 @@ const TABS = [
   { id: 'overview', label: 'Overview', shortLabel: 'Overview', Icon: HomeIcon },
   { id: 'erp-revenue', label: 'ERP Revenue', shortLabel: 'Revenue', Icon: PipelineIcon },
   { id: 'erp-finance', label: 'ERP Finance', shortLabel: 'Finance', Icon: SparkIcon },
+  { id: 'trade-profile', label: 'Trade profile', shortLabel: 'Profile', Icon: RouteIcon },
   { id: 'deals', label: 'Deals', shortLabel: 'Deals', Icon: PipelineIcon },
   { id: 'notes', label: 'Timeline', shortLabel: 'Timeline', Icon: LogIcon },
   { id: 'schedule', label: 'Tasks & meetings', shortLabel: 'Tasks', Icon: CalendarIcon },
@@ -1120,6 +1123,16 @@ export default function LeadWorkspace({
 
         {(tab === 'erp-revenue' || tab === 'erp-finance') && (
           <LeadErpPanels lead={lead} tab={tab} />
+        )}
+
+        {tab === 'trade-profile' && (
+          <LeadTradeProfilePanel
+            lead={lead}
+            patchLead={patchLead}
+            busy={savingScope !== null}
+            onNotice={setNotice}
+            onError={setError}
+          />
         )}
 
         {tab === 'deals' && (
