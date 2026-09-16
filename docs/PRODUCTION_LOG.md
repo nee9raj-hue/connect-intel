@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 471a346
+npm run prod:rollback -- 4ee3dd6
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 471a346
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `b1d8427` |
-| Log updated (IST) | 16/09/2026, 11:17:22 |
+| Commit | `7cdb395` |
+| Log updated (IST) | 16/09/2026, 11:23:57 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 471a346
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 16/09/2026, 11:16:23 | `b1d8427` | Replace generic CRM lead stages with a freight account lifecycle. | [preview](https://connect-intel-h4140ezpn-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b1d8427` | **← LIVE**
+| 16/09/2026, 11:23:11 | `7cdb395` | Restore mergeLeadForClientListMinimal on bulk CRM updates. | [preview](https://connect-intel-k20bot1s1-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7cdb395` | **← LIVE**
+| 16/09/2026, 11:18:33 | `4ee3dd6` | Record production deploy b1d8427 as LIVE. | [preview](https://connect-intel-3d947jtw3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4ee3dd6` |
+| 16/09/2026, 11:16:23 | `b1d8427` | Replace generic CRM lead stages with a freight account lifecycle. | [preview](https://connect-intel-h4140ezpn-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b1d8427` |
 | 16/09/2026, 10:17:47 | `471a346` | Record production deploy 5b84a41 as LIVE. | [preview](https://connect-intel-j3ozoomt4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 471a346` |
 | 16/09/2026, 10:16:35 | `5b84a41` | Replace deal forecast pills with filter-aware customers, booked, and lost totals. | [preview](https://connect-intel-5fmbfzl9t-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5b84a41` |
 | 16/09/2026, 00:55:20 | `e9d4223` | Merge branch 'cursor/fix-deals-mobile-view-802f' | [preview](https://connect-intel-6no09lt5d-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e9d4223` |
@@ -61,8 +63,6 @@ npm run prod:rollback -- 471a346
 | 15/09/2026, 21:49:27 | `d1f1474` | Record production deploy 2f8de67 as LIVE. | [preview](https://connect-intel-exhj1cl31-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d1f1474` |
 | 15/09/2026, 21:48:23 | `2f8de67` | Treat ocean freight as USD and convert revenue to INR. | [preview](https://connect-intel-fzkw3fjnq-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2f8de67` |
 | 15/09/2026, 21:35:31 | `83b8beb` | Record production deploy bc4ccd6 as LIVE. | [preview](https://connect-intel-in15dktzu-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 83b8beb` |
-| 15/09/2026, 21:33:49 | `bc4ccd6` | Replace All Deals stage pills with a multi-select dropdown. | [preview](https://connect-intel-g4ykah2i0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- bc4ccd6` |
-| 15/09/2026, 21:24:28 | `1901df4` | Record production deploy d5cf838 as LIVE. | [preview](https://connect-intel-q5wgk6kvt-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1901df4` |
 
 ---
 
