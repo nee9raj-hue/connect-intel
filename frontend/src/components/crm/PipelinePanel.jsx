@@ -1765,6 +1765,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                     compact={isMobile}
                     tagById={tagById}
                     teamMembers={teamMembers}
+                    canOpenCompany={canOpenCompanyAccounts}
+                    onOpenCompany={openCompanyFromLead}
                   />
                 )
               })}
@@ -2124,6 +2126,8 @@ function KanbanColumn({
   tagById,
   teamMembers = [],
   compact = false,
+  canOpenCompany = false,
+  onOpenCompany,
 }) {
   const [dropTarget, setDropTarget] = useState(false)
   const [draggingId, setDraggingId] = useState(null)
@@ -2240,13 +2244,13 @@ function KanbanColumn({
                       >
                         {lead.company[0]?.toUpperCase() || 'C'}
                       </span>
-                      {canOpenCompanyAccounts ? (
+                      {canOpenCompany ? (
                         <button
                           type="button"
                           className="text-sm text-orange-700 font-medium truncate leading-snug hover:underline text-left"
                           onClick={(e) => {
                             e.stopPropagation()
-                            openCompanyFromLead(lead)
+                            onOpenCompany?.(lead)
                           }}
                         >
                           {lead.company}
