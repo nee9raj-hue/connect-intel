@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 7d9f607
+npm run prod:rollback -- 02ad742
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 7d9f607
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `02ad742` |
-| Log updated (IST) | 16/09/2026, 20:06:24 |
+| Commit | `c61e4e9` |
+| Log updated (IST) | 16/09/2026, 20:27:46 |
 
 ---
 
@@ -44,7 +44,8 @@ npm run prod:rollback -- 7d9f607
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 16/09/2026, 20:06:08 | `02ad742` | Fix deal click crash and keep CRM deals off ERP re-import. | [preview](https://connect-intel-dll3n6pum-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 02ad742` | **← LIVE**
+| 16/09/2026, 20:07:18 | `c61e4e9` | Record production deploy 02ad742 as LIVE. | [preview](https://connect-intel-lhdgqtuny-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c61e4e9` | **← LIVE**
+| 16/09/2026, 20:06:08 | `02ad742` | Fix deal click crash and keep CRM deals off ERP re-import. | [preview](https://connect-intel-dll3n6pum-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 02ad742` |
 | 16/09/2026, 19:53:32 | `7d9f607` | Record production deploy d2e9536 as LIVE. | [preview](https://connect-intel-giuwbm6ui-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7d9f607` |
 | 16/09/2026, 19:52:19 | `d2e9536` | Restore filledDealMilestones import so Pipeline Deals can load. | [preview](https://connect-intel-cxgr80b5r-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d2e9536` |
 | 16/09/2026, 16:34:52 | `42ea1c3` | Record production deploy bf5f67d as LIVE. | [preview](https://connect-intel-m6d60f3rl-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 42ea1c3` |
@@ -63,7 +64,6 @@ npm run prod:rollback -- 7d9f607
 | 16/09/2026, 11:23:11 | `7cdb395` | Restore mergeLeadForClientListMinimal on bulk CRM updates. | [preview](https://connect-intel-k20bot1s1-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7cdb395` |
 | 16/09/2026, 11:18:33 | `4ee3dd6` | Record production deploy b1d8427 as LIVE. | [preview](https://connect-intel-3d947jtw3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4ee3dd6` |
 | 16/09/2026, 11:16:23 | `b1d8427` | Replace generic CRM lead stages with a freight account lifecycle. | [preview](https://connect-intel-h4140ezpn-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b1d8427` |
-| 16/09/2026, 10:17:47 | `471a346` | Record production deploy 5b84a41 as LIVE. | [preview](https://connect-intel-j3ozoomt4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 471a346` |
 
 ---
 
