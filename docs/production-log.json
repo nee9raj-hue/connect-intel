@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-16T16:36:34.320Z",
-  "updatedAtIst": "16/09/2026, 22:06:34",
+  "updatedAt": "2026-09-16T16:44:09.049Z",
+  "updatedAtIst": "16/09/2026, 22:14:09",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "dc12696",
+  "currentProductionCommit": "ac9b2dd",
   "entries": [
+    {
+      "logId": "20260916-2214-ac9b2dd",
+      "commit": "ac9b2dd",
+      "commitFull": "ac9b2ddd93b9578d629f2be07e32fd49213ad5a5",
+      "message": "Pass company-open props into kanban so board view does not crash.",
+      "deployedAt": "2026-09-16T16:44:03.789Z",
+      "deployedAtIst": "16/09/2026, 22:14:03",
+      "committedAtIst": "16/09/2026, 22:13:14",
+      "vercelPreviewUrl": "https://connect-intel-8qc0c657o-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- ac9b2dd"
+    },
+    {
+      "logId": "20260916-2207-0913764",
+      "commit": "0913764",
+      "commitFull": "09137641f9c038ae6158733dec9f5e2da1bc5b30",
+      "message": "Record production LIVE snapshot for findPipelineEntry restore.",
+      "deployedAt": "2026-09-16T16:37:29.163Z",
+      "deployedAtIst": "16/09/2026, 22:07:29",
+      "committedAtIst": "16/09/2026, 22:06:46",
+      "vercelPreviewUrl": "https://connect-intel-erqtmrhqm-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 0913764"
+    },
     {
       "logId": "20260916-2206-dc12696",
       "commit": "dc12696",
@@ -15,7 +43,7 @@
       "committedAtIst": "16/09/2026, 22:05:37",
       "vercelPreviewUrl": "https://connect-intel-8uxkyza8p-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- dc12696"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 796697d"
-    },
-    {
-      "logId": "20260916-1231-bbbc423",
-      "commit": "bbbc423",
-      "commitFull": "bbbc4234d464d443b9d31dddd09c1357b5b06d5c",
-      "message": "Record production deploy 3e01162 as LIVE.",
-      "deployedAt": "2026-09-16T07:01:48.271Z",
-      "deployedAtIst": "16/09/2026, 12:31:48",
-      "committedAtIst": "16/09/2026, 12:31:00",
-      "vercelPreviewUrl": "https://connect-intel-54202nnf5-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- bbbc423"
-    },
-    {
-      "logId": "20260916-1229-3e01162",
-      "commit": "3e01162",
-      "commitFull": "3e0116234f34c7ff504c103c3b41aab84786186f",
-      "message": "Keep Copilot as a single header CRM assistant without web theater.",
-      "deployedAt": "2026-09-16T06:59:22.954Z",
-      "deployedAtIst": "16/09/2026, 12:29:22",
-      "committedAtIst": "16/09/2026, 12:28:27",
-      "vercelPreviewUrl": "https://connect-intel-q7lg52doc-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 3e01162"
     }
   ]
 }

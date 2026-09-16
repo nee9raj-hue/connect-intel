@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 11ddb5b
+npm run prod:rollback -- 0913764
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 11ddb5b
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `dc12696` |
-| Log updated (IST) | 16/09/2026, 22:06:34 |
+| Commit | `ac9b2dd` |
+| Log updated (IST) | 16/09/2026, 22:14:09 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 11ddb5b
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 16/09/2026, 22:06:19 | `dc12696` | Restore findPipelineEntry import so lead tag and CRM saves work. | [preview](https://connect-intel-8uxkyza8p-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- dc12696` | **← LIVE**
+| 16/09/2026, 22:14:03 | `ac9b2dd` | Pass company-open props into kanban so board view does not crash. | [preview](https://connect-intel-8qc0c657o-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ac9b2dd` | **← LIVE**
+| 16/09/2026, 22:07:29 | `0913764` | Record production LIVE snapshot for findPipelineEntry restore. | [preview](https://connect-intel-erqtmrhqm-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0913764` |
+| 16/09/2026, 22:06:19 | `dc12696` | Restore findPipelineEntry import so lead tag and CRM saves work. | [preview](https://connect-intel-8uxkyza8p-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- dc12696` |
 | 16/09/2026, 22:04:00 | `11ddb5b` | Record production deploy f23e34c as LIVE. | [preview](https://connect-intel-c1f5j6f5d-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 11ddb5b` |
 | 16/09/2026, 22:02:56 | `f23e34c` | Fix pipeline lead tagging so tag ids persist and saves are not stripped. | [preview](https://connect-intel-dpwc5lid2-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f23e34c` |
 | 16/09/2026, 21:24:25 | `eae1dd3` | Record production deploy bdf1df5 as LIVE. | [preview](https://connect-intel-c9hmwq318-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- eae1dd3` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 11ddb5b
 | 16/09/2026, 13:19:41 | `ca41c41` | Remove duplicate deal-stage pills from the Pipeline Deals header. | [preview](https://connect-intel-3mucw1fpr-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ca41c41` |
 | 16/09/2026, 13:06:38 | `0c6ebce` | Record production deploy 796697d as LIVE. | [preview](https://connect-intel-41bhsp2bw-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0c6ebce` |
 | 16/09/2026, 13:02:28 | `796697d` | Fix Copilot crashing with Unexpected identifier pipeline_leads. | [preview](https://connect-intel-mr56j4wiq-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 796697d` |
-| 16/09/2026, 12:31:48 | `bbbc423` | Record production deploy 3e01162 as LIVE. | [preview](https://connect-intel-54202nnf5-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- bbbc423` |
-| 16/09/2026, 12:29:22 | `3e01162` | Keep Copilot as a single header CRM assistant without web theater. | [preview](https://connect-intel-q7lg52doc-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3e01162` |
 
 ---
 
