@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-16T15:53:14.854Z",
-  "updatedAtIst": "16/09/2026, 21:23:14",
+  "updatedAt": "2026-09-16T16:33:11.232Z",
+  "updatedAtIst": "16/09/2026, 22:03:11",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "bdf1df5",
+  "currentProductionCommit": "f23e34c",
   "entries": [
+    {
+      "logId": "20260916-2202-f23e34c",
+      "commit": "f23e34c",
+      "commitFull": "f23e34cfadf8f9703dda4459bb63cb219f7f73ba",
+      "message": "Fix pipeline lead tagging so tag ids persist and saves are not stripped.",
+      "deployedAt": "2026-09-16T16:32:56.938Z",
+      "deployedAtIst": "16/09/2026, 22:02:56",
+      "committedAtIst": "16/09/2026, 22:02:11",
+      "vercelPreviewUrl": "https://connect-intel-dpwc5lid2-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- f23e34c"
+    },
+    {
+      "logId": "20260916-2124-eae1dd3",
+      "commit": "eae1dd3",
+      "commitFull": "eae1dd397adf38d81f5046f1826d26cfd2f2ffc3",
+      "message": "Record production deploy bdf1df5 as LIVE.",
+      "deployedAt": "2026-09-16T15:54:25.471Z",
+      "deployedAtIst": "16/09/2026, 21:24:25",
+      "committedAtIst": "16/09/2026, 21:23:31",
+      "vercelPreviewUrl": "https://connect-intel-c9hmwq318-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- eae1dd3"
+    },
     {
       "logId": "20260916-2122-bdf1df5",
       "commit": "bdf1df5",
@@ -15,7 +43,7 @@
       "committedAtIst": "16/09/2026, 21:21:41",
       "vercelPreviewUrl": "https://connect-intel-otwwdd1od-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- bdf1df5"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- b6dd140"
-    },
-    {
-      "logId": "20260916-1125-ee3b6d8",
-      "commit": "ee3b6d8",
-      "commitFull": "ee3b6d8b50f39816deff5301cc3e878adaa50892",
-      "message": "Record production deploy 7cdb395 as LIVE.",
-      "deployedAt": "2026-09-16T05:55:00.579Z",
-      "deployedAtIst": "16/09/2026, 11:25:00",
-      "committedAtIst": "16/09/2026, 11:24:15",
-      "vercelPreviewUrl": "https://connect-intel-d02wvwfde-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- ee3b6d8"
-    },
-    {
-      "logId": "20260916-1123-7cdb395",
-      "commit": "7cdb395",
-      "commitFull": "7cdb395ce01c7fffaa346a537dadc94290b69ed2",
-      "message": "Restore mergeLeadForClientListMinimal on bulk CRM updates.",
-      "deployedAt": "2026-09-16T05:53:11.783Z",
-      "deployedAtIst": "16/09/2026, 11:23:11",
-      "committedAtIst": "16/09/2026, 11:22:27",
-      "vercelPreviewUrl": "https://connect-intel-k20bot1s1-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 7cdb395"
     }
   ]
 }
