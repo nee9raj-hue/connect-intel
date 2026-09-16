@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-16T05:53:57.056Z",
-  "updatedAtIst": "16/09/2026, 11:23:57",
+  "updatedAt": "2026-09-16T06:38:56.616Z",
+  "updatedAtIst": "16/09/2026, 12:08:56",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "7cdb395",
+  "currentProductionCommit": "b6dd140",
   "entries": [
+    {
+      "logId": "20260916-1208-b6dd140",
+      "commit": "b6dd140",
+      "commitFull": "b6dd1401a78971bb6e1446342ff5f88e28b66697",
+      "message": "Show deal stages in the lead and pipeline headers and relink leftover deals.",
+      "deployedAt": "2026-09-16T06:38:45.960Z",
+      "deployedAtIst": "16/09/2026, 12:08:45",
+      "committedAtIst": "16/09/2026, 12:07:48",
+      "vercelPreviewUrl": "https://connect-intel-knbfix8k4-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- b6dd140"
+    },
+    {
+      "logId": "20260916-1125-ee3b6d8",
+      "commit": "ee3b6d8",
+      "commitFull": "ee3b6d8b50f39816deff5301cc3e878adaa50892",
+      "message": "Record production deploy 7cdb395 as LIVE.",
+      "deployedAt": "2026-09-16T05:55:00.579Z",
+      "deployedAtIst": "16/09/2026, 11:25:00",
+      "committedAtIst": "16/09/2026, 11:24:15",
+      "vercelPreviewUrl": "https://connect-intel-d02wvwfde-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- ee3b6d8"
+    },
     {
       "logId": "20260916-1123-7cdb395",
       "commit": "7cdb395",
@@ -15,7 +43,7 @@
       "committedAtIst": "16/09/2026, 11:22:27",
       "vercelPreviewUrl": "https://connect-intel-k20bot1s1-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 7cdb395"
     },
@@ -242,34 +270,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- d1f1474"
-    },
-    {
-      "logId": "20260915-2148-2f8de67",
-      "commit": "2f8de67",
-      "commitFull": "2f8de67afa5bbea3a1a1bb35770cbba05c348c5e",
-      "message": "Treat ocean freight as USD and convert revenue to INR.",
-      "deployedAt": "2026-09-15T16:18:23.608Z",
-      "deployedAtIst": "15/09/2026, 21:48:23",
-      "committedAtIst": "15/09/2026, 21:47:44",
-      "vercelPreviewUrl": "https://connect-intel-fzkw3fjnq-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 2f8de67"
-    },
-    {
-      "logId": "20260915-2135-83b8beb",
-      "commit": "83b8beb",
-      "commitFull": "83b8beb291c3432a54446e308c0448efe047862b",
-      "message": "Record production deploy bc4ccd6 as LIVE.",
-      "deployedAt": "2026-09-15T16:05:31.347Z",
-      "deployedAtIst": "15/09/2026, 21:35:31",
-      "committedAtIst": "15/09/2026, 21:34:51",
-      "vercelPreviewUrl": "https://connect-intel-in15dktzu-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 83b8beb"
     }
   ]
 }
