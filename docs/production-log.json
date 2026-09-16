@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-16T06:38:56.616Z",
-  "updatedAtIst": "16/09/2026, 12:08:56",
+  "updatedAt": "2026-09-16T07:00:38.818Z",
+  "updatedAtIst": "16/09/2026, 12:30:38",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "b6dd140",
+  "currentProductionCommit": "3e01162",
   "entries": [
+    {
+      "logId": "20260916-1229-3e01162",
+      "commit": "3e01162",
+      "commitFull": "3e0116234f34c7ff504c103c3b41aab84786186f",
+      "message": "Keep Copilot as a single header CRM assistant without web theater.",
+      "deployedAt": "2026-09-16T06:59:22.954Z",
+      "deployedAtIst": "16/09/2026, 12:29:22",
+      "committedAtIst": "16/09/2026, 12:28:27",
+      "vercelPreviewUrl": "https://connect-intel-q7lg52doc-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 3e01162"
+    },
+    {
+      "logId": "20260916-1209-b6fd53c",
+      "commit": "b6fd53c",
+      "commitFull": "b6fd53c6af24ec1e054f470fb8271712af7be9c4",
+      "message": "Record production deploy b6dd140 as LIVE.",
+      "deployedAt": "2026-09-16T06:39:40.565Z",
+      "deployedAtIst": "16/09/2026, 12:09:40",
+      "committedAtIst": "16/09/2026, 12:09:01",
+      "vercelPreviewUrl": "https://connect-intel-mk8g4ojkw-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- b6fd53c"
+    },
     {
       "logId": "20260916-1208-b6dd140",
       "commit": "b6dd140",
@@ -15,7 +43,7 @@
       "committedAtIst": "16/09/2026, 12:07:48",
       "vercelPreviewUrl": "https://connect-intel-knbfix8k4-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- b6dd140"
     },
@@ -242,34 +270,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- ec57021"
-    },
-    {
-      "logId": "20260915-2154-f30b3e6",
-      "commit": "f30b3e6",
-      "commitFull": "f30b3e65ce44b3c890d5bbd88ad5039c5afddcd0",
-      "message": "Show freight fields on open deals so reps can update quoted rates.",
-      "deployedAt": "2026-09-15T16:24:46.445Z",
-      "deployedAtIst": "15/09/2026, 21:54:46",
-      "committedAtIst": "15/09/2026, 21:54:07",
-      "vercelPreviewUrl": "https://connect-intel-orlb9dgld-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- f30b3e6"
-    },
-    {
-      "logId": "20260915-2149-d1f1474",
-      "commit": "d1f1474",
-      "commitFull": "d1f1474c37965f8fb703019acfeb613066eea929",
-      "message": "Record production deploy 2f8de67 as LIVE.",
-      "deployedAt": "2026-09-15T16:19:27.508Z",
-      "deployedAtIst": "15/09/2026, 21:49:27",
-      "committedAtIst": "15/09/2026, 21:48:49",
-      "vercelPreviewUrl": "https://connect-intel-exhj1cl31-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- d1f1474"
     }
   ]
 }
