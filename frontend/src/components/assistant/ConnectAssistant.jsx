@@ -124,10 +124,9 @@ export default function ConnectAssistant({
   const [escalating, setEscalating] = useState(false)
   const [status, setStatus] = useState(null)
   const [suggestions, setSuggestions] = useState([])
-  const [webResearchAvailable, setWebResearchAvailable] = useState(false)
   const [showRaiseForm, setShowRaiseForm] = useState(false)
   const [concernText, setConcernText] = useState('')
-  const [activeTab, setActiveTab] = useState('copilot')
+  const [activeTab, setActiveTab] = useState('crm')
   const [progressStep, setProgressStep] = useState('')
   const [recentSearches, setRecentSearches] = useState([])
   const [editingMessageId, setEditingMessageId] = useState(null)
@@ -149,7 +148,6 @@ export default function ConnectAssistant({
       setMessages(data.messages || [])
       setThreadId(data.threadId || null)
       setMyTickets(data.myTickets || [])
-      setWebResearchAvailable(Boolean(data.webResearchAvailable))
       const lastAssistant = [...(data.messages || [])].reverse().find((m) => m.role === 'assistant')
       if (lastAssistant?.suggestions?.length) {
         setSuggestions(lastAssistant.suggestions)
@@ -387,16 +385,13 @@ export default function ConnectAssistant({
   )
 
   const tabMeta = COPILOT_TABS.find((t) => t.id === activeTab) || COPILOT_TABS[0]
-  const copilotSub = pipelineLeadId
-    ? 'Lead context on · CRM + web research'
-    : `${tabMeta.hint}${webResearchAvailable ? ' · web live' : ''}`
+  const copilotSub = pipelineLeadId ? 'Using the open pipeline lead' : tabMeta.hint
 
   const inputPlaceholder = {
-    copilot: 'Ask anything — CRM data, company research, emails, pipeline…',
-    market: 'Find exporters, research companies, market news…',
-    crm: 'Search pipeline, counts, follow-ups, stalled deals…',
-    actions: 'Draft email, schedule meeting, create task…',
-  }[activeTab]
+    crm: 'Follow-ups, stages, stalled deals, brief me…',
+    lead: 'Summarize, draft email, reminder, or paste RFQ…',
+    actions: 'Draft email, schedule a call, create a task…',
+  }[activeTab] || 'Ask about your pipeline…'
 
   if (!user || user.isPlatformAdmin) return null
 
@@ -474,10 +469,10 @@ export default function ConnectAssistant({
           {showWelcome && (
             <div className="ci-ai-welcome">
               <p className="ci-ai-welcome__hi">
-                Hi{user.name ? `, ${user.name.split(' ')[0]}` : ''} — your sales copilot.
+                Hi{user.name ? `, ${user.name.split(' ')[0]}` : ''} — Copilot for your pipeline.
               </p>
               <p className="ci-ai-welcome__copy">
-                {tabMeta.hint}. I check **CRM first**, then enrich from **web sources** — with one-click actions.
+                Answers from your CRM: follow-ups, stage counts, at-risk accounts, email drafts, tasks, and RFQ paste.
               </p>
               {recentSearches.length > 0 ? (
                 <div className="ci-ai-recent">
@@ -528,10 +523,7 @@ export default function ConnectAssistant({
             <div className="ci-ai-thinking">
               <span className="ci-ai-thinking__dot" />
               <span>
-                {progressStep ||
-                  (activeTab === 'market'
-                    ? 'Searching companies — may take up to 60s…'
-                    : 'Working…')}
+                {progressStep || 'Working…'}
               </span>
               <div className="ci-ai-thinking__bar" aria-hidden>
                 <span className="ci-ai-thinking__bar-fill" />
