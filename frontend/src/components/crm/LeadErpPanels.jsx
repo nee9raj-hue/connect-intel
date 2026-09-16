@@ -101,7 +101,10 @@ export default function LeadErpPanels({ lead, tab }) {
             />
           </div>
           {!hasData ? (
-            <LwEmpty>ERP revenue will appear here after the next customer import.</LwEmpty>
+            <LwEmpty>
+              No ERP revenue yet. Open this lead after a workspace shipment upload or trading import
+              that matches this company or customer code.
+            </LwEmpty>
           ) : (
             <>
               <div className="lw-stat-row">
@@ -141,7 +144,10 @@ export default function LeadErpPanels({ lead, tab }) {
   return (
     <LwSection icon={SparkIcon} title="ERP Finance">
       {!hasFinance ? (
-        <LwEmpty>ERP finance will appear here after invoices and payments are imported.</LwEmpty>
+        <LwEmpty>
+          No ERP finance yet. Invoice status, payments, and ledger fill from matched shipments and
+          open or won deals.
+        </LwEmpty>
       ) : (
         <>
           <div className="lw-stat-row">

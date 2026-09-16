@@ -608,6 +608,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
         return {
           ...base,
           ...listLead,
+          erp: listLead.erp || base.erp,
           commercialEmailOptIn:
             listLead.commercialEmailOptIn ??
             (listLead.commercialEmailConsentAt ? true : base.commercialEmailOptIn),
