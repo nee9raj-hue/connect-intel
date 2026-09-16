@@ -630,7 +630,30 @@
   font-size: 0.75rem;
   font-weight: 400;
   color: var(--lw-text-secondary);
-  margin-left: 4px;
+  margin-top: 4px;
+  margin-left: 0;
+}
+
+.lw-stat-card--featured {
+  background: var(--lw-brand-soft);
+  border-color: #ffd4b8;
+  padding: 16px 18px;
+}
+
+.lw-stat-card--featured .lw-stat-card__label {
+  color: #c05621;
+}
+
+.lw-stat-card--featured .lw-stat-card__value {
+  font-size: 1.5rem;
+  letter-spacing: -0.04em;
+  margin-top: 4px;
+}
+
+.lw-erp-recency {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 /* Contact grid */

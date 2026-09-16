@@ -37,6 +37,7 @@ import {
   TIMELINE_FILTERS,
 } from '../../lib/crmTimeline'
 import { hasWorkspaceFeature } from '../../lib/workspaceFeatures'
+import { lastOrderRecencyLabel, resolveLeadLastOrderCreatedAt } from '../../../../lib/leadLastOrder.js'
 import FieldVisitRecordForm from './FieldVisitRecordForm'
 import LeadDealsSection from './LeadDealsSection'
 import LeadErpPanels from './LeadErpPanels'
@@ -229,6 +230,7 @@ export default function LeadWorkspace({
   const canScheduleForTeam = isManager || canAssignThisLead
   const fieldVisitExpensesEnabled = hasWorkspaceFeature(user, 'fieldVisitExpenses')
   const crm = lead.crm || {}
+  const lastOrderAt = resolveLeadLastOrderCreatedAt(lead)
   const timeline = useMemo(
     () =>
       filterTimelineItems(
@@ -899,6 +901,16 @@ export default function LeadWorkspace({
           <>
             <LeadCallLogCard lead={lead} saving={saving} onLog={logCallActivity} onSuccess={setNotice} />
 
+            <div className="lw-section lw-section--padded">
+              <LwStatCard
+                featured
+                label="Last order"
+                value={lastOrderAt ? formatCrmDate(lastOrderAt) : 'No order on file'}
+                sub={lastOrderRecencyLabel(lastOrderAt)}
+                action={<LwLinkBtn onClick={() => setTab('erp-revenue')}>ERP Revenue</LwLinkBtn>}
+              />
+            </div>
+
             <LwSection icon={PipelineIcon} title="Pipeline status">
               <LwField label="Status">
                 <LwSelect value={status} onChange={(e) => changeStatus(e.target.value)}>
@@ -1105,6 +1117,7 @@ export default function LeadWorkspace({
             <LwSection icon={LogIcon} title="Activity">
               <LwInfoGrid
                 items={[
+                  { label: 'Last order', value: lastOrderAt ? formatCrmDate(lastOrderAt) : '—' },
                   { label: 'Last communication', value: formatDateTime(crm.lastCommunicationAt) },
                   { label: 'Type', value: ACTIVITY_LABELS[crm.lastCommunicationType] || '—' },
                   { label: 'Next follow-up', value: formatDateTime(crm.nextFollowUpAt) },

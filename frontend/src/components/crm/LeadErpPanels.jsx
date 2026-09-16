@@ -14,6 +14,7 @@ import {
 } from '../../../../lib/leadErp.js'
 import { formatDealValue } from '../../lib/crmTimeline'
 import { formatCrmDate } from '../../lib/crmConstants'
+import { lastOrderRecencyLabel, resolveLeadLastOrderCreatedAt } from '../../../../lib/leadLastOrder.js'
 import {
   LwEmpty,
   LwInfoGrid,
@@ -90,7 +91,8 @@ export default function LeadErpPanels({ lead, tab }) {
     const revenue = periodFilterActive ? periodTotals.revenue : rev.revenue
     const shipments = periodFilterActive ? periodTotals.shipmentCount : rev.shipmentCount
     const lastShip = rev.lastShipmentDate || rev.lastTransactedDate
-    const hasTrading = revenue != null || shipments != null || lastShip
+    const lastOrderAt = resolveLeadLastOrderCreatedAt(lead) || lastShip
+    const hasTrading = revenue != null || shipments != null || lastShip || lastOrderAt
     const hasShipping = Boolean(rev.shipmentMethod || rev.shipType || rev.countries || rev.shipmentTypes || rev.taxTypes || rev.incoTerm)
     const hasVolume =
       rev.dailyAverageLoadMoq != null ||
@@ -99,7 +101,13 @@ export default function LeadErpPanels({ lead, tab }) {
       rev.volume15To30Days != null
     const hasSavings = rev.totalSavings != null
     const hasPeriods = filteredPeriods.length > 0
-    const hasData = hasLeadErpDisplayData({ revenue: rev, finance: {} }) || hasTrading || hasShipping || hasVolume || hasSavings
+    const hasData =
+      hasLeadErpDisplayData({ revenue: rev, finance: {} }) ||
+      hasTrading ||
+      hasShipping ||
+      hasVolume ||
+      hasSavings ||
+      Boolean(lastOrderAt)
 
     if (!hasData) {
       return (
@@ -114,6 +122,14 @@ export default function LeadErpPanels({ lead, tab }) {
 
     return (
       <div className="lw-erp">
+        <div className="lw-erp-recency">
+          <LwStatCard
+            featured
+            label="Last order"
+            value={lastOrderAt ? formatCrmDate(lastOrderAt) : '—'}
+            sub={lastOrderRecencyLabel(lastOrderAt)}
+          />
+        </div>
         <LwSection icon={PipelineIcon} title="Trading activity">
           <p className="lw-erp-subcopy">How often this account ships with Xindus.</p>
           <div className="lw-stat-row">
@@ -124,8 +140,8 @@ export default function LeadErpPanels({ lead, tab }) {
             />
             <LwStatCard
               label="Last transacted"
-              value={lastShip ? formatCrmDate(lastShip) : '—'}
-              sub="Last shipment / trade date"
+              value={lastShip ? formatCrmDate(lastShip) : lastOrderAt ? formatCrmDate(lastOrderAt) : '—'}
+              sub="ERP last shipment / trade date"
             />
             <LwStatCard
               label="Recorded revenue"

@@ -106,9 +106,9 @@ export function LwAlert({ type = 'error', children }) {
   )
 }
 
-export function LwStatCard({ label, value, sub, action }) {
+export function LwStatCard({ label, value, sub, action, featured = false }) {
   return (
-    <div className="lw-stat-card">
+    <div className={`lw-stat-card ${featured ? 'lw-stat-card--featured' : ''}`.trim()}>
       <div className="lw-stat-card__main">
         <span className="lw-stat-card__label">{label}</span>
         <span className="lw-stat-card__value">{value}</span>

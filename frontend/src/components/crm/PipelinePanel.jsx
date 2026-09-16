@@ -1779,9 +1779,9 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               showHoverActions={hoverActionsEnabled}
               selectedId={pipelineLeadId}
               selectedIds={selectedIds}
-              onSelect={(leadId) => {
+              onSelect={(leadId, tab) => {
                 const lead = findLeadInLists(leadId) || filtered.find((l) => String(l.id) === String(leadId))
-                openPipelineLeadRow(lead || { id: leadId })
+                openPipelineLeadRow(lead || { id: leadId }, tab)
               }}
               onToggleSelect={toggleSelect}
               onSelectAllVisible={selectAllVisible}

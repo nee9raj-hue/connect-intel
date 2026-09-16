@@ -10,6 +10,7 @@ export const PIPELINE_TABLE_COLUMNS = [
   { id: 'tags', label: 'Tags', default: false },
   { id: 'phone', label: 'Phone', default: true },
   { id: 'owner', label: 'Lead owner', default: true },
+  { id: 'lastOrder', label: 'Last order', default: true },
   { id: 'activity', label: 'Last activity', default: true },
   { id: 'email', label: 'Email', default: false },
   { id: 'notes', label: 'Notes', default: false },

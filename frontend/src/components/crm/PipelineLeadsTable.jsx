@@ -11,6 +11,7 @@ import {
   DEFAULT_PIPELINE_VISIBLE_COLUMNS,
   normalizePipelineColumnOrder,
 } from '../../lib/pipelineColumnPrefs'
+import { resolveLeadLastOrderCreatedAt } from '../../../../lib/leadLastOrder.js'
 import PipelineRowActionsMenu from './PipelineRowActionsMenu'
 import {
   PhoneIcon,
@@ -122,6 +123,10 @@ function sortLeads(leads, sortKey, sortDir) {
         av = lastActivityMeta(a).at || ''
         bv = lastActivityMeta(b).at || ''
         break
+      case 'lastOrder':
+        av = resolveLeadLastOrderCreatedAt(a) || ''
+        bv = resolveLeadLastOrderCreatedAt(b) || ''
+        break
       case 'created':
         av = a.savedAt || a.createdAt || ''
         bv = b.savedAt || b.createdAt || ''
@@ -224,6 +229,18 @@ function renderPipelineHeader(colId, { sortKey, sortDir, onSort }) {
           sortDir={sortDir}
           onSort={onSort}
           className="pipeline-hs-th pipeline-hs-th--activity"
+        />
+      )
+    case 'lastOrder':
+      return (
+        <SortHeader
+          key={colId}
+          label="Last order"
+          sortKey="lastOrder"
+          activeKey={sortKey}
+          sortDir={sortDir}
+          onSort={onSort}
+          className="pipeline-hs-th pipeline-hs-th--created"
         />
       )
     case 'tags':
@@ -488,6 +505,25 @@ function renderPipelineCell(colId, lead, ctx) {
           )}
         </td>
       )
+    case 'lastOrder': {
+      const lastOrderAt = resolveLeadLastOrderCreatedAt(lead)
+      return (
+        <td key={colId} className="pipeline-hs-td">
+          {lastOrderAt ? (
+            <button
+              type="button"
+              className="pipeline-hs-cell-text"
+              onClick={() => onSelect(lead.id, 'erp-revenue')}
+              title={formatDateTime(lastOrderAt)}
+            >
+              {formatCrmDate(lastOrderAt)}
+            </button>
+          ) : (
+            <span className="pipeline-hs-muted">—</span>
+          )}
+        </td>
+      )
+    }
     case 'tags':
       return (
         <td key={colId} className="pipeline-hs-td pipeline-hs-td--tags">
