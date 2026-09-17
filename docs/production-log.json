@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-17T10:18:45.567Z",
-  "updatedAtIst": "17/09/2026, 15:48:45",
+  "updatedAt": "2026-09-17T10:35:24.907Z",
+  "updatedAtIst": "17/09/2026, 16:05:24",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "ec6cb26",
+  "currentProductionCommit": "2d02dd5",
   "entries": [
+    {
+      "logId": "20260917-1605-2d02dd5",
+      "commit": "2d02dd5",
+      "commitFull": "2d02dd5fad09a21da5645e7f95fb4c44ccff6037",
+      "message": "Match Last shipment year and month to the other pipeline filter pills.",
+      "deployedAt": "2026-09-17T10:35:09.208Z",
+      "deployedAtIst": "17/09/2026, 16:05:09",
+      "committedAtIst": "17/09/2026, 16:04:22",
+      "vercelPreviewUrl": "https://connect-intel-3fl582gk5-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 2d02dd5"
+    },
+    {
+      "logId": "20260917-1550-514dae9",
+      "commit": "514dae9",
+      "commitFull": "514dae97b1c188753685e86d59a87d633a16234e",
+      "message": "Record production LIVE snapshot for ERP rep identity pipeline visibility.",
+      "deployedAt": "2026-09-17T10:20:35.149Z",
+      "deployedAtIst": "17/09/2026, 15:50:35",
+      "committedAtIst": "17/09/2026, 15:49:46",
+      "vercelPreviewUrl": "https://connect-intel-90wxl3y9n-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 514dae9"
+    },
     {
       "logId": "20260917-1548-ec6cb26",
       "commit": "ec6cb26",
@@ -15,7 +43,7 @@
       "committedAtIst": "17/09/2026, 15:47:15",
       "vercelPreviewUrl": "https://connect-intel-8jjirrggf-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- ec6cb26"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- b0baa7e"
-    },
-    {
-      "logId": "20260917-0012-7c52c99",
-      "commit": "7c52c99",
-      "commitFull": "7c52c99795a3cfaa63a4e4c2a2aef9bc73a6ca97",
-      "message": "Show last order on Overview, pipeline table, and as the first card on ERP Revenue.",
-      "deployedAt": "2026-09-16T18:42:53.462Z",
-      "deployedAtIst": "17/09/2026, 00:12:53",
-      "committedAtIst": "17/09/2026, 00:12:08",
-      "vercelPreviewUrl": "https://connect-intel-gs1ei644d-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 7c52c99"
-    },
-    {
-      "logId": "20260916-2353-11843e2",
-      "commit": "11843e2",
-      "commitFull": "11843e23700c26aee0c24effea2183a889f6ca4d",
-      "message": "Add a Trade profile tab on the lead so reps can save shipping fit for service decisions.",
-      "deployedAt": "2026-09-16T18:23:04.556Z",
-      "deployedAtIst": "16/09/2026, 23:53:04",
-      "committedAtIst": "16/09/2026, 23:52:12",
-      "vercelPreviewUrl": "https://connect-intel-qwuxz213t-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 11843e2"
     }
   ]
 }
