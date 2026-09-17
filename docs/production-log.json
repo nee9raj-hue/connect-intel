@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-17T09:51:00.253Z",
-  "updatedAtIst": "17/09/2026, 15:21:00",
+  "updatedAt": "2026-09-17T10:18:45.567Z",
+  "updatedAtIst": "17/09/2026, 15:48:45",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "85db860",
+  "currentProductionCommit": "ec6cb26",
   "entries": [
+    {
+      "logId": "20260917-1548-ec6cb26",
+      "commit": "ec6cb26",
+      "commitFull": "ec6cb268129293a67dbf0075d5cdb691a1f34c0d",
+      "message": "Let CRM reps see ERP-owned leads across invite and login user ids.",
+      "deployedAt": "2026-09-17T10:18:10.266Z",
+      "deployedAtIst": "17/09/2026, 15:48:10",
+      "committedAtIst": "17/09/2026, 15:47:15",
+      "vercelPreviewUrl": "https://connect-intel-8jjirrggf-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- ec6cb26"
+    },
+    {
+      "logId": "20260917-1522-8ede71f",
+      "commit": "8ede71f",
+      "commitFull": "8ede71ff85993690eb15bafca2a9383778430c41",
+      "message": "Record production LIVE snapshot for ERP rep lead claim.",
+      "deployedAt": "2026-09-17T09:52:03.153Z",
+      "deployedAtIst": "17/09/2026, 15:22:03",
+      "committedAtIst": "17/09/2026, 15:21:18",
+      "vercelPreviewUrl": "https://connect-intel-jwl6958vb-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 8ede71f"
+    },
     {
       "logId": "20260917-1519-85db860",
       "commit": "85db860",
@@ -15,7 +43,7 @@
       "committedAtIst": "17/09/2026, 15:18:47",
       "vercelPreviewUrl": "https://connect-intel-kg2oymjg0-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 85db860"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 11843e2"
-    },
-    {
-      "logId": "20260916-2337-439f7af",
-      "commit": "439f7af",
-      "commitFull": "439f7afcd2f1c8042c833d50a3d25ca7f11055c8",
-      "message": "Map account pipeline statuses onto the public.leads check constraint so CRM payload upserts succeed.",
-      "deployedAt": "2026-09-16T18:07:21.568Z",
-      "deployedAtIst": "16/09/2026, 23:37:21",
-      "committedAtIst": "16/09/2026, 23:36:32",
-      "vercelPreviewUrl": "https://connect-intel-liedo3oyb-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 439f7af"
-    },
-    {
-      "logId": "20260916-2334-039da35",
-      "commit": "039da35",
-      "commitFull": "039da3517221d126042b7ca2e4c5cbb03567e4b6",
-      "message": "Await enterprise lead sync during ERP overlay so crm_payload.lastOrderCreatedAt is written.",
-      "deployedAt": "2026-09-16T18:04:54.436Z",
-      "deployedAtIst": "16/09/2026, 23:34:54",
-      "committedAtIst": "16/09/2026, 23:34:09",
-      "vercelPreviewUrl": "https://connect-intel-qctvyfcrh-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 039da35"
     }
   ]
 }
