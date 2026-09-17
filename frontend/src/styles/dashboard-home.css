@@ -1923,6 +1923,10 @@
   margin-bottom: 1.25rem;
 }
 
+.uc-dash--retention {
+  margin-top: 0.25rem;
+}
+
 .uc-dash__hero {
   display: flex;
   flex-wrap: wrap;
