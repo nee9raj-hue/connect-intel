@@ -93,6 +93,10 @@
   min-width: 0;
 }
 
+.pipeline-filter-command-bar__filters .crm-filter-btn {
+  max-width: none;
+}
+
 .pipeline-filter-command-bar__meta {
   display: flex;
   align-items: center;

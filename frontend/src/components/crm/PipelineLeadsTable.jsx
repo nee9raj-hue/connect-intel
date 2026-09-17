@@ -11,7 +11,7 @@ import {
   DEFAULT_PIPELINE_VISIBLE_COLUMNS,
   normalizePipelineColumnOrder,
 } from '../../lib/pipelineColumnPrefs'
-import { resolveLeadLastOrderCreatedAt } from '../../../../lib/leadLastOrder.js'
+import { formatLastShipmentMonthYear, resolveLeadLastOrderCreatedAt } from '../../../../lib/leadLastOrder.js'
 import PipelineRowActionsMenu from './PipelineRowActionsMenu'
 import {
   PhoneIcon,
@@ -235,7 +235,7 @@ function renderPipelineHeader(colId, { sortKey, sortDir, onSort }) {
       return (
         <SortHeader
           key={colId}
-          label="Last order"
+          label="Last shipment"
           sortKey="lastOrder"
           activeKey={sortKey}
           sortDir={sortDir}
@@ -516,7 +516,7 @@ function renderPipelineCell(colId, lead, ctx) {
               onClick={() => onSelect(lead.id, 'erp-revenue')}
               title={formatDateTime(lastOrderAt)}
             >
-              {formatCrmDate(lastOrderAt)}
+              {formatLastShipmentMonthYear(lastOrderAt)}
             </button>
           ) : (
             <span className="pipeline-hs-muted">—</span>

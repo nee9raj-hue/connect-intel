@@ -72,6 +72,7 @@ import useIsMobile from '../../hooks/useIsMobile'
 import usePipelineFilterMobile, { usePipelineNarrowViewport } from '../../hooks/usePipelineFilterMobile'
 import MyDayReturnBar from '../overview/MyDayReturnBar'
 import { buildPipelineBreadcrumb, pipelineFilterParts } from '../../lib/pipelineListBreadcrumb'
+import { lastShipmentPeriodLabel } from '../../../../lib/leadLastShipmentFilter.js'
 import {
   loadPipelineColumnPrefs,
   loadPipelineHoverActionsPref,
@@ -680,7 +681,9 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     advancedFilters.lastActivityFrom !== appliedAdvanced.lastActivityFrom ||
     advancedFilters.lastActivityTo !== appliedAdvanced.lastActivityTo ||
     advancedFilters.sourceFilter !== appliedAdvanced.sourceFilter ||
-    advancedFilters.stuckLeads !== appliedAdvanced.stuckLeads
+    advancedFilters.stuckLeads !== appliedAdvanced.stuckLeads ||
+    advancedFilters.lastShipmentYear !== appliedAdvanced.lastShipmentYear ||
+    advancedFilters.lastShipmentMonth !== appliedAdvanced.lastShipmentMonth
 
   const buildServerFilters = useCallback(
     (adv, q) => ({
@@ -717,7 +720,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
           serverFilters.tagIds?.length ||
           serverFilters.minLeadScore != null ||
           serverFilters.followUpDue ||
-          serverFilters.overdueFollowUp
+          serverFilters.overdueFollowUp ||
+          serverFilters.lastShipmentYear
       ),
     [serverFilters]
   )
@@ -847,6 +851,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       lastActivityTo: appliedAdvanced.lastActivityTo,
       sourceFilter: appliedAdvanced.sourceFilter,
       stuckLeads: appliedAdvanced.stuckLeads,
+      lastShipmentYear: appliedAdvanced.lastShipmentYear,
+      lastShipmentMonth: appliedAdvanced.lastShipmentMonth,
       staleDays: appliedAdvanced.staleDays ?? smartViewFilters.staleDays,
       assignedAfter: panelOptions?.assignedAfter || null,
       lastActivity: panelOptions?.lastActivity || null,
@@ -927,6 +933,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       cityLabels: getFilterCities(appliedAdvanced),
       stateLabels: getFilterStates(appliedAdvanced),
       search: appliedSearch,
+      lastShipmentLabel: lastShipmentPeriodLabel(appliedAdvanced),
     })
     if (!statusLabel && !stageListMode && listStatusFilter === 'all') {
       parts.push('All statuses')

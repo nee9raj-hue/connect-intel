@@ -279,6 +279,10 @@ export const api = {
     }
     if (params.followUpDue) qs.set('followUpDue', '1')
     if (params.overdueFollowUp) qs.set('overdueFollowUp', '1')
+    if (params.lastShipmentYear) qs.set('lastShipmentYear', String(params.lastShipmentYear))
+    if (params.lastShipmentYear && params.lastShipmentMonth) {
+      qs.set('lastShipmentMonth', String(params.lastShipmentMonth))
+    }
     for (const [col, limit] of Object.entries(params.columnLimits || {})) {
       if (limit > 0) qs.set(`col_${col}`, String(limit))
     }
@@ -301,6 +305,8 @@ export const api = {
     minLeadScore,
     followUpDue,
     overdueFollowUp,
+    lastShipmentYear,
+    lastShipmentMonth,
     teamId,
     teamIds,
     leadIds,
@@ -332,6 +338,8 @@ export const api = {
     if (minLeadScore != null && minLeadScore !== '') qs.set('minLeadScore', String(minLeadScore))
     if (followUpDue) qs.set('followUpDue', '1')
     if (overdueFollowUp) qs.set('overdueFollowUp', '1')
+    if (lastShipmentYear) qs.set('lastShipmentYear', String(lastShipmentYear))
+    if (lastShipmentYear && lastShipmentMonth) qs.set('lastShipmentMonth', String(lastShipmentMonth))
     if (teamId) qs.set('teamId', String(teamId))
     for (const id of teamIds || []) qs.append('teamId', String(id))
     return request(`/api/saved-leads?${qs}`, { timeoutMs: 45_000 }, { silent })

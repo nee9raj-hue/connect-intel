@@ -11,6 +11,7 @@ import {
   repPipelineEntryVisible,
 } from '../../../lib/pipelineOwner.js'
 import { crmStatusMatchesFilter } from '../../../lib/crmLeadStatuses.js'
+import { leadMatchesLastShipmentPeriod } from '../../../lib/leadLastShipmentFilter.js'
 
 export const CONTACT_FILTER_OPTIONS = [
   { id: 'any', label: 'All contacts' },
@@ -49,6 +50,8 @@ export function pipelineServerFilterExtras(adv = {}, smartView = {}) {
     followUpDue: adv.followUpDue ? '1' : undefined,
     overdueFollowUp: adv.overdueFollowUp ? '1' : undefined,
     stuck: adv.stuckLeads ? '1' : undefined,
+    lastShipmentYear: adv.lastShipmentYear || undefined,
+    lastShipmentMonth: adv.lastShipmentMonth || undefined,
   }
 }
 
@@ -71,6 +74,8 @@ export const DEFAULT_PIPELINE_FILTERS = {
   lastActivityTo: '',
   sourceFilter: '',
   stuckLeads: false,
+  lastShipmentYear: '',
+  lastShipmentMonth: '',
 }
 
 /** @deprecated use cities[] — kept for saved views migration */
@@ -286,6 +291,8 @@ export function applyPipelineFilters(
     leadIds = null,
     teamMemberIds = null,
     teamIds = [],
+    lastShipmentYear = '',
+    lastShipmentMonth = '',
   } = {}
 ) {
   let list = leads || []
@@ -352,6 +359,12 @@ export function applyPipelineFilters(
         l.crm?.lastCommunicationAt || l.crm?.lastEmailSentAt || l.crm?.lastCallAt || null
       return matchesDateRange(at, lastActivityFrom, lastActivityTo)
     })
+  }
+
+  if (lastShipmentYear) {
+    list = list.filter((l) =>
+      leadMatchesLastShipmentPeriod(l, { lastShipmentYear, lastShipmentMonth })
+    )
   }
 
   if (sourceFilter) {
@@ -517,6 +530,7 @@ export function countActiveFilters(filters, search) {
   if (filters.lastActivityFrom || filters.lastActivityTo) n += 1
   if (filters.sourceFilter) n += 1
   if (filters.stuckLeads) n += 1
+  if (filters.lastShipmentYear) n += 1
   if (search?.trim()) n += 1
   return n
 }

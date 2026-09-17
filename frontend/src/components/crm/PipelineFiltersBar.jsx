@@ -1,9 +1,11 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import usePipelineFilterMobile from '../../hooks/usePipelineFilterMobile'
 import { PIPELINE_SEARCH_ID } from '../../hooks/useAppKeyboardShortcuts'
 import { api } from '../../lib/api'
 import { CONTACT_FILTER_OPTIONS, DEFAULT_PIPELINE_FILTERS, getFilterCities, getFilterStates } from '../../lib/pipelineFilters'
-import { FilterChipButton } from './FilterDropdown'
+import FilterDropdown, { FilterChipButton } from './FilterDropdown'
+import { DEAL_MONTH_OPTIONS, dealYearOptions, formatDealPeriodLabel } from '../../lib/pipelineDealsFilter'
+import { lastShipmentPeriodLabel } from '../../../../lib/leadLastShipmentFilter.js'
 import LeadTag from '../ui/LeadTag'
 import PipelineFilterPopup from './PipelineFilterPopup'
 import PipelineFilterToolbarButton from './PipelineFilterToolbarButton'
@@ -135,6 +137,17 @@ export default function PipelineFiltersBar({
     },
     [onFiltersChange, onApplyFilters]
   )
+
+  const shipmentYearOptions = useMemo(() => dealYearOptions(new Date(), []), [])
+  const shipmentYear = String(appliedFilters.lastShipmentYear || filters.lastShipmentYear || '')
+  const shipmentMonth = String(appliedFilters.lastShipmentMonth || filters.lastShipmentMonth || '')
+  const shipmentMonthDisplay = DEAL_MONTH_OPTIONS.find((o) => o.value === String(shipmentMonth))?.label || null
+
+  const applyLastShipment = (year, month) => {
+    const lastShipmentYear = String(year || '')
+    const lastShipmentMonth = lastShipmentYear ? String(month || '') : ''
+    commitFilters({ ...filters, lastShipmentYear, lastShipmentMonth })
+  }
 
   const cityOptions = cities.map((c) => ({ label: c, value: c }))
   const stateOptions = states.map((s) => ({ label: s, value: s }))
@@ -524,7 +537,8 @@ export default function PipelineFiltersBar({
     (appliedFilters.smartTags?.length || 0) > 0 ||
     (appliedFilters.teamIds?.length || 0) > 0 ||
     (!stageListMode && statusFilter !== 'all') ||
-    (appliedFilters.contact && appliedFilters.contact !== 'any')
+    (appliedFilters.contact && appliedFilters.contact !== 'any') ||
+    Boolean(appliedFilters.lastShipmentYear)
 
   const filterToolbar = (
     <>
@@ -616,6 +630,26 @@ export default function PipelineFiltersBar({
         active={Boolean(filters.contact && filters.contact !== 'any')}
         aria-expanded={activeFilter?.type === 'contact'}
         onClick={() => openFilter('contact')}
+      />
+
+      <FilterDropdown
+        label="Last shipment"
+        value={shipmentYear}
+        displayValue={shipmentYear || null}
+        options={shipmentYearOptions}
+        emptyLabel="Any year"
+        compact={useMobileFilterSheet}
+        onChange={(next) => applyLastShipment(next, next ? shipmentMonth : '')}
+      />
+      <FilterDropdown
+        label="Month"
+        value={shipmentMonth}
+        displayValue={shipmentMonthDisplay}
+        options={DEAL_MONTH_OPTIONS}
+        emptyLabel="All months"
+        compact={useMobileFilterSheet}
+        disabled={!shipmentYear}
+        onChange={(next) => applyLastShipment(shipmentYear, next)}
       />
 
       <PipelineFilterToolbarButton
@@ -766,6 +800,20 @@ export default function PipelineFiltersBar({
               onRemove={() => onRemoveAppliedFilter?.({ contact: 'any' })}
             />
           )}
+          {appliedFilters.lastShipmentYear ? (
+            <FilterChipButton
+              label={
+                lastShipmentPeriodLabel(appliedFilters) ||
+                formatDealPeriodLabel({
+                  year: appliedFilters.lastShipmentYear,
+                  month: appliedFilters.lastShipmentMonth,
+                })
+              }
+              onRemove={() =>
+                onRemoveAppliedFilter?.({ lastShipmentYear: '', lastShipmentMonth: '' })
+              }
+            />
+          ) : null}
           {(appliedFilters.teamIds || []).map((teamId) => {
             const team = orgTeams.find((t) => t.id === teamId)
             return (

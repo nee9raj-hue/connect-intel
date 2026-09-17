@@ -31,6 +31,7 @@ export function pipelineFilterParts({
   stateLabels = [],
   tagLabels = [],
   search = '',
+  lastShipmentLabel = '',
 } = {}) {
   const parts = []
   if (statusLabel) parts.push(`Status: ${statusLabel}`)
@@ -38,6 +39,7 @@ export function pipelineFilterParts({
   if (cityLabels.length) parts.push(`City: ${cityLabels.join(', ')}`)
   if (stateLabels.length) parts.push(`State: ${stateLabels.join(', ')}`)
   if (tagLabels.length) parts.push(`Tags: ${tagLabels.join(', ')}`)
+  if (lastShipmentLabel) parts.push(lastShipmentLabel)
   if (search?.trim()) parts.push(`Search: “${search.trim()}”`)
   return parts
 }
