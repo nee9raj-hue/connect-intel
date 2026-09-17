@@ -418,6 +418,8 @@ export const api = {
     request(`/api/crm/activity-timeline?${appendTimeZoneToQuery(query)}`, { timeoutMs: 45_000 }),
   getCrmMyDay: (query = '') =>
     request(`/api/crm/my-day?${appendTimeZoneToQuery(query)}`, { timeoutMs: 15_000 }),
+  getCrmUniqueCustomers: (query = '') =>
+    request(`/api/crm/unique-customers?${appendTimeZoneToQuery(query)}`, { timeoutMs: 60_000 }),
   getDashboardBootstrap: () =>
     dedupeGet('dashboard-bootstrap', () =>
       request('/api/dashboard/bootstrap', { timeoutMs: 30_000 })

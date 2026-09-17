@@ -1,24 +1,21 @@
 import { useApp } from '../../context/AppContext'
-import { isFreightDealOrg } from '../../lib/freightDeal'
 import HomeDashboard from './HomeDashboard'
-import FreightDealsDashboard from './FreightDealsDashboard'
 
 export default function OverviewPanel({ onNavigate, isActive = true }) {
-  const { user, pipelineSummary } = useApp()
+  const { pipelineSummary } = useApp()
 
   if (!isActive) {
     return <div className="panel-shell overview-panel-v3 dash-home-shell hidden" aria-hidden />
   }
 
-  const freightBlock = isFreightDealOrg(user) ? (
-    <FreightDealsDashboard user={user} pipelineSummary={pipelineSummary} onNavigate={onNavigate} />
-  ) : null
-
   return (
     <div className="panel-shell overview-panel-v3 dash-home-shell">
       <div className="panel-body-scroll">
-        <HomeDashboard onNavigate={onNavigate} isActive={isActive} />
-        {freightBlock}
+        <HomeDashboard
+          onNavigate={onNavigate}
+          isActive={isActive}
+          pipelineSummary={pipelineSummary}
+        />
       </div>
     </div>
   )
