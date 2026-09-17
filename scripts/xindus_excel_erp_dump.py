@@ -19,7 +19,11 @@ def json_val(v):
         return v.isoformat()
     if isinstance(v, bool):
         return v
-    if isinstance(v, (int, float)):
+    if isinstance(v, int):
+        return str(v) if abs(v) > 2**53 else v
+    if isinstance(v, float):
+        if v.is_integer() and abs(v) > 2**53:
+            return str(int(v))
         return v
     return str(v)
 

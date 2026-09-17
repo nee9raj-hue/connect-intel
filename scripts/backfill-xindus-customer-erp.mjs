@@ -62,9 +62,14 @@ function buildOverlays(rows) {
     const keys = matchKeysFromXindusRow(row)
     overlays.push({
       xindusId: keys.xindusId,
+      crmId: keys.crmId,
       phone: keys.phone,
       email: keys.email,
       company: String(row.Company || row.company || '').trim(),
+      gst: keys.gst,
+      pan: keys.pan,
+      crn: keys.crn,
+      iec: keys.iec,
       erp: compactErp(overlay),
     })
   }
@@ -74,37 +79,41 @@ function buildOverlays(rows) {
 async function pushRemote(overlays) {
   const secret = process.env.CRON_SECRET
   if (!secret) throw new Error('CRON_SECRET missing — cannot call production backfill')
-  let offset = 0
+  const overlayBatchSize = 800
   const totals = { scanned: 0, matched: 0, updated: 0 }
   let orgId = null
-  for (;;) {
-    const res = await fetch(`${apiBase.replace(/\/$/, '')}/api/crm/xindus-erp-backfill`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${secret}`,
-      },
-      body: JSON.stringify({
-        nameQuery: 'Xindus',
-        overlays,
-        offset,
-        limit: 250,
-        dryRun,
-      }),
-    })
-    const data = await res.json().catch(() => ({}))
-    if (!res.ok) {
-      throw new Error(data.error || `HTTP ${res.status}`)
+  for (let start = 0; start < overlays.length; start += overlayBatchSize) {
+    const slice = overlays.slice(start, start + overlayBatchSize)
+    let offset = 0
+    for (;;) {
+      const res = await fetch(`${apiBase.replace(/\/$/, '')}/api/crm/xindus-erp-backfill`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${secret}`,
+        },
+        body: JSON.stringify({
+          nameQuery: 'Xindus',
+          overlays: slice,
+          offset,
+          limit: 250,
+          dryRun,
+        }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        throw new Error(data.error || `HTTP ${res.status}`)
+      }
+      orgId = data.organizationId || orgId
+      totals.scanned += data.scanned || 0
+      totals.matched += data.matched || 0
+      totals.updated += data.updated || 0
+      console.log(
+        `overlay ${start}-${start + slice.length - 1} offset ${offset}: scanned ${data.scanned} matched ${data.matched} updated ${data.updated} done=${data.done}`
+      )
+      if (data.done) break
+      offset = data.nextOffset
     }
-    orgId = data.organizationId || orgId
-    totals.scanned += data.scanned || 0
-    totals.matched += data.matched || 0
-    totals.updated += data.updated || 0
-    console.log(
-      `offset ${offset}: scanned ${data.scanned} matched ${data.matched} updated ${data.updated} done=${data.done}`
-    )
-    if (data.done) break
-    offset = data.nextOffset
   }
   return { ...totals, orgId, dryRun, mode: 'remote' }
 }
