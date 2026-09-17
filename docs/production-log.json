@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-17T16:17:32.140Z",
-  "updatedAtIst": "17/09/2026, 21:47:32",
+  "updatedAt": "2026-09-17T16:59:29.724Z",
+  "updatedAtIst": "17/09/2026, 22:29:29",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "cc694f4",
+  "currentProductionCommit": "8295de2",
   "entries": [
+    {
+      "logId": "20260917-2228-8295de2",
+      "commit": "8295de2",
+      "commitFull": "8295de27c97f8b3a9586459ddb3b63d41fd5b263",
+      "message": "Let teammates share pipeline via team and allowed tags, grey out locked rep features, and keep the default view assigned-only.",
+      "deployedAt": "2026-09-17T16:58:49.531Z",
+      "deployedAtIst": "17/09/2026, 22:28:49",
+      "committedAtIst": "17/09/2026, 22:28:05",
+      "vercelPreviewUrl": "https://connect-intel-9qewlbvio-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 8295de2"
+    },
+    {
+      "logId": "20260917-2148-1f26345",
+      "commit": "1f26345",
+      "commitFull": "1f2634572bd7bd80a99b99e02321859d6557e037",
+      "message": "Record production LIVE snapshot for ERP owner filter aliases.",
+      "deployedAt": "2026-09-17T16:18:21.973Z",
+      "deployedAtIst": "17/09/2026, 21:48:21",
+      "committedAtIst": "17/09/2026, 21:47:37",
+      "vercelPreviewUrl": "https://connect-intel-ou9423rjj-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 1f26345"
+    },
     {
       "logId": "20260917-2147-cc694f4",
       "commit": "cc694f4",
@@ -15,7 +43,7 @@
       "committedAtIst": "17/09/2026, 21:46:28",
       "vercelPreviewUrl": "https://connect-intel-1j963m7ty-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- cc694f4"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 73ef1fa"
-    },
-    {
-      "logId": "20260917-1038-0281e80",
-      "commit": "0281e80",
-      "commitFull": "0281e8061e08856b1cabacbba7bfb2f4d74baa5a",
-      "message": "Fix assigning a team manager by resolving the SQL profile id that was never imported.",
-      "deployedAt": "2026-09-17T05:08:35.404Z",
-      "deployedAtIst": "17/09/2026, 10:38:35",
-      "committedAtIst": "17/09/2026, 10:37:51",
-      "vercelPreviewUrl": "https://connect-intel-b7a6soz9t-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 0281e80"
-    },
-    {
-      "logId": "20260917-1030-baf6053",
-      "commit": "baf6053",
-      "commitFull": "baf6053320ee6da4f5dfdbb2b71ab065400c8d48",
-      "message": "Record production LIVE snapshot for ERP retention owners.",
-      "deployedAt": "2026-09-17T05:00:27.538Z",
-      "deployedAtIst": "17/09/2026, 10:30:27",
-      "committedAtIst": "17/09/2026, 10:29:50",
-      "vercelPreviewUrl": "https://connect-intel-q1y022stu-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- baf6053"
     }
   ]
 }
