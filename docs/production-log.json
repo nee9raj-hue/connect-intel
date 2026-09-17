@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-17T18:21:38.553Z",
-  "updatedAtIst": "17/09/2026, 23:51:38",
+  "updatedAt": "2026-09-17T18:39:11.617Z",
+  "updatedAtIst": "18/09/2026, 00:09:11",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "0eb0d66",
+  "currentProductionCommit": "0adbbf3",
   "entries": [
+    {
+      "logId": "20260918-0007-0adbbf3",
+      "commit": "0adbbf3",
+      "commitFull": "0adbbf3b68711961884cf001d0faf16a8af5d9c0",
+      "message": "Stamp Xindus ERP last-shipment onto leads that missed overlay match so idle accounts like XLP leave New Account.",
+      "deployedAt": "2026-09-17T18:37:41.800Z",
+      "deployedAtIst": "18/09/2026, 00:07:41",
+      "committedAtIst": "18/09/2026, 00:06:54",
+      "vercelPreviewUrl": "https://connect-intel-bo5ndkmtz-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 0adbbf3"
+    },
+    {
+      "logId": "20260917-2352-5472a90",
+      "commit": "5472a90",
+      "commitFull": "5472a90e2102d25d6710c5377bcd5cc5dfd29a94",
+      "message": "Record production LIVE snapshot for ERP restage and permission-gated nav.",
+      "deployedAt": "2026-09-17T18:22:32.492Z",
+      "deployedAtIst": "17/09/2026, 23:52:32",
+      "committedAtIst": "17/09/2026, 23:51:51",
+      "vercelPreviewUrl": "https://connect-intel-6uxgqv1to-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 5472a90"
+    },
     {
       "logId": "20260917-2351-0eb0d66",
       "commit": "0eb0d66",
@@ -15,7 +43,7 @@
       "committedAtIst": "17/09/2026, 23:50:32",
       "vercelPreviewUrl": "https://connect-intel-4tupl63g9-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 0eb0d66"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 140bef9"
-    },
-    {
-      "logId": "20260917-1502-90a27ea",
-      "commit": "90a27ea",
-      "commitFull": "90a27ea67b99f77b4681ffc25bc1f19e84e41991",
-      "message": "Classify ERP-imported pipeline stages from last shipment and balance, without overwriting a rep’s manual move.",
-      "deployedAt": "2026-09-17T09:32:38.941Z",
-      "deployedAtIst": "17/09/2026, 15:02:38",
-      "committedAtIst": "17/09/2026, 15:01:45",
-      "vercelPreviewUrl": "https://connect-intel-1ort39tzj-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 90a27ea"
-    },
-    {
-      "logId": "20260917-1456-6703c6d",
-      "commit": "6703c6d",
-      "commitFull": "6703c6dfc2917f1ace1bc42ec622d901da6a3489",
-      "message": "Record production LIVE snapshot for ERP owner lead assignment.",
-      "deployedAt": "2026-09-17T09:26:41.794Z",
-      "deployedAtIst": "17/09/2026, 14:56:41",
-      "committedAtIst": "17/09/2026, 14:55:53",
-      "vercelPreviewUrl": "https://connect-intel-zkjmnmllm-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 6703c6d"
     }
   ]
 }

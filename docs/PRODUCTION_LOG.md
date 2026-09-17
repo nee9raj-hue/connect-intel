@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 632a41d
+npm run prod:rollback -- 5472a90
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 632a41d
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `0eb0d66` |
-| Log updated (IST) | 17/09/2026, 23:51:38 |
+| Commit | `0adbbf3` |
+| Log updated (IST) | 18/09/2026, 00:09:11 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 632a41d
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 17/09/2026, 23:51:13 | `0eb0d66` | Restage ERP accounts from first and last shipment, match short names like XLP, and hide sidebar items a role cannot use. | [preview](https://connect-intel-4tupl63g9-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0eb0d66` | **← LIVE**
+| 18/09/2026, 00:07:41 | `0adbbf3` | Stamp Xindus ERP last-shipment onto leads that missed overlay match so idle accounts like XLP leave New Account. | [preview](https://connect-intel-bo5ndkmtz-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0adbbf3` | **← LIVE**
+| 17/09/2026, 23:52:32 | `5472a90` | Record production LIVE snapshot for ERP restage and permission-gated nav. | [preview](https://connect-intel-6uxgqv1to-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5472a90` |
+| 17/09/2026, 23:51:13 | `0eb0d66` | Restage ERP accounts from first and last shipment, match short names like XLP, and hide sidebar items a role cannot use. | [preview](https://connect-intel-4tupl63g9-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0eb0d66` |
 | 17/09/2026, 22:59:47 | `632a41d` | Record production LIVE snapshot for Unique customers list removal. | [preview](https://connect-intel-c56rmof8a-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 632a41d` |
 | 17/09/2026, 22:58:32 | `a6c9bed` | Remove the Unique customers owner list from Home so the dashboard only shows period totals. | [preview](https://connect-intel-m3fonbipr-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a6c9bed` |
 | 17/09/2026, 22:44:49 | `2430f9f` | Record production LIVE snapshot for Home dashboard ERP shipment facts. | [preview](https://connect-intel-a07iz3ljh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2430f9f` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 632a41d
 | 17/09/2026, 15:22:03 | `8ede71f` | Record production LIVE snapshot for ERP rep lead claim. | [preview](https://connect-intel-jwl6958vb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8ede71f` |
 | 17/09/2026, 15:19:33 | `85db860` | Assign ERP-owned leads to the signed-in rep so newly added teammates like Tanishq see their book. | [preview](https://connect-intel-kg2oymjg0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 85db860` |
 | 17/09/2026, 15:03:51 | `140bef9` | Record production LIVE snapshot for ERP pipeline stage classification. | [preview](https://connect-intel-2gvfa92y0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 140bef9` |
-| 17/09/2026, 15:02:38 | `90a27ea` | Classify ERP-imported pipeline stages from last shipment and balance, without overwriting a rep’s manual move. | [preview](https://connect-intel-1ort39tzj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 90a27ea` |
-| 17/09/2026, 14:56:41 | `6703c6d` | Record production LIVE snapshot for ERP owner lead assignment. | [preview](https://connect-intel-zkjmnmllm-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6703c6d` |
 
 ---
 
