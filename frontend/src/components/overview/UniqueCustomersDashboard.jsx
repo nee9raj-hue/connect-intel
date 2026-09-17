@@ -42,7 +42,6 @@ export default function UniqueCustomersDashboard({
   tagOptions = [],
   ownerOptions = [],
   onRetry,
-  onOpenLead,
 }) {
   const timeZone = DEFAULT_TIME_ZONE
   const yearOptions = useMemo(() => dealYearOptions(new Date(), [], timeZone), [timeZone])
@@ -78,7 +77,6 @@ export default function UniqueCustomersDashboard({
 
   const weeks = report?.weeks || []
   const totals = report?.totals || { uniqueCustomers: 0, revenue: 0 }
-  const groups = report?.groups || []
 
   return (
     <section className="uc-dash" aria-label="Unique customers">
@@ -87,8 +85,7 @@ export default function UniqueCustomersDashboard({
           <p className="uc-dash__eyebrow">Dashboard</p>
           <h1 className="uc-dash__title">Unique customers</h1>
           <p className="uc-dash__sub">
-            Who ordered in the selected weeks, grouped by sales owner. Revenue uses recorded ERP
-            figures when present.
+            Who ordered in the selected weeks. Revenue uses recorded ERP figures when present.
           </p>
         </div>
         <div className="uc-dash__kpis">
@@ -205,50 +202,9 @@ export default function UniqueCustomersDashboard({
           <p className="uc-dash__empty">
             {filters.month
               ? 'No unique customers with a last order in this period.'
-              : 'Pick a month to see week-wise unique customers. The list below covers the selected year.'}
+              : 'Pick a month to see week-wise unique customers. Totals still cover the selected year.'}
           </p>
         ) : null}
-      </div>
-
-      <div className="uc-dash__list">
-        <h2 className="uc-dash__list-title">Customer list</h2>
-        {loading ? <p className="uc-dash__empty">Loading customers…</p> : null}
-        {!loading && !groups.length ? (
-          <p className="uc-dash__empty">No unique customers with a last order in this period.</p>
-        ) : null}
-        {groups.map((group) => (
-          <section key={group.ownerId} className="uc-dash__group">
-            <header className="uc-dash__group-head">
-              <h3>{group.ownerName}</h3>
-              <p>
-                Unique customers {formatCount(group.uniqueCustomers)} · Revenue{' '}
-                {formatRevenue(group.revenue)}
-              </p>
-            </header>
-            <table className="uc-dash__table uc-dash__table--list">
-              <thead>
-                <tr>
-                  <th>Customer</th>
-                  <th>Unique customers</th>
-                  <th>Revenue</th>
-                </tr>
-              </thead>
-              <tbody>
-                {group.customers.map((c) => (
-                  <tr key={c.leadId || c.name}>
-                    <td>
-                      <button type="button" className="uc-dash__name" onClick={() => onOpenLead(c.leadId)}>
-                        {c.name}
-                      </button>
-                    </td>
-                    <td>{formatCount(c.uniqueCustomers)}</td>
-                    <td>{formatRevenue(c.revenue)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </section>
-        ))}
       </div>
     </section>
   )

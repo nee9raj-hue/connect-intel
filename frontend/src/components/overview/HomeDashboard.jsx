@@ -47,7 +47,7 @@ function salesPipelineSnapshotFromSummary(pipelineSummary) {
 }
 
 export default function HomeDashboard({ onNavigate, isActive = true, pipelineSummary = {} }) {
-  const { user, openPipelineLead, orgLeadTags, teamMembers, refreshTeam, refreshOrgLeadTags } = useApp()
+  const { user, orgLeadTags, teamMembers, refreshTeam, refreshOrgLeadTags } = useApp()
   const [filters, setFilters] = useState(defaultUniqueCustomerFilters)
   const [report, setReport] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -163,15 +163,6 @@ export default function HomeDashboard({ onNavigate, isActive = true, pipelineSum
     setRetentionFilters((prev) => ({ ...prev, ...partial }))
   }, [])
 
-  const onLead = useCallback(
-    (leadId) => {
-      if (!leadId) return
-      openPipelineLead(leadId)
-      onNavigate?.('pipeline', { returnTo: 'overview' })
-    },
-    [openPipelineLead, onNavigate]
-  )
-
   const runPipeline = useCallback(
     (action = {}) => {
       const opts = dashboardNavOptions({ ...action, returnTo: action.returnTo || 'overview' }, user)
@@ -194,7 +185,6 @@ export default function HomeDashboard({ onNavigate, isActive = true, pipelineSum
           tagOptions={tagOptions}
           ownerOptions={ownerOptions}
           onRetry={load}
-          onOpenLead={onLead}
         />
 
         <SalesPipelineSnapshot
