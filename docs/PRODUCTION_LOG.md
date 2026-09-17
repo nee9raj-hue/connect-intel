@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 153bc38
+npm run prod:rollback -- a0f6855
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 153bc38
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `df689b0` |
-| Log updated (IST) | 17/09/2026, 16:25:12 |
+| Commit | `cc694f4` |
+| Log updated (IST) | 17/09/2026, 21:47:32 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 153bc38
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 17/09/2026, 16:24:48 | `df689b0` | Persist ERP last-shipment pipeline stages on load so existing leads recategorize without overwriting a rep’s manual stage. | [preview](https://connect-intel-gya661ipi-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- df689b0` | **← LIVE**
+| 17/09/2026, 21:47:08 | `cc694f4` | Show a rep’s full ERP book in the admin Owner filter by matching login aliases and ERP sales owner, without changing Tanishq’s identity path. | [preview](https://connect-intel-1j963m7ty-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- cc694f4` | **← LIVE**
+| 17/09/2026, 16:26:13 | `a0f6855` | Record production LIVE snapshot for ERP last-shipment stage persist. | [preview](https://connect-intel-kcj1zeut6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a0f6855` |
+| 17/09/2026, 16:24:48 | `df689b0` | Persist ERP last-shipment pipeline stages on load so existing leads recategorize without overwriting a rep’s manual stage. | [preview](https://connect-intel-gya661ipi-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- df689b0` |
 | 17/09/2026, 16:06:20 | `153bc38` | Record production LIVE snapshot for Last shipment filter pills. | [preview](https://connect-intel-kkvez49vw-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 153bc38` |
 | 17/09/2026, 16:05:09 | `2d02dd5` | Match Last shipment year and month to the other pipeline filter pills. | [preview](https://connect-intel-3fl582gk5-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2d02dd5` |
 | 17/09/2026, 15:50:35 | `514dae9` | Record production LIVE snapshot for ERP rep identity pipeline visibility. | [preview](https://connect-intel-90wxl3y9n-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 514dae9` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 153bc38
 | 17/09/2026, 10:39:29 | `73ef1fa` | Record production LIVE snapshot for team manager assignment fix. | [preview](https://connect-intel-81rg32ek0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 73ef1fa` |
 | 17/09/2026, 10:38:35 | `0281e80` | Fix assigning a team manager by resolving the SQL profile id that was never imported. | [preview](https://connect-intel-b7a6soz9t-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0281e80` |
 | 17/09/2026, 10:30:27 | `baf6053` | Record production LIVE snapshot for ERP retention owners. | [preview](https://connect-intel-q1y022stu-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- baf6053` |
-| 17/09/2026, 10:29:38 | `456e1cf` | Use ERP onboarding dates and sales owners on Retention, keep unmatched accounts unassigned, and let team managers see their members. | [preview](https://connect-intel-o4v5z7wao-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 456e1cf` |
-| 17/09/2026, 09:57:26 | `c3f8ab6` | Record production LIVE snapshot for Retention onboarding dashboard. | [preview](https://connect-intel-q9ws57orm-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c3f8ab6` |
 
 ---
 

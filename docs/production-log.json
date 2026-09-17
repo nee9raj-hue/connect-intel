@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-17T10:55:12.771Z",
-  "updatedAtIst": "17/09/2026, 16:25:12",
+  "updatedAt": "2026-09-17T16:17:32.140Z",
+  "updatedAtIst": "17/09/2026, 21:47:32",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "df689b0",
+  "currentProductionCommit": "cc694f4",
   "entries": [
+    {
+      "logId": "20260917-2147-cc694f4",
+      "commit": "cc694f4",
+      "commitFull": "cc694f4464096326f61b217f4bd27779c7dbc63e",
+      "message": "Show a rep’s full ERP book in the admin Owner filter by matching login aliases and ERP sales owner, without changing Tanishq’s identity path.",
+      "deployedAt": "2026-09-17T16:17:08.850Z",
+      "deployedAtIst": "17/09/2026, 21:47:08",
+      "committedAtIst": "17/09/2026, 21:46:28",
+      "vercelPreviewUrl": "https://connect-intel-1j963m7ty-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- cc694f4"
+    },
+    {
+      "logId": "20260917-1626-a0f6855",
+      "commit": "a0f6855",
+      "commitFull": "a0f68554c39f9e8b81c2edce508cc0e5937bea6f",
+      "message": "Record production LIVE snapshot for ERP last-shipment stage persist.",
+      "deployedAt": "2026-09-17T10:56:13.152Z",
+      "deployedAtIst": "17/09/2026, 16:26:13",
+      "committedAtIst": "17/09/2026, 16:25:23",
+      "vercelPreviewUrl": "https://connect-intel-kcj1zeut6-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- a0f6855"
+    },
     {
       "logId": "20260917-1624-df689b0",
       "commit": "df689b0",
@@ -15,7 +43,7 @@
       "committedAtIst": "17/09/2026, 16:23:58",
       "vercelPreviewUrl": "https://connect-intel-gya661ipi-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- df689b0"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- baf6053"
-    },
-    {
-      "logId": "20260917-1029-456e1cf",
-      "commit": "456e1cf",
-      "commitFull": "456e1cfa17ff4902b935c68c013c6e45f3d4b99b",
-      "message": "Use ERP onboarding dates and sales owners on Retention, keep unmatched accounts unassigned, and let team managers see their members.",
-      "deployedAt": "2026-09-17T04:59:38.882Z",
-      "deployedAtIst": "17/09/2026, 10:29:38",
-      "committedAtIst": "17/09/2026, 10:29:02",
-      "vercelPreviewUrl": "https://connect-intel-o4v5z7wao-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 456e1cf"
-    },
-    {
-      "logId": "20260917-0957-c3f8ab6",
-      "commit": "c3f8ab6",
-      "commitFull": "c3f8ab6cf5cd6c1f879525b6835d1511d427f454",
-      "message": "Record production LIVE snapshot for Retention onboarding dashboard.",
-      "deployedAt": "2026-09-17T04:27:26.469Z",
-      "deployedAtIst": "17/09/2026, 09:57:26",
-      "committedAtIst": "17/09/2026, 09:56:47",
-      "vercelPreviewUrl": "https://connect-intel-q9ws57orm-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- c3f8ab6"
     }
   ]
 }
