@@ -233,7 +233,7 @@ function matchesDateRange(iso, from, to) {
 
 function matchesWonThisMonth(lead) {
   const crm = lead.crm || {}
-  if (crm.status !== 'onboarding' && crm.status !== 'won') return false
+  if (crm.status !== 'onboarding' && crm.status !== 'won' && crm.status !== 'new_account') return false
   const monthStart = new Date()
   monthStart.setDate(1)
   monthStart.setHours(0, 0, 0, 0)
