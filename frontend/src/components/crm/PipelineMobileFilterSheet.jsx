@@ -10,7 +10,9 @@ export function SearchableMultiList({ options, values, onChange, placeholder, em
     return options.filter((o) => o.label.toLowerCase().includes(q))
   }, [options, query])
 
-  const toggle = (value) => {
+  const toggle = (opt) => {
+    if (opt.disabled) return
+    const value = opt.value
     const set = new Set(values || [])
     if (set.has(value)) set.delete(value)
     else set.add(value)
@@ -42,11 +44,15 @@ export function SearchableMultiList({ options, values, onChange, placeholder, em
           const checked = (values || []).includes(opt.value)
           return (
             <li key={opt.value}>
-              <label className={`crm-filter-mobile-check ${checked ? 'is-checked' : ''}`}>
+              <label
+                className={`crm-filter-mobile-check ${checked ? 'is-checked' : ''} ${opt.disabled ? 'is-disabled' : ''}`}
+                title={opt.disabled ? opt.hint || "You don't have access to this" : undefined}
+              >
                 <input
                   type="checkbox"
                   checked={checked}
-                  onChange={() => toggle(opt.value)}
+                  disabled={Boolean(opt.disabled)}
+                  onChange={() => toggle(opt)}
                   className="crm-filter-check-input"
                 />
                 <span>{opt.label}</span>

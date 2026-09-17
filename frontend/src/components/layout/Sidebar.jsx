@@ -190,6 +190,7 @@ export default function Sidebar({
   }
 
   const go = (target) => {
+    if (target?.locked) return
     const options =
       target.panel === 'pipeline' ? pipelineSidebarNavOptions(target) : navTargetToOptions(target)
     onNavigate(target.panel, options)
@@ -407,7 +408,14 @@ function NavGroup({
   const badge = resolveBadge(group)
 
   if (!hasChildren) {
-    const target = { panel: group.panel, tab: group.tab, status: group.status, upcomingOnly: group.upcomingOnly }
+    const target = {
+      panel: group.panel,
+      tab: group.tab,
+      status: group.status,
+      upcomingOnly: group.upcomingOnly,
+      locked: group.locked,
+      lockHint: group.lockHint,
+    }
     const active = isTargetActive(target)
     if (compact) {
       return (
@@ -418,6 +426,8 @@ function NavGroup({
           muted={muted}
           badge={badge}
           leaf
+          locked={group.locked}
+          lockHint={group.lockHint}
           navPanel={group.panel}
           dismissFlyouts={dismissFlyouts}
           onNavigate={() => onGo(target)}
@@ -432,6 +442,8 @@ function NavGroup({
         onClick={() => onGo(target)}
         badge={badge}
         muted={muted}
+        locked={group.locked}
+        lockHint={group.lockHint}
         navPanel={group.panel}
       />
     )
@@ -458,6 +470,8 @@ function NavGroup({
               active={isTargetActive(child)}
               badge={resolveBadge(child)}
               onClick={() => onGo(child)}
+              locked={child.locked}
+              lockHint={child.lockHint}
               inRailFlyout
             />
           )
@@ -509,6 +523,8 @@ function NavGroup({
                 active={isTargetActive(child)}
                 badge={resolveBadge(child)}
                 onClick={() => onGo(child)}
+                locked={child.locked}
+                lockHint={child.lockHint}
               />
             )
           )}
@@ -730,18 +746,22 @@ function RailFlyoutAnchor({
   )
 }
 
-function NavBtn({ label, icon: Icon, active, onClick, badge, muted = false, navPanel }) {
+function NavBtn({ label, icon: Icon, active, onClick, badge, muted = false, navPanel, locked = false, lockHint }) {
   return (
     <button
       type="button"
       data-nav-panel={navPanel || undefined}
-      onClick={onClick}
+      onClick={locked ? undefined : onClick}
+      disabled={locked}
+      title={locked ? lockHint || "You don't have access to this" : undefined}
       className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-[12px] font-medium tracking-[-0.015em] mb-1 transition-colors ${
-        active
-          ? 'bg-white text-[#17191c]'
-          : muted
-            ? 'text-[#808892] hover:bg-white/6'
-            : 'text-[#d4d9de] hover:bg-white/6 hover:text-white'
+        locked
+          ? 'text-[#6b7280] opacity-45 cursor-not-allowed'
+          : active
+            ? 'bg-white text-[#17191c]'
+            : muted
+              ? 'text-[#808892] hover:bg-white/6'
+              : 'text-[#d4d9de] hover:bg-white/6 hover:text-white'
       }`}
     >
       <NavIcon
@@ -788,6 +808,8 @@ function RailFlyoutStageGroup({ stage, expanded, onToggle, isTargetActive, onGo,
               active={isTargetActive(child)}
               badge={resolveBadge(child)}
               onClick={() => onGo(child)}
+              locked={child.locked}
+              lockHint={child.lockHint}
               inRailFlyout
             />
           ))}
@@ -822,6 +844,8 @@ function NavStageGroup({ stage, expanded, onToggle, isTargetActive, onGo, resolv
               active={isTargetActive(child)}
               badge={resolveBadge(child)}
               onClick={() => onGo(child)}
+              locked={child.locked}
+              lockHint={child.lockHint}
             />
           ))}
         </div>
@@ -830,7 +854,7 @@ function NavStageGroup({ stage, expanded, onToggle, isTargetActive, onGo, resolv
   )
 }
 
-function NavSubBtn({ label, active, badge, onClick, inRailFlyout = false }) {
+function NavSubBtn({ label, active, badge, onClick, inRailFlyout = false, locked = false, lockHint }) {
   const inactiveClass = inRailFlyout
     ? 'text-[#c8cfd6] hover:bg-white/8 hover:text-white'
     : 'text-[#bcc4cc] hover:bg-white/6 hover:text-white'
@@ -838,9 +862,11 @@ function NavSubBtn({ label, active, badge, onClick, inRailFlyout = false }) {
   return (
     <button
       type="button"
-      onClick={onClick}
+      onClick={locked ? undefined : onClick}
+      disabled={locked}
+      title={locked ? lockHint || "You don't have access to this" : undefined}
       className={`sidebar-sub-item w-full flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-colors ${
-        active ? 'nav-sub-active' : inactiveClass
+        locked ? 'opacity-40 cursor-not-allowed text-[#7b838c]' : active ? 'nav-sub-active' : inactiveClass
       }`}
     >
       <span className="flex-1 text-left truncate">{label}</span>

@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import usePipelineFilterMobile from '../../hooks/usePipelineFilterMobile'
+import { useApp } from '../../context/AppContext'
 import { PIPELINE_SEARCH_ID } from '../../hooks/useAppKeyboardShortcuts'
 import { api } from '../../lib/api'
 import { CONTACT_FILTER_OPTIONS, DEFAULT_PIPELINE_FILTERS, getFilterCities, getFilterStates } from '../../lib/pipelineFilters'
 import { FilterChipButton } from './FilterDropdown'
 import { DEAL_MONTH_OPTIONS, dealYearOptions, formatDealPeriodLabel } from '../../lib/pipelineDealsFilter'
 import { lastShipmentPeriodLabel } from '../../../../lib/leadLastShipmentFilter.js'
+import { teamIdsFromHierarchyForUser } from '../../../../lib/pipelineMemberVisibility.js'
 import LeadTag from '../ui/LeadTag'
 import PipelineFilterPopup from './PipelineFilterPopup'
 import PipelineFilterToolbarButton from './PipelineFilterToolbarButton'
@@ -77,10 +79,12 @@ export default function PipelineFiltersBar({
   onOwnerFilterChange,
   statusCounts = {},
 }) {
+  const { user } = useApp()
   const [savedViews, setSavedViews] = useState([])
   const [savedReports, setSavedReports] = useState([])
   const [activeFilter, setActiveFilter] = useState(null)
   const [orgTeams, setOrgTeams] = useState([])
+  const [hierarchyDepartments, setHierarchyDepartments] = useState([])
   const useMobileFilterSheet = usePipelineFilterMobile()
 
   const loadViews = useCallback(async () => {
@@ -117,13 +121,20 @@ export default function PipelineFiltersBar({
             id: String(team.id),
             label: dept.name ? `${team.name} (${dept.name})` : team.name,
             name: team.name,
+            memberIds: (team.members || [])
+              .map((m) => String(m.userId || m.legacyUserId || ''))
+              .filter(Boolean),
           }))
         )
         setOrgTeams(teams)
+        setHierarchyDepartments(data?.departments || [])
         void refreshOrgLeadTags?.()
       })
       .catch(() => {
-        if (!cancelled) setOrgTeams([])
+        if (!cancelled) {
+          setOrgTeams([])
+          setHierarchyDepartments([])
+        }
       })
     return () => {
       cancelled = true
@@ -166,8 +177,32 @@ export default function PipelineFiltersBar({
     label: o.label,
     value: o.id,
   }))
-  const tagOptions = orgLeadTags.map((t) => ({ label: t.name, value: t.id }))
-  const teamOptions = orgTeams.map((t) => ({ label: t.label, value: t.id }))
+  const isOrgAdmin = Boolean(user?.isOrgAdmin || user?.orgRole === 'org_admin')
+  const memberTeamIds = useMemo(
+    () => teamIdsFromHierarchyForUser(hierarchyDepartments, user?.id, user?.teamId),
+    [hierarchyDepartments, user?.id, user?.teamId]
+  )
+  const tagOptions = orgLeadTags.map((t) => {
+    const locked =
+      !isOrgAdmin &&
+      Boolean(t.teamId || t.source === 'org_team') &&
+      !memberTeamIds.includes(String(t.teamId || ''))
+    return {
+      label: t.name,
+      value: t.id,
+      disabled: locked,
+      hint: locked ? 'Only this team can use this tag' : undefined,
+    }
+  })
+  const teamOptions = orgTeams.map((t) => {
+    const locked = !isOrgAdmin && !memberTeamIds.includes(String(t.id))
+    return {
+      label: t.label,
+      value: t.id,
+      disabled: locked,
+      hint: locked ? "You don't have access to this team" : undefined,
+    }
+  })
   const smartOptions = SMART_TAG_OPTIONS.map((o) => ({ label: o.label, value: o.id }))
   const savedViewOptions = savedViews.map((v) => ({
     label: v.shared ? `${v.name} (Team)` : v.name,
@@ -781,17 +816,34 @@ export default function PipelineFiltersBar({
             <button type="button" className="crm-filter-link-btn" onClick={onSaveAsAudience}>
               Save as audience
             </button>
-          ) : null}
+          ) : (
+            <button type="button" className="crm-filter-link-btn is-locked" disabled title="You don't have access to this">
+              Save as audience
+            </button>
+          )}
           {canSaveReport ? (
             <button type="button" className="crm-filter-link-btn" onClick={onSaveReport}>
               Save as report
             </button>
-          ) : null}
+          ) : (
+            <button type="button" className="crm-filter-link-btn is-locked" disabled title="You don't have access to this">
+              Save as report
+            </button>
+          )}
           {canExportFunnel ? (
             <button type="button" className="crm-filter-link-btn" onClick={onExportFunnel}>
               Export funnel CSV
             </button>
-          ) : null}
+          ) : (
+            <button
+              type="button"
+              className="crm-filter-link-btn is-locked"
+              disabled
+              title="You don't have access to this"
+            >
+              Export funnel CSV
+            </button>
+          )}
           {appliedSearch && (
             <FilterChipButton
               label={`Search: “${appliedSearch}”`}

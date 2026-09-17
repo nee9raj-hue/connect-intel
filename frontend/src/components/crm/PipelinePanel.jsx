@@ -36,6 +36,7 @@ import {
   normalizeLocationKey,
   pipelineServerFilterExtras,
 } from '../../lib/pipelineFilters'
+import { repFilterLiftsOwnerScope } from '../../../../lib/pipelineMemberVisibility.js'
 import { tagMapById } from '../../lib/orgLeadTags'
 import { leadHasCallablePhone } from '../../lib/phoneUtils'
 import LeadPhoneCall from './LeadPhoneCall'
@@ -531,7 +532,9 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const scopedLeads = useMemo(() => {
     let base = marketingSliceLeads ?? pipelineScopedLeads
     if (!effectiveAssigneeFilter && !isOrgAdmin && !isTeamManager) {
-      base = filterRepPipelineLeads(base, user)
+      base = filterRepPipelineLeads(base, user, {
+        skipOwnerFilter: repFilterLiftsOwnerScope(appliedAdvanced),
+      })
     }
     if (!effectiveAssigneeFilter) return base
     return base.filter((l) => leadMatchesAssignee(l, effectiveAssigneeFilter))
@@ -542,6 +545,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     isOrgAdmin,
     isTeamManager,
     user,
+    appliedAdvanced,
   ])
 
   const locationOptions = useMemo(() => {

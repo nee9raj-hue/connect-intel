@@ -105,10 +105,14 @@ export function leadMatchesAssignee(lead, assigneeUserId) {
   return pipelineEntryMatchesOwnerFilter(lead, assigneeUserId)
 }
 
-/** Rep safety net: own leads + open pool (no indexed owner). */
-export function filterRepPipelineLeads(leads, user, { isOrgAdmin = false, isTeamManager = false } = {}) {
+/** Rep safety net: own leads unless a team/tag shared view is active. */
+export function filterRepPipelineLeads(
+  leads,
+  user,
+  { isOrgAdmin = false, isTeamManager = false, skipOwnerFilter = false } = {}
+) {
   if (!user?.id || user.accountType !== 'company') return leads || []
-  if (isOrgAdmin || isTeamManager) return leads || []
+  if (isOrgAdmin || isTeamManager || skipOwnerFilter) return leads || []
   return (leads || []).filter((lead) =>
     repPipelineEntryVisible(lead, user.id, user.pipelineActorIds)
   )

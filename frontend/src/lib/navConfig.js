@@ -297,6 +297,12 @@ export function buildCustomerNavSections(
   const columns = getVisiblePipelineColumns(user)
   const isCompany = user?.accountType === 'company'
   const freightOrg = isFreightDealOrg(user)
+  const perms = user?.orgPermissions || {}
+  const canManageTeam = Boolean(user?.isOrgAdmin || perms.manage_team)
+  const canAnalytics = Boolean(user?.isOrgAdmin || perms.view_analytics)
+  const canMarketing = user?.isOrgAdmin || perms.access_marketing !== false
+  const canAiSearch = user?.canSearch !== false
+  const lockHint = "You don't have access to this"
 
   const pipelineChildren = freightOrg
     ? buildFreightPipelineChildren(columns, pipelineCounts, dealCounts || {}, allDealCounts || {})
@@ -308,14 +314,14 @@ export function buildCustomerNavSections(
       )
 
   const marketingChildren = [
-    { id: 'marketing-overview', label: 'Overview', panel: 'marketing', tab: 'overview' },
-    { id: 'marketing-campaigns', label: 'Campaigns', panel: 'marketing', tab: 'campaigns' },
-    { id: 'marketing-templates', label: 'Templates', panel: 'marketing', tab: 'templates' },
-    { id: 'marketing-automations', label: 'Automations', panel: 'marketing', tab: 'automations' },
-    { id: 'marketing-forms', label: 'Forms', panel: 'marketing', tab: 'forms' },
-    { id: 'marketing-audiences', label: 'Audiences', panel: 'marketing', tab: 'audiences' },
-    { id: 'marketing-analytics', label: 'Analytics', panel: 'marketing', tab: 'analytics' },
-    { id: 'marketing-domains', label: 'Domains', panel: 'marketing', tab: 'domains' },
+    { id: 'marketing-overview', label: 'Overview', panel: 'marketing', tab: 'overview', locked: !canMarketing, lockHint },
+    { id: 'marketing-campaigns', label: 'Campaigns', panel: 'marketing', tab: 'campaigns', locked: !canMarketing, lockHint },
+    { id: 'marketing-templates', label: 'Templates', panel: 'marketing', tab: 'templates', locked: !canMarketing, lockHint },
+    { id: 'marketing-automations', label: 'Automations', panel: 'marketing', tab: 'automations', locked: !canMarketing, lockHint },
+    { id: 'marketing-forms', label: 'Forms', panel: 'marketing', tab: 'forms', locked: !canMarketing, lockHint },
+    { id: 'marketing-audiences', label: 'Audiences', panel: 'marketing', tab: 'audiences', locked: !canMarketing, lockHint },
+    { id: 'marketing-analytics', label: 'Analytics', panel: 'marketing', tab: 'analytics', locked: !canAnalytics, lockHint },
+    { id: 'marketing-domains', label: 'Domains', panel: 'marketing', tab: 'domains', locked: !canMarketing, lockHint },
   ]
 
   const calendarChildren = [
@@ -331,8 +337,16 @@ export function buildCustomerNavSections(
 
   const automationChildren = [
     { id: 'crm-sequences', label: 'Sequences', panel: 'crm-sequences' },
-    ...(isCompany && user?.isOrgAdmin
-      ? [{ id: 'crm-automation', label: 'Automation', panel: 'crm-automation' }]
+    ...(isCompany
+      ? [
+          {
+            id: 'crm-automation',
+            label: 'Automation',
+            panel: 'crm-automation',
+            locked: !user?.isOrgAdmin,
+            lockHint,
+          },
+        ]
       : []),
   ]
 
@@ -346,6 +360,8 @@ export function buildCustomerNavSections(
             label: 'Team intelligence',
             icon: 'chart',
             panel: 'crm-dashboard',
+            locked: !canAnalytics,
+            lockHint,
           },
         ]
       : []),
@@ -369,7 +385,7 @@ export function buildCustomerNavSections(
         { id: 'contacts', label: 'Contacts', icon: 'people', panel: 'contacts' },
         { id: 'opportunities', label: 'Opportunities', icon: 'pipeline', panel: 'opportunities' },
         ...(isCompany ? [{ id: 'companies', label: 'Accounts', icon: 'chart', panel: 'companies' }] : []),
-        { id: 'marketing', label: 'Marketing', icon: 'mail', children: marketingChildren },
+        { id: 'marketing', label: 'Marketing', icon: 'mail', children: marketingChildren, locked: !canMarketing, lockHint },
         { id: 'calendar', label: 'Calendar', icon: 'calendar', children: calendarChildren },
         ...(automationChildren.length
           ? [{ id: 'automation', label: 'Automation', icon: 'bolt', children: automationChildren }]
@@ -408,7 +424,7 @@ export function buildCustomerNavSections(
           {
             title: 'AI prospecting',
             groups: [
-              { id: 'search', label: 'AI prospect search', icon: 'spark', panel: 'search' },
+              { id: 'search', label: 'AI prospect search', icon: 'spark', panel: 'search', locked: !canAiSearch, lockHint },
               {
                 id: 'saved',
                 label: 'Saved leads',
@@ -442,9 +458,26 @@ export function buildCustomerNavSections(
       ],
     })
   } else if (isCompany) {
+    const teamChildren = [
+      { id: 'team-members', label: 'Team members', panel: 'team', teamTab: 'members', locked: !canManageTeam, lockHint },
+      { id: 'team-hierarchy', label: 'Teams & departments', panel: 'team', teamTab: 'teams', locked: !canManageTeam, lockHint },
+      { id: 'team-permissions', label: 'Permissions', panel: 'team', teamTab: 'permissions', locked: !canManageTeam, lockHint },
+      { id: 'team-audit', label: 'Audit log', panel: 'team', teamTab: 'audit', locked: !canManageTeam, lockHint },
+      { id: 'team-email-sends', label: 'Email sends', panel: 'team', teamTab: 'email-sends', locked: !canManageTeam, lockHint },
+    ]
     sections.push({
       title: 'Workspace',
-      groups: [{ id: 'my-email', label: 'Work email', icon: 'mail', panel: 'my-email' }],
+      groups: [
+        { id: 'my-email', label: 'Work email', icon: 'mail', panel: 'my-email' },
+        {
+          id: 'team',
+          label: 'Team & email',
+          icon: 'team',
+          locked: !canManageTeam,
+          lockHint,
+          children: teamChildren,
+        },
+      ],
     })
   } else if (user?.accountType === 'individual') {
     sections.push({
