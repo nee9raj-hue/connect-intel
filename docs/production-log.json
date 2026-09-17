@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-17T10:35:24.907Z",
-  "updatedAtIst": "17/09/2026, 16:05:24",
+  "updatedAt": "2026-09-17T10:55:12.771Z",
+  "updatedAtIst": "17/09/2026, 16:25:12",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "2d02dd5",
+  "currentProductionCommit": "df689b0",
   "entries": [
+    {
+      "logId": "20260917-1624-df689b0",
+      "commit": "df689b0",
+      "commitFull": "df689b0cebba9c68c3eaf5e4080c5c6610f3242c",
+      "message": "Persist ERP last-shipment pipeline stages on load so existing leads recategorize without overwriting a rep’s manual stage.",
+      "deployedAt": "2026-09-17T10:54:48.459Z",
+      "deployedAtIst": "17/09/2026, 16:24:48",
+      "committedAtIst": "17/09/2026, 16:23:58",
+      "vercelPreviewUrl": "https://connect-intel-gya661ipi-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- df689b0"
+    },
+    {
+      "logId": "20260917-1606-153bc38",
+      "commit": "153bc38",
+      "commitFull": "153bc380d53dba3b8d40401c81ea24425bf96590",
+      "message": "Record production LIVE snapshot for Last shipment filter pills.",
+      "deployedAt": "2026-09-17T10:36:20.153Z",
+      "deployedAtIst": "17/09/2026, 16:06:20",
+      "committedAtIst": "17/09/2026, 16:05:33",
+      "vercelPreviewUrl": "https://connect-intel-kkvez49vw-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 153bc38"
+    },
     {
       "logId": "20260917-1605-2d02dd5",
       "commit": "2d02dd5",
@@ -15,7 +43,7 @@
       "committedAtIst": "17/09/2026, 16:04:22",
       "vercelPreviewUrl": "https://connect-intel-3fl582gk5-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 2d02dd5"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- c3f8ab6"
-    },
-    {
-      "logId": "20260917-0956-227659b",
-      "commit": "227659b",
-      "commitFull": "227659b21e1cbc5a66ba1c7dcf7f0d1466c05e3c",
-      "message": "Add a Retention onboarding grid under Sales pipeline, with year, month, week, owner, and team filters.",
-      "deployedAt": "2026-09-17T04:26:15.866Z",
-      "deployedAtIst": "17/09/2026, 09:56:15",
-      "committedAtIst": "17/09/2026, 09:55:39",
-      "vercelPreviewUrl": "https://connect-intel-pd01t6s9z-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 227659b"
-    },
-    {
-      "logId": "20260917-0937-b0baa7e",
-      "commit": "b0baa7e",
-      "commitFull": "b0baa7e80202350a7abd6d726b20fe7fed5f736b",
-      "message": "Rebuild Home dashboard around unique customers by week, with CRM tag, status, and owner filters.",
-      "deployedAt": "2026-09-17T04:07:30.197Z",
-      "deployedAtIst": "17/09/2026, 09:37:30",
-      "committedAtIst": "17/09/2026, 09:36:46",
-      "vercelPreviewUrl": "https://connect-intel-l0a7jy603-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- b0baa7e"
     }
   ]
 }
