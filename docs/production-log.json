@@ -1,10 +1,24 @@
 {
-  "updatedAt": "2026-09-17T18:45:46.407Z",
-  "updatedAtIst": "18/09/2026, 00:15:46",
+  "updatedAt": "2026-09-17T19:09:55.767Z",
+  "updatedAtIst": "18/09/2026, 00:39:55",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "a9a77b2",
+  "currentProductionCommit": "0c81265",
   "entries": [
+    {
+      "logId": "20260918-0016-0c81265",
+      "commit": "0c81265",
+      "commitFull": "0c812650be1ac41e79af9d7f445c3eee34eae118",
+      "message": "Record production LIVE snapshot after the overlay-matching log commit reached Vercel.",
+      "deployedAt": "2026-09-17T18:46:44.101Z",
+      "deployedAtIst": "18/09/2026, 00:16:44",
+      "committedAtIst": "18/09/2026, 00:16:04",
+      "vercelPreviewUrl": "https://connect-intel-kzx4ihv6g-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 0c81265"
+    },
     {
       "logId": "20260918-0010-a9a77b2",
       "commit": "a9a77b2",
@@ -15,7 +29,7 @@
       "committedAtIst": "18/09/2026, 00:09:25",
       "vercelPreviewUrl": "https://connect-intel-ofc961ktg-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- a9a77b2"
     },
@@ -270,20 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 8ede71f"
-    },
-    {
-      "logId": "20260917-1519-85db860",
-      "commit": "85db860",
-      "commitFull": "85db86072efa5a1538749e9d0a31fe3ac0af8ef1",
-      "message": "Assign ERP-owned leads to the signed-in rep so newly added teammates like Tanishq see their book.",
-      "deployedAt": "2026-09-17T09:49:33.887Z",
-      "deployedAtIst": "17/09/2026, 15:19:33",
-      "committedAtIst": "17/09/2026, 15:18:47",
-      "vercelPreviewUrl": "https://connect-intel-kg2oymjg0-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 85db860"
     }
   ]
 }
