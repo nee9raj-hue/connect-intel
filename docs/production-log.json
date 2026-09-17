@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-17T04:59:48.649Z",
-  "updatedAtIst": "17/09/2026, 10:29:48",
+  "updatedAt": "2026-09-17T05:08:46.820Z",
+  "updatedAtIst": "17/09/2026, 10:38:46",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "456e1cf",
+  "currentProductionCommit": "0281e80",
   "entries": [
+    {
+      "logId": "20260917-1038-0281e80",
+      "commit": "0281e80",
+      "commitFull": "0281e8061e08856b1cabacbba7bfb2f4d74baa5a",
+      "message": "Fix assigning a team manager by resolving the SQL profile id that was never imported.",
+      "deployedAt": "2026-09-17T05:08:35.404Z",
+      "deployedAtIst": "17/09/2026, 10:38:35",
+      "committedAtIst": "17/09/2026, 10:37:51",
+      "vercelPreviewUrl": "https://connect-intel-b7a6soz9t-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 0281e80"
+    },
+    {
+      "logId": "20260917-1030-baf6053",
+      "commit": "baf6053",
+      "commitFull": "baf6053320ee6da4f5dfdbb2b71ab065400c8d48",
+      "message": "Record production LIVE snapshot for ERP retention owners.",
+      "deployedAt": "2026-09-17T05:00:27.538Z",
+      "deployedAtIst": "17/09/2026, 10:30:27",
+      "committedAtIst": "17/09/2026, 10:29:50",
+      "vercelPreviewUrl": "https://connect-intel-q1y022stu-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- baf6053"
+    },
     {
       "logId": "20260917-1029-456e1cf",
       "commit": "456e1cf",
@@ -15,7 +43,7 @@
       "committedAtIst": "17/09/2026, 10:29:02",
       "vercelPreviewUrl": "https://connect-intel-o4v5z7wao-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 456e1cf"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- e0ef88f"
-    },
-    {
-      "logId": "20260916-2214-ac9b2dd",
-      "commit": "ac9b2dd",
-      "commitFull": "ac9b2ddd93b9578d629f2be07e32fd49213ad5a5",
-      "message": "Pass company-open props into kanban so board view does not crash.",
-      "deployedAt": "2026-09-16T16:44:03.789Z",
-      "deployedAtIst": "16/09/2026, 22:14:03",
-      "committedAtIst": "16/09/2026, 22:13:14",
-      "vercelPreviewUrl": "https://connect-intel-8qc0c657o-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- ac9b2dd"
-    },
-    {
-      "logId": "20260916-2207-0913764",
-      "commit": "0913764",
-      "commitFull": "09137641f9c038ae6158733dec9f5e2da1bc5b30",
-      "message": "Record production LIVE snapshot for findPipelineEntry restore.",
-      "deployedAt": "2026-09-16T16:37:29.163Z",
-      "deployedAtIst": "16/09/2026, 22:07:29",
-      "committedAtIst": "16/09/2026, 22:06:46",
-      "vercelPreviewUrl": "https://connect-intel-erqtmrhqm-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 0913764"
     }
   ]
 }
