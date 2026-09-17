@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-17T17:13:41.853Z",
-  "updatedAtIst": "17/09/2026, 22:43:41",
+  "updatedAt": "2026-09-17T17:29:05.933Z",
+  "updatedAtIst": "17/09/2026, 22:59:05",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "d2ff4e4",
+  "currentProductionCommit": "a6c9bed",
   "entries": [
+    {
+      "logId": "20260917-2258-a6c9bed",
+      "commit": "a6c9bed",
+      "commitFull": "a6c9bed8a7668a387f2a1cecfd06617d204c1ef6",
+      "message": "Remove the Unique customers owner list from Home so the dashboard only shows period totals.",
+      "deployedAt": "2026-09-17T17:28:32.733Z",
+      "deployedAtIst": "17/09/2026, 22:58:32",
+      "committedAtIst": "17/09/2026, 22:57:41",
+      "vercelPreviewUrl": "https://connect-intel-m3fonbipr-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- a6c9bed"
+    },
+    {
+      "logId": "20260917-2244-2430f9f",
+      "commit": "2430f9f",
+      "commitFull": "2430f9f798555f6a0a4e03e5a73f063c2f55f4fe",
+      "message": "Record production LIVE snapshot for Home dashboard ERP shipment facts.",
+      "deployedAt": "2026-09-17T17:14:49.550Z",
+      "deployedAtIst": "17/09/2026, 22:44:49",
+      "committedAtIst": "17/09/2026, 22:43:55",
+      "vercelPreviewUrl": "https://connect-intel-a07iz3ljh-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 2430f9f"
+    },
     {
       "logId": "20260917-2243-d2ff4e4",
       "commit": "d2ff4e4",
@@ -15,7 +43,7 @@
       "committedAtIst": "17/09/2026, 22:42:26",
       "vercelPreviewUrl": "https://connect-intel-4a0astmas-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- d2ff4e4"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- b801a44"
-    },
-    {
-      "logId": "20260917-1440-195685b",
-      "commit": "195685b",
-      "commitFull": "195685bbc4e038b9baf38f669bc908117d458171",
-      "message": "Add a pipeline Last shipment year and month filter so reps can list leads by last ERP shipment period.",
-      "deployedAt": "2026-09-17T09:10:56.131Z",
-      "deployedAtIst": "17/09/2026, 14:40:56",
-      "committedAtIst": "17/09/2026, 14:40:02",
-      "vercelPreviewUrl": "https://connect-intel-nubtdglgr-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 195685b"
-    },
-    {
-      "logId": "20260917-1113-1e332de",
-      "commit": "1e332de",
-      "commitFull": "1e332deeb57a933901ab0d00f03daf4a698feaf2",
-      "message": "Record production LIVE snapshot for New Account CRM stage.",
-      "deployedAt": "2026-09-17T05:43:34.083Z",
-      "deployedAtIst": "17/09/2026, 11:13:34",
-      "committedAtIst": "17/09/2026, 11:12:57",
-      "vercelPreviewUrl": "https://connect-intel-4r46phyga-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 1e332de"
     }
   ]
 }
