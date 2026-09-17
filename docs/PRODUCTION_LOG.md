@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- baf6053
+npm run prod:rollback -- 73ef1fa
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- baf6053
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `0281e80` |
-| Log updated (IST) | 17/09/2026, 10:38:46 |
+| Commit | `5dd196d` |
+| Log updated (IST) | 17/09/2026, 11:12:55 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- baf6053
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 17/09/2026, 10:38:35 | `0281e80` | Fix assigning a team manager by resolving the SQL profile id that was never imported. | [preview](https://connect-intel-b7a6soz9t-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0281e80` | **← LIVE**
+| 17/09/2026, 11:12:39 | `5dd196d` | Add a New Account pipeline stage for recently onboarded ERP customers who have not traded yet. | [preview](https://connect-intel-kw6isql6c-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5dd196d` | **← LIVE**
+| 17/09/2026, 10:39:29 | `73ef1fa` | Record production LIVE snapshot for team manager assignment fix. | [preview](https://connect-intel-81rg32ek0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 73ef1fa` |
+| 17/09/2026, 10:38:35 | `0281e80` | Fix assigning a team manager by resolving the SQL profile id that was never imported. | [preview](https://connect-intel-b7a6soz9t-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0281e80` |
 | 17/09/2026, 10:30:27 | `baf6053` | Record production LIVE snapshot for ERP retention owners. | [preview](https://connect-intel-q1y022stu-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- baf6053` |
 | 17/09/2026, 10:29:38 | `456e1cf` | Use ERP onboarding dates and sales owners on Retention, keep unmatched accounts unassigned, and let team managers see their members. | [preview](https://connect-intel-o4v5z7wao-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 456e1cf` |
 | 17/09/2026, 09:57:26 | `c3f8ab6` | Record production LIVE snapshot for Retention onboarding dashboard. | [preview](https://connect-intel-q9ws57orm-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c3f8ab6` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- baf6053
 | 16/09/2026, 22:46:55 | `36a751f` | Record production LIVE snapshot for ERP empty-state fallback. | [preview](https://connect-intel-j6iyrh0re-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 36a751f` |
 | 16/09/2026, 22:45:09 | `1d308ed` | Fill ERP tabs from trading history on the lead and clarify empty state. | [preview](https://connect-intel-a7wf7n1kb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1d308ed` |
 | 16/09/2026, 22:33:13 | `53359a6` | Record production LIVE snapshot for ERP tab populate. | [preview](https://connect-intel-1akhban7x-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 53359a6` |
-| 16/09/2026, 22:32:13 | `b7aa208` | Populate lead ERP Revenue and Finance tabs from shipments, trading, and deals. | [preview](https://connect-intel-p4ybnue4n-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b7aa208` |
-| 16/09/2026, 22:15:02 | `e0ef88f` | Record production LIVE snapshot for pipeline board crash fix. | [preview](https://connect-intel-icw1ayv4k-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e0ef88f` |
 
 ---
 
