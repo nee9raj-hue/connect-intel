@@ -179,7 +179,11 @@ export default function RetentionOnboardingDashboard({
           </tbody>
         </table>
         {!loading && !weeks.length ? (
-          <p className="uc-dash__empty">Pick a year and month to see new customer onboarding by team.</p>
+          <p className="uc-dash__empty">
+            {filters.month
+              ? 'No new customers onboarded in this period.'
+              : 'Pick a month to see week-wise onboarding. Team totals below cover the selected year.'}
+          </p>
         ) : null}
         {!loading && weeks.length && !teams.length ? (
           <p className="uc-dash__empty">No new customers onboarded in this period.</p>
@@ -190,10 +194,10 @@ export default function RetentionOnboardingDashboard({
 }
 
 export function defaultRetentionFilters() {
-  const { year, month } = currentYearMonth()
+  const { year } = currentYearMonth()
   return {
     year,
-    month,
+    month: '',
     weeks: [],
     ownerIds: [],
     teamIds: [],

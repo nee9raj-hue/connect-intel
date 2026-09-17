@@ -202,7 +202,11 @@ export default function UniqueCustomersDashboard({
           </tbody>
         </table>
         {!loading && !weeks.length ? (
-          <p className="uc-dash__empty">Pick a year and month to see week-wise unique customers.</p>
+          <p className="uc-dash__empty">
+            {filters.month
+              ? 'No unique customers with a last order in this period.'
+              : 'Pick a month to see week-wise unique customers. The list below covers the selected year.'}
+          </p>
         ) : null}
       </div>
 
@@ -251,10 +255,10 @@ export default function UniqueCustomersDashboard({
 }
 
 export function defaultUniqueCustomerFilters() {
-  const { year, month } = currentYearMonth()
+  const { year } = currentYearMonth()
   return {
     year,
-    month,
+    month: '',
     weeks: [],
     tagIds: [],
     statuses: [],

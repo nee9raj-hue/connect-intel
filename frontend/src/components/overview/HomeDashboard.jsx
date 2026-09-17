@@ -9,6 +9,8 @@ import RetentionOnboardingDashboard, {
 } from './RetentionOnboardingDashboard'
 import SalesPipelineSnapshot from './enterprise/SalesPipelineSnapshot'
 import { dashboardNavOptions } from '../../lib/dashboardNavigation'
+import { CRM_STATUSES } from '../../lib/crmConstants'
+import { pipelineCountsFromSummary } from '../../lib/navConfig'
 import '../../styles/dashboard-home.css'
 import '../../styles/dashboard-enterprise.css'
 
@@ -25,6 +27,23 @@ function flattenOrgTeams(hierarchy) {
       label: dept.name ? `${team.name} (${dept.name})` : team.name,
     }))
   )
+}
+
+function salesPipelineSnapshotFromSummary(pipelineSummary) {
+  if (Array.isArray(pipelineSummary?.stages) && pipelineSummary.stages.length) {
+    return {
+      stages: pipelineSummary.stages,
+      total: Number(pipelineSummary.leadCount ?? pipelineSummary.total) || 0,
+    }
+  }
+  const counts = pipelineCountsFromSummary(pipelineSummary, [])
+  const total = Number(pipelineSummary?.leadCount ?? pipelineSummary?.total ?? counts.all) || 0
+  const stages = CRM_STATUSES.map((s) => ({
+    id: s.id,
+    count: counts[s.id] || 0,
+    pct: total ? Math.round(((counts[s.id] || 0) / total) * 100) : 0,
+  }))
+  return { stages, total }
 }
 
 export default function HomeDashboard({ onNavigate, isActive = true, pipelineSummary = {} }) {
@@ -161,7 +180,7 @@ export default function HomeDashboard({ onNavigate, isActive = true, pipelineSum
     [onNavigate, user]
   )
 
-  const ps = pipelineSummary || {}
+  const ps = salesPipelineSnapshotFromSummary(pipelineSummary)
 
   return (
     <div className="dash-home dash-home--enterprise">
@@ -180,7 +199,7 @@ export default function HomeDashboard({ onNavigate, isActive = true, pipelineSum
 
         <SalesPipelineSnapshot
           stages={ps.stages}
-          total={ps.leadCount}
+          total={ps.total}
           role={isCompanyRepUser(user) ? 'rep' : role}
           onStageClick={runPipeline}
         />
