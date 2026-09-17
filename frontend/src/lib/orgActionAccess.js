@@ -1,3 +1,7 @@
+import { userHasOrgNavPermission, isCustomerPanelAllowed } from '../../../lib/orgNavAccess.js'
+
+export { userHasOrgNavPermission, isCustomerPanelAllowed }
+
 /** Company CRM delete (leads and deals) is Org Admin only. Solo users keep access. */
 export function userCanDeleteCrmRecords(user) {
   if (!user) return false

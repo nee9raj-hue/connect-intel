@@ -140,6 +140,7 @@ export default function AppShell() {
       const { panel, panelOptions: opts = {}, leadId } = location || {}
       const panelId = resolvePanelForUser(normalizeCrmPanel(panel || 'overview'), {
         isPlatformAdmin: Boolean(user?.isPlatformAdmin),
+        user,
       })
       const resolved = resolvePanelOptions(panelId, panelId === panel ? opts : {})
       setActivePanel(panelId)
@@ -151,7 +152,7 @@ export default function AppShell() {
       if (normalizedLeadId) openPipelineLead(normalizedLeadId)
       else setPipelineLeadId(null)
     },
-    [openPipelineLead, setPipelineLeadId, setPipelineAssigneeFilter, resolvePanelOptions, user?.isPlatformAdmin]
+    [openPipelineLead, setPipelineLeadId, setPipelineAssigneeFilter, resolvePanelOptions, user]
   )
 
   const commitHistory = useCallback((location, { replace = false } = {}) => {
@@ -178,6 +179,7 @@ export default function AppShell() {
     const initial = resolveInitialAppLocation(window.location.search, {
       isPlatformAdmin: user.isPlatformAdmin,
       pathname: window.location.pathname,
+      user,
     })
     const panel = initial.panel || 'overview'
     const resolved = {
@@ -194,14 +196,14 @@ export default function AppShell() {
     applyingHistoryRef.current = false
 
     return undefined
-  }, [user?.id, user?.isPlatformAdmin])
+  }, [user?.id, user?.isPlatformAdmin, user?.orgPermissions])
 
   useEffect(() => {
     const onPopState = () => {
       applyingHistoryRef.current = true
       const loc = sanitizeAppLocation(
         parseAppLocation(window.location.search, window.location.pathname),
-        { isPlatformAdmin: Boolean(user?.isPlatformAdmin) },
+        { isPlatformAdmin: Boolean(user?.isPlatformAdmin), user },
       )
       applyLocation(loc)
       lastHistoryKeyRef.current = appLocationKey(loc)
@@ -210,14 +212,14 @@ export default function AppShell() {
     }
     window.addEventListener('popstate', onPopState)
     return () => window.removeEventListener('popstate', onPopState)
-  }, [applyLocation, user?.isPlatformAdmin])
+  }, [applyLocation, user])
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const oauth = params.get('email_oauth')
     if (!oauth) return
     if (oauth === 'connected' || oauth === 'error') {
-      const panel = user?.isPlatformAdmin ? 'integrations' : 'team'
+      const panel = user?.isPlatformAdmin ? 'integrations' : user?.isOrgAdmin ? 'team' : 'my-email'
       const loc = { panel, panelOptions: {}, leadId: null }
       applyLocationRef.current?.(loc)
       commitHistoryRef.current?.(loc, { replace: true })
@@ -237,6 +239,7 @@ export default function AppShell() {
       const replace = Boolean(navOpts.replace)
       const panelId = resolvePanelForUser(normalizeCrmPanel(id), {
         isPlatformAdmin: Boolean(user?.isPlatformAdmin),
+        user,
       })
       const leavingChithi = isChithiPanel(activePanel) && !isChithiPanel(panelId)
       if (leavingChithi && sidebarMode === 'rail') {
@@ -259,7 +262,7 @@ export default function AppShell() {
         commitHistory(loc, { replace })
       }
     },
-    [activePanel, sidebarMode, pipelineLeadId, setPipelineLeadId, setPipelineAssigneeFilter, commitHistory, resolvePanelOptions, user?.isPlatformAdmin]
+    [activePanel, sidebarMode, pipelineLeadId, setPipelineLeadId, setPipelineAssigneeFilter, commitHistory, resolvePanelOptions, user]
   )
 
   useEffect(() => {

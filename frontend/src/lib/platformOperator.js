@@ -1,5 +1,7 @@
 /** Platform operator (Connect Intel staff) panels — not for customer workspaces. */
 
+import { isCustomerPanelAllowed } from '../../../lib/orgNavAccess.js'
+
 export const PLATFORM_OPERATOR_PANELS = new Set([
   'admin-home',
   'admin',
@@ -11,13 +13,14 @@ export function isPlatformOperatorPanel(panel) {
   return PLATFORM_OPERATOR_PANELS.has(String(panel || '').trim())
 }
 
-export function resolvePanelForUser(panel, { isPlatformAdmin = false } = {}) {
+export function resolvePanelForUser(panel, { isPlatformAdmin = false, user = null } = {}) {
   const id = String(panel || 'overview').trim() || 'overview'
   if (!isPlatformAdmin && isPlatformOperatorPanel(id)) return 'overview'
+  if (!isCustomerPanelAllowed(user, id)) return 'overview'
   return id
 }
 
-export function sanitizeAppLocation(location, { isPlatformAdmin = false } = {}) {
+export function sanitizeAppLocation(location, { isPlatformAdmin = false, user = null } = {}) {
   const base = location?.panel
     ? {
         panel: location.panel,
@@ -26,7 +29,7 @@ export function sanitizeAppLocation(location, { isPlatformAdmin = false } = {}) 
       }
     : { panel: 'overview', panelOptions: {}, leadId: null }
 
-  const panel = resolvePanelForUser(base.panel, { isPlatformAdmin })
+  const panel = resolvePanelForUser(base.panel, { isPlatformAdmin, user })
   if (panel === base.panel) return base
   return { panel, panelOptions: {}, leadId: null }
 }

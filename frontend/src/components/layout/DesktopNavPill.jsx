@@ -16,6 +16,7 @@ import {
   getDesktopPillSubmenuTargets,
   isNavTargetActive,
   MOBILE_NAV_PILL_ITEMS,
+  filterNavItemsByPermission,
   navTargetToOptions,
   pipelineCountsFromSummary,
 } from '../../lib/navConfig'
@@ -264,7 +265,7 @@ export default function DesktopNavPill({ activePanel, panelOptions, onNavigate }
     ]
   )
 
-  const items = MOBILE_NAV_PILL_ITEMS
+  const items = useMemo(() => filterNavItemsByPermission(MOBILE_NAV_PILL_ITEMS, user), [user])
   const submenuByPillId = useMemo(() => {
     const map = {}
     for (const item of items) {

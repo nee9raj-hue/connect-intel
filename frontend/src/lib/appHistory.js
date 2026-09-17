@@ -207,7 +207,7 @@ export function clearAppNavigationState() {
 }
 
 /** Prefer URL state; fall back to last session location when URL is bare (e.g. PWA reopen). */
-export function resolveInitialAppLocation(search = '', { isPlatformAdmin = false, pathname = '/' } = {}) {
+export function resolveInitialAppLocation(search = '', { isPlatformAdmin = false, pathname = '/', user = null } = {}) {
   let location
 
   if (urlHasAppNavigation(search, pathname)) {
@@ -225,7 +225,7 @@ export function resolveInitialAppLocation(search = '', { isPlatformAdmin = false
     }
   }
 
-  return sanitizeAppLocation(location, { isPlatformAdmin })
+  return sanitizeAppLocation(location, { isPlatformAdmin, user })
 }
 
 export function serializeAppLocation({ panel = 'overview', panelOptions = {}, leadId = null } = {}) {

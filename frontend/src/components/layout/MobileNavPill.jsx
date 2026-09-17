@@ -5,6 +5,7 @@ import {
   isNavTargetActive,
   MOBILE_NAV_PILL_MORE_ITEMS,
   MOBILE_NAV_PILL_PRIMARY_ITEMS,
+  filterNavItemsByPermission,
   navTargetToOptions,
 } from '../../lib/navConfig'
 import { isFreightDealOrg } from '../../lib/freightDeal'
@@ -81,8 +82,9 @@ export default function MobileNavPill({ activePanel, panelOptions, onNavigate, o
   const freightOrg = isFreightDealOrg(user)
 
   const primaryItems = useMemo(() => {
-    if (!freightOrg) return MOBILE_NAV_PILL_PRIMARY_ITEMS
-    const items = [...MOBILE_NAV_PILL_PRIMARY_ITEMS]
+    const base = filterNavItemsByPermission(MOBILE_NAV_PILL_PRIMARY_ITEMS, user)
+    if (!freightOrg) return base
+    const items = [...base]
     const leadsIdx = items.findIndex((item) => item.id === 'pipeline')
     const dealsItem = {
       id: 'deals',
@@ -95,7 +97,7 @@ export default function MobileNavPill({ activePanel, panelOptions, onNavigate, o
     if (leadsIdx >= 0) items.splice(leadsIdx + 1, 0, dealsItem)
     else items.push(dealsItem)
     return items
-  }, [freightOrg])
+  }, [freightOrg, user])
 
   const moreActive = useMemo(
     () => isMoreSectionActive(activePanel, panelOptions, primaryItems),
@@ -130,7 +132,7 @@ export default function MobileNavPill({ activePanel, panelOptions, onNavigate, o
             ))}
           </div>
           <div className="mobile-nav-pill__scroll" aria-label="More shortcuts">
-            {MOBILE_NAV_PILL_MORE_ITEMS.map((item) => (
+            {filterNavItemsByPermission(MOBILE_NAV_PILL_MORE_ITEMS, user).map((item) => (
               <NavPillButton
                 key={item.id}
                 item={item}
