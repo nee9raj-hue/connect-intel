@@ -109,7 +109,9 @@ export function leadMatchesAssignee(lead, assigneeUserId) {
 export function filterRepPipelineLeads(leads, user, { isOrgAdmin = false, isTeamManager = false } = {}) {
   if (!user?.id || user.accountType !== 'company') return leads || []
   if (isOrgAdmin || isTeamManager) return leads || []
-  return (leads || []).filter((lead) => repPipelineEntryVisible(lead, user.id))
+  return (leads || []).filter((lead) =>
+    repPipelineEntryVisible(lead, user.id, user.pipelineActorIds)
+  )
 }
 
 function matchesAnyLocationField(value, filterList) {
