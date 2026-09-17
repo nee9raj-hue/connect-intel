@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 6703c6d
+npm run prod:rollback -- 140bef9
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 6703c6d
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `90a27ea` |
-| Log updated (IST) | 17/09/2026, 15:02:54 |
+| Commit | `85db860` |
+| Log updated (IST) | 17/09/2026, 15:21:00 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 6703c6d
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 17/09/2026, 15:02:38 | `90a27ea` | Classify ERP-imported pipeline stages from last shipment and balance, without overwriting a rep’s manual move. | [preview](https://connect-intel-1ort39tzj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 90a27ea` | **← LIVE**
+| 17/09/2026, 15:19:33 | `85db860` | Assign ERP-owned leads to the signed-in rep so newly added teammates like Tanishq see their book. | [preview](https://connect-intel-kg2oymjg0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 85db860` | **← LIVE**
+| 17/09/2026, 15:03:51 | `140bef9` | Record production LIVE snapshot for ERP pipeline stage classification. | [preview](https://connect-intel-2gvfa92y0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 140bef9` |
+| 17/09/2026, 15:02:38 | `90a27ea` | Classify ERP-imported pipeline stages from last shipment and balance, without overwriting a rep’s manual move. | [preview](https://connect-intel-1ort39tzj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 90a27ea` |
 | 17/09/2026, 14:56:41 | `6703c6d` | Record production LIVE snapshot for ERP owner lead assignment. | [preview](https://connect-intel-zkjmnmllm-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6703c6d` |
 | 17/09/2026, 14:55:35 | `b2fa6ea` | Assign ERP-imported leads to CRM teammates by email or name so newly added reps see their book. | [preview](https://connect-intel-1fvyaqg2q-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b2fa6ea` |
 | 17/09/2026, 14:43:13 | `b801a44` | Record production LIVE snapshot for last shipment pipeline filter. | [preview](https://connect-intel-rkrf8cuuh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b801a44` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 6703c6d
 | 16/09/2026, 23:53:04 | `11843e2` | Add a Trade profile tab on the lead so reps can save shipping fit for service decisions. | [preview](https://connect-intel-qwuxz213t-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 11843e2` |
 | 16/09/2026, 23:37:21 | `439f7af` | Map account pipeline statuses onto the public.leads check constraint so CRM payload upserts succeed. | [preview](https://connect-intel-liedo3oyb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 439f7af` |
 | 16/09/2026, 23:34:54 | `039da35` | Await enterprise lead sync during ERP overlay so crm_payload.lastOrderCreatedAt is written. | [preview](https://connect-intel-qctvyfcrh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 039da35` |
-| 16/09/2026, 23:29:44 | `f8949dc` | Stamp lastOrderCreatedAt on CRM payload from last transacted date. | [preview](https://connect-intel-jv2bj8so4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f8949dc` |
-| 16/09/2026, 23:18:35 | `4d4d34b` | Add production ERP backfill endpoint and push Xindus Excel overlays onto leads. | [preview](https://connect-intel-olxr4f4is-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4d4d34b` |
 
 ---
 
