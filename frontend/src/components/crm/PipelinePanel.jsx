@@ -991,7 +991,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     [findLeadInLists, patchLead, refreshPipelineLead]
   )
 
-  const pipelineHasLeads = pipelineSummary.total > 0
+  const pipelineHasLeads =
+    pipelineSummary.total > 0 || pipelineLoad.total > 0 || scopedLeads.length > 0
   const hasPipelineFiltersActive =
     hasActiveServerFilters ||
     activeFilterCount > 0 ||
