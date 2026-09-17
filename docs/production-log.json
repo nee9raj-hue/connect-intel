@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-17T05:42:55.239Z",
-  "updatedAtIst": "17/09/2026, 11:12:55",
+  "updatedAt": "2026-09-17T09:12:03.368Z",
+  "updatedAtIst": "17/09/2026, 14:42:03",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "5dd196d",
+  "currentProductionCommit": "195685b",
   "entries": [
+    {
+      "logId": "20260917-1440-195685b",
+      "commit": "195685b",
+      "commitFull": "195685bbc4e038b9baf38f669bc908117d458171",
+      "message": "Add a pipeline Last shipment year and month filter so reps can list leads by last ERP shipment period.",
+      "deployedAt": "2026-09-17T09:10:56.131Z",
+      "deployedAtIst": "17/09/2026, 14:40:56",
+      "committedAtIst": "17/09/2026, 14:40:02",
+      "vercelPreviewUrl": "https://connect-intel-nubtdglgr-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 195685b"
+    },
+    {
+      "logId": "20260917-1113-1e332de",
+      "commit": "1e332de",
+      "commitFull": "1e332deeb57a933901ab0d00f03daf4a698feaf2",
+      "message": "Record production LIVE snapshot for New Account CRM stage.",
+      "deployedAt": "2026-09-17T05:43:34.083Z",
+      "deployedAtIst": "17/09/2026, 11:13:34",
+      "committedAtIst": "17/09/2026, 11:12:57",
+      "vercelPreviewUrl": "https://connect-intel-4r46phyga-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 1e332de"
+    },
     {
       "logId": "20260917-1112-5dd196d",
       "commit": "5dd196d",
@@ -15,7 +43,7 @@
       "committedAtIst": "17/09/2026, 11:11:59",
       "vercelPreviewUrl": "https://connect-intel-kw6isql6c-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 5dd196d"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 36a751f"
-    },
-    {
-      "logId": "20260916-2245-1d308ed",
-      "commit": "1d308ed",
-      "commitFull": "1d308edf9ed95a4fe455610a286ccbe425883a29",
-      "message": "Fill ERP tabs from trading history on the lead and clarify empty state.",
-      "deployedAt": "2026-09-16T17:15:09.130Z",
-      "deployedAtIst": "16/09/2026, 22:45:09",
-      "committedAtIst": "16/09/2026, 22:44:21",
-      "vercelPreviewUrl": "https://connect-intel-a7wf7n1kb-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 1d308ed"
-    },
-    {
-      "logId": "20260916-2233-53359a6",
-      "commit": "53359a6",
-      "commitFull": "53359a6abeb714ea7ad49a6f06a40d20229060f3",
-      "message": "Record production LIVE snapshot for ERP tab populate.",
-      "deployedAt": "2026-09-16T17:03:13.926Z",
-      "deployedAtIst": "16/09/2026, 22:33:13",
-      "committedAtIst": "16/09/2026, 22:32:23",
-      "vercelPreviewUrl": "https://connect-intel-1akhban7x-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 53359a6"
     }
   ]
 }

@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 73ef1fa
+npm run prod:rollback -- 1e332de
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 73ef1fa
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `5dd196d` |
-| Log updated (IST) | 17/09/2026, 11:12:55 |
+| Commit | `195685b` |
+| Log updated (IST) | 17/09/2026, 14:42:03 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 73ef1fa
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 17/09/2026, 11:12:39 | `5dd196d` | Add a New Account pipeline stage for recently onboarded ERP customers who have not traded yet. | [preview](https://connect-intel-kw6isql6c-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5dd196d` | **← LIVE**
+| 17/09/2026, 14:40:56 | `195685b` | Add a pipeline Last shipment year and month filter so reps can list leads by last ERP shipment period. | [preview](https://connect-intel-nubtdglgr-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 195685b` | **← LIVE**
+| 17/09/2026, 11:13:34 | `1e332de` | Record production LIVE snapshot for New Account CRM stage. | [preview](https://connect-intel-4r46phyga-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1e332de` |
+| 17/09/2026, 11:12:39 | `5dd196d` | Add a New Account pipeline stage for recently onboarded ERP customers who have not traded yet. | [preview](https://connect-intel-kw6isql6c-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5dd196d` |
 | 17/09/2026, 10:39:29 | `73ef1fa` | Record production LIVE snapshot for team manager assignment fix. | [preview](https://connect-intel-81rg32ek0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 73ef1fa` |
 | 17/09/2026, 10:38:35 | `0281e80` | Fix assigning a team manager by resolving the SQL profile id that was never imported. | [preview](https://connect-intel-b7a6soz9t-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0281e80` |
 | 17/09/2026, 10:30:27 | `baf6053` | Record production LIVE snapshot for ERP retention owners. | [preview](https://connect-intel-q1y022stu-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- baf6053` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 73ef1fa
 | 16/09/2026, 23:08:21 | `458f6fb` | Apply Xindus Excel ERP columns when a pipeline import updates a lead. | [preview](https://connect-intel-2i1pd86n9-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 458f6fb` |
 | 16/09/2026, 23:05:23 | `dbdf964` | Show Xindus customer Excel fields in structured ERP Revenue and Finance tabs. | [preview](https://connect-intel-dz4n0x7yy-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- dbdf964` |
 | 16/09/2026, 22:46:55 | `36a751f` | Record production LIVE snapshot for ERP empty-state fallback. | [preview](https://connect-intel-j6iyrh0re-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 36a751f` |
-| 16/09/2026, 22:45:09 | `1d308ed` | Fill ERP tabs from trading history on the lead and clarify empty state. | [preview](https://connect-intel-a7wf7n1kb-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1d308ed` |
-| 16/09/2026, 22:33:13 | `53359a6` | Record production LIVE snapshot for ERP tab populate. | [preview](https://connect-intel-1akhban7x-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 53359a6` |
 
 ---
 
