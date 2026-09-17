@@ -209,6 +209,11 @@
   color: #2563eb;
 }
 
+.pipeline-filter-pill--tone-shipment .pipeline-filter-pill__icon {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
 .pipeline-filter-pill--tone-more .pipeline-filter-pill__icon {
   background: #f8fafc;
   color: #64748b;
@@ -1407,6 +1412,13 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.pipeline-filter-popout-hint {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #7c98b6;
 }
 
 .pipeline-filter-popout-dates {

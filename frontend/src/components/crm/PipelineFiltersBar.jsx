@@ -3,7 +3,7 @@ import usePipelineFilterMobile from '../../hooks/usePipelineFilterMobile'
 import { PIPELINE_SEARCH_ID } from '../../hooks/useAppKeyboardShortcuts'
 import { api } from '../../lib/api'
 import { CONTACT_FILTER_OPTIONS, DEFAULT_PIPELINE_FILTERS, getFilterCities, getFilterStates } from '../../lib/pipelineFilters'
-import FilterDropdown, { FilterChipButton } from './FilterDropdown'
+import { FilterChipButton } from './FilterDropdown'
 import { DEAL_MONTH_OPTIONS, dealYearOptions, formatDealPeriodLabel } from '../../lib/pipelineDealsFilter'
 import { lastShipmentPeriodLabel } from '../../../../lib/leadLastShipmentFilter.js'
 import LeadTag from '../ui/LeadTag'
@@ -18,6 +18,7 @@ import {
   PeopleIcon,
   SearchIcon,
   TeamIcon,
+  CalendarIcon,
 } from '../ui/icons'
 
 const SMART_TAG_OPTIONS = [
@@ -32,6 +33,7 @@ const MOBILE_FILTER_TITLES = {
   city: 'City',
   state: 'State',
   contact: 'Contact',
+  lastShipment: 'Last shipment',
   advanced: 'More filters',
 }
 
@@ -141,13 +143,11 @@ export default function PipelineFiltersBar({
   const shipmentYearOptions = useMemo(() => dealYearOptions(new Date(), []), [])
   const shipmentYear = String(appliedFilters.lastShipmentYear || filters.lastShipmentYear || '')
   const shipmentMonth = String(appliedFilters.lastShipmentMonth || filters.lastShipmentMonth || '')
-  const shipmentMonthDisplay = DEAL_MONTH_OPTIONS.find((o) => o.value === String(shipmentMonth))?.label || null
-
-  const applyLastShipment = (year, month) => {
-    const lastShipmentYear = String(year || '')
-    const lastShipmentMonth = lastShipmentYear ? String(month || '') : ''
-    commitFilters({ ...filters, lastShipmentYear, lastShipmentMonth })
-  }
+  const shipmentDisplay =
+    formatDealPeriodLabel({
+      year: shipmentYear,
+      month: shipmentMonth,
+    }) || shipmentYear || null
 
   const cityOptions = cities.map((c) => ({ label: c, value: c }))
   const stateOptions = states.map((s) => ({ label: s, value: s }))
@@ -280,6 +280,12 @@ export default function PipelineFiltersBar({
       case 'team':
         commitFilters({ ...filters, teamIds: draft.filters.teamIds || [] })
         break
+      case 'lastShipment': {
+        const lastShipmentYear = String(draft.filters.lastShipmentYear || '')
+        const lastShipmentMonth = lastShipmentYear ? String(draft.filters.lastShipmentMonth || '') : ''
+        commitFilters({ ...filters, lastShipmentYear, lastShipmentMonth })
+        break
+      }
       case 'advanced': {
         commitFilters({ ...draft.filters })
         const view = savedViews.find((v) => v.id === draft.smartViewId)
@@ -356,6 +362,38 @@ export default function PipelineFiltersBar({
             placeholder="Search teams…"
             emptyLabel="All teams"
           />
+        )
+      case 'lastShipment':
+        return (
+          <div className="pipeline-filter-popout-sections">
+            <section className="pipeline-filter-popout-section">
+              <p className="hs-advanced-filter-label">Year</p>
+              <SingleSelectList
+                options={shipmentYearOptions}
+                value={String(filterDraft.filters.lastShipmentYear || '')}
+                emptyLabel="Any year"
+                onChange={(year) =>
+                  updateFilterDraft({
+                    lastShipmentYear: year || '',
+                    lastShipmentMonth: year ? filterDraft.filters.lastShipmentMonth || '' : '',
+                  })
+                }
+              />
+            </section>
+            <section className="pipeline-filter-popout-section">
+              <p className="hs-advanced-filter-label">Month</p>
+              {filterDraft.filters.lastShipmentYear ? (
+                <SingleSelectList
+                  options={DEAL_MONTH_OPTIONS}
+                  value={String(filterDraft.filters.lastShipmentMonth || '')}
+                  emptyLabel="All months"
+                  onChange={(month) => updateFilterDraft({ lastShipmentMonth: month || '' })}
+                />
+              ) : (
+                <p className="pipeline-filter-popout-hint">Choose a year to filter by month.</p>
+              )}
+            </section>
+          </div>
         )
       case 'advanced':
         return (
@@ -632,24 +670,15 @@ export default function PipelineFiltersBar({
         onClick={() => openFilter('contact')}
       />
 
-      <FilterDropdown
+      <PipelineFilterToolbarButton
+        icon={CalendarIcon}
+        iconTone="shipment"
         label="Last shipment"
-        value={shipmentYear}
-        displayValue={shipmentYear || null}
-        options={shipmentYearOptions}
-        emptyLabel="Any year"
         compact={useMobileFilterSheet}
-        onChange={(next) => applyLastShipment(next, next ? shipmentMonth : '')}
-      />
-      <FilterDropdown
-        label="Month"
-        value={shipmentMonth}
-        displayValue={shipmentMonthDisplay}
-        options={DEAL_MONTH_OPTIONS}
-        emptyLabel="All months"
-        compact={useMobileFilterSheet}
-        disabled={!shipmentYear}
-        onChange={(next) => applyLastShipment(shipmentYear, next)}
+        displayValue={shipmentDisplay}
+        active={Boolean(shipmentYear)}
+        aria-expanded={activeFilter?.type === 'lastShipment'}
+        onClick={() => openFilter('lastShipment')}
       />
 
       <PipelineFilterToolbarButton
