@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-17T09:12:03.368Z",
-  "updatedAtIst": "17/09/2026, 14:42:03",
+  "updatedAt": "2026-09-17T09:25:42.642Z",
+  "updatedAtIst": "17/09/2026, 14:55:42",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "195685b",
+  "currentProductionCommit": "b2fa6ea",
   "entries": [
+    {
+      "logId": "20260917-1455-b2fa6ea",
+      "commit": "b2fa6ea",
+      "commitFull": "b2fa6ea5101585856896e04a167780591474b2d9",
+      "message": "Assign ERP-imported leads to CRM teammates by email or name so newly added reps see their book.",
+      "deployedAt": "2026-09-17T09:25:35.173Z",
+      "deployedAtIst": "17/09/2026, 14:55:35",
+      "committedAtIst": "17/09/2026, 14:54:46",
+      "vercelPreviewUrl": "https://connect-intel-1fvyaqg2q-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- b2fa6ea"
+    },
+    {
+      "logId": "20260917-1443-b801a44",
+      "commit": "b801a44",
+      "commitFull": "b801a44046a7b623bc319d58f44df7fb8ef4b5d1",
+      "message": "Record production LIVE snapshot for last shipment pipeline filter.",
+      "deployedAt": "2026-09-17T09:13:13.403Z",
+      "deployedAtIst": "17/09/2026, 14:43:13",
+      "committedAtIst": "17/09/2026, 14:42:31",
+      "vercelPreviewUrl": "https://connect-intel-rkrf8cuuh-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- b801a44"
+    },
     {
       "logId": "20260917-1440-195685b",
       "commit": "195685b",
@@ -15,7 +43,7 @@
       "committedAtIst": "17/09/2026, 14:40:02",
       "vercelPreviewUrl": "https://connect-intel-nubtdglgr-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 195685b"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 458f6fb"
-    },
-    {
-      "logId": "20260916-2305-dbdf964",
-      "commit": "dbdf964",
-      "commitFull": "dbdf964f1ca3797f7e5846efdb3f8ab86f74a112",
-      "message": "Show Xindus customer Excel fields in structured ERP Revenue and Finance tabs.",
-      "deployedAt": "2026-09-16T17:35:23.579Z",
-      "deployedAtIst": "16/09/2026, 23:05:23",
-      "committedAtIst": "16/09/2026, 23:04:35",
-      "vercelPreviewUrl": "https://connect-intel-dz4n0x7yy-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- dbdf964"
-    },
-    {
-      "logId": "20260916-2246-36a751f",
-      "commit": "36a751f",
-      "commitFull": "36a751f11d1e9e6d87bfd25d4f4a51d74fdb0adf",
-      "message": "Record production LIVE snapshot for ERP empty-state fallback.",
-      "deployedAt": "2026-09-16T17:16:55.290Z",
-      "deployedAtIst": "16/09/2026, 22:46:55",
-      "committedAtIst": "16/09/2026, 22:45:56",
-      "vercelPreviewUrl": "https://connect-intel-j6iyrh0re-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 36a751f"
     }
   ]
 }
