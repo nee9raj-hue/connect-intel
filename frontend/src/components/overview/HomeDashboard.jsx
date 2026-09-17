@@ -194,7 +194,6 @@ export default function HomeDashboard({ onNavigate, isActive = true, pipelineSum
           ownerOptions={ownerOptions}
           teamOptions={teamOptions}
           onRetry={loadRetention}
-          onOpenLead={onLead}
         />
       </div>
     </div>

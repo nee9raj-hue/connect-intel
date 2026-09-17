@@ -215,7 +215,7 @@ export default function UniqueCustomersDashboard({
         {groups.map((group) => (
           <section key={group.ownerId} className="uc-dash__group">
             <header className="uc-dash__group-head">
-              <h3>Team — {group.ownerName}</h3>
+              <h3>{group.ownerName}</h3>
               <p>
                 Unique customers {formatCount(group.uniqueCustomers)} · Revenue{' '}
                 {formatRevenue(group.revenue)}

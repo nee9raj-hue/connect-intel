@@ -1,10 +1,4 @@
-/** Bundled for Vercel — mirror of supabase/migrations/20260710163000_pipeline_collaborator_ids.sql */
-export const PIPELINE_COLLABORATOR_IDS_BOOTSTRAP_SQL = `
-ALTER TABLE public.pipeline_leads
-  ADD COLUMN IF NOT EXISTS collaborator_ids text[] NOT NULL DEFAULT '{}';
-
-CREATE INDEX IF NOT EXISTS idx_pipeline_leads_collaborator_ids
-  ON public.pipeline_leads USING GIN (collaborator_ids);
+-- Lead owner is assignee only. Importer / saved-by must not become owner_id.
 
 CREATE OR REPLACE FUNCTION public.pipeline_leads_sync_scope_cols()
 RETURNS TRIGGER
@@ -69,13 +63,11 @@ BEGIN
     IF v_department_id IS NOT NULL THEN
       NEW.department_id := v_department_id;
     END IF;
+  ELSE
+    NEW.team_id := NULLIF(btrim(NEW.entry->>'teamId'), '');
+    NEW.department_id := NULLIF(btrim(NEW.entry->>'departmentId'), '');
   END IF;
 
   RETURN NEW;
 END;
 $$;
-
-UPDATE public.pipeline_leads
-SET collaborator_ids = '{}'
-WHERE collaborator_ids IS NULL;
-`

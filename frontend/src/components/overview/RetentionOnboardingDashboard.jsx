@@ -26,13 +26,6 @@ function optionLabel(options, id) {
   return options.find((o) => String(o.value) === String(id) || String(o.id) === String(id))?.label || id
 }
 
-function formatOnboarded(iso) {
-  if (!iso) return '—'
-  const d = new Date(iso)
-  if (!Number.isFinite(d.getTime())) return '—'
-  return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
-}
-
 export default function RetentionOnboardingDashboard({
   report,
   loading,
@@ -42,7 +35,6 @@ export default function RetentionOnboardingDashboard({
   ownerOptions = [],
   teamOptions = [],
   onRetry,
-  onOpenLead,
 }) {
   const timeZone = DEFAULT_TIME_ZONE
   const yearOptions = useMemo(() => dealYearOptions(new Date(), [], timeZone), [timeZone])
@@ -74,7 +66,6 @@ export default function RetentionOnboardingDashboard({
   const weeks = report?.weeks || []
   const teams = report?.teams || []
   const totals = report?.totals || { onboarded: 0 }
-  const groups = report?.groups || []
 
   return (
     <section className="uc-dash uc-dash--retention" aria-label="Retention">
@@ -83,8 +74,8 @@ export default function RetentionOnboardingDashboard({
           <p className="uc-dash__eyebrow">Retention</p>
           <h2 className="uc-dash__title">New customer onboarding</h2>
           <p className="uc-dash__sub">
-            First shipment when recorded, otherwise the date the customer entered the pipeline.
-            Counts unique companies against each team.
+            ERP onboarding date (first shipment, else customer created) against each team.
+            Sales owner comes from ERP account / lead / sales owner.
           </p>
         </div>
         <div className="uc-dash__kpis">
@@ -193,42 +184,6 @@ export default function RetentionOnboardingDashboard({
         {!loading && weeks.length && !teams.length ? (
           <p className="uc-dash__empty">No new customers onboarded in this period.</p>
         ) : null}
-      </div>
-
-      <div className="uc-dash__list">
-        <h3 className="uc-dash__list-title">Onboarded customers</h3>
-        {loading ? <p className="uc-dash__empty">Loading customers…</p> : null}
-        {!loading && !groups.length ? (
-          <p className="uc-dash__empty">No new customer onboarding in this period.</p>
-        ) : null}
-        {groups.map((group) => (
-          <section key={group.teamId} className="uc-dash__group">
-            <header className="uc-dash__group-head">
-              <h3>{group.teamName}</h3>
-              <p>New customers {formatCount(group.onboarded)}</p>
-            </header>
-            <table className="uc-dash__table uc-dash__table--list">
-              <thead>
-                <tr>
-                  <th>Customer</th>
-                  <th>Onboarded</th>
-                </tr>
-              </thead>
-              <tbody>
-                {group.customers.map((c) => (
-                  <tr key={c.leadId || c.name}>
-                    <td>
-                      <button type="button" className="uc-dash__name" onClick={() => onOpenLead(c.leadId)}>
-                        {c.name}
-                      </button>
-                    </td>
-                    <td>{formatOnboarded(c.onboardedAt)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </section>
-        ))}
       </div>
     </section>
   )
