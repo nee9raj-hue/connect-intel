@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- b0baa7e
+npm run prod:rollback -- c3f8ab6
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- b0baa7e
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `227659b` |
-| Log updated (IST) | 17/09/2026, 09:56:31 |
+| Commit | `456e1cf` |
+| Log updated (IST) | 17/09/2026, 10:29:48 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- b0baa7e
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 17/09/2026, 09:56:15 | `227659b` | Add a Retention onboarding grid under Sales pipeline, with year, month, week, owner, and team filters. | [preview](https://connect-intel-pd01t6s9z-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 227659b` | **← LIVE**
+| 17/09/2026, 10:29:38 | `456e1cf` | Use ERP onboarding dates and sales owners on Retention, keep unmatched accounts unassigned, and let team managers see their members. | [preview](https://connect-intel-o4v5z7wao-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 456e1cf` | **← LIVE**
+| 17/09/2026, 09:57:26 | `c3f8ab6` | Record production LIVE snapshot for Retention onboarding dashboard. | [preview](https://connect-intel-q9ws57orm-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c3f8ab6` |
+| 17/09/2026, 09:56:15 | `227659b` | Add a Retention onboarding grid under Sales pipeline, with year, month, week, owner, and team filters. | [preview](https://connect-intel-pd01t6s9z-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 227659b` |
 | 17/09/2026, 09:37:30 | `b0baa7e` | Rebuild Home dashboard around unique customers by week, with CRM tag, status, and owner filters. | [preview](https://connect-intel-l0a7jy603-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b0baa7e` |
 | 17/09/2026, 00:12:53 | `7c52c99` | Show last order on Overview, pipeline table, and as the first card on ERP Revenue. | [preview](https://connect-intel-gs1ei644d-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7c52c99` |
 | 16/09/2026, 23:53:04 | `11843e2` | Add a Trade profile tab on the lead so reps can save shipping fit for service decisions. | [preview](https://connect-intel-qwuxz213t-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 11843e2` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- b0baa7e
 | 16/09/2026, 22:15:02 | `e0ef88f` | Record production LIVE snapshot for pipeline board crash fix. | [preview](https://connect-intel-icw1ayv4k-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e0ef88f` |
 | 16/09/2026, 22:14:03 | `ac9b2dd` | Pass company-open props into kanban so board view does not crash. | [preview](https://connect-intel-8qc0c657o-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ac9b2dd` |
 | 16/09/2026, 22:07:29 | `0913764` | Record production LIVE snapshot for findPipelineEntry restore. | [preview](https://connect-intel-erqtmrhqm-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0913764` |
-| 16/09/2026, 22:06:19 | `dc12696` | Restore findPipelineEntry import so lead tag and CRM saves work. | [preview](https://connect-intel-8uxkyza8p-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- dc12696` |
-| 16/09/2026, 22:04:00 | `11ddb5b` | Record production deploy f23e34c as LIVE. | [preview](https://connect-intel-c1f5j6f5d-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 11ddb5b` |
 
 ---
 

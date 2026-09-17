@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-17T04:26:31.564Z",
-  "updatedAtIst": "17/09/2026, 09:56:31",
+  "updatedAt": "2026-09-17T04:59:48.649Z",
+  "updatedAtIst": "17/09/2026, 10:29:48",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "227659b",
+  "currentProductionCommit": "456e1cf",
   "entries": [
+    {
+      "logId": "20260917-1029-456e1cf",
+      "commit": "456e1cf",
+      "commitFull": "456e1cfa17ff4902b935c68c013c6e45f3d4b99b",
+      "message": "Use ERP onboarding dates and sales owners on Retention, keep unmatched accounts unassigned, and let team managers see their members.",
+      "deployedAt": "2026-09-17T04:59:38.882Z",
+      "deployedAtIst": "17/09/2026, 10:29:38",
+      "committedAtIst": "17/09/2026, 10:29:02",
+      "vercelPreviewUrl": "https://connect-intel-o4v5z7wao-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 456e1cf"
+    },
+    {
+      "logId": "20260917-0957-c3f8ab6",
+      "commit": "c3f8ab6",
+      "commitFull": "c3f8ab6cf5cd6c1f879525b6835d1511d427f454",
+      "message": "Record production LIVE snapshot for Retention onboarding dashboard.",
+      "deployedAt": "2026-09-17T04:27:26.469Z",
+      "deployedAtIst": "17/09/2026, 09:57:26",
+      "committedAtIst": "17/09/2026, 09:56:47",
+      "vercelPreviewUrl": "https://connect-intel-q9ws57orm-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- c3f8ab6"
+    },
     {
       "logId": "20260917-0956-227659b",
       "commit": "227659b",
@@ -15,7 +43,7 @@
       "committedAtIst": "17/09/2026, 09:55:39",
       "vercelPreviewUrl": "https://connect-intel-pd01t6s9z-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 227659b"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 0913764"
-    },
-    {
-      "logId": "20260916-2206-dc12696",
-      "commit": "dc12696",
-      "commitFull": "dc12696141cbd1c399ea6811d430dfba8d08e3ad",
-      "message": "Restore findPipelineEntry import so lead tag and CRM saves work.",
-      "deployedAt": "2026-09-16T16:36:19.601Z",
-      "deployedAtIst": "16/09/2026, 22:06:19",
-      "committedAtIst": "16/09/2026, 22:05:37",
-      "vercelPreviewUrl": "https://connect-intel-8uxkyza8p-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- dc12696"
-    },
-    {
-      "logId": "20260916-2204-11ddb5b",
-      "commit": "11ddb5b",
-      "commitFull": "11ddb5bbf2279479da31144f0a1fd00ecb98c7a0",
-      "message": "Record production deploy f23e34c as LIVE.",
-      "deployedAt": "2026-09-16T16:34:00.852Z",
-      "deployedAtIst": "16/09/2026, 22:04:00",
-      "committedAtIst": "16/09/2026, 22:03:12",
-      "vercelPreviewUrl": "https://connect-intel-c1f5j6f5d-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 11ddb5b"
     }
   ]
 }
