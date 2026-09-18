@@ -19,7 +19,7 @@
     },
     {
       "path": "/api/crm/xindus-erp-sync",
-      "schedule": "25 * * * *"
+      "schedule": "20 21 * * *"
     }
   ],
   "redirects": [
