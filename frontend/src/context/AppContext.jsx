@@ -481,7 +481,7 @@ export function AppProvider({ children }) {
       try {
         const session = await withTimeout(
           api.getSession(),
-          45_000,
+          90_000,
           'Sign-in check timed out. You can refresh or continue from the home page.'
         )
         if (cancelled) return
@@ -692,7 +692,7 @@ export function AppProvider({ children }) {
     try {
       const session = await withTimeout(
         api.createSession(payload),
-        45_000,
+        90_000,
         'Sign-in is taking too long. Please try again.'
       )
       if (session.token) storeSessionToken(session.token)

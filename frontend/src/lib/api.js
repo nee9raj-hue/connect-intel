@@ -113,9 +113,9 @@ async function requestInner(path, options = {}, { retried = false, silent = fals
 export const api = {
   touchSession,
   getIntegrationStatus: () => request('/api/integrations/status'),
-  getSession: () => request('/api/auth/session', { timeoutMs: 45_000 }),
+  getSession: () => request('/api/auth/session', { timeoutMs: 90_000 }),
   createSession: (payload) =>
-    request('/api/auth/session', { method: 'POST', body: payload, timeoutMs: 55_000 }),
+    request('/api/auth/session', { method: 'POST', body: payload, timeoutMs: 90_000 }),
   destroySession: () => request('/api/auth/session', { method: 'DELETE' }),
   completeOnboarding: (payload) =>
     request('/api/onboarding/complete', { method: 'POST', body: payload }),
