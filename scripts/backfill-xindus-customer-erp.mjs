@@ -26,7 +26,7 @@ import {
 } from '../lib/xindusErpCustomerFeed.js'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const dryRun = process.argv.includes('--dry-run')
+const resetOwners = process.argv.includes('--reset-owners')
 const forceLocal = process.argv.includes('--local')
 const fromOverlay = Math.max(
   0,
@@ -77,6 +77,8 @@ function buildOverlays(rows) {
     const overlay = erpFromXindusCustomerRow(row)
     if (!overlay) continue
     const keys = matchKeysFromXindusRow(row)
+    const erp = compactErp(overlay)
+    erp.ownership = {}
     overlays.push({
       xindusId: keys.xindusId,
       crmId: keys.crmId,
@@ -88,7 +90,7 @@ function buildOverlays(rows) {
       crn: keys.crn,
       iec: keys.iec,
       ownerAuthoritative: false,
-      erp: compactErp(overlay),
+      erp,
     })
   }
   return overlays
@@ -98,7 +100,7 @@ async function sleep(ms) {
   await new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-async function postOverlayPage(secret, slice, offset) {
+async function postBackfill(secret, body) {
   let lastErr
   for (let attempt = 1; attempt <= 6; attempt++) {
     try {
@@ -108,30 +110,61 @@ async function postOverlayPage(secret, slice, offset) {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${secret}`,
         },
-        body: JSON.stringify({
-          nameQuery: 'Xindus',
-          overlays: slice,
-          offset,
-          limit: 250,
-          dryRun,
-        }),
+        body: JSON.stringify(body),
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`)
       return data
     } catch (err) {
       lastErr = err
-      console.warn(`retry ${attempt}/6 offset ${offset}: ${err.message || err}`)
+      console.warn(`retry ${attempt}/6: ${err.message || err}`)
       await sleep(2500 * attempt)
     }
   }
   throw lastErr
 }
 
+async function postOverlayPage(secret, slice, offset) {
+  return postBackfill(secret, {
+    nameQuery: 'Xindus',
+    overlays: slice,
+    offset,
+    limit: 250,
+    dryRun,
+  })
+}
+
+async function resetRemoteOwners(secret) {
+  const totals = { scanned: 0, updated: 0, reclaimed: 0 }
+  let offset = 0
+  for (;;) {
+    const data = await postBackfill(secret, {
+      nameQuery: 'Xindus',
+      resetOwners: true,
+      offset,
+      limit: 250,
+      dryRun,
+    })
+    totals.scanned += data.scanned || 0
+    totals.updated += data.updated || 0
+    totals.reclaimed += data.reclaimed || 0
+    console.log(
+      `reset offset ${offset}: scanned ${data.scanned} updated ${data.updated} reclaimed ${data.reclaimed} done=${data.done}`
+    )
+    if (data.done) break
+    offset = data.nextOffset
+  }
+  return totals
+}
+
 async function pushRemote(overlays) {
   const secret = process.env.CRON_SECRET
   if (!secret) throw new Error('CRON_SECRET missing — cannot call production backfill')
-  const overlayBatchSize = 800
+  if (resetOwners) {
+    console.log('Clearing ERP dump owners on existing Xindus leads (deals/notes kept)')
+    await resetRemoteOwners(secret)
+  }
+  const overlayBatchSize = overlays.length <= 8000 ? overlays.length || 1 : 800
   const totals = { scanned: 0, matched: 0, updated: 0 }
   let orgId = null
   for (let start = fromOverlay; start < overlays.length; start += overlayBatchSize) {
@@ -158,8 +191,29 @@ async function pushLocal(overlays) {
     throw new Error('Local Supabase env is not configured')
   }
   const organizationId = await resolveXindusOrgId('Xindus')
+  const totals = { scanned: 0, matched: 0, updated: 0, reclaimed: 0, organizationId }
+  if (resetOwners) {
+    let offset = 0
+    for (;;) {
+      const data = await applyOverlaysToLeadPage({
+        organizationId,
+        overlays: [],
+        offset,
+        limit: 250,
+        dryRun,
+        resetOwners: true,
+      })
+      totals.scanned += data.scanned
+      totals.updated += data.updated
+      totals.reclaimed += data.reclaimed || 0
+      console.log(
+        `reset offset ${offset}: scanned ${data.scanned} updated ${data.updated} done=${data.done}`
+      )
+      if (data.done) break
+      offset = data.nextOffset
+    }
+  }
   let offset = 0
-  const totals = { scanned: 0, matched: 0, updated: 0, organizationId }
   for (;;) {
     const data = await applyOverlaysToLeadPage({
       organizationId,
