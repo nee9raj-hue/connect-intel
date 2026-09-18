@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-17T19:09:55.767Z",
-  "updatedAtIst": "18/09/2026, 00:39:55",
+  "updatedAt": "2026-09-18T07:32:31.039Z",
+  "updatedAtIst": "18/09/2026, 13:02:31",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "0c81265",
+  "currentProductionCommit": "3f46a72",
   "entries": [
+    {
+      "logId": "20260918-1302-3f46a72",
+      "commit": "3f46a72",
+      "commitFull": "3f46a724a394d18cdf1e834b176d60ae6d3d2fe8",
+      "message": "Schedule the ERP customer sync daily so Vercel Hobby will accept the deploy.",
+      "deployedAt": "2026-09-18T07:32:15.069Z",
+      "deployedAtIst": "18/09/2026, 13:02:15",
+      "committedAtIst": "18/09/2026, 13:00:19",
+      "vercelPreviewUrl": "https://connect-intel-nl2hq933v-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 3f46a72"
+    },
+    {
+      "logId": "20260918-0041-677f15f",
+      "commit": "677f15f",
+      "commitFull": "677f15f4e48f214f4436d3b6affd2d1addc09da9",
+      "message": "Record production LIVE snapshot for 0c81265.",
+      "deployedAt": "2026-09-17T19:11:07.590Z",
+      "deployedAtIst": "18/09/2026, 00:41:07",
+      "committedAtIst": "18/09/2026, 00:40:09",
+      "vercelPreviewUrl": "https://connect-intel-ro9zc2nz3-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 677f15f"
+    },
     {
       "logId": "20260918-0016-0c81265",
       "commit": "0c81265",
@@ -15,7 +43,7 @@
       "committedAtIst": "18/09/2026, 00:16:04",
       "vercelPreviewUrl": "https://connect-intel-kzx4ihv6g-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 0c81265"
     },
@@ -242,48 +270,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 2d02dd5"
-    },
-    {
-      "logId": "20260917-1550-514dae9",
-      "commit": "514dae9",
-      "commitFull": "514dae97b1c188753685e86d59a87d633a16234e",
-      "message": "Record production LIVE snapshot for ERP rep identity pipeline visibility.",
-      "deployedAt": "2026-09-17T10:20:35.149Z",
-      "deployedAtIst": "17/09/2026, 15:50:35",
-      "committedAtIst": "17/09/2026, 15:49:46",
-      "vercelPreviewUrl": "https://connect-intel-90wxl3y9n-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 514dae9"
-    },
-    {
-      "logId": "20260917-1548-ec6cb26",
-      "commit": "ec6cb26",
-      "commitFull": "ec6cb268129293a67dbf0075d5cdb691a1f34c0d",
-      "message": "Let CRM reps see ERP-owned leads across invite and login user ids.",
-      "deployedAt": "2026-09-17T10:18:10.266Z",
-      "deployedAtIst": "17/09/2026, 15:48:10",
-      "committedAtIst": "17/09/2026, 15:47:15",
-      "vercelPreviewUrl": "https://connect-intel-8jjirrggf-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- ec6cb26"
-    },
-    {
-      "logId": "20260917-1522-8ede71f",
-      "commit": "8ede71f",
-      "commitFull": "8ede71ff85993690eb15bafca2a9383778430c41",
-      "message": "Record production LIVE snapshot for ERP rep lead claim.",
-      "deployedAt": "2026-09-17T09:52:03.153Z",
-      "deployedAtIst": "17/09/2026, 15:22:03",
-      "committedAtIst": "17/09/2026, 15:21:18",
-      "vercelPreviewUrl": "https://connect-intel-jwl6958vb-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 8ede71f"
     }
   ]
 }
