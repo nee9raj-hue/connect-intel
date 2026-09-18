@@ -61,6 +61,7 @@ export const DEFAULT_PIPELINE_FILTERS = {
   contact: 'any',
   tagIds: [],
   teamIds: [],
+  teamMemberUserIds: [],
   tagMode: 'any',
   smartTags: [],
   overdueFollowUp: false,
@@ -297,6 +298,7 @@ export function applyPipelineFilters(
     leadIds = null,
     teamMemberIds = null,
     teamIds = [],
+    teamMemberUserIds = [],
     lastShipmentYear = '',
     lastShipmentMonth = '',
   } = {}
@@ -450,18 +452,25 @@ export function applyPipelineFilters(
   }
 
   const ownerTeamIds = Array.isArray(teamMemberIds) ? teamMemberIds.map(String).filter(Boolean) : []
-  if (ownerTeamIds.length) {
-    const allowed = new Set(ownerTeamIds)
-    list = list.filter((l) => {
-      const owner = l.assignedToUserId || l.savedByUserId || l.userId
-      return owner != null && allowed.has(String(owner))
-    })
-  }
-
+  const extraTeamMembers = Array.isArray(teamMemberUserIds)
+    ? teamMemberUserIds.map(String).filter(Boolean)
+    : []
+  const memberSet = new Set([...ownerTeamIds, ...extraTeamMembers])
   const departmentTeamIds = Array.isArray(teamIds) ? teamIds.map(String).filter(Boolean) : []
   if (departmentTeamIds.length) {
     const allowed = new Set(departmentTeamIds)
-    list = list.filter((l) => l.teamId && allowed.has(String(l.teamId)))
+    list = list.filter((l) => {
+      if (memberSet.size) {
+        const owner = leadOwnerUserId(l)
+        return Boolean(owner && memberSet.has(String(owner)))
+      }
+      return Boolean(l.teamId && allowed.has(String(l.teamId)))
+    })
+  } else if (memberSet.size) {
+    list = list.filter((l) => {
+      const owner = leadOwnerUserId(l)
+      return owner != null && memberSet.has(String(owner))
+    })
   }
 
   if (staleDays != null && staleDays !== '') {

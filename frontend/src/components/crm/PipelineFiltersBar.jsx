@@ -28,6 +28,19 @@ const SMART_TAG_OPTIONS = [
   { id: 'hot_score', label: 'Hot (Score 70+)' },
 ]
 
+function memberIdsForTeams(teams, teamIds) {
+  const wanted = new Set((teamIds || []).map(String).filter(Boolean))
+  if (!wanted.size) return []
+  const ids = []
+  for (const team of teams || []) {
+    if (!wanted.has(String(team.id))) continue
+    for (const id of team.memberIds || []) {
+      if (id) ids.push(String(id))
+    }
+  }
+  return [...new Set(ids)]
+}
+
 const MOBILE_FILTER_TITLES = {
   owner: 'Lead owner',
   status: 'Lead status',
@@ -215,6 +228,7 @@ export default function PipelineFiltersBar({
   const advancedActiveCount =
     (appliedFilters.tagIds?.length || 0) +
     (appliedFilters.smartTags?.length || 0) +
+    (appliedFilters.teamIds?.length || 0) +
     (activeSmartViewId ? 1 : 0)
 
   const openFilter = (type) => {
@@ -312,9 +326,15 @@ export default function PipelineFiltersBar({
       case 'contact':
         commitFilters({ ...filters, contact: draft.filters.contact || 'any' })
         break
-      case 'team':
-        commitFilters({ ...filters, teamIds: draft.filters.teamIds || [] })
+      case 'team': {
+        const teamIds = draft.filters.teamIds || []
+        commitFilters({
+          ...filters,
+          teamIds,
+          teamMemberUserIds: memberIdsForTeams(orgTeams, teamIds),
+        })
         break
+      }
       case 'lastShipment': {
         const lastShipmentYear = String(draft.filters.lastShipmentYear || '')
         const lastShipmentMonth = lastShipmentYear ? String(draft.filters.lastShipmentMonth || '') : ''
@@ -322,7 +342,10 @@ export default function PipelineFiltersBar({
         break
       }
       case 'advanced': {
-        commitFilters({ ...draft.filters })
+        const next = { ...draft.filters }
+        const teamIds = next.teamIds || []
+        next.teamMemberUserIds = memberIdsForTeams(orgTeams, teamIds)
+        commitFilters(next)
         const view = savedViews.find((v) => v.id === draft.smartViewId)
         if (view) onApplySmartView?.(view)
         break
@@ -484,6 +507,18 @@ export default function PipelineFiltersBar({
                   onChange={(v) => updateFilterDraft({ tagIds: v })}
                   placeholder="Search tags…"
                   emptyLabel="Any tag"
+                />
+              </section>
+            ) : null}
+            {teamOptions.length > 0 ? (
+              <section className="pipeline-filter-popout-section">
+                <p className="hs-advanced-filter-label">Teams</p>
+                <SearchableMultiList
+                  options={teamOptions}
+                  values={filterDraft.filters.teamIds || []}
+                  onChange={(v) => updateFilterDraft({ teamIds: v })}
+                  placeholder="Search teams…"
+                  emptyLabel="All teams"
                 />
               </section>
             ) : null}
@@ -901,11 +936,13 @@ export default function PipelineFiltersBar({
               <FilterChipButton
                 key={`team-${teamId}`}
                 label={`Team: ${team?.name || teamId}`}
-                onRemove={() =>
+                onRemove={() => {
+                  const teamIds = (appliedFilters.teamIds || []).filter((id) => id !== teamId)
                   onRemoveAppliedFilter?.({
-                    teamIds: (appliedFilters.teamIds || []).filter((id) => id !== teamId),
+                    teamIds,
+                    teamMemberUserIds: memberIdsForTeams(orgTeams, teamIds),
                   })
-                }
+                }}
               />
             )
           })}

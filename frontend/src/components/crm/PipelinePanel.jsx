@@ -866,7 +866,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       ),
       leadIds: dashboardLeadIds,
       teamMemberIds: teamMemberIdsForFilter,
-      teamIds: serverSidePipeline ? [] : appliedAdvanced.teamIds,
+      teamIds: appliedAdvanced.teamIds,
+      teamMemberUserIds: appliedAdvanced.teamMemberUserIds,
       ...smartViewFilters,
     })
   }, [
