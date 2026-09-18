@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-18T07:32:31.039Z",
-  "updatedAtIst": "18/09/2026, 13:02:31",
+  "updatedAt": "2026-09-18T09:28:35.814Z",
+  "updatedAtIst": "18/09/2026, 14:58:35",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "3f46a72",
+  "currentProductionCommit": "ce5fb85",
   "entries": [
+    {
+      "logId": "20260918-1457-ce5fb85",
+      "commit": "ce5fb85",
+      "commitFull": "ce5fb85a04f61b663b6f9b3899d9378e056eea4c",
+      "message": "Assign CRM owners from ERP sales owner and reclaim unmatched books.",
+      "deployedAt": "2026-09-18T09:27:28.415Z",
+      "deployedAtIst": "18/09/2026, 14:57:28",
+      "committedAtIst": "18/09/2026, 14:56:43",
+      "vercelPreviewUrl": "https://connect-intel-v2hhu6tj3-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- ce5fb85"
+    },
+    {
+      "logId": "20260918-1303-2aaba95",
+      "commit": "2aaba95",
+      "commitFull": "2aaba95494840a4551062699c21bd208394b23b3",
+      "message": "Record production LIVE snapshot for ERP customer-service overlay sync.",
+      "deployedAt": "2026-09-18T07:33:33.260Z",
+      "deployedAtIst": "18/09/2026, 13:03:33",
+      "committedAtIst": "18/09/2026, 13:02:39",
+      "vercelPreviewUrl": "https://connect-intel-eeijfld84-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 2aaba95"
+    },
     {
       "logId": "20260918-1302-3f46a72",
       "commit": "3f46a72",
@@ -15,7 +43,7 @@
       "committedAtIst": "18/09/2026, 13:00:19",
       "vercelPreviewUrl": "https://connect-intel-nl2hq933v-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 3f46a72"
     },
@@ -242,34 +270,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- df689b0"
-    },
-    {
-      "logId": "20260917-1606-153bc38",
-      "commit": "153bc38",
-      "commitFull": "153bc380d53dba3b8d40401c81ea24425bf96590",
-      "message": "Record production LIVE snapshot for Last shipment filter pills.",
-      "deployedAt": "2026-09-17T10:36:20.153Z",
-      "deployedAtIst": "17/09/2026, 16:06:20",
-      "committedAtIst": "17/09/2026, 16:05:33",
-      "vercelPreviewUrl": "https://connect-intel-kkvez49vw-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 153bc38"
-    },
-    {
-      "logId": "20260917-1605-2d02dd5",
-      "commit": "2d02dd5",
-      "commitFull": "2d02dd5fad09a21da5645e7f95fb4c44ccff6037",
-      "message": "Match Last shipment year and month to the other pipeline filter pills.",
-      "deployedAt": "2026-09-17T10:35:09.208Z",
-      "deployedAtIst": "17/09/2026, 16:05:09",
-      "committedAtIst": "17/09/2026, 16:04:22",
-      "vercelPreviewUrl": "https://connect-intel-3fl582gk5-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 2d02dd5"
     }
   ]
 }
