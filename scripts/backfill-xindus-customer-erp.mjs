@@ -87,6 +87,7 @@ function buildOverlays(rows) {
       pan: keys.pan,
       crn: keys.crn,
       iec: keys.iec,
+      ownerAuthoritative: false,
       erp: compactErp(overlay),
     })
   }
