@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-18T16:34:49.583Z",
-  "updatedAtIst": "18/09/2026, 22:04:49",
+  "updatedAt": "2026-09-18T16:52:37.344Z",
+  "updatedAtIst": "18/09/2026, 22:22:37",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "6590bef",
+  "currentProductionCommit": "0f83385",
   "entries": [
+    {
+      "logId": "20260918-2214-0f83385",
+      "commit": "0f83385",
+      "commitFull": "0f833856cbcd71fadb8781b4a7dd05df9109be8f",
+      "message": "Reset ERP dump owners on existing Xindus leads without deleting deals.",
+      "deployedAt": "2026-09-18T16:44:58.889Z",
+      "deployedAtIst": "18/09/2026, 22:14:58",
+      "committedAtIst": "18/09/2026, 22:14:06",
+      "vercelPreviewUrl": "https://connect-intel-4h0eot52s-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 0f83385"
+    },
+    {
+      "logId": "20260918-2205-554f204",
+      "commit": "554f204",
+      "commitFull": "554f204b5e6941ab5439c8cd37df4ba6dab0fdcf",
+      "message": "Record production LIVE snapshot for ERP ops-list owner mapping.",
+      "deployedAt": "2026-09-18T16:35:55.086Z",
+      "deployedAtIst": "18/09/2026, 22:05:55",
+      "committedAtIst": "18/09/2026, 22:04:57",
+      "vercelPreviewUrl": "https://connect-intel-kt95r2868-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 554f204"
+    },
     {
       "logId": "20260918-2204-6590bef",
       "commit": "6590bef",
@@ -15,7 +43,7 @@
       "committedAtIst": "18/09/2026, 22:03:16",
       "vercelPreviewUrl": "https://connect-intel-3mvzxim5e-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 6590bef"
     },
@@ -242,34 +270,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- a9a77b2"
-    },
-    {
-      "logId": "20260918-0007-0adbbf3",
-      "commit": "0adbbf3",
-      "commitFull": "0adbbf3b68711961884cf001d0faf16a8af5d9c0",
-      "message": "Stamp Xindus ERP last-shipment onto leads that missed overlay match so idle accounts like XLP leave New Account.",
-      "deployedAt": "2026-09-17T18:37:41.800Z",
-      "deployedAtIst": "18/09/2026, 00:07:41",
-      "committedAtIst": "18/09/2026, 00:06:54",
-      "vercelPreviewUrl": "https://connect-intel-bo5ndkmtz-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 0adbbf3"
-    },
-    {
-      "logId": "20260917-2352-5472a90",
-      "commit": "5472a90",
-      "commitFull": "5472a90e2102d25d6710c5377bcd5cc5dfd29a94",
-      "message": "Record production LIVE snapshot for ERP restage and permission-gated nav.",
-      "deployedAt": "2026-09-17T18:22:32.492Z",
-      "deployedAtIst": "17/09/2026, 23:52:32",
-      "committedAtIst": "17/09/2026, 23:51:51",
-      "vercelPreviewUrl": "https://connect-intel-6uxgqv1to-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 5472a90"
     }
   ]
 }

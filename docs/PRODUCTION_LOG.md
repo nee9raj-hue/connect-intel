@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 1e08615
+npm run prod:rollback -- 554f204
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 1e08615
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `6590bef` |
-| Log updated (IST) | 18/09/2026, 22:04:49 |
+| Commit | `0f83385` |
+| Log updated (IST) | 18/09/2026, 22:22:37 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 1e08615
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 18/09/2026, 22:04:28 | `6590bef` | Assign CRM sales owners from the ERP ops customer list, not the Metabase dump. | [preview](https://connect-intel-3mvzxim5e-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6590bef` | **← LIVE**
+| 18/09/2026, 22:14:58 | `0f83385` | Reset ERP dump owners on existing Xindus leads without deleting deals. | [preview](https://connect-intel-4h0eot52s-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0f83385` | **← LIVE**
+| 18/09/2026, 22:05:55 | `554f204` | Record production LIVE snapshot for ERP ops-list owner mapping. | [preview](https://connect-intel-kt95r2868-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 554f204` |
+| 18/09/2026, 22:04:28 | `6590bef` | Assign CRM sales owners from the ERP ops customer list, not the Metabase dump. | [preview](https://connect-intel-3mvzxim5e-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6590bef` |
 | 18/09/2026, 16:38:27 | `1e08615` | Record production LIVE snapshot for fast sign-in. | [preview](https://connect-intel-1g4rm4e0j-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1e08615` |
 | 18/09/2026, 16:37:33 | `7b93347` | Return a session without writing the user store on sign-in. | [preview](https://connect-intel-n6ox6pkaw-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7b93347` |
 | 18/09/2026, 16:30:41 | `eab4736` | Record production LIVE snapshot for sign-in store-read fix. | [preview](https://connect-intel-q9quk1ajq-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- eab4736` |
@@ -61,8 +63,6 @@ npm run prod:rollback -- 1e08615
 | 18/09/2026, 00:41:07 | `677f15f` | Record production LIVE snapshot for 0c81265. | [preview](https://connect-intel-ro9zc2nz3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 677f15f` |
 | 18/09/2026, 00:16:44 | `0c81265` | Record production LIVE snapshot after the overlay-matching log commit reached Vercel. | [preview](https://connect-intel-kzx4ihv6g-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0c81265` |
 | 18/09/2026, 00:10:04 | `a9a77b2` | Record production LIVE snapshot for ERP last-shipment overlay matching. | [preview](https://connect-intel-ofc961ktg-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a9a77b2` |
-| 18/09/2026, 00:07:41 | `0adbbf3` | Stamp Xindus ERP last-shipment onto leads that missed overlay match so idle accounts like XLP leave New Account. | [preview](https://connect-intel-bo5ndkmtz-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0adbbf3` |
-| 17/09/2026, 23:52:32 | `5472a90` | Record production LIVE snapshot for ERP restage and permission-gated nav. | [preview](https://connect-intel-6uxgqv1to-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5472a90` |
 
 ---
 
