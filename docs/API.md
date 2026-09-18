@@ -161,6 +161,8 @@ Protected by `CRON_SECRET` or `MARKETING_CRON_SECRET`:
 | Path | Schedule |
 |------|----------|
 | `crm/dashboard-warm-cron` | Vercel cron 04:00 UTC daily |
+| `crm/xindus-erp-sync` | Vercel cron hourly (`25 * * * *`); full snapshot at 21:00 UTC, incremental otherwise |
+| `crm/xindus-erp-backfill` | Manual POST overlays or `{ "fetchFromErp": true }` |
 | `marketing/cron` | Manual / external scheduler |
 | `workers/cron` | BullMQ drain |
 | `crm/reminders-cron` | Manual |

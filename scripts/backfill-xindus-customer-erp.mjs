@@ -1,13 +1,15 @@
 #!/usr/bin/env node
 /**
- * Overlay Xindus customer.xlsx ERP fields onto matching pipeline leads.
+ * Overlay Xindus ERP customer fields onto matching pipeline leads.
  *
- * Prefers posting to production (server has Supabase):
- *   node scripts/backfill-xindus-customer-erp.mjs
- *   node scripts/backfill-xindus-customer-erp.mjs --dry-run
+ * Live customer-service API (preferred):
+ *   node scripts/backfill-xindus-customer-erp.mjs --from-api
+ *
+ * Excel dump (fallback):
+ *   node scripts/backfill-xindus-customer-erp.mjs --xlsx=/path/to/Xindus\ customer.xlsx
  *
  * Direct DB (if SUPABASE_SERVICE_ROLE_KEY is in the env):
- *   node scripts/backfill-xindus-customer-erp.mjs --local
+ *   node scripts/backfill-xindus-customer-erp.mjs --local --from-api
  */
 import { spawnSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
@@ -17,10 +19,23 @@ import { erpFromXindusCustomerRow, matchKeysFromXindusRow } from '../lib/xindusC
 import { compactErp } from '../lib/server/xindusErpOverlayApply.js'
 import { isSupabaseEnabled } from '../lib/server/supabaseClient.js'
 import { applyOverlaysToLeadPage, resolveXindusOrgId } from '../lib/server/xindusErpOverlayApply.js'
+import {
+  fetchXindusErpCustomers,
+  getXindusErpFeedConfig,
+  overlaysFromXindusApiCustomers,
+} from '../lib/xindusErpCustomerFeed.js'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const dryRun = process.argv.includes('--dry-run')
 const forceLocal = process.argv.includes('--local')
+const fromOverlay = Math.max(
+  0,
+  Number(process.argv.find((a) => a.startsWith('--from-overlay='))?.slice('--from-overlay='.length) || 0) || 0
+)
+const pageOffsetStart = Math.max(
+  0,
+  Number(process.argv.find((a) => a.startsWith('--from-offset='))?.slice('--from-offset='.length) || 0) || 0
+)
 const xlsxArg = process.argv.find((a) => a.startsWith('--xlsx='))?.slice('--xlsx='.length)
 const xlsx = xlsxArg || '/Users/apple/Downloads/Xindus customer.xlsx'
 const apiBase = process.argv.find((a) => a.startsWith('--api='))?.slice('--api='.length) || 'https://connectintel.net'
@@ -42,6 +57,8 @@ function loadEnvFile(path) {
 
 loadEnvFile(join(ROOT, '.env.railway.secrets'))
 loadEnvFile(join(ROOT, '.env.prod.local'))
+
+const fromApi = process.argv.includes('--from-api') || (!xlsxArg && getXindusErpFeedConfig().configured)
 
 function dumpExcelRows() {
   const py = spawnSync('python3', [join(ROOT, 'scripts/xindus_excel_erp_dump.py'), xlsx], {
@@ -76,16 +93,14 @@ function buildOverlays(rows) {
   return overlays
 }
 
-async function pushRemote(overlays) {
-  const secret = process.env.CRON_SECRET
-  if (!secret) throw new Error('CRON_SECRET missing — cannot call production backfill')
-  const overlayBatchSize = 800
-  const totals = { scanned: 0, matched: 0, updated: 0 }
-  let orgId = null
-  for (let start = 0; start < overlays.length; start += overlayBatchSize) {
-    const slice = overlays.slice(start, start + overlayBatchSize)
-    let offset = 0
-    for (;;) {
+async function sleep(ms) {
+  await new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+async function postOverlayPage(secret, slice, offset) {
+  let lastErr
+  for (let attempt = 1; attempt <= 6; attempt++) {
+    try {
       const res = await fetch(`${apiBase.replace(/\/$/, '')}/api/crm/xindus-erp-backfill`, {
         method: 'POST',
         headers: {
@@ -101,9 +116,28 @@ async function pushRemote(overlays) {
         }),
       })
       const data = await res.json().catch(() => ({}))
-      if (!res.ok) {
-        throw new Error(data.error || `HTTP ${res.status}`)
-      }
+      if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`)
+      return data
+    } catch (err) {
+      lastErr = err
+      console.warn(`retry ${attempt}/6 offset ${offset}: ${err.message || err}`)
+      await sleep(2500 * attempt)
+    }
+  }
+  throw lastErr
+}
+
+async function pushRemote(overlays) {
+  const secret = process.env.CRON_SECRET
+  if (!secret) throw new Error('CRON_SECRET missing — cannot call production backfill')
+  const overlayBatchSize = 800
+  const totals = { scanned: 0, matched: 0, updated: 0 }
+  let orgId = null
+  for (let start = fromOverlay; start < overlays.length; start += overlayBatchSize) {
+    const slice = overlays.slice(start, start + overlayBatchSize)
+    let offset = start === fromOverlay ? pageOffsetStart : 0
+    for (;;) {
+      const data = await postOverlayPage(secret, slice, offset)
       orgId = data.organizationId || orgId
       totals.scanned += data.scanned || 0
       totals.matched += data.matched || 0
@@ -145,10 +179,11 @@ async function pushLocal(overlays) {
   return { ...totals, dryRun, mode: 'local' }
 }
 
-console.log('Reading', xlsx)
-const excelRows = dumpExcelRows()
-const overlays = buildOverlays(excelRows)
-console.log(`Excel rows ${excelRows.length} → overlays ${overlays.length}`)
+console.log(fromApi ? 'Fetching ERP customer-service feed' : `Reading ${xlsx}`)
+const overlays = fromApi
+  ? overlaysFromXindusApiCustomers((await fetchXindusErpCustomers({ mode: 'full' })).rows)
+  : buildOverlays(dumpExcelRows())
+console.log(`overlays ${overlays.length}`)
 
 const result =
   !forceLocal && process.env.CRON_SECRET
