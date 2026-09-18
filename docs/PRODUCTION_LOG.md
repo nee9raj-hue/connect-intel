@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 554f204
+npm run prod:rollback -- 08438c3
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 554f204
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `0f83385` |
-| Log updated (IST) | 18/09/2026, 22:22:37 |
+| Commit | `828834a` |
+| Log updated (IST) | 18/09/2026, 23:11:21 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 554f204
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 18/09/2026, 22:14:58 | `0f83385` | Reset ERP dump owners on existing Xindus leads without deleting deals. | [preview](https://connect-intel-4h0eot52s-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0f83385` | **← LIVE**
+| 18/09/2026, 23:09:45 | `828834a` | Filter pipeline by team members like tags, not stale lead team_id. | [preview](https://connect-intel-rj066g5bi-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 828834a` | **← LIVE**
+| 18/09/2026, 22:23:32 | `08438c3` | Record production LIVE snapshot for ERP owner reset remap. | [preview](https://connect-intel-btd5xnjp0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 08438c3` |
+| 18/09/2026, 22:14:58 | `0f83385` | Reset ERP dump owners on existing Xindus leads without deleting deals. | [preview](https://connect-intel-4h0eot52s-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0f83385` |
 | 18/09/2026, 22:05:55 | `554f204` | Record production LIVE snapshot for ERP ops-list owner mapping. | [preview](https://connect-intel-kt95r2868-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 554f204` |
 | 18/09/2026, 22:04:28 | `6590bef` | Assign CRM sales owners from the ERP ops customer list, not the Metabase dump. | [preview](https://connect-intel-3mvzxim5e-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6590bef` |
 | 18/09/2026, 16:38:27 | `1e08615` | Record production LIVE snapshot for fast sign-in. | [preview](https://connect-intel-1g4rm4e0j-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1e08615` |
@@ -61,8 +63,6 @@ npm run prod:rollback -- 554f204
 | 18/09/2026, 13:03:33 | `2aaba95` | Record production LIVE snapshot for ERP customer-service overlay sync. | [preview](https://connect-intel-eeijfld84-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2aaba95` |
 | 18/09/2026, 13:02:15 | `3f46a72` | Schedule the ERP customer sync daily so Vercel Hobby will accept the deploy. | [preview](https://connect-intel-nl2hq933v-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3f46a72` |
 | 18/09/2026, 00:41:07 | `677f15f` | Record production LIVE snapshot for 0c81265. | [preview](https://connect-intel-ro9zc2nz3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 677f15f` |
-| 18/09/2026, 00:16:44 | `0c81265` | Record production LIVE snapshot after the overlay-matching log commit reached Vercel. | [preview](https://connect-intel-kzx4ihv6g-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0c81265` |
-| 18/09/2026, 00:10:04 | `a9a77b2` | Record production LIVE snapshot for ERP last-shipment overlay matching. | [preview](https://connect-intel-ofc961ktg-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a9a77b2` |
 
 ---
 

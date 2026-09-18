@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-18T16:52:37.344Z",
-  "updatedAtIst": "18/09/2026, 22:22:37",
+  "updatedAt": "2026-09-18T17:41:21.605Z",
+  "updatedAtIst": "18/09/2026, 23:11:21",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "0f83385",
+  "currentProductionCommit": "828834a",
   "entries": [
+    {
+      "logId": "20260918-2309-828834a",
+      "commit": "828834a",
+      "commitFull": "828834a73b7dc08201c2a2741cda01cc0be37e24",
+      "message": "Filter pipeline by team members like tags, not stale lead team_id.",
+      "deployedAt": "2026-09-18T17:39:45.798Z",
+      "deployedAtIst": "18/09/2026, 23:09:45",
+      "committedAtIst": "18/09/2026, 23:08:53",
+      "vercelPreviewUrl": "https://connect-intel-rj066g5bi-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 828834a"
+    },
+    {
+      "logId": "20260918-2223-08438c3",
+      "commit": "08438c3",
+      "commitFull": "08438c3126e1619479250cb8c2a53f72e0af3b4d",
+      "message": "Record production LIVE snapshot for ERP owner reset remap.",
+      "deployedAt": "2026-09-18T16:53:32.744Z",
+      "deployedAtIst": "18/09/2026, 22:23:32",
+      "committedAtIst": "18/09/2026, 22:22:47",
+      "vercelPreviewUrl": "https://connect-intel-btd5xnjp0-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 08438c3"
+    },
     {
       "logId": "20260918-2214-0f83385",
       "commit": "0f83385",
@@ -15,7 +43,7 @@
       "committedAtIst": "18/09/2026, 22:14:06",
       "vercelPreviewUrl": "https://connect-intel-4h0eot52s-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 0f83385"
     },
@@ -242,34 +270,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 677f15f"
-    },
-    {
-      "logId": "20260918-0016-0c81265",
-      "commit": "0c81265",
-      "commitFull": "0c812650be1ac41e79af9d7f445c3eee34eae118",
-      "message": "Record production LIVE snapshot after the overlay-matching log commit reached Vercel.",
-      "deployedAt": "2026-09-17T18:46:44.101Z",
-      "deployedAtIst": "18/09/2026, 00:16:44",
-      "committedAtIst": "18/09/2026, 00:16:04",
-      "vercelPreviewUrl": "https://connect-intel-kzx4ihv6g-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 0c81265"
-    },
-    {
-      "logId": "20260918-0010-a9a77b2",
-      "commit": "a9a77b2",
-      "commitFull": "a9a77b26985c8a6e1f177151f6a0a5679c675166",
-      "message": "Record production LIVE snapshot for ERP last-shipment overlay matching.",
-      "deployedAt": "2026-09-17T18:40:04.673Z",
-      "deployedAtIst": "18/09/2026, 00:10:04",
-      "committedAtIst": "18/09/2026, 00:09:25",
-      "vercelPreviewUrl": "https://connect-intel-ofc961ktg-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- a9a77b2"
     }
   ]
 }
