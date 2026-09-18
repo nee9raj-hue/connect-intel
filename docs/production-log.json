@@ -1,10 +1,24 @@
 {
-  "updatedAt": "2026-09-18T09:28:35.814Z",
-  "updatedAtIst": "18/09/2026, 14:58:35",
+  "updatedAt": "2026-09-18T10:27:18.544Z",
+  "updatedAtIst": "18/09/2026, 15:57:18",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "ce5fb85",
+  "currentProductionCommit": "8cb0b10",
   "entries": [
+    {
+      "logId": "20260918-1459-8cb0b10",
+      "commit": "8cb0b10",
+      "commitFull": "8cb0b10a730efcbbee613327f65501c08cfd6735",
+      "message": "Record production LIVE snapshot for ERP owner reclaim.",
+      "deployedAt": "2026-09-18T09:29:42.152Z",
+      "deployedAtIst": "18/09/2026, 14:59:42",
+      "committedAtIst": "18/09/2026, 14:58:57",
+      "vercelPreviewUrl": "https://connect-intel-bgl5s3wxy-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 8cb0b10"
+    },
     {
       "logId": "20260918-1457-ce5fb85",
       "commit": "ce5fb85",
@@ -15,7 +29,7 @@
       "committedAtIst": "18/09/2026, 14:56:43",
       "vercelPreviewUrl": "https://connect-intel-v2hhu6tj3-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- ce5fb85"
     },
@@ -256,20 +270,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- a0f6855"
-    },
-    {
-      "logId": "20260917-1624-df689b0",
-      "commit": "df689b0",
-      "commitFull": "df689b0cebba9c68c3eaf5e4080c5c6610f3242c",
-      "message": "Persist ERP last-shipment pipeline stages on load so existing leads recategorize without overwriting a rep’s manual stage.",
-      "deployedAt": "2026-09-17T10:54:48.459Z",
-      "deployedAtIst": "17/09/2026, 16:24:48",
-      "committedAtIst": "17/09/2026, 16:23:58",
-      "vercelPreviewUrl": "https://connect-intel-gya661ipi-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- df689b0"
     }
   ]
 }
