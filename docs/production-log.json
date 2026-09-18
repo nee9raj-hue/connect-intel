@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-18T10:51:36.887Z",
-  "updatedAtIst": "18/09/2026, 16:21:36",
+  "updatedAt": "2026-09-18T10:59:57.083Z",
+  "updatedAtIst": "18/09/2026, 16:29:57",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "647399a",
+  "currentProductionCommit": "31b8b77",
   "entries": [
+    {
+      "logId": "20260918-1629-31b8b77",
+      "commit": "31b8b77",
+      "commitFull": "31b8b778b8ac9c6fc9d72de5688bf929d90f63aa",
+      "message": "Stop email sign-in from loading the entire CRM store.",
+      "deployedAt": "2026-09-18T10:59:47.175Z",
+      "deployedAtIst": "18/09/2026, 16:29:47",
+      "committedAtIst": "18/09/2026, 16:29:03",
+      "vercelPreviewUrl": "https://connect-intel-ocnwpar34-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 31b8b77"
+    },
+    {
+      "logId": "20260918-1622-4b3682c",
+      "commit": "4b3682c",
+      "commitFull": "4b3682c2beccf56f22520431f06ea2b3122f5c29",
+      "message": "Record production LIVE snapshot for sign-in timeout fix.",
+      "deployedAt": "2026-09-18T10:52:20.649Z",
+      "deployedAtIst": "18/09/2026, 16:22:20",
+      "committedAtIst": "18/09/2026, 16:21:38",
+      "vercelPreviewUrl": "https://connect-intel-lalaxie9t-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 4b3682c"
+    },
     {
       "logId": "20260918-1620-647399a",
       "commit": "647399a",
@@ -15,7 +43,7 @@
       "committedAtIst": "18/09/2026, 16:20:01",
       "vercelPreviewUrl": "https://connect-intel-8rygofcur-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 647399a"
     },
@@ -242,34 +270,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 2430f9f"
-    },
-    {
-      "logId": "20260917-2243-d2ff4e4",
-      "commit": "d2ff4e4",
-      "commitFull": "d2ff4e4de3887387cea903b53022ae4903a89e43",
-      "message": "Fill Home dashboard widgets from ERP shipment dates and match overlay rows that the pipeline missed.",
-      "deployedAt": "2026-09-17T17:13:23.220Z",
-      "deployedAtIst": "17/09/2026, 22:43:23",
-      "committedAtIst": "17/09/2026, 22:42:26",
-      "vercelPreviewUrl": "https://connect-intel-4a0astmas-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- d2ff4e4"
-    },
-    {
-      "logId": "20260917-2230-8ea23ee",
-      "commit": "8ea23ee",
-      "commitFull": "8ea23ee651c85676290600b284d0f7cdde163c39",
-      "message": "Record production LIVE snapshot for team pipeline sharing and locked rep nav.",
-      "deployedAt": "2026-09-17T17:00:19.315Z",
-      "deployedAtIst": "17/09/2026, 22:30:19",
-      "committedAtIst": "17/09/2026, 22:29:38",
-      "vercelPreviewUrl": "https://connect-intel-nnmhkf26q-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 8ea23ee"
     }
   ]
 }

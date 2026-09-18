@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 88e6235
+npm run prod:rollback -- 4b3682c
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 88e6235
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `647399a` |
-| Log updated (IST) | 18/09/2026, 16:21:36 |
+| Commit | `31b8b77` |
+| Log updated (IST) | 18/09/2026, 16:29:57 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 88e6235
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 18/09/2026, 16:20:43 | `647399a` | Keep sign-in from waiting on ERP owner claim. | [preview](https://connect-intel-8rygofcur-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 647399a` | **← LIVE**
+| 18/09/2026, 16:29:47 | `31b8b77` | Stop email sign-in from loading the entire CRM store. | [preview](https://connect-intel-ocnwpar34-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 31b8b77` | **← LIVE**
+| 18/09/2026, 16:22:20 | `4b3682c` | Record production LIVE snapshot for sign-in timeout fix. | [preview](https://connect-intel-lalaxie9t-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4b3682c` |
+| 18/09/2026, 16:20:43 | `647399a` | Keep sign-in from waiting on ERP owner claim. | [preview](https://connect-intel-8rygofcur-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 647399a` |
 | 18/09/2026, 16:13:20 | `88e6235` | Record production LIVE snapshot for pipeline timeout fix. | [preview](https://connect-intel-7ywivhl87-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 88e6235` |
 | 18/09/2026, 16:12:03 | `4bdbdf1` | Stop Pipeline from waiting on ERP owner claim. | [preview](https://connect-intel-6u8onp3vh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4bdbdf1` |
 | 18/09/2026, 15:58:23 | `593dbc7` | Record production LIVE snapshot for 8cb0b10. | [preview](https://connect-intel-gmscbauw3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 593dbc7` |
@@ -61,8 +63,6 @@ npm run prod:rollback -- 88e6235
 | 17/09/2026, 22:59:47 | `632a41d` | Record production LIVE snapshot for Unique customers list removal. | [preview](https://connect-intel-c56rmof8a-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 632a41d` |
 | 17/09/2026, 22:58:32 | `a6c9bed` | Remove the Unique customers owner list from Home so the dashboard only shows period totals. | [preview](https://connect-intel-m3fonbipr-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a6c9bed` |
 | 17/09/2026, 22:44:49 | `2430f9f` | Record production LIVE snapshot for Home dashboard ERP shipment facts. | [preview](https://connect-intel-a07iz3ljh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2430f9f` |
-| 17/09/2026, 22:43:23 | `d2ff4e4` | Fill Home dashboard widgets from ERP shipment dates and match overlay rows that the pipeline missed. | [preview](https://connect-intel-4a0astmas-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d2ff4e4` |
-| 17/09/2026, 22:30:19 | `8ea23ee` | Record production LIVE snapshot for team pipeline sharing and locked rep nav. | [preview](https://connect-intel-nnmhkf26q-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8ea23ee` |
 
 ---
 
