@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- ce5fb85
+npm run prod:rollback -- 593dbc7
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- ce5fb85
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `8cb0b10` |
-| Log updated (IST) | 18/09/2026, 15:57:18 |
+| Commit | `4bdbdf1` |
+| Log updated (IST) | 18/09/2026, 16:12:35 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- ce5fb85
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 18/09/2026, 14:59:42 | `8cb0b10` | Record production LIVE snapshot for ERP owner reclaim. | [preview](https://connect-intel-bgl5s3wxy-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8cb0b10` | **← LIVE**
+| 18/09/2026, 16:12:03 | `4bdbdf1` | Stop Pipeline from waiting on ERP owner claim. | [preview](https://connect-intel-6u8onp3vh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4bdbdf1` | **← LIVE**
+| 18/09/2026, 15:58:23 | `593dbc7` | Record production LIVE snapshot for 8cb0b10. | [preview](https://connect-intel-gmscbauw3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 593dbc7` |
+| 18/09/2026, 14:59:42 | `8cb0b10` | Record production LIVE snapshot for ERP owner reclaim. | [preview](https://connect-intel-bgl5s3wxy-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8cb0b10` |
 | 18/09/2026, 14:57:28 | `ce5fb85` | Assign CRM owners from ERP sales owner and reclaim unmatched books. | [preview](https://connect-intel-v2hhu6tj3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ce5fb85` |
 | 18/09/2026, 13:03:33 | `2aaba95` | Record production LIVE snapshot for ERP customer-service overlay sync. | [preview](https://connect-intel-eeijfld84-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2aaba95` |
 | 18/09/2026, 13:02:15 | `3f46a72` | Schedule the ERP customer sync daily so Vercel Hobby will accept the deploy. | [preview](https://connect-intel-nl2hq933v-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3f46a72` |
@@ -61,8 +63,6 @@ npm run prod:rollback -- ce5fb85
 | 17/09/2026, 22:30:19 | `8ea23ee` | Record production LIVE snapshot for team pipeline sharing and locked rep nav. | [preview](https://connect-intel-nnmhkf26q-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8ea23ee` |
 | 17/09/2026, 22:28:49 | `8295de2` | Let teammates share pipeline via team and allowed tags, grey out locked rep features, and keep the default view assigned-only. | [preview](https://connect-intel-9qewlbvio-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8295de2` |
 | 17/09/2026, 21:48:21 | `1f26345` | Record production LIVE snapshot for ERP owner filter aliases. | [preview](https://connect-intel-ou9423rjj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1f26345` |
-| 17/09/2026, 21:47:08 | `cc694f4` | Show a rep’s full ERP book in the admin Owner filter by matching login aliases and ERP sales owner, without changing Tanishq’s identity path. | [preview](https://connect-intel-1j963m7ty-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- cc694f4` |
-| 17/09/2026, 16:26:13 | `a0f6855` | Record production LIVE snapshot for ERP last-shipment stage persist. | [preview](https://connect-intel-kcj1zeut6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a0f6855` |
 
 ---
 

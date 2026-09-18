@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-18T10:27:18.544Z",
-  "updatedAtIst": "18/09/2026, 15:57:18",
+  "updatedAt": "2026-09-18T10:42:35.189Z",
+  "updatedAtIst": "18/09/2026, 16:12:35",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "8cb0b10",
+  "currentProductionCommit": "4bdbdf1",
   "entries": [
+    {
+      "logId": "20260918-1612-4bdbdf1",
+      "commit": "4bdbdf1",
+      "commitFull": "4bdbdf1b15c7e0e92877120f6ba974b4de63af1b",
+      "message": "Stop Pipeline from waiting on ERP owner claim.",
+      "deployedAt": "2026-09-18T10:42:03.625Z",
+      "deployedAtIst": "18/09/2026, 16:12:03",
+      "committedAtIst": "18/09/2026, 16:11:21",
+      "vercelPreviewUrl": "https://connect-intel-6u8onp3vh-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 4bdbdf1"
+    },
+    {
+      "logId": "20260918-1558-593dbc7",
+      "commit": "593dbc7",
+      "commitFull": "593dbc75a45525e43044bd15ce20a25da15c0eac",
+      "message": "Record production LIVE snapshot for 8cb0b10.",
+      "deployedAt": "2026-09-18T10:28:23.107Z",
+      "deployedAtIst": "18/09/2026, 15:58:23",
+      "committedAtIst": "18/09/2026, 15:57:37",
+      "vercelPreviewUrl": "https://connect-intel-gmscbauw3-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 593dbc7"
+    },
     {
       "logId": "20260918-1459-8cb0b10",
       "commit": "8cb0b10",
@@ -15,7 +43,7 @@
       "committedAtIst": "18/09/2026, 14:58:57",
       "vercelPreviewUrl": "https://connect-intel-bgl5s3wxy-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 8cb0b10"
     },
@@ -242,34 +270,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 1f26345"
-    },
-    {
-      "logId": "20260917-2147-cc694f4",
-      "commit": "cc694f4",
-      "commitFull": "cc694f4464096326f61b217f4bd27779c7dbc63e",
-      "message": "Show a rep’s full ERP book in the admin Owner filter by matching login aliases and ERP sales owner, without changing Tanishq’s identity path.",
-      "deployedAt": "2026-09-17T16:17:08.850Z",
-      "deployedAtIst": "17/09/2026, 21:47:08",
-      "committedAtIst": "17/09/2026, 21:46:28",
-      "vercelPreviewUrl": "https://connect-intel-1j963m7ty-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- cc694f4"
-    },
-    {
-      "logId": "20260917-1626-a0f6855",
-      "commit": "a0f6855",
-      "commitFull": "a0f68554c39f9e8b81c2edce508cc0e5937bea6f",
-      "message": "Record production LIVE snapshot for ERP last-shipment stage persist.",
-      "deployedAt": "2026-09-17T10:56:13.152Z",
-      "deployedAtIst": "17/09/2026, 16:26:13",
-      "committedAtIst": "17/09/2026, 16:25:23",
-      "vercelPreviewUrl": "https://connect-intel-kcj1zeut6-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- a0f6855"
     }
   ]
 }
