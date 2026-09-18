@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-18T11:07:44.690Z",
-  "updatedAtIst": "18/09/2026, 16:37:44",
+  "updatedAt": "2026-09-18T16:34:49.583Z",
+  "updatedAtIst": "18/09/2026, 22:04:49",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "7b93347",
+  "currentProductionCommit": "6590bef",
   "entries": [
+    {
+      "logId": "20260918-2204-6590bef",
+      "commit": "6590bef",
+      "commitFull": "6590befa53d872b5d3665fde2c78e782f2230e4e",
+      "message": "Assign CRM sales owners from the ERP ops customer list, not the Metabase dump.",
+      "deployedAt": "2026-09-18T16:34:28.093Z",
+      "deployedAtIst": "18/09/2026, 22:04:28",
+      "committedAtIst": "18/09/2026, 22:03:16",
+      "vercelPreviewUrl": "https://connect-intel-3mvzxim5e-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 6590bef"
+    },
+    {
+      "logId": "20260918-1638-1e08615",
+      "commit": "1e08615",
+      "commitFull": "1e0861512fa8bb80c8f94896c5cd4a84a8f85eb6",
+      "message": "Record production LIVE snapshot for fast sign-in.",
+      "deployedAt": "2026-09-18T11:08:27.050Z",
+      "deployedAtIst": "18/09/2026, 16:38:27",
+      "committedAtIst": "18/09/2026, 16:37:46",
+      "vercelPreviewUrl": "https://connect-intel-1g4rm4e0j-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 1e08615"
+    },
     {
       "logId": "20260918-1637-7b93347",
       "commit": "7b93347",
@@ -15,7 +43,7 @@
       "committedAtIst": "18/09/2026, 16:36:47",
       "vercelPreviewUrl": "https://connect-intel-n6ox6pkaw-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 7b93347"
     },
@@ -242,34 +270,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 5472a90"
-    },
-    {
-      "logId": "20260917-2351-0eb0d66",
-      "commit": "0eb0d66",
-      "commitFull": "0eb0d66e1ab6263003bb426b3bb382db041a174c",
-      "message": "Restage ERP accounts from first and last shipment, match short names like XLP, and hide sidebar items a role cannot use.",
-      "deployedAt": "2026-09-17T18:21:13.583Z",
-      "deployedAtIst": "17/09/2026, 23:51:13",
-      "committedAtIst": "17/09/2026, 23:50:32",
-      "vercelPreviewUrl": "https://connect-intel-4tupl63g9-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 0eb0d66"
-    },
-    {
-      "logId": "20260917-2259-632a41d",
-      "commit": "632a41d",
-      "commitFull": "632a41d25f8c3c7f3905ea5a21a5a75fa8d0a02d",
-      "message": "Record production LIVE snapshot for Unique customers list removal.",
-      "deployedAt": "2026-09-17T17:29:47.302Z",
-      "deployedAtIst": "17/09/2026, 22:59:47",
-      "committedAtIst": "17/09/2026, 22:59:10",
-      "vercelPreviewUrl": "https://connect-intel-c56rmof8a-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 632a41d"
     }
   ]
 }
