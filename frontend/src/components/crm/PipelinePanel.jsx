@@ -109,6 +109,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     orgLeadTags,
     notifications,
     refreshOrgLeadTags,
+    sessionError,
   } = useApp()
 
   const [tableColumns, setTableColumns] = useState(() => loadPipelineColumnPrefs())
@@ -1033,7 +1034,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     filter !== 'all' ||
     listStatusFilter !== 'all' ||
     Boolean(smartViewId)
-  const showPipelineOnboarding = !pipelineHasLeads && !filterApplying
+  const showPipelineOnboarding = !pipelineHasLeads && !filterApplying && !sessionError
   const showNoFilterMatches =
     pipelineHasLeads && filtered.length === 0 && !filterApplying && !marketingSliceLoading
   const showPipelineFilters = pipelineHasLeads || hasPipelineFiltersActive

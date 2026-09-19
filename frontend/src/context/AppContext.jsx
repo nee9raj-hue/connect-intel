@@ -604,7 +604,12 @@ export function AppProvider({ children }) {
             const error = bootstrapResult._error
             if (error?.status === 401) {
               setSessionError(error.message || 'Session expired. Please sign in again.')
+            } else {
+              setSessionError(
+                'Your pipeline is taking longer than usual to load. Wait a moment and try again.'
+              )
             }
+            setWorkspaceReady(true)
             return
           }
 
