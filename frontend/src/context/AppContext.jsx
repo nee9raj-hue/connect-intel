@@ -587,17 +587,28 @@ export function AppProvider({ children }) {
 
           const teamPromise =
             user.organizationId && user.accountType === 'company'
-              ? api.getTeamMembers({ silent: true })
+              ? api.getTeamMembers({ silent: true }).catch(() => null)
               : Promise.resolve(null)
 
-          const [bootstrap, historyResult, teamData] = await Promise.all([
-            api.getPipelineBootstrap({ offset: 0, limit: 100, silent: true, assigneeUserId }),
-            api.getSearchHistory({ silent: true }),
+          const [bootstrapResult, historyResult, teamData] = await Promise.all([
+            api
+              .getPipelineBootstrap({ offset: 0, limit: 50, silent: true, assigneeUserId })
+              .catch((error) => ({ _error: error })),
+            api.getSearchHistory({ silent: true }).catch(() => ({ history: [] })),
             teamPromise,
           ])
 
           if (cancelled) return
 
+          if (bootstrapResult?._error) {
+            const error = bootstrapResult._error
+            if (error?.status === 401) {
+              setSessionError(error.message || 'Session expired. Please sign in again.')
+            }
+            return
+          }
+
+          const bootstrap = bootstrapResult
           writeBootstrapCache(cacheKey, bootstrap)
 
           const leads = bootstrap.leads || []
@@ -626,12 +637,8 @@ export function AppProvider({ children }) {
           }
           setSessionError(null)
         } catch (error) {
-          if (!cancelled) {
-            if (error?.status === 401) {
-              setSessionError(error.message || 'Session expired. Please sign in again.')
-            } else if (error?.message) {
-              setSessionError(error.message)
-            }
+          if (!cancelled && error?.status === 401) {
+            setSessionError(error.message || 'Session expired. Please sign in again.')
           }
         }
       })()
