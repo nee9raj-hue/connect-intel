@@ -156,137 +156,66 @@ export function isNavTargetActive(activePanel, panelOptions, target) {
   return true
 }
 
-function buildFreightPipelineChildren(columns, pipelineCounts, openDealCounts = {}, allDealCounts = {}) {
-  const open = openDealCounts || {}
-  const all = allDealCounts || {}
-
-  const items = [
+function buildPipelineLeadChildren(columns, pipelineCounts) {
+  return [
     {
-      id: 'pipeline-leads-group',
-      label: 'Leads',
-      children: [
-        {
-          id: 'pipeline-all',
-          label: 'All leads',
-          panel: 'pipeline',
-          status: 'all',
-          view: 'leads',
-          badge: pipelineCounts.all,
-        },
-        ...columns.map((col) => ({
-          id: `pipeline-${col.id}-leads`,
-          label: col.label,
-          panel: 'pipeline',
-          status: col.id,
-          view: 'leads',
-          badge: pipelineCounts[col.id] || 0,
-        })),
-      ],
+      id: 'pipeline-all',
+      label: 'All leads',
+      panel: 'pipeline',
+      status: 'all',
+      view: 'leads',
+      badge: pipelineCounts.all,
     },
-    {
-      id: 'pipeline-deals-group',
-      label: 'Deals',
-      children: [
-        {
-          id: 'pipeline-all-deals',
-          label: 'All Deals',
-          panel: 'pipeline',
-          view: 'deals',
-          dealStage: 'all',
-          badge: all.all || open.all || null,
-        },
-        ...FREIGHT_DEAL_STAGES.filter((s) => s.id !== 'won' && s.id !== 'lost').map((stage) => ({
-          id: `pipeline-deal-${stage.id}`,
-          label: stage.label,
-          panel: 'pipeline',
-          view: 'deals',
-          dealStage: stage.id,
-          badge: open[stage.id] || null,
-        })),
-        {
-          id: 'pipeline-won-deals',
-          label: 'Won',
-          panel: 'pipeline',
-          view: 'deals',
-          dealStage: 'won',
-          badge: all.won || null,
-        },
-        {
-          id: 'pipeline-lost-deals',
-          label: 'Lost',
-          panel: 'pipeline',
-          view: 'deals',
-          dealStage: 'lost',
-          badge: all.lost || null,
-        },
-      ],
-    },
+    ...columns.map((col) => ({
+      id: `pipeline-${col.id}-leads`,
+      label: col.label,
+      panel: 'pipeline',
+      status: col.id,
+      view: 'leads',
+      badge: pipelineCounts[col.id] || 0,
+    })),
   ]
-
-  return items
 }
 
-function buildStandardPipelineChildren(
-  columns,
-  pipelineCounts,
-  openDealCounts = {},
-  allDealCounts = {}
-) {
+function buildDealsChildren(openDealCounts = {}, allDealCounts = {}, { freightOrg = false } = {}) {
   const open = openDealCounts || {}
   const all = allDealCounts || {}
+  const openStages = freightOrg
+    ? FREIGHT_DEAL_STAGES.filter((stage) => stage.id !== 'won' && stage.id !== 'lost')
+    : []
 
   return [
     {
-      id: 'pipeline-leads-group',
-      label: 'Leads',
-      children: [
-        {
-          id: 'pipeline-all',
-          label: 'All leads',
-          panel: 'pipeline',
-          status: 'all',
-          view: 'leads',
-          badge: pipelineCounts.all,
-        },
-        ...columns.map((col) => ({
-          id: `pipeline-${col.id}-leads`,
-          label: col.label,
-          panel: 'pipeline',
-          status: col.id,
-          view: 'leads',
-          badge: pipelineCounts[col.id] || 0,
-        })),
-      ],
+      id: 'pipeline-all-deals',
+      label: 'All Deals',
+      panel: 'pipeline',
+      view: 'deals',
+      dealStage: 'all',
+      badge: all.all || open.all || null,
+    },
+    ...openStages.map((stage) => ({
+      id: `pipeline-deal-${stage.id}`,
+      label: stage.label,
+      panel: 'pipeline',
+      view: 'deals',
+      dealStage: stage.id,
+      badge: open[stage.id] || null,
+    })),
+    {
+      id: 'pipeline-won-deals',
+      label: 'Won',
+      panel: 'pipeline',
+      view: 'deals',
+      dealStage: 'won',
+      badge: all.won || null,
     },
     {
-      id: 'pipeline-deals-group',
-      label: 'Deals',
-      children: [
-        {
-          id: 'pipeline-all-deals',
-          label: 'All Deals',
-          panel: 'pipeline',
-          view: 'deals',
-          dealStage: 'all',
-          badge: all.all || open.all || null,
-        },
-        {
-          id: 'pipeline-won-deals',
-          label: 'Won',
-          panel: 'pipeline',
-          view: 'deals',
-          dealStage: 'won',
-          badge: all.won || null,
-        },
-        {
-          id: 'pipeline-lost-deals',
-          label: 'Lost',
-          panel: 'pipeline',
-          view: 'deals',
-          dealStage: 'lost',
-          badge: all.lost || null,
-        },
-      ],
+      id: 'pipeline-lost-deals',
+      label: 'Lost',
+      panel: 'pipeline',
+      view: 'deals',
+      dealStage: 'lost',
+      badge: all.lost || null,
     },
   ]
 }
@@ -303,14 +232,8 @@ export function buildCustomerNavSections(
   const canMarketing = userHasOrgNavPermission(user, 'access_marketing')
   const canAiSearch = Boolean(user?.isOrgAdmin || user?.isPlatformAdmin || user?.canSearch !== false)
 
-  const pipelineChildren = freightOrg
-    ? buildFreightPipelineChildren(columns, pipelineCounts, dealCounts || {}, allDealCounts || {})
-    : buildStandardPipelineChildren(
-        columns,
-        pipelineCounts,
-        dealCounts || {},
-        allDealCounts || {}
-      )
+  const pipelineChildren = buildPipelineLeadChildren(columns, pipelineCounts)
+  const dealsChildren = buildDealsChildren(dealCounts || {}, allDealCounts || {}, { freightOrg })
 
   const marketingChildren = canMarketing
     ? [
@@ -373,6 +296,7 @@ export function buildCustomerNavSections(
       title: 'CRM / Sales',
       groups: [
         { id: 'pipeline', label: 'Pipeline', icon: 'pipeline', children: pipelineChildren },
+        { id: 'deals', label: 'Deals', icon: 'deals', children: dealsChildren },
         ...(isCompany && hasWorkspaceFeature(user, 'panelActiveCustomers')
           ? [{ id: 'active-customers', label: 'Active customers', icon: 'chart', panel: 'active-customers' }]
           : []),
@@ -555,8 +479,11 @@ export function getDesktopPillSubmenuTargets(pillItem, sections = []) {
     return leaves
   }
 
-  if (pillItem.panel === 'pipeline') {
+  if (pillItem.panel === 'pipeline' && pillItem.view !== 'deals') {
     return flattenLeaves(groupChildren((g) => g.id === 'pipeline'))
+  }
+  if (pillItem.id === 'deals' || (pillItem.panel === 'pipeline' && pillItem.view === 'deals')) {
+    return flattenLeaves(groupChildren((g) => g.id === 'deals'))
   }
   if (pillItem.panel === 'marketing') {
     const kids = groupChildren((g) => g.id === 'marketing')

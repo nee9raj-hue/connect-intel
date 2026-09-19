@@ -4717,6 +4717,15 @@ button.ci-lead-tag:disabled {
   font-weight: 600;
 }
 
+.sidebar-rail-flyout::before {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 0;
+  bottom: 0;
+  width: 12px;
+}
+
 /* Collapsed sidebar: hover flyout matches main nav chrome */
 .sidebar-rail-flyout {
   color: #d4d9de;

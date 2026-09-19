@@ -202,6 +202,17 @@ export function PipelineIcon({ className }) {
   )
 }
 
+export function DealsIcon({ className }) {
+  return (
+    <LineIcon className={className}>
+      <rect x="5" y="7" width="14" height="11" rx="1.5" />
+      <path d="M8 4.75h8" />
+      <path d="M8.5 11.5h7" />
+      <path d="M8.5 14.75h4.5" />
+    </LineIcon>
+  )
+}
+
 export function LogIcon({ className }) {
   return (
     <LineIcon className={className}>
