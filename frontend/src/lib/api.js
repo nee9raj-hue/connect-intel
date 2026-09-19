@@ -122,7 +122,8 @@ export const api = {
   getOrgWorkspaceLookup: () => request('/api/org/workspace-lookup', { silent: true }),
   requestOrgAccess: (payload) =>
     request('/api/org/access-request', { method: 'POST', body: payload }),
-  getTeamMembers: ({ silent = false } = {}) => request('/api/team/members', {}, { silent }),
+  getTeamMembers: ({ silent = false } = {}) =>
+    request('/api/team/members', { timeoutMs: 20_000 }, { silent }),
   inviteTeamMember: (payload) =>
     request('/api/team/invite', { method: 'POST', body: payload, timeoutMs: 60_000 }),
   getInviteEmailDiagnostics: () => request('/api/team/invite-email'),
