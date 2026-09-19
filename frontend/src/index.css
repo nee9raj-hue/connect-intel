@@ -2888,6 +2888,35 @@ button.ci-lead-tag:disabled {
   color: #7c98b6;
 }
 
+.ci-erp-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.ci-erp-tag {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 0.08rem 0.4rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 0.5625rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ci-erp-tags-more {
+  font-size: 0.5625rem;
+  font-weight: 600;
+  color: #7c98b6;
+}
+
 .pipeline-hs-tags {
   margin-top: 0.2rem;
 }

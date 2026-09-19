@@ -6,6 +6,8 @@ import { hasActiveTextSelection } from '../../lib/keyboardShortcuts'
 import { getLeadEmail, leadHasSendableEmail } from '../../lib/emailUtils'
 import LeadPhoneCall from './LeadPhoneCall'
 import LeadTag from '../ui/LeadTag'
+import ErpTagChips from './ErpTagChips'
+import { readErpTagsFromLead } from '../../lib/erpTags'
 import { leadHasCallablePhone } from '../../lib/phoneUtils'
 import {
   DEFAULT_PIPELINE_VISIBLE_COLUMNS,
@@ -524,25 +526,34 @@ function renderPipelineCell(colId, lead, ctx) {
         </td>
       )
     }
-    case 'tags':
+    case 'tags': {
+      const erpTags = readErpTagsFromLead(lead)
+      const hasCrmTags = tags.length > 0
+      const hasErpTags = erpTags.length > 0
       return (
         <td key={colId} className="pipeline-hs-td pipeline-hs-td--tags">
-          {tags.length ? (
-            <div className="ci-lead-tags pipeline-hs-tags-cell">
-              {tags.slice(0, 4).map((t) => (
-                <LeadTag key={t.id} name={t.name} title={t.name} />
-              ))}
-              {tags.length > 4 ? (
-                <span className="ci-lead-tags-more" title={tags.map((t) => t.name).join(', ')}>
-                  +{tags.length - 4}
-                </span>
+          {hasCrmTags || hasErpTags ? (
+            <div className="pipeline-hs-tags-stack">
+              {hasCrmTags ? (
+                <div className="ci-lead-tags pipeline-hs-tags-cell">
+                  {tags.slice(0, 4).map((t) => (
+                    <LeadTag key={t.id} name={t.name} title={t.name} />
+                  ))}
+                  {tags.length > 4 ? (
+                    <span className="ci-lead-tags-more" title={tags.map((t) => t.name).join(', ')}>
+                      +{tags.length - 4}
+                    </span>
+                  ) : null}
+                </div>
               ) : null}
+              {hasErpTags ? <ErpTagChips lead={lead} max={4} className="pipeline-hs-erp-tags" /> : null}
             </div>
           ) : (
             <span className="pipeline-hs-muted">—</span>
           )}
         </td>
       )
+    }
     case 'email':
       return (
         <td key={colId} className="pipeline-hs-td pipeline-hs-td--email">

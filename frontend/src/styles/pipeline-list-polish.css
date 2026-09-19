@@ -623,6 +623,25 @@
   overflow: hidden;
 }
 
+.pipeline-hs-tags-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+}
+
+.pipeline-hs-erp-tags .ci-erp-tag {
+  font-size: 0.5625rem;
+  padding: 0.06rem 0.35rem;
+}
+
+.ci-lead-tags-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+}
+
 .pipeline-hs-tags-cell .ci-lead-tag {
   flex-shrink: 0;
   max-width: 5.5rem;
