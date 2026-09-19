@@ -132,7 +132,7 @@ export const api = {
   previewInvite: (token) => request(`/api/invite/preview?token=${encodeURIComponent(token)}`),
   acceptInvite: (token) => request('/api/invite/accept', { method: 'POST', body: { token } }),
   updateTeamBranding: (payload) => request('/api/team/branding', { method: 'PATCH', body: payload }),
-  getOrgLeadTags: ({ silent = false } = {}) => request('/api/org/lead-tags', {}, { silent }),
+  getOrgLeadTags: ({ silent = false } = {}) => request('/api/org/lead-tags', { timeoutMs: 20_000 }, { silent }),
   getOrgWorkspaceSettings: () => request('/api/org/workspace'),
   confirmOrgPlanUpgrade: (planId) =>
     request('/api/org/plan-upgrade', {
@@ -569,8 +569,8 @@ export const api = {
       body: { datasetType, rows, addToPipeline, tagIds, filename },
       timeoutMs: 120_000,
     }),
-  getOrgHierarchy: ({ skipLeadCounts = false, silent = false } = {}) => {
-    const qs = skipLeadCounts ? '?skipLeadCounts=1' : ''
+  getOrgHierarchy: ({ skipLeadCounts = true, silent = false } = {}) => {
+    const qs = skipLeadCounts ? '?skipLeadCounts=1' : '?skipLeadCounts=0'
     return request(`/api/org/departments${qs}`, {}, { silent })
   },
   createOrgDepartment: (body) =>
