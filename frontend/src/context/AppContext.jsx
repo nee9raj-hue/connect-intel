@@ -504,7 +504,7 @@ export function AppProvider({ children }) {
       } catch (error) {
         if (!cancelled) {
           const message = String(error?.message || '')
-          const dbBusy = /timed out|unavailable|supabase|circuit|workspace is taking longer/i.test(message)
+          const dbBusy = /timed out|unavailable|supabase|circuit|workspace is taking longer|Could not load your workspace/i.test(message)
           setSessionError(
             dbBusy
               ? 'Your workspace is taking longer than usual to load. Wait a moment and try again.'
