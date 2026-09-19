@@ -114,6 +114,7 @@ export function AppProvider({ children }) {
   const [notifications, setNotifications] = useState([])
   const readNotificationIdsRef = useRef(loadReadNotificationIds())
   const [notificationTick, setNotificationTick] = useState(0)
+  const [sessionError, setSessionError] = useState(null)
   const refreshSavedLeadsRef = useRef(null)
   const panelNavigateRef = useRef(null)
   const closePipelineLeadRef = useRef(null)
