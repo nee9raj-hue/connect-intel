@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-19T08:51:44.527Z",
-  "updatedAtIst": "19/09/2026, 14:21:44",
+  "updatedAt": "2026-09-19T09:10:26.635Z",
+  "updatedAtIst": "19/09/2026, 14:40:26",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "49315cf",
+  "currentProductionCommit": "9c66a9d",
   "entries": [
+    {
+      "logId": "20260919-1440-9c66a9d",
+      "commit": "9c66a9d",
+      "commitFull": "9c66a9d998e5ada6e395f60e174972bf8ff0200a",
+      "message": "Restore Deals list-only and stop downloading the full deals table.",
+      "deployedAt": "2026-09-19T09:10:05.645Z",
+      "deployedAtIst": "19/09/2026, 14:40:05",
+      "committedAtIst": "19/09/2026, 14:39:17",
+      "vercelPreviewUrl": "https://connect-intel-q2g9z3oor-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 9c66a9d"
+    },
+    {
+      "logId": "20260919-1422-5b4c1a2",
+      "commit": "5b4c1a2",
+      "commitFull": "5b4c1a2b8315be02c798abc421697a80b0b2156b",
+      "message": "Record production LIVE snapshot for deals board/list toggle.",
+      "deployedAt": "2026-09-19T08:52:44.225Z",
+      "deployedAtIst": "19/09/2026, 14:22:44",
+      "committedAtIst": "19/09/2026, 14:21:46",
+      "vercelPreviewUrl": "https://connect-intel-2vjc1ptky-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 5b4c1a2"
+    },
     {
       "logId": "20260919-1421-49315cf",
       "commit": "49315cf",
@@ -15,7 +43,7 @@
       "committedAtIst": "19/09/2026, 14:20:29",
       "vercelPreviewUrl": "https://connect-intel-gkk4pgo4f-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 49315cf"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 593dbc7"
-    },
-    {
-      "logId": "20260918-1459-8cb0b10",
-      "commit": "8cb0b10",
-      "commitFull": "8cb0b10a730efcbbee613327f65501c08cfd6735",
-      "message": "Record production LIVE snapshot for ERP owner reclaim.",
-      "deployedAt": "2026-09-18T09:29:42.152Z",
-      "deployedAtIst": "18/09/2026, 14:59:42",
-      "committedAtIst": "18/09/2026, 14:58:57",
-      "vercelPreviewUrl": "https://connect-intel-bgl5s3wxy-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 8cb0b10"
-    },
-    {
-      "logId": "20260918-1457-ce5fb85",
-      "commit": "ce5fb85",
-      "commitFull": "ce5fb85a04f61b663b6f9b3899d9378e056eea4c",
-      "message": "Assign CRM owners from ERP sales owner and reclaim unmatched books.",
-      "deployedAt": "2026-09-18T09:27:28.415Z",
-      "deployedAtIst": "18/09/2026, 14:57:28",
-      "committedAtIst": "18/09/2026, 14:56:43",
-      "vercelPreviewUrl": "https://connect-intel-v2hhu6tj3-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- ce5fb85"
     }
   ]
 }
