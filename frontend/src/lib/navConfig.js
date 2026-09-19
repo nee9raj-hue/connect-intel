@@ -354,16 +354,7 @@ export function buildCustomerNavSections(
   const canAiSearch = Boolean(user?.isOrgAdmin || user?.isPlatformAdmin || user?.canSearch !== false)
 
   const pipelineChildren = freightOrg
-    ? [
-        {
-          id: 'pipeline-all',
-          label: 'All leads',
-          panel: 'pipeline',
-          status: 'all',
-          view: 'leads',
-          badge: pipelineCounts.all,
-        },
-      ]
+    ? buildFreightPipelineChildren(pipelineCounts)
     : buildPipelineLeadChildren(columns, pipelineCounts)
   const dealsChildren = buildDealsChildren(dealCounts || {}, allDealCounts || {}, { freightOrg })
 
@@ -427,7 +418,7 @@ export function buildCustomerNavSections(
     {
       title: 'CRM / Sales',
       groups: [
-        { id: 'pipeline', label: 'Pipeline', icon: 'pipeline', children: pipelineChildren },
+        { id: 'pipeline', label: 'Pipeline', icon: 'pipeline', panel: 'pipeline', view: 'leads', status: 'all', children: pipelineChildren },
         { id: 'deals', label: 'Deals', icon: 'deals', children: dealsChildren },
         ...(isCompany && hasWorkspaceFeature(user, 'panelActiveCustomers')
           ? [{ id: 'active-customers', label: 'Active customers', icon: 'chart', panel: 'active-customers' }]

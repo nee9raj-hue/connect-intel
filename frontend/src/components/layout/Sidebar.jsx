@@ -445,7 +445,18 @@ function NavGroup({
 }) {
   const Icon = icons[group.icon] || HomeIcon
   const hasChildren = group.children?.length > 0
-  const groupActive = hasChildren && group.children.some((child) => navChildIsActive(child, isTargetActive))
+  const clickTarget = group.panel
+    ? {
+        panel: group.panel,
+        view: group.view,
+        status: group.status,
+        tab: group.tab,
+        dealStage: group.dealStage,
+      }
+    : null
+  const groupActive =
+    Boolean(clickTarget && isTargetActive(clickTarget)) ||
+    (hasChildren && group.children.some((child) => navChildIsActive(child, isTargetActive)))
   const badge = resolveBadge(group)
 
   if (!hasChildren) {
@@ -502,6 +513,7 @@ function NavGroup({
         compact={compact}
         navPanel={group.panel}
         dismissFlyouts={dismissFlyouts}
+        onNavigate={clickTarget ? () => onGo(clickTarget) : undefined}
       >
         {renderFlyoutItems(group.children, {
           isTargetActive,
@@ -670,7 +682,7 @@ function NavFlyoutAnchor({
 
   const handleIconClick = () => {
     clearCloseTimer()
-    if (leaf && onNavigate) {
+    if (onNavigate) {
       onNavigate()
       closeNow()
       return
@@ -752,7 +764,7 @@ function NavFlyoutAnchor({
     >
       <button
         type="button"
-        data-nav-panel={leaf && navPanel ? navPanel : undefined}
+        data-nav-panel={navPanel || undefined}
         aria-expanded={open}
         aria-haspopup={hasMenu ? 'menu' : 'true'}
         onFocus={openNow}
