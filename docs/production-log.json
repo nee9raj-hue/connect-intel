@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-19T08:34:59.477Z",
-  "updatedAtIst": "19/09/2026, 14:04:59",
+  "updatedAt": "2026-09-19T08:51:44.527Z",
+  "updatedAtIst": "19/09/2026, 14:21:44",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "d97a54c",
+  "currentProductionCommit": "49315cf",
   "entries": [
+    {
+      "logId": "20260919-1421-49315cf",
+      "commit": "49315cf",
+      "commitFull": "49315cfd4e9965e36011395f1d9de4b2e4b22ed6",
+      "message": "Put Deals board/list toggle in the page header where Pipeline already shows it.",
+      "deployedAt": "2026-09-19T08:51:21.287Z",
+      "deployedAtIst": "19/09/2026, 14:21:21",
+      "committedAtIst": "19/09/2026, 14:20:29",
+      "vercelPreviewUrl": "https://connect-intel-gkk4pgo4f-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 49315cf"
+    },
+    {
+      "logId": "20260919-1405-cd52e29",
+      "commit": "cd52e29",
+      "commitFull": "cd52e290c8e8764d0cc2df813a2b5e0e74340e86",
+      "message": "Record production LIVE snapshot for lead tag master.",
+      "deployedAt": "2026-09-19T08:35:48.759Z",
+      "deployedAtIst": "19/09/2026, 14:05:48",
+      "committedAtIst": "19/09/2026, 14:05:04",
+      "vercelPreviewUrl": "https://connect-intel-5rja91lcp-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- cd52e29"
+    },
     {
       "logId": "20260919-1404-d97a54c",
       "commit": "d97a54c",
@@ -15,7 +43,7 @@
       "committedAtIst": "19/09/2026, 14:03:45",
       "vercelPreviewUrl": "https://connect-intel-kqfe7o221-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- d97a54c"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- ce5fb85"
-    },
-    {
-      "logId": "20260918-1303-2aaba95",
-      "commit": "2aaba95",
-      "commitFull": "2aaba95494840a4551062699c21bd208394b23b3",
-      "message": "Record production LIVE snapshot for ERP customer-service overlay sync.",
-      "deployedAt": "2026-09-18T07:33:33.260Z",
-      "deployedAtIst": "18/09/2026, 13:03:33",
-      "committedAtIst": "18/09/2026, 13:02:39",
-      "vercelPreviewUrl": "https://connect-intel-eeijfld84-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 2aaba95"
-    },
-    {
-      "logId": "20260918-1302-3f46a72",
-      "commit": "3f46a72",
-      "commitFull": "3f46a724a394d18cdf1e834b176d60ae6d3d2fe8",
-      "message": "Schedule the ERP customer sync daily so Vercel Hobby will accept the deploy.",
-      "deployedAt": "2026-09-18T07:32:15.069Z",
-      "deployedAtIst": "18/09/2026, 13:02:15",
-      "committedAtIst": "18/09/2026, 13:00:19",
-      "vercelPreviewUrl": "https://connect-intel-nl2hq933v-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 3f46a72"
     }
   ]
 }
