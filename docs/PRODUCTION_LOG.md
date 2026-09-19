@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 368a69b
+npm run prod:rollback -- af9adb1
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 368a69b
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `af9adb1` |
-| Log updated (IST) | 19/09/2026, 18:18:45 |
+| Commit | `2a1fb30` |
+| Log updated (IST) | 19/09/2026, 18:20:16 |
 
 ---
 
@@ -44,7 +44,8 @@ npm run prod:rollback -- 368a69b
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 19/09/2026, 18:18:05 | `af9adb1` | Keep Team, CRM tags, and Pipeline off the users blob during ERP overlay. | [preview](https://connect-intel-dtz9qqe9x-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- af9adb1` | **← LIVE**
+| 19/09/2026, 18:19:48 | `2a1fb30` | Record production LIVE snapshot for ERP overlay Team/Pipeline recovery. | [preview](https://connect-intel-nzfi63t3l-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2a1fb30` | **← LIVE**
+| 19/09/2026, 18:18:05 | `af9adb1` | Keep Team, CRM tags, and Pipeline off the users blob during ERP overlay. | [preview](https://connect-intel-dtz9qqe9x-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- af9adb1` |
 | 19/09/2026, 17:59:11 | `368a69b` | Load company Pipeline from SQL using the session, not the users blob. | [preview](https://connect-intel-lo1xejrpl-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 368a69b` |
 | 19/09/2026, 17:42:26 | `df1e6a8` | Count Xindus ERP cron handlers as cron-gated in the RBAC audit. | [preview](https://connect-intel-ksgvfw9nu-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- df1e6a8` |
 | 19/09/2026, 17:40:02 | `aaec16a` | Record production LIVE snapshot for crm.xindus.net sign-in fix. | [preview](https://connect-intel-51xd632yr-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- aaec16a` |
@@ -63,7 +64,6 @@ npm run prod:rollback -- 368a69b
 | 19/09/2026, 14:04:34 | `d97a54c` | Keep pipeline tags in a Supabase lead_tag_master table. | [preview](https://connect-intel-kqfe7o221-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d97a54c` |
 | 18/09/2026, 23:12:15 | `7f93e12` | Record production LIVE snapshot for pipeline team filter. | [preview](https://connect-intel-imxg8kom4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7f93e12` |
 | 18/09/2026, 23:09:45 | `828834a` | Filter pipeline by team members like tags, not stale lead team_id. | [preview](https://connect-intel-rj066g5bi-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 828834a` |
-| 18/09/2026, 22:23:32 | `08438c3` | Record production LIVE snapshot for ERP owner reset remap. | [preview](https://connect-intel-btd5xnjp0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 08438c3` |
 
 ---
 
