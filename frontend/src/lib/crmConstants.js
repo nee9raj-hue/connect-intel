@@ -99,14 +99,13 @@ export const FREIGHT_ERP_PIPELINE_COLUMNS = FREIGHT_ERP_PIPELINE_STAGE_DEFS.map(
 export function getVisiblePipelineColumns(user, { pipelineTrack, status } = {}) {
   const freight = isFreightDealOrg(user)
   const track = normalizePipelineTrack(pipelineTrack)
-  if (freight) {
-    if (track === 'erp' || String(status || '').startsWith('erp_')) return FREIGHT_ERP_PIPELINE_COLUMNS
-    if (
-      track === 'crm' ||
-      ['fresh', 'qualified', 'unqualified', 'account_created_erp'].includes(String(status || ''))
-    ) {
-      return FREIGHT_CRM_PIPELINE_COLUMNS
-    }
+  if (freight && track === 'erp') return FREIGHT_ERP_PIPELINE_COLUMNS
+  if (freight && track === 'crm') return FREIGHT_CRM_PIPELINE_COLUMNS
+  if (freight && String(status || '').startsWith('erp_')) return FREIGHT_ERP_PIPELINE_COLUMNS
+  if (
+    freight &&
+    ['fresh', 'account_created_erp'].includes(String(status || ''))
+  ) {
     return FREIGHT_CRM_PIPELINE_COLUMNS
   }
   if (!user || user.accountType !== 'company') return CRM_STATUSES

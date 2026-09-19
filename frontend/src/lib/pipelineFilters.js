@@ -13,6 +13,7 @@ import {
 import { crmStatusMatchesFilter, normalizeCrmLeadStatus } from '../../../lib/crmLeadStatuses.js'
 import { pipelineTrackSqlAliases } from '../../../lib/crmPipelineFlow.js'
 import { leadMatchesLastShipmentPeriod } from '../../../lib/leadLastShipmentFilter.js'
+import { leadMatchesErpTagFilter } from '../../../lib/erpTags.js'
 
 export const CONTACT_FILTER_OPTIONS = [
   { id: 'any', label: 'All contacts' },
@@ -78,6 +79,7 @@ export const DEFAULT_PIPELINE_FILTERS = {
   stuckLeads: false,
   lastShipmentYear: '',
   lastShipmentMonth: '',
+  erpTagNames: [],
 }
 
 /** @deprecated use cities[] — kept for saved views migration */
@@ -303,6 +305,8 @@ export function applyPipelineFilters(
     lastShipmentYear = '',
     lastShipmentMonth = '',
     pipelineTrack = '',
+    erpTagNames = [],
+    erpTagMode = 'any',
   } = {}
 ) {
   let list = leads || []
@@ -343,6 +347,10 @@ export function applyPipelineFilters(
         return allowed.has(raw) || allowed.has(normalizeCrmLeadStatus(raw))
       })
     }
+  }
+
+  if ((erpTagNames || []).length) {
+    list = list.filter((l) => leadMatchesErpTagFilter(l, erpTagNames, erpTagMode))
   }
 
   if (minLeadScore != null && minLeadScore !== '') {
@@ -559,6 +567,7 @@ export function countActiveFilters(filters, search) {
   if (filters.sourceFilter) n += 1
   if (filters.stuckLeads) n += 1
   if (filters.lastShipmentYear) n += 1
+  if (filters.erpTagNames?.length) n += 1
   if (search?.trim()) n += 1
   return n
 }

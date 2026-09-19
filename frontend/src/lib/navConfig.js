@@ -354,7 +354,16 @@ export function buildCustomerNavSections(
   const canAiSearch = Boolean(user?.isOrgAdmin || user?.isPlatformAdmin || user?.canSearch !== false)
 
   const pipelineChildren = freightOrg
-    ? buildFreightPipelineChildren(pipelineCounts)
+    ? [
+        {
+          id: 'pipeline-all',
+          label: 'All leads',
+          panel: 'pipeline',
+          status: 'all',
+          view: 'leads',
+          badge: pipelineCounts.all,
+        },
+      ]
     : buildPipelineLeadChildren(columns, pipelineCounts)
   const dealsChildren = buildDealsChildren(dealCounts || {}, allDealCounts || {}, { freightOrg })
 

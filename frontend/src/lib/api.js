@@ -285,6 +285,10 @@ export const api = {
       qs.set('lastShipmentMonth', String(params.lastShipmentMonth))
     }
     if (params.pipelineTrack) qs.set('pipelineTrack', String(params.pipelineTrack))
+    for (const name of params.erpTagNames || []) {
+      if (name) qs.append('erpTag', String(name))
+    }
+    if (params.erpTagMode && params.erpTagMode !== 'any') qs.set('erpTagMode', String(params.erpTagMode))
     for (const [col, limit] of Object.entries(params.columnLimits || {})) {
       if (limit > 0) qs.set(`col_${col}`, String(limit))
     }
@@ -313,6 +317,8 @@ export const api = {
     teamIds,
     leadIds,
     pipelineTrack,
+    erpTagNames,
+    erpTagMode = 'any',
     silent = false,
   } = {}) => {
     const qs = new URLSearchParams({
@@ -346,6 +352,10 @@ export const api = {
     if (teamId) qs.set('teamId', String(teamId))
     for (const id of teamIds || []) qs.append('teamId', String(id))
     if (pipelineTrack) qs.set('pipelineTrack', String(pipelineTrack))
+    for (const name of erpTagNames || []) {
+      if (name) qs.append('erpTag', String(name))
+    }
+    if (erpTagMode && erpTagMode !== 'any') qs.set('erpTagMode', String(erpTagMode))
     return request(`/api/saved-leads?${qs}`, { timeoutMs: 45_000 }, { silent })
   },
 

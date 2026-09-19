@@ -22,6 +22,7 @@ import PipelineViewSettings from './PipelineViewSettings'
 import PipelineLeadsTable from './PipelineLeadsTable'
 import PipelineDealsView from './PipelineDealsView'
 import LeadTagDots from './LeadTagDots'
+import { collectErpTagOptions } from '../../lib/erpTags'
 import PipelineFiltersBar, { DEFAULT_PIPELINE_FILTERS } from './PipelineFiltersBar'
 import PipelineMobileHeaderChrome from './PipelineMobileHeaderChrome'
 import BulkWhatsAppModal from './BulkWhatsAppModal'
@@ -131,9 +132,9 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
 
   const orgPipelines = useMemo(() => pipelinesFromSettings(crmSettings), [crmSettings])
   const columns = useMemo(() => {
-    if (isFreightDealOrg(user)) {
+    if (isFreightDealOrg(user) && panelOptions?.pipelineTrack) {
       return getVisiblePipelineColumns(user, {
-        pipelineTrack: panelOptions?.pipelineTrack,
+        pipelineTrack: panelOptions.pipelineTrack,
         status: panelOptions?.status,
       })
     }
@@ -281,10 +282,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const freightOrg = isFreightDealOrg(user)
   const isDealsView = panelOptions?.view === 'deals'
   const dealsStage = panelOptions?.dealStage || 'all'
-  const pipelineTrack =
-    freightOrg && !isDealsView
-      ? normalizePipelineTrack(panelOptions?.pipelineTrack) || 'crm'
-      : normalizePipelineTrack(panelOptions?.pipelineTrack)
+  const pipelineTrack = normalizePipelineTrack(panelOptions?.pipelineTrack)
   const statusMetaOf = (id) => getStatusMeta(id, { freightOrg, pipelineTrack })
 
   const teamMemberIdsForFilter = useMemo(() => {
@@ -577,6 +575,10 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     }
   }, [scopedLeads, pipelineSummary.cities, pipelineSummary.states])
   const tagById = useMemo(() => tagMapById(orgLeadTags), [orgLeadTags])
+  const erpTagOptions = useMemo(
+    () => collectErpTagOptions(savedLeads, appliedAdvanced.erpTagNames),
+    [savedLeads, appliedAdvanced.erpTagNames]
+  )
 
   const [smartViewId, setSmartViewId] = useState(null)
   const [smartViewFilters, setSmartViewFilters] = useState({})
@@ -689,6 +691,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     getFilterStates(advancedFilters).join('|') !== getFilterStates(appliedAdvanced).join('|') ||
     advancedFilters.contact !== appliedAdvanced.contact ||
     (advancedFilters.tagIds || []).join(',') !== (appliedAdvanced.tagIds || []).join(',') ||
+    (advancedFilters.erpTagNames || []).join(',') !== (appliedAdvanced.erpTagNames || []).join(',') ||
     (advancedFilters.teamIds || []).join(',') !== (appliedAdvanced.teamIds || []).join(',') ||
     (advancedFilters.smartTags || []).join(',') !== (appliedAdvanced.smartTags || []).join(',') ||
     advancedFilters.minLeadScore !== appliedAdvanced.minLeadScore ||
@@ -715,6 +718,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       teamIds: adv.teamIds?.length ? adv.teamIds : undefined,
       tagIds: adv.tagIds?.length ? adv.tagIds : undefined,
       tagMode: adv.tagMode || 'any',
+      erpTagNames: adv.erpTagNames?.length ? adv.erpTagNames : undefined,
+      erpTagMode: adv.erpTagMode || 'any',
       ...pipelineServerFilterExtras(adv, smartViewFilters),
     }),
     [filter, listStatusFilter, effectiveAssigneeFilter, smartViewFilters, panelOptions?.teamId, pipelineTrack]
@@ -737,6 +742,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
           serverFilters.cities?.length ||
           serverFilters.states?.length ||
           serverFilters.tagIds?.length ||
+          serverFilters.erpTagNames?.length ||
           serverFilters.minLeadScore != null ||
           serverFilters.followUpDue ||
           serverFilters.overdueFollowUp ||
@@ -858,6 +864,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       contact: appliedAdvanced.contact,
       tagIds: appliedAdvanced.tagIds,
       tagMode: appliedAdvanced.tagMode,
+      erpTagNames: appliedAdvanced.erpTagNames,
+      erpTagMode: appliedAdvanced.erpTagMode,
       search: serverSidePipeline ? '' : appliedSearch,
       smartTags: appliedAdvanced.smartTags,
       overdueFollowUp: appliedAdvanced.overdueFollowUp,
@@ -1646,6 +1654,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               onApplySmartView={applySmartView}
               activeSmartViewId={smartViewId}
               orgLeadTags={orgLeadTags}
+              erpTagOptions={erpTagOptions}
               refreshOrgLeadTags={refreshOrgLeadTags}
               stageListMode={stageListMode}
               onRemoveAppliedFilter={removeAppliedFilter}

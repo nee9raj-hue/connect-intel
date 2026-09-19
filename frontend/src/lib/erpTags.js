@@ -45,3 +45,28 @@ export function readErpTagsFromLead(lead) {
     lead.lead?.erp?.revenue?.tags
   )
 }
+
+export function collectErpTagOptions(leads = [], extraNames = []) {
+  const byKey = new Map()
+  for (const lead of leads || []) {
+    for (const tag of readErpTagsFromLead(lead)) {
+      const key = tag.name.toLowerCase()
+      if (!byKey.has(key)) byKey.set(key, { name: tag.name, color: tag.color, type: tag.type })
+    }
+  }
+  for (const raw of extraNames || []) {
+    const name = String(raw || '').trim()
+    if (!name) continue
+    const key = name.toLowerCase()
+    if (!byKey.has(key)) byKey.set(key, { name, color: '#64748b' })
+  }
+  return [...byKey.values()].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }))
+}
+
+export function leadMatchesErpTagFilter(lead, names = [], mode = 'any') {
+  const wanted = (names || []).map((n) => String(n || '').trim().toLowerCase()).filter(Boolean)
+  if (!wanted.length) return true
+  const have = new Set(readErpTagsFromLead(lead).map((t) => t.name.toLowerCase()))
+  if (String(mode || 'any').toLowerCase() === 'all') return wanted.every((n) => have.has(n))
+  return wanted.some((n) => have.has(n))
+}

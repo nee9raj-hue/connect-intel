@@ -8,7 +8,9 @@ import { FilterChipButton } from './FilterDropdown'
 import { DEAL_MONTH_OPTIONS, dealYearOptions, formatDealPeriodLabel } from '../../lib/pipelineDealsFilter'
 import { lastShipmentPeriodLabel } from '../../../../lib/leadLastShipmentFilter.js'
 import { teamIdsFromHierarchyForUser } from '../../../../lib/pipelineMemberVisibility.js'
+import { isFreightDealOrg } from '../../lib/freightDeal'
 import LeadTag from '../ui/LeadTag'
+import ErpTagChip from '../ui/ErpTagChip'
 import PipelineFilterPopup from './PipelineFilterPopup'
 import PipelineFilterToolbarButton from './PipelineFilterToolbarButton'
 import PipelineMobileFilterSheet, { SearchableMultiList, SingleSelectList } from './PipelineMobileFilterSheet'
@@ -49,6 +51,7 @@ const MOBILE_FILTER_TITLES = {
   state: 'State',
   contact: 'Contact',
   lastShipment: 'Last shipment',
+  erpTags: 'ERP tags',
   advanced: 'More filters',
 }
 
@@ -76,6 +79,7 @@ export default function PipelineFiltersBar({
   onApplySmartView,
   activeSmartViewId,
   orgLeadTags = [],
+  erpTagOptions = [],
   refreshOrgLeadTags,
   stageListMode = false,
   onRemoveAppliedFilter,
@@ -207,6 +211,11 @@ export default function PipelineFiltersBar({
       hint: locked ? 'Only this team can use this tag' : undefined,
     }
   })
+  const erpTagSelectOptions = erpTagOptions.map((t) => ({
+    label: t.name,
+    value: t.name,
+  }))
+  const showErpTagFilter = erpTagSelectOptions.length > 0 || isFreightDealOrg(user)
   const teamOptions = orgTeams.map((t) => {
     const locked = !isOrgAdmin && !memberTeamIds.includes(String(t.id))
     return {
@@ -227,6 +236,7 @@ export default function PipelineFiltersBar({
 
   const advancedActiveCount =
     (appliedFilters.tagIds?.length || 0) +
+    (appliedFilters.erpTagNames?.length || 0) +
     (appliedFilters.smartTags?.length || 0) +
     (appliedFilters.teamIds?.length || 0) +
     (activeSmartViewId ? 1 : 0)
@@ -341,6 +351,9 @@ export default function PipelineFiltersBar({
         commitFilters({ ...filters, lastShipmentYear, lastShipmentMonth })
         break
       }
+      case 'erpTags':
+        commitFilters({ ...filters, erpTagNames: draft.filters.erpTagNames || [] })
+        break
       case 'advanced': {
         const next = { ...draft.filters }
         const teamIds = next.teamIds || []
@@ -453,6 +466,16 @@ export default function PipelineFiltersBar({
             </section>
           </div>
         )
+      case 'erpTags':
+        return (
+          <SearchableMultiList
+            options={erpTagSelectOptions}
+            values={filterDraft.filters.erpTagNames || []}
+            onChange={(v) => updateFilterDraft({ erpTagNames: v })}
+            placeholder="Search ERP tags…"
+            emptyLabel="Any ERP tag"
+          />
+        )
       case 'advanced':
         return (
           <div className="pipeline-filter-popout-sections">
@@ -507,6 +530,18 @@ export default function PipelineFiltersBar({
                   onChange={(v) => updateFilterDraft({ tagIds: v })}
                   placeholder="Search tags…"
                   emptyLabel="Any tag"
+                />
+              </section>
+            ) : null}
+            {showErpTagFilter ? (
+              <section className="pipeline-filter-popout-section">
+                <p className="hs-advanced-filter-label">ERP tags</p>
+                <SearchableMultiList
+                  options={erpTagSelectOptions}
+                  values={filterDraft.filters.erpTagNames || []}
+                  onChange={(v) => updateFilterDraft({ erpTagNames: v })}
+                  placeholder="Search ERP tags…"
+                  emptyLabel="Any ERP tag"
                 />
               </section>
             ) : null}
@@ -642,6 +677,7 @@ export default function PipelineFiltersBar({
     appliedCities.length ||
     appliedStates.length ||
     (appliedFilters.tagIds?.length || 0) > 0 ||
+    (appliedFilters.erpTagNames?.length || 0) > 0 ||
     (appliedFilters.smartTags?.length || 0) > 0 ||
     (appliedFilters.teamIds?.length || 0) > 0 ||
     (!stageListMode && statusFilter !== 'all') ||
@@ -692,6 +728,25 @@ export default function PipelineFiltersBar({
           active={statusFilter !== 'all'}
           aria-expanded={activeFilter?.type === 'status'}
           onClick={() => openFilter('status')}
+        />
+      ) : null}
+
+      {showErpTagFilter ? (
+        <PipelineFilterToolbarButton
+          icon={ListIcon}
+          iconTone="status"
+          label="ERP tags"
+          compact={useMobileFilterSheet}
+          displayValue={
+            (appliedFilters.erpTagNames || []).length === 1
+              ? appliedFilters.erpTagNames[0]
+              : (appliedFilters.erpTagNames || []).length > 1
+                ? `${appliedFilters.erpTagNames.length} ERP tags`
+                : undefined
+          }
+          active={(appliedFilters.erpTagNames || []).length > 0}
+          aria-expanded={activeFilter?.type === 'erpTags'}
+          onClick={() => openFilter('erpTags')}
         />
       ) : null}
 
@@ -961,6 +1016,26 @@ export default function PipelineFiltersBar({
                   }
                   className="crm-filter-chip-x"
                   aria-label="Remove tag filter"
+                >
+                  ×
+                </button>
+              </span>
+            )
+          })}
+          {(appliedFilters.erpTagNames || []).map((name) => {
+            const tag = erpTagOptions.find((t) => t.name === name) || { name, color: '#64748b' }
+            return (
+              <span key={`erp-${name}`} className="crm-filter-chip crm-filter-chip--tag">
+                <ErpTagChip name={tag.name} color={tag.color} type={tag.type} />
+                <button
+                  type="button"
+                  onClick={() =>
+                    onRemoveAppliedFilter?.({
+                      erpTagNames: (appliedFilters.erpTagNames || []).filter((n) => n !== name),
+                    })
+                  }
+                  className="crm-filter-chip-x"
+                  aria-label="Remove ERP tag filter"
                 >
                   ×
                 </button>
