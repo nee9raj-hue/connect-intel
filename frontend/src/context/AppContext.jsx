@@ -598,6 +598,11 @@ export function AppProvider({ children }) {
             teamPromise,
           ])
 
+          if (teamData) {
+            setTeamMembers(teamData.members || [])
+            setRepRoster(teamData.repRoster || teamData.members || [])
+          }
+
           if (cancelled) return
 
           if (bootstrapResult?._error) {
@@ -620,11 +625,6 @@ export function AppProvider({ children }) {
           const summary = bootstrap.summary || {}
           setPipelineSummary(normalizePipelineSummary(summary))
           setSearchHistory(historyResult.history || [])
-
-          if (teamData) {
-            setTeamMembers(teamData.members || [])
-            setRepRoster(teamData.repRoster || teamData.members || [])
-          }
 
           const listSuperseded = bootstrapGen !== pipelineListFetchGenRef.current
           if (!listSuperseded) {
