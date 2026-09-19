@@ -11,7 +11,7 @@ export function pipelineBootstrapCacheKey(user, { assigneeUserId, summaryOnly } 
   const org = user?.organizationId || 'solo'
   const uid = user?.id || 'anon'
   const assignee = assigneeUserId || 'all'
-  return `pipeline:${org}:${uid}:${assignee}:${summaryOnly ? 'summary' : 'full'}`
+  return `pipeline:v2:${org}:${uid}:${assignee}:${summaryOnly ? 'summary' : 'full'}`
 }
 
 export function readBootstrapCache(key, { maxAgeMs = TTL_MS } = {}) {
@@ -58,14 +58,22 @@ export function clearPipelineBootstrapCachesForUser(user) {
   if (!user?.id) return
   const org = user.organizationId || 'solo'
   const uid = user.id
-  const prefixes = [`ci-bootstrap-cache:pipeline:${org}:${uid}:`]
+  const prefixes = [
+    `ci-bootstrap-cache:pipeline:v2:${org}:${uid}:`,
+    `ci-bootstrap-cache:pipeline:${org}:${uid}:`,
+  ]
   for (const key of [...memory.keys()]) {
-    if (prefixes.some((p) => key.includes(`pipeline:${org}:${uid}:`))) memory.delete(key)
+    if (
+      key.includes(`pipeline:v2:${org}:${uid}:`) ||
+      key.includes(`pipeline:${org}:${uid}:`)
+    ) {
+      memory.delete(key)
+    }
   }
   try {
     for (let i = sessionStorage.length - 1; i >= 0; i -= 1) {
       const k = sessionStorage.key(i)
-      if (k && prefixes.some((p) => k.includes(`pipeline:${org}:${uid}:`))) {
+      if (k && prefixes.some((p) => k.startsWith(p))) {
         sessionStorage.removeItem(k)
       }
     }
