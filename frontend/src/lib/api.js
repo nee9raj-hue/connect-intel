@@ -248,6 +248,7 @@ export const api = {
     offset = 0,
     limit = 100,
     assigneeUserId = null,
+    customerType = '',
     silent = false,
   } = {}) => {
     const qs = new URLSearchParams({
@@ -256,6 +257,7 @@ export const api = {
       offset: String(offset),
     })
     if (assigneeUserId) qs.set('assigneeUserId', assigneeUserId)
+    if (customerType) qs.set('customerType', customerType)
     return request(`/api/crm/deals?${qs}`, { timeoutMs: 60_000 }, { silent })
   },
 
@@ -310,6 +312,7 @@ export const api = {
     teamId,
     teamIds,
     leadIds,
+    pipelineTrack,
     silent = false,
   } = {}) => {
     const qs = new URLSearchParams({
@@ -342,6 +345,7 @@ export const api = {
     if (lastShipmentYear && lastShipmentMonth) qs.set('lastShipmentMonth', String(lastShipmentMonth))
     if (teamId) qs.set('teamId', String(teamId))
     for (const id of teamIds || []) qs.append('teamId', String(id))
+    if (pipelineTrack) qs.set('pipelineTrack', String(pipelineTrack))
     return request(`/api/saved-leads?${qs}`, { timeoutMs: 45_000 }, { silent })
   },
 

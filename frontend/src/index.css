@@ -2882,6 +2882,59 @@ button.ci-lead-tag:disabled {
   gap: 0.25rem;
 }
 
+.ci-lead-tags-stack,
+.pipeline-hs-tags-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.ci-erp-tags {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.ci-erp-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.625rem;
+  font-weight: 700;
+  line-height: 1.35;
+  padding: 0.12rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.ci-duplicate-chip {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 0.2rem;
+  padding: 0.08rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid #f5c2c7;
+  background: #fff1f2;
+  color: #9f1239;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+
+.ci-duplicate-chip--lg {
+  margin-top: 0;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.75rem;
+}
+
+.ci-duplicate-chip:hover {
+  background: #ffe4e6;
+}
+
 .ci-lead-tags-more {
   font-size: 0.5625rem;
   font-weight: 600;

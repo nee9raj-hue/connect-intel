@@ -6,6 +6,9 @@ import { hasActiveTextSelection } from '../../lib/keyboardShortcuts'
 import { getLeadEmail, leadHasSendableEmail } from '../../lib/emailUtils'
 import LeadPhoneCall from './LeadPhoneCall'
 import LeadTag from '../ui/LeadTag'
+import ErpTagChips from './ErpTagChips'
+import { isErpDuplicatePending } from '../../../../lib/crmPipelineFlow.js'
+import { readErpTagsFromLead } from '../../../../lib/erpTags.js'
 import { leadHasCallablePhone } from '../../lib/phoneUtils'
 import {
   DEFAULT_PIPELINE_VISIBLE_COLUMNS,
@@ -307,6 +310,7 @@ function renderPipelineCell(colId, lead, ctx) {
     onChangeStatus,
     onOpenCompany,
     canOpenCompany = false,
+    onMoveToErpPipeline,
   } = ctx
 
   switch (colId) {
@@ -328,6 +332,18 @@ function renderPipelineCell(colId, lead, ctx) {
               >
                 {nameStr}
               </button>
+              {isErpDuplicatePending(lead) ? (
+                <button
+                  type="button"
+                  className="ci-duplicate-chip"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    ctx.onMoveToErpPipeline?.(lead)
+                  }}
+                >
+                  Duplicate
+                </button>
+              ) : null}
             </div>
             {showHoverActions ? (
               <span className="pipeline-row-hover-actions" aria-label="Quick actions">
@@ -527,20 +543,24 @@ function renderPipelineCell(colId, lead, ctx) {
     case 'tags':
       return (
         <td key={colId} className="pipeline-hs-td pipeline-hs-td--tags">
-          {tags.length ? (
-            <div className="ci-lead-tags pipeline-hs-tags-cell">
-              {tags.slice(0, 4).map((t) => (
-                <LeadTag key={t.id} name={t.name} title={t.name} />
-              ))}
-              {tags.length > 4 ? (
-                <span className="ci-lead-tags-more" title={tags.map((t) => t.name).join(', ')}>
-                  +{tags.length - 4}
-                </span>
-              ) : null}
-            </div>
-          ) : (
-            <span className="pipeline-hs-muted">—</span>
-          )}
+          <div className="pipeline-hs-tags-stack">
+            <ErpTagChips lead={lead} max={4} />
+            {tags.length ? (
+              <div className="ci-lead-tags pipeline-hs-tags-cell">
+                {tags.slice(0, 4).map((t) => (
+                  <LeadTag key={t.id} name={t.name} title={t.name} />
+                ))}
+                {tags.length > 4 ? (
+                  <span className="ci-lead-tags-more" title={tags.map((t) => t.name).join(', ')}>
+                    +{tags.length - 4}
+                  </span>
+                ) : null}
+              </div>
+            ) : null}
+            {!tags.length && !readErpTagsFromLead(lead).length ? (
+              <span className="pipeline-hs-muted">—</span>
+            ) : null}
+          </div>
         </td>
       )
     case 'email':
@@ -637,6 +657,7 @@ export default function PipelineLeadsTable({
   tagById,
   teamMembers = [],
   onStatusChange,
+  onMoveToErpPipeline,
   onOwnerFilter,
   canFilterByOwner = false,
   onQuickCall,
@@ -649,6 +670,7 @@ export default function PipelineLeadsTable({
   onChangeStatus,
   onOpenCompany,
   canOpenCompany = false,
+  freightOrg = false,
 }) {
   const [sortKey, setSortKey] = useState('created')
   const [sortDir, setSortDir] = useState('desc')
@@ -698,7 +720,7 @@ export default function PipelineLeadsTable({
         </thead>
         <tbody>
           {sorted.map((lead) => {
-            const meta = getStatusMeta(lead.crm?.status)
+            const meta = getStatusMeta(lead.crm?.status, { freightOrg })
             const isActive = selectedId === lead.id
             const isChecked = selectedIds.has(lead.id)
             const email = getLeadEmail(lead)
@@ -758,6 +780,7 @@ export default function PipelineLeadsTable({
                     onChangeStatus,
                     onOpenCompany,
                     canOpenCompany,
+                    onMoveToErpPipeline,
                   })
                 )}
                 <td className="pipeline-hs-td pipeline-hs-td--actions">

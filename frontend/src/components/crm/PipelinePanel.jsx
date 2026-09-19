@@ -130,11 +130,17 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
 
   const orgPipelines = useMemo(() => pipelinesFromSettings(crmSettings), [crmSettings])
   const columns = useMemo(() => {
+    if (isFreightDealOrg(user)) {
+      return getVisiblePipelineColumns(user, {
+        pipelineTrack: panelOptions?.pipelineTrack,
+        status: panelOptions?.status,
+      })
+    }
     if (crmSettings && user?.accountType === 'company') {
       return getVisiblePipelineColumnsForSettings(user, crmSettings, activePipelineId)
     }
     return getVisiblePipelineColumns(user)
-  }, [user, crmSettings, activePipelineId])
+  }, [user, crmSettings, activePipelineId, panelOptions?.pipelineTrack, panelOptions?.status])
 
   const pipelineScopedLeads = useMemo(() => {
     if (!crmSettings?.pipelines?.length || orgPipelines.length <= 1) return savedLeads
@@ -274,6 +280,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const freightOrg = isFreightDealOrg(user)
   const isDealsView = panelOptions?.view === 'deals'
   const dealsStage = panelOptions?.dealStage || 'all'
+  const dealsCustomerType = panelOptions?.dealCustomerType || ''
 
   const teamMemberIdsForFilter = useMemo(() => {
     const teamId = panelOptions?.teamId
@@ -450,6 +457,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     }
   }, [
     panelOptions?.status,
+    panelOptions?.pipelineTrack,
     panelOptions?.view,
     panelOptions?.due,
     panelOptions?.overdueFollowUp,
@@ -693,6 +701,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     (adv, q) => ({
       status:
         filter !== 'all' ? filter : listStatusFilter !== 'all' ? listStatusFilter : undefined,
+      pipelineTrack: panelOptions?.pipelineTrack || undefined,
       q: q || undefined,
       cities: getFilterCities(adv).length ? getFilterCities(adv) : undefined,
       states: getFilterStates(adv).length ? getFilterStates(adv) : undefined,
@@ -703,7 +712,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       tagMode: adv.tagMode || 'any',
       ...pipelineServerFilterExtras(adv, smartViewFilters),
     }),
-    [filter, listStatusFilter, effectiveAssigneeFilter, smartViewFilters, panelOptions?.teamId]
+    [filter, listStatusFilter, effectiveAssigneeFilter, smartViewFilters, panelOptions?.teamId, panelOptions?.pipelineTrack]
   )
 
   const serverFilters = useMemo(
@@ -719,6 +728,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
           serverFilters.teamIds?.length ||
           serverFilters.status ||
           serverFilters.q ||
+          serverFilters.pipelineTrack ||
           serverFilters.cities?.length ||
           serverFilters.states?.length ||
           serverFilters.tagIds?.length ||
@@ -995,6 +1005,24 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       }
     },
     [findLeadInLists, patchLead, refreshPipelineLead]
+  )
+
+  const handleMoveToErpPipeline = useCallback(
+    async (lead) => {
+      if (!lead?.id) return
+      const ok = window.confirm(
+        'This CRM lead matches an ERP account. Move it to the ERP pipeline and remove it from the CRM pipeline?'
+      )
+      if (!ok) return
+      try {
+        await patchLead(lead.id, { crm: { moveToErpPipeline: true } })
+        await refreshPipelineLead?.(lead.id)
+        await loadPipelineList(serverFilters, { append: false, silent: true })
+      } catch {
+        setBulkNotice('Could not move this lead to the ERP pipeline')
+      }
+    },
+    [patchLead, refreshPipelineLead, loadPipelineList, serverFilters]
   )
 
   const pipelineHasLeads =
@@ -1572,7 +1600,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               <button
                 type="button"
                 onClick={() => {
-                  setAddLeadStatus('new')
+                  setAddLeadStatus(freightOrg ? 'fresh' : 'new')
                   setAddOpen(true)
                 }}
                 className="pipeline-v2-btn-add"
@@ -1750,10 +1778,15 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
             <div className="h-full min-h-0 flex flex-col">
               <PipelineDealsView
                 dealStage={dealsStage}
+                dealCustomerType={dealsCustomerType}
                 assigneeFilter={effectiveAssigneeFilter}
                 onOpenLead={openDealFromPipeline}
                 onDealStageChange={(stage) =>
-                  onNavigate?.('pipeline', { view: 'deals', dealStage: stage })
+                  onNavigate?.('pipeline', {
+                    view: 'deals',
+                    dealStage: stage,
+                    dealCustomerType: dealsCustomerType || undefined,
+                  })
                 }
               />
             </div>
@@ -1820,7 +1853,9 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               statusOptions={columns}
               tagById={tagById}
               teamMembers={teamMembers}
+              freightOrg={freightOrg}
               onStatusChange={handleLeadStatusChange}
+              onMoveToErpPipeline={handleMoveToErpPipeline}
               onOwnerFilter={handleOwnerFilter}
               canFilterByOwner={canFilterByOwner}
               onQuickCall={(lead) => openPipelineLeadRow(lead, 'overview')}
@@ -1881,6 +1916,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
           statusOptions={columns}
           onClose={() => closePipelineLead()}
           onNavigate={onNavigate}
+          onMoveToErpPipeline={handleMoveToErpPipeline}
           recordPanel
         />
       )}
@@ -1890,7 +1926,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
         initialStatus={addLeadStatus}
         onClose={() => {
           setAddOpen(false)
-          setAddLeadStatus('new')
+          setAddLeadStatus(freightOrg ? 'fresh' : 'new')
         }}
         onAdded={(lead) => {
           refreshSavedLeads()

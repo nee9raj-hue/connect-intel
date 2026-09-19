@@ -39,6 +39,7 @@ function dealRowKey({ leadId, deal }) {
 /** Pipeline view — all freight deals across leads, filterable by deal stage. */
 export default function PipelineDealsView({
   dealStage = 'all',
+  dealCustomerType = '',
   onOpenLead,
   onDealStageChange,
   assigneeFilter = null,
@@ -78,6 +79,7 @@ export default function PipelineDealsView({
         stages: isAllDealsView ? selectedStages : [],
         dateStages: isAllDealsView ? selectedStages : [dealStage],
         timeZone,
+        customerType: dealCustomerType,
       }),
     [
       rows,
@@ -88,6 +90,7 @@ export default function PipelineDealsView({
       selectedStages,
       isAllDealsView,
       dealStage,
+      dealCustomerType,
       timeZone,
     ]
   )
@@ -132,8 +135,9 @@ export default function PipelineDealsView({
       year: periodYear || null,
       month: periodMonth || null,
       weeks: selectedWeeks.length ? selectedWeeks : null,
+      customerType: dealCustomerType || null,
     }),
-    [dealStage, assigneeFilter, transportMode, periodYear, periodMonth, selectedWeeks]
+    [dealStage, assigneeFilter, transportMode, periodYear, periodMonth, selectedWeeks, dealCustomerType]
   )
 
   const filterSummary = useMemo(() => {
@@ -222,6 +226,7 @@ export default function PipelineDealsView({
         offset: append ? offset : 0,
         limit: DEALS_PAGE_SIZE,
         assigneeUserId: assigneeFilter || undefined,
+        customerType: dealCustomerType || undefined,
       })
       const list = data.deals || []
       if (append) {
@@ -247,7 +252,7 @@ export default function PipelineDealsView({
       setLoading(false)
       setLoadingMore(false)
     }
-  }, [dealStage, assigneeFilter])
+  }, [dealStage, assigneeFilter, dealCustomerType])
 
   useEffect(() => {
     void load({ append: false })

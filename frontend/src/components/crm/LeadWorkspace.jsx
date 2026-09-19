@@ -12,6 +12,8 @@ import { leadHasCallablePhone, openWhatsAppChat } from '../../lib/phoneUtils'
 import LeadCallLogCard from './LeadCallLogCard'
 import LeadPhoneCall from './LeadPhoneCall'
 import EmailValidationIcon from './EmailValidationIcon'
+import ErpTagChips from './ErpTagChips'
+import { isErpDuplicatePending } from '../../../../lib/crmPipelineFlow.js'
 import { STARTER_TEMPLATES, blocksToPlainText } from '../../lib/marketingEmailDesign'
 import {
   CRM_STATUSES,
@@ -19,6 +21,7 @@ import {
   formatCrmDate,
   getStatusMeta,
 } from '../../lib/crmConstants'
+import { isFreightDealOrg } from '../../lib/freightDeal'
 import {
   ACTIVITY_LABELS,
   MEETING_TYPES,
@@ -134,6 +137,7 @@ export default function LeadWorkspace({
   onNavigate,
   statusOptions = CRM_STATUSES,
   recordPanel = false,
+  onMoveToErpPipeline,
 }) {
   const {
     user,
@@ -239,7 +243,7 @@ export default function LeadWorkspace({
       ),
     [crm, marketingTimeline, indexedActivities, timelineFilter]
   )
-  const statusMeta = getStatusMeta(status)
+  const statusMeta = getStatusMeta(status, { freightOrg: isFreightDealOrg(user) })
   const saving = savingScope !== null
   const savingTask = savingScope === 'task'
   const savingMeeting = savingScope === 'meeting'
@@ -928,8 +932,17 @@ export default function LeadWorkspace({
               )}
             </LwSection>
 
+            {isErpDuplicatePending(lead) ? (
+              <div className="lw-section lw-section--padded">
+                <button type="button" className="ci-duplicate-chip ci-duplicate-chip--lg" onClick={() => onMoveToErpPipeline?.(lead)}>
+                  Duplicate — click to merge into ERP pipeline
+                </button>
+              </div>
+            ) : null}
+
             {user?.accountType === 'company' && (
               <LwSection icon={TaskIcon} title="Tags">
+                <ErpTagChips lead={lead} max={8} className="mb-2" />
                 <LeadTagsEditor
                   lead={lead}
                   orgLeadTags={orgLeadTags}
