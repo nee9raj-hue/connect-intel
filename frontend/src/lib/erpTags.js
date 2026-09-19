@@ -1,22 +1,22 @@
 /** Read-only ERP tags — display only; never mixed with CRM tagIds. */
 
+function namedTags(raw) {
+  if (!Array.isArray(raw)) return null
+  return raw.filter((t) => t && t.name)
+}
+
 export function readErpTagsFromLead(lead) {
   if (!lead || typeof lead !== 'object') return []
 
-  if (Array.isArray(lead.erpTags) && lead.erpTags.length) {
-    return lead.erpTags.filter((t) => t?.name)
-  }
+  const fromPayload = namedTags(lead.crm_payload?.erp_tags)
+  if (fromPayload) return fromPayload
 
-  if (Array.isArray(lead.crm_payload?.erp_tags)) {
-    return lead.crm_payload.erp_tags.filter((t) => t?.name)
-  }
+  const fromCrm = namedTags(lead.crm?.erp_tags)
+  if (fromCrm) return fromCrm
 
-  if (Array.isArray(lead.crm?.erp_tags)) {
-    return lead.crm.erp_tags.filter((t) => t?.name)
-  }
+  const fromRoot = namedTags(lead.erpTags)
+  if (fromRoot?.length) return fromRoot
 
-  const fromErp = lead.erp?.erpTags ?? lead.erp?.erp_tags
-  if (Array.isArray(fromErp)) return fromErp.filter((t) => t?.name)
-
-  return []
+  const fromErp = namedTags(lead.erp?.erpTags ?? lead.erp?.erp_tags)
+  return fromErp || []
 }
