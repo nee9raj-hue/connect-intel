@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
-import { DEAL_STAGES, getDealStageMeta } from '../../lib/crmConstants'
+import { getDealStageMeta } from '../../lib/crmConstants'
 import {
   freightRouteLabel,
   formatDealValue,
@@ -10,7 +10,7 @@ import {
   freightCustomerTypeLabel,
   summarizePipelineDealRows,
 } from '../../lib/freightDeals'
-import { estimatedFreightRevenueInr, sumEstimatedFreightRevenue, FREIGHT_DEAL_STAGES, resolveFreightDealCurrency, FALLBACK_USD_INR, isFreightDealOrg, normalizeFreightDealStage } from '../../lib/freightDeal'
+import { estimatedFreightRevenueInr, sumEstimatedFreightRevenue, FREIGHT_DEAL_STAGES, resolveFreightDealCurrency, FALLBACK_USD_INR, isFreightDealOrg } from '../../lib/freightDeal'
 import { filledDealMilestones } from '../../lib/dealMilestones'
 import { userCanDeleteCrmRecords } from '../../lib/orgActionAccess'
 import {
@@ -26,31 +26,7 @@ import { DashboardSegmented } from '../dashboard/dashboardUi'
 import FilterDropdown from './FilterDropdown'
 import SaveReportModal from './SaveReportModal'
 
-const DEALS_LAYOUT_KEY = 'ci.dealsLayout'
-
-export function readDealsLayout() {
-  try {
-    const value = localStorage.getItem(DEALS_LAYOUT_KEY)
-    if (value === 'list' || value === 'board') return value
-  } catch {
-    /* private mode */
-  }
-  return 'board'
-}
-
-function writeDealsLayout(value) {
-  try {
-    localStorage.setItem(DEALS_LAYOUT_KEY, value)
-  } catch {
-    /* ignore */
-  }
-}
-
-export function persistDealsLayout(value) {
-  const next = value === 'list' ? 'list' : 'board'
-  writeDealsLayout(next)
-  return next
-}
+const DEALS_PAGE_SIZE = 80
 
 function formatWeight(freight) {
   return formatFreightGross(freight)
@@ -66,15 +42,13 @@ export default function PipelineDealsView({
   onOpenLead,
   onDealStageChange,
   assigneeFilter = null,
-  layout: layoutProp = null,
-  onLayoutChange,
 }) {
-  const { refreshSavedLeads, refreshPipelineSummary, user } = useApp()
+  const { refreshSavedLeads, user } = useApp()
   const freightOrg = isFreightDealOrg(user)
-  const dealStages = freightOrg ? FREIGHT_DEAL_STAGES : DEAL_STAGES
-  const [layout, setLayoutState] = useState(() => layoutProp || readDealsLayout())
   const [rows, setRows] = useState([])
   const [total, setTotal] = useState(0)
+  const [hasMore, setHasMore] = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [selected, setSelected] = useState(() => new Set())
@@ -93,7 +67,6 @@ export default function PipelineDealsView({
   const timeZone = user?.timezone || undefined
 
   const isAllDealsView = dealStage === 'all'
-  const isBoard = layout === 'board'
 
   const filteredRows = useMemo(
     () =>
@@ -102,8 +75,8 @@ export default function PipelineDealsView({
         month: periodMonth,
         weeks: selectedWeeks,
         transportMode,
-        stages: isBoard || isAllDealsView ? selectedStages : [],
-        dateStages: isBoard || isAllDealsView ? selectedStages : [dealStage],
+        stages: isAllDealsView ? selectedStages : [],
+        dateStages: isAllDealsView ? selectedStages : [dealStage],
         timeZone,
       }),
     [
@@ -114,7 +87,6 @@ export default function PipelineDealsView({
       transportMode,
       selectedStages,
       isAllDealsView,
-      isBoard,
       dealStage,
       timeZone,
     ]
@@ -237,87 +209,53 @@ export default function PipelineDealsView({
     }
   }, [])
 
-  const load = useCallback(async () => {
-    setLoading(true)
+  const load = useCallback(async ({ append = false, offset = 0 } = {}) => {
+    if (append) setLoadingMore(true)
+    else {
+      setLoading(true)
+      setHasMore(false)
+    }
     setError(null)
     try {
       const data = await api.fetchPipelineDeals({
-        dealStage: isBoard ? 'all' : dealStage,
-        limit: isBoard || isAllDealsView ? 500 : 200,
+        dealStage,
+        offset: append ? offset : 0,
+        limit: DEALS_PAGE_SIZE,
         assigneeUserId: assigneeFilter || undefined,
       })
       const list = data.deals || []
-      setRows(list)
-      setTotal(data.total ?? list.length)
-      setSelected((prev) => {
-        const valid = new Set(list.map(dealRowKey))
-        const next = new Set()
-        for (const key of prev) {
-          if (valid.has(key)) next.add(key)
-        }
-        return next
-      })
-      void refreshPipelineSummary?.()
+      if (append) {
+        setRows((prev) => [...prev, ...list])
+        setTotal((prev) => data.total ?? prev + list.length)
+      } else {
+        setRows(list)
+        setTotal(data.total ?? list.length)
+        setSelected((prev) => {
+          const valid = new Set(list.map(dealRowKey))
+          const next = new Set()
+          for (const key of prev) {
+            if (valid.has(key)) next.add(key)
+          }
+          return next
+        })
+      }
+      setHasMore(Boolean(data.hasMore))
     } catch (e) {
       setError(e.message || 'Could not load deals')
-      setRows([])
+      if (!append) setRows([])
     } finally {
       setLoading(false)
+      setLoadingMore(false)
     }
-  }, [dealStage, assigneeFilter, refreshPipelineSummary, isAllDealsView, isBoard])
+  }, [dealStage, assigneeFilter])
 
   useEffect(() => {
-    load()
+    void load({ append: false })
   }, [load])
 
   useEffect(() => {
     if (!isAllDealsView) setSelectedStages([])
   }, [isAllDealsView])
-
-  const boardColumns = useMemo(() => {
-    if (selectedStages.length) return dealStages.filter((stage) => selectedStages.includes(stage.id))
-    return dealStages
-  }, [dealStages, selectedStages])
-
-  const rowsByStage = useMemo(() => {
-    const map = Object.fromEntries(dealStages.map((stage) => [stage.id, []]))
-    for (const row of filteredRows) {
-      const raw = freightOrg
-        ? normalizeFreightDealStage(row.deal?.stage)
-        : String(row.deal?.stage || '')
-      const key = map[raw] ? raw : dealStages[0]?.id
-      if (key) map[key].push(row)
-    }
-    return map
-  }, [filteredRows, dealStages, freightOrg])
-
-  const moveDealToStage = async (row, stageId) => {
-    if (!row?.deal?.id || !stageId) return
-    const current = freightOrg
-      ? normalizeFreightDealStage(row.deal.stage)
-      : String(row.deal.stage || '')
-    if (current === stageId) return
-    setError(null)
-    try {
-      if (stageId === 'won') {
-        await api.patchCrmDeal({ dealId: row.deal.id, action: 'won' })
-      } else if (stageId === 'lost') {
-        await api.patchCrmDeal({ dealId: row.deal.id, action: 'lost' })
-      } else {
-        await api.patchCrmDeal({ dealId: row.deal.id, stage: stageId })
-      }
-      setRows((prev) =>
-        prev.map((item) =>
-          item.deal?.id === row.deal.id ? { ...item, deal: { ...item.deal, stage: stageId } } : item
-        )
-      )
-      void refreshSavedLeads().catch(() => {})
-      void refreshPipelineSummary?.()
-    } catch (e) {
-      setError(e.message || 'Could not move deal')
-      await load()
-    }
-  }
 
   const toggleRow = (row, checked) => {
     const key = dealRowKey(row)
@@ -427,14 +365,12 @@ export default function PipelineDealsView({
   }
 
   return (
-    <div className={`pipeline-deals-view space-y-3 min-w-0 ${isBoard ? 'pipeline-deals-view--board' : ''}`}>
+    <div className="pipeline-deals-view space-y-3 min-w-0">
       <div className="flex flex-wrap items-center justify-between gap-2 px-3 md:px-4 pt-3">
         <div className="min-w-0">
-          <h2 className="text-sm font-semibold text-gray-900">{isBoard ? 'Deals board' : stageMeta.label}</h2>
+          <h2 className="text-sm font-semibold text-gray-900">{stageMeta.label}</h2>
           <p className="text-xs text-gray-500">
-            {isBoard
-              ? 'Drag deals across stages, or click a card to open the lead.'
-              : 'Select deals for bulk actions, or click a row to open the lead.'}
+            Select deals for bulk actions, or click a row to open the lead.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2 shrink-0">
@@ -484,7 +420,7 @@ export default function PipelineDealsView({
           ) : null}
           <p className="text-xs text-gray-500 tabular-nums">
             {filteredRows.length}
-            {filtersActive && rows.length !== filteredRows.length ? ` of ${rows.length}` : ''} deal
+            {total > filteredRows.length ? ` of ${total}` : filtersActive && rows.length !== filteredRows.length ? ` of ${rows.length}` : ''} deal
             {filteredRows.length === 1 ? '' : 's'}
           </p>
         </div>
@@ -695,7 +631,7 @@ export default function PipelineDealsView({
       {error && (
         <p className="text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{error}</p>
       )}
-      {!loading && !error && filteredRows.length === 0 && !isBoard && (
+      {!loading && !error && filteredRows.length === 0 && (
         <p className="text-xs text-gray-500 py-10 text-center border rounded-xl bg-gray-50">
           {rows.length > 0 && filtersActive
             ? 'No deals match these filters. Try another period or transport mode.'
@@ -703,33 +639,7 @@ export default function PipelineDealsView({
         </p>
       )}
 
-      {!loading && isBoard && (
-        <div className="crm-kanban-board pipeline-deals-board" aria-label="Deals by stage">
-          {boardColumns.map((column) => {
-            const columnRows = rowsByStage[column.id] || []
-            return (
-              <DealStageColumn
-                key={column.id}
-                column={column}
-                rows={columnRows}
-                highlight={dealStage !== 'all' && dealStage === column.id}
-                usdInrRate={usdInrRate}
-                freightOrg={freightOrg}
-                selected={selected}
-                onToggleRow={toggleRow}
-                onOpenLead={onOpenLead}
-                onDropDeal={(dealId) => {
-                  const row = (rowsByStage[column.id] || []).find((r) => r.deal?.id === dealId)
-                    || filteredRows.find((r) => r.deal?.id === dealId)
-                  if (row) void moveDealToStage(row, column.id)
-                }}
-              />
-            )
-          })}
-        </div>
-      )}
-
-      {!loading && !isBoard && filteredRows.length > 0 && (
+      {!loading && filteredRows.length > 0 && (
         <>
           <ul className="pipeline-deals-mobile-list mx-3 md:mx-4" aria-label="Deals">
             {filteredRows.map((row) => {
@@ -911,6 +821,18 @@ export default function PipelineDealsView({
           </div>
         </>
       )}
+      {!loading && hasMore && !filtersActive ? (
+        <div className="px-3 md:px-4 pb-3">
+          <button
+            type="button"
+            className="crm-filter-link-btn"
+            disabled={loadingMore}
+            onClick={() => void load({ append: true, offset: rows.length })}
+          >
+            {loadingMore ? 'Loading…' : 'Load more deals'}
+          </button>
+        </div>
+      ) : null}
       <SaveReportModal
         open={saveReportOpen}
         module="deals"
@@ -925,104 +847,6 @@ export default function PipelineDealsView({
           void loadSavedReports()
         }}
       />
-    </div>
-  )
-}
-
-function DealStageColumn({
-  column,
-  rows,
-  highlight,
-  usdInrRate,
-  freightOrg,
-  selected,
-  onToggleRow,
-  onOpenLead,
-  onDropDeal,
-}) {
-  const [dropTarget, setDropTarget] = useState(false)
-
-  return (
-    <div className={`crm-kanban-column ${highlight ? 'pipeline-deals-column--focus' : ''}`}>
-      <div className="crm-kanban-column-header flex items-center justify-between gap-1">
-        <span className="truncate">{column.label}</span>
-        <span
-          className="text-xs font-medium tabular-nums px-2 py-0.5 rounded-full"
-          style={{ background: '#64748B', color: '#fff' }}
-        >
-          {rows.length}
-        </span>
-      </div>
-      <div
-        className={`crm-kanban-column-body ${dropTarget ? 'pipeline-kanban-column--drop-target' : ''}`}
-        onDragOver={(e) => {
-          e.preventDefault()
-          setDropTarget(true)
-        }}
-        onDragLeave={() => setDropTarget(false)}
-        onDrop={(e) => {
-          e.preventDefault()
-          setDropTarget(false)
-          const dealId = e.dataTransfer.getData('text/deal-id') || e.dataTransfer.getData('text/plain')
-          if (dealId) onDropDeal(dealId)
-        }}
-      >
-        {rows.length === 0 ? (
-          <p className="text-xs text-[#7c98b6] text-center py-6">No deals</p>
-        ) : (
-          rows.map((row) => {
-            const key = dealRowKey(row)
-            const { deal, leadId, leadName, company } = row
-            const freight = deal.freight
-            const isChecked = selected.has(key)
-            return (
-              <div
-                key={key}
-                draggable
-                onDragStart={(e) => {
-                  e.dataTransfer.setData('text/deal-id', deal.id)
-                  e.dataTransfer.setData('text/plain', deal.id)
-                  e.dataTransfer.effectAllowed = 'move'
-                }}
-                className={`crm-kanban-card pipeline-deals-kanban-card ${isChecked ? 'is-checked' : ''}`}
-              >
-                <div className="flex items-start gap-1 p-1.5">
-                  <input
-                    type="checkbox"
-                    className="mt-0.5 shrink-0 pipeline-hs-checkbox"
-                    checked={isChecked}
-                    onChange={(e) => onToggleRow(row, e.target.checked)}
-                    onClick={(e) => e.stopPropagation()}
-                    aria-label={`Select ${deal.name}`}
-                  />
-                  <button
-                    type="button"
-                    className="min-w-0 flex-1 text-left"
-                    onClick={() => onOpenLead?.(leadId, 'deals')}
-                  >
-                    <span className="block text-[13px] font-semibold text-[#33475b] truncate" title={deal.name}>
-                      {deal.name}
-                    </span>
-                    <span className="block text-[11px] text-[#516f90] truncate" title={leadName}>
-                      {leadName}
-                      {company && company !== leadName ? ` · ${company}` : ''}
-                    </span>
-                    {freightOrg && freightRouteLabel(freight) !== '—' ? (
-                      <span className="block text-[11px] text-[#7c98b6] truncate">{freightRouteLabel(freight)}</span>
-                    ) : null}
-                    <span className="mt-1 flex items-center justify-between gap-2 text-[11px]">
-                      <span className="text-[#516f90]">{transportModeLabel(freight?.transportMode)}</span>
-                      <span className="tabular-nums font-semibold text-[#33475b]">
-                        {formatDealValue(estimatedFreightRevenueInr(deal, usdInrRate), 'INR')}
-                      </span>
-                    </span>
-                  </button>
-                </div>
-              </div>
-            )
-          })
-        )}
-      </div>
     </div>
   )
 }
