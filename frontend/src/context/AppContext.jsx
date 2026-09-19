@@ -114,7 +114,7 @@ export function AppProvider({ children }) {
   const [notifications, setNotifications] = useState([])
   const readNotificationIdsRef = useRef(loadReadNotificationIds())
   const [notificationTick, setNotificationTick] = useState(0)
-  const [sessionError, setSessionError] = useState(null)
+  const refreshSavedLeadsRef = useRef(null)
   const panelNavigateRef = useRef(null)
   const closePipelineLeadRef = useRef(null)
   const pendingLeadOpenRef = useRef({ leadId: null, tab: null })
@@ -182,6 +182,9 @@ export function AppProvider({ children }) {
         setUser(session.user)
         setScreen('app')
         setSessionError(null)
+        clearPipelineBootstrapCachesForUser(session.user)
+        pipelineListFetchGenRef.current += 1
+        await refreshSavedLeadsRef.current?.({ fresh: true })
       } else {
         setUser(null)
         setScreen('landing')
@@ -301,7 +304,7 @@ export function AppProvider({ children }) {
   )
 
   const refreshSavedLeads = useCallback(
-    async () => {
+    async ({ fresh = false } = {}) => {
       try {
         const assigneeUserId =
           pipelineAssigneeFilter || loadPipelineAssigneeFilter() || undefined
@@ -310,6 +313,7 @@ export function AppProvider({ children }) {
           limit: 100,
           silent: false,
           assigneeUserId,
+          fresh,
         })
         const leads = bootstrap.leads || []
         const summary = bootstrap.summary || {}
@@ -339,6 +343,7 @@ export function AppProvider({ children }) {
     },
     [pipelineAssigneeFilter]
   )
+  refreshSavedLeadsRef.current = refreshSavedLeads
 
   const refreshPipelineSummary = useCallback(async () => {
     try {
@@ -614,10 +619,11 @@ export function AppProvider({ children }) {
           }
 
           const bootstrap = bootstrapResult
-          writeBootstrapCache(cacheKey, bootstrap)
-
           const leads = bootstrap.leads || []
           const summary = bootstrap.summary || {}
+          if (leads.length || Number(bootstrap.total || summary.total || 0) > 0) {
+            writeBootstrapCache(cacheKey, bootstrap)
+          }
           setPipelineSummary(normalizePipelineSummary(summary))
           setSearchHistory(historyResult.history || [])
 
