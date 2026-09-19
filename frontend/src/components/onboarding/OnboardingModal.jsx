@@ -61,10 +61,6 @@ export default function OnboardingModal() {
   }
 
   const continueIndividual = async () => {
-    if (!mobile.trim()) {
-      setError('Mobile number is required.')
-      return
-    }
     setLoading(true)
     setError(null)
     try {
@@ -80,10 +76,6 @@ export default function OnboardingModal() {
   }
 
   const requestAccess = async () => {
-    if (!mobile.trim()) {
-      setError('Add your mobile so an admin can reach you.')
-      return
-    }
     setAccessLoading(true)
     setError(null)
     try {
@@ -137,15 +129,18 @@ export default function OnboardingModal() {
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-gray-600 mb-1">Your mobile (WhatsApp)</label>
+          <label className="block text-xs font-semibold text-gray-600 mb-1">
+            Your mobile (WhatsApp) <span className="font-normal text-gray-400">(optional)</span>
+          </label>
           <input
-            required
             value={mobile}
             onChange={(e) => setMobile(e.target.value)}
             placeholder="+91 98765 43210"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
           />
-          <p className="text-xs text-gray-500 mt-1">Same number you use on WhatsApp — for customer outreach from CRM.</p>
+          <p className="text-xs text-gray-500 mt-1">
+            Same number you use on WhatsApp — for customer outreach from CRM. You can add this later.
+          </p>
         </div>
 
         {accountType === 'company' && lookupLoading && (
