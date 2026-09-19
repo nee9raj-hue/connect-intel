@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-18T17:41:21.605Z",
-  "updatedAtIst": "18/09/2026, 23:11:21",
+  "updatedAt": "2026-09-19T08:34:59.477Z",
+  "updatedAtIst": "19/09/2026, 14:04:59",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "828834a",
+  "currentProductionCommit": "d97a54c",
   "entries": [
+    {
+      "logId": "20260919-1404-d97a54c",
+      "commit": "d97a54c",
+      "commitFull": "d97a54c60f40a3c04a54d1a6f22c23ebe6826c74",
+      "message": "Keep pipeline tags in a Supabase lead_tag_master table.",
+      "deployedAt": "2026-09-19T08:34:34.927Z",
+      "deployedAtIst": "19/09/2026, 14:04:34",
+      "committedAtIst": "19/09/2026, 14:03:45",
+      "vercelPreviewUrl": "https://connect-intel-kqfe7o221-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- d97a54c"
+    },
+    {
+      "logId": "20260918-2312-7f93e12",
+      "commit": "7f93e12",
+      "commitFull": "7f93e121ecc8f126055a93ceed6c0fd980b1c5d0",
+      "message": "Record production LIVE snapshot for pipeline team filter.",
+      "deployedAt": "2026-09-18T17:42:15.408Z",
+      "deployedAtIst": "18/09/2026, 23:12:15",
+      "committedAtIst": "18/09/2026, 23:11:27",
+      "vercelPreviewUrl": "https://connect-intel-imxg8kom4-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 7f93e12"
+    },
     {
       "logId": "20260918-2309-828834a",
       "commit": "828834a",
@@ -15,7 +43,7 @@
       "committedAtIst": "18/09/2026, 23:08:53",
       "vercelPreviewUrl": "https://connect-intel-rj066g5bi-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 828834a"
     },
@@ -256,20 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 3f46a72"
-    },
-    {
-      "logId": "20260918-0041-677f15f",
-      "commit": "677f15f",
-      "commitFull": "677f15f4e48f214f4436d3b6affd2d1addc09da9",
-      "message": "Record production LIVE snapshot for 0c81265.",
-      "deployedAt": "2026-09-17T19:11:07.590Z",
-      "deployedAtIst": "18/09/2026, 00:41:07",
-      "committedAtIst": "18/09/2026, 00:40:09",
-      "vercelPreviewUrl": "https://connect-intel-ro9zc2nz3-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 677f15f"
     }
   ]
 }
