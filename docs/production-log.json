@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-19T09:10:26.635Z",
-  "updatedAtIst": "19/09/2026, 14:40:26",
+  "updatedAt": "2026-09-19T09:37:36.210Z",
+  "updatedAtIst": "19/09/2026, 15:07:36",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "9c66a9d",
+  "currentProductionCommit": "91006a3",
   "entries": [
+    {
+      "logId": "20260919-1507-91006a3",
+      "commit": "91006a3",
+      "commitFull": "91006a374521a3eddbf7e18e1702bc5870a4447c",
+      "message": "Open left-nav submenus as right hover popups and promote Deals.",
+      "deployedAt": "2026-09-19T09:37:22.625Z",
+      "deployedAtIst": "19/09/2026, 15:07:22",
+      "committedAtIst": "19/09/2026, 15:06:30",
+      "vercelPreviewUrl": "https://connect-intel-7zh5t28vl-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 91006a3"
+    },
+    {
+      "logId": "20260919-1441-7179687",
+      "commit": "7179687",
+      "commitFull": "717968743e33ff176ec8f566c18fab5b39e70ade",
+      "message": "Record production LIVE snapshot for deals list timeout fix.",
+      "deployedAt": "2026-09-19T09:11:21.347Z",
+      "deployedAtIst": "19/09/2026, 14:41:21",
+      "committedAtIst": "19/09/2026, 14:40:40",
+      "vercelPreviewUrl": "https://connect-intel-7c8s726gf-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 7179687"
+    },
     {
       "logId": "20260919-1440-9c66a9d",
       "commit": "9c66a9d",
@@ -15,7 +43,7 @@
       "committedAtIst": "19/09/2026, 14:39:17",
       "vercelPreviewUrl": "https://connect-intel-q2g9z3oor-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 9c66a9d"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 88e6235"
-    },
-    {
-      "logId": "20260918-1612-4bdbdf1",
-      "commit": "4bdbdf1",
-      "commitFull": "4bdbdf1b15c7e0e92877120f6ba974b4de63af1b",
-      "message": "Stop Pipeline from waiting on ERP owner claim.",
-      "deployedAt": "2026-09-18T10:42:03.625Z",
-      "deployedAtIst": "18/09/2026, 16:12:03",
-      "committedAtIst": "18/09/2026, 16:11:21",
-      "vercelPreviewUrl": "https://connect-intel-6u8onp3vh-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 4bdbdf1"
-    },
-    {
-      "logId": "20260918-1558-593dbc7",
-      "commit": "593dbc7",
-      "commitFull": "593dbc75a45525e43044bd15ce20a25da15c0eac",
-      "message": "Record production LIVE snapshot for 8cb0b10.",
-      "deployedAt": "2026-09-18T10:28:23.107Z",
-      "deployedAtIst": "18/09/2026, 15:58:23",
-      "committedAtIst": "18/09/2026, 15:57:37",
-      "vercelPreviewUrl": "https://connect-intel-gmscbauw3-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 593dbc7"
     }
   ]
 }
