@@ -503,17 +503,9 @@ export function AppProvider({ children }) {
         }
       } catch (error) {
         if (!cancelled) {
-          const message = String(error?.message || '')
-          const dbBusy = /timed out|unavailable|supabase|circuit|workspace is taking longer|Could not load your workspace/i.test(message)
-          setSessionError(
-            dbBusy
-              ? 'Your workspace is taking longer than usual to load. Wait a moment and try again.'
-              : message || 'Could not refresh your session'
-          )
-          if (!dbBusy) {
-            setUser(null)
-            setScreen('landing')
-          }
+          setUser(null)
+          setScreen('landing')
+          if (error?.message) setSessionError(error.message)
         }
       } finally {
         setReady(true)
@@ -587,44 +579,28 @@ export function AppProvider({ children }) {
 
           const teamPromise =
             user.organizationId && user.accountType === 'company'
-              ? api.getTeamMembers({ silent: true }).catch(() => null)
+              ? api.getTeamMembers({ silent: true })
               : Promise.resolve(null)
 
-          const [bootstrapResult, historyResult, teamData] = await Promise.all([
-            api
-              .getPipelineBootstrap({ offset: 0, limit: 50, silent: true, assigneeUserId })
-              .catch((error) => ({ _error: error })),
-            api.getSearchHistory({ silent: true }).catch(() => ({ history: [] })),
+          const [bootstrap, historyResult, teamData] = await Promise.all([
+            api.getPipelineBootstrap({ offset: 0, limit: 100, silent: true, assigneeUserId }),
+            api.getSearchHistory({ silent: true }),
             teamPromise,
           ])
 
-          if (teamData) {
-            setTeamMembers(teamData.members || [])
-            setRepRoster(teamData.repRoster || teamData.members || [])
-          }
-
           if (cancelled) return
 
-          if (bootstrapResult?._error) {
-            const error = bootstrapResult._error
-            if (error?.status === 401) {
-              setSessionError(error.message || 'Session expired. Please sign in again.')
-            } else {
-              setSessionError(
-                'Your pipeline is taking longer than usual to load. Wait a moment and try again.'
-              )
-            }
-            setWorkspaceReady(true)
-            return
-          }
-
-          const bootstrap = bootstrapResult
           writeBootstrapCache(cacheKey, bootstrap)
 
           const leads = bootstrap.leads || []
           const summary = bootstrap.summary || {}
           setPipelineSummary(normalizePipelineSummary(summary))
           setSearchHistory(historyResult.history || [])
+
+          if (teamData) {
+            setTeamMembers(teamData.members || [])
+            setRepRoster(teamData.repRoster || teamData.members || [])
+          }
 
           const listSuperseded = bootstrapGen !== pipelineListFetchGenRef.current
           if (!listSuperseded) {
@@ -642,8 +618,12 @@ export function AppProvider({ children }) {
           }
           setSessionError(null)
         } catch (error) {
-          if (!cancelled && error?.status === 401) {
-            setSessionError(error.message || 'Session expired. Please sign in again.')
+          if (!cancelled) {
+            if (error?.status === 401) {
+              setSessionError(error.message || 'Session expired. Please sign in again.')
+            } else if (error?.message) {
+              setSessionError(error.message)
+            }
           }
         }
       })()

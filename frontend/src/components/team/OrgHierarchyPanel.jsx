@@ -25,7 +25,7 @@ export default function OrgHierarchyPanel({ teamMembers = [], onMembersChanged }
     setLoading(true)
     setError(null)
     try {
-      const data = await api.getOrgHierarchy({ skipLeadCounts: true })
+      const data = await api.getOrgHierarchy()
       setHierarchy(data)
     } catch (err) {
       setError(err.message || 'Could not load departments')

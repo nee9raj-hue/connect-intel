@@ -18,6 +18,7 @@ import { BRAND_LOGO_MARK_LIGHT, BRAND_LOGO_MARK_CLASS } from '../../lib/brandAss
 import AppHeader from './AppHeader'
 import EmailOAuthNotice from './EmailOAuthNotice'
 import CrmGmailOAuthNotice from './CrmGmailOAuthNotice'
+import MobileRequiredModal from '../profile/MobileRequiredModal'
 import PanelViewport from './PanelViewport'
 import { useWorkspaceSync } from '../../hooks/useWorkspaceSync'
 import { useWorkspacePulse } from '../../hooks/useWorkspacePulse'
@@ -383,6 +384,7 @@ export default function AppShell() {
         {user?.isPlatformAdmin && (
           <EmailOAuthNotice onOpenSystemStatus={() => navigate('integrations')} />
         )}
+        <MobileRequiredModal />
         {!user?.isPlatformAdmin && !chithiFocus && !marketingFocus && !(calendarImmersive && isMobile) && (
           <AppHeader
             onNavigate={navigate}

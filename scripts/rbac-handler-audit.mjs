@@ -52,8 +52,6 @@ const PUBLIC_OK = new Set([
   'crm-dashboard-warm-cron.js',
   'crm-meili-sync-cron.js',
   'crm-data-sync-cron.js',
-  'crm-xindus-erp-sync.js',
-  'crm-xindus-erp-backfill.js',
   'reports-scheduled-cron.js',
   'marketing-cron.js',
   'grafana-metrics-cron.js',

@@ -6,18 +6,6 @@ import { getBuiltInGoogleClientId, resolveGoogleClientId } from '../../lib/googl
 
 const IS_PROD = import.meta.env.PROD
 
-function signInErrorMessage(error) {
-  const message = String(error?.message || '')
-  if (
-    /supabase|vercel|SUPABASE_|DATABASE_URL|timed out|unavailable|circuit|workspace is taking longer|Could not load your workspace/i.test(
-      message
-    )
-  ) {
-    return 'Sign-in is taking longer than usual. Wait a moment and try again.'
-  }
-  return message || 'Could not sign in with Google. Please try again.'
-}
-
 function useButtonWidth() {
   const ref = useRef(null)
   const [width, setWidth] = useState(320)
@@ -72,7 +60,7 @@ function MissingGoogleConfig({ label, compact = false }) {
       <p className="font-semibold">{label || 'Google sign-in unavailable'}</p>
       <p className="text-xs mt-1 text-amber-800/90 leading-relaxed">
         {IS_PROD
-          ? 'Google sign-in is not available right now. Try again in a moment, or use email and password if you have an account.'
+          ? 'Add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET on Vercel, then redeploy. In Google Cloud Console, authorize https://connectintel.net as a JavaScript origin.'
           : 'Set VITE_GOOGLE_CLIENT_ID in frontend/.env.local for local Google login.'}
       </p>
     </div>
@@ -93,24 +81,24 @@ export default function GoogleSignIn({
   const { login, authBusy } = useApp()
   const [containerRef, btnWidth] = useButtonWidth()
   const { clientId, ready, configured } = useGoogleClientId()
-  const [signInError, setSignInError] = useState('')
 
   const handleSuccess = async (credentialResponse) => {
     if (authBusy) return
-    setSignInError('')
     if (!credentialResponse?.credential) {
-      setSignInError('Google did not return a sign-in token. Please try again.')
+      alert('Google did not return a sign-in token. Please try again.')
       return
     }
     try {
       await login({ credential: credentialResponse.credential })
     } catch (error) {
-      setSignInError(signInErrorMessage(error))
+      alert(error.message || 'Could not sign in with Google. Please try again.')
     }
   }
 
   const handleError = () => {
-    setSignInError('Google sign-in could not start. Wait a moment and try again.')
+    alert(
+      'Google sign-in could not start. Check that https://connectintel.net is listed under Authorized JavaScript origins in Google Cloud Console.'
+    )
   }
 
   const displayLabel =
@@ -184,15 +172,12 @@ export default function GoogleSignIn({
             width={btnWidth}
           />
         </div>
-        {signInError ? (
-          <p className="mt-2 text-sm text-center text-amber-800">{signInError}</p>
-        ) : null}
       </div>
     )
   }
 
   return (
-    <div ref={containerRef} className="inline-flex flex-col items-center overflow-visible">
+    <div ref={containerRef} className="inline-flex justify-center overflow-visible">
       <GoogleLogin
         onSuccess={handleSuccess}
         onError={handleError}
@@ -203,9 +188,6 @@ export default function GoogleSignIn({
         shape="rectangular"
         width={btnWidth}
       />
-      {signInError ? (
-        <p className="mt-2 text-sm text-center text-amber-800">{signInError}</p>
-      ) : null}
     </div>
   )
 }
@@ -213,7 +195,6 @@ export default function GoogleSignIn({
 export function GoogleSignInCompact({ onBeforeLogin }) {
   const { login, setScreen, authBusy } = useApp()
   const { clientId, ready, configured } = useGoogleClientId()
-  const [signInError, setSignInError] = useState('')
 
   const handleSuccess = async (credentialResponse) => {
     if (authBusy) return
@@ -222,7 +203,7 @@ export function GoogleSignInCompact({ onBeforeLogin }) {
     try {
       await login({ credential: credentialResponse.credential })
     } catch (error) {
-      setSignInError(signInErrorMessage(error))
+      alert(error.message || 'Google sign-in failed.')
     }
   }
 
@@ -270,17 +251,18 @@ export function GoogleSignInCompact({ onBeforeLogin }) {
   }
 
   return (
-    <div className="inline-flex flex-col items-end overflow-visible min-w-[180px]">
+    <div className="inline-flex overflow-visible min-w-[180px]">
       <GoogleLogin
         onSuccess={handleSuccess}
-        onError={() => setSignInError('Google sign-in could not start. Wait a moment and try again.')}
+        onError={() =>
+          alert('Google sign-in failed. Add connectintel.net to Authorized JavaScript origins in Google Cloud.')
+        }
         theme="outline"
         size="medium"
         text="signin_with"
         shape="rectangular"
         width={200}
       />
-      {signInError ? <p className="mt-1 text-xs text-amber-800 max-w-[220px] text-right">{signInError}</p> : null}
     </div>
   )
 }

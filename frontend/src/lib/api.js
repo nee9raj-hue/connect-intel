@@ -122,8 +122,7 @@ export const api = {
   getOrgWorkspaceLookup: () => request('/api/org/workspace-lookup', { silent: true }),
   requestOrgAccess: (payload) =>
     request('/api/org/access-request', { method: 'POST', body: payload }),
-  getTeamMembers: ({ silent = false } = {}) =>
-    request('/api/team/members', { timeoutMs: 20_000 }, { silent }),
+  getTeamMembers: ({ silent = false } = {}) => request('/api/team/members', {}, { silent }),
   inviteTeamMember: (payload) =>
     request('/api/team/invite', { method: 'POST', body: payload, timeoutMs: 60_000 }),
   getInviteEmailDiagnostics: () => request('/api/team/invite-email'),
@@ -132,7 +131,7 @@ export const api = {
   previewInvite: (token) => request(`/api/invite/preview?token=${encodeURIComponent(token)}`),
   acceptInvite: (token) => request('/api/invite/accept', { method: 'POST', body: { token } }),
   updateTeamBranding: (payload) => request('/api/team/branding', { method: 'PATCH', body: payload }),
-  getOrgLeadTags: ({ silent = false } = {}) => request('/api/org/lead-tags', { timeoutMs: 20_000 }, { silent }),
+  getOrgLeadTags: ({ silent = false } = {}) => request('/api/org/lead-tags', {}, { silent }),
   getOrgWorkspaceSettings: () => request('/api/org/workspace'),
   confirmOrgPlanUpgrade: (planId) =>
     request('/api/org/plan-upgrade', {
@@ -249,7 +248,6 @@ export const api = {
     offset = 0,
     limit = 100,
     assigneeUserId = null,
-    customerType = '',
     silent = false,
   } = {}) => {
     const qs = new URLSearchParams({
@@ -258,7 +256,6 @@ export const api = {
       offset: String(offset),
     })
     if (assigneeUserId) qs.set('assigneeUserId', assigneeUserId)
-    if (customerType) qs.set('customerType', customerType)
     return request(`/api/crm/deals?${qs}`, { timeoutMs: 60_000 }, { silent })
   },
 
@@ -313,7 +310,6 @@ export const api = {
     teamId,
     teamIds,
     leadIds,
-    pipelineTrack,
     silent = false,
   } = {}) => {
     const qs = new URLSearchParams({
@@ -346,7 +342,6 @@ export const api = {
     if (lastShipmentYear && lastShipmentMonth) qs.set('lastShipmentMonth', String(lastShipmentMonth))
     if (teamId) qs.set('teamId', String(teamId))
     for (const id of teamIds || []) qs.append('teamId', String(id))
-    if (pipelineTrack) qs.set('pipelineTrack', String(pipelineTrack))
     return request(`/api/saved-leads?${qs}`, { timeoutMs: 45_000 }, { silent })
   },
 
@@ -569,8 +564,8 @@ export const api = {
       body: { datasetType, rows, addToPipeline, tagIds, filename },
       timeoutMs: 120_000,
     }),
-  getOrgHierarchy: ({ skipLeadCounts = true, silent = false } = {}) => {
-    const qs = skipLeadCounts ? '?skipLeadCounts=1' : '?skipLeadCounts=0'
+  getOrgHierarchy: ({ skipLeadCounts = false, silent = false } = {}) => {
+    const qs = skipLeadCounts ? '?skipLeadCounts=1' : ''
     return request(`/api/org/departments${qs}`, {}, { silent })
   },
   createOrgDepartment: (body) =>

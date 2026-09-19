@@ -1,17 +1,10 @@
 import {
   FREIGHT_DEAL_STAGES,
   getFreightDealStageMeta,
-  isFreightDealOrg,
   isFreightDealStageClosed,
 } from '../../../lib/freightDeal.js'
 import { CRM_LEAD_STATUS_DEFS, DEFAULT_CRM_LEAD_STATUS, normalizeCrmLeadStatus, crmLeadStatusLabel } from '../../../lib/crmLeadStatuses.js'
 import { formatDate } from './dateLocale.js'
-import {
-  FREIGHT_CRM_PIPELINE_STAGE_DEFS,
-  FREIGHT_ERP_PIPELINE_STAGE_DEFS,
-  freightPipelineStatusLabel,
-  normalizePipelineTrack,
-} from '../../../lib/crmPipelineFlow.js'
 
 const STAGE_TW = {
   slate: 'bg-slate-100 text-slate-700 border-slate-200',
@@ -80,30 +73,7 @@ export const HIERARCHY_SQL_ROLES = [
   { id: 'admin', label: 'Admin', description: 'Full organization' },
 ]
 
-export const FREIGHT_CRM_PIPELINE_COLUMNS = FREIGHT_CRM_PIPELINE_STAGE_DEFS.map((row) => ({
-  id: row.id,
-  label: row.label,
-  hint: row.hint,
-  color: STAGE_TW[row.color] || STAGE_TW.slate,
-}))
-
-export const FREIGHT_ERP_PIPELINE_COLUMNS = FREIGHT_ERP_PIPELINE_STAGE_DEFS.map((row) => ({
-  id: row.id,
-  label: row.label,
-  hint: row.hint,
-  color: STAGE_TW[row.color] || STAGE_TW.slate,
-}))
-
-export function getVisiblePipelineColumns(user, { pipelineTrack, status } = {}) {
-  const freight = isFreightDealOrg(user)
-  const track = normalizePipelineTrack(pipelineTrack)
-  if (freight) {
-    if (track === 'erp' || String(status || '').startsWith('erp_')) return FREIGHT_ERP_PIPELINE_COLUMNS
-    if (track === 'crm' || ['fresh', 'qualified', 'unqualified', 'account_created_erp'].includes(String(status || ''))) {
-      return FREIGHT_CRM_PIPELINE_COLUMNS
-    }
-    return FREIGHT_CRM_PIPELINE_COLUMNS
-  }
+export function getVisiblePipelineColumns(user) {
   if (!user || user.accountType !== 'company') return CRM_STATUSES
   return CRM_STATUSES
 }
@@ -132,19 +102,7 @@ export function defaultCrm() {
   }
 }
 
-export function getStatusMeta(statusId, { freightOrg = false, pipelineTrack } = {}) {
-  const raw = String(statusId || '').trim().toLowerCase()
-  if (freightOrg) {
-    const label = freightPipelineStatusLabel(raw, { pipelineTrack })
-    const fromFreight =
-      FREIGHT_CRM_PIPELINE_COLUMNS.find((s) => s.id === raw) ||
-      FREIGHT_ERP_PIPELINE_COLUMNS.find((s) => s.id === raw) ||
-      (label
-        ? FREIGHT_ERP_PIPELINE_COLUMNS.find((s) => s.label === label) ||
-          FREIGHT_CRM_PIPELINE_COLUMNS.find((s) => s.label === label)
-        : null)
-    if (fromFreight) return fromFreight
-  }
+export function getStatusMeta(statusId) {
   const id = normalizeCrmLeadStatus(statusId)
   return CRM_STATUSES.find((s) => s.id === id) || CRM_STATUSES[0]
 }

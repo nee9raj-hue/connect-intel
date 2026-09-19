@@ -27,8 +27,6 @@ export function buildPipelineExportQuery(serverFilters = {}, { reportId } = {}) 
   if (serverFilters.followUpDue) params.set('followUpDue', '1')
   if (serverFilters.overdueFollowUp) params.set('overdueFollowUp', '1')
   if (serverFilters.stuck) params.set('stuck', '1')
-    if (serverFilters.lastShipmentYear) params.set('lastShipmentYear', String(serverFilters.lastShipmentYear))
-  if (serverFilters.pipelineTrack) params.set('pipelineTrack', String(serverFilters.pipelineTrack))
   if (reportId) params.set('reportId', reportId)
   return params
 }

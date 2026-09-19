@@ -70,7 +70,7 @@ export default function TeamPanel({ onNavigate, panelOptions = {} }) {
       setHierarchy(data)
       hierarchyLoadedRef.current = true
       if (data.sql === false) {
-        setHierarchyError('Team structure is not available yet. Refresh in a moment.')
+        setHierarchyError('SQL hierarchy is not enabled for this workspace.')
       }
       return data
     } catch (err) {
