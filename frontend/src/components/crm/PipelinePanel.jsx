@@ -20,7 +20,7 @@ import { PipelineBulkAssignModal, PipelineBulkEditModal } from './PipelineBulkMo
 import BulkLeadTagsModal from './BulkLeadTagsModal'
 import PipelineViewSettings from './PipelineViewSettings'
 import PipelineLeadsTable from './PipelineLeadsTable'
-import PipelineDealsView from './PipelineDealsView'
+import PipelineDealsView, { persistDealsLayout, readDealsLayout } from './PipelineDealsView'
 import LeadTagDots from './LeadTagDots'
 import PipelineFiltersBar, { DEFAULT_PIPELINE_FILTERS } from './PipelineFiltersBar'
 import PipelineMobileHeaderChrome from './PipelineMobileHeaderChrome'
@@ -146,6 +146,10 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const useMobileFilterSheet = usePipelineFilterMobile()
   const usePipelineNarrow = usePipelineNarrowViewport()
   const [view, setView] = useState('list')
+  const [dealsLayout, setDealsLayout] = useState(readDealsLayout)
+  const changeDealsLayout = useCallback((next) => {
+    setDealsLayout(persistDealsLayout(next))
+  }, [])
   const [filter, setFilter] = useState(panelOptions?.status || 'all')
   /** Status picked from toolbar on All Leads — does not change sidebar stage navigation. */
   const [listStatusFilter, setListStatusFilter] = useState('all')
@@ -1470,8 +1474,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               statsText={mobileHeaderStats}
               stageListMode={stageListMode}
               dealsMode={isDealsView}
-              view={view}
-              onViewChange={setView}
+              view={isDealsView ? dealsLayout : view}
+              onViewChange={isDealsView ? changeDealsLayout : setView}
             />,
             mobileHeaderSlot
           )
@@ -1513,7 +1517,38 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                 </div>
               </div>
             ) : null}
+            {isDealsView && !usePipelineNarrow ? (
+              <div className="pipeline-v2-header__brand min-w-0">
+                <div className="pipeline-v2-header__icon-wrap" aria-hidden>
+                  <PipelineIcon className="pipeline-v2-header__icon" />
+                </div>
+                <div className="min-w-0">
+                  <h1 className="pipeline-v2-header__title">Deals</h1>
+                  <p className="pipeline-v2-header__breadcrumb">Board or list by deal stage</p>
+                </div>
+              </div>
+            ) : null}
             <div className="crm-page-actions pipeline-page-actions">
+              {isDealsView ? (
+                <div className="pipeline-v2-view-toggle" role="tablist" aria-label="Deals view">
+                  {[
+                    { id: 'board', label: 'Board', Icon: PipelineIcon },
+                    { id: 'list', label: 'List', Icon: ListIcon },
+                  ].map((v) => (
+                    <button
+                      key={v.id}
+                      type="button"
+                      role="tab"
+                      aria-selected={dealsLayout === v.id}
+                      onClick={() => changeDealsLayout(v.id)}
+                      className={`pipeline-v2-view-toggle__btn ${dealsLayout === v.id ? 'is-active' : ''}`}
+                    >
+                      <v.Icon aria-hidden />
+                      {v.label}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
               {!stageListMode && !usePipelineNarrow && !isDealsView ? (
                 <div className="pipeline-v2-view-toggle" role="tablist" aria-label="Pipeline view">
                   {[
@@ -1546,6 +1581,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                   <span>View settings</span>
                 </button>
               ) : null}
+              {!isDealsView ? (
+                <>
               <button
                 type="button"
                 onClick={() => setImportOpen(true)}
@@ -1567,6 +1604,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                 <PlusIcon className="pipeline-action-btn__icon w-4 h-4" aria-hidden />
                 <span>Add lead</span>
               </button>
+                </>
+              ) : null}
             </div>
           </div>
 
@@ -1635,7 +1674,9 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
         <div className="crm-page-body flex-1 min-h-0">
           <div
             className={`crm-content-card flex-1 min-h-0 ${
-              useHubSpotList || isDealsView
+              isDealsView && dealsLayout === 'board'
+                ? 'crm-content-card--pipeline-board'
+                : useHubSpotList || isDealsView
                 ? 'crm-content-card--pipeline-table'
                 : view === 'board' && !stageListMode
                   ? 'crm-content-card--pipeline-board'
@@ -1725,14 +1766,19 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
 
           <div
             className={`crm-content-scroll pipeline-scroll-area ${
-              view === 'board' && !stageListMode && !isDealsView ? 'crm-content-scroll-board' : ''
+              (view === 'board' && !stageListMode && !isDealsView) ||
+              (isDealsView && dealsLayout === 'board')
+                ? 'crm-content-scroll-board'
+                : ''
             }`}
           >
           {isDealsView ? (
-            <div className="p-3 md:p-4">
+            <div className="h-full min-h-0 flex flex-col">
               <PipelineDealsView
                 dealStage={dealsStage}
                 assigneeFilter={effectiveAssigneeFilter}
+                layout={dealsLayout}
+                onLayoutChange={changeDealsLayout}
                 onOpenLead={openDealFromPipeline}
                 onDealStageChange={(stage) =>
                   onNavigate?.('pipeline', { view: 'deals', dealStage: stage })

@@ -6,7 +6,7 @@ export default function PipelineMobileHeaderChrome({
   view,
   onViewChange,
 }) {
-  const hideViewToggle = stageListMode || dealsMode
+  const hideViewToggle = stageListMode && !dealsMode
 
   return (
     <div className="ci-pipeline-mobile-header" role="group" aria-label="Pipeline summary">

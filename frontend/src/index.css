@@ -3127,6 +3127,30 @@ button.ci-lead-tag:disabled {
   text-decoration: underline;
 }
 
+.pipeline-deals-view--board {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.pipeline-deals-board {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.pipeline-deals-column--focus .crm-kanban-column-header {
+  color: #ff773d;
+}
+
+.pipeline-deals-kanban-card {
+  cursor: grab;
+}
+
+.pipeline-deals-kanban-card:active {
+  cursor: grabbing;
+}
+
 .pipeline-deals-table-wrap {
   width: 100%;
   overflow-x: auto;
