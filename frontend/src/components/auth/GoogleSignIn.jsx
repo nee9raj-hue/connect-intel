@@ -6,6 +6,14 @@ import { getBuiltInGoogleClientId, resolveGoogleClientId } from '../../lib/googl
 
 const IS_PROD = import.meta.env.PROD
 
+function signInErrorMessage(error) {
+  const message = String(error?.message || '')
+  if (/supabase|vercel|SUPABASE_|DATABASE_URL|timed out|unavailable|circuit|workspace is taking longer/i.test(message)) {
+    return 'Sign-in is taking longer than usual. Wait a moment and try again.'
+  }
+  return message || 'Could not sign in with Google. Please try again.'
+}
+
 function useButtonWidth() {
   const ref = useRef(null)
   const [width, setWidth] = useState(320)
@@ -91,7 +99,7 @@ export default function GoogleSignIn({
     try {
       await login({ credential: credentialResponse.credential })
     } catch (error) {
-      alert(error.message || 'Could not sign in with Google. Please try again.')
+      alert(signInErrorMessage(error))
     }
   }
 
@@ -203,7 +211,7 @@ export function GoogleSignInCompact({ onBeforeLogin }) {
     try {
       await login({ credential: credentialResponse.credential })
     } catch (error) {
-      alert(error.message || 'Google sign-in failed.')
+      alert(signInErrorMessage(error))
     }
   }
 
