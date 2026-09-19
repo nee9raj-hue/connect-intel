@@ -1,10 +1,38 @@
 {
-  "updatedAt": "2026-09-19T13:18:04.052Z",
-  "updatedAtIst": "19/09/2026, 18:48:04",
+  "updatedAt": "2026-09-19T13:24:28.830Z",
+  "updatedAtIst": "19/09/2026, 18:54:28",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "b2a6279",
+  "currentProductionCommit": "efddd8b",
   "entries": [
+    {
+      "logId": "20260919-1854-efddd8b",
+      "commit": "efddd8b",
+      "commitFull": "efddd8b6a8fba72eeb7ba0c1ad32f0eeee065f10",
+      "message": "Stop sign-in from downloading the users blob and fix crm.xindus.net cookies.",
+      "deployedAt": "2026-09-19T13:24:16.636Z",
+      "deployedAtIst": "19/09/2026, 18:54:16",
+      "committedAtIst": "19/09/2026, 18:52:58",
+      "vercelPreviewUrl": "https://connect-intel-f1ryx2ncy-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- efddd8b"
+    },
+    {
+      "logId": "20260919-1848-f0ff339",
+      "commit": "f0ff339",
+      "commitFull": "f0ff339e646ae63aff6cfee45e71356ec58a7a65",
+      "message": "Record production LIVE snapshot after reverting to 72585b6 tree.",
+      "deployedAt": "2026-09-19T13:18:56.917Z",
+      "deployedAtIst": "19/09/2026, 18:48:56",
+      "committedAtIst": "19/09/2026, 18:48:11",
+      "vercelPreviewUrl": "https://connect-intel-3zswzxcw9-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- f0ff339"
+    },
     {
       "logId": "20260919-1847-b2a6279",
       "commit": "b2a6279",
@@ -15,7 +43,7 @@
       "committedAtIst": "19/09/2026, 18:46:12",
       "vercelPreviewUrl": "https://connect-intel-2rio7cavx-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- b2a6279"
     },
@@ -256,34 +284,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 9c66a9d"
-    },
-    {
-      "logId": "20260919-1422-5b4c1a2",
-      "commit": "5b4c1a2",
-      "commitFull": "5b4c1a2b8315be02c798abc421697a80b0b2156b",
-      "message": "Record production LIVE snapshot for deals board/list toggle.",
-      "deployedAt": "2026-09-19T08:52:44.225Z",
-      "deployedAtIst": "19/09/2026, 14:22:44",
-      "committedAtIst": "19/09/2026, 14:21:46",
-      "vercelPreviewUrl": "https://connect-intel-2vjc1ptky-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 5b4c1a2"
-    },
-    {
-      "logId": "20260919-1421-49315cf",
-      "commit": "49315cf",
-      "commitFull": "49315cfd4e9965e36011395f1d9de4b2e4b22ed6",
-      "message": "Put Deals board/list toggle in the page header where Pipeline already shows it.",
-      "deployedAt": "2026-09-19T08:51:21.287Z",
-      "deployedAtIst": "19/09/2026, 14:21:21",
-      "committedAtIst": "19/09/2026, 14:20:29",
-      "vercelPreviewUrl": "https://connect-intel-gkk4pgo4f-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 49315cf"
     }
   ]
 }

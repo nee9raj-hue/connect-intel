@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 6bf2234
+npm run prod:rollback -- f0ff339
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 6bf2234
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `b2a6279` |
-| Log updated (IST) | 19/09/2026, 18:48:04 |
+| Commit | `efddd8b` |
+| Log updated (IST) | 19/09/2026, 18:54:28 |
 
 ---
 
@@ -44,7 +44,9 @@ npm run prod:rollback -- 6bf2234
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 19/09/2026, 18:47:08 | `b2a6279` | Revert 2780b65 and every commit after it. | [preview](https://connect-intel-2rio7cavx-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b2a6279` | **← LIVE**
+| 19/09/2026, 18:54:16 | `efddd8b` | Stop sign-in from downloading the users blob and fix crm.xindus.net cookies. | [preview](https://connect-intel-f1ryx2ncy-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- efddd8b` | **← LIVE**
+| 19/09/2026, 18:48:56 | `f0ff339` | Record production LIVE snapshot after reverting to 72585b6 tree. | [preview](https://connect-intel-3zswzxcw9-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f0ff339` |
+| 19/09/2026, 18:47:08 | `b2a6279` | Revert 2780b65 and every commit after it. | [preview](https://connect-intel-2rio7cavx-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b2a6279` |
 | 19/09/2026, 18:29:24 | `6bf2234` | Record production LIVE snapshot for pipeline-index timeout fix. | [preview](https://connect-intel-kcbonvaza-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6bf2234` |
 | 19/09/2026, 18:27:59 | `afe217a` | Stop Team and Pipeline from waiting on the pipeline-index blob. | [preview](https://connect-intel-ox1lbea53-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- afe217a` |
 | 19/09/2026, 18:21:12 | `f4666a3` | Record production LIVE snapshot for 2a1fb30. | [preview](https://connect-intel-1a0j01l0e-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f4666a3` |
@@ -62,8 +64,6 @@ npm run prod:rollback -- 6bf2234
 | 19/09/2026, 15:07:22 | `91006a3` | Open left-nav submenus as right hover popups and promote Deals. | [preview](https://connect-intel-7zh5t28vl-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 91006a3` |
 | 19/09/2026, 14:41:21 | `7179687` | Record production LIVE snapshot for deals list timeout fix. | [preview](https://connect-intel-7c8s726gf-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7179687` |
 | 19/09/2026, 14:40:05 | `9c66a9d` | Restore Deals list-only and stop downloading the full deals table. | [preview](https://connect-intel-q2g9z3oor-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9c66a9d` |
-| 19/09/2026, 14:22:44 | `5b4c1a2` | Record production LIVE snapshot for deals board/list toggle. | [preview](https://connect-intel-2vjc1ptky-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5b4c1a2` |
-| 19/09/2026, 14:21:21 | `49315cf` | Put Deals board/list toggle in the page header where Pipeline already shows it. | [preview](https://connect-intel-gkk4pgo4f-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 49315cf` |
 
 ---
 
