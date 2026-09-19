@@ -9,6 +9,7 @@ import {
   COMMERCIAL_EMAIL_CONSENT_MESSAGE,
 } from '../../lib/emailUtils'
 import { leadHasCallablePhone, openWhatsAppChat } from '../../lib/phoneUtils'
+import { isFreightDealOrg } from '../../lib/freightDeal'
 import LeadCallLogCard from './LeadCallLogCard'
 import LeadPhoneCall from './LeadPhoneCall'
 import EmailValidationIcon from './EmailValidationIcon'
@@ -241,7 +242,7 @@ export default function LeadWorkspace({
       ),
     [crm, marketingTimeline, indexedActivities, timelineFilter]
   )
-  const statusMeta = getStatusMeta(status)
+  const statusMeta = getStatusMeta(status, { freightOrg: isFreightDealOrg(user) })
   const saving = savingScope !== null
   const savingTask = savingScope === 'task'
   const savingMeeting = savingScope === 'meeting'

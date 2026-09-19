@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
-import { CRM_STATUSES, formatCrmDate, getDealStageMeta, getStatusMeta, getVisiblePipelineColumns } from '../../lib/crmConstants'
+import { CRM_STATUSES, formatCrmDate, getDealStageMeta, getStatusMeta, getVisiblePipelineColumns, normalizePipelineTrack } from '../../lib/crmConstants'
 import { canAssignPipelineLeads } from '../../lib/pipelineAssignAccess'
 import { userCanDeleteCrmRecords } from '../../lib/orgActionAccess'
 import {
@@ -131,11 +131,17 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
 
   const orgPipelines = useMemo(() => pipelinesFromSettings(crmSettings), [crmSettings])
   const columns = useMemo(() => {
+    if (isFreightDealOrg(user)) {
+      return getVisiblePipelineColumns(user, {
+        pipelineTrack: panelOptions?.pipelineTrack,
+        status: panelOptions?.status,
+      })
+    }
     if (crmSettings && user?.accountType === 'company') {
       return getVisiblePipelineColumnsForSettings(user, crmSettings, activePipelineId)
     }
     return getVisiblePipelineColumns(user)
-  }, [user, crmSettings, activePipelineId])
+  }, [user, crmSettings, activePipelineId, panelOptions?.pipelineTrack, panelOptions?.status])
 
   const pipelineScopedLeads = useMemo(() => {
     if (!crmSettings?.pipelines?.length || orgPipelines.length <= 1) return savedLeads
@@ -275,6 +281,11 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const freightOrg = isFreightDealOrg(user)
   const isDealsView = panelOptions?.view === 'deals'
   const dealsStage = panelOptions?.dealStage || 'all'
+  const pipelineTrack =
+    freightOrg && !isDealsView
+      ? normalizePipelineTrack(panelOptions?.pipelineTrack) || 'crm'
+      : normalizePipelineTrack(panelOptions?.pipelineTrack)
+  const statusMetaOf = (id) => getStatusMeta(id, { freightOrg, pipelineTrack })
 
   const teamMemberIdsForFilter = useMemo(() => {
     const teamId = panelOptions?.teamId
@@ -451,6 +462,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     }
   }, [
     panelOptions?.status,
+    panelOptions?.pipelineTrack,
     panelOptions?.view,
     panelOptions?.due,
     panelOptions?.overdueFollowUp,
@@ -694,6 +706,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     (adv, q) => ({
       status:
         filter !== 'all' ? filter : listStatusFilter !== 'all' ? listStatusFilter : undefined,
+      pipelineTrack: pipelineTrack || undefined,
       q: q || undefined,
       cities: getFilterCities(adv).length ? getFilterCities(adv) : undefined,
       states: getFilterStates(adv).length ? getFilterStates(adv) : undefined,
@@ -704,7 +717,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       tagMode: adv.tagMode || 'any',
       ...pipelineServerFilterExtras(adv, smartViewFilters),
     }),
-    [filter, listStatusFilter, effectiveAssigneeFilter, smartViewFilters, panelOptions?.teamId]
+    [filter, listStatusFilter, effectiveAssigneeFilter, smartViewFilters, panelOptions?.teamId, pipelineTrack]
   )
 
   const serverFilters = useMemo(
@@ -720,6 +733,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
           serverFilters.teamIds?.length ||
           serverFilters.status ||
           serverFilters.q ||
+          serverFilters.pipelineTrack ||
           serverFilters.cities?.length ||
           serverFilters.states?.length ||
           serverFilters.tagIds?.length ||
@@ -838,6 +852,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       (serverFilters.states?.length > 0 || serverFilters.cities?.length > 0)
     return applyPipelineFilters(base, {
       status: pipelineStatusFilter,
+      pipelineTrack,
       cities: serverLocationFilter ? [] : getFilterCities(appliedAdvanced),
       states: serverLocationFilter ? [] : getFilterStates(appliedAdvanced),
       contact: appliedAdvanced.contact,
@@ -891,6 +906,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     serverSidePipeline,
     serverFilters.states,
     serverFilters.cities,
+    pipelineTrack,
   ])
 
   const applySmartView = useCallback((view) => {
@@ -932,7 +948,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       listStatusFilter !== 'all'
         ? columns.find((c) => c.id === listStatusFilter)?.label
         : stageListMode
-          ? getStatusMeta(filter).label
+          ? statusMetaOf(filter).label
           : null
     const parts = pipelineFilterParts({
       statusLabel: statusLabel && statusLabel !== 'All' ? statusLabel : null,
@@ -1059,7 +1075,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     if (assigneeName) return `Viewing ${assigneeName}`
     if (pipelineSummary.total === 0) return null
     const parts = []
-    if (stageListMode) parts.push(getStatusMeta(filter).label)
+    if (stageListMode) parts.push(statusMetaOf(filter).label)
     if (hasPipelineFiltersActive && savedLeads.length === 0) {
       parts.push('0 matches')
     } else {
@@ -1315,8 +1331,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       if (actions.status && evaluateBulkEdit(selectedIds.size, policies) === 'review') {
         const statuses = new Set(selectedLeads.map((l) => l.crm?.status || 'new'))
         const currentLabel =
-          statuses.size === 1 ? getStatusMeta([...statuses][0]).label : 'Mixed stages'
-        const targetLabel = getStatusMeta(actions.status).label
+          statuses.size === 1 ? statusMetaOf([...statuses][0]).label : 'Mixed stages'
+        const targetLabel = statusMetaOf(actions.status).label
         setEditReview({ open: true, actions, currentLabel, targetLabel })
         return
       }
@@ -1850,6 +1866,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               }}
               onOpenCompany={openCompanyFromLead}
               canOpenCompany={canOpenCompanyAccounts}
+              freightOrg={freightOrg}
+              pipelineTrack={pipelineTrack}
             />
           )}
           </div>
@@ -2266,8 +2284,8 @@ function KanbanColumn({
                     <span className="text-sm font-medium text-[#33475b] truncate leading-tight ci-selectable-text">
                       {primaryLabel}
                     </span>
-                    <span className={`pipeline-hs-status ${getStatusMeta(lead.crm?.status).color} shrink-0`}>
-                      {getStatusMeta(lead.crm?.status).label}
+                    <span className={`pipeline-hs-status ${statusMetaOf(lead.crm?.status).color} shrink-0`}>
+                      {statusMetaOf(lead.crm?.status).label}
                     </span>
                   </div>
                   {showCompanyRow ? (

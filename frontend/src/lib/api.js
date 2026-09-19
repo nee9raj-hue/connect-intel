@@ -284,6 +284,7 @@ export const api = {
     if (params.lastShipmentYear && params.lastShipmentMonth) {
       qs.set('lastShipmentMonth', String(params.lastShipmentMonth))
     }
+    if (params.pipelineTrack) qs.set('pipelineTrack', String(params.pipelineTrack))
     for (const [col, limit] of Object.entries(params.columnLimits || {})) {
       if (limit > 0) qs.set(`col_${col}`, String(limit))
     }
@@ -311,6 +312,7 @@ export const api = {
     teamId,
     teamIds,
     leadIds,
+    pipelineTrack,
     silent = false,
   } = {}) => {
     const qs = new URLSearchParams({
@@ -343,6 +345,7 @@ export const api = {
     if (lastShipmentYear && lastShipmentMonth) qs.set('lastShipmentMonth', String(lastShipmentMonth))
     if (teamId) qs.set('teamId', String(teamId))
     for (const id of teamIds || []) qs.append('teamId', String(id))
+    if (pipelineTrack) qs.set('pipelineTrack', String(pipelineTrack))
     return request(`/api/saved-leads?${qs}`, { timeoutMs: 45_000 }, { silent })
   },
 

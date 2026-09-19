@@ -12,15 +12,32 @@ import { hasWorkspaceFeature } from './workspaceFeatures'
 import { isFreightDealOrg, FREIGHT_DEAL_STAGES } from './freightDeal'
 import { bumpPipelineSummaryStatus, normalizePipelineSummary } from '../../../lib/pipelineSidebarSummary.js'
 import { isCustomerPanelAllowed, userHasOrgNavPermission } from '../../../lib/orgNavAccess.js'
+import {
+  FREIGHT_CRM_PIPELINE_STAGE_DEFS,
+  FREIGHT_ERP_PIPELINE_STAGE_DEFS,
+  mapStoredStatusToErpFilter,
+  normalizePipelineTrack,
+} from '../../../lib/crmPipelineFlow.js'
 
 export { bumpPipelineSummaryStatus, normalizePipelineSummary }
 
 export function countPipelineByStatus(leads = []) {
   const counts = { all: leads.length }
   for (const s of CRM_STATUSES) counts[s.id] = 0
+  counts.fresh = 0
+  counts.account_created_erp = 0
   for (const lead of leads) {
+    const raw = String(lead.crm?.status || '')
+      .trim()
+      .toLowerCase()
+    if (raw === 'fresh' || raw === 'account_created_erp') {
+      counts[raw] = (counts[raw] || 0) + 1
+      continue
+    }
     const st = normalizeCrmLeadStatus(lead.crm?.status)
     if (counts[st] !== undefined) counts[st] += 1
+    const erpFilter = mapStoredStatusToErpFilter(st)
+    if (erpFilter) counts[erpFilter] = (counts[erpFilter] || 0) + 1
   }
   return counts
 }
@@ -31,6 +48,17 @@ export function pipelineCountsFromSummary(pipelineSummary, savedLeads = []) {
     const counts = { all: Number(pipelineSummary.total) || 0 }
     for (const row of foldCrmStatusCounts(pipelineSummary.byStatus)) {
       counts[row.status] = Number(row.count) || 0
+    }
+    for (const row of pipelineSummary.byStatus) {
+      const raw = String(row?.status || '')
+        .trim()
+        .toLowerCase()
+      const n = Number(row?.count ?? row?.cnt) || 0
+      if (raw === 'fresh' || raw === 'account_created_erp') {
+        counts[raw] = (counts[raw] || 0) + n
+      }
+      const erpFilter = mapStoredStatusToErpFilter(raw)
+      if (erpFilter) counts[erpFilter] = (counts[erpFilter] || 0) + n
     }
     return counts
   }
@@ -61,6 +89,7 @@ export function pipelineSidebarNavOptions(target = {}) {
     return options
   }
   if (target.status) options.status = target.status
+  if (target.pipelineTrack) options.pipelineTrack = target.pipelineTrack
   return options
 }
 
@@ -70,6 +99,7 @@ export function navTargetToOptions(target = {}) {
   if (target.status || target.filter) options.status = target.status || target.filter
   if (target.view) options.view = target.view
   if (target.dealStage) options.dealStage = target.dealStage
+  if (target.pipelineTrack) options.pipelineTrack = target.pipelineTrack
   if (target.upcomingOnly) options.upcomingOnly = true
   if (target.focusToday) options.focusToday = true
   if (target.activityType) options.activityType = target.activityType
@@ -133,8 +163,14 @@ export function isNavTargetActive(activePanel, panelOptions, target) {
       const targetStage = target.dealStage || 'all'
       return stage === targetStage
     }
+    const track = normalizePipelineTrack(panelOptions?.pipelineTrack)
+    const targetTrack = normalizePipelineTrack(target.pipelineTrack)
+    if (targetTrack && track !== targetTrack) return false
     if (target.status && (panelOptions?.status || 'all') !== target.status) return false
-    if (!target.status) return (panelOptions?.status || 'all') === 'all'
+    if (!target.status) {
+      if (targetTrack) return (panelOptions?.status || 'all') === 'all' && track === targetTrack
+      return (panelOptions?.status || 'all') === 'all' && !track
+    }
     return true
   }
 
@@ -154,6 +190,91 @@ export function isNavTargetActive(activePanel, panelOptions, target) {
     return currentTab === 'members'
   }
   return true
+}
+
+function countForAliases(pipelineCounts, aliases) {
+  let n = 0
+  for (const id of aliases) n += Number(pipelineCounts[id] || 0)
+  return n
+}
+
+function buildFreightPipelineChildren(pipelineCounts) {
+  return [
+    {
+      id: 'pipeline-crm',
+      label: 'CRM Pipeline',
+      children: [
+        {
+          id: 'pipeline-crm-all',
+          label: 'All CRM leads',
+          panel: 'pipeline',
+          view: 'leads',
+          pipelineTrack: 'crm',
+          status: 'all',
+          badge: countForAliases(pipelineCounts, [
+            'fresh',
+            'qualified',
+            'unqualified',
+            'account_created_erp',
+            'new',
+            'contacted',
+          ]),
+        },
+        ...FREIGHT_CRM_PIPELINE_STAGE_DEFS.map((col) => ({
+          id: `pipeline-crm-${col.id}`,
+          label: col.label,
+          panel: 'pipeline',
+          view: 'leads',
+          pipelineTrack: 'crm',
+          status: col.id,
+          badge: pipelineCounts[col.id] || 0,
+        })),
+      ],
+    },
+    {
+      id: 'pipeline-erp',
+      label: 'ERP Pipeline',
+      children: [
+        {
+          id: 'pipeline-erp-all',
+          label: 'All ERP accounts',
+          panel: 'pipeline',
+          view: 'leads',
+          pipelineTrack: 'erp',
+          status: 'all',
+          badge: countForAliases(pipelineCounts, [
+            'new_account',
+            'onboarding',
+            'active_trading',
+            'opportunity',
+            'churned',
+            'lost',
+            'at_risk',
+            'erp_early',
+            'erp_active',
+            'erp_churn',
+            'erp_dormant',
+          ]),
+        },
+        ...FREIGHT_ERP_PIPELINE_STAGE_DEFS.map((col) => ({
+          id: `pipeline-erp-${col.id}`,
+          label: col.label,
+          panel: 'pipeline',
+          view: 'leads',
+          pipelineTrack: 'erp',
+          status: col.id,
+          badge:
+            col.id === 'erp_early'
+              ? countForAliases(pipelineCounts, ['new_account', 'onboarding', 'erp_early'])
+              : col.id === 'erp_active'
+                ? countForAliases(pipelineCounts, ['active_trading', 'opportunity', 'erp_active'])
+                : col.id === 'erp_churn'
+                  ? countForAliases(pipelineCounts, ['churned', 'lost', 'erp_churn'])
+                  : countForAliases(pipelineCounts, ['at_risk', 'erp_dormant']),
+        })),
+      ],
+    },
+  ]
 }
 
 function buildPipelineLeadChildren(columns, pipelineCounts) {
@@ -232,7 +353,9 @@ export function buildCustomerNavSections(
   const canMarketing = userHasOrgNavPermission(user, 'access_marketing')
   const canAiSearch = Boolean(user?.isOrgAdmin || user?.isPlatformAdmin || user?.canSearch !== false)
 
-  const pipelineChildren = buildPipelineLeadChildren(columns, pipelineCounts)
+  const pipelineChildren = freightOrg
+    ? buildFreightPipelineChildren(pipelineCounts)
+    : buildPipelineLeadChildren(columns, pipelineCounts)
   const dealsChildren = buildDealsChildren(dealCounts || {}, allDealCounts || {}, { freightOrg })
 
   const marketingChildren = canMarketing

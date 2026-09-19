@@ -2,21 +2,46 @@
 
 function namedTags(raw) {
   if (!Array.isArray(raw)) return null
-  return raw.filter((t) => t && t.name)
+  const tags = raw
+    .map((t) => {
+      if (!t || typeof t !== 'object') return null
+      const name = String(t.name ?? t.label ?? t.tagName ?? '').trim()
+      if (!name) return null
+      return { ...t, name }
+    })
+    .filter(Boolean)
+  return tags
+}
+
+function firstNamed(...candidates) {
+  for (const raw of candidates) {
+    const tags = namedTags(raw)
+    if (tags?.length) return tags
+  }
+  return []
 }
 
 export function readErpTagsFromLead(lead) {
   if (!lead || typeof lead !== 'object') return []
 
-  const fromPayload = namedTags(lead.crm_payload?.erp_tags)
-  if (fromPayload) return fromPayload
+  if (Array.isArray(lead.crm_payload?.erp_tags)) {
+    const fromPayload = namedTags(lead.crm_payload.erp_tags)
+    if (fromPayload?.length) return fromPayload
+    const fromRevenue = firstNamed(lead.erp?.revenue?.tags, lead.lead?.erp?.revenue?.tags)
+    if (fromRevenue.length) return fromRevenue
+    return []
+  }
 
   const fromCrm = namedTags(lead.crm?.erp_tags)
-  if (fromCrm) return fromCrm
+  if (fromCrm?.length) return fromCrm
 
-  const fromRoot = namedTags(lead.erpTags)
-  if (fromRoot?.length) return fromRoot
-
-  const fromErp = namedTags(lead.erp?.erpTags ?? lead.erp?.erp_tags)
-  return fromErp || []
+  return firstNamed(
+    lead.erpTags,
+    lead.erp?.erpTags,
+    lead.erp?.erp_tags,
+    lead.lead?.erp?.erpTags,
+    lead.lead?.erp?.erp_tags,
+    lead.erp?.revenue?.tags,
+    lead.lead?.erp?.revenue?.tags
+  )
 }

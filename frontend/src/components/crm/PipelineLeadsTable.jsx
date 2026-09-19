@@ -660,6 +660,8 @@ export default function PipelineLeadsTable({
   onChangeStatus,
   onOpenCompany,
   canOpenCompany = false,
+  freightOrg = false,
+  pipelineTrack = '',
 }) {
   const [sortKey, setSortKey] = useState('created')
   const [sortDir, setSortDir] = useState('desc')
@@ -709,7 +711,7 @@ export default function PipelineLeadsTable({
         </thead>
         <tbody>
           {sorted.map((lead) => {
-            const meta = getStatusMeta(lead.crm?.status)
+            const meta = getStatusMeta(lead.crm?.status, { freightOrg, pipelineTrack })
             const isActive = selectedId === lead.id
             const isChecked = selectedIds.has(lead.id)
             const email = getLeadEmail(lead)

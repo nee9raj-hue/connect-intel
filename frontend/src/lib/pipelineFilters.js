@@ -10,7 +10,8 @@ import {
   pipelineOwnerUserId,
   repPipelineEntryVisible,
 } from '../../../lib/pipelineOwner.js'
-import { crmStatusMatchesFilter } from '../../../lib/crmLeadStatuses.js'
+import { crmStatusMatchesFilter, normalizeCrmLeadStatus } from '../../../lib/crmLeadStatuses.js'
+import { pipelineTrackSqlAliases } from '../../../lib/crmPipelineFlow.js'
 import { leadMatchesLastShipmentPeriod } from '../../../lib/leadLastShipmentFilter.js'
 
 export const CONTACT_FILTER_OPTIONS = [
@@ -301,6 +302,7 @@ export function applyPipelineFilters(
     teamMemberUserIds = [],
     lastShipmentYear = '',
     lastShipmentMonth = '',
+    pipelineTrack = '',
   } = {}
 ) {
   let list = leads || []
@@ -330,6 +332,17 @@ export function applyPipelineFilters(
 
   if (status && status !== 'all') {
     list = list.filter((l) => crmStatusMatchesFilter(l.crm?.status, status))
+  } else {
+    const trackIds = pipelineTrackSqlAliases(pipelineTrack)
+    if (trackIds.length) {
+      const allowed = new Set(trackIds)
+      list = list.filter((l) => {
+        const raw = String(l.crm?.status || '')
+          .trim()
+          .toLowerCase()
+        return allowed.has(raw) || allowed.has(normalizeCrmLeadStatus(raw))
+      })
+    }
   }
 
   if (minLeadScore != null && minLeadScore !== '') {
