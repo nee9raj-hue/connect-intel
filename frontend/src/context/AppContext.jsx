@@ -503,9 +503,17 @@ export function AppProvider({ children }) {
         }
       } catch (error) {
         if (!cancelled) {
-          setUser(null)
-          setScreen('landing')
-          if (error?.message) setSessionError(error.message)
+          const message = String(error?.message || '')
+          const dbBusy = /timed out|unavailable|supabase|circuit|workspace is taking longer/i.test(message)
+          setSessionError(
+            dbBusy
+              ? 'Your workspace is taking longer than usual to load. Wait a moment and try again.'
+              : message || 'Could not refresh your session'
+          )
+          if (!dbBusy) {
+            setUser(null)
+            setScreen('landing')
+          }
         }
       } finally {
         setReady(true)
