@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- c448392
+npm run prod:rollback -- 368a69b
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- c448392
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `ab66375` |
-| Log updated (IST) | 19/09/2026, 17:34:09 |
+| Commit | `af9adb1` |
+| Log updated (IST) | 19/09/2026, 18:18:45 |
 
 ---
 
@@ -44,7 +44,11 @@ npm run prod:rollback -- c448392
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 19/09/2026, 17:33:51 | `ab66375` | Stop sign-in from downloading the users blob and fix crm.xindus.net cookies. | [preview](https://connect-intel-nhkpfztd2-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ab66375` | **← LIVE**
+| 19/09/2026, 18:18:05 | `af9adb1` | Keep Team, CRM tags, and Pipeline off the users blob during ERP overlay. | [preview](https://connect-intel-dtz9qqe9x-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- af9adb1` | **← LIVE**
+| 19/09/2026, 17:59:11 | `368a69b` | Load company Pipeline from SQL using the session, not the users blob. | [preview](https://connect-intel-lo1xejrpl-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 368a69b` |
+| 19/09/2026, 17:42:26 | `df1e6a8` | Count Xindus ERP cron handlers as cron-gated in the RBAC audit. | [preview](https://connect-intel-ksgvfw9nu-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- df1e6a8` |
+| 19/09/2026, 17:40:02 | `aaec16a` | Record production LIVE snapshot for crm.xindus.net sign-in fix. | [preview](https://connect-intel-51xd632yr-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- aaec16a` |
+| 19/09/2026, 17:33:51 | `ab66375` | Stop sign-in from downloading the users blob and fix crm.xindus.net cookies. | [preview](https://connect-intel-nhkpfztd2-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- ab66375` |
 | 19/09/2026, 17:14:23 | `c448392` | Stop team roster downloads from emptying Pipeline on timeout. | [preview](https://connect-intel-i2lo8d9kp-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c448392` |
 | 19/09/2026, 17:03:48 | `0345bc7` | Allow login and signup without a mobile number. | [preview](https://connect-intel-nn3a9dz0k-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0345bc7` |
 | 19/09/2026, 16:53:38 | `2eef4ff` | Keep Pipeline opening when Supabase is slow instead of blocking sign-in. | [preview](https://connect-intel-36h6w0vol-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2eef4ff` |
@@ -60,10 +64,6 @@ npm run prod:rollback -- c448392
 | 18/09/2026, 23:12:15 | `7f93e12` | Record production LIVE snapshot for pipeline team filter. | [preview](https://connect-intel-imxg8kom4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7f93e12` |
 | 18/09/2026, 23:09:45 | `828834a` | Filter pipeline by team members like tags, not stale lead team_id. | [preview](https://connect-intel-rj066g5bi-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 828834a` |
 | 18/09/2026, 22:23:32 | `08438c3` | Record production LIVE snapshot for ERP owner reset remap. | [preview](https://connect-intel-btd5xnjp0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 08438c3` |
-| 18/09/2026, 22:14:58 | `0f83385` | Reset ERP dump owners on existing Xindus leads without deleting deals. | [preview](https://connect-intel-4h0eot52s-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0f83385` |
-| 18/09/2026, 22:05:55 | `554f204` | Record production LIVE snapshot for ERP ops-list owner mapping. | [preview](https://connect-intel-kt95r2868-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 554f204` |
-| 18/09/2026, 22:04:28 | `6590bef` | Assign CRM sales owners from the ERP ops customer list, not the Metabase dump. | [preview](https://connect-intel-3mvzxim5e-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6590bef` |
-| 18/09/2026, 16:38:27 | `1e08615` | Record production LIVE snapshot for fast sign-in. | [preview](https://connect-intel-1g4rm4e0j-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1e08615` |
 
 ---
 
