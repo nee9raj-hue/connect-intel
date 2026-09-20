@@ -1912,8 +1912,11 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               }}
               tagOptions={orgLeadTags.map((t) => ({ label: t.name, value: t.id }))}
               onColumnFilterChange={(patch) => {
-                if (patch.statusIds) setListStatusFilter('all')
-                applyFilters({ advanced: { ...appliedAdvanced, ...patch } })
+                if (Object.prototype.hasOwnProperty.call(patch, 'statusIds')) {
+                  setListStatusFilter('all')
+                }
+                setAdvancedFilters((draft) => ({ ...draft, ...patch }))
+                setAppliedAdvanced((applied) => ({ ...applied, ...patch }))
               }}
             />
           )}
