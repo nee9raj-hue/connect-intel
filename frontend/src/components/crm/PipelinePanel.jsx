@@ -74,7 +74,7 @@ import useIsMobile from '../../hooks/useIsMobile'
 import usePipelineFilterMobile, { usePipelineNarrowViewport } from '../../hooks/usePipelineFilterMobile'
 import MyDayReturnBar from '../overview/MyDayReturnBar'
 import { buildPipelineBreadcrumb, pipelineFilterParts } from '../../lib/pipelineListBreadcrumb'
-import { lastShipmentMonthValues, lastShipmentPeriodLabel } from '../../../../lib/leadLastShipmentFilter.js'
+import { lastShipmentMonthValues, lastShipmentPeriodLabel, lastShipmentPeriodTokens } from '../../../../lib/leadLastShipmentFilter.js'
 import {
   loadPipelineColumnPrefs,
   loadPipelineHoverActionsPref,
@@ -708,12 +708,22 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     advancedFilters.stuckLeads !== appliedAdvanced.stuckLeads ||
     advancedFilters.lastShipmentYear !== appliedAdvanced.lastShipmentYear ||
     lastShipmentMonthValues(advancedFilters).join(',') !==
-      lastShipmentMonthValues(appliedAdvanced).join(',')
+      lastShipmentMonthValues(appliedAdvanced).join(',') ||
+    (advancedFilters.lastShipmentPeriods || []).join(',') !==
+      (appliedAdvanced.lastShipmentPeriods || []).join(',') ||
+    (advancedFilters.statusIds || []).join(',') !== (appliedAdvanced.statusIds || []).join(',') ||
+    (advancedFilters.notesPresence || []).join(',') !== (appliedAdvanced.notesPresence || []).join(',')
 
   const buildServerFilters = useCallback(
     (adv, q) => ({
       status:
-        filter !== 'all' ? filter : listStatusFilter !== 'all' ? listStatusFilter : undefined,
+        (adv.statusIds || []).length
+          ? undefined
+          : filter !== 'all'
+            ? filter
+            : listStatusFilter !== 'all'
+              ? listStatusFilter
+              : undefined,
       pipelineTrack: pipelineTrack || undefined,
       q: q || undefined,
       cities: getFilterCities(adv).length ? getFilterCities(adv) : undefined,
@@ -753,7 +763,10 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
           serverFilters.minLeadScore != null ||
           serverFilters.followUpDue ||
           serverFilters.overdueFollowUp ||
-          serverFilters.lastShipmentYear
+          serverFilters.lastShipmentYear ||
+          serverFilters.lastShipmentPeriods?.length ||
+          serverFilters.statusIds?.length ||
+          serverFilters.notesPresence
       ),
     [serverFilters]
   )
@@ -874,6 +887,9 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       erpTagNames: appliedAdvanced.erpTagNames,
       erpTagMode: appliedAdvanced.erpTagMode,
       crmStageIds: appliedAdvanced.crmStageIds,
+      statusIds: appliedAdvanced.statusIds,
+      notesPresence: appliedAdvanced.notesPresence,
+      lastShipmentPeriods: appliedAdvanced.lastShipmentPeriods,
       search: serverSidePipeline ? '' : appliedSearch,
       smartTags: appliedAdvanced.smartTags,
       overdueFollowUp: appliedAdvanced.overdueFollowUp,
@@ -890,6 +906,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       stuckLeads: appliedAdvanced.stuckLeads,
       lastShipmentYear: appliedAdvanced.lastShipmentYear,
       lastShipmentMonth: appliedAdvanced.lastShipmentMonth,
+      lastShipmentMonths: appliedAdvanced.lastShipmentMonths,
       staleDays: appliedAdvanced.staleDays ?? smartViewFilters.staleDays,
       assignedAfter: panelOptions?.assignedAfter || null,
       lastActivity: panelOptions?.lastActivity || null,
@@ -1885,6 +1902,19 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               canOpenCompany={canOpenCompanyAccounts}
               freightOrg={freightOrg}
               pipelineTrack={pipelineTrack}
+              columnFilters={{
+                statusIds: appliedAdvanced.statusIds || [],
+                tagIds: appliedAdvanced.tagIds || [],
+                lastShipmentPeriods: lastShipmentPeriodTokens(appliedAdvanced).filter((token) =>
+                  token.includes('-')
+                ),
+                notesPresence: appliedAdvanced.notesPresence || [],
+              }}
+              tagOptions={orgLeadTags.map((t) => ({ label: t.name, value: t.id }))}
+              onColumnFilterChange={(patch) => {
+                if (patch.statusIds) setListStatusFilter('all')
+                applyFilters({ advanced: { ...appliedAdvanced, ...patch } })
+              }}
             />
           )}
           </div>

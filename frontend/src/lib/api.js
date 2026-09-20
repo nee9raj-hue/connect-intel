@@ -284,6 +284,9 @@ export const api = {
     if (params.lastShipmentYear && params.lastShipmentMonth) {
       qs.set('lastShipmentMonth', String(params.lastShipmentMonth))
     }
+    for (const token of params.lastShipmentPeriods || []) {
+      if (token) qs.append('lastShipmentPeriod', String(token))
+    }
     if (params.pipelineTrack) qs.set('pipelineTrack', String(params.pipelineTrack))
     for (const name of params.erpTagNames || []) {
       if (name) qs.append('erpTag', String(name))
@@ -291,6 +294,15 @@ export const api = {
     if (params.erpTagMode && params.erpTagMode !== 'any') qs.set('erpTagMode', String(params.erpTagMode))
     for (const id of params.crmStageIds || []) {
       if (id) qs.append('crmStage', String(id))
+    }
+    for (const id of params.statusIds || []) {
+      if (id) qs.append('statusId', String(id))
+    }
+    if (params.notesPresence) {
+      const notes = Array.isArray(params.notesPresence) ? params.notesPresence : [params.notesPresence]
+      for (const value of notes) {
+        if (value) qs.append('notesPresence', String(value))
+      }
     }
     for (const [col, limit] of Object.entries(params.columnLimits || {})) {
       if (limit > 0) qs.set(`col_${col}`, String(limit))
@@ -316,6 +328,7 @@ export const api = {
     overdueFollowUp,
     lastShipmentYear,
     lastShipmentMonth,
+    lastShipmentPeriods,
     teamId,
     teamIds,
     leadIds,
@@ -323,6 +336,8 @@ export const api = {
     erpTagNames,
     erpTagMode = 'any',
     crmStageIds,
+    statusIds,
+    notesPresence,
     silent = false,
   } = {}) => {
     const qs = new URLSearchParams({
@@ -353,6 +368,9 @@ export const api = {
     if (overdueFollowUp) qs.set('overdueFollowUp', '1')
     if (lastShipmentYear) qs.set('lastShipmentYear', String(lastShipmentYear))
     if (lastShipmentYear && lastShipmentMonth) qs.set('lastShipmentMonth', String(lastShipmentMonth))
+    for (const token of lastShipmentPeriods || []) {
+      if (token) qs.append('lastShipmentPeriod', String(token))
+    }
     if (teamId) qs.set('teamId', String(teamId))
     for (const id of teamIds || []) qs.append('teamId', String(id))
     if (pipelineTrack) qs.set('pipelineTrack', String(pipelineTrack))
@@ -362,6 +380,13 @@ export const api = {
     if (erpTagMode && erpTagMode !== 'any') qs.set('erpTagMode', String(erpTagMode))
     for (const id of crmStageIds || []) {
       if (id) qs.append('crmStage', String(id))
+    }
+    for (const id of statusIds || []) {
+      if (id) qs.append('statusId', String(id))
+    }
+    const notes = Array.isArray(notesPresence) ? notesPresence : notesPresence ? [notesPresence] : []
+    for (const value of notes) {
+      if (value) qs.append('notesPresence', String(value))
     }
     return request(`/api/saved-leads?${qs}`, { timeoutMs: 45_000 }, { silent })
   },

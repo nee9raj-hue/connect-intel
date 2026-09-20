@@ -2520,6 +2520,39 @@ textarea {
   background: #eaf0f6;
 }
 
+.pipeline-hs-th-row {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.pipeline-hs-th-btn--inline {
+  width: auto;
+  padding: 0.5rem 0.15rem 0.5rem 0.45rem;
+}
+
+.pipeline-hs-th-filter {
+  min-width: 0;
+  flex: 1;
+}
+
+.pipeline-hs-th-filter .crm-filter-btn {
+  width: 100%;
+  padding: 0.45rem 0.5rem 0.45rem 0.2rem;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  font: inherit;
+  font-weight: 600;
+  color: inherit;
+}
+
+.pipeline-hs-th-filter .crm-filter-btn:hover,
+.pipeline-hs-th-filter .crm-filter-btn-active {
+  background: #eaf0f6;
+}
+
 .pipeline-hs-sort-icon {
   font-size: 0.65rem;
   color: #7c98b6;

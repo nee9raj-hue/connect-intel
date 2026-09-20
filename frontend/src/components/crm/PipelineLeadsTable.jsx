@@ -14,7 +14,9 @@ import {
   normalizePipelineColumnOrder,
 } from '../../lib/pipelineColumnPrefs'
 import { formatLastShipmentMonthYear, resolveLeadLastOrderCreatedAt } from '../../../../lib/leadLastOrder.js'
-import PipelineRowActionsMenu from './PipelineRowActionsMenu'
+import FilterDropdown from './FilterDropdown'
+import { DEAL_MONTH_OPTIONS, dealYearOptions } from '../../lib/pipelineDealsFilter'
+import { NOTES_PRESENCE_OPTIONS } from '../../../../lib/pipelineColumnFilters.js'
 import {
   PhoneIcon,
   MailIcon,
@@ -165,7 +167,80 @@ function SortHeader({ label, sortKey, activeKey, sortDir, onSort, className = ''
   )
 }
 
-function renderPipelineHeader(colId, { sortKey, sortDir, onSort }) {
+function FilterHeader({
+  label,
+  className = '',
+  options,
+  values = [],
+  onChange,
+  searchable = false,
+  emptyLabel = 'Any',
+  displayValue,
+  sortKey,
+  activeKey,
+  sortDir,
+  onSort,
+}) {
+  return (
+    <th scope="col" className={className}>
+      <div className="pipeline-hs-th-row">
+        {onSort && sortKey ? (
+          <button
+            type="button"
+            className={`pipeline-hs-th-btn pipeline-hs-th-btn--inline ${activeKey === sortKey ? 'is-active' : ''}`}
+            onClick={() => onSort(sortKey)}
+          >
+            <span className="pipeline-hs-sort-icon" aria-hidden>
+              {activeKey === sortKey ? (sortDir === 'asc' ? '↑' : '↓') : '↕'}
+            </span>
+          </button>
+        ) : null}
+        <FilterDropdown
+          portal
+          compact
+          multiSelect
+          searchable={searchable}
+          label={label}
+          values={values}
+          options={options}
+          displayValue={displayValue}
+          emptyLabel={emptyLabel}
+          onMultiChange={onChange}
+          className="pipeline-hs-th-filter"
+        />
+      </div>
+    </th>
+  )
+}
+
+function shipmentPeriodOptions() {
+  const years = dealYearOptions(new Date(), []).slice(0, 5)
+  const out = []
+  for (const year of years) {
+    for (const month of DEAL_MONTH_OPTIONS) {
+      out.push({
+        value: `${year.value}-${month.value}`,
+        label: `${month.label} ${year.label}`,
+      })
+    }
+  }
+  return out
+}
+
+const SHIPMENT_PERIOD_OPTIONS = shipmentPeriodOptions()
+
+function renderPipelineHeader(colId, ctx) {
+  const {
+    sortKey,
+    sortDir,
+    onSort,
+    statusOptions = [],
+    tagOptions = [],
+    columnFilters = {},
+    onColumnFilterChange,
+    shipmentOptions = SHIPMENT_PERIOD_OPTIONS,
+  } = ctx
+  const patch = (next) => onColumnFilterChange?.(next)
   switch (colId) {
     case 'name':
       return (
@@ -181,9 +256,22 @@ function renderPipelineHeader(colId, { sortKey, sortDir, onSort }) {
       )
     case 'status':
       return (
-        <th key={colId} scope="col" className="pipeline-hs-th">
-          Status
-        </th>
+        <FilterHeader
+          key={colId}
+          label="Status"
+          className="pipeline-hs-th"
+          searchable
+          options={statusOptions.map((s) => ({ label: s.label, value: s.id }))}
+          values={columnFilters.statusIds || []}
+          displayValue={
+            (columnFilters.statusIds || []).length === 1
+              ? statusOptions.find((s) => s.id === columnFilters.statusIds[0])?.label
+              : (columnFilters.statusIds || []).length > 1
+                ? `${columnFilters.statusIds.length} statuses`
+                : undefined
+          }
+          onChange={(statusIds) => patch({ statusIds })}
+        />
       )
     case 'company':
       return (
@@ -235,21 +323,52 @@ function renderPipelineHeader(colId, { sortKey, sortDir, onSort }) {
       )
     case 'lastOrder':
       return (
-        <SortHeader
+        <FilterHeader
           key={colId}
           label="Last shipment"
+          className="pipeline-hs-th pipeline-hs-th--created"
+          searchable
+          options={shipmentOptions}
+          values={columnFilters.lastShipmentPeriods || []}
+          displayValue={
+            (columnFilters.lastShipmentPeriods || []).length === 1
+              ? shipmentOptions.find((o) => o.value === columnFilters.lastShipmentPeriods[0])?.label
+              : (columnFilters.lastShipmentPeriods || []).length > 1
+                ? `${columnFilters.lastShipmentPeriods.length} months`
+                : undefined
+          }
+          onChange={(lastShipmentPeriods) =>
+            patch({
+              lastShipmentPeriods,
+              lastShipmentYear: '',
+              lastShipmentMonth: '',
+              lastShipmentMonths: [],
+            })
+          }
           sortKey="lastOrder"
           activeKey={sortKey}
           sortDir={sortDir}
           onSort={onSort}
-          className="pipeline-hs-th pipeline-hs-th--created"
         />
       )
     case 'tags':
       return (
-        <th key={colId} scope="col" className="pipeline-hs-th">
-          Tags
-        </th>
+        <FilterHeader
+          key={colId}
+          label="Tags"
+          className="pipeline-hs-th"
+          searchable
+          options={tagOptions}
+          values={columnFilters.tagIds || []}
+          displayValue={
+            (columnFilters.tagIds || []).length === 1
+              ? tagOptions.find((o) => o.value === columnFilters.tagIds[0])?.label
+              : (columnFilters.tagIds || []).length > 1
+                ? `${columnFilters.tagIds.length} tags`
+                : undefined
+          }
+          onChange={(tagIds) => patch({ tagIds })}
+        />
       )
     case 'email':
       return (
@@ -259,9 +378,20 @@ function renderPipelineHeader(colId, { sortKey, sortDir, onSort }) {
       )
     case 'notes':
       return (
-        <th key={colId} scope="col" className="pipeline-hs-th pipeline-hs-th--notes">
-          Notes
-        </th>
+        <FilterHeader
+          key={colId}
+          label="Notes"
+          className="pipeline-hs-th pipeline-hs-th--notes"
+          options={NOTES_PRESENCE_OPTIONS}
+          values={columnFilters.notesPresence || []}
+          displayValue={
+            (columnFilters.notesPresence || []).length === 1
+              ? NOTES_PRESENCE_OPTIONS.find((o) => o.value === columnFilters.notesPresence[0])?.label
+              : undefined
+          }
+          emptyLabel="Any"
+          onChange={(notesPresence) => patch({ notesPresence })}
+        />
       )
     case 'created':
       return (
@@ -662,6 +792,9 @@ export default function PipelineLeadsTable({
   canOpenCompany = false,
   freightOrg = false,
   pipelineTrack = '',
+  columnFilters = {},
+  onColumnFilterChange,
+  tagOptions = [],
 }) {
   const [sortKey, setSortKey] = useState('created')
   const [sortDir, setSortDir] = useState('desc')
@@ -704,7 +837,15 @@ export default function PipelineLeadsTable({
               />
             </th>
             {orderedColumns.map((colId) =>
-              renderPipelineHeader(colId, { sortKey, sortDir, onSort })
+              renderPipelineHeader(colId, {
+                sortKey,
+                sortDir,
+                onSort,
+                statusOptions,
+                tagOptions,
+                columnFilters,
+                onColumnFilterChange,
+              })
             )}
             <th scope="col" className="pipeline-hs-th pipeline-hs-th--actions" aria-label="Actions" />
           </tr>

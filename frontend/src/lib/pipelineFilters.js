@@ -11,8 +11,14 @@ import {
   repPipelineEntryVisible,
 } from '../../../lib/pipelineOwner.js'
 import { collectCrmStageFilterIds } from '../../../lib/crmPipelineFlow.js'
-import { lastShipmentMonthValues } from '../../../lib/leadLastShipmentFilter.js'
+import { lastShipmentFilterActive, lastShipmentMonthValues } from '../../../lib/leadLastShipmentFilter.js'
 import { leadMatchesCrmErpUnion } from '../../../lib/pipelineCrmErpUnion.js'
+import {
+  collectStatusFilterIds,
+  leadMatchesNotesPresence,
+  leadMatchesStatusIds,
+  normalizeNotesPresence,
+} from '../../../lib/pipelineColumnFilters.js'
 
 export const CONTACT_FILTER_OPTIONS = [
   { id: 'any', label: 'All contacts' },
@@ -46,6 +52,8 @@ export function pipelineServerFilterExtras(adv = {}, smartView = {}) {
       ? Number(adv.maxLeadScore)
       : undefined
   const crmStageIds = collectCrmStageFilterIds(adv)
+  const statusIds = collectStatusFilterIds(adv)
+  const notesPresence = normalizeNotesPresence(adv)
   return {
     minLeadScore: min,
     maxLeadScore: max,
@@ -54,7 +62,10 @@ export function pipelineServerFilterExtras(adv = {}, smartView = {}) {
     stuck: adv.stuckLeads ? '1' : undefined,
     lastShipmentYear: adv.lastShipmentYear || undefined,
     lastShipmentMonth: lastShipmentMonthValues(adv).join(',') || undefined,
+    lastShipmentPeriods: adv.lastShipmentPeriods?.length ? adv.lastShipmentPeriods : undefined,
     crmStageIds: crmStageIds.length ? crmStageIds : undefined,
+    statusIds: statusIds.length ? statusIds : undefined,
+    notesPresence: notesPresence || undefined,
   }
 }
 
@@ -81,8 +92,11 @@ export const DEFAULT_PIPELINE_FILTERS = {
   lastShipmentYear: '',
   lastShipmentMonth: '',
   lastShipmentMonths: [],
+  lastShipmentPeriods: [],
   erpTagNames: [],
   crmStageIds: [],
+  statusIds: [],
+  notesPresence: [],
 }
 
 /** @deprecated use cities[] — kept for saved views migration */
@@ -308,10 +322,13 @@ export function applyPipelineFilters(
     lastShipmentYear = '',
     lastShipmentMonth = '',
     lastShipmentMonths = [],
+    lastShipmentPeriods = [],
     pipelineTrack = '',
     erpTagNames = [],
     erpTagMode = 'any',
     crmStageIds = [],
+    statusIds = [],
+    notesPresence = [],
   } = {}
 ) {
   let list = leads || []
@@ -339,18 +356,24 @@ export function applyPipelineFilters(
     })
   }
 
+  const selectedStatusIds = collectStatusFilterIds({ statusIds })
   list = list.filter((l) =>
     leadMatchesCrmErpUnion(l, {
-      status,
-      pipelineTrack,
+      status: selectedStatusIds.length ? 'all' : status,
+      pipelineTrack: selectedStatusIds.length ? '' : pipelineTrack,
       erpTagNames,
       erpTagMode,
       lastShipmentYear,
       lastShipmentMonth,
       lastShipmentMonths,
+      lastShipmentPeriods,
       crmStageIds,
     })
   )
+  if (selectedStatusIds.length) {
+    list = list.filter((l) => leadMatchesStatusIds(l, selectedStatusIds))
+  }
+  list = list.filter((l) => leadMatchesNotesPresence(l, { notesPresence }))
 
   if (minLeadScore != null && minLeadScore !== '') {
     const min = Number(minLeadScore)
@@ -559,9 +582,11 @@ export function countActiveFilters(filters, search) {
   if (filters.lastActivityFrom || filters.lastActivityTo) n += 1
   if (filters.sourceFilter) n += 1
   if (filters.stuckLeads) n += 1
-  if (filters.lastShipmentYear) n += 1
+  if (lastShipmentFilterActive(filters)) n += 1
   if (filters.erpTagNames?.length) n += 1
   if (filters.crmStageIds?.length) n += 1
+  if (filters.statusIds?.length) n += 1
+  if (normalizeNotesPresence(filters)) n += 1
   if (search?.trim()) n += 1
   return n
 }

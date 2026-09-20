@@ -37,6 +37,7 @@ export default function FilterDropdown({
   compact = false,
   wide = false,
   iconOnly = false,
+  portal = false,
   iconSrc = null,
   icon: Icon = null,
   showLabel = false,
@@ -67,17 +68,17 @@ export default function FilterDropdown({
 
   const iconButton = iconOnly && (iconSrc || Icon)
   const hubspotStatusMenu = menuVariant === 'hubspot-status' && !multiSelect
-  const usePortalMenu = Boolean(iconButton && open)
+  const usePortalMenu = Boolean(open && (portal || iconButton))
 
   useLayoutEffect(() => {
-    if (!open || !iconButton || isMobile) return
+    if (!open || !usePortalMenu || isMobile) return
     const btn = rootRef.current?.querySelector('button')
     if (!btn) return
     const rect = btn.getBoundingClientRect()
     const menuWidth = hubspotStatusMenu ? 248 : wide ? 280 : 240
     const left = Math.max(8, Math.min(rect.left, window.innerWidth - menuWidth - 8))
     setAnchorPos({ top: rect.bottom + 4, left })
-  }, [open, iconButton, isMobile, hubspotStatusMenu, wide])
+  }, [open, usePortalMenu, isMobile, hubspotStatusMenu, wide])
 
   useEffect(() => {
     if (!open) return undefined
@@ -105,13 +106,13 @@ export default function FilterDropdown({
   }, [open, close])
 
   useEffect(() => {
-    if (!open || !isMobile || !iconButton) return undefined
+    if (!open || !isMobile || !usePortalMenu) return undefined
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     return () => {
       document.body.style.overflow = prev
     }
-  }, [open, isMobile, iconButton])
+  }, [open, isMobile, usePortalMenu])
 
   useEffect(() => {
     if (open && multiSelect) setDraftMulti([...(values || [])])
