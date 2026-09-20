@@ -1851,6 +1851,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
                     teamMembers={teamMembers}
                     canOpenCompany={canOpenCompanyAccounts}
                     onOpenCompany={openCompanyFromLead}
+                    statusMetaOf={statusMetaOf}
                   />
                 )
               })}
@@ -2230,6 +2231,7 @@ function KanbanColumn({
   compact = false,
   canOpenCompany = false,
   onOpenCompany,
+  statusMetaOf,
 }) {
   const [dropTarget, setDropTarget] = useState(false)
   const [draggingId, setDraggingId] = useState(null)
@@ -2334,8 +2336,8 @@ function KanbanColumn({
                     <span className="text-sm font-medium text-[#33475b] truncate leading-tight ci-selectable-text">
                       {primaryLabel}
                     </span>
-                    <span className={`pipeline-hs-status ${statusMetaOf(lead.crm?.status).color} shrink-0`}>
-                      {statusMetaOf(lead.crm?.status).label}
+                    <span className={`pipeline-hs-status ${statusMetaOf?.(lead.crm?.status)?.color || ''} shrink-0`}>
+                      {statusMetaOf?.(lead.crm?.status)?.label || ''}
                     </span>
                   </div>
                   {showCompanyRow ? (
