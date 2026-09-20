@@ -9,4 +9,5 @@ export {
   isoWeeksOverlappingMonth,
   parseDealFilterDate,
   dealFilterDateInputValue,
+  normalizeDealPeriodMonths,
 } from '../../../lib/pipelineDealsFilter.js'

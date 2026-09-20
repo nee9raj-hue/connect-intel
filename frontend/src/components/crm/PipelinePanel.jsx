@@ -74,7 +74,7 @@ import useIsMobile from '../../hooks/useIsMobile'
 import usePipelineFilterMobile, { usePipelineNarrowViewport } from '../../hooks/usePipelineFilterMobile'
 import MyDayReturnBar from '../overview/MyDayReturnBar'
 import { buildPipelineBreadcrumb, pipelineFilterParts } from '../../lib/pipelineListBreadcrumb'
-import { lastShipmentPeriodLabel } from '../../../../lib/leadLastShipmentFilter.js'
+import { lastShipmentMonthValues, lastShipmentPeriodLabel } from '../../../../lib/leadLastShipmentFilter.js'
 import {
   loadPipelineColumnPrefs,
   loadPipelineHoverActionsPref,
@@ -695,6 +695,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     advancedFilters.contact !== appliedAdvanced.contact ||
     (advancedFilters.tagIds || []).join(',') !== (appliedAdvanced.tagIds || []).join(',') ||
     (advancedFilters.erpTagNames || []).join(',') !== (appliedAdvanced.erpTagNames || []).join(',') ||
+    (advancedFilters.crmStageIds || []).join(',') !== (appliedAdvanced.crmStageIds || []).join(',') ||
     (advancedFilters.teamIds || []).join(',') !== (appliedAdvanced.teamIds || []).join(',') ||
     (advancedFilters.smartTags || []).join(',') !== (appliedAdvanced.smartTags || []).join(',') ||
     advancedFilters.minLeadScore !== appliedAdvanced.minLeadScore ||
@@ -706,7 +707,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     advancedFilters.sourceFilter !== appliedAdvanced.sourceFilter ||
     advancedFilters.stuckLeads !== appliedAdvanced.stuckLeads ||
     advancedFilters.lastShipmentYear !== appliedAdvanced.lastShipmentYear ||
-    advancedFilters.lastShipmentMonth !== appliedAdvanced.lastShipmentMonth
+    lastShipmentMonthValues(advancedFilters).join(',') !==
+      lastShipmentMonthValues(appliedAdvanced).join(',')
 
   const buildServerFilters = useCallback(
     (adv, q) => ({
@@ -723,6 +725,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       tagMode: adv.tagMode || 'any',
       erpTagNames: adv.erpTagNames?.length ? adv.erpTagNames : undefined,
       erpTagMode: adv.erpTagMode || 'any',
+      crmStageIds: adv.crmStageIds?.length ? adv.crmStageIds : undefined,
       ...pipelineServerFilterExtras(adv, smartViewFilters),
     }),
     [filter, listStatusFilter, effectiveAssigneeFilter, smartViewFilters, panelOptions?.teamId, pipelineTrack]
@@ -746,6 +749,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
           serverFilters.states?.length ||
           serverFilters.tagIds?.length ||
           serverFilters.erpTagNames?.length ||
+          serverFilters.crmStageIds?.length ||
           serverFilters.minLeadScore != null ||
           serverFilters.followUpDue ||
           serverFilters.overdueFollowUp ||
@@ -869,6 +873,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       tagMode: appliedAdvanced.tagMode,
       erpTagNames: appliedAdvanced.erpTagNames,
       erpTagMode: appliedAdvanced.erpTagMode,
+      crmStageIds: appliedAdvanced.crmStageIds,
       search: serverSidePipeline ? '' : appliedSearch,
       smartTags: appliedAdvanced.smartTags,
       overdueFollowUp: appliedAdvanced.overdueFollowUp,

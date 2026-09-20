@@ -6,9 +6,10 @@ import { api } from '../../lib/api'
 import { CONTACT_FILTER_OPTIONS, DEFAULT_PIPELINE_FILTERS, getFilterCities, getFilterStates } from '../../lib/pipelineFilters'
 import { FilterChipButton } from './FilterDropdown'
 import { DEAL_MONTH_OPTIONS, dealYearOptions, formatDealPeriodLabel } from '../../lib/pipelineDealsFilter'
-import { lastShipmentPeriodLabel } from '../../../../lib/leadLastShipmentFilter.js'
+import { lastShipmentMonthValues, lastShipmentPeriodLabel } from '../../../../lib/leadLastShipmentFilter.js'
 import { teamIdsFromHierarchyForUser } from '../../../../lib/pipelineMemberVisibility.js'
 import { isFreightDealOrg } from '../../lib/freightDeal'
+import { FREIGHT_CRM_PIPELINE_COLUMNS } from '../../lib/crmConstants'
 import LeadTag from '../ui/LeadTag'
 import ErpTagChip from '../ui/ErpTagChip'
 import PipelineFilterPopup from './PipelineFilterPopup'
@@ -21,7 +22,6 @@ import {
   MapPinIcon,
   PeopleIcon,
   SearchIcon,
-  TeamIcon,
   CalendarIcon,
 } from '../ui/icons'
 
@@ -46,12 +46,10 @@ function memberIdsForTeams(teams, teamIds) {
 const MOBILE_FILTER_TITLES = {
   owner: 'Lead owner',
   status: 'Lead status',
-  team: 'Team',
   city: 'City',
   state: 'State',
   contact: 'Contact',
   lastShipment: 'Last shipment',
-  erpTags: 'ERP tags',
   advanced: 'More filters',
 }
 
@@ -170,11 +168,11 @@ export default function PipelineFiltersBar({
 
   const shipmentYearOptions = useMemo(() => dealYearOptions(new Date(), []), [])
   const shipmentYear = String(appliedFilters.lastShipmentYear || filters.lastShipmentYear || '')
-  const shipmentMonth = String(appliedFilters.lastShipmentMonth || filters.lastShipmentMonth || '')
+  const shipmentMonths = lastShipmentMonthValues(appliedFilters.lastShipmentYear ? appliedFilters : filters).map(String)
   const shipmentDisplay =
     formatDealPeriodLabel({
       year: shipmentYear,
-      month: shipmentMonth,
+      months: shipmentMonths,
     }) || shipmentYear || null
 
   const cityOptions = cities.map((c) => ({ label: c, value: c }))
@@ -216,6 +214,10 @@ export default function PipelineFiltersBar({
     value: t.name,
   }))
   const showErpTagFilter = erpTagSelectOptions.length > 0 || isFreightDealOrg(user)
+  const freightOrg = isFreightDealOrg(user)
+  const crmStageOptions = freightOrg
+    ? FREIGHT_CRM_PIPELINE_COLUMNS.map((s) => ({ label: s.label, value: s.id }))
+    : []
   const teamOptions = orgTeams.map((t) => {
     const locked = !isOrgAdmin && !memberTeamIds.includes(String(t.id))
     return {
@@ -237,6 +239,7 @@ export default function PipelineFiltersBar({
   const advancedActiveCount =
     (appliedFilters.tagIds?.length || 0) +
     (appliedFilters.erpTagNames?.length || 0) +
+    (appliedFilters.crmStageIds?.length || 0) +
     (appliedFilters.smartTags?.length || 0) +
     (appliedFilters.teamIds?.length || 0) +
     (activeSmartViewId ? 1 : 0)
@@ -336,24 +339,19 @@ export default function PipelineFiltersBar({
       case 'contact':
         commitFilters({ ...filters, contact: draft.filters.contact || 'any' })
         break
-      case 'team': {
-        const teamIds = draft.filters.teamIds || []
+      case 'lastShipment': {
+        const lastShipmentYear = String(draft.filters.lastShipmentYear || '')
+        const lastShipmentMonths = lastShipmentYear
+          ? lastShipmentMonthValues(draft.filters).map(String)
+          : []
         commitFilters({
           ...filters,
-          teamIds,
-          teamMemberUserIds: memberIdsForTeams(orgTeams, teamIds),
+          lastShipmentYear,
+          lastShipmentMonths,
+          lastShipmentMonth: lastShipmentMonths.join(','),
         })
         break
       }
-      case 'lastShipment': {
-        const lastShipmentYear = String(draft.filters.lastShipmentYear || '')
-        const lastShipmentMonth = lastShipmentYear ? String(draft.filters.lastShipmentMonth || '') : ''
-        commitFilters({ ...filters, lastShipmentYear, lastShipmentMonth })
-        break
-      }
-      case 'erpTags':
-        commitFilters({ ...filters, erpTagNames: draft.filters.erpTagNames || [] })
-        break
       case 'advanced': {
         const next = { ...draft.filters }
         const teamIds = next.teamIds || []
@@ -424,16 +422,6 @@ export default function PipelineFiltersBar({
             onChange={(v) => updateFilterDraft({ contact: v || 'any' })}
           />
         )
-      case 'team':
-        return (
-          <SearchableMultiList
-            options={teamOptions}
-            values={filterDraft.filters.teamIds || []}
-            onChange={(v) => updateFilterDraft({ teamIds: v })}
-            placeholder="Search teams…"
-            emptyLabel="All teams"
-          />
-        )
       case 'lastShipment':
         return (
           <div className="pipeline-filter-popout-sections">
@@ -447,34 +435,32 @@ export default function PipelineFiltersBar({
                   updateFilterDraft({
                     lastShipmentYear: year || '',
                     lastShipmentMonth: year ? filterDraft.filters.lastShipmentMonth || '' : '',
+                    lastShipmentMonths: year
+                      ? lastShipmentMonthValues(filterDraft.filters).map(String)
+                      : [],
                   })
                 }
               />
             </section>
             <section className="pipeline-filter-popout-section">
-              <p className="hs-advanced-filter-label">Month</p>
+              <p className="hs-advanced-filter-label">Months</p>
               {filterDraft.filters.lastShipmentYear ? (
-                <SingleSelectList
+                <SearchableMultiList
                   options={DEAL_MONTH_OPTIONS}
-                  value={String(filterDraft.filters.lastShipmentMonth || '')}
+                  values={lastShipmentMonthValues(filterDraft.filters).map(String)}
                   emptyLabel="All months"
-                  onChange={(month) => updateFilterDraft({ lastShipmentMonth: month || '' })}
+                  onChange={(months) =>
+                    updateFilterDraft({
+                      lastShipmentMonths: months,
+                      lastShipmentMonth: months.join(','),
+                    })
+                  }
                 />
               ) : (
                 <p className="pipeline-filter-popout-hint">Choose a year to filter by month.</p>
               )}
             </section>
           </div>
-        )
-      case 'erpTags':
-        return (
-          <SearchableMultiList
-            options={erpTagSelectOptions}
-            values={filterDraft.filters.erpTagNames || []}
-            onChange={(v) => updateFilterDraft({ erpTagNames: v })}
-            placeholder="Search ERP tags…"
-            emptyLabel="Any ERP tag"
-          />
         )
       case 'advanced':
         return (
@@ -542,6 +528,21 @@ export default function PipelineFiltersBar({
                   onChange={(v) => updateFilterDraft({ erpTagNames: v })}
                   placeholder="Search ERP tags…"
                   emptyLabel="Any ERP tag"
+                />
+              </section>
+            ) : null}
+            {crmStageOptions.length ? (
+              <section className="pipeline-filter-popout-section">
+                <p className="hs-advanced-filter-label">CRM stages</p>
+                <p className="pipeline-filter-popout-hint">
+                  Adds CRM pipeline leads even when ERP tags or last shipment filters are on.
+                </p>
+                <SearchableMultiList
+                  options={crmStageOptions}
+                  values={filterDraft.filters.crmStageIds || []}
+                  onChange={(v) => updateFilterDraft({ crmStageIds: v })}
+                  placeholder="Search CRM stages…"
+                  emptyLabel="Any CRM stage"
                 />
               </section>
             ) : null}
@@ -678,6 +679,7 @@ export default function PipelineFiltersBar({
     appliedStates.length ||
     (appliedFilters.tagIds?.length || 0) > 0 ||
     (appliedFilters.erpTagNames?.length || 0) > 0 ||
+    (appliedFilters.crmStageIds?.length || 0) > 0 ||
     (appliedFilters.smartTags?.length || 0) > 0 ||
     (appliedFilters.teamIds?.length || 0) > 0 ||
     (!stageListMode && statusFilter !== 'all') ||
@@ -699,25 +701,6 @@ export default function PipelineFiltersBar({
         />
       ) : null}
 
-      {teamOptions.length > 0 ? (
-        <PipelineFilterToolbarButton
-          icon={TeamIcon}
-          iconTone="owner"
-          label="Team"
-          compact={useMobileFilterSheet}
-          displayValue={
-            (appliedFilters.teamIds || []).length === 1
-              ? orgTeams.find((t) => t.id === appliedFilters.teamIds[0])?.name
-              : (appliedFilters.teamIds || []).length > 1
-                ? `${appliedFilters.teamIds.length} teams`
-                : undefined
-          }
-          active={(appliedFilters.teamIds || []).length > 0}
-          aria-expanded={activeFilter?.type === 'team'}
-          onClick={() => openFilter('team')}
-        />
-      ) : null}
-
       {!stageListMode ? (
         <PipelineFilterToolbarButton
           icon={ListIcon}
@@ -728,25 +711,6 @@ export default function PipelineFiltersBar({
           active={statusFilter !== 'all'}
           aria-expanded={activeFilter?.type === 'status'}
           onClick={() => openFilter('status')}
-        />
-      ) : null}
-
-      {showErpTagFilter ? (
-        <PipelineFilterToolbarButton
-          icon={ListIcon}
-          iconTone="status"
-          label="ERP tags"
-          compact={useMobileFilterSheet}
-          displayValue={
-            (appliedFilters.erpTagNames || []).length === 1
-              ? appliedFilters.erpTagNames[0]
-              : (appliedFilters.erpTagNames || []).length > 1
-                ? `${appliedFilters.erpTagNames.length} ERP tags`
-                : undefined
-          }
-          active={(appliedFilters.erpTagNames || []).length > 0}
-          aria-expanded={activeFilter?.type === 'erpTags'}
-          onClick={() => openFilter('erpTags')}
         />
       ) : null}
 
@@ -981,7 +945,11 @@ export default function PipelineFiltersBar({
                 })
               }
               onRemove={() =>
-                onRemoveAppliedFilter?.({ lastShipmentYear: '', lastShipmentMonth: '' })
+                onRemoveAppliedFilter?.({
+                  lastShipmentYear: '',
+                  lastShipmentMonth: '',
+                  lastShipmentMonths: [],
+                })
               }
             />
           ) : null}
@@ -1040,6 +1008,23 @@ export default function PipelineFiltersBar({
                   ×
                 </button>
               </span>
+            )
+          })}
+          {(appliedFilters.crmStageIds || []).map((id) => {
+            const opt = crmStageOptions.find((s) => s.value === id) || {
+              label: FREIGHT_CRM_PIPELINE_COLUMNS.find((s) => s.id === id)?.label || id,
+              value: id,
+            }
+            return (
+              <FilterChipButton
+                key={`crm-stage-${id}`}
+                label={`CRM: ${opt.label}`}
+                onRemove={() =>
+                  onRemoveAppliedFilter?.({
+                    crmStageIds: (appliedFilters.crmStageIds || []).filter((x) => x !== id),
+                  })
+                }
+              />
             )
           })}
           {(appliedFilters.smartTags || []).map((id) => {

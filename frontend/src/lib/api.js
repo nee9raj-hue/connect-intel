@@ -289,6 +289,9 @@ export const api = {
       if (name) qs.append('erpTag', String(name))
     }
     if (params.erpTagMode && params.erpTagMode !== 'any') qs.set('erpTagMode', String(params.erpTagMode))
+    for (const id of params.crmStageIds || []) {
+      if (id) qs.append('crmStage', String(id))
+    }
     for (const [col, limit] of Object.entries(params.columnLimits || {})) {
       if (limit > 0) qs.set(`col_${col}`, String(limit))
     }
@@ -319,6 +322,7 @@ export const api = {
     pipelineTrack,
     erpTagNames,
     erpTagMode = 'any',
+    crmStageIds,
     silent = false,
   } = {}) => {
     const qs = new URLSearchParams({
@@ -356,6 +360,9 @@ export const api = {
       if (name) qs.append('erpTag', String(name))
     }
     if (erpTagMode && erpTagMode !== 'any') qs.set('erpTagMode', String(erpTagMode))
+    for (const id of crmStageIds || []) {
+      if (id) qs.append('crmStage', String(id))
+    }
     return request(`/api/saved-leads?${qs}`, { timeoutMs: 45_000 }, { silent })
   },
 

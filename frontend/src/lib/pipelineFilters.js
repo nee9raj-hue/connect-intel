@@ -10,10 +10,9 @@ import {
   pipelineOwnerUserId,
   repPipelineEntryVisible,
 } from '../../../lib/pipelineOwner.js'
-import { crmStatusMatchesFilter, normalizeCrmLeadStatus } from '../../../lib/crmLeadStatuses.js'
-import { pipelineTrackSqlAliases } from '../../../lib/crmPipelineFlow.js'
-import { leadMatchesLastShipmentPeriod } from '../../../lib/leadLastShipmentFilter.js'
-import { leadMatchesErpTagFilter } from '../../../lib/erpTags.js'
+import { collectCrmStageFilterIds } from '../../../lib/crmPipelineFlow.js'
+import { lastShipmentMonthValues } from '../../../lib/leadLastShipmentFilter.js'
+import { leadMatchesCrmErpUnion } from '../../../lib/pipelineCrmErpUnion.js'
 
 export const CONTACT_FILTER_OPTIONS = [
   { id: 'any', label: 'All contacts' },
@@ -46,6 +45,7 @@ export function pipelineServerFilterExtras(adv = {}, smartView = {}) {
     adv.maxLeadScore != null && adv.maxLeadScore !== '' && !Number.isNaN(Number(adv.maxLeadScore))
       ? Number(adv.maxLeadScore)
       : undefined
+  const crmStageIds = collectCrmStageFilterIds(adv)
   return {
     minLeadScore: min,
     maxLeadScore: max,
@@ -53,7 +53,8 @@ export function pipelineServerFilterExtras(adv = {}, smartView = {}) {
     overdueFollowUp: adv.overdueFollowUp ? '1' : undefined,
     stuck: adv.stuckLeads ? '1' : undefined,
     lastShipmentYear: adv.lastShipmentYear || undefined,
-    lastShipmentMonth: adv.lastShipmentMonth || undefined,
+    lastShipmentMonth: lastShipmentMonthValues(adv).join(',') || undefined,
+    crmStageIds: crmStageIds.length ? crmStageIds : undefined,
   }
 }
 
@@ -79,7 +80,9 @@ export const DEFAULT_PIPELINE_FILTERS = {
   stuckLeads: false,
   lastShipmentYear: '',
   lastShipmentMonth: '',
+  lastShipmentMonths: [],
   erpTagNames: [],
+  crmStageIds: [],
 }
 
 /** @deprecated use cities[] — kept for saved views migration */
@@ -304,9 +307,11 @@ export function applyPipelineFilters(
     teamMemberUserIds = [],
     lastShipmentYear = '',
     lastShipmentMonth = '',
+    lastShipmentMonths = [],
     pipelineTrack = '',
     erpTagNames = [],
     erpTagMode = 'any',
+    crmStageIds = [],
   } = {}
 ) {
   let list = leads || []
@@ -334,24 +339,18 @@ export function applyPipelineFilters(
     })
   }
 
-  if (status && status !== 'all') {
-    list = list.filter((l) => crmStatusMatchesFilter(l.crm?.status, status))
-  } else {
-    const trackIds = pipelineTrackSqlAliases(pipelineTrack)
-    if (trackIds.length) {
-      const allowed = new Set(trackIds)
-      list = list.filter((l) => {
-        const raw = String(l.crm?.status || '')
-          .trim()
-          .toLowerCase()
-        return allowed.has(raw) || allowed.has(normalizeCrmLeadStatus(raw))
-      })
-    }
-  }
-
-  if ((erpTagNames || []).length) {
-    list = list.filter((l) => leadMatchesErpTagFilter(l, erpTagNames, erpTagMode))
-  }
+  list = list.filter((l) =>
+    leadMatchesCrmErpUnion(l, {
+      status,
+      pipelineTrack,
+      erpTagNames,
+      erpTagMode,
+      lastShipmentYear,
+      lastShipmentMonth,
+      lastShipmentMonths,
+      crmStageIds,
+    })
+  )
 
   if (minLeadScore != null && minLeadScore !== '') {
     const min = Number(minLeadScore)
@@ -388,12 +387,6 @@ export function applyPipelineFilters(
         l.crm?.lastCommunicationAt || l.crm?.lastEmailSentAt || l.crm?.lastCallAt || null
       return matchesDateRange(at, lastActivityFrom, lastActivityTo)
     })
-  }
-
-  if (lastShipmentYear) {
-    list = list.filter((l) =>
-      leadMatchesLastShipmentPeriod(l, { lastShipmentYear, lastShipmentMonth })
-    )
   }
 
   if (sourceFilter) {
@@ -568,6 +561,7 @@ export function countActiveFilters(filters, search) {
   if (filters.stuckLeads) n += 1
   if (filters.lastShipmentYear) n += 1
   if (filters.erpTagNames?.length) n += 1
+  if (filters.crmStageIds?.length) n += 1
   if (search?.trim()) n += 1
   return n
 }
