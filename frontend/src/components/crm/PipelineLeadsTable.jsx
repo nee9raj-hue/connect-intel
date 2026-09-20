@@ -15,6 +15,7 @@ import {
 } from '../../lib/pipelineColumnPrefs'
 import { formatLastShipmentMonthYear, resolveLeadLastOrderCreatedAt } from '../../../../lib/leadLastOrder.js'
 import FilterDropdown from './FilterDropdown'
+import PipelineRowActionsMenu from './PipelineRowActionsMenu'
 import { DEAL_MONTH_OPTIONS, dealYearOptions } from '../../lib/pipelineDealsFilter'
 import { NOTES_PRESENCE_OPTIONS } from '../../../../lib/pipelineColumnFilters.js'
 import {
