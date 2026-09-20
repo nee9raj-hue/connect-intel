@@ -36,7 +36,7 @@ export function urlBase64ToUint8Array(base64String) {
 
 export async function getServiceWorkerRegistration() {
   if (!('serviceWorker' in navigator)) return null
-  return navigator.serviceWorker.ready
+  return navigator.serviceWorker.getRegistration()
 }
 
 export async function readLocalPushSubscription() {

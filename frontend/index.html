@@ -48,49 +48,44 @@
     />
     <script>
       (function () {
-        var KEY = 'ci_deploy_recovery'
-        function isStale(msg) {
-          msg = String(msg || '').toLowerCase()
-          return (
-            msg.indexOf('importing a module script failed') !== -1 ||
-            msg.indexOf('failed to fetch dynamically imported module') !== -1 ||
-            msg.indexOf('error loading dynamically imported module') !== -1
-          )
+        var KEY = 'ci_pwa_off_v1'
+        function markDone() {
+          try { localStorage.setItem(KEY, '1') } catch (_) {}
         }
-        function recover() {
-          if (sessionStorage.getItem(KEY)) return
-          sessionStorage.setItem(KEY, '1')
-          Promise.resolve()
-            .then(function () {
-              if (!('serviceWorker' in navigator)) return
-              return navigator.serviceWorker.getRegistrations().then(function (regs) {
-                return Promise.all(regs.map(function (reg) { return reg.unregister() }))
-              })
+        function alreadyDone() {
+          try { return localStorage.getItem(KEY) === '1' } catch (_) { return false }
+        }
+        function uninstall() {
+          var had = 0
+          var p = Promise.resolve()
+          if ('serviceWorker' in navigator) {
+            p = navigator.serviceWorker.getRegistrations().then(function (regs) {
+              had = regs.length
+              return Promise.all(regs.map(function (reg) { return reg.unregister() }))
             })
+          }
+          return p
             .then(function () {
               if (!('caches' in window)) return
               return caches.keys().then(function (keys) {
                 return Promise.all(keys.map(function (key) { return caches.delete(key) }))
               })
             })
-            .then(function () { location.reload() })
-            .catch(function () { location.reload() })
+            .then(function () { return had })
         }
-        window.addEventListener(
-          'error',
-          function (event) {
-            if (isStale(event.message)) recover()
-          },
-          true,
-        )
-        window.addEventListener('unhandledrejection', function (event) {
-          var reason = event.reason
-          var msg = reason && reason.message ? reason.message : String(reason || '')
-          if (isStale(msg)) recover()
-        })
-        window.addEventListener('load', function () {
-          try { sessionStorage.removeItem(KEY) } catch (_) {}
-        })
+        if (alreadyDone()) {
+          uninstall().catch(function () {})
+          return
+        }
+        uninstall()
+          .then(function (had) {
+            markDone()
+            if (!had) return
+            var url = new URL(location.href)
+            url.searchParams.delete('_ci')
+            location.replace(url.pathname + url.search + url.hash)
+          })
+          .catch(function () { markDone() })
       })()
     </script>
   </head>

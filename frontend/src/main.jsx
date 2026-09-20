@@ -1,6 +1,5 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { registerSW } from 'virtual:pwa-register'
 import { applyBrandCssVars } from './lib/brandTokens'
 import './index.css'
 import './styles/hubspot-premium.css'
@@ -20,18 +19,6 @@ import { initNativeAppShell } from './lib/nativeApp.js'
 import { initDeployRecovery } from './lib/deployRecovery.js'
 
 initDeployRecovery()
-
-const updateSW = registerSW({
-  immediate: true,
-  onNeedRefresh() {
-    void updateSW(true)
-  },
-  onRegisteredSW(_swUrl, registration) {
-    if (registration) {
-      setInterval(() => registration.update(), 15 * 60 * 1000)
-    }
-  },
-})
 void initNativeAppShell()
 applyBrandCssVars()
 

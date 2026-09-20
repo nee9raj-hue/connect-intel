@@ -1,27 +1,17 @@
 import { Component } from 'react'
-import {
-  canAutoRecover,
-  clearPwaCachesAndReload,
-  isStaleAssetError,
-  tryAutoRecover,
-} from '../../lib/deployRecovery.js'
+import { clearPwaCachesAndReload, isStaleAssetError } from '../../lib/deployRecovery.js'
 
 export default class ErrorBoundary extends Component {
   constructor(props) {
     super(props)
-    this.state = { error: null, recovering: false }
+    this.state = { error: null }
   }
 
   static getDerivedStateFromError(error) {
-    const message = error?.message || ''
-    if (isStaleAssetError(message) && canAutoRecover()) {
-      return { error, recovering: true }
-    }
-    return { error, recovering: false }
+    return { error }
   }
 
   componentDidCatch(error, info) {
-    if (tryAutoRecover(error?.message || '')) return
     const payload = {
       message: error?.message || 'React error',
       stack: [error?.stack, info?.componentStack].filter(Boolean).join('\n'),
@@ -35,15 +25,6 @@ export default class ErrorBoundary extends Component {
   }
 
   render() {
-    if (this.state.recovering) {
-      return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-[#f6f7f9] px-6 text-center">
-          <h1 className="text-lg font-semibold text-[#202938]">Updating Connect Intel</h1>
-          <p className="mt-2 max-w-md text-sm text-[#536072]">Loading the latest version…</p>
-        </div>
-      )
-    }
-
     if (this.state.error) {
       const message = this.state.error.message || 'Something went wrong in the app.'
       const staleAssets = isStaleAssetError(message)
@@ -52,7 +33,7 @@ export default class ErrorBoundary extends Component {
           <h1 className="text-lg font-semibold text-[#202938]">Connect Intel could not load</h1>
           <p className="mt-2 max-w-md text-sm text-[#536072]">
             {staleAssets
-              ? 'The app was updated. Reload to continue from where you were.'
+              ? 'Reload this page to open Pipeline again.'
               : message}
           </p>
           <button
@@ -62,7 +43,7 @@ export default class ErrorBoundary extends Component {
             }}
             className="mt-5 rounded-xl bg-[#17191c] px-4 py-2.5 text-sm font-semibold text-white"
           >
-            Reload
+            Open Pipeline
           </button>
         </div>
       )
