@@ -348,12 +348,10 @@ export function AppProvider({ children }) {
 
   const refreshPipelineSummary = useCallback(async () => {
     try {
-      clearPipelineBootstrapCachesForUser(user)
       const data = await api.getPipelineBootstrap({
         summaryOnly: true,
         silent: true,
         status: 'all',
-        fresh: true,
       })
       if (data?.summary) {
         setPipelineSummary(normalizePipelineSummary(data.summary))
@@ -576,44 +574,62 @@ export function AppProvider({ children }) {
             const leads = cached.leads || []
             const summary = cached.summary || {}
             setPipelineSummary(normalizePipelineSummary(summary))
-            if (!cachedBootstrap.stale) {
-              setSavedLeads(leads)
-              setPipelineLoad({
-                total: cached.total ?? summary.total ?? cached.pipelineTotal ?? leads.length,
-                loaded: leads.length,
-                hasMore: Boolean(cached.hasMore),
-                loadingMore: false,
-              })
-              loadedCountRef.current = leads.length
-              pipelineCursorRef.current = cached.nextCursor || null
-              workspaceLoadedAtRef.current = Date.now()
-              setWorkspaceReady(true)
-            }
+            setSavedLeads(leads)
+            setPipelineLoad({
+              total: cached.total ?? summary.total ?? cached.pipelineTotal ?? leads.length,
+              loaded: leads.length,
+              hasMore: Boolean(cached.hasMore),
+              loadingMore: false,
+            })
+            loadedCountRef.current = leads.length
+            pipelineCursorRef.current = cached.nextCursor || null
+            workspaceLoadedAtRef.current = Date.now()
+            setWorkspaceReady(true)
           }
 
           const teamPromise =
             user.organizationId && user.accountType === 'company'
               ? api.getTeamMembers({ silent: true }).catch(() => null)
               : Promise.resolve(null)
+          const historyPromise = api.getSearchHistory({ silent: true }).catch(() => ({ history: [] }))
 
-          const [bootstrapResult, historyResult, teamData] = await Promise.all([
-            api
-              .getPipelineBootstrap({ offset: 0, limit: 50, silent: true, assigneeUserId })
-              .catch((error) => ({ _error: error })),
-            api.getSearchHistory({ silent: true }).catch(() => ({ history: [] })),
-            teamPromise,
-          ])
+          const bootstrapResult = await api
+            .getPipelineBootstrap({ offset: 0, limit: 50, silent: true, assigneeUserId })
+            .catch((error) => ({ _error: error }))
 
           if (cancelled) return
+
+          historyPromise.then((historyResult) => {
+            if (!cancelled) setSearchHistory(historyResult?.history || [])
+          })
+          teamPromise.then((teamData) => {
+            if (cancelled || !teamData) return
+            setTeamMembers(teamData.members || [])
+            setRepRoster(teamData.repRoster || teamData.members || [])
+          })
 
           if (bootstrapResult?._error) {
             const error = bootstrapResult._error
             if (error?.status === 401) {
               setSessionError(error.message || 'Session expired. Please sign in again.')
-            } else {
-              setSessionError(
-                'Your pipeline is taking longer than usual to load. Wait a moment and try again.'
-              )
+              setWorkspaceReady(true)
+              return
+            }
+            if (!cachedBootstrap?.data) {
+              try {
+                const fallback = await loadPipelineList(
+                  { assigneeUserId },
+                  { silent: true }
+                )
+                if (cancelled) return
+                if (fallback?.length || fallback) {
+                  setWorkspaceReady(true)
+                  setSessionError(null)
+                  return
+                }
+              } catch {
+                /* keep going — show workspace, not a blocking timeout banner */
+              }
             }
             setWorkspaceReady(true)
             return
@@ -626,12 +642,6 @@ export function AppProvider({ children }) {
             writeBootstrapCache(cacheKey, bootstrap)
           }
           setPipelineSummary(normalizePipelineSummary(summary))
-          setSearchHistory(historyResult.history || [])
-
-          if (teamData) {
-            setTeamMembers(teamData.members || [])
-            setRepRoster(teamData.repRoster || teamData.members || [])
-          }
 
           const listSuperseded = bootstrapGen !== pipelineListFetchGenRef.current
           if (!listSuperseded) {
@@ -673,9 +683,8 @@ export function AppProvider({ children }) {
   useEffect(() => {
     if (!user?.id) return
     const refreshCounts = () => {
-      clearPipelineBootstrapCachesForUser(user)
       api
-        .getPipelineBootstrap({ summaryOnly: true, silent: true, status: 'all', fresh: true })
+        .getPipelineBootstrap({ summaryOnly: true, silent: true, status: 'all' })
         .then((data) => {
           if (data?.summary) {
             setPipelineSummary(normalizePipelineSummary(data.summary))

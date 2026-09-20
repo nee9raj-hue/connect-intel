@@ -237,10 +237,10 @@ export const api = {
     const path = `/api/pipeline/bootstrap?${qs}`
     const dedupeKey = `pipeline-bootstrap:${path}`
     if (fresh) {
-      return request(path, { timeoutMs: 60_000 }, { silent })
+      return request(path, { timeoutMs: 25_000 }, { silent })
     }
     return dedupeGet(dedupeKey, () =>
-      request(path, { timeoutMs: 60_000 }, { silent })
+      request(path, { timeoutMs: 25_000 }, { silent })
     )
   },
 

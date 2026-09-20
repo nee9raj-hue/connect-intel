@@ -1,6 +1,6 @@
 /** Client stale-while-revalidate cache for pipeline bootstrap (login + back navigation). */
 
-const TTL_MS = 90 * 1000
+const TTL_MS = 30 * 60 * 1000
 const memory = new Map()
 
 function storageKey(key) {
