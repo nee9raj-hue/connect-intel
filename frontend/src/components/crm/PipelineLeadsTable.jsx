@@ -7,7 +7,7 @@ import { getLeadEmail, leadHasSendableEmail } from '../../lib/emailUtils'
 import LeadPhoneCall from './LeadPhoneCall'
 import LeadTag from '../ui/LeadTag'
 import ErpTagChips from './ErpTagChips'
-import { readErpTagsFromLead } from '../../lib/erpTags'
+import { readDisplayErpTagsFromLead } from '../../lib/erpTags'
 import { leadHasCallablePhone } from '../../lib/phoneUtils'
 import {
   DEFAULT_PIPELINE_VISIBLE_COLUMNS,
@@ -527,7 +527,7 @@ function renderPipelineCell(colId, lead, ctx) {
       )
     }
     case 'tags': {
-      const erpTags = readErpTagsFromLead(lead)
+      const erpTags = readDisplayErpTagsFromLead(lead)
       const hasCrmTags = tags.length > 0
       const hasErpTags = erpTags.length > 0
       return (

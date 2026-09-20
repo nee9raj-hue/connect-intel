@@ -576,8 +576,11 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   }, [scopedLeads, pipelineSummary.cities, pipelineSummary.states])
   const tagById = useMemo(() => tagMapById(orgLeadTags), [orgLeadTags])
   const erpTagOptions = useMemo(
-    () => collectErpTagOptions(savedLeads, appliedAdvanced.erpTagNames),
-    [savedLeads, appliedAdvanced.erpTagNames]
+    () =>
+      collectErpTagOptions(savedLeads, appliedAdvanced.erpTagNames, {
+        includeStages: freightOrg,
+      }),
+    [savedLeads, appliedAdvanced.erpTagNames, freightOrg]
   )
 
   const [smartViewId, setSmartViewId] = useState(null)

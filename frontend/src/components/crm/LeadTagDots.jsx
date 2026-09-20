@@ -1,12 +1,12 @@
 import LeadTag from '../ui/LeadTag'
 import ErpTagChips from './ErpTagChips'
-import { readErpTagsFromLead } from '../../lib/erpTags'
+import { readDisplayErpTagsFromLead } from '../../lib/erpTags'
 
 export default function LeadTagDots({ lead, tagById, max = 4, className = '' }) {
   const crmTags = tagById?.size
     ? (lead.crm?.tagIds || []).map((id) => tagById.get(id)).filter(Boolean)
     : []
-  const erpTags = readErpTagsFromLead(lead)
+  const erpTags = readDisplayErpTagsFromLead(lead)
   if (!crmTags.length && !erpTags.length) return null
 
   return (

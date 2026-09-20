@@ -30,7 +30,7 @@ import {
 import TeamParticipantPicker from './TeamParticipantPicker'
 import LeadTagsEditor from './LeadTagsEditor'
 import ErpTagChips from './ErpTagChips'
-import { readErpTagsFromLead } from '../../lib/erpTags'
+import { readDisplayErpTagsFromLead } from '../../lib/erpTags'
 import CrmEmailThread from './CrmEmailThread'
 import {
   buildUnifiedTimeline,
@@ -944,10 +944,10 @@ export default function LeadWorkspace({
               </LwSection>
             )}
 
-            {readErpTagsFromLead(lead).length > 0 ? (
+            {readDisplayErpTagsFromLead(lead).length > 0 ? (
               <LwSection icon={TaskIcon} title="ERP tags">
                 <p className="lw-field-hint" style={{ margin: '0 0 8px' }}>
-                  Read-only — synced from ERP on each push.
+                  Read-only — ERP stage plus tags synced from ERP.
                 </p>
                 <ErpTagChips lead={lead} />
               </LwSection>

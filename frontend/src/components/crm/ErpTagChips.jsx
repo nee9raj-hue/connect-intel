@@ -1,8 +1,8 @@
 import ErpTagChip from '../ui/ErpTagChip'
-import { readErpTagsFromLead } from '../../lib/erpTags'
+import { readDisplayErpTagsFromLead } from '../../lib/erpTags'
 
 export default function ErpTagChips({ lead, max, className = '', empty = null }) {
-  const tags = readErpTagsFromLead(lead)
+  const tags = readDisplayErpTagsFromLead(lead)
   if (!tags.length) return empty
 
   const visible = typeof max === 'number' ? tags.slice(0, max) : tags
