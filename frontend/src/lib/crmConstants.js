@@ -9,6 +9,7 @@ import { formatDate } from './dateLocale.js'
 import {
   FREIGHT_CRM_PIPELINE_STAGE_DEFS,
   FREIGHT_ERP_PIPELINE_STAGE_DEFS,
+  freightBoardColumnIds,
   freightPipelineStatusLabel,
   normalizePipelineTrack,
 } from '../../../lib/crmPipelineFlow.js'
@@ -95,6 +96,12 @@ export const FREIGHT_ERP_PIPELINE_COLUMNS = FREIGHT_ERP_PIPELINE_STAGE_DEFS.map(
   hint: row.hint,
   color: STAGE_TW[row.color] || STAGE_TW.slate,
 }))
+
+export function getFreightBoardColumns({ pipelineTrack, status } = {}) {
+  const ids = freightBoardColumnIds({ pipelineTrack, status })
+  const catalog = [...FREIGHT_CRM_PIPELINE_COLUMNS, ...FREIGHT_ERP_PIPELINE_COLUMNS]
+  return ids.map((id) => catalog.find((col) => col.id === id)).filter(Boolean)
+}
 
 export function getVisiblePipelineColumns(user, { pipelineTrack, status } = {}) {
   const freight = isFreightDealOrg(user)

@@ -1,0 +1,14 @@
+{
+  "versions": [
+    {
+      "code": "S-2EA18A4",
+      "commit": "2ea18a4",
+      "commitFull": "2ea18a4ff64d42c1202d54fc21f6d82b6e8a82af",
+      "message": "Fix Pipeline board crash from a missing status helper.",
+      "note": "2ea18a4",
+      "recordedAt": "2026-09-20T19:11:11.823Z",
+      "recordedAtIst": "21/09/2026, 00:41:11",
+      "rollbackCommand": "npm run prod:rollback -- S-2EA18A4"
+    }
+  ]
+}

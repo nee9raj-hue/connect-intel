@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 01d55d3
+npm run prod:rollback -- 5b9bf74
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,18 @@ npm run prod:rollback -- 01d55d3
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `a69703d` |
-| Log updated (IST) | 20/09/2026, 10:34:56 |
+| Commit | `2ea18a4` |
+| Log updated (IST) | 21/09/2026, 00:27:54 |
+
+---
+
+## Safe restore codes
+
+These are exact production builds to restore if a later change goes wrong. Tell the assistant the **code** (for example `S-2EA18A4`).
+
+| Code | Commit | Note | Recorded (IST) | Restore |
+|------|--------|------|----------------|---------|
+| `S-2EA18A4` | `2ea18a4` | 2ea18a4 | 21/09/2026, 00:41:11 | `npm run prod:rollback -- S-2EA18A4` |
 
 ---
 
@@ -44,7 +54,13 @@ npm run prod:rollback -- 01d55d3
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 20/09/2026, 10:34:33 | `a69703d` | Keep Pipeline header filters from wiping other applied filters. | [preview](https://connect-intel-bcl9q1fec-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a69703d` | **← LIVE**
+| 21/09/2026, 00:27:36 | `2ea18a4` | Fix Pipeline board crash from a missing status helper. | [preview](https://connect-intel-5jtilj2p7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2ea18a4` | **← LIVE**
+| 21/09/2026, 00:11:13 | `5b9bf74` | Show last-30-day deal chips next to Last shipment on Pipeline. | [preview](https://connect-intel-ktlrml8q9-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5b9bf74` |
+| 20/09/2026, 11:05:42 | `d3b3269` | Fix Pipeline crash from a missing row-actions import. | [preview](https://connect-intel-plbxm5r2h-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d3b3269` |
+| 20/09/2026, 11:01:57 | `843f8e6` | Stop the Pipeline update loop by turning off auto-reload and the service worker. | [preview](https://connect-intel-a3gvs2gtq-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 843f8e6` |
+| 20/09/2026, 10:54:31 | `b5a1e6b` | Recover Pipeline after deploys instead of leaving a stale PWA cache wall. | [preview](https://connect-intel-mq5smh0y0-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b5a1e6b` |
+| 20/09/2026, 10:35:46 | `d13b82e` | Record production snapshot a69703d as LIVE. | [preview](https://connect-intel-efdkmx4td-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d13b82e` |
+| 20/09/2026, 10:34:33 | `a69703d` | Keep Pipeline header filters from wiping other applied filters. | [preview](https://connect-intel-bcl9q1fec-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- a69703d` |
 | 20/09/2026, 10:26:36 | `01d55d3` | Stop Pipeline from hanging on bootstrap timeout after a cache miss. | [preview](https://connect-intel-qxw69dyk7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 01d55d3` |
 | 20/09/2026, 10:14:27 | `78cee03` | Add multi-select filters on Pipeline column headers for status, tags, last shipment, and notes. | [preview](https://connect-intel-8izw8k55o-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 78cee03` |
 | 20/09/2026, 09:53:13 | `e01c463` | Ship pipeline filter updates: drop top-bar duplicates, multi-month last shipment, and CRM stages that union with ERP filters. | [preview](https://connect-intel-g35mnjrmu-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e01c463` |
@@ -58,12 +74,6 @@ npm run prod:rollback -- 01d55d3
 | 19/09/2026, 19:16:32 | `5dd1efa` | Show Pipeline leads when SQL org ids no longer match the session. | [preview](https://connect-intel-blcu7b3cv-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5dd1efa` |
 | 19/09/2026, 19:04:26 | `72073a4` | Stop company Pipeline from waiting on the pipeline-index blob. | [preview](https://connect-intel-orjnc8q96-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 72073a4` |
 | 19/09/2026, 18:55:19 | `c377f10` | Record production LIVE snapshot for restored sign-in path. | [preview](https://connect-intel-27g2rrzw7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c377f10` |
-| 19/09/2026, 18:54:16 | `efddd8b` | Stop sign-in from downloading the users blob and fix crm.xindus.net cookies. | [preview](https://connect-intel-f1ryx2ncy-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- efddd8b` |
-| 19/09/2026, 18:48:56 | `f0ff339` | Record production LIVE snapshot after reverting to 72585b6 tree. | [preview](https://connect-intel-3zswzxcw9-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f0ff339` |
-| 19/09/2026, 18:47:08 | `b2a6279` | Revert 2780b65 and every commit after it. | [preview](https://connect-intel-2rio7cavx-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b2a6279` |
-| 19/09/2026, 18:29:24 | `6bf2234` | Record production LIVE snapshot for pipeline-index timeout fix. | [preview](https://connect-intel-kcbonvaza-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6bf2234` |
-| 19/09/2026, 18:27:59 | `afe217a` | Stop Team and Pipeline from waiting on the pipeline-index blob. | [preview](https://connect-intel-ox1lbea53-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- afe217a` |
-| 19/09/2026, 18:21:12 | `f4666a3` | Record production LIVE snapshot for 2a1fb30. | [preview](https://connect-intel-1a0j01l0e-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f4666a3` |
 
 ---
 
@@ -82,10 +92,11 @@ npm run prod:rollback -- 01d55d3
 |---------|---------|
 | `npm run prod:log` | Sync log from Vercel + regenerate this file |
 | `npm run prod:log:list` | Print snapshots in the terminal |
-| `npm run prod:rollback -- <commit>` | Point production domain at that deployment |
+| `npm run prod:rollback -- <commit-or-safe-code>` | Point production domain at that deployment |
 | `npm run prod:ship` | Pre-flight checks before pushing to `main` |
 | `npm run prod:verify` | Build + verify critical files only |
 | `npm run prod:tag -- [commit]` | Git tag for a known-good production commit |
+| `npm run prod:safe` | Snapshot the current LIVE CRM as a restore code before a risky change |
 
 ---
 

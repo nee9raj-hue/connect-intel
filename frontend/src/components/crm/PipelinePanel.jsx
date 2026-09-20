@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useApp } from '../../context/AppContext'
 import { api } from '../../lib/api'
-import { CRM_STATUSES, formatCrmDate, getDealStageMeta, getStatusMeta, getVisiblePipelineColumns, normalizePipelineTrack } from '../../lib/crmConstants'
+import { CRM_STATUSES, formatCrmDate, getDealStageMeta, getFreightBoardColumns, getStatusMeta, getVisiblePipelineColumns, normalizePipelineTrack } from '../../lib/crmConstants'
 import { canAssignPipelineLeads } from '../../lib/pipelineAssignAccess'
 import { userCanDeleteCrmRecords } from '../../lib/orgActionAccess'
 import {
@@ -75,6 +75,7 @@ import usePipelineFilterMobile, { usePipelineNarrowViewport } from '../../hooks/
 import MyDayReturnBar from '../overview/MyDayReturnBar'
 import { buildPipelineBreadcrumb, pipelineFilterParts } from '../../lib/pipelineListBreadcrumb'
 import { lastShipmentMonthValues, lastShipmentPeriodLabel, lastShipmentPeriodTokens } from '../../../../lib/leadLastShipmentFilter.js'
+import { boardBucketForLeadStatus, freightBoardColumnIds } from '../../../../lib/crmPipelineFlow.js'
 import {
   loadPipelineColumnPrefs,
   loadPipelineHoverActionsPref,
@@ -284,6 +285,13 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const dealsStage = panelOptions?.dealStage || 'all'
   const pipelineTrack = normalizePipelineTrack(panelOptions?.pipelineTrack)
   const statusMetaOf = (id) => getStatusMeta(id, { freightOrg, pipelineTrack })
+  const boardColumns = useMemo(() => {
+    if (!freightOrg) return columns
+    return getFreightBoardColumns({
+      pipelineTrack,
+      status: panelOptions?.status,
+    })
+  }, [freightOrg, columns, pipelineTrack, panelOptions?.status])
 
   const teamMemberIdsForFilter = useMemo(() => {
     const teamId = panelOptions?.teamId
@@ -855,8 +863,34 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       .fetchPipelineBoard({ ...serverFilters, columnLimits: boardColumnLimits })
       .then((data) => {
         if (!cancelled) {
-          setBoardLeadsByStatus(data.board || {})
-          setBoardColumnTotals(data.columnTotals || {})
+          if (freightOrg) {
+            const columnIds = freightBoardColumnIds({
+              pipelineTrack,
+              status: panelOptions?.status,
+            })
+            const nextBoard = Object.fromEntries(columnIds.map((id) => [id, []]))
+            const nextTotals = Object.fromEntries(columnIds.map((id) => [id, 0]))
+            for (const leads of Object.values(data.board || {})) {
+              for (const lead of leads || []) {
+                const bucket = boardBucketForLeadStatus(lead?.crm?.status, columnIds)
+                nextBoard[bucket].push(lead)
+              }
+            }
+            const rawTotals = data.columnTotals || {}
+            if (Object.keys(rawTotals).length) {
+              for (const [key, n] of Object.entries(rawTotals)) {
+                const bucket = boardBucketForLeadStatus(key, columnIds)
+                nextTotals[bucket] += Number(n || 0)
+              }
+            } else {
+              for (const id of columnIds) nextTotals[id] = nextBoard[id].length
+            }
+            setBoardLeadsByStatus(nextBoard)
+            setBoardColumnTotals(nextTotals)
+          } else {
+            setBoardLeadsByStatus(data.board || {})
+            setBoardColumnTotals(data.columnTotals || {})
+          }
         }
       })
       .catch(() => {
@@ -868,7 +902,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     return () => {
       cancelled = true
     }
-  }, [serverSidePipeline, view, stageListMode, serverFilters, boardColumnLimits, isDealsView])
+  }, [serverSidePipeline, view, stageListMode, serverFilters, boardColumnLimits, isDealsView, freightOrg, pipelineTrack, panelOptions?.status])
 
   const filtered = useMemo(() => {
     const base = scopedLeads
@@ -1175,19 +1209,19 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   }, [serverSidePipeline, view, stageListMode, boardColumnTotals, pipelineSummary?.byStatus])
 
   const byStatus = useMemo(() => {
+    const stageColumns = freightOrg ? boardColumns : columns
     if (serverSidePipeline && boardLeadsByStatus) return boardLeadsByStatus
-    const map = Object.fromEntries(columns.map((s) => [s.id, []]))
-    const hidden = []
+    const map = Object.fromEntries(stageColumns.map((s) => [s.id, []]))
+    const columnIds = stageColumns.map((s) => s.id)
     for (const lead of filtered) {
-      const st = lead.crm?.status || 'new'
+      const st = freightOrg
+        ? boardBucketForLeadStatus(lead.crm?.status, columnIds)
+        : lead.crm?.status || 'new'
       if (map[st]) map[st].push(lead)
-      else hidden.push(lead)
-    }
-    if (hidden.length && map[columns[0]?.id]) {
-      map[columns[0].id].push(...hidden)
+      else if (map[columnIds[0]]) map[columnIds[0]].push(lead)
     }
     return map
-  }, [filtered, columns, serverSidePipeline, boardLeadsByStatus])
+  }, [filtered, columns, boardColumns, freightOrg, serverSidePipeline, boardLeadsByStatus])
 
   const clearAllFilters = useCallback(() => {
     const empty = { ...DEFAULT_PIPELINE_FILTERS }
@@ -1822,7 +1856,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
             />
           ) : view === 'board' && !stageListMode ? (
             <div className="crm-kanban-board min-w-0">
-              {columns.map((col) => {
+              {boardColumns.map((col) => {
                 const colLeads = byStatus[col.id] || []
                 const colTotal = serverSidePipeline
                   ? boardColumnTotals[col.id] ?? colLeads.length

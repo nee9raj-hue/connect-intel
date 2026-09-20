@@ -19,6 +19,14 @@ Production: **https://connectintel.net** (Vercel `connect-intel`).
 3. If search/index ops did not run, manually: `npm run prod:ops` (all orgs) or `npm run prod:ops -- --name=Xindus`.
 4. Optional known-good marker: `npm run prod:tag -- <commit>` then `git push origin --tags`.
 
+Before a **risky** Pipeline/board/CRM change, snapshot LIVE first:
+
+```bash
+npm run prod:safe
+```
+
+That writes a restore **code** (example `S-2EA18A4`) to `docs/safe-versions.json`. Restore with `npm run prod:rollback -- S-2EA18A4`.
+
 ## If production breaks
 
 1. `npm run prod:rollback -- <commit>` (from PRODUCTION_LOG.md).

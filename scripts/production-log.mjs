@@ -18,6 +18,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..')
 const JSON_PATH = join(ROOT, 'docs/production-log.json')
 const MD_PATH = join(ROOT, 'docs/PRODUCTION_LOG.md')
+const SAFE_PATH = join(ROOT, 'docs/safe-versions.json')
 const PRODUCTION_DOMAIN = 'https://connectintel.net'
 const VERCEL_PROJECT = 'connect-intel'
 const MAX_ENTRIES = 80
@@ -138,6 +139,7 @@ function syncLog() {
     productionDomain: PRODUCTION_DOMAIN,
     vercelProject: VERCEL_PROJECT,
     currentProductionCommit: entries[0]?.commit || null,
+    safeVersions: existing.safeVersions || [],
     entries,
   }
 
@@ -173,6 +175,11 @@ function writeMarkdown(data) {
       const notes = e.notes ? `\n  - Notes: ${e.notes}` : ''
       return `| ${e.deployedAtIst} | \`${e.commit}\` | ${e.message.replace(/\|/g, '\\|')} | [preview](${e.vercelPreviewUrl}) | \`${e.rollbackCommand}\` |${current}${notes}`
     })
+    .join('\n')
+
+  const current = data.currentProductionCommit || '—'
+  const safeRows = (data.safeVersions || [])
+    .map((s) => `| \`${s.code}\` | \`${s.commit}\` | ${String(s.note || s.message || '').replace(/\|/g, '\\|')} | ${s.recordedAtIst || '—'} | \`npm run prod:rollback -- ${s.code}\` |`)
     .join('\n')
 
   const md = `# Production deployment log
@@ -217,6 +224,16 @@ npm run prod:rollback -- ${rollbackExample}
 
 ---
 
+## Safe restore codes
+
+These are exact production builds to restore if a later change goes wrong. Tell the assistant the **code** (for example \`S-2EA18A4\`).
+
+| Code | Commit | Note | Recorded (IST) | Restore |
+|------|--------|------|----------------|---------|
+${safeRows || '| — | — | Run `npm run prod:safe` while CRM is healthy | — | — |'}
+
+---
+
 ## Snapshots (newest first)
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
@@ -240,10 +257,11 @@ ${rows || '| — | — | Run `npm run prod:log` to populate | — | — |'}
 |---------|---------|
 | \`npm run prod:log\` | Sync log from Vercel + regenerate this file |
 | \`npm run prod:log:list\` | Print snapshots in the terminal |
-| \`npm run prod:rollback -- <commit>\` | Point production domain at that deployment |
+| \`npm run prod:rollback -- <commit-or-safe-code>\` | Point production domain at that deployment |
 | \`npm run prod:ship\` | Pre-flight checks before pushing to \`main\` |
 | \`npm run prod:verify\` | Build + verify critical files only |
 | \`npm run prod:tag -- [commit]\` | Git tag for a known-good production commit |
+| \`npm run prod:safe\` | Snapshot the current LIVE CRM as a restore code before a risky change |
 
 ---
 
@@ -271,14 +289,73 @@ function listLog() {
   }
 }
 
+function readSafeVersions() {
+  try {
+    return JSON.parse(readFileSync(SAFE_PATH, 'utf8'))
+  } catch {
+    return { versions: [] }
+  }
+}
+
+function writeSafeVersions(data) {
+  mkdirSync(dirname(SAFE_PATH), { recursive: true })
+  writeFileSync(SAFE_PATH, `${JSON.stringify(data, null, 2)}\n`, 'utf8')
+}
+
+function recordSafeVersion(arg, noteArg) {
+  const log = readLog()
+  const commitArg = arg?.trim()
+  const commit = commitArg || log.currentProductionCommit
+  if (!commit) {
+    console.error('No production commit to snapshot. Run npm run prod:log first.')
+    process.exit(1)
+  }
+  const entry = resolveEntry(commit, log.entries || [])
+  const sha = entry?.commit || shortSha(commit)
+  const code = `S-${String(sha).slice(0, 7).toUpperCase()}`
+  const note = noteArg || 'Healthy CRM snapshot before a later change'
+  const row = {
+    code,
+    commit: sha,
+    commitFull: entry?.commitFull || '',
+    message: entry?.message || '',
+    note,
+    recordedAt: new Date().toISOString(),
+    recordedAtIst: formatIst(Date.now()),
+    rollbackCommand: `npm run prod:rollback -- ${code}`,
+  }
+  const safe = readSafeVersions()
+  safe.versions = [row, ...(safe.versions || []).filter((v) => v.code !== code && v.commit !== sha)]
+  writeSafeVersions(safe)
+  log.safeVersions = safe.versions
+  writeLog(log)
+  writeMarkdown(log)
+  try {
+    run(`git tag -a "safe/${code}" -m "${code}: ${note.replace(/"/g, '')}" ${entry?.commitFull || sha}`)
+    console.log(`Git tag safe/${code}`)
+  } catch (err) {
+    console.warn('Git tag skipped:', err.message || err)
+  }
+  console.log(`Safe restore code: ${code}`)
+  console.log(`Exact commit: ${sha}`)
+  console.log(`Restore with: npm run prod:rollback -- ${code}`)
+}
+
 function resolveEntry(arg, entries) {
   if (!arg) return null
-  const a = arg.trim().toLowerCase()
+  const a = arg.trim()
+  const lower = a.toLowerCase()
+  const code = a.toUpperCase().startsWith('S-') ? a.toUpperCase() : ''
+  const safeHit = (readSafeVersions().versions || []).find(
+    (v) => v.code === code || String(v.commit).toLowerCase() === lower
+  )
+  const commit = safeHit?.commit || lower
   return (
-    entries.find((e) => e.commit === a) ||
-    entries.find((e) => e.logId === a) ||
-    entries.find((e) => e.vercelPreviewUrl.includes(a)) ||
-    entries.find((e) => e.commitFull?.startsWith(a))
+    entries.find((e) => e.commit === commit) ||
+    entries.find((e) => e.commit === lower) ||
+    entries.find((e) => e.logId === lower) ||
+    entries.find((e) => e.vercelPreviewUrl?.includes(lower)) ||
+    entries.find((e) => e.commitFull?.startsWith(lower))
   )
 }
 
@@ -343,13 +420,17 @@ try {
     case 'tag':
       tagRelease(arg)
       break
+    case 'safe':
+      recordSafeVersion(arg, process.argv[3])
+      break
     default:
       console.log(`Usage:
   node scripts/production-log.mjs sync
   node scripts/production-log.mjs list
   node scripts/production-log.mjs markdown
-  node scripts/production-log.mjs rollback <commit|logId|preview-host>
-  node scripts/production-log.mjs tag [commit]`)
+  node scripts/production-log.mjs rollback <commit|safe-code|logId>
+  node scripts/production-log.mjs tag [commit]
+  node scripts/production-log.mjs safe [commit] [note]`)
       process.exit(cmd ? 1 : 0)
   }
 } catch (err) {
