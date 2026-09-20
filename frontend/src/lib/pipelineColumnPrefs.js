@@ -11,6 +11,7 @@ export const PIPELINE_TABLE_COLUMNS = [
   { id: 'phone', label: 'Phone', default: true },
   { id: 'owner', label: 'Lead owner', default: true },
   { id: 'lastOrder', label: 'Last shipment', default: true },
+  { id: 'deals', label: 'Deals', default: true },
   { id: 'activity', label: 'Last activity', default: true },
   { id: 'email', label: 'Email', default: false },
   { id: 'notes', label: 'Notes', default: false },
@@ -70,17 +71,43 @@ export function normalizePipelineColumnOrder(columnIds) {
   return ordered.length > 1 || ordered[0] === 'name' ? ordered : [...DEFAULT_VISIBLE]
 }
 
+function insertByCatalog(columnIds, id) {
+  if (!VALID_COLUMN_IDS.has(id) || columnIds.includes(id)) return columnIds
+  const catalog = PIPELINE_TABLE_COLUMNS.map((c) => c.id)
+  const want = catalog.indexOf(id)
+  let at = columnIds.length
+  for (let i = 0; i < columnIds.length; i += 1) {
+    if (catalog.indexOf(columnIds[i]) > want) {
+      at = i
+      break
+    }
+  }
+  const next = [...columnIds]
+  next.splice(at, 0, id)
+  return next
+}
+
+export function insertVisibleColumn(columnIds, id, { afterId } = {}) {
+  const cols = normalizePipelineColumnOrder(columnIds).filter((c) => c !== id)
+  if (!VALID_COLUMN_IDS.has(id) || id === 'name') return cols
+  if (afterId && cols.includes(afterId)) {
+    const next = [...cols]
+    next.splice(cols.indexOf(afterId) + 1, 0, id)
+    return next
+  }
+  return insertByCatalog(cols, id)
+}
+
 function mergeNewDefaultColumns(columnIds) {
   const cols = normalizePipelineColumnOrder(columnIds)
   const seen = new Set(cols)
-  const additions = PIPELINE_TABLE_COLUMNS.filter((c) => c.default && !c.locked && !seen.has(c.id))
-  if (!additions.length) return cols
-
-  for (const col of additions) {
-    cols.push(col.id)
+  let next = cols
+  for (const col of PIPELINE_TABLE_COLUMNS) {
+    if (!col.default || col.locked || seen.has(col.id)) continue
+    next = insertByCatalog(next, col.id)
     seen.add(col.id)
   }
-  return normalizePipelineColumnOrder(cols)
+  return normalizePipelineColumnOrder(next)
 }
 
 export function loadPipelineColumnPrefs() {

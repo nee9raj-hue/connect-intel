@@ -6,6 +6,7 @@ import {
   normalizePipelineColumnOrder,
   pipelineColumnMeta,
   pipelineColumnSettingsRows,
+  insertVisibleColumn,
 } from '../../lib/pipelineColumnPrefs'
 
 export default function PipelineViewSettings({
@@ -39,8 +40,12 @@ export default function PipelineViewSettings({
   const toggleColumn = (id, checked) => {
     const col = pipelineColumnMeta(id)
     if (col?.locked) return
-    let next = checked ? [...orderedVisible, id] : orderedVisible.filter((c) => c !== id)
-    onColumnsChange?.(normalizePipelineColumnOrder(next))
+    if (checked) {
+      const afterId = id === 'deals' ? 'lastOrder' : undefined
+      onColumnsChange?.(insertVisibleColumn(orderedVisible, id, { afterId }))
+      return
+    }
+    onColumnsChange?.(normalizePipelineColumnOrder(orderedVisible.filter((c) => c !== id)))
   }
 
   const moveColumn = (id, direction) => {
@@ -119,7 +124,7 @@ export default function PipelineViewSettings({
           <section className="hs-view-settings__section">
             <p className="hs-view-settings__section-label">Columns</p>
             <p className="hs-view-settings__hint px-0 pb-2">
-              Name stays first. Use arrows to reorder visible columns.
+              Name stays first. Use arrows to reorder visible columns. Deals show the last 30 days as compact chips next to Last shipment.
             </p>
             {columnRows.map((id) => {
               const col = pipelineColumnMeta(id)

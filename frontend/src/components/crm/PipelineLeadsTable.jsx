@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
-import { formatCrmDate, getStatusMeta } from '../../lib/crmConstants'
+import { formatCrmDate, getStatusMeta, getDealStageMeta } from '../../lib/crmConstants'
 import { formatDateTime } from '../../lib/crmUiConstants'
+import { formatDealValue } from '../../lib/crmTimeline'
+import { resolveFreightDealCurrency } from '../../lib/freightDeal'
 import { getLeadCity, getLeadState, leadOwnerUserId } from '../../lib/pipelineFilters'
 import { hasActiveTextSelection } from '../../lib/keyboardShortcuts'
 import { getLeadEmail, leadHasSendableEmail } from '../../lib/emailUtils'
@@ -18,6 +20,7 @@ import FilterDropdown from './FilterDropdown'
 import PipelineRowActionsMenu from './PipelineRowActionsMenu'
 import { DEAL_MONTH_OPTIONS, dealYearOptions } from '../../lib/pipelineDealsFilter'
 import { NOTES_PRESENCE_OPTIONS } from '../../../../lib/pipelineColumnFilters.js'
+import { compactDealClipMeta, slimPipelineDealsForList } from '../../../../lib/pipelineDealClips.js'
 import {
   PhoneIcon,
   MailIcon,
@@ -28,6 +31,39 @@ import {
   WhatsAppIcon,
   ChevronRightIcon,
 } from '../ui/icons'
+
+function PipelineDealClips({ lead, freightOrg, onSelect }) {
+  const clips = slimPipelineDealsForList(lead.crm?.deals)
+  if (!clips.length) return <span className="pipeline-hs-muted">—</span>
+  return (
+    <div className="pipeline-deal-clips">
+      {clips.map((deal) => {
+        const stage = getDealStageMeta(deal.stage, { freightOrg })
+        const amount = Number(deal.amount)
+        const amountLabel =
+          Number.isFinite(amount) && amount > 0
+            ? formatDealValue(amount, deal.currency || resolveFreightDealCurrency(deal) || 'INR')
+            : ''
+        const meta = compactDealClipMeta(deal, { stageLabel: stage.label, amountLabel })
+        return (
+          <button
+            key={deal.id || deal.name}
+            type="button"
+            className="pipeline-deal-clip"
+            title={[deal.name, meta].filter(Boolean).join('\n')}
+            onClick={(e) => {
+              e.stopPropagation()
+              onSelect?.(lead.id, 'deals')
+            }}
+          >
+            <span className="pipeline-deal-clip__name">{deal.name}</span>
+            {meta ? <span className="pipeline-deal-clip__meta">{meta}</span> : null}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
 
 function displayName(lead) {
   const n = [lead.firstName, lead.lastName].filter(Boolean).join(' ').trim()
@@ -352,6 +388,12 @@ function renderPipelineHeader(colId, ctx) {
           onSort={onSort}
         />
       )
+    case 'deals':
+      return (
+        <th key={colId} scope="col" className="pipeline-hs-th pipeline-hs-th--deals">
+          Deals
+        </th>
+      )
     case 'tags':
       return (
         <FilterHeader
@@ -657,6 +699,12 @@ function renderPipelineCell(colId, lead, ctx) {
         </td>
       )
     }
+    case 'deals':
+      return (
+        <td key={colId} className="pipeline-hs-td pipeline-hs-td--deals">
+          <PipelineDealClips lead={lead} freightOrg={ctx.freightOrg} onSelect={onSelect} />
+        </td>
+      )
     case 'tags': {
       const erpTags = readDisplayErpTagsFromLead(lead)
       const hasCrmTags = tags.length > 0
@@ -913,6 +961,7 @@ export default function PipelineLeadsTable({
                     onChangeStatus,
                     onOpenCompany,
                     canOpenCompany,
+                    freightOrg,
                   })
                 )}
                 <td className="pipeline-hs-td pipeline-hs-td--actions">

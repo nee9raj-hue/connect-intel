@@ -613,9 +613,60 @@
   max-width: 9rem;
 }
 
-.pipeline-hs-td--tags {
-  min-width: 6rem;
-  max-width: 14rem;
+.pipeline-hs-td--deals {
+  min-width: 9rem;
+  max-width: 16rem;
+  vertical-align: middle;
+}
+
+.pipeline-deal-clips {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 0.28rem;
+  max-width: 16rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 1px;
+}
+
+.pipeline-deal-clip {
+  flex: 0 0 auto;
+  max-width: 9.5rem;
+  padding: 0.12rem 0.38rem 0.16rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: #f8fafc;
+  text-align: left;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.pipeline-deal-clip:hover {
+  border-color: #cbd5e1;
+  background: #fff;
+}
+
+.pipeline-deal-clip__name {
+  display: block;
+  font-size: 0.625rem;
+  font-weight: 650;
+  color: #1e293b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pipeline-deal-clip__meta {
+  display: block;
+  margin-top: 0.05rem;
+  font-size: 0.5625rem;
+  font-weight: 500;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .pipeline-hs-tags-cell {
