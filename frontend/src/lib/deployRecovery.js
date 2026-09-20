@@ -1,4 +1,5 @@
 const RECOVERY_KEY = 'ci_deploy_recovery'
+const MAX_AUTO_RECOVERIES = 2
 
 export function isStaleAssetError(message) {
   const m = String(message || '').toLowerCase()
@@ -13,13 +14,19 @@ export function isStaleAssetError(message) {
   )
 }
 
-export async function clearPwaCachesAndReload() {
+function recoveryCount() {
   try {
-    sessionStorage.removeItem(RECOVERY_KEY)
+    return Number(sessionStorage.getItem(RECOVERY_KEY) || 0) || 0
   } catch {
-    // ignore
+    return MAX_AUTO_RECOVERIES
   }
+}
 
+export function canAutoRecover() {
+  return recoveryCount() < MAX_AUTO_RECOVERIES
+}
+
+export async function clearPwaCachesAndReload() {
   if ('serviceWorker' in navigator) {
     try {
       const regs = await navigator.serviceWorker.getRegistrations()
@@ -38,14 +45,16 @@ export async function clearPwaCachesAndReload() {
     }
   }
 
-  window.location.reload()
+  const url = new URL(window.location.href)
+  url.searchParams.set('_ci', String(Date.now()))
+  window.location.replace(url.href)
 }
 
 export function tryAutoRecover(message) {
   if (!isStaleAssetError(message)) return false
-  if (sessionStorage.getItem(RECOVERY_KEY)) return false
+  if (!canAutoRecover()) return false
   try {
-    sessionStorage.setItem(RECOVERY_KEY, '1')
+    sessionStorage.setItem(RECOVERY_KEY, String(recoveryCount() + 1))
   } catch {
     return false
   }
@@ -72,10 +81,12 @@ export function initDeployRecovery() {
   })
 
   window.addEventListener('load', () => {
-    try {
-      sessionStorage.removeItem(RECOVERY_KEY)
-    } catch {
-      // ignore
-    }
+    window.setTimeout(() => {
+      try {
+        sessionStorage.removeItem(RECOVERY_KEY)
+      } catch {
+        // ignore
+      }
+    }, 8_000)
   })
 }

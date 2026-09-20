@@ -17,18 +17,18 @@ import './styles/calendar.css'
 import App from './App.jsx'
 import ErrorBoundary from './components/ui/ErrorBoundary.jsx'
 import { initNativeAppShell } from './lib/nativeApp.js'
-import { clearPwaCachesAndReload, initDeployRecovery } from './lib/deployRecovery.js'
+import { initDeployRecovery } from './lib/deployRecovery.js'
 
 initDeployRecovery()
 
-registerSW({
+const updateSW = registerSW({
   immediate: true,
   onNeedRefresh() {
-    void clearPwaCachesAndReload()
+    void updateSW(true)
   },
   onRegisteredSW(_swUrl, registration) {
     if (registration) {
-      setInterval(() => registration.update(), 60 * 60 * 1000)
+      setInterval(() => registration.update(), 15 * 60 * 1000)
     }
   },
 })

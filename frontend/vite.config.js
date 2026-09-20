@@ -89,7 +89,9 @@ export default defineConfig({
               globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff2}'],
               importScripts: ['chithi-push-sw.js'],
               navigateFallback: '/index.html',
-              navigateFallbackDenylist: [/^\/api\//],
+              // Never serve a precached index.html for navigations. Stale HTML after
+              // a deploy 404s hashed chunks and blocks Pipeline. Vercel already rewrites SPA routes.
+              navigateFallbackDenylist: [/./],
               runtimeCaching: [
                 {
                   urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
