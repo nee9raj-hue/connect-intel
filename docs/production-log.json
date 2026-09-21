@@ -1,9 +1,9 @@
 {
-  "updatedAt": "2026-09-21T13:23:29.052Z",
-  "updatedAtIst": "21/09/2026, 18:53:29",
+  "updatedAt": "2026-09-21T13:34:01.564Z",
+  "updatedAtIst": "21/09/2026, 19:04:01",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "b75be84",
+  "currentProductionCommit": "311ae71",
   "safeVersions": [
     {
       "code": "S-485FC4A",
@@ -48,6 +48,34 @@
   ],
   "entries": [
     {
+      "logId": "20260921-1903-311ae71",
+      "commit": "311ae71",
+      "commitFull": "311ae71a99394b3749ddad0f9d80b87bf805fb79",
+      "message": "Clear leftover app cache so the restored CRM can fetch again.",
+      "deployedAt": "2026-09-21T13:33:35.004Z",
+      "deployedAtIst": "21/09/2026, 19:03:35",
+      "committedAtIst": "21/09/2026, 19:02:53",
+      "vercelPreviewUrl": "https://connect-intel-9efzb9qem-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 311ae71"
+    },
+    {
+      "logId": "20260921-1854-25e05c2",
+      "commit": "25e05c2",
+      "commitFull": "25e05c2a2e7c3599e17c21d8b50ccc49a94a8f32",
+      "message": "Record production LIVE at the restored 4c0640e snapshot.",
+      "deployedAt": "2026-09-21T13:24:23.682Z",
+      "deployedAtIst": "21/09/2026, 18:54:23",
+      "committedAtIst": "21/09/2026, 18:53:37",
+      "vercelPreviewUrl": "https://connect-intel-ha14sol5w-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 25e05c2"
+    },
+    {
       "logId": "20260921-1852-b75be84",
       "commit": "b75be84",
       "commitFull": "b75be849367960f82d6adf3ba2ce472ba388b395",
@@ -57,7 +85,7 @@
       "committedAtIst": "21/09/2026, 18:51:55",
       "vercelPreviewUrl": "https://connect-intel-h5xf8or7t-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- b75be84"
     },
@@ -298,34 +326,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- e453adb"
-    },
-    {
-      "logId": "20260921-1613-c1d7384",
-      "commit": "c1d7384",
-      "commitFull": "c1d73845261f01d900f221912c1c7dbf8a02a29e",
-      "message": "Find existing Xindus users on sign-in from the profiles table instead of a failing blob scan.",
-      "deployedAt": "2026-09-21T10:43:45.299Z",
-      "deployedAtIst": "21/09/2026, 16:13:45",
-      "committedAtIst": "21/09/2026, 16:12:57",
-      "vercelPreviewUrl": "https://connect-intel-cgsf8lknj-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- c1d7384"
-    },
-    {
-      "logId": "20260921-1604-d276f4f",
-      "commit": "d276f4f",
-      "commitFull": "d276f4fe06ee8d29c504c4f91b81e1eafee85ec5",
-      "message": "Stop expired session tokens from hanging sign-in and bouncing back to the login page.",
-      "deployedAt": "2026-09-21T10:34:20.860Z",
-      "deployedAtIst": "21/09/2026, 16:04:20",
-      "committedAtIst": "21/09/2026, 16:03:35",
-      "vercelPreviewUrl": "https://connect-intel-135ntnaco-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- d276f4f"
     }
   ]
 }

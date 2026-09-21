@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 153ea47
+npm run prod:rollback -- 25e05c2
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 153ea47
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `b75be84` |
-| Log updated (IST) | 21/09/2026, 18:53:29 |
+| Commit | `311ae71` |
+| Log updated (IST) | 21/09/2026, 19:04:01 |
 
 ---
 
@@ -57,7 +57,9 @@ These are exact production builds to restore if a later change goes wrong. Tell 
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 21/09/2026, 18:52:47 | `b75be84` | Restore production to the 4c0640e working snapshot. | [preview](https://connect-intel-h5xf8or7t-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b75be84` | **← LIVE**
+| 21/09/2026, 19:03:35 | `311ae71` | Clear leftover app cache so the restored CRM can fetch again. | [preview](https://connect-intel-9efzb9qem-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 311ae71` | **← LIVE**
+| 21/09/2026, 18:54:23 | `25e05c2` | Record production LIVE at the restored 4c0640e snapshot. | [preview](https://connect-intel-ha14sol5w-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 25e05c2` |
+| 21/09/2026, 18:52:47 | `b75be84` | Restore production to the 4c0640e working snapshot. | [preview](https://connect-intel-h5xf8or7t-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b75be84` |
 | 21/09/2026, 18:14:49 | `153ea47` | Record production LIVE at 7274334. | [preview](https://connect-intel-1u1z5jgm4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 153ea47` |
 | 21/09/2026, 18:13:49 | `7274334` | Stop the workspace spinner from waiting forever after Google sign-in. | [preview](https://connect-intel-lb7aph9mm-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7274334` |
 | 21/09/2026, 18:10:38 | `222c7d6` | Record production LIVE at f729182. | [preview](https://connect-intel-iguvi8bn4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 222c7d6` |
@@ -75,8 +77,6 @@ These are exact production builds to restore if a later change goes wrong. Tell 
 | 21/09/2026, 16:27:24 | `547910f` | Scan the users table by email when profiles misses an existing Xindus login. | [preview](https://connect-intel-8kf6f1pi1-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 547910f` |
 | 21/09/2026, 16:23:22 | `8227d6d` | Look up Xindus accounts in the login store when they are missing from profiles. | [preview](https://connect-intel-2a4ydkvx2-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 8227d6d` |
 | 21/09/2026, 16:18:20 | `e453adb` | Stop sign-in from probing every Postgres host and scanning the users blob. | [preview](https://connect-intel-app7xlnfa-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- e453adb` |
-| 21/09/2026, 16:13:45 | `c1d7384` | Find existing Xindus users on sign-in from the profiles table instead of a failing blob scan. | [preview](https://connect-intel-cgsf8lknj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c1d7384` |
-| 21/09/2026, 16:04:20 | `d276f4f` | Stop expired session tokens from hanging sign-in and bouncing back to the login page. | [preview](https://connect-intel-135ntnaco-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d276f4f` |
 
 ---
 
