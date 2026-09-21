@@ -1,10 +1,20 @@
 {
-  "updatedAt": "2026-09-21T05:23:41.016Z",
-  "updatedAtIst": "21/09/2026, 10:53:41",
+  "updatedAt": "2026-09-21T06:12:22.385Z",
+  "updatedAtIst": "21/09/2026, 11:42:22",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "485fc4a",
+  "currentProductionCommit": "4c0640e",
   "safeVersions": [
+    {
+      "code": "S-4C0640E",
+      "commit": "4c0640e",
+      "commitFull": "4c0640ee3f0aeb27ca73ff2f1b0ec27e2c12698d",
+      "message": "Load a teammate's full Pipeline when filtering by that team's tag.",
+      "note": "4c0640e",
+      "recordedAt": "2026-09-21T08:52:07.771Z",
+      "recordedAtIst": "21/09/2026, 14:22:07",
+      "rollbackCommand": "npm run prod:rollback -- S-4C0640E"
+    },
     {
       "code": "S-485FC4A",
       "commit": "485fc4a",
@@ -48,6 +58,20 @@
   ],
   "entries": [
     {
+      "logId": "20260921-1142-4c0640e",
+      "commit": "4c0640e",
+      "commitFull": "4c0640ee3f0aeb27ca73ff2f1b0ec27e2c12698d",
+      "message": "Load a teammate's full Pipeline when filtering by that team's tag.",
+      "deployedAt": "2026-09-21T06:12:10.182Z",
+      "deployedAtIst": "21/09/2026, 11:42:10",
+      "committedAtIst": "21/09/2026, 11:41:24",
+      "vercelPreviewUrl": "https://connect-intel-cic55cjdt-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 4c0640e"
+    },
+    {
       "logId": "20260921-1053-485fc4a",
       "commit": "485fc4a",
       "commitFull": "485fc4a7d67cd15ef0ee85a774b5b71c642f9c70",
@@ -57,7 +81,7 @@
       "committedAtIst": "21/09/2026, 10:52:43",
       "vercelPreviewUrl": "https://connect-intel-21ekd4qyd-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 485fc4a"
     },
@@ -312,20 +336,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- d2726dc"
-    },
-    {
-      "logId": "20260919-1919-c79535a",
-      "commit": "c79535a",
-      "commitFull": "c79535aa89b931f431945f68578139bd89fd8068",
-      "message": "Restore sessionError so the CRM shell can render after Reconnect.",
-      "deployedAt": "2026-09-19T13:49:59.870Z",
-      "deployedAtIst": "19/09/2026, 19:19:59",
-      "committedAtIst": "19/09/2026, 19:18:39",
-      "vercelPreviewUrl": "https://connect-intel-6914nqeeh-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- c79535a"
     }
   ]
 }

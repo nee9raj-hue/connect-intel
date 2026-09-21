@@ -563,7 +563,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     let base = marketingSliceLeads ?? pipelineScopedLeads
     if (!effectiveAssigneeFilter && !isOrgAdmin && !isTeamManager) {
       base = filterRepPipelineLeads(base, user, {
-        skipOwnerFilter: repFilterLiftsOwnerScope(appliedAdvanced),
+        skipOwnerFilter:
+          repFilterLiftsOwnerScope(appliedAdvanced) || serverSidePipeline,
       })
     }
     if (!effectiveAssigneeFilter) return base
@@ -576,6 +577,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     isTeamManager,
     user,
     appliedAdvanced,
+    serverSidePipeline,
   ])
 
   const locationOptions = useMemo(() => {

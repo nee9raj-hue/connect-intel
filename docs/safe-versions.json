@@ -1,6 +1,16 @@
 {
   "versions": [
     {
+      "code": "S-4C0640E",
+      "commit": "4c0640e",
+      "commitFull": "4c0640ee3f0aeb27ca73ff2f1b0ec27e2c12698d",
+      "message": "Load a teammate's full Pipeline when filtering by that team's tag.",
+      "note": "4c0640e",
+      "recordedAt": "2026-09-21T08:52:07.771Z",
+      "recordedAtIst": "21/09/2026, 14:22:07",
+      "rollbackCommand": "npm run prod:rollback -- S-4C0640E"
+    },
+    {
       "code": "S-485FC4A",
       "commit": "485fc4a",
       "commitFull": "485fc4a7d67cd15ef0ee85a774b5b71c642f9c70",
