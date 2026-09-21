@@ -752,7 +752,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       assigneeUserId: effectiveAssigneeFilter || undefined,
       teamId: panelOptions?.teamId || undefined,
       teamIds: scoped.teamIds?.length ? scoped.teamIds : undefined,
-      tagIds: scoped.tagIds?.length ? scoped.tagIds : undefined,
+      tagIds: adv.tagIds?.length ? adv.tagIds : undefined,
       tagMode: adv.tagMode || 'any',
       erpTagNames: adv.erpTagNames?.length ? adv.erpTagNames : undefined,
       erpTagMode: adv.erpTagMode || 'any',
@@ -938,7 +938,12 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       appliedAdvanced.tagIds,
       orgLeadTags,
       memberTeamIdsForTags,
-      { isOrgAdmin }
+      {
+        isOrgAdmin,
+        teams: (orgLeadTags || [])
+          .filter((tag) => tag.teamId)
+          .map((tag) => ({ id: tag.teamId, name: tag.name })),
+      }
     )
     return applyPipelineFilters(base, {
       status: pipelineStatusFilter,

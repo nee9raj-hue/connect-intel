@@ -1,6 +1,16 @@
 {
   "versions": [
     {
+      "code": "S-485FC4A",
+      "commit": "485fc4a",
+      "commitFull": "485fc4a7d67cd15ef0ee85a774b5b71c642f9c70",
+      "message": "Keep the Non Large B2B tag selected after Apply in More filters.",
+      "note": "485fc4a",
+      "recordedAt": "2026-09-21T06:10:58.625Z",
+      "recordedAtIst": "21/09/2026, 11:40:58",
+      "rollbackCommand": "npm run prod:rollback -- S-485FC4A"
+    },
+    {
       "code": "S-2C53FBD",
       "commit": "2c53fbd",
       "commitFull": "2c53fbd37ce1de4d0024ba5bb90e87400840e2bd",

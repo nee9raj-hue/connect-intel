@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 66f9509
+npm run prod:rollback -- 2c53fbd
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 66f9509
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `2c53fbd` |
-| Log updated (IST) | 21/09/2026, 10:16:57 |
+| Commit | `485fc4a` |
+| Log updated (IST) | 21/09/2026, 10:53:41 |
 
 ---
 
@@ -46,6 +46,7 @@ These are exact production builds to restore if a later change goes wrong. Tell 
 
 | Code | Commit | Note | Recorded (IST) | Restore |
 |------|--------|------|----------------|---------|
+| `S-485FC4A` | `485fc4a` | 485fc4a | 21/09/2026, 11:40:58 | `npm run prod:rollback -- S-485FC4A` |
 | `S-2C53FBD` | `2c53fbd` | 2c53fbd | 21/09/2026, 10:52:23 | `npm run prod:rollback -- S-2C53FBD` |
 | `S-66F9509` | `66f9509` | 66f9509 | 21/09/2026, 10:00:37 | `npm run prod:rollback -- S-66F9509` |
 | `S-2EA18A4` | `2ea18a4` | 2ea18a4 | 21/09/2026, 00:41:11 | `npm run prod:rollback -- S-2EA18A4` |
@@ -56,7 +57,8 @@ These are exact production builds to restore if a later change goes wrong. Tell 
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 21/09/2026, 10:16:48 | `2c53fbd` | Show a team's full Pipeline when members filter by that team's tag. | [preview](https://connect-intel-evsoej3m4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2c53fbd` | **← LIVE**
+| 21/09/2026, 10:53:33 | `485fc4a` | Keep the Non Large B2B tag selected after Apply in More filters. | [preview](https://connect-intel-21ekd4qyd-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 485fc4a` | **← LIVE**
+| 21/09/2026, 10:16:48 | `2c53fbd` | Show a team's full Pipeline when members filter by that team's tag. | [preview](https://connect-intel-evsoej3m4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2c53fbd` |
 | 21/09/2026, 00:42:07 | `66f9509` | Align Pipeline board with combined CRM+ERP stages and add restore codes. | [preview](https://connect-intel-g23l28b2e-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 66f9509` |
 | 21/09/2026, 00:27:36 | `2ea18a4` | Fix Pipeline board crash from a missing status helper. | [preview](https://connect-intel-5jtilj2p7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 2ea18a4` |
 | 21/09/2026, 00:11:13 | `5b9bf74` | Show last-30-day deal chips next to Last shipment on Pipeline. | [preview](https://connect-intel-ktlrml8q9-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5b9bf74` |
@@ -75,7 +77,6 @@ These are exact production builds to restore if a later change goes wrong. Tell 
 | 20/09/2026, 02:06:43 | `0f1004d` | Keep read-only ERP tag chips off CRM tagIds on list and workspace refresh. | [preview](https://connect-intel-hv44w7eb3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0f1004d` |
 | 20/09/2026, 02:00:22 | `d2726dc` | Show read-only ERP tags separately from CRM tagIds. | [preview](https://connect-intel-qcmtpoejk-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d2726dc` |
 | 19/09/2026, 19:19:59 | `c79535a` | Restore sessionError so the CRM shell can render after Reconnect. | [preview](https://connect-intel-6914nqeeh-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c79535a` |
-| 19/09/2026, 19:16:32 | `5dd1efa` | Show Pipeline leads when SQL org ids no longer match the session. | [preview](https://connect-intel-blcu7b3cv-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5dd1efa` |
 
 ---
 

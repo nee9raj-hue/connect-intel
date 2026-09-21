@@ -361,7 +361,10 @@ export default function PipelineFiltersBar({
       }
       case 'advanced': {
         const next = { ...draft.filters }
-        const scoped = mergeTeamScopedTagFilters(next, orgLeadTags, memberTeamIds, { isOrgAdmin })
+        const scoped = mergeTeamScopedTagFilters(next, orgLeadTags, memberTeamIds, {
+          isOrgAdmin,
+          teams: orgTeams,
+        })
         next.teamMemberUserIds = memberIdsForTeams(orgTeams, scoped.teamIds || [])
         commitFilters(next)
         const view = savedViews.find((v) => v.id === draft.smartViewId)
