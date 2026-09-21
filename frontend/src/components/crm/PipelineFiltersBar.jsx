@@ -7,7 +7,11 @@ import { CONTACT_FILTER_OPTIONS, DEFAULT_PIPELINE_FILTERS, getFilterCities, getF
 import { FilterChipButton } from './FilterDropdown'
 import { DEAL_MONTH_OPTIONS, dealYearOptions, formatDealPeriodLabel } from '../../lib/pipelineDealsFilter'
 import { lastShipmentMonthValues, lastShipmentPeriodLabel } from '../../../../lib/leadLastShipmentFilter.js'
-import { mergeTeamScopedTagFilters, teamIdsFromHierarchyForUser } from '../../../../lib/pipelineMemberVisibility.js'
+import {
+  displayTagIdsForFilters,
+  mergeTeamScopedTagFilters,
+  teamIdsFromHierarchyForUser,
+} from '../../../../lib/pipelineMemberVisibility.js'
 import { isFreightDealOrg } from '../../lib/freightDeal'
 import { FREIGHT_CRM_PIPELINE_COLUMNS } from '../../lib/crmConstants'
 import LeadTag from '../ui/LeadTag'
@@ -249,7 +253,10 @@ export default function PipelineFiltersBar({
     setActiveFilter({
       type,
       draft: {
-        filters: { ...filters },
+        filters: {
+          ...filters,
+          tagIds: displayTagIdsForFilters(filters, orgLeadTags),
+        },
         statusFilter,
         ownerFilter: ownerFilter || '',
         smartViewId: activeSmartViewId || '',
@@ -353,13 +360,9 @@ export default function PipelineFiltersBar({
         break
       }
       case 'advanced': {
-        const next = mergeTeamScopedTagFilters(
-          { ...draft.filters },
-          orgLeadTags,
-          memberTeamIds,
-          { isOrgAdmin }
-        )
-        next.teamMemberUserIds = memberIdsForTeams(orgTeams, next.teamIds || [])
+        const next = { ...draft.filters }
+        const scoped = mergeTeamScopedTagFilters(next, orgLeadTags, memberTeamIds, { isOrgAdmin })
+        next.teamMemberUserIds = memberIdsForTeams(orgTeams, scoped.teamIds || [])
         commitFilters(next)
         const view = savedViews.find((v) => v.id === draft.smartViewId)
         if (view) onApplySmartView?.(view)
@@ -973,7 +976,7 @@ export default function PipelineFiltersBar({
               />
             )
           })}
-          {(appliedFilters.tagIds || []).map((tagId) => {
+          {(displayTagIdsForFilters(appliedFilters, orgLeadTags) || []).map((tagId) => {
             const tag = orgLeadTags.find((t) => t.id === tagId)
             if (!tag) return null
             return (
@@ -981,11 +984,19 @@ export default function PipelineFiltersBar({
                 <LeadTag name={tag.name} />
                 <button
                   type="button"
-                  onClick={() =>
+                  onClick={() => {
+                    const tag = orgLeadTags.find((t) => String(t.id) === String(tagId))
+                    const nextTagIds = (appliedFilters.tagIds || []).filter((id) => id !== tagId)
+                    const teamId = String(tag?.teamId || '').trim()
+                    const nextTeamIds = teamId
+                      ? (appliedFilters.teamIds || []).filter((id) => String(id) !== teamId)
+                      : appliedFilters.teamIds || []
                     onRemoveAppliedFilter?.({
-                      tagIds: (appliedFilters.tagIds || []).filter((id) => id !== tagId),
+                      tagIds: nextTagIds,
+                      teamIds: nextTeamIds,
+                      teamMemberUserIds: memberIdsForTeams(orgTeams, nextTeamIds),
                     })
-                  }
+                  }}
                   className="crm-filter-chip-x"
                   aria-label="Remove tag filter"
                 >

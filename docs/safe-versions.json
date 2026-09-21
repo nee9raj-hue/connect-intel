@@ -1,6 +1,16 @@
 {
   "versions": [
     {
+      "code": "S-2C53FBD",
+      "commit": "2c53fbd",
+      "commitFull": "2c53fbd37ce1de4d0024ba5bb90e87400840e2bd",
+      "message": "Show a team's full Pipeline when members filter by that team's tag.",
+      "note": "2c53fbd",
+      "recordedAt": "2026-09-21T05:22:23.221Z",
+      "recordedAtIst": "21/09/2026, 10:52:23",
+      "rollbackCommand": "npm run prod:rollback -- S-2C53FBD"
+    },
+    {
       "code": "S-66F9509",
       "commit": "66f9509",
       "commitFull": "66f95094023b4ef4db9b4de6fb6779b90f5c5511",
