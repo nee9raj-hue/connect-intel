@@ -17,8 +17,12 @@ export async function fetchWithTimeout(url, options = {}, timeoutMs = DEFAULT_MS
   try {
     return await fetch(url, { ...rest, signal: controller.signal })
   } catch (error) {
+    const text = String(error?.message || '')
     if (error?.name === 'AbortError') {
       throw new Error('Request timed out. Please refresh the page or try again in a moment.')
+    }
+    if (/networkerror|failed to fetch|fetch resource/i.test(text)) {
+      throw new Error('Could not reach the workspace. Refresh the page and try again.')
     }
     throw error
   } finally {

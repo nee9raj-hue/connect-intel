@@ -8,7 +8,10 @@ export function isStaleAssetError(message) {
     m.includes('error loading dynamically imported module') ||
     m.includes('unable to preload css') ||
     m.includes('dynamically imported module') ||
-    m.includes('pipelinedealsview is not defined')
+    m.includes('pipelinedealsview is not defined') ||
+    m.includes('networkerror') ||
+    m.includes('failed to fetch') ||
+    m.includes('fetch resource')
   )
 }
 

@@ -40,7 +40,8 @@ export default defineConfig({
       ? [viteSingleFile(), pwaStubPlugin()]
       : [
           VitePWA({
-            registerType: 'prompt',
+            selfDestroying: true,
+            registerType: 'autoUpdate',
             injectRegister: false,
             includeAssets: [
               'connect-intel-hero-logo.png',
@@ -84,10 +85,10 @@ export default defineConfig({
               ],
             },
             workbox: {
-              skipWaiting: false,
-              clientsClaim: false,
+              skipWaiting: true,
+              clientsClaim: true,
               cleanupOutdatedCaches: true,
-              globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff2}'],
+              globPatterns: ['**/*.{js,css,ico,png,svg,webp,woff2}'],
               importScripts: ['chithi-push-sw.js'],
               navigateFallback: '/index.html',
               // Never serve a precached index.html for navigations. Stale HTML after
