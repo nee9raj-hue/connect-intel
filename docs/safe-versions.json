@@ -1,6 +1,16 @@
 {
   "versions": [
     {
+      "code": "S-66F9509",
+      "commit": "66f9509",
+      "commitFull": "66f95094023b4ef4db9b4de6fb6779b90f5c5511",
+      "message": "Align Pipeline board with combined CRM+ERP stages and add restore codes.",
+      "note": "66f9509",
+      "recordedAt": "2026-09-21T04:30:37.355Z",
+      "recordedAtIst": "21/09/2026, 10:00:37",
+      "rollbackCommand": "npm run prod:rollback -- S-66F9509"
+    },
+    {
       "code": "S-2EA18A4",
       "commit": "2ea18a4",
       "commitFull": "2ea18a4ff64d42c1202d54fc21f6d82b6e8a82af",

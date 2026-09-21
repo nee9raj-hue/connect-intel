@@ -37,7 +37,7 @@ import {
   normalizeLocationKey,
   pipelineServerFilterExtras,
 } from '../../lib/pipelineFilters'
-import { repFilterLiftsOwnerScope } from '../../../../lib/pipelineMemberVisibility.js'
+import { mergeTeamScopedTagFilters, consumeTeamScopedLeadTags, repFilterLiftsOwnerScope } from '../../../../lib/pipelineMemberVisibility.js'
 import { tagMapById } from '../../lib/orgLeadTags'
 import { leadHasCallablePhone } from '../../lib/phoneUtils'
 import LeadPhoneCall from './LeadPhoneCall'
@@ -301,6 +301,17 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       .map((m) => String(m.userId))
     return ids.length ? ids : null
   }, [panelOptions?.teamId, teamMembers])
+
+  const memberTeamIdsForTags = useMemo(() => {
+    const ids = new Set()
+    if (user?.teamId) ids.add(String(user.teamId))
+    for (const member of teamMembers || []) {
+      if (String(member.userId) === String(user?.id) && member.teamId) {
+        ids.add(String(member.teamId))
+      }
+    }
+    return [...ids]
+  }, [user?.id, user?.teamId, teamMembers])
 
   const unreadLeadIds = useMemo(() => {
     if (!panelOptions?.unreadOnly && panelOptions?.activityFilter !== 'unread') return null
@@ -723,7 +734,9 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     (advancedFilters.notesPresence || []).join(',') !== (appliedAdvanced.notesPresence || []).join(',')
 
   const buildServerFilters = useCallback(
-    (adv, q) => ({
+    (adv, q) => {
+      const scoped = mergeTeamScopedTagFilters(adv, orgLeadTags, memberTeamIdsForTags, { isOrgAdmin })
+      return {
       status:
         (adv.statusIds || []).length
           ? undefined
@@ -738,15 +751,26 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       states: getFilterStates(adv).length ? getFilterStates(adv) : undefined,
       assigneeUserId: effectiveAssigneeFilter || undefined,
       teamId: panelOptions?.teamId || undefined,
-      teamIds: adv.teamIds?.length ? adv.teamIds : undefined,
-      tagIds: adv.tagIds?.length ? adv.tagIds : undefined,
+      teamIds: scoped.teamIds?.length ? scoped.teamIds : undefined,
+      tagIds: scoped.tagIds?.length ? scoped.tagIds : undefined,
       tagMode: adv.tagMode || 'any',
       erpTagNames: adv.erpTagNames?.length ? adv.erpTagNames : undefined,
       erpTagMode: adv.erpTagMode || 'any',
       crmStageIds: adv.crmStageIds?.length ? adv.crmStageIds : undefined,
       ...pipelineServerFilterExtras(adv, smartViewFilters),
-    }),
-    [filter, listStatusFilter, effectiveAssigneeFilter, smartViewFilters, panelOptions?.teamId, pipelineTrack]
+    }
+    },
+    [
+      filter,
+      listStatusFilter,
+      effectiveAssigneeFilter,
+      smartViewFilters,
+      panelOptions?.teamId,
+      pipelineTrack,
+      orgLeadTags,
+      memberTeamIdsForTags,
+      isOrgAdmin,
+    ]
   )
 
   const serverFilters = useMemo(
@@ -910,13 +934,19 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     const serverLocationFilter =
       serverSidePipeline &&
       (serverFilters.states?.length > 0 || serverFilters.cities?.length > 0)
+    const consumedTags = consumeTeamScopedLeadTags(
+      appliedAdvanced.tagIds,
+      orgLeadTags,
+      memberTeamIdsForTags,
+      { isOrgAdmin }
+    )
     return applyPipelineFilters(base, {
       status: pipelineStatusFilter,
       pipelineTrack,
       cities: serverLocationFilter ? [] : getFilterCities(appliedAdvanced),
       states: serverLocationFilter ? [] : getFilterStates(appliedAdvanced),
       contact: appliedAdvanced.contact,
-      tagIds: appliedAdvanced.tagIds,
+      tagIds: consumedTags.tagIds,
       tagMode: appliedAdvanced.tagMode,
       erpTagNames: appliedAdvanced.erpTagNames,
       erpTagMode: appliedAdvanced.erpTagMode,
@@ -974,6 +1004,9 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     serverFilters.states,
     serverFilters.cities,
     pipelineTrack,
+    orgLeadTags,
+    memberTeamIdsForTags,
+    isOrgAdmin,
   ])
 
   const applySmartView = useCallback((view) => {

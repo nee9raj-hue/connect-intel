@@ -7,7 +7,7 @@ import { CONTACT_FILTER_OPTIONS, DEFAULT_PIPELINE_FILTERS, getFilterCities, getF
 import { FilterChipButton } from './FilterDropdown'
 import { DEAL_MONTH_OPTIONS, dealYearOptions, formatDealPeriodLabel } from '../../lib/pipelineDealsFilter'
 import { lastShipmentMonthValues, lastShipmentPeriodLabel } from '../../../../lib/leadLastShipmentFilter.js'
-import { teamIdsFromHierarchyForUser } from '../../../../lib/pipelineMemberVisibility.js'
+import { mergeTeamScopedTagFilters, teamIdsFromHierarchyForUser } from '../../../../lib/pipelineMemberVisibility.js'
 import { isFreightDealOrg } from '../../lib/freightDeal'
 import { FREIGHT_CRM_PIPELINE_COLUMNS } from '../../lib/crmConstants'
 import LeadTag from '../ui/LeadTag'
@@ -353,9 +353,13 @@ export default function PipelineFiltersBar({
         break
       }
       case 'advanced': {
-        const next = { ...draft.filters }
-        const teamIds = next.teamIds || []
-        next.teamMemberUserIds = memberIdsForTeams(orgTeams, teamIds)
+        const next = mergeTeamScopedTagFilters(
+          { ...draft.filters },
+          orgLeadTags,
+          memberTeamIds,
+          { isOrgAdmin }
+        )
+        next.teamMemberUserIds = memberIdsForTeams(orgTeams, next.teamIds || [])
         commitFilters(next)
         const view = savedViews.find((v) => v.id === draft.smartViewId)
         if (view) onApplySmartView?.(view)

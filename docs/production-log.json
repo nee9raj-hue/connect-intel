@@ -1,10 +1,46 @@
 {
-  "updatedAt": "2026-09-20T18:57:54.493Z",
-  "updatedAtIst": "21/09/2026, 00:27:54",
+  "updatedAt": "2026-09-20T19:12:32.563Z",
+  "updatedAtIst": "21/09/2026, 00:42:32",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "2ea18a4",
+  "currentProductionCommit": "66f9509",
+  "safeVersions": [
+    {
+      "code": "S-66F9509",
+      "commit": "66f9509",
+      "commitFull": "66f95094023b4ef4db9b4de6fb6779b90f5c5511",
+      "message": "Align Pipeline board with combined CRM+ERP stages and add restore codes.",
+      "note": "66f9509",
+      "recordedAt": "2026-09-21T04:30:37.355Z",
+      "recordedAtIst": "21/09/2026, 10:00:37",
+      "rollbackCommand": "npm run prod:rollback -- S-66F9509"
+    },
+    {
+      "code": "S-2EA18A4",
+      "commit": "2ea18a4",
+      "commitFull": "2ea18a4ff64d42c1202d54fc21f6d82b6e8a82af",
+      "message": "Fix Pipeline board crash from a missing status helper.",
+      "note": "2ea18a4",
+      "recordedAt": "2026-09-20T19:11:11.823Z",
+      "recordedAtIst": "21/09/2026, 00:41:11",
+      "rollbackCommand": "npm run prod:rollback -- S-2EA18A4"
+    }
+  ],
   "entries": [
+    {
+      "logId": "20260921-0042-66f9509",
+      "commit": "66f9509",
+      "commitFull": "66f95094023b4ef4db9b4de6fb6779b90f5c5511",
+      "message": "Align Pipeline board with combined CRM+ERP stages and add restore codes.",
+      "deployedAt": "2026-09-20T19:12:07.784Z",
+      "deployedAtIst": "21/09/2026, 00:42:07",
+      "committedAtIst": "21/09/2026, 00:41:25",
+      "vercelPreviewUrl": "https://connect-intel-g23l28b2e-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 66f9509"
+    },
     {
       "logId": "20260921-0027-2ea18a4",
       "commit": "2ea18a4",
@@ -15,7 +51,7 @@
       "committedAtIst": "21/09/2026, 00:26:55",
       "vercelPreviewUrl": "https://connect-intel-5jtilj2p7-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 2ea18a4"
     },
@@ -270,32 +306,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 72073a4"
-    },
-    {
-      "logId": "20260919-1855-c377f10",
-      "commit": "c377f10",
-      "commitFull": "c377f108aae44617adeffbc96e0fe71ac054c334",
-      "message": "Record production LIVE snapshot for restored sign-in path.",
-      "deployedAt": "2026-09-19T13:25:19.681Z",
-      "deployedAtIst": "19/09/2026, 18:55:19",
-      "committedAtIst": "19/09/2026, 18:54:34",
-      "vercelPreviewUrl": "https://connect-intel-27g2rrzw7-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- c377f10"
-    }
-  ],
-  "safeVersions": [
-    {
-      "code": "S-2EA18A4",
-      "commit": "2ea18a4",
-      "commitFull": "2ea18a4ff64d42c1202d54fc21f6d82b6e8a82af",
-      "message": "Fix Pipeline board crash from a missing status helper.",
-      "note": "2ea18a4",
-      "recordedAt": "2026-09-20T19:11:11.823Z",
-      "recordedAtIst": "21/09/2026, 00:41:11",
-      "rollbackCommand": "npm run prod:rollback -- S-2EA18A4"
     }
   ]
 }
