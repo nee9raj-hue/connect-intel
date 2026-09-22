@@ -1,9 +1,9 @@
 {
-  "updatedAt": "2026-09-22T14:38:04.361Z",
-  "updatedAtIst": "22/09/2026, 20:08:04",
+  "updatedAt": "2026-09-22T14:58:08.364Z",
+  "updatedAtIst": "22/09/2026, 20:28:08",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "4db6966",
+  "currentProductionCommit": "eb84c89",
   "safeVersions": [
     {
       "code": "S-4DB6966",
@@ -88,6 +88,34 @@
   ],
   "entries": [
     {
+      "logId": "20260922-2027-eb84c89",
+      "commit": "eb84c89",
+      "commitFull": "eb84c89ab796d7e15cc8b595ab1465d585e97cc9",
+      "message": "Show Searching while a new Pipeline query runs, and match each word of a company name.",
+      "deployedAt": "2026-09-22T14:57:54.314Z",
+      "deployedAtIst": "22/09/2026, 20:27:54",
+      "committedAtIst": "22/09/2026, 20:27:08",
+      "vercelPreviewUrl": "https://connect-intel-198s4qqlk-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- eb84c89"
+    },
+    {
+      "logId": "20260922-2008-c0628e6",
+      "commit": "c0628e6",
+      "commitFull": "c0628e6a83f73056bad69e250663ecb55f973bb4",
+      "message": "Record production LIVE at 4db6966.",
+      "deployedAt": "2026-09-22T14:38:53.381Z",
+      "deployedAtIst": "22/09/2026, 20:08:53",
+      "committedAtIst": "22/09/2026, 20:08:10",
+      "vercelPreviewUrl": "https://connect-intel-8wl2sk0ss-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- c0628e6"
+    },
+    {
       "logId": "20260922-2007-4db6966",
       "commit": "4db6966",
       "commitFull": "4db6966fa3726a4b47a951bdbf1ab6bd3f537b87",
@@ -97,7 +125,7 @@
       "committedAtIst": "22/09/2026, 20:06:58",
       "vercelPreviewUrl": "https://connect-intel-5e5lyi3zk-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 4db6966"
     },
@@ -338,34 +366,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 30191ad"
-    },
-    {
-      "logId": "20260921-1755-91af4cd",
-      "commit": "91af4cd",
-      "commitFull": "91af4cd77b5f79490193c683887ca6469ae33d9f",
-      "message": "Record production LIVE at 007f74d.",
-      "deployedAt": "2026-09-21T12:25:06.592Z",
-      "deployedAtIst": "21/09/2026, 17:55:06",
-      "committedAtIst": "21/09/2026, 17:54:17",
-      "vercelPreviewUrl": "https://connect-intel-9xg7anqbb-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 91af4cd"
-    },
-    {
-      "logId": "20260921-1753-007f74d",
-      "commit": "007f74d",
-      "commitFull": "007f74d4b308129c281a6ca9d04de40d17f3ec5e",
-      "message": "Record production LIVE at df78703.",
-      "deployedAt": "2026-09-21T12:23:47.606Z",
-      "deployedAtIst": "21/09/2026, 17:53:47",
-      "committedAtIst": "21/09/2026, 17:53:00",
-      "vercelPreviewUrl": "https://connect-intel-3yjorsay1-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 007f74d"
     }
   ]
 }
