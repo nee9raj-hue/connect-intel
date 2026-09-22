@@ -19,6 +19,8 @@ import {
   leadMatchesStatusIds,
   normalizeNotesPresence,
 } from '../../../lib/pipelineColumnFilters.js'
+import { leadDisplayName, leadEmailBounced, leadHasSendableEmail } from './emailUtils.js'
+import { leadHasCallablePhone } from './phoneUtils.js'
 
 export const CONTACT_FILTER_OPTIONS = [
   { id: 'any', label: 'All contacts' },

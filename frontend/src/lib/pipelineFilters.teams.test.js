@@ -29,3 +29,23 @@ test('Non Large B2B team tag in More filters does not hide Vivek leads that lack
   })
   assert.deepEqual(out.map((l) => l.id).sort(), ['dakash-lead', 'vivek-lead'])
 })
+
+test('pipeline search matches a contact name without throwing', () => {
+  const leads = [
+    { id: '1', firstName: 'Neeraj', lastName: 'Kumar', company: 'Xindus', email: 'neeraj@xindus.net' },
+    { id: '2', firstName: 'Other', lastName: 'Rep', company: 'Acme' },
+  ]
+  const out = applyPipelineFilters(leads, { search: 'neeraj' })
+  assert.deepEqual(out.map((l) => l.id), ['1'])
+})
+
+test('pipeline contact filter uses email/phone helpers without throwing', () => {
+  const leads = [
+    { id: 'email', email: 'ok@xindus.net' },
+    { id: 'phone', phone: '9876543210' },
+  ]
+  const withEmail = applyPipelineFilters(leads, { contact: 'has_email' })
+  const withPhone = applyPipelineFilters(leads, { contact: 'has_phone' })
+  assert.deepEqual(withEmail.map((l) => l.id), ['email'])
+  assert.deepEqual(withPhone.map((l) => l.id), ['phone'])
+})
