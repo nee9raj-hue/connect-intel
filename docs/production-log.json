@@ -1,9 +1,9 @@
 {
-  "updatedAt": "2026-09-22T10:50:07.022Z",
-  "updatedAtIst": "22/09/2026, 16:20:07",
+  "updatedAt": "2026-09-22T10:57:25.249Z",
+  "updatedAtIst": "22/09/2026, 16:27:25",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "b80aa92",
+  "currentProductionCommit": "86e0474",
   "safeVersions": [
     {
       "code": "S-1CF3E1C",
@@ -68,6 +68,34 @@
   ],
   "entries": [
     {
+      "logId": "20260922-1627-86e0474",
+      "commit": "86e0474",
+      "commitFull": "86e04742ae37800692390266d82b90ae4825e4b1",
+      "message": "Stop tag create/list from loading the full CRM store so reps and managers no longer time out.",
+      "deployedAt": "2026-09-22T10:57:05.601Z",
+      "deployedAtIst": "22/09/2026, 16:27:05",
+      "committedAtIst": "22/09/2026, 16:26:23",
+      "vercelPreviewUrl": "https://connect-intel-iy0mrfeyj-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 86e0474"
+    },
+    {
+      "logId": "20260922-1620-f7f4bf0",
+      "commit": "f7f4bf0",
+      "commitFull": "f7f4bf01489b8040738f7514a2f48a6e3fe06c61",
+      "message": "Record production LIVE at b80aa92.",
+      "deployedAt": "2026-09-22T10:50:48.684Z",
+      "deployedAtIst": "22/09/2026, 16:20:48",
+      "committedAtIst": "22/09/2026, 16:20:12",
+      "vercelPreviewUrl": "https://connect-intel-ac5ewmv64-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- f7f4bf0"
+    },
+    {
       "logId": "20260922-1619-b80aa92",
       "commit": "b80aa92",
       "commitFull": "b80aa9227f5a6839f3ae2c40441e57421dbfd960",
@@ -77,7 +105,7 @@
       "committedAtIst": "22/09/2026, 16:18:40",
       "vercelPreviewUrl": "https://connect-intel-7f10oj4k7-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- b80aa92"
     },
@@ -318,34 +346,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 0c31b47"
-    },
-    {
-      "logId": "20260921-1645-6fae73d",
-      "commit": "6fae73d",
-      "commitFull": "6fae73d03ff77bd47f8d12b78df95f4cf3afe176",
-      "message": "Look up Xindus sign-in by exact work email and skip the hanging user-list fallback.",
-      "deployedAt": "2026-09-21T11:15:34.100Z",
-      "deployedAtIst": "21/09/2026, 16:45:34",
-      "committedAtIst": "21/09/2026, 16:44:42",
-      "vercelPreviewUrl": "https://connect-intel-k3wq3wr44-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 6fae73d"
-    },
-    {
-      "logId": "20260921-1639-eb12f76",
-      "commit": "eb12f76",
-      "commitFull": "eb12f76e7beb44d4c996fe6abe91bb386f38b735",
-      "message": "Return Microsoft sign-in to crm.xindus.net with the session instead of leaving it on connectintel.net.",
-      "deployedAt": "2026-09-21T11:09:19.113Z",
-      "deployedAtIst": "21/09/2026, 16:39:19",
-      "committedAtIst": "21/09/2026, 16:38:28",
-      "vercelPreviewUrl": "https://connect-intel-a3yet3cjs-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- eb12f76"
     }
   ]
 }
