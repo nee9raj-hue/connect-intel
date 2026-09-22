@@ -1,9 +1,9 @@
 {
-  "updatedAt": "2026-09-22T14:58:08.364Z",
-  "updatedAtIst": "22/09/2026, 20:28:08",
+  "updatedAt": "2026-09-22T15:26:26.532Z",
+  "updatedAtIst": "22/09/2026, 20:56:26",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "eb84c89",
+  "currentProductionCommit": "fe51015",
   "safeVersions": [
     {
       "code": "S-EB84C89",
@@ -98,6 +98,34 @@
   ],
   "entries": [
     {
+      "logId": "20260922-2056-fe51015",
+      "commit": "fe51015",
+      "commitFull": "fe5101566c474a688904cae9ab1867f2b08ee2ec",
+      "message": "Open Pipeline after sign-in and save team role changes without rewriting the whole CRM store.",
+      "deployedAt": "2026-09-22T15:26:11.143Z",
+      "deployedAtIst": "22/09/2026, 20:56:11",
+      "committedAtIst": "22/09/2026, 20:55:24",
+      "vercelPreviewUrl": "https://connect-intel-oyq4tnbzo-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- fe51015"
+    },
+    {
+      "logId": "20260922-2028-91b351f",
+      "commit": "91b351f",
+      "commitFull": "91b351f7475f32b50c236f910248ab97bab01b43",
+      "message": "Record production LIVE at eb84c89.",
+      "deployedAt": "2026-09-22T14:58:57.332Z",
+      "deployedAtIst": "22/09/2026, 20:28:57",
+      "committedAtIst": "22/09/2026, 20:28:15",
+      "vercelPreviewUrl": "https://connect-intel-awc2luqf2-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 91b351f"
+    },
+    {
       "logId": "20260922-2027-eb84c89",
       "commit": "eb84c89",
       "commitFull": "eb84c89ab796d7e15cc8b595ab1465d585e97cc9",
@@ -107,7 +135,7 @@
       "committedAtIst": "22/09/2026, 20:27:08",
       "vercelPreviewUrl": "https://connect-intel-198s4qqlk-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- eb84c89"
     },
@@ -348,34 +376,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 222c7d6"
-    },
-    {
-      "logId": "20260921-1806-f729182",
-      "commit": "f729182",
-      "commitFull": "f729182acbb9fda267026ea19950fd07bb853368",
-      "message": "Record production LIVE at 30191ad.",
-      "deployedAt": "2026-09-21T12:36:12.356Z",
-      "deployedAtIst": "21/09/2026, 18:06:12",
-      "committedAtIst": "21/09/2026, 18:05:17",
-      "vercelPreviewUrl": "https://connect-intel-ecofq9930-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- f729182"
-    },
-    {
-      "logId": "20260921-1805-30191ad",
-      "commit": "30191ad",
-      "commitFull": "30191ad3438007d3b034162f380e226af13f1dd8",
-      "message": "Stop sign-in from aborting as a timeout and give Pipeline more time to load.",
-      "deployedAt": "2026-09-21T12:35:00.217Z",
-      "deployedAtIst": "21/09/2026, 18:05:00",
-      "committedAtIst": "21/09/2026, 18:04:13",
-      "vercelPreviewUrl": "https://connect-intel-9slthx421-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 30191ad"
     }
   ]
 }

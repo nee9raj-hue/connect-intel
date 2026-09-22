@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- c0628e6
+npm run prod:rollback -- 91b351f
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- c0628e6
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `eb84c89` |
-| Log updated (IST) | 22/09/2026, 20:28:08 |
+| Commit | `fe51015` |
+| Log updated (IST) | 22/09/2026, 20:56:26 |
 
 ---
 
@@ -62,7 +62,9 @@ These are exact production builds to restore if a later change goes wrong. Tell 
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 22/09/2026, 20:27:54 | `eb84c89` | Show Searching while a new Pipeline query runs, and match each word of a company name. | [preview](https://connect-intel-198s4qqlk-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- eb84c89` | **← LIVE**
+| 22/09/2026, 20:56:11 | `fe51015` | Open Pipeline after sign-in and save team role changes without rewriting the whole CRM store. | [preview](https://connect-intel-oyq4tnbzo-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- fe51015` | **← LIVE**
+| 22/09/2026, 20:28:57 | `91b351f` | Record production LIVE at eb84c89. | [preview](https://connect-intel-awc2luqf2-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 91b351f` |
+| 22/09/2026, 20:27:54 | `eb84c89` | Show Searching while a new Pipeline query runs, and match each word of a company name. | [preview](https://connect-intel-198s4qqlk-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- eb84c89` |
 | 22/09/2026, 20:08:53 | `c0628e6` | Record production LIVE at 4db6966. | [preview](https://connect-intel-8wl2sk0ss-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- c0628e6` |
 | 22/09/2026, 20:07:46 | `4db6966` | Keep Pipeline search results stable across back-to-back queries and assign tags on the fast patch path. | [preview](https://connect-intel-5e5lyi3zk-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 4db6966` |
 | 22/09/2026, 19:36:26 | `367c6d7` | Record production LIVE at 1a915e5. | [preview](https://connect-intel-1q1llr3rg-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 367c6d7` |
@@ -80,8 +82,6 @@ These are exact production builds to restore if a later change goes wrong. Tell 
 | 21/09/2026, 18:14:49 | `153ea47` | Record production LIVE at 7274334. | [preview](https://connect-intel-1u1z5jgm4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 153ea47` |
 | 21/09/2026, 18:13:49 | `7274334` | Stop the workspace spinner from waiting forever after Google sign-in. | [preview](https://connect-intel-lb7aph9mm-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 7274334` |
 | 21/09/2026, 18:10:38 | `222c7d6` | Record production LIVE at f729182. | [preview](https://connect-intel-iguvi8bn4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 222c7d6` |
-| 21/09/2026, 18:06:12 | `f729182` | Record production LIVE at 30191ad. | [preview](https://connect-intel-ecofq9930-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f729182` |
-| 21/09/2026, 18:05:00 | `30191ad` | Stop sign-in from aborting as a timeout and give Pipeline more time to load. | [preview](https://connect-intel-9slthx421-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 30191ad` |
 
 ---
 
