@@ -881,6 +881,7 @@ export function AppProvider({ children }) {
       'responseReceived',
       'notes',
       'nextFollowUpAt',
+      'tagIds',
     ])
     const needsFullReload = Boolean(
       body?.contact ||

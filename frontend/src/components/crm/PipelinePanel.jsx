@@ -83,6 +83,7 @@ import {
   savePipelineHoverActionsPref,
 } from '../../lib/pipelineColumnPrefs'
 import { useDebouncedPipelineSearch } from '../../hooks/useDebouncedPipelineSearch'
+import { isPipelineSearchBusy, shouldShowPipelineNoMatches } from '../../../../lib/pipelineSearchBusy.js'
 import { companyTargetFromLead } from '../../../../lib/accountNavigation.js'
 
 export default function PipelinePanel({ onNavigate, panelOptions }) {
@@ -163,6 +164,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const [appliedSearch, setAppliedSearch] = useState('')
   const [appliedAdvanced, setAppliedAdvanced] = useState({ ...DEFAULT_PIPELINE_FILTERS })
   const [filterApplying, setFilterApplying] = useState(false)
+  const filterRequestGenRef = useRef(0)
   const [selectedIds, setSelectedIds] = useState(new Set())
   const [importOpen, setImportOpen] = useState(false)
   const [addOpen, setAddOpen] = useState(false)
@@ -871,10 +873,13 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     lastServerFiltersRef.current = key
     if (isDealsView) return undefined
     setBoardColumnLimits({})
+    const requestGen = ++filterRequestGenRef.current
     setFilterApplying(true)
     loadPipelineList(serverFilters, { append: false, silent: true })
       .catch(() => {})
-      .finally(() => setFilterApplying(false))
+      .finally(() => {
+        if (requestGen === filterRequestGenRef.current) setFilterApplying(false)
+      })
   }, [serverSidePipeline, serverFilters, loadPipelineList, hasActiveServerFilters, isDealsView])
 
   useEffect(() => {
@@ -1127,9 +1132,18 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     filter !== 'all' ||
     listStatusFilter !== 'all' ||
     Boolean(smartViewId)
-  const showPipelineOnboarding = !pipelineHasLeads && !filterApplying && !sessionError
-  const showNoFilterMatches =
-    pipelineHasLeads && filtered.length === 0 && !filterApplying && !marketingSliceLoading
+  const searchBusy = isPipelineSearchBusy({
+    search,
+    appliedSearch,
+    filterApplying,
+  })
+  const showPipelineOnboarding = !pipelineHasLeads && !searchBusy && !sessionError
+  const showNoFilterMatches = shouldShowPipelineNoMatches({
+    pipelineHasLeads,
+    filteredCount: filtered.length,
+    searchBusy,
+    marketingSliceLoading,
+  })
   const showPipelineFilters = pipelineHasLeads || hasPipelineFiltersActive
 
   const selectedLeads = useMemo(() => {
@@ -1738,7 +1752,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               appliedSearch={appliedSearch}
               filtersDirty={filtersDirty}
               onApplyFilters={applyFilters}
-              applying={filterApplying}
+              applying={searchBusy}
               cities={locationOptions.cities}
               states={locationOptions.states}
               statusFilter={listStatusFilter}

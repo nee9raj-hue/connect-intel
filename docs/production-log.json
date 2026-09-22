@@ -6,6 +6,16 @@
   "currentProductionCommit": "1a915e5",
   "safeVersions": [
     {
+      "code": "S-1A915E5",
+      "commit": "1a915e5",
+      "commitFull": "1a915e529b619e8bfa3fb63470129ad0361c59e1",
+      "message": "Fix Pipeline white-screen when searching or filtering contacts.",
+      "note": "Healthy CRM snapshot before a later change",
+      "recordedAt": "2026-09-22T14:36:42.643Z",
+      "recordedAtIst": "22/09/2026, 20:06:42",
+      "rollbackCommand": "npm run prod:rollback -- S-1A915E5"
+    },
+    {
       "code": "S-1CF3E1C",
       "commit": "1cf3e1c",
       "commitFull": "1cf3e1c9cd708c3a20a1cb13289a04d574f1f21c",
