@@ -1,9 +1,9 @@
 {
-  "updatedAt": "2026-09-22T10:57:25.249Z",
-  "updatedAtIst": "22/09/2026, 16:27:25",
+  "updatedAt": "2026-09-22T14:05:46.602Z",
+  "updatedAtIst": "22/09/2026, 19:35:46",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "86e0474",
+  "currentProductionCommit": "1a915e5",
   "safeVersions": [
     {
       "code": "S-1CF3E1C",
@@ -68,6 +68,34 @@
   ],
   "entries": [
     {
+      "logId": "20260922-1935-1a915e5",
+      "commit": "1a915e5",
+      "commitFull": "1a915e529b619e8bfa3fb63470129ad0361c59e1",
+      "message": "Fix Pipeline white-screen when searching or filtering contacts.",
+      "deployedAt": "2026-09-22T14:05:28.970Z",
+      "deployedAtIst": "22/09/2026, 19:35:28",
+      "committedAtIst": "22/09/2026, 19:34:43",
+      "vercelPreviewUrl": "https://connect-intel-hu4bvenh6-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 1a915e5"
+    },
+    {
+      "logId": "20260922-1628-57299f2",
+      "commit": "57299f2",
+      "commitFull": "57299f290f009a3047b30c3139357131d0493b8a",
+      "message": "Record production LIVE at 86e0474.",
+      "deployedAt": "2026-09-22T10:58:04.360Z",
+      "deployedAtIst": "22/09/2026, 16:28:04",
+      "committedAtIst": "22/09/2026, 16:27:26",
+      "vercelPreviewUrl": "https://connect-intel-n439pcrrw-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 57299f2"
+    },
+    {
       "logId": "20260922-1627-86e0474",
       "commit": "86e0474",
       "commitFull": "86e04742ae37800692390266d82b90ae4825e4b1",
@@ -77,7 +105,7 @@
       "committedAtIst": "22/09/2026, 16:26:23",
       "vercelPreviewUrl": "https://connect-intel-iy0mrfeyj-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 86e0474"
     },
@@ -318,34 +346,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 77c01e8"
-    },
-    {
-      "logId": "20260921-1705-1dd93e7",
-      "commit": "1dd93e7",
-      "commitFull": "1dd93e762507d009cca7d2270b728dc39312b696",
-      "message": "Unstick Google sign-in on crm.xindus.net from a stale cached app and personal Gmail.",
-      "deployedAt": "2026-09-21T11:35:59.746Z",
-      "deployedAtIst": "21/09/2026, 17:05:59",
-      "committedAtIst": "21/09/2026, 17:05:09",
-      "vercelPreviewUrl": "https://connect-intel-qpuwpdb3z-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 1dd93e7"
-    },
-    {
-      "logId": "20260921-1656-0c31b47",
-      "commit": "0c31b47",
-      "commitFull": "0c31b477eef2ca0223dc0a4ae25d515985703174",
-      "message": "Fix Google sign-in on crm.xindus.net instead of the Microsoft SSO path.",
-      "deployedAt": "2026-09-21T11:26:27.669Z",
-      "deployedAtIst": "21/09/2026, 16:56:27",
-      "committedAtIst": "21/09/2026, 16:55:40",
-      "vercelPreviewUrl": "https://connect-intel-jbodjd58j-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 0c31b47"
     }
   ]
 }

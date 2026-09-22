@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- f7f4bf0
+npm run prod:rollback -- 57299f2
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- f7f4bf0
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `86e0474` |
-| Log updated (IST) | 22/09/2026, 16:27:25 |
+| Commit | `1a915e5` |
+| Log updated (IST) | 22/09/2026, 19:35:46 |
 
 ---
 
@@ -59,7 +59,9 @@ These are exact production builds to restore if a later change goes wrong. Tell 
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 22/09/2026, 16:27:05 | `86e0474` | Stop tag create/list from loading the full CRM store so reps and managers no longer time out. | [preview](https://connect-intel-iy0mrfeyj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 86e0474` | **← LIVE**
+| 22/09/2026, 19:35:28 | `1a915e5` | Fix Pipeline white-screen when searching or filtering contacts. | [preview](https://connect-intel-hu4bvenh6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1a915e5` | **← LIVE**
+| 22/09/2026, 16:28:04 | `57299f2` | Record production LIVE at 86e0474. | [preview](https://connect-intel-n439pcrrw-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 57299f2` |
+| 22/09/2026, 16:27:05 | `86e0474` | Stop tag create/list from loading the full CRM store so reps and managers no longer time out. | [preview](https://connect-intel-iy0mrfeyj-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 86e0474` |
 | 22/09/2026, 16:20:48 | `f7f4bf0` | Record production LIVE at b80aa92. | [preview](https://connect-intel-ac5ewmv64-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f7f4bf0` |
 | 22/09/2026, 16:19:19 | `b80aa92` | Let reps create personal CRM tags that only they and admins can use. | [preview](https://connect-intel-7f10oj4k7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b80aa92` |
 | 22/09/2026, 15:06:31 | `521977a` | Record production LIVE at 1cf3e1c. | [preview](https://connect-intel-6bqjaxsm3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 521977a` |
@@ -77,8 +79,6 @@ These are exact production builds to restore if a later change goes wrong. Tell 
 | 21/09/2026, 17:53:47 | `007f74d` | Record production LIVE at df78703. | [preview](https://connect-intel-3yjorsay1-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 007f74d` |
 | 21/09/2026, 17:52:29 | `df78703` | Drop the stale cached sign-in app and restore the real Xindus Google user. | [preview](https://connect-intel-gazrnsvcl-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- df78703` |
 | 21/09/2026, 17:07:42 | `77c01e8` | Record production LIVE at 1dd93e7 after the Google sign-in deploy. | [preview](https://connect-intel-hymdwh3bq-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 77c01e8` |
-| 21/09/2026, 17:05:59 | `1dd93e7` | Unstick Google sign-in on crm.xindus.net from a stale cached app and personal Gmail. | [preview](https://connect-intel-qpuwpdb3z-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1dd93e7` |
-| 21/09/2026, 16:56:27 | `0c31b47` | Fix Google sign-in on crm.xindus.net instead of the Microsoft SSO path. | [preview](https://connect-intel-jbodjd58j-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0c31b47` |
 
 ---
 
