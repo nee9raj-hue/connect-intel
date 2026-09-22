@@ -1,12 +1,16 @@
 import { useEffect, useMemo, useState } from 'react'
 import { toggleTagId } from '../../lib/orgLeadTags'
+import { api } from '../../lib/api'
+import { useApp } from '../../context/AppContext'
 import LeadTag from '../ui/LeadTag'
 
-export default function LeadTagsEditor({ lead, orgLeadTags, onSave, readOnly = false }) {
+export default function LeadTagsEditor({ lead, orgLeadTags, onSave, readOnly = false, onNavigate }) {
+  const { refreshOrgLeadTags } = useApp()
   const [saving, setSaving] = useState(false)
   const [open, setOpen] = useState(false)
   const [error, setError] = useState(null)
   const [pendingIds, setPendingIds] = useState(null)
+  const [newName, setNewName] = useState('')
   const leadId = lead?.id
   const serverIds = (lead?.crm?.tagIds || []).map(String)
 
@@ -14,6 +18,7 @@ export default function LeadTagsEditor({ lead, orgLeadTags, onSave, readOnly = f
     setPendingIds(null)
     setError(null)
     setOpen(false)
+    setNewName('')
   }, [leadId])
   const serverKey = serverIds.join(',')
   const selected = useMemo(
@@ -25,14 +30,6 @@ export default function LeadTagsEditor({ lead, orgLeadTags, onSave, readOnly = f
     () => (orgLeadTags || []).filter((t) => selected.has(String(t.id))),
     [orgLeadTags, selected]
   )
-
-  if (!orgLeadTags?.length) {
-    return (
-      <div className="text-xs text-gray-500">
-        No company tags yet. Ask your admin to create tags under <strong>Team → Lead tags</strong>.
-      </div>
-    )
-  }
 
   const apply = async (nextIds) => {
     setSaving(true)
@@ -52,6 +49,29 @@ export default function LeadTagsEditor({ lead, orgLeadTags, onSave, readOnly = f
   const toggle = (tagId) => {
     const next = toggleTagId([...selected], String(tagId))
     void apply(next)
+  }
+
+  const createTag = async (e) => {
+    e.preventDefault()
+    const name = newName.trim()
+    if (!name) return
+    setSaving(true)
+    setError(null)
+    try {
+      const data = await api.createOrgLeadTag({ name })
+      const created = data.tag || data.created?.[0]
+      await refreshOrgLeadTags?.()
+      setNewName('')
+      if (created?.id) {
+        const next = [...new Set([...selected, String(created.id)])]
+        await onSave(next)
+        setPendingIds(next)
+      }
+    } catch (err) {
+      setError(err?.message || 'Could not create tag')
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -89,18 +109,43 @@ export default function LeadTagsEditor({ lead, orgLeadTags, onSave, readOnly = f
         )}
       </div>
       {open && !readOnly && (
-        <div className="ci-lead-tags p-2 rounded-lg border border-gray-200 bg-gray-50">
-          {orgLeadTags.map((tag) => (
-            <LeadTag
-              key={tag.id}
-              as="button"
-              type="button"
-              name={tag.name}
-              active={selected.has(String(tag.id))}
-              disabled={saving}
-              onClick={() => toggle(tag.id)}
+        <div className="p-2 rounded-lg border border-gray-200 bg-gray-50 space-y-2">
+          <div className="ci-lead-tags">
+            {(orgLeadTags || []).map((tag) => (
+              <LeadTag
+                key={tag.id}
+                as="button"
+                type="button"
+                name={tag.name}
+                active={selected.has(String(tag.id))}
+                disabled={saving}
+                onClick={() => toggle(tag.id)}
+              />
+            ))}
+          </div>
+          <form onSubmit={createTag} className="flex gap-2">
+            <input
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              placeholder="New personal tag"
+              className="flex-1 text-sm border border-gray-300 rounded px-2 py-1"
+              maxLength={48}
             />
-          ))}
+            <button
+              type="submit"
+              disabled={saving || !newName.trim()}
+              className="text-xs font-semibold px-2 py-1 bg-gray-900 text-white rounded disabled:opacity-50"
+            >
+              Add
+            </button>
+          </form>
+          {onNavigate ? (
+            <button type="button" className="text-xs text-gray-500 underline" onClick={() => onNavigate('lead-tags')}>
+              Manage all tags
+            </button>
+          ) : (
+            <p className="text-[11px] text-gray-500">Create and edit your tags under CRM → Tags.</p>
+          )}
         </div>
       )}
     </div>

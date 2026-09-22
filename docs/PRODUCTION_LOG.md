@@ -46,6 +46,7 @@ These are exact production builds to restore if a later change goes wrong. Tell 
 
 | Code | Commit | Note | Recorded (IST) | Restore |
 |------|--------|------|----------------|---------|
+| `S-1CF3E1C` | `1cf3e1c` | Healthy CRM snapshot before a later change | 22/09/2026, 16:18:13 | `npm run prod:rollback -- S-1CF3E1C` |
 | `S-311AE71` | `311ae71` | Healthy CRM snapshot before a later change | 22/09/2026, 15:03:28 | `npm run prod:rollback -- S-311AE71` |
 | `S-485FC4A` | `485fc4a` | 485fc4a | 21/09/2026, 11:40:58 | `npm run prod:rollback -- S-485FC4A` |
 | `S-2C53FBD` | `2c53fbd` | 2c53fbd | 21/09/2026, 10:52:23 | `npm run prod:rollback -- S-2C53FBD` |

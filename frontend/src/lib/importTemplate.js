@@ -244,7 +244,7 @@ const INSTRUCTIONS_ROWS = [
   ['team_leader', 'Optional — team member display name; small typos are matched to a real member.'],
   [
     'lead_tags',
-    'Optional — comma-separated tag names that already exist in Settings → Lead tags (merged with tags you pick on the import screen).',
+    'Optional — comma-separated tag names that already exist in CRM → Tags (merged with tags you pick on the import screen).',
   ],
 ]
 

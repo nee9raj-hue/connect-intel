@@ -563,7 +563,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     let base = marketingSliceLeads ?? pipelineScopedLeads
     if (!effectiveAssigneeFilter && !isOrgAdmin && !isTeamManager) {
       base = filterRepPipelineLeads(base, user, {
-        skipOwnerFilter: repFilterLiftsOwnerScope(appliedAdvanced),
+        skipOwnerFilter: repFilterLiftsOwnerScope(appliedAdvanced, orgLeadTags),
       })
     }
     if (!effectiveAssigneeFilter) return base
@@ -1767,6 +1767,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               ownerOptions={ownerFilterOptions}
               onOwnerFilterChange={(id) => setPipelineAssigneeFilter?.(id)}
               statusCounts={boardAwareStatusCounts}
+              onNavigate={onNavigate}
             />
           )}
         </header>

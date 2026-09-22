@@ -424,6 +424,7 @@ export function buildCustomerNavSections(
           ? [{ id: 'active-customers', label: 'Active customers', icon: 'chart', panel: 'active-customers' }]
           : []),
         { id: 'contacts', label: 'Contacts', icon: 'people', panel: 'contacts' },
+        ...(isCompany ? [{ id: 'lead-tags', label: 'Tags', icon: 'list', panel: 'lead-tags' }] : []),
         { id: 'opportunities', label: 'Opportunities', icon: 'pipeline', panel: 'opportunities' },
         ...(isCompany ? [{ id: 'companies', label: 'Accounts', icon: 'chart', panel: 'companies' }] : []),
         ...(canMarketing

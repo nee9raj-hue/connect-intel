@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { api } from '../../lib/api'
 import { parseTagNamesInput } from '../../lib/orgLeadTags'
+import { useApp } from '../../context/AppContext'
 import LeadTag from '../ui/LeadTag'
 
 const PRESET_COLORS = [
@@ -14,8 +15,19 @@ const PRESET_COLORS = [
   '#dc2626',
 ]
 
+function tagScopeLabel(tag, isAdmin) {
+  if (tag?.visibility === 'personal' || tag?.source === 'personal') {
+    return isAdmin && tag.createdByUserId ? 'Personal' : 'Only you'
+  }
+  if (tag?.teamId || tag?.source === 'org_team') return 'Team'
+  return 'Company'
+}
+
 export default function OrgLeadTagsPanel({ onTagsChange, embedded = false }) {
+  const { user, refreshOrgLeadTags } = useApp()
+  const isAdmin = Boolean(user?.isOrgAdmin || user?.isPlatformAdmin)
   const [tags, setTags] = useState([])
+  const [canManageCompanyTags, setCanManageCompanyTags] = useState(isAdmin)
   const [loading, setLoading] = useState(true)
   const [name, setName] = useState('')
   const [color, setColor] = useState(PRESET_COLORS[0])
@@ -35,17 +47,24 @@ export default function OrgLeadTagsPanel({ onTagsChange, embedded = false }) {
       const data = await api.getOrgLeadTags()
       const next = data.tags || []
       setTags(next)
+      setCanManageCompanyTags(Boolean(data.canManageCompanyTags ?? isAdmin))
       onTagsChange?.(next)
     } catch (e) {
       setError(e.message || 'Could not load tags')
     } finally {
       setLoading(false)
     }
-  }, [onTagsChange])
+  }, [onTagsChange, isAdmin])
 
   useEffect(() => {
     load()
   }, [load])
+
+  const applyList = (next) => {
+    setTags(next)
+    onTagsChange?.(next)
+    refreshOrgLeadTags?.()
+  }
 
   const handleCreate = async (e) => {
     e.preventDefault()
@@ -58,9 +77,7 @@ export default function OrgLeadTagsPanel({ onTagsChange, embedded = false }) {
       const payload =
         names.length === 1 ? { name: names[0], color: color || PRESET_COLORS[0] } : { names }
       const data = await api.createOrgLeadTag(payload)
-      const next = data.tags || []
-      setTags(next)
-      onTagsChange?.(next)
+      applyList(data.tags || [])
       setName('')
 
       const created = data.created || (data.tag ? [data.tag] : [])
@@ -93,9 +110,7 @@ export default function OrgLeadTagsPanel({ onTagsChange, embedded = false }) {
     setError(null)
     try {
       const data = await api.updateOrgLeadTag({ id: tagId, name: trimmed })
-      const next = data.tags || []
-      setTags(next)
-      onTagsChange?.(next)
+      applyList(data.tags || [])
       setEditingId(null)
       setNotice('Tag updated')
     } catch (e) {
@@ -106,14 +121,12 @@ export default function OrgLeadTagsPanel({ onTagsChange, embedded = false }) {
   }
 
   const removeTag = async (tag) => {
-    if (!window.confirm(`Delete tag “${tag.name}”? It will be removed from all leads.`)) return
+    if (!window.confirm(`Delete tag “${tag.name}”? It will be removed from leads that use it.`)) return
     setBusy(true)
     setError(null)
     try {
       const data = await api.deleteOrgLeadTag(tag.id)
-      const next = data.tags || []
-      setTags(next)
-      onTagsChange?.(next)
+      applyList(data.tags || [])
       setNotice(`Tag “${tag.name}” deleted`)
     } catch (e) {
       setError(e.message || 'Could not delete tag')
@@ -126,18 +139,19 @@ export default function OrgLeadTagsPanel({ onTagsChange, embedded = false }) {
     <>
       {!embedded && (
         <div>
-          <h2 className="text-sm font-semibold text-gray-900">Lead tags</h2>
+          <h2 className="text-sm font-semibold text-gray-900">Tags</h2>
           <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-            Add one tag or several at once separated by commas (e.g.{' '}
-            <span className="font-medium text-gray-700">B2B, B2C, UK, USA, Air, Ocean</span>). Each tag gets its
-            own color. Anyone on the team can tag leads; only admins manage the list here.
+            {isAdmin || canManageCompanyTags
+              ? 'Your tags stay private to you. Company tags you create are shared. You can also see each rep’s personal tags.'
+              : 'Tags you create here are only visible to you and workspace admins. Use them to filter Pipeline. Company and team tags stay shared.'}
           </p>
         </div>
       )}
       {embedded && (
         <p className="text-xs text-gray-500 leading-relaxed">
-          Comma-separated names create multiple tags with different colors. Team members apply tags on leads in
-          Pipeline.
+          {isAdmin
+            ? 'Company tags are shared. Personal tags belong to one rep and are also visible to admins.'
+            : 'Your tags are only for you and admins. Apply them on leads in Pipeline, then filter by Tags.'}
         </p>
       )}
 
@@ -158,14 +172,16 @@ export default function OrgLeadTagsPanel({ onTagsChange, embedded = false }) {
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="B2B, B2C, UK, USA, Air, Ocean"
+            placeholder={isAdmin ? 'VIP, Follow up' : 'My follow-ups, Hot this week'}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
           />
           {pendingNames.length > 0 && (
             <p className="text-xs text-gray-500 mt-1">
               {isBulk
-                ? `Will create ${pendingNames.length} tags with different colors`
-                : 'One tag — pick a color below (optional)'}
+                ? `Will create ${pendingNames.length} tags`
+                : isAdmin
+                  ? 'Admins create a company tag unless you already use personal tags from this screen as a member'
+                  : 'This tag will only be visible to you and admins'}
             </p>
           )}
         </div>
@@ -202,13 +218,16 @@ export default function OrgLeadTagsPanel({ onTagsChange, embedded = false }) {
       ) : tags.length === 0 ? (
         <p className="text-xs text-gray-500">No tags yet. Add your first tag above.</p>
       ) : (
-        <ul className="space-y-1.5 max-h-64 overflow-y-auto">
+        <ul className="space-y-1.5 max-h-[28rem] overflow-y-auto">
           {tags.map((tag) => (
             <li
               key={tag.id}
               className="flex items-center gap-2 px-2 py-1.5 rounded-lg border border-gray-100 bg-gray-50/80"
             >
               <LeadTag name={tag.name} className="shrink-0" />
+              <span className="text-[10px] uppercase tracking-wide text-gray-400">
+                {tagScopeLabel(tag, isAdmin)}
+              </span>
               {editingId === tag.id ? (
                 <>
                   <input
@@ -232,17 +251,21 @@ export default function OrgLeadTagsPanel({ onTagsChange, embedded = false }) {
               ) : (
                 <>
                   <span className="flex-1" />
-                  <button type="button" onClick={() => startEdit(tag)} className="text-xs text-gray-500 hover:text-gray-800">
-                    Edit
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => removeTag(tag)}
-                    disabled={busy}
-                    className="text-xs text-red-600 hover:text-red-800"
-                  >
-                    Delete
-                  </button>
+                  {isAdmin || tag.canEdit ? (
+                    <>
+                      <button type="button" onClick={() => startEdit(tag)} className="text-xs text-gray-500 hover:text-gray-800">
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeTag(tag)}
+                        disabled={busy}
+                        className="text-xs text-red-600 hover:text-red-800"
+                      >
+                        Delete
+                      </button>
+                    </>
+                  ) : null}
                 </>
               )}
             </li>

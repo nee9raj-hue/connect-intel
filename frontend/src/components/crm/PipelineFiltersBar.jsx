@@ -97,6 +97,7 @@ export default function PipelineFiltersBar({
   ownerOptions = [],
   onOwnerFilterChange,
   statusCounts = {},
+  onNavigate,
 }) {
   const { user } = useApp()
   const [savedViews, setSavedViews] = useState([])
@@ -507,11 +508,20 @@ export default function PipelineFiltersBar({
                 </ul>
               </section>
             ) : null}
-            {orgLeadTags.length > 0 ? (
-              <section className="pipeline-filter-popout-section">
+            <section className="pipeline-filter-popout-section">
                 <div className="flex items-center justify-between gap-2 mb-2">
                   <p className="hs-advanced-filter-label mb-0">Tags</p>
-                  <select
+                  <div className="flex items-center gap-2">
+                    {onNavigate ? (
+                      <button
+                        type="button"
+                        className="text-[11px] font-semibold text-gray-600 hover:text-gray-900"
+                        onClick={() => onNavigate('lead-tags')}
+                      >
+                        Manage
+                      </button>
+                    ) : null}
+                    <select
                     value={filterDraft.filters.tagMode || 'any'}
                     onChange={(e) => updateFilterDraft({ tagMode: e.target.value })}
                     className="crm-select-sm crm-select-sm--hubspot"
@@ -519,6 +529,7 @@ export default function PipelineFiltersBar({
                     <option value="any">Any</option>
                     <option value="all">All</option>
                   </select>
+                  </div>
                 </div>
                 <SearchableMultiList
                   options={tagOptions}
@@ -528,7 +539,6 @@ export default function PipelineFiltersBar({
                   emptyLabel="Any tag"
                 />
               </section>
-            ) : null}
             {showErpTagFilter ? (
               <section className="pipeline-filter-popout-section">
                 <p className="hs-advanced-filter-label">ERP tags</p>

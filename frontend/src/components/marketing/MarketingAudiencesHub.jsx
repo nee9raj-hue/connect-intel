@@ -4,7 +4,7 @@ import { CRM_STATUSES } from '../../lib/crmConstants'
 import MarketingSegmentsPanel from './MarketingSegmentsPanel'
 import MarketingListsPanel from './MarketingListsPanel'
 import WhatsAppInboxPanel from './WhatsAppInboxPanel'
-import LeadTag from '../ui/LeadTag'
+import OrgLeadTagsPanel from '../team/OrgLeadTagsPanel'
 import { ChevronRightIcon, MailIcon, NoteIcon } from '../ui/icons'
 
 const SURVEY_TEMPLATES = [
@@ -89,20 +89,6 @@ function ContactsIllustration() {
       <span className="mc-audience-illus__send">
         <MailIcon className="w-5 h-5" />
       </span>
-    </div>
-  )
-}
-
-function TagsIllustration() {
-  return (
-    <div className="mc-audience-illus mc-audience-illus--tags">
-      <span className="mc-audience-illus__tag-icon">#</span>
-      <div className="mc-audience-illus__stat-card">
-        <span>42</span>
-        <span>21</span>
-        <span>12</span>
-        <span>30</span>
-      </div>
     </div>
   )
 }
@@ -316,27 +302,7 @@ function ContactsPage({
   )
 }
 
-function TagsPage({ orgLeadTags, refreshOrgLeadTags, setError, setNotice, busy, setBusy, onNavigate }) {
-  const [createOpen, setCreateOpen] = useState(false)
-  const [tagName, setTagName] = useState('')
-
-  const handleCreate = async () => {
-    const name = tagName.trim()
-    if (!name) return
-    setBusy?.(true)
-    try {
-      await api.createOrgLeadTag({ name })
-      setTagName('')
-      setCreateOpen(false)
-      await refreshOrgLeadTags?.()
-      setNotice?.(`Tag “${name}” created`)
-    } catch (e) {
-      setError?.(e.message)
-    } finally {
-      setBusy?.(false)
-    }
-  }
-
+function TagsPage({ onNavigate }) {
   return (
     <>
       <header className="mc-audience-header">
@@ -347,79 +313,13 @@ function TagsPage({ orgLeadTags, refreshOrgLeadTags, setError, setNotice, busy, 
             className="mc-btn mc-btn--outline"
             onClick={() => onNavigate?.('pipeline')}
           >
-            Bulk tag
-          </button>
-          <button type="button" className="mc-btn mc-btn--primary" onClick={() => setCreateOpen(true)}>
-            Create new tag
+            Use in pipeline
           </button>
         </div>
       </header>
-
-      {!orgLeadTags?.length ? (
-        <AudienceHero
-          title="Create your first tag"
-          description="Tags are static labels you apply to contacts to organize them. (Example: VIPs.) Use tags to personalize your marketing based on criteria you define."
-          primaryLabel="Create tag"
-          onPrimary={() => setCreateOpen(true)}
-          helpLabel="About tags"
-          onHelp={() => onNavigate?.('pipeline')}
-          illustration={<TagsIllustration />}
-        />
-      ) : (
-        <div className="mc-table-wrap">
-          <table className="mc-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Contacts</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {orgLeadTags.map((tag) => (
-                <tr key={tag.id}>
-                  <td>
-                    <LeadTag name={tag.name} color={tag.color} />
-                  </td>
-                  <td className="mc-audience-muted">—</td>
-                  <td>
-                    <button type="button" className="mc-link" onClick={() => onNavigate?.('pipeline')}>
-                      Use in pipeline
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {createOpen ? (
-        <div className="mc-modal" role="dialog" aria-modal="true">
-          <div className="mc-modal__backdrop" onClick={() => setCreateOpen(false)} />
-          <div className="mc-modal__card">
-            <h3 style={{ marginTop: 0 }}>Create tag</h3>
-            <div className="mc-field">
-              <label htmlFor="mc-tag-name">Tag name</label>
-              <input
-                id="mc-tag-name"
-                value={tagName}
-                onChange={(e) => setTagName(e.target.value)}
-                placeholder="e.g. VIP"
-                autoFocus
-              />
-            </div>
-            <div className="mc-accordion__actions">
-              <button type="button" className="mc-btn mc-btn--primary" disabled={busy} onClick={() => void handleCreate()}>
-                Create tag
-              </button>
-              <button type="button" className="mc-btn mc-btn--ghost" onClick={() => setCreateOpen(false)}>
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
+      <div className="mc-audience-tags-manage max-w-xl">
+        <OrgLeadTagsPanel embedded />
+      </div>
     </>
   )
 }
@@ -631,15 +531,7 @@ export default function MarketingAudiencesHub(props) {
     switch (subTab) {
       case 'tags':
         return (
-          <TagsPage
-            orgLeadTags={orgLeadTags}
-            refreshOrgLeadTags={refreshOrgLeadTags}
-            setError={setError}
-            setNotice={setNotice}
-            busy={busy}
-            setBusy={setBusy}
-            onNavigate={onNavigate}
-          />
+          <TagsPage onNavigate={onNavigate} />
         )
       case 'segments':
         return <SegmentsPage segments={segments} segmentPanelProps={segmentPanelProps} />

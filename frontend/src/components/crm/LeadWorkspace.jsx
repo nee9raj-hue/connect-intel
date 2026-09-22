@@ -936,6 +936,7 @@ export default function LeadWorkspace({
                 <LeadTagsEditor
                   lead={lead}
                   orgLeadTags={orgLeadTags}
+                  onNavigate={onNavigate}
                   onSave={async (tagIds) => {
                     await updateLeadCrmFromContext(lead.id, { tagIds })
                     setNotice('Tags updated')

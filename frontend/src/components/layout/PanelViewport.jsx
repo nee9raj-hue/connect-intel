@@ -21,6 +21,7 @@ import ChithiPanel from '../chithi/ChithiPanel'
 import TeamNotesPanel from '../team/TeamNotesPanel'
 import TeamTasksPanel from '../team/TeamTasksPanel'
 import ContactsPanel from '../contacts/ContactsPanel'
+import LeadTagsManagePanel from '../crm/LeadTagsManagePanel'
 import CompaniesPanel from '../companies/CompaniesPanel'
 import OpportunitiesPanel from '../opportunities/OpportunitiesPanel'
 import CrmSequencesPanel from '../crm/CrmSequencesPanel'
@@ -44,6 +45,7 @@ const PANELS = {
   'active-customers': ActiveCustomersPanel,
   'field-expenses': FieldExpensesPanel,
   contacts: ContactsPanel,
+  'lead-tags': LeadTagsManagePanel,
   companies: CompaniesPanel,
   opportunities: OpportunitiesPanel,
   chithi: ChithiPanel,

@@ -6,6 +6,16 @@
   "currentProductionCommit": "1cf3e1c",
   "safeVersions": [
     {
+      "code": "S-1CF3E1C",
+      "commit": "1cf3e1c",
+      "commitFull": "1cf3e1c9cd708c3a20a1cb13289a04d574f1f21c",
+      "message": "Show Pipeline for reps whose Google login id is a duplicate of their CRM book.",
+      "note": "Healthy CRM snapshot before a later change",
+      "recordedAt": "2026-09-22T10:48:13.345Z",
+      "recordedAtIst": "22/09/2026, 16:18:13",
+      "rollbackCommand": "npm run prod:rollback -- S-1CF3E1C"
+    },
+    {
       "code": "S-311AE71",
       "commit": "311ae71",
       "commitFull": "311ae71a99394b3749ddad0f9d80b87bf805fb79",

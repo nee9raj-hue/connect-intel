@@ -98,7 +98,7 @@ export default function BulkLeadTagsModal({
     return (
       <ModalShell open={open} title={title} onClose={onClose}>
         <p className="text-sm text-[#516f90] leading-relaxed">
-          No company tags yet. Ask your admin to create tags under <strong>Team → Lead tags</strong>.
+          No tags yet. Create them under <strong>CRM → Tags</strong>.
         </p>
       </ModalShell>
     )
