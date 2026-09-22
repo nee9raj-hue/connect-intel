@@ -1,6 +1,16 @@
 {
   "versions": [
     {
+      "code": "S-4DB6966",
+      "commit": "4db6966",
+      "commitFull": "4db6966fa3726a4b47a951bdbf1ab6bd3f537b87",
+      "message": "Keep Pipeline search results stable across back-to-back queries and assign tags on the fast patch path.",
+      "note": "Healthy CRM snapshot before a later change",
+      "recordedAt": "2026-09-22T14:56:57.424Z",
+      "recordedAtIst": "22/09/2026, 20:26:57",
+      "rollbackCommand": "npm run prod:rollback -- S-4DB6966"
+    },
+    {
       "code": "S-1A915E5",
       "commit": "1a915e5",
       "commitFull": "1a915e529b619e8bfa3fb63470129ad0361c59e1",

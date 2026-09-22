@@ -164,6 +164,9 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const [appliedSearch, setAppliedSearch] = useState('')
   const [appliedAdvanced, setAppliedAdvanced] = useState({ ...DEFAULT_PIPELINE_FILTERS })
   const [filterApplying, setFilterApplying] = useState(false)
+  const [searchFailed, setSearchFailed] = useState(false)
+  const [resultsForQuery, setResultsForQuery] = useState('')
+  const [searchRetry, setSearchRetry] = useState(0)
   const filterRequestGenRef = useRef(0)
   const [selectedIds, setSelectedIds] = useState(new Set())
   const [importOpen, setImportOpen] = useState(false)
@@ -858,7 +861,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const lastServerFiltersRef = useRef('')
   useEffect(() => {
     if (!serverSidePipeline) return undefined
-    const key = JSON.stringify(serverFilters)
+    const key = `${searchRetry}:${JSON.stringify(serverFilters)}`
     if (lastServerFiltersRef.current === key) return undefined
 
     const isInitialMount = !pipelineFiltersBootRef.current
@@ -874,13 +877,23 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     if (isDealsView) return undefined
     setBoardColumnLimits({})
     const requestGen = ++filterRequestGenRef.current
+    const queryForRequest = String(serverFilters.q || '')
     setFilterApplying(true)
+    setSearchFailed(false)
     loadPipelineList(serverFilters, { append: false, silent: true })
-      .catch(() => {})
+      .then(() => {
+        if (requestGen !== filterRequestGenRef.current) return
+        setResultsForQuery(queryForRequest)
+        setSearchFailed(false)
+      })
+      .catch(() => {
+        if (requestGen !== filterRequestGenRef.current) return
+        setSearchFailed(true)
+      })
       .finally(() => {
         if (requestGen === filterRequestGenRef.current) setFilterApplying(false)
       })
-  }, [serverSidePipeline, serverFilters, loadPipelineList, hasActiveServerFilters, isDealsView])
+  }, [serverSidePipeline, serverFilters, loadPipelineList, hasActiveServerFilters, isDealsView, searchRetry])
 
   useEffect(() => {
     if (!serverSidePipeline || view !== 'board' || stageListMode || isDealsView) {
@@ -1137,11 +1150,13 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     appliedSearch,
     filterApplying,
   })
-  const showPipelineOnboarding = !pipelineHasLeads && !searchBusy && !sessionError
+  const resultsMatchQuery = (appliedSearch || '') === (resultsForQuery || '')
+  const showSearchPending = serverSidePipeline && !resultsMatchQuery && !searchFailed
+  const showPipelineOnboarding = !pipelineHasLeads && !searchBusy && !showSearchPending && !sessionError
   const showNoFilterMatches = shouldShowPipelineNoMatches({
     pipelineHasLeads,
     filteredCount: filtered.length,
-    searchBusy,
+    searchBusy: searchBusy || showSearchPending,
     marketingSliceLoading,
   })
   const showPipelineFilters = pipelineHasLeads || hasPipelineFiltersActive
@@ -1901,6 +1916,25 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               onAdd={() => setAddOpen(true)}
               compact={isMobile}
             />
+          ) : showSearchPending ? (
+            <div className="pipeline-empty-v2 pipeline-empty-v2--premium" role="status">
+              <h3 className="pipeline-empty-v2__title">Searching…</h3>
+              <p className="pipeline-empty-v2__sub">
+                {appliedSearch ? `Looking up “${appliedSearch}”.` : 'Loading pipeline.'}
+              </p>
+            </div>
+          ) : searchFailed && serverSidePipeline && !resultsMatchQuery ? (
+            <div className="pipeline-empty-v2 pipeline-empty-v2--premium" role="status">
+              <h3 className="pipeline-empty-v2__title">Search didn’t finish</h3>
+              <p className="pipeline-empty-v2__sub">Try the same name again.</p>
+              <button
+                type="button"
+                className="crm-btn crm-btn-secondary"
+                onClick={() => setSearchRetry((n) => n + 1)}
+              >
+                Search again
+              </button>
+            </div>
           ) : showNoFilterMatches ? (
             <PipelineNoMatches
               onClearFilters={resetAllPipelineFilters}
