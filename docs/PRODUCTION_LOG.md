@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 67b70cd
+npm run prod:rollback -- 521977a
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 67b70cd
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `1cf3e1c` |
-| Log updated (IST) | 22/09/2026, 15:05:33 |
+| Commit | `b80aa92` |
+| Log updated (IST) | 22/09/2026, 16:20:07 |
 
 ---
 
@@ -59,7 +59,9 @@ These are exact production builds to restore if a later change goes wrong. Tell 
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 22/09/2026, 15:04:35 | `1cf3e1c` | Show Pipeline for reps whose Google login id is a duplicate of their CRM book. | [preview](https://connect-intel-9sqwdhk3z-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1cf3e1c` | **← LIVE**
+| 22/09/2026, 16:19:19 | `b80aa92` | Let reps create personal CRM tags that only they and admins can use. | [preview](https://connect-intel-7f10oj4k7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b80aa92` | **← LIVE**
+| 22/09/2026, 15:06:31 | `521977a` | Record production LIVE at 1cf3e1c. | [preview](https://connect-intel-6bqjaxsm3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 521977a` |
+| 22/09/2026, 15:04:35 | `1cf3e1c` | Show Pipeline for reps whose Google login id is a duplicate of their CRM book. | [preview](https://connect-intel-9sqwdhk3z-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1cf3e1c` |
 | 21/09/2026, 19:04:45 | `67b70cd` | Record production LIVE at 311ae71. | [preview](https://connect-intel-qmbhnyjtu-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 67b70cd` |
 | 21/09/2026, 19:03:35 | `311ae71` | Clear leftover app cache so the restored CRM can fetch again. | [preview](https://connect-intel-9efzb9qem-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 311ae71` |
 | 21/09/2026, 18:54:23 | `25e05c2` | Record production LIVE at the restored 4c0640e snapshot. | [preview](https://connect-intel-ha14sol5w-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 25e05c2` |
@@ -77,8 +79,6 @@ These are exact production builds to restore if a later change goes wrong. Tell 
 | 21/09/2026, 16:56:27 | `0c31b47` | Fix Google sign-in on crm.xindus.net instead of the Microsoft SSO path. | [preview](https://connect-intel-jbodjd58j-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 0c31b47` |
 | 21/09/2026, 16:45:34 | `6fae73d` | Look up Xindus sign-in by exact work email and skip the hanging user-list fallback. | [preview](https://connect-intel-k3wq3wr44-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6fae73d` |
 | 21/09/2026, 16:39:19 | `eb12f76` | Return Microsoft sign-in to crm.xindus.net with the session instead of leaving it on connectintel.net. | [preview](https://connect-intel-a3yet3cjs-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- eb12f76` |
-| 21/09/2026, 16:29:28 | `d0a7300` | Do not let a users-blob scan hang sign-in after a profiles miss. | [preview](https://connect-intel-5aj8ds3c4-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- d0a7300` |
-| 21/09/2026, 16:27:24 | `547910f` | Scan the users table by email when profiles misses an existing Xindus login. | [preview](https://connect-intel-8kf6f1pi1-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 547910f` |
 
 ---
 
