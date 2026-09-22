@@ -6,6 +6,16 @@
   "currentProductionCommit": "311ae71",
   "safeVersions": [
     {
+      "code": "S-311AE71",
+      "commit": "311ae71",
+      "commitFull": "311ae71a99394b3749ddad0f9d80b87bf805fb79",
+      "message": "Clear leftover app cache so the restored CRM can fetch again.",
+      "note": "Healthy CRM snapshot before a later change",
+      "recordedAt": "2026-09-22T09:33:28.654Z",
+      "recordedAtIst": "22/09/2026, 15:03:28",
+      "rollbackCommand": "npm run prod:rollback -- S-311AE71"
+    },
+    {
       "code": "S-485FC4A",
       "commit": "485fc4a",
       "commitFull": "485fc4a7d67cd15ef0ee85a774b5b71c642f9c70",
