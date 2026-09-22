@@ -1,9 +1,9 @@
 {
-  "updatedAt": "2026-09-21T13:34:01.564Z",
-  "updatedAtIst": "21/09/2026, 19:04:01",
+  "updatedAt": "2026-09-22T09:35:33.603Z",
+  "updatedAtIst": "22/09/2026, 15:05:33",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "311ae71",
+  "currentProductionCommit": "1cf3e1c",
   "safeVersions": [
     {
       "code": "S-311AE71",
@@ -58,6 +58,34 @@
   ],
   "entries": [
     {
+      "logId": "20260922-1504-1cf3e1c",
+      "commit": "1cf3e1c",
+      "commitFull": "1cf3e1c9cd708c3a20a1cb13289a04d574f1f21c",
+      "message": "Show Pipeline for reps whose Google login id is a duplicate of their CRM book.",
+      "deployedAt": "2026-09-22T09:34:35.327Z",
+      "deployedAtIst": "22/09/2026, 15:04:35",
+      "committedAtIst": "22/09/2026, 15:03:40",
+      "vercelPreviewUrl": "https://connect-intel-9sqwdhk3z-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 1cf3e1c"
+    },
+    {
+      "logId": "20260921-1904-67b70cd",
+      "commit": "67b70cd",
+      "commitFull": "67b70cd6c09f5759a0ebd3823360671da8fb8031",
+      "message": "Record production LIVE at 311ae71.",
+      "deployedAt": "2026-09-21T13:34:45.440Z",
+      "deployedAtIst": "21/09/2026, 19:04:45",
+      "committedAtIst": "21/09/2026, 19:04:03",
+      "vercelPreviewUrl": "https://connect-intel-qmbhnyjtu-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 67b70cd"
+    },
+    {
       "logId": "20260921-1903-311ae71",
       "commit": "311ae71",
       "commitFull": "311ae71a99394b3749ddad0f9d80b87bf805fb79",
@@ -67,7 +95,7 @@
       "committedAtIst": "21/09/2026, 19:02:53",
       "vercelPreviewUrl": "https://connect-intel-9efzb9qem-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 311ae71"
     },
@@ -308,34 +336,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 547910f"
-    },
-    {
-      "logId": "20260921-1623-8227d6d",
-      "commit": "8227d6d",
-      "commitFull": "8227d6d1cf66971ee5c9b87c799565679b566e6c",
-      "message": "Look up Xindus accounts in the login store when they are missing from profiles.",
-      "deployedAt": "2026-09-21T10:53:22.413Z",
-      "deployedAtIst": "21/09/2026, 16:23:22",
-      "committedAtIst": "21/09/2026, 16:22:37",
-      "vercelPreviewUrl": "https://connect-intel-2a4ydkvx2-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 8227d6d"
-    },
-    {
-      "logId": "20260921-1618-e453adb",
-      "commit": "e453adb",
-      "commitFull": "e453adba34cb4815039bd5bbfc5ebaa02435a111",
-      "message": "Stop sign-in from probing every Postgres host and scanning the users blob.",
-      "deployedAt": "2026-09-21T10:48:20.428Z",
-      "deployedAtIst": "21/09/2026, 16:18:20",
-      "committedAtIst": "21/09/2026, 16:17:32",
-      "vercelPreviewUrl": "https://connect-intel-app7xlnfa-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- e453adb"
     }
   ]
 }
