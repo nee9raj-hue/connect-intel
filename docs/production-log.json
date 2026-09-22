@@ -6,6 +6,16 @@
   "currentProductionCommit": "fe51015",
   "safeVersions": [
     {
+      "code": "S-FE51015",
+      "commit": "fe51015",
+      "commitFull": "fe5101566c474a688904cae9ab1867f2b08ee2ec",
+      "message": "Open Pipeline after sign-in and save team role changes without rewriting the whole CRM store.",
+      "note": "Healthy CRM snapshot before a later change",
+      "recordedAt": "2026-09-22T16:11:34.586Z",
+      "recordedAtIst": "22/09/2026, 21:41:34",
+      "rollbackCommand": "npm run prod:rollback -- S-FE51015"
+    },
+    {
       "code": "S-EB84C89",
       "commit": "eb84c89",
       "commitFull": "eb84c89ab796d7e15cc8b595ab1465d585e97cc9",
