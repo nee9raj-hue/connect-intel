@@ -1,9 +1,9 @@
 {
-  "updatedAt": "2026-09-22T14:05:46.602Z",
-  "updatedAtIst": "22/09/2026, 19:35:46",
+  "updatedAt": "2026-09-22T14:38:04.361Z",
+  "updatedAtIst": "22/09/2026, 20:08:04",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "1a915e5",
+  "currentProductionCommit": "4db6966",
   "safeVersions": [
     {
       "code": "S-1A915E5",
@@ -78,6 +78,34 @@
   ],
   "entries": [
     {
+      "logId": "20260922-2007-4db6966",
+      "commit": "4db6966",
+      "commitFull": "4db6966fa3726a4b47a951bdbf1ab6bd3f537b87",
+      "message": "Keep Pipeline search results stable across back-to-back queries and assign tags on the fast patch path.",
+      "deployedAt": "2026-09-22T14:37:46.063Z",
+      "deployedAtIst": "22/09/2026, 20:07:46",
+      "committedAtIst": "22/09/2026, 20:06:58",
+      "vercelPreviewUrl": "https://connect-intel-5e5lyi3zk-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 4db6966"
+    },
+    {
+      "logId": "20260922-1936-367c6d7",
+      "commit": "367c6d7",
+      "commitFull": "367c6d79750e7f3e4bce3fd533a0b3d6601f127b",
+      "message": "Record production LIVE at 1a915e5.",
+      "deployedAt": "2026-09-22T14:06:26.997Z",
+      "deployedAtIst": "22/09/2026, 19:36:26",
+      "committedAtIst": "22/09/2026, 19:35:48",
+      "vercelPreviewUrl": "https://connect-intel-1q1llr3rg-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 367c6d7"
+    },
+    {
       "logId": "20260922-1935-1a915e5",
       "commit": "1a915e5",
       "commitFull": "1a915e529b619e8bfa3fb63470129ad0361c59e1",
@@ -87,7 +115,7 @@
       "committedAtIst": "22/09/2026, 19:34:43",
       "vercelPreviewUrl": "https://connect-intel-hu4bvenh6-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 1a915e5"
     },
@@ -328,34 +356,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 007f74d"
-    },
-    {
-      "logId": "20260921-1752-df78703",
-      "commit": "df78703",
-      "commitFull": "df7870306da5f9fcf0e87704e72ae6fe75d7adc8",
-      "message": "Drop the stale cached sign-in app and restore the real Xindus Google user.",
-      "deployedAt": "2026-09-21T12:22:29.294Z",
-      "deployedAtIst": "21/09/2026, 17:52:29",
-      "committedAtIst": "21/09/2026, 17:51:43",
-      "vercelPreviewUrl": "https://connect-intel-gazrnsvcl-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- df78703"
-    },
-    {
-      "logId": "20260921-1707-77c01e8",
-      "commit": "77c01e8",
-      "commitFull": "77c01e8a18ce0747e0ec4e81795f42d762c5589b",
-      "message": "Record production LIVE at 1dd93e7 after the Google sign-in deploy.",
-      "deployedAt": "2026-09-21T11:37:42.663Z",
-      "deployedAtIst": "21/09/2026, 17:07:42",
-      "committedAtIst": "21/09/2026, 17:06:59",
-      "vercelPreviewUrl": "https://connect-intel-hymdwh3bq-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 77c01e8"
     }
   ]
 }
