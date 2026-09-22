@@ -32,8 +32,9 @@ export function pathnameForPanel(panel = 'overview') {
   return PANEL_TO_PATH[panel] || '/'
 }
 
+/** First screen after sign-in when the URL does not name a panel. */
 export function defaultDashboardLocation() {
-  return { panel: 'overview', panelOptions: {}, leadId: null }
+  return { panel: 'pipeline', panelOptions: {}, leadId: null }
 }
 
 export function normalizeLeadId(leadId) {
@@ -44,7 +45,7 @@ export function normalizeLeadId(leadId) {
 export function parseAppLocation(search = '', pathname = '/') {
   const params = new URLSearchParams(search)
   const pathPanel = panelFromPathname(pathname)
-  let panel = pathPanel || String(params.get('panel') || 'overview').trim() || 'overview'
+  let panel = pathPanel || String(params.get('panel') || 'pipeline').trim() || 'pipeline'
   const panelOptions = {}
 
   panel = normalizeCrmPanel(panel)
@@ -145,7 +146,7 @@ export function persistAppLocation(location) {
     sessionStorage.setItem(
       LAST_LOCATION_KEY,
       JSON.stringify({
-        panel: location.panel || 'overview',
+        panel: location.panel || 'pipeline',
         panelOptions: location.panelOptions || {},
         leadId: normalizeLeadId(location.leadId),
       })
@@ -228,10 +229,10 @@ export function resolveInitialAppLocation(search = '', { isPlatformAdmin = false
   return sanitizeAppLocation(location, { isPlatformAdmin, user })
 }
 
-export function serializeAppLocation({ panel = 'overview', panelOptions = {}, leadId = null } = {}) {
+export function serializeAppLocation({ panel = 'pipeline', panelOptions = {}, leadId = null } = {}) {
   const params = new URLSearchParams()
 
-  if (panel && panel !== 'overview') params.set('panel', panel)
+  if (panel && panel !== 'pipeline') params.set('panel', panel)
   if (panelOptions.tab) params.set('tab', panelOptions.tab)
   if (panelOptions.status && panelOptions.status !== 'all') params.set('status', panelOptions.status)
   if (panelOptions.view && panelOptions.view !== 'leads') params.set('view', panelOptions.view)
@@ -309,15 +310,15 @@ export function serializeAppLocation({ panel = 'overview', panelOptions = {}, le
 export function appLocationKey(location) {
   const { panel, panelOptions, leadId } = location || {}
   return JSON.stringify({
-    panel: panel || 'overview',
+    panel: panel || 'pipeline',
     panelOptions: panelOptions || {},
     leadId: normalizeLeadId(leadId),
   })
 }
 
 export function appLocationUrl(location) {
-  if (typeof window === 'undefined') return DASHBOARD_PATH
-  const panel = location?.panel || 'overview'
+  if (typeof window === 'undefined') return '/'
+  const panel = location?.panel || 'pipeline'
   const pathname = pathnameForPanel(panel)
   const qs = serializeAppLocation(location)
   return `${pathname}${qs ? `?${qs}` : ''}`

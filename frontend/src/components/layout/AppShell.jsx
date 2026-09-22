@@ -54,7 +54,7 @@ export default function AppShell() {
     pipelineAssigneeFilter,
   } = useApp()
   const isMobile = useIsMobile()
-  const [activePanel, setActivePanel] = useState('overview')
+  const [activePanel, setActivePanel] = useState('pipeline')
   const [panelOptions, setPanelOptions] = useState({})
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [sidebarMode, setSidebarMode] = useState(() => loadSidebarMode())
@@ -137,7 +137,7 @@ export default function AppShell() {
   const applyLocation = useCallback(
     (location) => {
       const { panel, panelOptions: opts = {}, leadId } = location || {}
-      const panelId = resolvePanelForUser(normalizeCrmPanel(panel || 'overview'), {
+      const panelId = resolvePanelForUser(normalizeCrmPanel(panel || 'pipeline'), {
         isPlatformAdmin: Boolean(user?.isPlatformAdmin),
         user,
       })
@@ -180,7 +180,7 @@ export default function AppShell() {
       pathname: window.location.pathname,
       user,
     })
-    const panel = initial.panel || 'overview'
+    const panel = initial.panel || 'pipeline'
     const resolved = {
       panel,
       panelOptions: resolvePanelOptionsRef.current(panel, initial.panelOptions || {}),

@@ -189,7 +189,7 @@ export const api = {
   saveCompanyWorkspaceGoals: (body) =>
     request('/api/org/company-workspace', { method: 'PATCH', body }),
   updateMemberPermissions: (payload) =>
-    request('/api/team/permissions', { method: 'PATCH', body: payload }),
+    request('/api/team/permissions', { method: 'PATCH', body: payload, timeoutMs: 45_000 }),
   // Pipeline leads: server reads PII from decrypted_leads; writes sync to leads (encrypted_*).
   getPipelineSummary: ({ silent = false } = {}) =>
     request('/api/saved-leads?summary=1&light=1', { timeoutMs: 45_000 }, { silent }),

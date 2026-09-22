@@ -1,6 +1,16 @@
 {
   "versions": [
     {
+      "code": "S-EB84C89",
+      "commit": "eb84c89",
+      "commitFull": "eb84c89ab796d7e15cc8b595ab1465d585e97cc9",
+      "message": "Show Searching while a new Pipeline query runs, and match each word of a company name.",
+      "note": "Healthy CRM snapshot before a later change",
+      "recordedAt": "2026-09-22T15:25:07.211Z",
+      "recordedAtIst": "22/09/2026, 20:55:07",
+      "rollbackCommand": "npm run prod:rollback -- S-EB84C89"
+    },
+    {
       "code": "S-4DB6966",
       "commit": "4db6966",
       "commitFull": "4db6966fa3726a4b47a951bdbf1ab6bd3f537b87",

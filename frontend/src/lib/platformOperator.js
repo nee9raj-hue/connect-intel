@@ -14,9 +14,9 @@ export function isPlatformOperatorPanel(panel) {
 }
 
 export function resolvePanelForUser(panel, { isPlatformAdmin = false, user = null } = {}) {
-  const id = String(panel || 'overview').trim() || 'overview'
-  if (!isPlatformAdmin && isPlatformOperatorPanel(id)) return 'overview'
-  if (!isCustomerPanelAllowed(user, id)) return 'overview'
+  const id = String(panel || 'pipeline').trim() || 'pipeline'
+  if (!isPlatformAdmin && isPlatformOperatorPanel(id)) return 'pipeline'
+  if (!isCustomerPanelAllowed(user, id)) return 'pipeline'
   return id
 }
 
@@ -27,7 +27,7 @@ export function sanitizeAppLocation(location, { isPlatformAdmin = false, user = 
         panelOptions: location.panelOptions || {},
         leadId: location.leadId ?? null,
       }
-    : { panel: 'overview', panelOptions: {}, leadId: null }
+    : { panel: 'pipeline', panelOptions: {}, leadId: null }
 
   const panel = resolvePanelForUser(base.panel, { isPlatformAdmin, user })
   if (panel === base.panel) return base

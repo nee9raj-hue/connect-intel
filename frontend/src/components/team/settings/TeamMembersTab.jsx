@@ -229,15 +229,19 @@ export default function TeamMembersTab({
     if (roleKey === 'manager') {
       payload.sqlRole = 'manager'
       payload.pipelineRole = 'manager'
+      payload.marketingRole = null
     } else if (roleKey === 'marketing_manager') {
-      payload.sqlRole = 'manager'
-      payload.marketingRole = 'manager'
+      payload.sqlRole = 'rep'
+      payload.pipelineRole = 'member'
+      payload.marketingRole = 'marketing_manager'
     } else if (roleKey === 'marketing_executive') {
       payload.sqlRole = 'rep'
-      payload.marketingRole = 'executive'
+      payload.pipelineRole = 'member'
+      payload.marketingRole = 'marketing_executive'
     } else {
       payload.sqlRole = 'rep'
       payload.pipelineRole = 'member'
+      payload.marketingRole = null
     }
     try {
       await updateMemberPermissions(payload)

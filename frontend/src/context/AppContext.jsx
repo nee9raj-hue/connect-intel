@@ -765,7 +765,7 @@ export function AppProvider({ children }) {
     if (data.token) storeSessionToken(data.token)
     setUser(data.user)
     preparePostLoginNavigation()
-    panelNavigateRef.current?.('overview', {}, { replace: true })
+    panelNavigateRef.current?.('pipeline', {}, { replace: true })
     return data.user
   }, [])
 

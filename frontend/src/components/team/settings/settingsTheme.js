@@ -53,11 +53,13 @@ export function memberInitials(name, email) {
 
 export function normalizeMemberRole(member) {
   if (member?.role === 'org_admin') return 'admin'
+  const marketing = String(member?.marketingRole || '')
+  if (marketing === 'marketing_manager' || marketing === 'manager') return 'marketing_manager'
+  if (marketing === 'marketing_executive' || marketing === 'executive') return 'marketing_executive'
   const sql = member?.sqlRole
-  if (sql === 'admin' || sql === 'manager' || sql === 'rep') return sql
-  if (member?.marketingRole === 'manager') return 'marketing_manager'
-  if (member?.marketingRole === 'executive') return 'marketing_executive'
-  if (member?.pipelineRole === 'manager') return 'manager'
+  if (sql === 'admin') return 'admin'
+  if (sql === 'manager' || member?.pipelineRole === 'manager') return 'manager'
+  if (sql === 'rep') return 'rep'
   return 'rep'
 }
 

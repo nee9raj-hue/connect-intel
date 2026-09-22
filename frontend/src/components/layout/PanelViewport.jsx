@@ -74,6 +74,7 @@ const PANELS = {
 
 /** Panels kept mounted (hidden) for instant back navigation. */
 const KEEP_ALIVE_PANELS = new Set([
+  'pipeline',
   'overview',
   'companies',
   ...(TEAM_INTELLIGENCE_IN_CRM_ENABLED ? ['crm-rep-review'] : []),
