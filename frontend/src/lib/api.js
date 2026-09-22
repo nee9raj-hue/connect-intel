@@ -132,7 +132,10 @@ export const api = {
   previewInvite: (token) => request(`/api/invite/preview?token=${encodeURIComponent(token)}`),
   acceptInvite: (token) => request('/api/invite/accept', { method: 'POST', body: { token } }),
   updateTeamBranding: (payload) => request('/api/team/branding', { method: 'PATCH', body: payload }),
-  getOrgLeadTags: ({ silent = false } = {}) => request('/api/org/lead-tags', {}, { silent }),
+  getOrgLeadTags: ({ silent = false } = {}) => request('/api/org/lead-tags', { timeoutMs: 20_000 }, { silent }),
+  createOrgLeadTag: (payload) => request('/api/org/lead-tags', { method: 'POST', body: payload, timeoutMs: 20_000 }),
+  updateOrgLeadTag: (payload) => request('/api/org/lead-tags', { method: 'PATCH', body: payload, timeoutMs: 20_000 }),
+  deleteOrgLeadTag: (id) => request('/api/org/lead-tags', { method: 'DELETE', body: { id }, timeoutMs: 20_000 }),
   getOrgWorkspaceSettings: () => request('/api/org/workspace'),
   confirmOrgPlanUpgrade: (planId) =>
     request('/api/org/plan-upgrade', {
@@ -185,9 +188,6 @@ export const api = {
     }),
   saveCompanyWorkspaceGoals: (body) =>
     request('/api/org/company-workspace', { method: 'PATCH', body }),
-  createOrgLeadTag: (payload) => request('/api/org/lead-tags', { method: 'POST', body: payload }),
-  updateOrgLeadTag: (payload) => request('/api/org/lead-tags', { method: 'PATCH', body: payload }),
-  deleteOrgLeadTag: (id) => request('/api/org/lead-tags', { method: 'DELETE', body: { id } }),
   updateMemberPermissions: (payload) =>
     request('/api/team/permissions', { method: 'PATCH', body: payload }),
   // Pipeline leads: server reads PII from decrypted_leads; writes sync to leads (encrypted_*).
