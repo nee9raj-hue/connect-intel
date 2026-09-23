@@ -1,9 +1,9 @@
 {
-  "updatedAt": "2026-09-23T05:40:04.249Z",
-  "updatedAtIst": "23/09/2026, 11:10:04",
+  "updatedAt": "2026-09-23T06:50:09.138Z",
+  "updatedAtIst": "23/09/2026, 12:20:09",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "5ddada4",
+  "currentProductionCommit": "9904199",
   "safeVersions": [
     {
       "code": "S-5DDADA4",
@@ -148,6 +148,34 @@
   ],
   "entries": [
     {
+      "logId": "20260923-1219-9904199",
+      "commit": "9904199",
+      "commitFull": "9904199e1c4dd81256bab1a2ab47edacb4243ae9",
+      "message": "Show every assigned lead when Pipeline is opened, including ERP-stage accounts.",
+      "deployedAt": "2026-09-23T06:49:45.428Z",
+      "deployedAtIst": "23/09/2026, 12:19:45",
+      "committedAtIst": "23/09/2026, 12:18:57",
+      "vercelPreviewUrl": "https://connect-intel-f76u6pms9-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 9904199"
+    },
+    {
+      "logId": "20260923-1110-42d4e46",
+      "commit": "42d4e46",
+      "commitFull": "42d4e46bf535682afaf550e612524ef408b5a46b",
+      "message": "Record production LIVE at 5ddada4.",
+      "deployedAt": "2026-09-23T05:40:59.982Z",
+      "deployedAtIst": "23/09/2026, 11:10:59",
+      "committedAtIst": "23/09/2026, 11:10:27",
+      "vercelPreviewUrl": "https://connect-intel-byph6brg0-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 42d4e46"
+    },
+    {
       "logId": "20260923-1109-5ddada4",
       "commit": "5ddada4",
       "commitFull": "5ddada495974e64b19dcd67c6dba45ab92d69080",
@@ -157,7 +185,7 @@
       "committedAtIst": "23/09/2026, 11:08:45",
       "vercelPreviewUrl": "https://connect-intel-ghnlk8ga1-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 5ddada4"
     },
@@ -398,34 +426,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- f7f4bf0"
-    },
-    {
-      "logId": "20260922-1619-b80aa92",
-      "commit": "b80aa92",
-      "commitFull": "b80aa9227f5a6839f3ae2c40441e57421dbfd960",
-      "message": "Let reps create personal CRM tags that only they and admins can use.",
-      "deployedAt": "2026-09-22T10:49:19.061Z",
-      "deployedAtIst": "22/09/2026, 16:19:19",
-      "committedAtIst": "22/09/2026, 16:18:40",
-      "vercelPreviewUrl": "https://connect-intel-7f10oj4k7-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- b80aa92"
-    },
-    {
-      "logId": "20260922-1506-521977a",
-      "commit": "521977a",
-      "commitFull": "521977a186e5f98800641225266f51a4ad3096ba",
-      "message": "Record production LIVE at 1cf3e1c.",
-      "deployedAt": "2026-09-22T09:36:31.874Z",
-      "deployedAtIst": "22/09/2026, 15:06:31",
-      "committedAtIst": "22/09/2026, 15:05:43",
-      "vercelPreviewUrl": "https://connect-intel-6bqjaxsm3-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 521977a"
     }
   ]
 }
