@@ -14,6 +14,7 @@ import './styles/connect-intel-ai.css'
 import './styles/marketing-mailchimp.css'
 import './styles/calendar.css'
 import App from './App.jsx'
+import CourierFlowPreview from './components/crm/CourierFlowPreview.jsx'
 import ErrorBoundary from './components/ui/ErrorBoundary.jsx'
 import { initNativeAppShell } from './lib/nativeApp.js'
 import { initDeployRecovery } from './lib/deployRecovery.js'
@@ -22,10 +23,13 @@ initDeployRecovery()
 void initNativeAppShell()
 applyBrandCssVars()
 
+const courierPreview =
+  import.meta.env.DEV && new URLSearchParams(window.location.search).get('preview') === 'courier'
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ErrorBoundary>
-      <App />
+      {courierPreview ? <CourierFlowPreview /> : <App />}
     </ErrorBoundary>
   </StrictMode>,
 )

@@ -3,6 +3,8 @@ import { formatDealValue } from './crmTimeline'
 import {
   CARGO_READINESS_OPTIONS,
   COURIER_DESTINATION_OPTIONS,
+  courierContractProjection,
+  courierCommodityLabels,
   freightChargeableMeasure,
   formatFreightMeasure,
   freightGrossFieldLabel,
@@ -59,12 +61,19 @@ function formatCourierBlock(courier) {
     .map((id) => COURIER_DESTINATION_OPTIONS.find((o) => o.id === id)?.label || id)
     .filter(Boolean)
   if (countries.length) rows.push(line('Destinations', countries.join(', ')))
-  if (courier.weeklyShipments != null) rows.push(line('Weekly shipments', courier.weeklyShipments))
-  if (courier.weeklyWeightKg != null) rows.push(line('Weekly weight', `${courier.weeklyWeightKg} kg`))
+  const commodities = courierCommodityLabels(courier)
+  if (commodities.length) rows.push(line('Commodity', commodities.join(', ')))
+  const projection = courierContractProjection(courier)
+  if (projection.monthlyShipments != null) rows.push(line('Monthly shipments', projection.monthlyShipments))
+  if (projection.monthlyWeightKg != null) rows.push(line('Monthly weight', `${projection.monthlyWeightKg} kg`))
+  if (projection.monthlyRevenue != null) rows.push(line('Monthly revenue', `₹${Math.round(projection.monthlyRevenue).toLocaleString('en-IN')}`))
+  if (projection.contractValue != null) rows.push(line('Contract value', `₹${Math.round(projection.contractValue).toLocaleString('en-IN')}`))
+  if (courier.weeklyShipments != null && !courier.lanes?.length) rows.push(line('Weekly shipments', courier.weeklyShipments))
+  if (courier.weeklyWeightKg != null && !courier.lanes?.length) rows.push(line('Weekly weight', `${courier.weeklyWeightKg} kg`))
   if (courier.avgShipmentWeightKg != null) {
     rows.push(line('Avg shipment weight', `${courier.avgShipmentWeightKg} kg`))
   }
-  if (courier.targetRatePerKg != null) {
+  if (courier.targetRatePerKg != null && !courier.lanes?.length) {
     rows.push(line('Target rate', `₹${courier.targetRatePerKg}/kg`))
   }
   const slab = WEIGHT_SLAB_OPTIONS.find((o) => o.id === courier.weightSlab)

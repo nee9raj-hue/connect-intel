@@ -10,7 +10,8 @@ import {
   freightCustomerTypeLabel,
   summarizePipelineDealRows,
 } from '../../lib/freightDeals'
-import { estimatedFreightRevenueInr, sumEstimatedFreightRevenue, FREIGHT_DEAL_STAGES, resolveFreightDealCurrency, FALLBACK_USD_INR, isFreightDealOrg } from '../../lib/freightDeal'
+import { estimatedFreightRevenueInr, sumEstimatedFreightRevenue, FREIGHT_DEAL_STAGES, resolveFreightDealCurrency, FALLBACK_USD_INR, isFreightDealOrg, DEAL_BOOK_FILTERS, courierContractProjection } from '../../lib/freightDeal'
+import CourierDealsBoard from './CourierDealsBoard'
 import { filledDealMilestones } from '../../lib/dealMilestones'
 import { userCanDeleteCrmRecords } from '../../lib/orgActionAccess'
 import {
@@ -61,6 +62,7 @@ export default function PipelineDealsView({
   const [periodMonth, setPeriodMonth] = useState('')
   const [selectedWeeks, setSelectedWeeks] = useState([])
   const [transportMode, setTransportMode] = useState('all')
+  const [dealBook, setDealBook] = useState('commercial')
   const [selectedStages, setSelectedStages] = useState([])
   const [usdInrRate, setUsdInrRate] = useState(FALLBACK_USD_INR)
 
@@ -68,29 +70,39 @@ export default function PipelineDealsView({
 
   const isAllDealsView = dealStage === 'all'
 
-  const filteredRows = useMemo(
-    () =>
-      filterPipelineDealRows(rows, {
-        year: periodYear,
-        month: periodMonth,
-        weeks: selectedWeeks,
-        transportMode,
-        stages: isAllDealsView ? selectedStages : [],
-        dateStages: isAllDealsView ? selectedStages : [dealStage],
-        timeZone,
-      }),
-    [
-      rows,
-      periodYear,
-      periodMonth,
-      selectedWeeks,
-      transportMode,
-      selectedStages,
-      isAllDealsView,
-      dealStage,
+  const courierBook = freightOrg && dealBook === 'courier'
+
+  const filteredRows = useMemo(() => {
+    const filtered = filterPipelineDealRows(rows, {
+      year: periodYear,
+      month: periodMonth,
+      weeks: selectedWeeks,
+      transportMode: courierBook ? 'all' : transportMode,
+      book: freightOrg ? dealBook : '',
+      stages: isAllDealsView ? selectedStages : [],
+      dateStages: isAllDealsView ? selectedStages : [dealStage],
       timeZone,
-    ]
-  )
+    })
+    if (!courierBook) return filtered
+    return [...filtered].sort(
+      (a, b) =>
+        (courierContractProjection(b.deal?.freight?.courier).monthlyWeightKg || 0) -
+        (courierContractProjection(a.deal?.freight?.courier).monthlyWeightKg || 0)
+    )
+  }, [
+    rows,
+    periodYear,
+    periodMonth,
+    selectedWeeks,
+    transportMode,
+    selectedStages,
+    isAllDealsView,
+    dealStage,
+    timeZone,
+    freightOrg,
+    dealBook,
+    courierBook,
+  ])
 
   const estimatedRevenueTotal = useMemo(
     () => Math.round(sumEstimatedFreightRevenue(filteredRows, usdInrRate)),
@@ -426,7 +438,25 @@ export default function PipelineDealsView({
         </div>
       </div>
 
-      {filteredRows.length > 0 || rows.length > 0 ? (
+      {freightOrg ? (
+        <div className="courier-book px-3 md:px-4">
+          <DashboardSegmented
+            value={dealBook}
+            onChange={(next) => {
+              setDealBook(next)
+              setSelected(new Set())
+            }}
+            options={DEAL_BOOK_FILTERS.map((opt) => ({ value: opt.id, label: opt.label }))}
+          />
+          <p>
+            {courierBook
+              ? 'One contract per account. Sorted by monthly kg. Mark won or lost after the lanes are filled.'
+              : 'Commercial is a quote for each shipment.'}
+          </p>
+        </div>
+      ) : null}
+
+      {!courierBook && (filteredRows.length > 0 || rows.length > 0) ? (
         <div className="pipeline-deals-forecast px-3 md:px-4" role="region" aria-label="Deal totals for this view">
           <article className="pipeline-deals-forecast__card">
             <span className="pipeline-deals-forecast__label">Open pipeline</span>
@@ -549,6 +579,7 @@ export default function PipelineDealsView({
             Choose a year, then month, then week numbers. Stages stay independent.
           </p>
         )}
+        {courierBook ? null : (
         <DashboardSegmented
           value={transportMode}
           onChange={(mode) => {
@@ -557,6 +588,7 @@ export default function PipelineDealsView({
           }}
           options={DEAL_TRANSPORT_FILTERS.map((opt) => ({ value: opt.id, label: opt.label }))}
         />
+        )}
         {filtersActive ? (
           <button
             type="button"
@@ -633,13 +665,26 @@ export default function PipelineDealsView({
       )}
       {!loading && !error && filteredRows.length === 0 && (
         <p className="text-xs text-gray-500 py-10 text-center border rounded-xl bg-gray-50">
-          {rows.length > 0 && filtersActive
+          {courierBook
+            ? 'No courier contracts in this view. On a lead, open Deals, choose Courier contract, and fill the lanes once.'
+            : rows.length > 0 && filtersActive
             ? 'No deals match these filters. Try another period or transport mode.'
             : "No deals in this stage yet. Create one from a lead's Deals tab."}
         </p>
       )}
 
-      {!loading && filteredRows.length > 0 && (
+      {!loading && courierBook && filteredRows.length > 0 && (
+        <CourierDealsBoard
+          rows={filteredRows}
+          selected={selected}
+          allSelected={allSelected}
+          onToggleRow={toggleRow}
+          onToggleAll={toggleAll}
+          onOpenLead={onOpenLead}
+        />
+      )}
+
+      {!loading && !courierBook && filteredRows.length > 0 && (
         <>
           <ul className="pipeline-deals-mobile-list mx-3 md:mx-4" aria-label="Deals">
             {filteredRows.map((row) => {

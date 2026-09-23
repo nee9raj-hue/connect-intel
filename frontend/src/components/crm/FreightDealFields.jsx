@@ -177,8 +177,8 @@ function FreightMeasureSummary({ freight, boxes }) {
 
   const unitLabel = ocean ? 'CBM' : 'kg'
   const formula = ocean
-    ? 'L × W × H (cm) ÷ 1,000,000'
-    : `L × W × H (cm) ÷ ${(freight.volumetricDivisor ?? 5000).toLocaleString('en-IN')}`
+    ? 'L × B × H (cm) × boxes ÷ 1,000,000'
+    : `L × B × H (cm) × boxes ÷ ${(freight.volumetricDivisor ?? 5000).toLocaleString('en-IN')}`
 
   return (
     <div className="lw-freight-weights rounded-lg border border-indigo-100 bg-indigo-50/40 p-2.5 text-xs space-y-1">
@@ -391,13 +391,24 @@ function SpotRfqSection({ freight, onChange, disabled, compact, boxes, setBoxes,
             </button>
           </div>
         </div>
+        <p className="text-[10px] text-gray-500 m-0">
+          No. of boxes starts at 1: one carton of this size. Raise it when several cartons share the same L × B × H.
+        </p>
+        <div className="lw-box-grid lw-box-grid--head" aria-hidden>
+          <span>Length (cm)</span>
+          <span>Breadth (cm)</span>
+          <span>Height (cm)</span>
+          <span>No. of boxes</span>
+          <span />
+        </div>
         {boxes.map((box, index) => (
-          <div key={index} className="grid grid-cols-5 gap-1.5 items-center">
+          <div key={index} className="lw-box-grid">
             <input
               type="number"
               min={0}
               value={box.lengthCm ?? ''}
               disabled={disabled}
+              aria-label={`Box ${index + 1} length cm`}
               onChange={(e) =>
                 updateBox(index, { lengthCm: e.target.value === '' ? null : Number(e.target.value) })
               }
@@ -409,10 +420,11 @@ function SpotRfqSection({ freight, onChange, disabled, compact, boxes, setBoxes,
               min={0}
               value={box.widthCm ?? ''}
               disabled={disabled}
+              aria-label={`Box ${index + 1} breadth cm`}
               onChange={(e) =>
                 updateBox(index, { widthCm: e.target.value === '' ? null : Number(e.target.value) })
               }
-              placeholder="W"
+              placeholder="B"
               className="text-xs border rounded-lg px-1.5 py-1 bg-white"
             />
             <input
@@ -420,6 +432,7 @@ function SpotRfqSection({ freight, onChange, disabled, compact, boxes, setBoxes,
               min={0}
               value={box.heightCm ?? ''}
               disabled={disabled}
+              aria-label={`Box ${index + 1} height cm`}
               onChange={(e) =>
                 updateBox(index, { heightCm: e.target.value === '' ? null : Number(e.target.value) })
               }
@@ -431,8 +444,8 @@ function SpotRfqSection({ freight, onChange, disabled, compact, boxes, setBoxes,
               min={1}
               value={box.quantity ?? 1}
               disabled={disabled}
+              aria-label={`Box ${index + 1} number of boxes`}
               onChange={(e) => updateBox(index, { quantity: Math.max(1, Number(e.target.value) || 1) })}
-              placeholder="Qty"
               className="text-xs border rounded-lg px-1.5 py-1 bg-white"
             />
             <button

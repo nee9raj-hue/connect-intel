@@ -10,7 +10,7 @@ import {
 } from '../../lib/crmConstants'
 import { formatDealValue } from '../../lib/crmTimeline'
 import { buildAutoDealName } from '../../lib/dealNaming'
-import { emptyFreightRfq, isFreightDealOrg, freightRateUnitLabel, isOceanTransportMode, resolveFreightDealCurrency, estimatedFreightRevenueInr, FALLBACK_USD_INR, FREIGHT_DEAL_STAGES, normalizeFreightDealStage } from '../../lib/freightDeal'
+import { emptyFreightRfq, isFreightDealOrg, freightRateUnitLabel, isOceanTransportMode, resolveFreightDealCurrency, estimatedFreightRevenueInr, FALLBACK_USD_INR, FREIGHT_DEAL_STAGES, normalizeFreightDealStage, courierContractProjection } from '../../lib/freightDeal'
 import FreightDealFields, { formatFreightSummary, freightDealCreateLabel } from './FreightDealFields'
 import { getFreightCustomerTypeMeta } from '../../lib/freightDeal'
 import DealShareActions from './DealShareActions'
@@ -125,7 +125,11 @@ function DealRow({
   }, [deal.id, deal.updatedAt, deal.amount])
 
   const saveFreight = () => {
-    const amount = amountDraft === '' ? null : Number(amountDraft)
+    let amount = amountDraft === '' ? null : Number(amountDraft)
+    if (freightDraft.customerType === 'courier') {
+      const contractValue = courierContractProjection(freightDraft.courier).contractValue
+      if (contractValue != null) amount = Math.round(contractValue)
+    }
     onUpdate(deal.id, {
       freight: freightDraft,
       amount: Number.isFinite(amount) ? amount : null,
@@ -239,7 +243,7 @@ function DealRow({
             ))}
           </LwSelect>
         </LwField>
-        <LwField label={freightOrg ? `Freight ${freightRateUnitLabel(rateMode)}` : 'Amount ₹'}>
+        <LwField label={deal.freight?.customerType === 'courier' ? 'Contract value' : freightOrg ? `Freight ${freightRateUnitLabel(rateMode)}` : 'Amount ₹'}>
           <FreightAmountInput
             freightOrg={freightOrg}
             transportMode={rateMode}
@@ -343,8 +347,11 @@ function DealRow({
       {freightOrg && showFreight && (
         <div className="lw-deal-rfq-panel lw-freight-fields">
           <p className="lw-deal-rfq-hint">
-            Update lanes, weight, and the quoted freight rate after negotiation. Ocean rates are USD per CBM.
+            {freightDraft.customerType === 'courier'
+              ? 'Fill the contract once. Monthly volume and contract value update as you type, then mark the deal won or lost.'
+              : 'Update lanes, weight, and the quoted freight rate after negotiation. Ocean rates are USD per CBM.'}
           </p>
+          {freightDraft.customerType === 'courier' ? null : (
           <LwField label={`Quoted freight ${freightRateUnitLabel(freightDraft.transportMode)}`}>
             <FreightAmountInput
               freightOrg
@@ -363,6 +370,7 @@ function DealRow({
               onChange={(e) => setAmountDraft(e.target.value)}
             />
           </LwField>
+          )}
           <FreightDealFields
             freight={freightDraft}
             onChange={setFreightDraft}
@@ -532,13 +540,18 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
   const addDeal = async (e) => {
     e.preventDefault()
     const dealName = name.trim() || buildAutoDealName({ company: lead.company, existingDeals: deals })
+    let dealAmount = amount === '' ? null : Number(amount)
+    if (freightOrg && freight.customerType === 'courier') {
+      const contractValue = courierContractProjection(freight.courier).contractValue
+      if (contractValue != null) dealAmount = Math.round(contractValue)
+    }
     const payload = {
       action: 'add',
       name: dealName,
       autoName: !name.trim(),
       company: lead.company || '',
       stage,
-      amount: amount === '' ? null : Number(amount),
+      amount: dealAmount,
       currency: resolveFreightDealCurrency({ freight }),
       expectedCloseDate: expectedCloseDate || null,
       ...pickDealMilestones(milestones),
@@ -655,6 +668,15 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
                   <LwInput value={getDealStageMeta(stage, { freightOrg }).label} disabled />
                 </LwField>
               )}
+              {freight.customerType === 'courier' ? (
+                <LwField label="Contract value">
+                  <LwInput
+                    value={formatDealValue(courierContractProjection(freight.courier).contractValue)}
+                    disabled
+                    readOnly
+                  />
+                </LwField>
+              ) : (
               <LwField label={freightOrg ? `Freight ${freightRateUnitLabel(freight.transportMode)}` : 'Amount ₹'}>
                 <FreightAmountInput
                   freightOrg={freightOrg}
@@ -674,6 +696,7 @@ export default function LeadDealsSection({ lead, patchLead, user, busy = false, 
                   }
                 />
               </LwField>
+              )}
             </div>
 
             <LwField label="Expected close" icon={CalendarIcon}>

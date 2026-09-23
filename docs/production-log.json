@@ -6,6 +6,16 @@
   "currentProductionCommit": "e332da2",
   "safeVersions": [
     {
+      "code": "S-E332DA2",
+      "commit": "e332da2",
+      "commitFull": "e332da2b88957f3e12fde2a614d65c0e5a542db6",
+      "message": "Load the selected owner's full assigned book when a manager filters Pipeline by owner.",
+      "note": "Healthy CRM snapshot before a later change",
+      "recordedAt": "2026-09-23T12:39:10.578Z",
+      "recordedAtIst": "23/09/2026, 18:09:10",
+      "rollbackCommand": "npm run prod:rollback -- S-E332DA2"
+    },
+    {
       "code": "S-9904199",
       "commit": "9904199",
       "commitFull": "9904199e1c4dd81256bab1a2ab47edacb4243ae9",
