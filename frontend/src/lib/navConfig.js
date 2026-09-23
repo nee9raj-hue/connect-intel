@@ -166,6 +166,8 @@ export function isNavTargetActive(activePanel, panelOptions, target) {
     const track = normalizePipelineTrack(panelOptions?.pipelineTrack)
     const targetTrack = normalizePipelineTrack(target.pipelineTrack)
     if (targetTrack && track !== targetTrack) return false
+    // Pipeline / All leads is the full book. A CRM or ERP track is a narrower view.
+    if (!targetTrack && track) return false
     if (target.status && (panelOptions?.status || 'all') !== target.status) return false
     if (!target.status) {
       if (targetTrack) return (panelOptions?.status || 'all') === 'all' && track === targetTrack
@@ -361,7 +363,17 @@ export function buildCustomerNavSections(
   const canAiSearch = Boolean(user?.isOrgAdmin || user?.isPlatformAdmin || user?.canSearch !== false)
 
   const pipelineChildren = freightOrg
-    ? buildFreightPipelineChildren(pipelineCounts)
+    ? [
+        {
+          id: 'pipeline-all',
+          label: 'All leads',
+          panel: 'pipeline',
+          view: 'leads',
+          status: 'all',
+          badge: pipelineCounts.all,
+        },
+        ...buildFreightPipelineChildren(pipelineCounts),
+      ]
     : buildPipelineLeadChildren(columns, pipelineCounts)
   const dealsChildren = buildDealsChildren(dealCounts || {}, allDealCounts || {}, { freightOrg })
 

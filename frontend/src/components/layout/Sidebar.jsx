@@ -529,7 +529,14 @@ function NavGroup({
     <div className="mb-1">
       <button
         type="button"
-        onClick={onToggle}
+        onClick={() => {
+          if (clickTarget) {
+            onGo(clickTarget)
+            if (!navExpanded) onToggle()
+            return
+          }
+          onToggle()
+        }}
         className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-2xl text-[12px] font-medium tracking-[-0.015em] transition-colors ${
           groupActive
             ? 'bg-white text-[#17191c] shadow-[0_1px_2px_rgba(0,0,0,0.08)]'
@@ -544,9 +551,18 @@ function NavGroup({
           className={`w-4 h-4 shrink-0 ${groupActive ? 'text-[#17191c]' : 'text-[#aab3bb]'}`}
         />
         <span className="flex-1 text-left truncate">{group.label}</span>
-        <ChevronRightIcon
-          className={`w-3.5 h-3.5 shrink-0 transition-transform ${navExpanded ? 'rotate-90' : ''}`}
-        />
+        <span
+          role="presentation"
+          className="shrink-0 p-0.5"
+          onClick={(event) => {
+            event.stopPropagation()
+            onToggle()
+          }}
+        >
+          <ChevronRightIcon
+            className={`w-3.5 h-3.5 transition-transform ${navExpanded ? 'rotate-90' : ''}`}
+          />
+        </span>
       </button>
       {navExpanded && (
         <div className="ml-3 mt-1 mb-1 space-y-1 border-l border-white/10 pl-2">

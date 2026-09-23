@@ -465,6 +465,9 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       setSearch('')
       setSmartViewFilters({})
       setSmartViewId(null)
+      if (po.status === 'all' && !normalizePipelineTrack(po.pipelineTrack)) {
+        setListStatusFilter('all')
+      }
     }
 
     if (po.tasksDueToday || (po.view === 'tasks' && po.due === 'today')) {
@@ -1082,7 +1085,9 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       lastShipmentLabel: lastShipmentPeriodLabel(appliedAdvanced),
     })
     if (!statusLabel && !stageListMode && listStatusFilter === 'all') {
-      parts.push('All statuses')
+      if (freightOrg && pipelineTrack === 'crm') parts.push('CRM leads')
+      else if (freightOrg && pipelineTrack === 'erp') parts.push('ERP accounts')
+      else parts.push('All leads')
     }
     const total = pipelineSummary.total || 0
     const showing = filtered.length
@@ -1121,6 +1126,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     pipelineLoad.total,
     activeFilterCount,
     serverSidePipeline,
+    freightOrg,
+    pipelineTrack,
   ])
 
   const handleLeadStatusChange = useCallback(

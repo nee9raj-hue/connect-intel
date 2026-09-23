@@ -1,6 +1,16 @@
 {
   "versions": [
     {
+      "code": "S-5DDADA4",
+      "commit": "5ddada4",
+      "commitFull": "5ddada495974e64b19dcd67c6dba45ab92d69080",
+      "message": "Save overview stage changes, show notes on calls and meetings, and sync those meetings to the rep calendar.",
+      "note": "Healthy CRM snapshot before a later change",
+      "recordedAt": "2026-09-23T06:48:31.301Z",
+      "recordedAtIst": "23/09/2026, 12:18:31",
+      "rollbackCommand": "npm run prod:rollback -- S-5DDADA4"
+    },
+    {
       "code": "S-202546C",
       "commit": "202546c",
       "commitFull": "202546cdde482b4f417b8d43bc49d670fe403044",
