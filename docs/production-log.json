@@ -1,9 +1,9 @@
 {
-  "updatedAt": "2026-09-23T03:58:12.988Z",
-  "updatedAtIst": "23/09/2026, 09:28:12",
+  "updatedAt": "2026-09-23T04:22:01.353Z",
+  "updatedAtIst": "23/09/2026, 09:52:01",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "6b439f4",
+  "currentProductionCommit": "202546c",
   "safeVersions": [
     {
       "code": "S-6B439F4",
@@ -128,6 +128,34 @@
   ],
   "entries": [
     {
+      "logId": "20260923-0951-202546c",
+      "commit": "202546c",
+      "commitFull": "202546cdde482b4f417b8d43bc49d670fe403044",
+      "message": "Remove the ERP Revenue and ERP Finance tabs from the lead record.",
+      "deployedAt": "2026-09-23T04:21:35.614Z",
+      "deployedAtIst": "23/09/2026, 09:51:35",
+      "committedAtIst": "23/09/2026, 09:51:03",
+      "vercelPreviewUrl": "https://connect-intel-m078toltu-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 202546c"
+    },
+    {
+      "logId": "20260923-0928-42c167a",
+      "commit": "42c167a",
+      "commitFull": "42c167a5cb695d682f0065f9f214171860e2b63a",
+      "message": "Record production LIVE at 6b439f4.",
+      "deployedAt": "2026-09-23T03:58:53.683Z",
+      "deployedAtIst": "23/09/2026, 09:28:53",
+      "committedAtIst": "23/09/2026, 09:28:18",
+      "vercelPreviewUrl": "https://connect-intel-f8ejpmgq5-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- 42c167a"
+    },
+    {
       "logId": "20260923-0927-6b439f4",
       "commit": "6b439f4",
       "commitFull": "6b439f4ec9b58d977e15f8c7f4bd81287688d754",
@@ -137,7 +165,7 @@
       "committedAtIst": "23/09/2026, 09:27:11",
       "vercelPreviewUrl": "https://connect-intel-pqu3qz5ri-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 6b439f4"
     },
@@ -378,34 +406,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 67b70cd"
-    },
-    {
-      "logId": "20260921-1903-311ae71",
-      "commit": "311ae71",
-      "commitFull": "311ae71a99394b3749ddad0f9d80b87bf805fb79",
-      "message": "Clear leftover app cache so the restored CRM can fetch again.",
-      "deployedAt": "2026-09-21T13:33:35.004Z",
-      "deployedAtIst": "21/09/2026, 19:03:35",
-      "committedAtIst": "21/09/2026, 19:02:53",
-      "vercelPreviewUrl": "https://connect-intel-9efzb9qem-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 311ae71"
-    },
-    {
-      "logId": "20260921-1854-25e05c2",
-      "commit": "25e05c2",
-      "commitFull": "25e05c2a2e7c3599e17c21d8b50ccc49a94a8f32",
-      "message": "Record production LIVE at the restored 4c0640e snapshot.",
-      "deployedAt": "2026-09-21T13:24:23.682Z",
-      "deployedAtIst": "21/09/2026, 18:54:23",
-      "committedAtIst": "21/09/2026, 18:53:37",
-      "vercelPreviewUrl": "https://connect-intel-ha14sol5w-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 25e05c2"
     }
   ]
 }
