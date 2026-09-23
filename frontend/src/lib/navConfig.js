@@ -341,6 +341,13 @@ function buildDealsChildren(openDealCounts = {}, allDealCounts = {}, { freightOr
   ]
 }
 
+/** Reps do not use Sequences or the automation builder. Admins and managers keep them. */
+function showAutomationNav(user, isCompany) {
+  if (!isCompany) return true
+  if (user?.isPlatformAdmin || user?.isOrgAdmin || user?.orgRole === 'org_admin') return true
+  return String(user?.pipelineRole || '').toLowerCase() === 'manager'
+}
+
 export function buildCustomerNavSections(
   user,
   { pipelineCounts = {}, upcomingCount = 0, dealCounts = null, allDealCounts = null } = {}
@@ -431,7 +438,7 @@ export function buildCustomerNavSections(
           ? [{ id: 'marketing', label: 'Marketing', icon: 'mail', children: marketingChildren }]
           : []),
         { id: 'calendar', label: 'Calendar', icon: 'calendar', children: calendarChildren },
-        ...(automationChildren.length
+        ...(showAutomationNav(user, isCompany) && automationChildren.length
           ? [{ id: 'automation', label: 'Automation', icon: 'bolt', children: automationChildren }]
           : []),
         ...(isCompany && hasWorkspaceFeature(user, 'fieldVisitExpenses')

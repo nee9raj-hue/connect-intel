@@ -915,7 +915,7 @@ export function AppProvider({ children }) {
       if (statusChanged) {
         void refreshPipelineSummary()
       }
-      return lead
+      return { lead, googleCalendar: data.googleCalendar || null }
     } catch (error) {
       setSavedLeads(previous)
       if (statusChanged && previousSummary) {
@@ -926,7 +926,10 @@ export function AppProvider({ children }) {
   }, [pipelineLeadId, refreshPipelineSummary, user])
 
   const updateSavedLeadCrm = useCallback(
-    async (leadId, crmPatch) => patchLead(leadId, { crm: crmPatch }),
+    async (leadId, crmPatch) => {
+      const result = await patchLead(leadId, { crm: crmPatch })
+      return result?.lead || null
+    },
     [patchLead]
   )
 

@@ -413,14 +413,14 @@ export default function LeadWorkspace({
     setSavingScope(scope)
     setError(null)
     try {
-      await patchLead(lead.id, body)
+      const result = await patchLead(lead.id, body)
       if (okMsg) {
         setNotice(okMsg)
         if (scope === 'task' || scope === 'meeting' || scope === 'visit') {
           setScheduleFeedback({ form: scope, message: okMsg })
         }
       }
-      return true
+      return result || true
     } catch (e) {
       setError(e.message)
       return false
@@ -517,6 +517,21 @@ export default function LeadWorkspace({
       'meeting'
     )
     if (ok) resetMeetingForm()
+    if (ok?.googleCalendar?.needsCalendarConsent && ok.googleCalendar.meetingId) {
+      try {
+        sessionStorage.setItem(
+          'ci_pending_gcal_meeting',
+          JSON.stringify({ leadId: lead.id, meetingId: ok.googleCalendar.meetingId })
+        )
+        const data = await api.startCrmGmailOAuthWithCalendar()
+        if (data?.url) {
+          window.location.href = data.url
+          return
+        }
+      } catch {
+        setNotice('Meeting is on your calendar. Allow Google Calendar once so the reminder reaches Gmail.')
+      }
+    }
   }
 
   const recordVisit = async (payload) => {
@@ -1199,6 +1214,9 @@ export default function LeadWorkspace({
                       subtitle={item.subtitle}
                       at={formatDateTime(item.at)}
                     >
+                      {item.meta?.notes && !String(item.title || '').includes(String(item.meta.notes)) ? (
+                        <p className="mt-2 text-xs text-[var(--lw-text-secondary)]">{item.meta.notes}</p>
+                      ) : null}
                       {item.meta?.answers?.length > 0 && (
                         <ul className="mt-2 pt-2 border-t border-[var(--lw-border)] space-y-1 text-xs text-[var(--lw-text-secondary)]">
                           {item.meta.answers.map((row) => (
@@ -1423,6 +1441,7 @@ export default function LeadWorkspace({
                           {formatDateTime(m.scheduledAt)} · {m.type}
                           {m.visitRecordedAt ? ' · Visit logged' : ''}
                         </p>
+                        {m.notes ? <p className="lw-list-item__meta">{m.notes}</p> : null}
                       </div>
                     </li>
                   ))}

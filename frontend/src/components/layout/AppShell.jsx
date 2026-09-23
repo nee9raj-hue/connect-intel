@@ -11,6 +11,7 @@ import {
 } from '../../lib/appHistory'
 import { resolvePanelForUser, sanitizeAppLocation } from '../../lib/platformOperator'
 import { useApp } from '../../context/AppContext'
+import { api } from '../../lib/api'
 import OnboardingModal from '../onboarding/OnboardingModal'
 import Sidebar from './Sidebar'
 import SidebarToggleButton from './SidebarToggleButton'
@@ -232,6 +233,21 @@ export default function AppShell() {
       markGmailSetupDone()
     }
   }, [])
+
+  useEffect(() => {
+    if (!user?.id) return
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('crm_calendar') !== 'connected') return
+    let pending = null
+    try {
+      pending = JSON.parse(sessionStorage.getItem('ci_pending_gcal_meeting') || 'null')
+    } catch {
+      pending = null
+    }
+    if (!pending?.leadId || !pending?.meetingId) return
+    sessionStorage.removeItem('ci_pending_gcal_meeting')
+    void api.pushCrmMeetingToGoogle(pending).catch(() => {})
+  }, [user?.id])
 
   const navigate = useCallback(
     (id, options = {}, navOpts = {}) => {

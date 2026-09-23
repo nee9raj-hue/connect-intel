@@ -36,6 +36,7 @@ export default function LeadCallLogCard({ lead, saving, onLog, onSuccess }) {
           outcome,
           direction: inbound ? 'inbound' : 'outbound',
           phone: phone || null,
+          notes: notes.trim() || null,
         },
       },
     }

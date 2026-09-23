@@ -82,8 +82,9 @@ export function buildUnifiedTimeline(crm = {}, { marketingEvents = [], indexedAc
       category: 'meetings',
       type: 'meeting',
       at: m.scheduledAt || m.createdAt,
-      title: m.title,
+      title: m.notes ? `${m.title} · ${m.notes}` : m.title,
       subtitle: m.type || 'Meeting',
+      notes: m.notes || '',
     })
   }
 

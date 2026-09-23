@@ -423,6 +423,11 @@ export const api = {
     request('/api/crm/calendar/google', { method: 'POST', body: { action: 'connect' } }),
   syncCrmGoogleCalendar: () =>
     request('/api/crm/calendar/google', { method: 'POST', body: { action: 'sync' } }),
+  pushCrmMeetingToGoogle: ({ leadId, meetingId }) =>
+    request('/api/crm/calendar/google', {
+      method: 'POST',
+      body: { action: 'push_meeting', leadId, meetingId },
+    }),
   setCrmGoogleCalendarSync: (enabled) =>
     request('/api/crm/calendar/google', {
       method: 'POST',
