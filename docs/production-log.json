@@ -6,6 +6,16 @@
   "currentProductionCommit": "be998ec",
   "safeVersions": [
     {
+      "code": "S-BE998EC",
+      "commit": "be998ec",
+      "commitFull": "be998ecc00049eeb5228f07c0231d2d8db5d2435",
+      "message": "Copy ERP last shipment onto Pipeline even when a duplicate customer row has no date.",
+      "note": "Healthy CRM snapshot before a later change",
+      "recordedAt": "2026-09-23T03:57:01.862Z",
+      "recordedAtIst": "23/09/2026, 09:27:01",
+      "rollbackCommand": "npm run prod:rollback -- S-BE998EC"
+    },
+    {
       "code": "S-FE51015",
       "commit": "fe51015",
       "commitFull": "fe5101566c474a688904cae9ab1867f2b08ee2ec",
