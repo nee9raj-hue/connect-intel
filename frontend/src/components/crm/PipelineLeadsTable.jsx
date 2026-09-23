@@ -688,7 +688,7 @@ function renderPipelineCell(colId, lead, ctx) {
             <button
               type="button"
               className="pipeline-hs-cell-text"
-              onClick={() => onSelect(lead.id, 'erp-revenue')}
+              onClick={() => onSelect(lead.id, 'overview')}
               title={formatDateTime(lastOrderAt)}
             >
               {formatLastShipmentMonthYear(lastOrderAt)}

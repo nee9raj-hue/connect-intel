@@ -43,7 +43,6 @@ import { hasWorkspaceFeature } from '../../lib/workspaceFeatures'
 import { lastOrderRecencyLabel, resolveLeadLastOrderCreatedAt } from '../../../../lib/leadLastOrder.js'
 import FieldVisitRecordForm from './FieldVisitRecordForm'
 import LeadDealsSection from './LeadDealsSection'
-import LeadErpPanels from './LeadErpPanels'
 import LeadTradeProfilePanel from './LeadTradeProfilePanel'
 import TeamIntelReturnBanner from './TeamIntelReturnBanner'
 import { DEFAULT_FIELD_VISIT_EXPENSE_SETTINGS } from '../../lib/fieldVisitExpenses'
@@ -113,8 +112,6 @@ function formatAttachmentSize(bytes) {
 
 const TABS = [
   { id: 'overview', label: 'Overview', shortLabel: 'Overview', Icon: HomeIcon },
-  { id: 'erp-revenue', label: 'ERP Revenue', shortLabel: 'Revenue', Icon: PipelineIcon },
-  { id: 'erp-finance', label: 'ERP Finance', shortLabel: 'Finance', Icon: SparkIcon },
   { id: 'trade-profile', label: 'Trade profile', shortLabel: 'Profile', Icon: RouteIcon },
   { id: 'deals', label: 'Deals', shortLabel: 'Deals', Icon: PipelineIcon },
   { id: 'notes', label: 'Timeline', shortLabel: 'Timeline', Icon: LogIcon },
@@ -910,7 +907,6 @@ export default function LeadWorkspace({
                 label="Last order"
                 value={lastOrderAt ? formatCrmDate(lastOrderAt) : 'No order on file'}
                 sub={lastOrderRecencyLabel(lastOrderAt)}
-                action={<LwLinkBtn onClick={() => setTab('erp-revenue')}>ERP Revenue</LwLinkBtn>}
               />
             </div>
 
@@ -1145,10 +1141,6 @@ export default function LeadWorkspace({
               ) : null}
             </LwSection>
           </>
-        )}
-
-        {(tab === 'erp-revenue' || tab === 'erp-finance') && (
-          <LeadErpPanels lead={lead} tab={tab} />
         )}
 
         {tab === 'trade-profile' && (
