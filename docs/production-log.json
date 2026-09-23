@@ -1,9 +1,9 @@
 {
-  "updatedAt": "2026-09-23T06:50:09.138Z",
-  "updatedAtIst": "23/09/2026, 12:20:09",
+  "updatedAt": "2026-09-23T09:04:35.192Z",
+  "updatedAtIst": "23/09/2026, 14:34:35",
   "productionDomain": "https://connectintel.net",
   "vercelProject": "connect-intel",
-  "currentProductionCommit": "9904199",
+  "currentProductionCommit": "e332da2",
   "safeVersions": [
     {
       "code": "S-9904199",
@@ -158,6 +158,34 @@
   ],
   "entries": [
     {
+      "logId": "20260923-1433-e332da2",
+      "commit": "e332da2",
+      "commitFull": "e332da2b88957f3e12fde2a614d65c0e5a542db6",
+      "message": "Load the selected owner's full assigned book when a manager filters Pipeline by owner.",
+      "deployedAt": "2026-09-23T09:03:47.069Z",
+      "deployedAtIst": "23/09/2026, 14:33:47",
+      "committedAtIst": "23/09/2026, 14:33:00",
+      "vercelPreviewUrl": "https://connect-intel-232r6i685-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": true,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- e332da2"
+    },
+    {
+      "logId": "20260923-1221-e9b1f99",
+      "commit": "e9b1f99",
+      "commitFull": "e9b1f9938a1178b0e6af7a61393fcdc337839d0a",
+      "message": "Record production LIVE at 9904199.",
+      "deployedAt": "2026-09-23T06:51:15.958Z",
+      "deployedAtIst": "23/09/2026, 12:21:15",
+      "committedAtIst": "23/09/2026, 12:20:38",
+      "vercelPreviewUrl": "https://connect-intel-9tdb15vm0-nee9raj-hues-projects.vercel.app",
+      "state": "READY",
+      "isCurrentProduction": false,
+      "notes": "",
+      "rollbackCommand": "npm run prod:rollback -- e9b1f99"
+    },
+    {
       "logId": "20260923-1219-9904199",
       "commit": "9904199",
       "commitFull": "9904199e1c4dd81256bab1a2ab47edacb4243ae9",
@@ -167,7 +195,7 @@
       "committedAtIst": "23/09/2026, 12:18:57",
       "vercelPreviewUrl": "https://connect-intel-f76u6pms9-nee9raj-hues-projects.vercel.app",
       "state": "READY",
-      "isCurrentProduction": true,
+      "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 9904199"
     },
@@ -408,34 +436,6 @@
       "isCurrentProduction": false,
       "notes": "",
       "rollbackCommand": "npm run prod:rollback -- 57299f2"
-    },
-    {
-      "logId": "20260922-1627-86e0474",
-      "commit": "86e0474",
-      "commitFull": "86e04742ae37800692390266d82b90ae4825e4b1",
-      "message": "Stop tag create/list from loading the full CRM store so reps and managers no longer time out.",
-      "deployedAt": "2026-09-22T10:57:05.601Z",
-      "deployedAtIst": "22/09/2026, 16:27:05",
-      "committedAtIst": "22/09/2026, 16:26:23",
-      "vercelPreviewUrl": "https://connect-intel-iy0mrfeyj-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- 86e0474"
-    },
-    {
-      "logId": "20260922-1620-f7f4bf0",
-      "commit": "f7f4bf0",
-      "commitFull": "f7f4bf01489b8040738f7514a2f48a6e3fe06c61",
-      "message": "Record production LIVE at b80aa92.",
-      "deployedAt": "2026-09-22T10:50:48.684Z",
-      "deployedAtIst": "22/09/2026, 16:20:48",
-      "committedAtIst": "22/09/2026, 16:20:12",
-      "vercelPreviewUrl": "https://connect-intel-ac5ewmv64-nee9raj-hues-projects.vercel.app",
-      "state": "READY",
-      "isCurrentProduction": false,
-      "notes": "",
-      "rollbackCommand": "npm run prod:rollback -- f7f4bf0"
     }
   ]
 }
