@@ -6,6 +6,16 @@
   "currentProductionCommit": "9904199",
   "safeVersions": [
     {
+      "code": "S-9904199",
+      "commit": "9904199",
+      "commitFull": "9904199e1c4dd81256bab1a2ab47edacb4243ae9",
+      "message": "Show every assigned lead when Pipeline is opened, including ERP-stage accounts.",
+      "note": "Healthy CRM snapshot before a later change",
+      "recordedAt": "2026-09-23T09:02:30.106Z",
+      "recordedAtIst": "23/09/2026, 14:32:30",
+      "rollbackCommand": "npm run prod:rollback -- S-9904199"
+    },
+    {
       "code": "S-5DDADA4",
       "commit": "5ddada4",
       "commitFull": "5ddada495974e64b19dcd67c6dba45ab92d69080",

@@ -565,7 +565,9 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     [canFilterByOwner, setPipelineAssigneeFilter]
   )
 
-  const serverSidePipeline = pipelineSummary.total > 120
+  // Owner filter must hit the server. The loaded team page is only the first 50 rows,
+  // so filtering that page locally hides the rest of the selected owner's book.
+  const serverSidePipeline = pipelineSummary.total > 120 || Boolean(effectiveAssigneeFilter)
 
   const scopedLeads = useMemo(() => {
     let base = marketingSliceLeads ?? pipelineScopedLeads
@@ -862,16 +864,19 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
 
   const pipelineFiltersBootRef = useRef(false)
   const lastServerFiltersRef = useRef('')
+  const ownerListFetchRef = useRef(false)
   useEffect(() => {
-    if (!serverSidePipeline) return undefined
+    const restoreTeamList = !effectiveAssigneeFilter && ownerListFetchRef.current
+    if (!serverSidePipeline && !restoreTeamList) return undefined
     const key = `${searchRetry}:${JSON.stringify(serverFilters)}`
     if (lastServerFiltersRef.current === key) return undefined
 
     const isInitialMount = !pipelineFiltersBootRef.current
     pipelineFiltersBootRef.current = true
+    ownerListFetchRef.current = Boolean(effectiveAssigneeFilter)
 
     // Workspace bootstrap loads unfiltered leads; only skip the first fetch when no filters apply.
-    if (isInitialMount && !hasActiveServerFilters) {
+    if (isInitialMount && !hasActiveServerFilters && !restoreTeamList) {
       lastServerFiltersRef.current = key
       return undefined
     }
@@ -896,7 +901,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       .finally(() => {
         if (requestGen === filterRequestGenRef.current) setFilterApplying(false)
       })
-  }, [serverSidePipeline, serverFilters, loadPipelineList, hasActiveServerFilters, isDealsView, searchRetry])
+  }, [serverSidePipeline, serverFilters, loadPipelineList, hasActiveServerFilters, isDealsView, searchRetry, effectiveAssigneeFilter])
 
   useEffect(() => {
     if (!serverSidePipeline || view !== 'board' || stageListMode || isDealsView) {
