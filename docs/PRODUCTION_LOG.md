@@ -18,7 +18,7 @@ That syncs Vercel deployments with git commits so you can **roll back** to any k
 2. Run the rollback command for that commit, for example:
 
 ```bash
-npm run prod:rollback -- 42c167a
+npm run prod:rollback -- 3e97c3b
 ```
 
 3. Wait until Vercel finishes (~30s). **connectintel.net** will serve that older build immediately.
@@ -35,8 +35,8 @@ npm run prod:rollback -- 42c167a
 | Field | Value |
 |-------|-------|
 | Domain | https://connectintel.net |
-| Commit | `202546c` |
-| Log updated (IST) | 23/09/2026, 09:52:01 |
+| Commit | `5ddada4` |
+| Log updated (IST) | 23/09/2026, 11:10:04 |
 
 ---
 
@@ -66,7 +66,9 @@ These are exact production builds to restore if a later change goes wrong. Tell 
 
 | Deployed (IST) | Commit | Message | Preview | Rollback command |
 |----------------|--------|---------|---------|------------------|
-| 23/09/2026, 09:51:35 | `202546c` | Remove the ERP Revenue and ERP Finance tabs from the lead record. | [preview](https://connect-intel-m078toltu-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 202546c` | **← LIVE**
+| 23/09/2026, 11:09:32 | `5ddada4` | Save overview stage changes, show notes on calls and meetings, and sync those meetings to the rep calendar. | [preview](https://connect-intel-ghnlk8ga1-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 5ddada4` | **← LIVE**
+| 23/09/2026, 09:52:43 | `3e97c3b` | Record production LIVE at 202546c. | [preview](https://connect-intel-dhapr8kf8-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 3e97c3b` |
+| 23/09/2026, 09:51:35 | `202546c` | Remove the ERP Revenue and ERP Finance tabs from the lead record. | [preview](https://connect-intel-m078toltu-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 202546c` |
 | 23/09/2026, 09:28:53 | `42c167a` | Record production LIVE at 6b439f4. | [preview](https://connect-intel-f8ejpmgq5-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 42c167a` |
 | 23/09/2026, 09:27:42 | `6b439f4` | Keep Pipeline owners aligned with the ERP sales owner when that person changes. | [preview](https://connect-intel-pqu3qz5ri-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 6b439f4` |
 | 22/09/2026, 21:43:32 | `9b9e1ca` | Record production LIVE at be998ec. | [preview](https://connect-intel-axjrkn2f6-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 9b9e1ca` |
@@ -84,8 +86,6 @@ These are exact production builds to restore if a later change goes wrong. Tell 
 | 22/09/2026, 16:20:48 | `f7f4bf0` | Record production LIVE at b80aa92. | [preview](https://connect-intel-ac5ewmv64-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- f7f4bf0` |
 | 22/09/2026, 16:19:19 | `b80aa92` | Let reps create personal CRM tags that only they and admins can use. | [preview](https://connect-intel-7f10oj4k7-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- b80aa92` |
 | 22/09/2026, 15:06:31 | `521977a` | Record production LIVE at 1cf3e1c. | [preview](https://connect-intel-6bqjaxsm3-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 521977a` |
-| 22/09/2026, 15:04:35 | `1cf3e1c` | Show Pipeline for reps whose Google login id is a duplicate of their CRM book. | [preview](https://connect-intel-9sqwdhk3z-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 1cf3e1c` |
-| 21/09/2026, 19:04:45 | `67b70cd` | Record production LIVE at 311ae71. | [preview](https://connect-intel-qmbhnyjtu-nee9raj-hues-projects.vercel.app) | `npm run prod:rollback -- 67b70cd` |
 
 ---
 
