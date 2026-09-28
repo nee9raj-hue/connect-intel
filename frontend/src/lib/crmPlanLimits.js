@@ -40,8 +40,10 @@ export const BUSINESS_PLAN = {
 export const XINDUS_PLAN = {
   id: 'xindus',
   label: 'Xindus',
-  maxSeats: 7,
-  maxLeads: 1000,
+  maxSeats: null,
+  maxLeads: null,
+  unlimitedSeats: true,
+  unlimitedLeads: true,
   priceInrPerMonth: 0,
   priceDisplay: 'Customer',
   customerOverride: true,

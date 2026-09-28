@@ -6,15 +6,15 @@ import { PrimaryButton, SettingsBadge, SettingsCard } from './SettingsUi'
 import { AI_PROSPECTING_IN_CRM_ENABLED, BILLING_IN_CRM_UI_ENABLED } from '../../../lib/crmProductFlags'
 import { ALL_PLANS, FREE_PLAN, getPlanById, PAID_PLANS } from '../../../lib/crmPlanLimits'
 
-function UsageBar({ label, used, total, warn }) {
-  const pct = total > 0 ? Math.min(100, Math.round((used / total) * 100)) : 0
+function UsageBar({ label, used, total, warn, unlimited = false }) {
+  const pct = !unlimited && total > 0 ? Math.min(100, Math.round((used / total) * 100)) : 0
   const barColor = warn ? '#c2410c' : C.accent
   return (
     <div style={{ marginBottom: 16 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 6 }}>
         <span style={{ color: C.textSecondary }}>{label}</span>
         <span style={{ color: warn ? '#c2410c' : C.textMuted }}>
-          {used.toLocaleString()} / {total.toLocaleString()} used
+          {used.toLocaleString()} / {unlimited ? 'Unlimited' : total.toLocaleString()} used
         </span>
       </div>
       <div style={{ height: 6, background: '#e8e8e6', borderRadius: 3, overflow: 'hidden' }}>
@@ -40,7 +40,7 @@ function CrmWorkspaceTab() {
       ? [user.upgradeQuote]
       : []
   const pendingPayment = user?.pendingPayment
-  const currentPlan = getPlanById(user?.planTier || planUsage?.planId || 'free')
+  const currentPlan = getPlanById(planUsage?.planId || user?.planTier || 'free')
   const isPaid = currentPlan.id !== 'free'
   const seats = planUsage?.seats ?? teamMembers.length
   const maxSeats = planUsage?.maxSeats ?? FREE_PLAN.maxSeats
@@ -100,8 +100,20 @@ function CrmWorkspaceTab() {
 
       <SettingsCard>
         <p style={{ fontSize: 14, fontWeight: 500, margin: '0 0 16px' }}>Usage</p>
-        <UsageBar label="Team seats" used={seats} total={maxSeats} warn={seatWarn} />
-        <UsageBar label="Pipeline leads" used={leads} total={maxLeads} warn={leadWarn} />
+        <UsageBar
+          label="Team seats"
+          used={seats}
+          total={maxSeats}
+          warn={seatWarn}
+          unlimited={Boolean(planUsage?.unlimitedSeats)}
+        />
+        <UsageBar
+          label="Pipeline leads"
+          used={leads}
+          total={maxLeads}
+          warn={leadWarn}
+          unlimited={Boolean(planUsage?.unlimitedLeads)}
+        />
         {!user?.isOrgAdmin && planUsage?.showUpgradePrompt ? (
           <p style={{ fontSize: 12, color: C.textMuted, margin: '8px 0 0' }}>
             Ask your workspace admin to confirm a plan upgrade if you need more capacity.
