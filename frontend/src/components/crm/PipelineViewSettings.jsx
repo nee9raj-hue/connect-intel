@@ -189,7 +189,7 @@ export default function PipelineViewSettings({
           <section className="hs-view-settings__section">
             <p className="hs-view-settings__section-label">Actions</p>
             <button type="button" className="hs-view-settings__row" onClick={onExport}>
-              <span>Export visible leads</span>
+              <span>Export filtered leads (Excel)</span>
             </button>
           </section>
         </div>

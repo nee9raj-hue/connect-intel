@@ -39,6 +39,7 @@ import {
 } from '../../lib/pipelineFilters'
 import { mergeTeamScopedTagFilters, consumeTeamScopedLeadTags, repFilterLiftsOwnerScope } from '../../../../lib/pipelineMemberVisibility.js'
 import { tagMapById } from '../../lib/orgLeadTags'
+import { downloadPipelineWorkbook } from '../../lib/pipelineExportWorkbook'
 import { leadHasCallablePhone } from '../../lib/phoneUtils'
 import LeadPhoneCall from './LeadPhoneCall'
 import { leadHasSendableEmail, getLeadEmail } from '../../lib/emailUtils'
@@ -567,7 +568,11 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
 
   // Owner filter must hit the server. The loaded team page is only the first 50 rows,
   // so filtering that page locally hides the rest of the selected owner's book.
-  const serverSidePipeline = pipelineSummary.total > 120 || Boolean(effectiveAssigneeFilter)
+  const searchLooksUpFullBook = String(appliedSearch || '').trim().length >= 2
+  // A name search must hit the server. Vivek's book is 93 leads, under the 120-row
+  // page cutoff, and DEE DEE EXPORTS is rank 82 — the loaded CRM page never contains it.
+  const serverSidePipeline =
+    pipelineSummary.total > 120 || Boolean(effectiveAssigneeFilter) || searchLooksUpFullBook
 
   const scopedLeads = useMemo(() => {
     let base = marketingSliceLeads ?? pipelineScopedLeads
@@ -750,12 +755,17 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       status:
         (adv.statusIds || []).length
           ? undefined
-          : filter !== 'all'
-            ? filter
-            : listStatusFilter !== 'all'
+          : String(q || '').trim().length >= 2
+            ? listStatusFilter !== 'all'
               ? listStatusFilter
-              : undefined,
-      pipelineTrack: pipelineTrack || undefined,
+              : undefined
+            : filter !== 'all'
+              ? filter
+              : listStatusFilter !== 'all'
+                ? listStatusFilter
+                : undefined,
+      pipelineTrack:
+        String(q || '').trim().length >= 2 ? undefined : pipelineTrack || undefined,
       q: q || undefined,
       cities: getFilterCities(adv).length ? getFilterCities(adv) : undefined,
       states: getFilterStates(adv).length ? getFilterStates(adv) : undefined,
@@ -865,15 +875,18 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
   const pipelineFiltersBootRef = useRef(false)
   const lastServerFiltersRef = useRef('')
   const ownerListFetchRef = useRef(false)
+  const searchListFetchRef = useRef(false)
   useEffect(() => {
     const restoreTeamList = !effectiveAssigneeFilter && ownerListFetchRef.current
-    if (!serverSidePipeline && !restoreTeamList) return undefined
+    const restoreAfterSearch = !searchLooksUpFullBook && searchListFetchRef.current
+    if (!serverSidePipeline && !restoreTeamList && !restoreAfterSearch) return undefined
     const key = `${searchRetry}:${JSON.stringify(serverFilters)}`
     if (lastServerFiltersRef.current === key) return undefined
 
     const isInitialMount = !pipelineFiltersBootRef.current
     pipelineFiltersBootRef.current = true
     ownerListFetchRef.current = Boolean(effectiveAssigneeFilter)
+    searchListFetchRef.current = searchLooksUpFullBook
 
     // Workspace bootstrap loads unfiltered leads; only skip the first fetch when no filters apply.
     if (isInitialMount && !hasActiveServerFilters && !restoreTeamList) {
@@ -901,7 +914,7 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       .finally(() => {
         if (requestGen === filterRequestGenRef.current) setFilterApplying(false)
       })
-  }, [serverSidePipeline, serverFilters, loadPipelineList, hasActiveServerFilters, isDealsView, searchRetry, effectiveAssigneeFilter])
+  }, [serverSidePipeline, serverFilters, loadPipelineList, hasActiveServerFilters, isDealsView, searchRetry, effectiveAssigneeFilter, searchLooksUpFullBook])
 
   useEffect(() => {
     if (!serverSidePipeline || view !== 'board' || stageListMode || isDealsView) {
@@ -972,8 +985,12 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       }
     )
     return applyPipelineFilters(base, {
-      status: pipelineStatusFilter,
-      pipelineTrack,
+      status: searchLooksUpFullBook
+        ? listStatusFilter !== 'all'
+          ? listStatusFilter
+          : 'all'
+        : pipelineStatusFilter,
+      pipelineTrack: searchLooksUpFullBook ? '' : pipelineTrack,
       cities: serverLocationFilter ? [] : getFilterCities(appliedAdvanced),
       states: serverLocationFilter ? [] : getFilterStates(appliedAdvanced),
       contact: appliedAdvanced.contact,
@@ -1035,6 +1052,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     serverFilters.states,
     serverFilters.cities,
     pipelineTrack,
+    searchLooksUpFullBook,
+    listStatusFilter,
     orgLeadTags,
     memberTeamIdsForTags,
     isOrgAdmin,
@@ -1089,7 +1108,9 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
       search: appliedSearch,
       lastShipmentLabel: lastShipmentPeriodLabel(appliedAdvanced),
     })
-    if (!statusLabel && !stageListMode && listStatusFilter === 'all') {
+    if (searchLooksUpFullBook && listStatusFilter === 'all' && !(appliedAdvanced.statusIds || []).length) {
+      parts.push('All assigned leads')
+    } else if (!statusLabel && !stageListMode && listStatusFilter === 'all') {
       if (freightOrg && pipelineTrack === 'crm') parts.push('CRM leads')
       else if (freightOrg && pipelineTrack === 'erp') parts.push('ERP accounts')
       else parts.push('All leads')
@@ -1528,24 +1549,19 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
     [pipelineLoad.total, pipelineSummary.total, filtered.length]
   )
 
-  const useServerPipelineExport =
-    serverSidePipeline || exportRowCount > filtered.length || hasActiveServerFilters
-
   const performPipelineExport = useCallback(async () => {
     if (!canExportLeads) {
       setBulkNotice('Export is disabled for your role. Ask your admin in Team → Permissions.')
       return
     }
-    if (useServerPipelineExport) {
-      try {
-        await api.exportPipelineReport(serverFilters, { timeoutMs: 120_000 })
-      } catch (e) {
-        setBulkNotice(e.message || 'Export failed')
-      }
-      return
+    try {
+      const result = await api.exportPipelineWorkbook(serverFilters, { timeoutMs: 120_000 })
+      downloadPipelineWorkbook(result)
+      setBulkNotice(`Exported ${result.rowCount || 0} filtered leads with a separate Deals sheet.`)
+    } catch (e) {
+      setBulkNotice(e.message || 'Export failed')
     }
-    downloadLeadsCsv(filtered)
-  }, [canExportLeads, useServerPipelineExport, serverFilters, filtered, downloadLeadsCsv])
+  }, [canExportLeads, serverFilters])
 
   const runSavedReportExport = useCallback(
     async (report) => {

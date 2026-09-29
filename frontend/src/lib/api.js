@@ -1098,6 +1098,24 @@ export const api = {
     const rowCount = Number(response.headers.get('X-Export-Row-Count') || 0)
     return { ok: true, rowCount }
   },
+  exportPipelineWorkbook: async (serverFilters = {}, options = {}) => {
+    const params = buildPipelineExportQuery(serverFilters, options)
+    params.set('format', 'workbook')
+    const token = getSessionToken()
+    const response = await fetchWithTimeout(
+      `/api/reports/pipeline-export?${params.toString()}`,
+      {
+        credentials: 'same-origin',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      },
+      options.timeoutMs ?? 120_000
+    )
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}))
+      throw new Error(data.error || data.message || 'Export failed')
+    }
+    return response.json()
+  },
   exportPipelineFunnelReport: async (serverFilters = {}, options = {}) => {
     const params = buildPipelineExportQuery(serverFilters, options)
     const token = getSessionToken()
