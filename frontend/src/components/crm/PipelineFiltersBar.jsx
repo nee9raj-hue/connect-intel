@@ -90,6 +90,8 @@ export default function PipelineFiltersBar({
   canSaveReport = false,
   onSaveReport,
   onRunSavedReport,
+  canExportLeads = false,
+  onExportLeads,
   canExportFunnel = false,
   onExportFunnel,
   canShowOwnerFilter = false,
@@ -904,9 +906,9 @@ export default function PipelineFiltersBar({
               Save as report
             </button>
           )}
-          {canExportFunnel ? (
-            <button type="button" className="crm-filter-link-btn" onClick={onExportFunnel}>
-              Export funnel CSV
+          {canExportLeads ? (
+            <button type="button" className="crm-filter-link-btn" onClick={onExportLeads}>
+              Export filtered leads (Excel)
             </button>
           ) : (
             <button
@@ -915,7 +917,21 @@ export default function PipelineFiltersBar({
               disabled
               title="You don't have access to this"
             >
-              Export funnel CSV
+              Export filtered leads (Excel)
+            </button>
+          )}
+          {canExportFunnel ? (
+            <button type="button" className="crm-filter-link-btn" onClick={onExportFunnel}>
+              Export funnel summary (CSV)
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="crm-filter-link-btn is-locked"
+              disabled
+              title="You don't have access to this"
+            >
+              Export funnel summary (CSV)
             </button>
           )}
           {appliedSearch && (

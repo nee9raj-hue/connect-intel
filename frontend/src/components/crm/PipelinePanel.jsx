@@ -1817,6 +1817,8 @@ export default function PipelinePanel({ onNavigate, panelOptions }) {
               canSaveReport={canSaveAsAudience}
               onSaveReport={() => setSaveReportOpen(true)}
               onRunSavedReport={runSavedReportExport}
+              canExportLeads={canExportLeads}
+              onExportLeads={() => void performPipelineExport()}
               canExportFunnel={canExportLeads}
               onExportFunnel={() => void runFunnelExport()}
               canShowOwnerFilter={canFilterByOwner}
