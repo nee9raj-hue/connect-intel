@@ -3,6 +3,7 @@
 export const MARKETING_HUB_TABS = [
   { id: 'overview', label: 'Home', short: 'Home' },
   { id: 'campaigns', label: 'Campaigns', short: 'Camp' },
+  { id: 'outreach', label: 'Outreach', short: 'Out' },
   { id: 'templates', label: 'Email templates', short: 'Tpl' },
   { id: 'automations', label: 'Automations', short: 'Auto' },
   { id: 'forms', label: 'Forms', short: 'Form' },

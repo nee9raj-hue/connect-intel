@@ -743,6 +743,15 @@ export const api = {
       timeoutMs: opts.timeoutMs ?? 60_000,
     })
   },
+  getOutreach: () => request('/api/marketing/outreach'),
+  importOutreachProspects: (prospects) =>
+    request('/api/marketing/outreach', { method: 'POST', body: { action: 'import', prospects } }),
+  addOutreachMailbox: (payload) =>
+    request('/api/marketing/outreach', { method: 'POST', body: { action: 'add_mailbox', ...payload } }),
+  updateOutreachProspect: (payload) =>
+    request('/api/marketing/outreach', { method: 'PATCH', body: payload }),
+  transferOutreachProspect: (id) =>
+    request('/api/marketing/outreach', { method: 'POST', body: { action: 'transfer', id } }),
   getMarketingCampaignReport: (campaignId) =>
     request(`/api/marketing/campaigns?campaignId=${encodeURIComponent(campaignId)}`, {
       timeoutMs: 90_000,

@@ -45,6 +45,7 @@ import {
 import { campaignToEditForm } from '../../lib/marketingCampaignChecklist'
 import MarketingDomainsPanel from './MarketingDomainsPanel'
 import MarketingFeedsPanel from './MarketingFeedsPanel'
+import OutreachPanel from './OutreachPanel'
 import PanelGuideModal from '../guides/PanelGuideModal'
 import {
   marketingGuideStepsForUser,
@@ -138,7 +139,7 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
 
   const isBuilderTab = tab === 'campaigns' || tab === 'templates'
   const hideMarketingKpis =
-    isBuilderTab || tab === 'analytics' || tab === 'audiences' || tab === 'overview' || tab === 'assets'
+    isBuilderTab || tab === 'analytics' || tab === 'audiences' || tab === 'overview' || tab === 'outreach' || tab === 'assets'
   const campaignReportId = panelOptions?.report || null
 
   const hideMarketingHeader =
@@ -1434,7 +1435,9 @@ export default function MarketingPanel({ onNavigate, panelOptions, activePanel, 
             </>
           }
         >
-          {tab === 'overview' ? (
+      {tab === 'outreach' ? (
+        <OutreachPanel user={user} />
+      ) : tab === 'overview' ? (
             <MarketingOverviewTab
               onNavigate={onNavigate}
               reportCampaigns={reportCampaigns}
