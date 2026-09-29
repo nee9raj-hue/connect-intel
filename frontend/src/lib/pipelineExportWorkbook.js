@@ -23,7 +23,10 @@ export function downloadPipelineWorkbook(data) {
   )
   XLSX.utils.book_append_sheet(
     workbook,
-    worksheet(data.dealRows || [], ['Lead name', 'Company', 'Lead owner', 'Deal', 'Stage', 'Amount', 'Currency', 'Expected close', 'Query received', 'Rates quoted', 'Booked', 'Won', 'Lost', 'Updated', 'Notes']),
+    worksheet(
+      data.dealRows || [],
+      ['Lead name', 'Company', 'Lead owner', 'Deal', 'Stage', 'Freight', 'Revenue', 'Currency', 'Type', 'Mode', 'Route / lane', 'Gross weight', 'Invoice amount', 'Expected close', 'Query received', 'Rates quoted', 'Booked', 'Won', 'Lost', 'Updated', 'Notes']
+    ),
     'Deals'
   )
   XLSX.writeFile(workbook, 'pipeline-export.xlsx')
